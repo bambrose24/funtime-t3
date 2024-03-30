@@ -1,16 +1,23 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 import { env } from "~/env";
-import { createServerClient, type CookieOptions } from "@supabase/ssr";
-import { type cookies } from "next/headers";
+import {
+  createServerClient as supabaseCreateServerClient,
+  type CookieOptions,
+} from "@supabase/ssr";
+import { cookies } from "next/headers";
 
-export const createClient = (cookieStore: ReturnType<typeof cookies>) => {
-  return createServerClient(
+export const supabaseServer = () => {
+  const cookieStore = cookies();
+  return supabaseCreateServerClient(
     env.NEXT_PUBLIC_SUPABASE_URL,
     env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
     {
       cookies: {
         get(name: string) {
-          return cookieStore.get(name)?.value;
+          console.log(`trying to get cookie with name ${name}`);
+          const res = cookieStore.get(name)?.value;
+          console.log(`got cookie value ${res} for name ${name}`);
+          return res;
         },
         set(name: string, value: string, options: CookieOptions) {
           try {

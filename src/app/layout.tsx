@@ -7,6 +7,7 @@ import type { Metadata } from "next";
 import { ThemeProvider } from "../components/theme-provider";
 import { cn } from "~/lib/utils";
 import { Toaster } from "~/components/ui/sonner";
+import { Nav } from "./(nav)/nav";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -30,10 +31,11 @@ export default function RootLayout({
         <TRPCReactProvider>
           <ThemeProvider
             attribute="class"
-            defaultTheme="dark"
+            defaultTheme="light"
             enableSystem
             disableTransitionOnChange
           >
+            <Nav />
             {children}
             <Toaster />
           </ThemeProvider>
