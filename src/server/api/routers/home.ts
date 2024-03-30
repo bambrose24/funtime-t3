@@ -8,8 +8,7 @@ export const homeRouter = createTRPCRouter({
     .query(async ({ input, ctx }) => {
       const { season } = input;
       const { db } = ctx;
-      const games = await db.games.findMany({ where: { season } });
-      console.log(`found ${games.length} for season ${season}`);
+      const games = await db.games.count({ where: { season } });
       return games;
     }),
 });
