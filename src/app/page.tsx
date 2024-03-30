@@ -1,4 +1,4 @@
-import { AppConfigDynamic } from "next/dist/build/utils";
+import { type AppConfigDynamic } from "next/dist/build/utils";
 import { api } from "~/trpc/server";
 
 // Almost all of the Funtime pages will need this
@@ -9,7 +9,7 @@ export default async function Home() {
   console.log("how many games in Home page?", gamesCount);
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#2e026d] to-[#15162c] text-white">
+    <main className="h-full w-full">
       <div className="w-full justify-center">{gamesCount} games!</div>
     </main>
   );
