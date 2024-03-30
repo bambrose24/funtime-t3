@@ -4,30 +4,12 @@ import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 
 export const homeRouter = createTRPCRouter({
   summary: publicProcedure
-    .input(z.object({ text: z.string() }))
-    .query(({ input }) => {
-      return {
-        greeting: `Hello ${input.text}`,
-      };
+    .input(z.object({ season: z.number() }))
+    .query(async ({ input, ctx }) => {
+      const { season } = input;
+      const { db } = ctx;
+      const games = await db.games.findMany({ where: { season } });
+      console.log(`found ${games.length} for season ${season}`);
+      return games;
     }),
-
-  create: publicProcedure
-    .input(z.object({ name: z.string().min(1) }))
-    .mutation(async ({ ctx, input }) => {
-      // simulate a slow db call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      const result = await ctx.db.games.findMany({
-        where: {
-          season: { equals: 2023 },
-        },
-      });
-      console;
-    }),
-
-  getLatest: publicProcedure.query(({ ctx }) => {
-    return ctx.db.post.findFirst({
-      orderBy: { createdAt: "desc" },
-    });
-  }),
 });
