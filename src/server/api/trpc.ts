@@ -7,7 +7,6 @@
  * need to use are documented accordingly near the end.
  */
 import { initTRPC } from "@trpc/server";
-import { cookies } from "next/headers";
 import superjson from "superjson";
 import { ZodError } from "zod";
 
@@ -27,15 +26,10 @@ import { supabaseServer } from "~/utils/supabase/server";
  * @see https://trpc.io/docs/server/context
  */
 export const createTRPCContext = async (opts: { headers: Headers }) => {
-  const cookieStore = cookies();
-  const supabase = supabaseServer(cookieStore);
-  const token = cookieStore.get("supabase-auth-token");
-  console.log("supabase-auth-token?", token);
+  const supabase = supabaseServer();
   const {
     data: { user: supabaseUser },
   } = await supabase.auth.getUser();
-
-  console.log("createTRPCContext", { supabaseUser });
 
   let dbUser = null;
   if (supabaseUser) {

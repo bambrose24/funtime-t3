@@ -1,6 +1,5 @@
 import { supabaseServer } from "~/utils/supabase/server";
 import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
 
 export async function GET(request: Request) {
   console.log("in auth callback GET");
@@ -9,8 +8,7 @@ export async function GET(request: Request) {
   console.log("code?", code);
 
   if (code) {
-    const cookieStore = cookies();
-    const supabase = supabaseServer(cookieStore);
+    const supabase = supabaseServer();
     await supabase.auth.exchangeCodeForSession(code);
   }
 
