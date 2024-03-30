@@ -11,8 +11,6 @@ export const createClient = (request: NextRequest) => {
     },
   });
 
-  // hi
-
   const supabase = createServerClient(
     env.NEXT_PUBLIC_SUPABASE_URL,
     env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
