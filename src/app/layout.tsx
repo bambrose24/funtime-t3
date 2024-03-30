@@ -6,6 +6,7 @@ import { TRPCReactProvider } from "~/trpc/react";
 import type { Metadata } from "next";
 import { ThemeProvider } from "../components/theme-provider";
 import { cn } from "~/lib/utils";
+import { Toaster } from "~/components/ui/sonner";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -34,6 +35,7 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             {children}
+            <Toaster />
           </ThemeProvider>
         </TRPCReactProvider>
       </body>
