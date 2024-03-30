@@ -5,7 +5,7 @@ import { createClient } from "~/utils/supabase/middleware";
 export async function middleware(request: NextRequest) {
   const { supabase, response } = createClient(request);
 
-  await supabase.auth.getSession();
+  await supabase.auth.getUser();
 
   return response;
 }
