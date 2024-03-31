@@ -24,6 +24,9 @@ import { type serverApi } from "~/trpc/server";
 import { clientSupabase } from "~/utils/supabase/client";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { useTheme } from "next-themes";
+import { Label } from "~/components/ui/label";
+import { Switch } from "~/components/ui/switch";
 
 type NavData = {
   data: Awaited<ReturnType<(typeof serverApi)["home"]["nav"]>>;
@@ -36,6 +39,7 @@ async function logout() {
 
 export function ClientNav(props: NavData) {
   const router = useRouter();
+  const { theme, setTheme } = useTheme();
   const user = props.data?.dbUser;
   return (
     <div className="flex w-full flex-col">
@@ -80,6 +84,26 @@ export function ClientNav(props: NavData) {
                     <div className="flex w-full flex-row items-center justify-between">
                       <Text.Small>Log Out</Text.Small>
                       <ExitIcon />
+                    </div>
+                  </MenubarItem>
+                  <MenubarItem
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setTheme((prev) => {
+                        if (prev === "dark") return "light";
+                        if (prev === "light") return "dark";
+                        return prev;
+                      });
+                    }}
+                  >
+                    <div className="flex w-full flex-row items-center justify-between">
+                      <Label htmlFor="dark-mode-toggle">
+                        <Text.Small>Dark Mode</Text.Small>
+                      </Label>
+                      <Switch
+                        id="dark-mode-toggle"
+                        checked={theme === "dark"}
+                      />
                     </div>
                   </MenubarItem>
                 </MenubarContent>
