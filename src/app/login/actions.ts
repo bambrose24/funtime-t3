@@ -2,20 +2,15 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { loginSchema } from "~/lib/schemas/auth";
 import { supabaseServer } from "~/utils/supabase/server";
 
 export async function login(formData: FormData) {
-  console.log("formData?", formData);
   const supabase = supabaseServer();
 
-  // type-casting here for convenience
-  // in practice, you should validate your inputs
-  const data = {
-    email: formData.get("email") as string,
-    password: formData.get("password") as string,
-  };
+  const { email, password } = loginSchema.parse(formData);
 
-  const { error } = await supabase.auth.signInWithPassword(data);
+  const { error } = await supabase.auth.signInWithPassword({ email, password });
 
   if (error) {
     redirect("/error");

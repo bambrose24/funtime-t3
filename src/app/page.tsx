@@ -1,15 +1,27 @@
 import { type AppConfigDynamic } from "next/dist/build/utils";
+import { HomeLeagueCard } from "~/components/home/HomeLeagueCard";
 import { serverApi } from "~/trpc/server";
+
+type LeagueCardData = NonNullable<
+  Awaited<ReturnType<(typeof serverApi)["home"]["summary"]>>
+>[number];
 
 // Almost all of the Funtime pages will need this
 export const dynamic: AppConfigDynamic = "force-dynamic";
 
 export default async function Home() {
-  const gamesCount = await serverApi.home.summary({ season: 2023 });
+  const data = await serverApi.home.summary({ season: 2023 });
 
   return (
-    <main className="h-full w-full">
-      <div className="w-full justify-center">{gamesCount} games!</div>
+    <main className="h-full w-full px-3">
+      <div className="flex w-full flex-row flex-wrap gap-4 py-4">
+        {data?.map((d) => {
+          if (!d) {
+            return null;
+          }
+          return <HomeLeagueCard key={d.league_id} data={d} />;
+        })}
+      </div>
     </main>
   );
 }

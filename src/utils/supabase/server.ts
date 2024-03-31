@@ -14,9 +14,7 @@ export const supabaseServer = () => {
     {
       cookies: {
         get(name: string) {
-          console.log(`trying to get cookie with name ${name}`);
           const res = cookieStore.get(name)?.value;
-          console.log(`got cookie value ${res} for name ${name}`);
           return res;
         },
         set(name: string, value: string, options: CookieOptions) {
