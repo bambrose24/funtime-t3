@@ -37,6 +37,9 @@ async function logout() {
   await clientSupabase.auth.signOut();
 }
 
+/**
+ * TODO model the top right after Vercel
+ */
 export function ClientNav(props: NavData) {
   const router = useRouter();
   const { theme, setTheme } = useTheme();
@@ -90,8 +93,12 @@ export function ClientNav(props: NavData) {
                     onClick={(e) => {
                       e.preventDefault();
                       setTheme((prev) => {
-                        if (prev === "dark") return "light";
-                        if (prev === "light") return "dark";
+                        if (prev === "dark") {
+                          return "light";
+                        }
+                        if (prev === "light") {
+                          return "dark";
+                        }
                         return prev;
                       });
                     }}
