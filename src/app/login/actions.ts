@@ -8,7 +8,10 @@ import { supabaseServer } from "~/utils/supabase/server";
 export async function login(formData: FormData) {
   const supabase = supabaseServer();
 
-  const { email, password } = loginSchema.parse(formData);
+  const { email, password } = loginSchema.parse({
+    email: formData.get("email"),
+    password: formData.get("password"),
+  });
 
   const { error } = await supabase.auth.signInWithPassword({ email, password });
 
