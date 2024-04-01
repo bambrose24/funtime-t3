@@ -33,6 +33,36 @@ export const homeRouter = createTRPCRouter({
             in: dbUser.leaguemembers.map((m) => m.league_id),
           },
         },
+        orderBy: {
+          season: "desc",
+        },
+        include: {
+          WeekWinners: {
+            where: {
+              membership_id: {
+                in: dbUser.leaguemembers.map((m) => m.membership_id),
+              },
+            },
+            select: {
+              correct_count: true,
+              week: true,
+            },
+          },
+          leaguemembers: {
+            where: {
+              membership_id: {
+                in: dbUser.leaguemembers.map((m) => m.membership_id),
+              },
+            },
+            include: {
+              picks: {
+                select: {
+                  correct: true,
+                },
+              },
+            },
+          },
+        },
       });
       return leagues;
     }),
