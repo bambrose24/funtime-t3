@@ -20,7 +20,6 @@ import {
 import { Separator } from "~/components/ui/separator";
 import { Text } from "~/components/ui/text";
 import { type serverApi } from "~/trpc/server";
-import { clientSupabase } from "~/utils/supabase/client";
 import { useTheme } from "next-themes";
 import {
   DropdownMenu,
@@ -100,9 +99,9 @@ export function ClientNav(props: NavData) {
                       <ThemeToggler />
                     </MenuRow>
                   </DropdownMenuItem>
-                  <DropdownMenuItem>Subscription</DropdownMenuItem>
 
                   <DropdownMenuSeparator />
+
                   <DropdownMenuItem
                     className="cursor-pointer"
                     onClick={async () => {
