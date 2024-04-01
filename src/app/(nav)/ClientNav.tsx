@@ -34,21 +34,17 @@ import {
 } from "~/components/ui/dropdown-menu";
 import { capitalize } from "lodash";
 import { type IconProps } from "@radix-ui/react-icons/dist/types";
+import { useLogout } from "../(auth)/auth/useLogout";
 
 type NavData = {
   data: Awaited<ReturnType<(typeof serverApi)["home"]["nav"]>>;
 };
 
-async function logout() {
-  console.log("signing out...");
-  const response = await clientSupabase.auth.signOut();
-  console.log("sign out response?", response);
-}
-
 /**
  * TODO model the top right after Vercel
  */
 export function ClientNav(props: NavData) {
+  const logout = useLogout();
   const user = props.data?.dbUser;
   return (
     <div className="flex w-full flex-col">

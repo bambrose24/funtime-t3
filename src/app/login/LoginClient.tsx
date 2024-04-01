@@ -1,5 +1,6 @@
 "use client";
 
+import { Loader2 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Card, CardContent, CardHeader } from "~/components/ui/card";
@@ -9,13 +10,14 @@ import { Input } from "~/components/ui/input";
 import { Button } from "~/components/ui/button";
 import { Text } from "~/components/ui/text";
 import { login } from "./actions";
+import { useFormState, useFormStatus } from "react-dom";
 
 type LoginFormType = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
   const {
     register,
-    formState: { errors },
+    formState: { errors, isLoading, isSubmitting },
   } = useForm<LoginFormType>({
     resolver: zodResolver(loginSchema),
   });
@@ -41,17 +43,27 @@ export default function LoginPage() {
                 </span>
               )}
               <div className="pt-4" />
-              <Button
-                className="w-full"
-                formAction={login}
-                disabled={Boolean(errors.email) || Boolean(errors.password)}
-              >
-                Login
-              </Button>
+              <LoginButton
+                hasErrors={Boolean(errors.email) || Boolean(errors.password)}
+              />
             </form>
           </div>
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+function LoginButton({ hasErrors }: { hasErrors: boolean }) {
+  const { pending } = useFormStatus();
+  return (
+    <Button
+      className="w-full"
+      formAction={login}
+      disabled={hasErrors || pending}
+    >
+      {pending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+      Login
+    </Button>
   );
 }
