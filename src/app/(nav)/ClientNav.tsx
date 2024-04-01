@@ -3,30 +3,37 @@
 import Link from "next/link";
 import { Button } from "~/components/ui/button";
 import {
-  Menubar,
-  MenubarTrigger,
-  MenubarContent,
-  MenubarItem,
-  MenubarMenu,
-} from "~/components/ui/menubar";
-import {
   NavigationMenu,
   NavigationMenuContent,
   NavigationMenuItem,
   NavigationMenuList,
   NavigationMenuTrigger,
 } from "~/components/ui/navigation-menu";
-import { ExitIcon } from "@radix-ui/react-icons";
+import {
+  DesktopIcon,
+  ExitIcon,
+  GearIcon,
+  MoonIcon,
+  SunIcon,
+} from "@radix-ui/react-icons";
 
 import { Separator } from "~/components/ui/separator";
 import { Text } from "~/components/ui/text";
 import { type serverApi } from "~/trpc/server";
 import { clientSupabase } from "~/utils/supabase/client";
-import { useRouter } from "next/navigation";
-import { toast } from "sonner";
 import { useTheme } from "next-themes";
-import { Label } from "~/components/ui/label";
-import { Switch } from "~/components/ui/switch";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "~/components/ui/dropdown-menu";
+import { capitalize } from "lodash";
+import { type IconProps } from "@radix-ui/react-icons/dist/types";
 
 type NavData = {
   data: Awaited<ReturnType<(typeof serverApi)["home"]["nav"]>>;
@@ -34,15 +41,14 @@ type NavData = {
 
 async function logout() {
   console.log("signing out...");
-  await clientSupabase.auth.signOut();
+  const response = await clientSupabase.auth.signOut();
+  console.log("sign out response?", response);
 }
 
 /**
  * TODO model the top right after Vercel
  */
 export function ClientNav(props: NavData) {
-  const router = useRouter();
-  const { theme, setTheme } = useTheme();
   const user = props.data?.dbUser;
   return (
     <div className="flex w-full flex-col">
@@ -51,7 +57,7 @@ export function ClientNav(props: NavData) {
           <NavigationMenuList>
             <NavigationMenuItem>
               <NavigationMenuTrigger>My Leagues</NavigationMenuTrigger>
-              <NavigationMenuContent>
+              <NavigationMenuContent className="flex min-w-[400px] flex-col gap-4 p-2">
                 {props.data?.leagues.map((l) => {
                   if (!l) {
                     return null;
@@ -59,7 +65,7 @@ export function ClientNav(props: NavData) {
                   return (
                     <div
                       key={`my_leagues_nav_${l.league_id}`}
-                      className="flex w-[200px] flex-row justify-between"
+                      className="flex flex-row justify-between"
                     >
                       <Text.Body>{l.name}</Text.Body>
                     </div>
@@ -71,51 +77,50 @@ export function ClientNav(props: NavData) {
         </NavigationMenu>
         {user ? (
           <div className="flex flex-row items-center">
-            <Menubar>
-              <MenubarMenu>
-                <MenubarTrigger>
-                  {user ? user.username : "Login"}
-                </MenubarTrigger>
-                <MenubarContent className="min-w-[200px]">
-                  <MenubarItem
-                    onClick={async (e) => {
+            {!user ? (
+              <LoginButton />
+            ) : (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline">{user.username}</Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="py-2">
+                  <div className="flex w-full flex-col items-start gap-1 px-2 py-2">
+                    <p className="text-sm font-semibold">{user.username}</p>
+                    <p className="text-sm">{user.email}</p>
+                  </div>
+
+                  <DropdownMenuSeparator />
+
+                  <DropdownMenuItem>
+                    <MenuRow>
+                      Settings
+                      <GearIcon />
+                    </MenuRow>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <MenuRow>
+                      Theme
+                      <ThemeToggler />
+                    </MenuRow>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>Subscription</DropdownMenuItem>
+
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    className="cursor-pointer"
+                    onClick={async () => {
                       await logout();
-                      toast.success("You are now logged out.");
-                      router.push("/login");
                     }}
                   >
-                    <div className="flex w-full flex-row items-center justify-between">
-                      <Text.Small>Log Out</Text.Small>
+                    <MenuRow>
+                      Log Out
                       <ExitIcon />
-                    </div>
-                  </MenubarItem>
-                  <MenubarItem
-                    onClick={(e) => {
-                      e.preventDefault();
-                      setTheme((prev) => {
-                        if (prev === "dark") {
-                          return "light";
-                        }
-                        if (prev === "light") {
-                          return "dark";
-                        }
-                        return prev;
-                      });
-                    }}
-                  >
-                    <div className="flex w-full flex-row items-center justify-between">
-                      <Label htmlFor="dark-mode-toggle">
-                        <Text.Small>Dark Mode</Text.Small>
-                      </Label>
-                      <Switch
-                        id="dark-mode-toggle"
-                        checked={theme === "dark"}
-                      />
-                    </div>
-                  </MenubarItem>
-                </MenubarContent>
-              </MenubarMenu>
-            </Menubar>
+                    </MenuRow>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
           </div>
         ) : (
           <div className="flex h-full flex-col justify-center">
@@ -128,4 +133,75 @@ export function ClientNav(props: NavData) {
       <Separator />
     </div>
   );
+}
+
+function MenuRow({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="flex w-full flex-row items-center justify-between gap-3">
+      {children}
+    </div>
+  );
+}
+
+function LoginButton() {
+  return (
+    <Link href="/login">
+      <Button>Login</Button>
+    </Link>
+  );
+}
+
+type ThemeChoice = "dark" | "light" | "system";
+
+function ThemeToggler() {
+  const { theme, setTheme } = useTheme();
+
+  const themeResult = theme as ThemeChoice;
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline" size="sm">
+          {capitalize(themeResult)}{" "}
+          <ThemeIcon className="ml-2" theme={themeResult} />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="w-56">
+        <DropdownMenuLabel>Select Theme</DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuRadioGroup
+          value={themeResult}
+          onValueChange={(value) => {
+            setTheme(value);
+            // https://github.com/shadcn-ui/ui/issues/468
+            setTimeout(() => (document.body.style.pointerEvents = ""), 500);
+          }}
+        >
+          <DropdownMenuRadioItem value="light" className="flex flex-row gap-2">
+            <ThemeIcon theme="light" />
+            Light
+          </DropdownMenuRadioItem>
+          <DropdownMenuRadioItem value="dark" className="flex flex-row gap-2">
+            <ThemeIcon theme="dark" />
+            Dark
+          </DropdownMenuRadioItem>
+          <DropdownMenuRadioItem value="system" className="flex flex-row gap-2">
+            <ThemeIcon theme="system" />
+            System
+          </DropdownMenuRadioItem>
+        </DropdownMenuRadioGroup>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
+
+function ThemeIcon({ theme, ...props }: { theme: ThemeChoice } & IconProps) {
+  switch (theme) {
+    case "light":
+      return <SunIcon {...props} />;
+    case "dark":
+      return <MoonIcon {...props} />;
+    case "system":
+      return <DesktopIcon {...props} />;
+  }
 }
