@@ -12,6 +12,6 @@ export function useLogout() {
     if (error) {
       throw error;
     }
-    router.refresh();
+    router.push("/login");
   }, [router]);
 }

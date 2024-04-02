@@ -1,7 +1,7 @@
 "use client";
 
 import { Loader2 } from "lucide-react";
-import { useForm } from "react-hook-form";
+import { useForm, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Card, CardContent, CardHeader } from "~/components/ui/card";
 import { loginSchema } from "~/lib/schemas/auth";
@@ -10,14 +10,15 @@ import { Input } from "~/components/ui/input";
 import { Button } from "~/components/ui/button";
 import { Text } from "~/components/ui/text";
 import { login } from "./actions";
-import { useFormState, useFormStatus } from "react-dom";
+import { useFormStatus } from "react-dom";
+import { useRouter } from "next/navigation";
 
 type LoginFormType = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
   const {
     register,
-    formState: { errors, isLoading, isSubmitting },
+    formState: { errors },
   } = useForm<LoginFormType>({
     resolver: zodResolver(loginSchema),
   });
@@ -46,6 +47,8 @@ export default function LoginPage() {
               <LoginButton
                 hasErrors={Boolean(errors.email) || Boolean(errors.password)}
               />
+              <div className="pt-2" />
+              <ForgotPasswordButton />
             </form>
           </div>
         </CardContent>
@@ -64,6 +67,23 @@ function LoginButton({ hasErrors }: { hasErrors: boolean }) {
     >
       {pending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
       Login
+    </Button>
+  );
+}
+
+function ForgotPasswordButton() {
+  const { pending } = useFormStatus();
+  const router = useRouter();
+  return (
+    <Button
+      className="w-full"
+      variant="outline"
+      onClick={(e) => {
+        e.preventDefault();
+        router.push("/forgot-password");
+      }}
+    >
+      Forgot Password?
     </Button>
   );
 }
