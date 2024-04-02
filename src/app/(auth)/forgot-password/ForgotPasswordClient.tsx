@@ -17,7 +17,7 @@ export function ForgotPasswordClient() {
   const {
     register,
     handleSubmit,
-    formState: { errors, isLoading, isSubmitting },
+    formState: { errors, isLoading, isSubmitting, isSubmitted },
   } = useForm<ForgotPasswordFormType>({
     resolver: zodResolver(forgotPasswordSchema),
   });
@@ -59,32 +59,22 @@ export function ForgotPasswordClient() {
               <div className="pt-4" />
               {errors.email && <span>{errors.email.message?.toString()}</span>}
               <div className="pt-4" />
-              <ForgotPasswordButton
-                hasErrors={Boolean(errors.email)}
+              <Button
+                className="w-full"
+                disabled={
+                  Boolean(errors.email) ||
+                  isLoading ||
+                  isSubmitting ||
+                  isSubmitted
+                }
                 loading={isLoading || isSubmitting}
-              />
+              >
+                Forgot Password
+              </Button>
             </form>
           </div>
         </CardContent>
       </Card>
     </div>
-  );
-}
-
-function ForgotPasswordButton({
-  hasErrors,
-  loading,
-}: {
-  hasErrors: boolean;
-  loading: boolean;
-}) {
-  return (
-    <Button
-      className="w-full"
-      disabled={hasErrors || loading}
-      loading={loading}
-    >
-      Forgot Password
-    </Button>
   );
 }
