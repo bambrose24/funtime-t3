@@ -13,21 +13,6 @@ import { revalidatePath } from "next/cache";
 
 type ForgotPasswordFormType = z.infer<typeof forgotPasswordSchema>;
 
-const onSubmit: SubmitHandler<ForgotPasswordFormType> = async ({ email }) => {
-  const { error } = await clientSupabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${typeof window !== "undefined" ? window.location.origin : "http://localhost:3000"}/confirm-reset-password`,
-  });
-
-  if (error) {
-    throw error;
-  }
-  revalidatePath("/", "layout");
-
-  toast.success(
-    "Please check your email for instructions on resetting your password.",
-  );
-};
-
 export function ForgotPasswordClient() {
   const {
     register,
@@ -36,6 +21,23 @@ export function ForgotPasswordClient() {
   } = useForm<ForgotPasswordFormType>({
     resolver: zodResolver(forgotPasswordSchema),
   });
+
+  const onSubmit: SubmitHandler<ForgotPasswordFormType> = async ({ email }) => {
+    const redirectTo = `${typeof window !== "undefined" ? window.location.origin : "http://localhost:3000"}/confirm-reset-password`;
+    console.log("redirect to?");
+    const { error } = await clientSupabase.auth.resetPasswordForEmail(email, {
+      redirectTo,
+    });
+
+    if (error) {
+      throw error;
+    }
+    revalidatePath("/", "layout");
+
+    toast.success(
+      "Please check your email for instructions on resetting your password.",
+    );
+  };
 
   return (
     <div className="flex h-full w-full flex-col items-center p-2 pt-8">
