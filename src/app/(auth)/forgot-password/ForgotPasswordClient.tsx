@@ -9,7 +9,7 @@ import { Input } from "~/components/ui/input";
 import { Button } from "~/components/ui/button";
 import { clientSupabase } from "~/utils/supabase/client";
 import { toast } from "sonner";
-import { revalidatePathServerAction, revalidatePaths } from "../actions";
+import { revalidatePathServerAction } from "../actions";
 
 type ForgotPasswordFormType = z.infer<typeof forgotPasswordSchema>;
 
