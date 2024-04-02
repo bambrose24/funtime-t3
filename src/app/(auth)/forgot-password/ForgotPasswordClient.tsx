@@ -13,6 +13,11 @@ import { revalidatePath } from "next/cache";
 
 type ForgotPasswordFormType = z.infer<typeof forgotPasswordSchema>;
 
+async function revalidatePaths() {
+  "use server";
+  revalidatePath("/", "layout");
+}
+
 export function ForgotPasswordClient() {
   const {
     register,
@@ -32,7 +37,8 @@ export function ForgotPasswordClient() {
     if (error) {
       throw error;
     }
-    revalidatePath("/", "layout");
+
+    await revalidatePaths();
 
     toast.success(
       "Please check your email for instructions on resetting your password.",
