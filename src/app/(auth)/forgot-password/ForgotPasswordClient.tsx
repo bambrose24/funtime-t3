@@ -10,13 +10,9 @@ import { Button } from "~/components/ui/button";
 import { clientSupabase } from "~/utils/supabase/client";
 import { toast } from "sonner";
 import { revalidatePath } from "next/cache";
+import { revalidatePaths } from "./actions";
 
 type ForgotPasswordFormType = z.infer<typeof forgotPasswordSchema>;
-
-async function revalidatePaths() {
-  "use server";
-  revalidatePath("/", "layout");
-}
 
 export function ForgotPasswordClient() {
   const {
