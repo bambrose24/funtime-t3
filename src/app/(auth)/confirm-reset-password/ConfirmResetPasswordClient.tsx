@@ -10,8 +10,8 @@ import { Input } from "~/components/ui/input";
 import { Button } from "~/components/ui/button";
 import { clientSupabase } from "~/utils/supabase/client";
 import { toast } from "sonner";
-import { revalidatePath } from "next/cache";
 import { clientApi } from "~/trpc/react";
+import { revalidatePathServerAction } from "../actions";
 
 type ForgotPasswordFormType = z.infer<typeof confirmResetPasswordSchema>;
 
@@ -42,9 +42,9 @@ export function ConfirmResetPasswordClient() {
       throw error;
     }
 
-    await invalidate();
+    await revalidatePathServerAction("/", "layout");
 
-    revalidatePath("/", "layout");
+    await invalidate();
 
     toast.success("Successfully reset your password.");
   };

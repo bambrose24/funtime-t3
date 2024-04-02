@@ -9,8 +9,7 @@ import { Input } from "~/components/ui/input";
 import { Button } from "~/components/ui/button";
 import { clientSupabase } from "~/utils/supabase/client";
 import { toast } from "sonner";
-import { revalidatePath } from "next/cache";
-import { revalidatePaths } from "./actions";
+import { revalidatePathServerAction, revalidatePaths } from "../actions";
 
 type ForgotPasswordFormType = z.infer<typeof forgotPasswordSchema>;
 
@@ -25,7 +24,6 @@ export function ForgotPasswordClient() {
 
   const onSubmit: SubmitHandler<ForgotPasswordFormType> = async ({ email }) => {
     const redirectTo = `${typeof window !== "undefined" ? window.location.origin : "http://localhost:3000"}/confirm-reset-password`;
-    console.log("redirect to?", redirectTo);
     const { error } = await clientSupabase.auth.resetPasswordForEmail(email, {
       redirectTo,
     });
@@ -34,7 +32,7 @@ export function ForgotPasswordClient() {
       throw error;
     }
 
-    await revalidatePaths();
+    await revalidatePathServerAction("/", "layout");
 
     toast.success(
       "Please check your email for instructions on resetting your password.",
@@ -44,7 +42,7 @@ export function ForgotPasswordClient() {
   return (
     <div className="flex h-full w-full flex-col items-center p-2 pt-8">
       <Card className="md:w-[300px]">
-        <CardHeader>Forgot Password</CardHeader>
+        <CardHeader>Reset Password</CardHeader>
         <CardContent>
           <div className="flex flex-col">
             <form onSubmit={handleSubmit(onSubmit)}>
@@ -71,7 +69,7 @@ export function ForgotPasswordClient() {
                 }
                 loading={isLoading || isSubmitting}
               >
-                Forgot Password
+                Reset Password
               </Button>
             </form>
           </div>
