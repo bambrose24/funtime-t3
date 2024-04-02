@@ -12,7 +12,6 @@ import { Text } from "../ui/text";
 import { useMemo } from "react";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
-import { CaretDownIcon } from "@radix-ui/react-icons";
 import Link from "next/link";
 
 type LeagueCardData = NonNullable<

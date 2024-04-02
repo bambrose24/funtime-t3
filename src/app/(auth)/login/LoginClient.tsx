@@ -1,7 +1,7 @@
 "use client";
 
 import { Loader2 } from "lucide-react";
-import { useForm, SubmitHandler } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Card, CardContent, CardHeader } from "~/components/ui/card";
 import { loginSchema } from "~/lib/schemas/auth";
@@ -72,7 +72,6 @@ function LoginButton({ hasErrors }: { hasErrors: boolean }) {
 }
 
 function ForgotPasswordButton() {
-  const { pending } = useFormStatus();
   const router = useRouter();
   return (
     <Button

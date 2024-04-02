@@ -8,9 +8,9 @@ export default async function ConfirmResetPasswordPage({
 }) {
   const code = searchParams?.code;
 
-  // if (typeof code !== "string") {
-  //   redirect("/");
-  // }
+  if (typeof code !== "string") {
+    redirect("/login");
+  }
 
   return <ConfirmResetPasswordClient />;
 }

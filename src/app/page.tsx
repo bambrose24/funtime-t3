@@ -2,10 +2,6 @@ import { type AppConfigDynamic } from "next/dist/build/utils";
 import { HomeLeagueCard } from "~/components/home/HomeLeagueCard";
 import { serverApi } from "~/trpc/server";
 
-type LeagueCardData = NonNullable<
-  Awaited<ReturnType<(typeof serverApi)["home"]["summary"]>>
->[number];
-
 // Almost all of the Funtime pages will need this
 export const dynamic: AppConfigDynamic = "force-dynamic";
 

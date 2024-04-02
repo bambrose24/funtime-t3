@@ -1,7 +1,7 @@
 "use client";
 
 import { type SubmitHandler, useForm } from "react-hook-form";
-import { confirmResetPasswordSchema } from "~/lib/schemas/auth";
+import { type confirmResetPasswordSchema } from "~/lib/schemas/auth";
 import { type z } from "zod";
 import { Card, CardContent, CardHeader } from "~/components/ui/card";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -33,7 +33,7 @@ export function ConfirmResetPasswordClient() {
     formState: { errors, isLoading, isSubmitting },
   } = useForm<ForgotPasswordFormType>({
     resolver: yupResolver(validationSchema),
-    mode: "all",
+    mode: "onBlur",
   });
 
   const router = useRouter();

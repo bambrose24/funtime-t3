@@ -35,7 +35,7 @@ export const homeRouter = createTRPCRouter({
   }),
   summary: publicProcedure
     .input(z.object({ season: z.number() }))
-    .query(async ({ input, ctx }) => {
+    .query(async ({ input: _input, ctx }) => {
       const { db, supabaseUser, dbUser } = ctx;
       if (!supabaseUser || !dbUser) {
         return null;
