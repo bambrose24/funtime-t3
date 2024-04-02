@@ -4,7 +4,7 @@ import { type SubmitHandler, useForm } from "react-hook-form";
 import { confirmResetPasswordSchema } from "~/lib/schemas/auth";
 import { type z } from "zod";
 import { Card, CardContent, CardHeader } from "~/components/ui/card";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { yupResolver } from "@hookform/resolvers/yup";
 import { Input } from "~/components/ui/input";
 
 import { Button } from "~/components/ui/button";
@@ -12,8 +12,18 @@ import { clientSupabase } from "~/utils/supabase/client";
 import { toast } from "sonner";
 import { clientApi } from "~/trpc/react";
 import { revalidatePathServerAction } from "../actions";
+import * as Yup from "yup";
 
 type ForgotPasswordFormType = z.infer<typeof confirmResetPasswordSchema>;
+
+const validationSchema = Yup.object({
+  password1: Yup.string()
+    .min(8, "Your password must be at least 8 characters")
+    .required("Password is required"),
+  password2: Yup.string()
+    .oneOf([Yup.ref("password1")], "Passwords must match")
+    .required("Please confirm your password"),
+});
 
 export function ConfirmResetPasswordClient() {
   const {
@@ -21,8 +31,11 @@ export function ConfirmResetPasswordClient() {
     handleSubmit,
     formState: { errors, isLoading, isSubmitting },
   } = useForm<ForgotPasswordFormType>({
-    resolver: zodResolver(confirmResetPasswordSchema),
+    resolver: yupResolver(validationSchema),
+    mode: "all",
   });
+
+  console.log("errors?", errors);
 
   // eslint-disable-next-line @typescript-eslint/unbound-method
   const { invalidate } = clientApi.useUtils();
@@ -32,7 +45,7 @@ export function ConfirmResetPasswordClient() {
     password2,
   }) => {
     if (password1 !== password2) {
-      throw new Error("Passwords must match");
+      throw new Error("Passwords must matchhhh");
     }
     const { error } = await clientSupabase.auth.updateUser({
       password: password1,
@@ -68,13 +81,15 @@ export function ConfirmResetPasswordClient() {
                 {...register("password2")}
               />
               <div className="pt-4" />
-              {errors.root && errors.root.message && (
-                <span>{errors.root.message}</span>
+              {errors.password2?.message && (
+                <span>{errors.password2.message}</span>
               )}
               <Button
                 className="w-full"
                 disabled={
-                  Object.keys(errors).length > 0 || isLoading || isSubmitting
+                  Boolean(errors.password2?.message) ||
+                  isLoading ||
+                  isSubmitting
                 }
                 loading={isLoading || isSubmitting}
               >

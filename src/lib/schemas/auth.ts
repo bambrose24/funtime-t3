@@ -13,9 +13,16 @@ export const confirmResetPasswordSchema = z
     password1: z.string(),
     password2: z.string(),
   })
-  .refine((data) => data.password1 === data.password2, {
-    message: "Passwords don't match",
-  });
+  .refine(
+    (data) => {
+      console.log("refining data?", data);
+      return data.password1 === data.password2;
+    },
+    {
+      message: "Passwords don't match",
+      path: ["password1"],
+    },
+  );
 
 export const signupSchema = z.object({
   email: z.string().email(),
