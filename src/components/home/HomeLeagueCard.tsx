@@ -1,9 +1,27 @@
-import { serverApi } from "~/trpc/server";
-import { Card, CardContent, CardHeader } from "~/components/ui/card";
+"use client";
+
+import { type serverApi } from "~/trpc/server";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+} from "~/components/ui/card";
 import { Separator } from "~/components/ui/separator";
 import { Text } from "../ui/text";
 import { useMemo } from "react";
 import { Badge } from "../ui/badge";
+import { Button } from "../ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
+import { CaretDownIcon } from "@radix-ui/react-icons";
+import Link from "next/link";
 
 type LeagueCardData = NonNullable<
   Awaited<ReturnType<(typeof serverApi)["home"]["summary"]>>
@@ -32,7 +50,7 @@ export function HomeLeagueCard({ data }: { data: LeagueCardData }) {
     <Card className="min-w-[240px]">
       <CardHeader className="text-center font-bold">{data.name}</CardHeader>
       <CardContent>
-        <div className="flex w-full flex-col gap-4">
+        <div className="flex w-full flex-col gap-3">
           <div className="flex w-full flex-row justify-between">
             <Text.Small>Correct Picks</Text.Small>
             <Text.Small className="font-semibold">
@@ -56,6 +74,35 @@ export function HomeLeagueCard({ data }: { data: LeagueCardData }) {
           </div>
         </div>
       </CardContent>
+      <CardFooter>
+        <div className="flex w-full flex-row gap-4">
+          <Link href={`/league/${data.league_id}`} passHref className="w-full">
+            <Button className="w-full">League Home</Button>
+          </Link>
+          {/* <DropdownMenu>
+            <DropdownMenuTrigger>
+              <Button>
+                <div className="flex flex-row items-center justify-between">
+                  Actions <CaretDownIcon />
+                </div>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuLabel>My Account</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <Link href={`/league/${data.league_id}`}>
+                <DropdownMenuItem>League Home</DropdownMenuItem>
+              </Link>
+              <Link href={`/league/${data.league_id}/pick`}>
+                <DropdownMenuItem>Make Picks</DropdownMenuItem>
+              </Link>
+              <Link href={`/league/${data.league_id}/standings`}>
+                <DropdownMenuItem>Standings</DropdownMenuItem>
+              </Link>
+            </DropdownMenuContent>
+          </DropdownMenu> */}
+        </div>
+      </CardFooter>
     </Card>
   );
 }

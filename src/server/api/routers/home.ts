@@ -86,12 +86,7 @@ export const homeRouter = createTRPCRouter({
           });
           return leagues;
         },
-        [
-          "leagues",
-          ...leagueIds.map((league_id) => league_id.toString()),
-          "members",
-          ...memberIds.map((m) => m.toString()),
-        ],
+        ["members", ...memberIds.map((m) => m.toString())],
         { revalidate: HOME_REVALIDATE_SECONDS },
       );
 
