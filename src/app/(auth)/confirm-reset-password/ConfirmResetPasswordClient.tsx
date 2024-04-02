@@ -13,6 +13,7 @@ import { toast } from "sonner";
 import { clientApi } from "~/trpc/react";
 import { revalidatePathServerAction } from "../actions";
 import * as Yup from "yup";
+import { useRouter } from "next/navigation";
 
 type ForgotPasswordFormType = z.infer<typeof confirmResetPasswordSchema>;
 
@@ -35,6 +36,8 @@ export function ConfirmResetPasswordClient() {
     mode: "all",
   });
 
+  const router = useRouter();
+
   console.log("errors?", errors);
 
   // eslint-disable-next-line @typescript-eslint/unbound-method
@@ -52,6 +55,7 @@ export function ConfirmResetPasswordClient() {
     });
 
     if (error) {
+      toast.error(error.message);
       throw error;
     }
 
@@ -60,6 +64,8 @@ export function ConfirmResetPasswordClient() {
     await invalidate();
 
     toast.success("Successfully reset your password.");
+
+    router.push("/");
   };
 
   return (
