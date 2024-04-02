@@ -12,14 +12,6 @@ import { Text } from "../ui/text";
 import { useMemo } from "react";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "../ui/dropdown-menu";
 import { CaretDownIcon } from "@radix-ui/react-icons";
 import Link from "next/link";
 

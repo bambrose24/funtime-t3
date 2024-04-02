@@ -1,31 +1,27 @@
 "use client";
 
-import { SubmitHandler, useForm } from "react-hook-form";
+import { type SubmitHandler, useForm } from "react-hook-form";
 import { forgotPasswordSchema } from "~/lib/schemas/auth";
 import { type z } from "zod";
 import { Card, CardContent, CardHeader } from "~/components/ui/card";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "~/components/ui/input";
-import { resetPassword } from "./actions";
 import { Button } from "~/components/ui/button";
-import { useFormStatus } from "react-dom";
 import { clientSupabase } from "~/utils/supabase/client";
 import { toast } from "sonner";
+import { revalidatePath } from "next/cache";
 
 type ForgotPasswordFormType = z.infer<typeof forgotPasswordSchema>;
 
 const onSubmit: SubmitHandler<ForgotPasswordFormType> = async ({ email }) => {
-  console.log("hi resetting on client..", window.location.origin);
   const { error } = await clientSupabase.auth.resetPasswordForEmail(email, {
-    redirectTo:
-      typeof window !== "undefined"
-        ? window.location.origin
-        : "http://localhost:3000",
+    redirectTo: `${typeof window !== "undefined" ? window.location.origin : "http://localhost:3000"}/confirm-reset-password`,
   });
 
   if (error) {
     throw error;
   }
+  revalidatePath("/", "layout");
 
   toast.success(
     "Please check your email for instructions on resetting your password.",
