@@ -7,7 +7,7 @@ import type { Metadata } from "next";
 import { ThemeProvider } from "../components/theme-provider";
 import { cn } from "~/lib/utils";
 import { Toaster } from "~/components/ui/sonner";
-import { Nav } from "./(nav)/nav";
+import { Nav } from "./_nav/nav";
 
 const inter = Inter({
   subsets: ["latin"],
