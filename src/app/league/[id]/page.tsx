@@ -5,6 +5,7 @@ import { getTeams } from "~/server/util/getTeams";
 import { getGamesByWeek } from "~/server/util/getGamesByWeek";
 import { getLeague } from "~/server/util/getLeague";
 
+// dynamic route params come in as `params` arg
 type Props = {
   params: {
     id: string;
