@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import { db } from "~/server/db";
-import { getGamesBySeason } from "~/server/util/getGamesBySeason";
+import { getGames } from "~/server/util/getGames";
 
 const currentWeekSeasonInputSchema = z.object({
   leagueId: z.number().int(),
@@ -19,7 +19,7 @@ export const timeRouter = createTRPCRouter({
 
       const { season } = league;
 
-      const gamesBySeason = await getGamesBySeason({ season });
+      const gamesBySeason = await getGames({ season });
 
       const now = new Date();
       const firstGameIdxAfterNow = gamesBySeason.findIndex((g) => {

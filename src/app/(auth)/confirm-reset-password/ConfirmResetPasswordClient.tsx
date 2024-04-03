@@ -38,8 +38,6 @@ export function ConfirmResetPasswordClient() {
 
   const router = useRouter();
 
-  console.log("errors?", errors);
-
   // eslint-disable-next-line @typescript-eslint/unbound-method
   const { invalidate } = clientApi.useUtils();
 

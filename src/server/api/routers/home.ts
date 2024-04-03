@@ -17,7 +17,6 @@ export const homeRouter = createTRPCRouter({
 
     const getLeagues = unstable_cache(
       async () => {
-        console.log("fetching leagues in homeRouter.nav...");
         const leagues = await db.leagues.findMany({
           where: {
             league_id: {
@@ -46,7 +45,6 @@ export const homeRouter = createTRPCRouter({
 
       const getSummaries = unstable_cache(
         async () => {
-          console.log("fetching leagues in homeRouter.summary...");
           const leagues = await db.leagues.findMany({
             where: {
               league_id: {

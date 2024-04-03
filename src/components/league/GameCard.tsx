@@ -1,6 +1,5 @@
 "use client";
 
-import { type getGamesBySeason } from "~/server/util/getGamesBySeason";
 import { Card } from "../ui/card";
 import { TeamLogo } from "../shared/TeamLogo";
 import { type getTeams } from "~/server/util/getTeams";
@@ -9,11 +8,12 @@ import localizedFormat from "dayjs/plugin/localizedFormat";
 import { Separator } from "../ui/separator";
 import { Button } from "../ui/button";
 import { cn } from "~/lib/utils";
+import { type serverApi } from "~/trpc/server";
 dayjs.extend(localizedFormat);
 
 type Props = {
-  game: Awaited<ReturnType<typeof getGamesBySeason>>[number];
-  homeTeam: Awaited<ReturnType<typeof getTeams>>[number];
+  game: Awaited<ReturnType<typeof serverApi.games.getGames>>[number];
+  homeTeam: Awaited<ReturnType<typeof serverApi.teams.getTeams>>[number];
   awayTeam: Awaited<ReturnType<typeof getTeams>>[number];
   onClickTeamId: (teamId: number) => void;
   simulated?: boolean;

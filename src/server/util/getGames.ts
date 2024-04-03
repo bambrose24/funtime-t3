@@ -4,39 +4,39 @@ import { db } from "../db";
 
 const REVALIDATE_SECONDS = 60;
 
-export async function getGamesByWeek({
+export async function getGames({
   season,
   week,
   skipCache,
 }: {
   season: number;
-  week: number;
+  week?: number;
   skipCache?: boolean;
 }) {
   if (skipCache) {
-    return await getGamesByWeekImpl({ season, week });
+    return await getGamesImpl({ season, week });
   }
-  const getGames = unstable_cache(
+  const getGamesFn = unstable_cache(
     async () => {
-      return await getGamesByWeekImpl({ season, week });
+      return await getGamesImpl({ season, week });
     },
-    ["getGamesBySeason", season.toString(), week.toString()],
+    ["getGamesBySeason", season.toString(), week ? week.toString() : "no_week"],
     {
       revalidate: REVALIDATE_SECONDS,
     },
   );
-  return await getGames();
+  return await getGamesFn();
 }
 
-async function getGamesByWeekImpl({
+async function getGamesImpl({
   season,
   week,
 }: {
   season: number;
-  week: number;
+  week?: number;
 }) {
   return await db.games.findMany({
-    where: { season, week },
+    where: { season, ...(week ? { week } : {}) },
     orderBy: [{ ts: "asc" }, { gid: "asc" }],
   });
 }

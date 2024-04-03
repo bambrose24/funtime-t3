@@ -1,8 +1,8 @@
 import { notFound } from "next/navigation";
 import { serverApi } from "~/trpc/server";
-import { ClientLeaguePage } from "./ClientLeaguePage";
+import { ClientLeaguePage } from "./client-league-page";
 import { getTeams } from "~/server/util/getTeams";
-import { getGamesByWeek } from "~/server/util/getGamesByWeek";
+import { getGames } from "~/server/util/getGames";
 import { getLeague } from "~/server/util/getLeague";
 
 // dynamic route params come in as `params` arg
@@ -33,11 +33,13 @@ export default async function LeaguePage({ params: { id } }: Props) {
   const { week, season } = game;
 
   const [data, games, teams, league] = await Promise.all([
-    serverApi.league.picksSummary({ leagueId }),
-    getGamesByWeek({ week, season }),
-    getTeams(),
-    getLeague({ leagueId }),
+    serverApi.league.picksSummary({ leagueId, week }),
+    serverApi.games.getGames({ week, season }),
+    serverApi.teams.getTeams(),
+    serverApi.league.get({ leagueId }),
   ]);
+
+  console.log("games length?", games.length, week, season);
 
   return (
     <ClientLeaguePage

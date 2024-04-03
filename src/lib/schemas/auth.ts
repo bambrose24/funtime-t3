@@ -15,7 +15,6 @@ export const confirmResetPasswordSchema = z
   })
   .refine(
     (data) => {
-      console.log("refining data?", data);
       return data.password1 === data.password2;
     },
     {

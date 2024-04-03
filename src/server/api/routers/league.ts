@@ -3,15 +3,34 @@ import { createTRPCRouter, publicProcedure } from "../trpc";
 import { unstable_cache } from "next/cache";
 import { db } from "~/server/db";
 import _ from "lodash";
-import { getGamesByWeek } from "~/server/util/getGamesByWeek";
-import { getGamesBySeason } from "~/server/util/getGamesBySeason";
+import { getGames } from "~/server/util/getGames";
+import { gamesRouter } from "./games";
 
 const picksSummarySchema = z.object({
   leagueId: z.number().int(),
   week: z.number().int().optional(),
 });
 
+const getLeagueSchema = z.object({
+  leagueId: z.number().int(),
+});
+
 export const leagueRouter = createTRPCRouter({
+  get: publicProcedure.input(getLeagueSchema).query(async ({ input }) => {
+    const { leagueId } = input;
+    const getLeagueImpl = unstable_cache(
+      async () => {
+        return await db.leagues.findFirstOrThrow({
+          where: { league_id: leagueId },
+        });
+      },
+      ["getLeague", leagueId.toString()],
+      {
+        revalidate: 60 * 60, // one hour
+      },
+    );
+    return await getLeagueImpl();
+  }),
   picksSummary: publicProcedure
     .input(picksSummarySchema)
     .query(async ({ input }) => {
@@ -55,9 +74,7 @@ export const leagueRouter = createTRPCRouter({
                 },
               },
             }),
-            week
-              ? getGamesByWeek({ week, season })
-              : getGamesBySeason({ season }),
+            getGames({ season, week }),
           ]);
 
           const gidToIndex = games.reduce((prev, curr, idx) => {
@@ -76,6 +93,10 @@ export const leagueRouter = createTRPCRouter({
               correctPicks: mp.picks.reduce((prev, curr) => {
                 return prev + (curr.correct ? 1 : 0);
               }, 0),
+              gameIdToPick: mp.picks.reduce((prev, curr) => {
+                prev.set(curr.gid, curr);
+                return prev;
+              }, new Map<number, (typeof mp.picks)[number]>()),
             };
           });
           return mps;
