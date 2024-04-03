@@ -4,7 +4,6 @@ import { unstable_cache } from "next/cache";
 import { db } from "~/server/db";
 import _ from "lodash";
 import { getGames } from "~/server/util/getGames";
-import { gamesRouter } from "./games";
 
 const picksSummarySchema = z.object({
   leagueId: z.number().int(),

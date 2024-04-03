@@ -1,9 +1,6 @@
 import { notFound } from "next/navigation";
 import { serverApi } from "~/trpc/server";
 import { ClientLeaguePage } from "./client-league-page";
-import { getTeams } from "~/server/util/getTeams";
-import { getGames } from "~/server/util/getGames";
-import { getLeague } from "~/server/util/getLeague";
 
 // dynamic route params come in as `params` arg
 type Props = {
@@ -38,8 +35,6 @@ export default async function LeaguePage({ params: { id } }: Props) {
     serverApi.teams.getTeams(),
     serverApi.league.get({ leagueId }),
   ]);
-
-  console.log("games length?", games.length, week, season);
 
   return (
     <ClientLeaguePage

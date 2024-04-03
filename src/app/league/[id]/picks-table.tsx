@@ -186,16 +186,4 @@ export function PicksTable({ picksSummary, games, teams }: Props) {
       </Table>
     </div>
   );
-
-  return <DataTable data={sortedData} columns={columns} />;
 }
-
-interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[];
-  data: TData[];
-}
-
-export function DataTable<TData, TValue>({
-  columns,
-  data,
-}: DataTableProps<TData, TValue>) {}
