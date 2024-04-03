@@ -1,7 +1,7 @@
-import { unstable_cache } from "next/cache";
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import { db } from "~/server/db";
+import { cache } from "~/utils/cache";
 
 const REVALIDATE_SECONDS = 120;
 
@@ -17,7 +17,8 @@ export const gamesRouter = createTRPCRouter({
     if (skipCache) {
       return await getGamesImpl({ season, week });
     }
-    const getGames = unstable_cache(
+
+    const getGames = cache(
       async () => {
         return await getGamesImpl({ season, week });
       },

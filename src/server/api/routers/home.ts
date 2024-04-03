@@ -1,7 +1,7 @@
-import { unstable_cache } from "next/cache";
 import { z } from "zod";
 
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
+import { cache } from "~/utils/cache";
 
 const HOME_REVALIDATE_SECONDS = 60 * 3; // 3 minutes should be good
 
@@ -15,7 +15,7 @@ export const homeRouter = createTRPCRouter({
 
     const leagueIds = dbUser.leaguemembers.map((m) => m.league_id).sort();
 
-    const getLeagues = unstable_cache(
+    const getLeagues = cache(
       async () => {
         const leagues = await db.leagues.findMany({
           where: {
@@ -43,7 +43,7 @@ export const homeRouter = createTRPCRouter({
       const leagueIds = dbUser.leaguemembers.map((m) => m.league_id).sort();
       const memberIds = dbUser.leaguemembers.map((m) => m.membership_id).sort();
 
-      const getSummaries = unstable_cache(
+      const getSummaries = cache(
         async () => {
           const leagues = await db.leagues.findMany({
             where: {

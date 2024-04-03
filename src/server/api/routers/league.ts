@@ -1,9 +1,9 @@
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "../trpc";
-import { unstable_cache } from "next/cache";
 import { db } from "~/server/db";
 import _ from "lodash";
 import { getGames } from "~/server/util/getGames";
+import { cache } from "~/utils/cache";
 
 const picksSummarySchema = z.object({
   leagueId: z.number().int(),
@@ -17,7 +17,7 @@ const getLeagueSchema = z.object({
 export const leagueRouter = createTRPCRouter({
   get: publicProcedure.input(getLeagueSchema).query(async ({ input }) => {
     const { leagueId } = input;
-    const getLeagueImpl = unstable_cache(
+    const getLeagueImpl = cache(
       async () => {
         return await db.leagues.findFirstOrThrow({
           where: { league_id: leagueId },
@@ -36,7 +36,7 @@ export const leagueRouter = createTRPCRouter({
       const { leagueId, week } = input;
 
       const REVALIDATE_SECONDS = 60;
-      const getLeagueData = unstable_cache(
+      const getLeagueData = cache(
         async () => {
           const weekWhere = week
             ? {

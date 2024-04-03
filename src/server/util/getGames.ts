@@ -1,6 +1,6 @@
 import "server-only";
-import { unstable_cache } from "next/cache";
 import { db } from "../db";
+import { cache } from "~/utils/cache";
 
 const REVALIDATE_SECONDS = 60;
 
@@ -16,7 +16,7 @@ export async function getGames({
   if (skipCache) {
     return await getGamesImpl({ season, week });
   }
-  const getGamesFn = unstable_cache(
+  const getGamesFn = cache(
     async () => {
       return await getGamesImpl({ season, week });
     },
