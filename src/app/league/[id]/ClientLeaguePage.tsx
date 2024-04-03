@@ -1,11 +1,6 @@
 "use client";
 import { GameCard } from "~/components/league/GameCard";
-import {
-  Card,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "~/components/ui/card";
+import { Card, CardHeader, CardTitle } from "~/components/ui/card";
 import { Text } from "~/components/ui/text";
 import { type getGamesByWeek } from "~/server/util/getGamesByWeek";
 import { type getLeague } from "~/server/util/getLeague";
@@ -20,7 +15,7 @@ type ClientLeaguePageProps = {
 };
 
 export function ClientLeaguePage({
-  picksSummary,
+  picksSummary: _picksSummary,
   games,
   teams,
   league,
@@ -55,7 +50,9 @@ export function ClientLeaguePage({
                     game={g}
                     awayTeam={awayTeam}
                     homeTeam={homeTeam}
-                    onClickTeamId={(teamId) => {}}
+                    onClickTeamId={(teamId) => {
+                      console.log(teamId);
+                    }}
                   />
                 );
               })}

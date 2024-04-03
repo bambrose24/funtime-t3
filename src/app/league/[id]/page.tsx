@@ -1,5 +1,4 @@
 import { notFound } from "next/navigation";
-import { db } from "~/server/db";
 import { serverApi } from "~/trpc/server";
 import { ClientLeaguePage } from "./ClientLeaguePage";
 import { getTeams } from "~/server/util/getTeams";
