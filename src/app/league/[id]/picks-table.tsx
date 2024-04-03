@@ -58,7 +58,7 @@ export function PicksTable({ picksSummary, games, teams }: Props) {
     {
       maxSize: 30,
       accessorFn: (data) => {
-        return data.people.username;
+        return data?.people?.username;
       },
       header: "Player",
       id: "player",
@@ -72,7 +72,12 @@ export function PicksTable({ picksSummary, games, teams }: Props) {
       return {
         id: g.gid?.toString(),
         accessorFn: (data) => {
+          // eslint-disable-next-line @typescript-eslint/prefer-optional-chain
+          if (!data?.gameIdToPick || !data?.gameIdToPick?.get) {
+            return "--";
+          }
           const winner = data?.gameIdToPick?.get(g.gid)?.winner;
+
           if (!winner) {
             return "--";
           }
