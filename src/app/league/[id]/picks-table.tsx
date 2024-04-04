@@ -19,6 +19,7 @@ import { Suspense, useMemo } from "react";
 import _ from "lodash";
 import { cn } from "~/lib/utils";
 import { Skeleton } from "~/components/ui/skeleton";
+import { useDictify } from "~/utils/hooks/useIdToValMemo";
 
 type Props = {
   picksSummary: Awaited<ReturnType<typeof serverApi.league.picksSummary>>;
@@ -43,19 +44,9 @@ function PicksTableSkeleton() {
 }
 
 function PicksTableImpl({ picksSummary, games, teams }: Props) {
-  const teamIdToTeam = useMemo(() => {
-    return teams.reduce((prev, curr) => {
-      prev.set(curr.teamid, curr);
-      return prev;
-    }, new Map<number, (typeof teams)[number]>());
-  }, [teams]);
+  const teamIdToTeam = useDictify(teams, (t) => t.teamid);
 
-  const gameIdToGame = useMemo(() => {
-    return games.reduce((prev, curr) => {
-      prev.set(curr.gid, curr);
-      return prev;
-    }, new Map<number, (typeof games)[number]>());
-  }, [games]);
+  const gameIdToGame = useDictify(games, (g) => g.gid);
 
   const sortedData = useMemo(() => {
     return _.sortBy(
@@ -174,7 +165,7 @@ function PicksTableImpl({ picksSummary, games, teams }: Props) {
                               : bgColor === "yellow"
                                 ? "bg-yellow-500 dark:bg-yellow-700"
                                 : "",
-                          "flex h-full w-full flex-row items-center justify-center p-1",
+                          "flex h-full w-full flex-row items-center justify-center overflow-hidden text-ellipsis whitespace-nowrap p-1",
                         )}
                       >
                         {flexRender(

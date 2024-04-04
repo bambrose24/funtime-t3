@@ -43,7 +43,7 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
                 <>
                   {firstGame && (
                     <CardHeader>
-                      <CardTitle>
+                      <CardTitle className="text-balance pb-2 text-center">
                         Your picks for Week {firstGame.week}, {firstGame.season}
                       </CardTitle>
                       <CardDescription>
