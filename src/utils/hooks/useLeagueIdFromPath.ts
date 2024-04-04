@@ -1,5 +1,4 @@
 import { usePathname } from "next/navigation";
-import { useMemo } from "react";
 import { z } from "zod";
 
 const regex = /^\/league\/(\d+).*$/;

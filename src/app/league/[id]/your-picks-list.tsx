@@ -1,6 +1,5 @@
 "use client";
 
-import { useMemo } from "react";
 import { Text } from "~/components/ui/text";
 import { TeamLogo } from "~/components/shared/TeamLogo";
 import { type serverApi } from "~/trpc/server";
