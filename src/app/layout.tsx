@@ -26,7 +26,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning className="overflow-y-scroll">
       <body className={cn(inter.variable, `h-full w-full font-sans`)}>
         <TRPCReactProvider>
           <ThemeProvider

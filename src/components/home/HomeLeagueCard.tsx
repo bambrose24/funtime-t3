@@ -33,7 +33,7 @@ export function HomeLeagueCard({ data }: { data: LeagueCardData }) {
 
   return (
     <Link href={`/league/${data.league_id}`} passHref>
-      <Card className="min-w-[240px] hover:border-primary">
+      <Card className="min-w-[240px] flex-grow hover:border-primary">
         <CardHeader className="text-center font-bold">{data.name}</CardHeader>
         <CardContent>
           <div className="flex w-full flex-col gap-3">

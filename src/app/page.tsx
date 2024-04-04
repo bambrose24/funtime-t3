@@ -10,7 +10,7 @@ export default async function Home() {
 
   return (
     <main className="h-full w-full px-3">
-      <div className="flex w-full flex-row flex-wrap justify-around gap-4 py-4">
+      <div className="flex w-full grow flex-row flex-wrap justify-around gap-4 py-4">
         {data?.map((d) => {
           if (!d) {
             return null;

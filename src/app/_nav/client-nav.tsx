@@ -6,10 +6,8 @@ import {
   NavigationMenu,
   NavigationMenuContent,
   NavigationMenuItem,
-  NavigationMenuLink,
   NavigationMenuList,
   NavigationMenuTrigger,
-  navigationMenuTriggerStyle,
 } from "~/components/ui/navigation-menu";
 import {
   DesktopIcon,
@@ -20,7 +18,6 @@ import {
 } from "@radix-ui/react-icons";
 
 import { Separator } from "~/components/ui/separator";
-import { Text } from "~/components/ui/text";
 import { type serverApi } from "~/trpc/server";
 import { useTheme } from "next-themes";
 import {
@@ -38,8 +35,8 @@ import { type IconProps } from "@radix-ui/react-icons/dist/types";
 import { useLogout } from "../(auth)/auth/useLogout";
 import { useLeagueIdFromPath } from "~/utils/hooks/useLeagueIdFromPath";
 import { ChevronsUpDown, HomeIcon, PenIcon, TrophyIcon } from "lucide-react";
-import { cn } from "~/lib/utils";
-import { Card, CardHeader, CardTitle, CardContent } from "~/components/ui/card";
+import { Card, CardTitle } from "~/components/ui/card";
+import { Avatar, AvatarFallback } from "~/components/ui/avatar";
 
 type NavData = {
   data: Awaited<ReturnType<(typeof serverApi)["home"]["nav"]>>;
@@ -53,13 +50,14 @@ export function ClientNav(props: NavData) {
   const logout = useLogout();
   const user = props.data?.dbUser;
 
-  const chosenLeague =
-    props.data?.leagues.find((l) => l.league_id === leagueId) ??
-    props.data?.leagues?.at(0);
+  const chosenLeague = props.data?.leagues.find(
+    (l) => l.league_id === leagueId,
+  );
+  console.log({ leagueIdFromPath: leagueId, chosenLeague });
   return (
     <div className="flex w-full flex-col">
       <div className="flex h-12 w-full flex-row justify-between px-2">
-        <div className="flex flex-row items-center gap-4">
+        <div className="flex flex-row items-center gap-2 lg:gap-4">
           <NavigationMenu className="h-full w-full items-center">
             <NavigationMenuList>
               <NavigationMenuItem>
@@ -96,8 +94,20 @@ export function ClientNav(props: NavData) {
               <LoginButton />
             ) : (
               <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline">{user.username}</Button>
+                <DropdownMenuTrigger>
+                  <>
+                    <Button variant="ghost" className="hidden sm:block">
+                      {user.username}
+                    </Button>
+                    <Avatar className="sm:hidden">
+                      <AvatarFallback>
+                        {user.username
+                          .split(" ")
+                          .slice(0, 2)
+                          .map((s) => s.at(0))}
+                      </AvatarFallback>
+                    </Avatar>
+                  </>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="py-2">
                   <div className="flex w-full flex-col items-start gap-1 px-2 py-2">
@@ -235,7 +245,8 @@ function LeagueDropdownMenu({ chosenLeague }: { chosenLeague: ChosenLeague }) {
         <DropdownMenuTrigger>
           <Button variant="outline">
             <div className="flex flex-row items-center gap-2">
-              <>League Home</>
+              <div className="hidden lg:block">League Home</div>
+              <div className="lg:hidden">Home</div>
               <ChevronsUpDown className="h-3 w-3" />
             </div>
           </Button>

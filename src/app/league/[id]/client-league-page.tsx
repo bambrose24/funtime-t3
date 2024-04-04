@@ -38,47 +38,39 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
       <div className="grid grid-cols-5 gap-4 2xl:grid-cols-7">
         <div className="hidden md:col-span-1 md:col-start-1 md:flex">
           <div className="w-full">
-            <Card className="w-full">
-              {myPicks ? (
-                <>
-                  {firstGame && (
-                    <CardHeader>
-                      <CardTitle className="text-balance pb-2 text-center">
-                        Your picks for Week {firstGame.week}, {firstGame.season}
-                      </CardTitle>
-                      <CardDescription>
-                        <div className="flex flex-col gap-1">
-                          <div className="flex w-full flex-row items-center justify-between gap-2">
-                            <Text.Muted>Correct:</Text.Muted>
-                            <Text.Small className="font-semibold text-card-foreground">
-                              {myPicks.correctPicks} / {games.length}
-                            </Text.Small>
-                          </div>
-                          <div className="flex w-full flex-row items-center justify-between gap-2">
-                            <Text.Muted>Tiebreaker Score:</Text.Muted>
-                            <Text.Small className="font-semibold text-card-foreground">
-                              {
-                                myPicks.picks.find(
-                                  (p) => p.score !== null && p.score > 0,
-                                )?.score
-                              }
-                            </Text.Small>
-                          </div>
-                        </div>
-                      </CardDescription>
-                      <Separator />
-                    </CardHeader>
-                  )}
-                  <CardContent>
-                    <YourPicksList {...props} myPicks={myPicks} />
-                  </CardContent>
-                </>
-              ) : (
+            {myPicks && firstGame && (
+              <Card className="w-full">
+                <CardHeader>
+                  <CardTitle className="text-balance pb-2 text-center">
+                    Your picks for Week {firstGame.week}, {firstGame.season}
+                  </CardTitle>
+                  <CardDescription>
+                    <div className="flex flex-col gap-1">
+                      <div className="flex w-full flex-row items-center justify-between gap-2">
+                        <Text.Muted>Correct:</Text.Muted>
+                        <Text.Small className="font-semibold text-card-foreground">
+                          {myPicks.correctPicks} / {games.length}
+                        </Text.Small>
+                      </div>
+                      <div className="flex w-full flex-row items-center justify-between gap-2">
+                        <Text.Muted>Tiebreaker Score:</Text.Muted>
+                        <Text.Small className="font-semibold text-card-foreground">
+                          {
+                            myPicks.picks.find(
+                              (p) => p.score !== null && p.score > 0,
+                            )?.score
+                          }
+                        </Text.Small>
+                      </div>
+                    </div>
+                  </CardDescription>
+                  <Separator />
+                </CardHeader>
                 <CardContent>
-                  <Text.Body>You missed picks this week!</Text.Body>
+                  <YourPicksList {...props} myPicks={myPicks} />
                 </CardContent>
-              )}
-            </Card>
+              </Card>
+            )}
           </div>
         </div>
         <div className="col-span-5 col-start-1 md:col-span-4 md:col-start-2 2xl:col-span-6">
