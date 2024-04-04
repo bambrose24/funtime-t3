@@ -11,6 +11,7 @@ import superjson from "superjson";
 import { ZodError } from "zod";
 
 import { db } from "~/server/db";
+import { cache } from "~/utils/cache";
 import { supabaseServer } from "~/utils/supabase/server";
 
 /**
@@ -32,20 +33,29 @@ export const createTRPCContext = async (opts: { headers: Headers }) => {
   } = await supabase.auth.getUser();
 
   let dbUser = null;
-  if (supabaseUser) {
-    dbUser = await db.people.findFirst({
-      where: {
-        email: supabaseUser?.email,
-      },
-      include: {
-        leaguemembers: {
-          select: {
-            league_id: true,
-            membership_id: true,
+  if (supabaseUser?.email) {
+    const getDbUser = cache(
+      async () => {
+        return await db.people.findFirst({
+          where: {
+            email: supabaseUser.email,
           },
-        },
+          include: {
+            leaguemembers: {
+              select: {
+                league_id: true,
+                membership_id: true,
+              },
+            },
+          },
+        });
       },
-    });
+      ["getUserByEmail", supabaseUser.email],
+      {
+        revalidate: 60 * 5, // every 5 minutes, short of there being an update to the username this should be fine
+      },
+    );
+    dbUser = await getDbUser();
   }
 
   return {
