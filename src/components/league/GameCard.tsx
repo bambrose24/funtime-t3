@@ -30,7 +30,11 @@ export function GameCard({
     <Card
       className={cn(
         "min-h-[120px] min-w-[120px] p-2",
-        simulated ? "border-yellow-300" : game.done ? "border-primary" : "",
+        simulated
+          ? "border-yellow-300"
+          : game.done
+            ? "border-2 border-primary"
+            : "",
       )}
     >
       <div className="grid grid-cols-3 gap-y-2">

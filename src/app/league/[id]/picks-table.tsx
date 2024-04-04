@@ -161,11 +161,11 @@ export function PicksTable({ picksSummary, games, teams }: Props) {
                       <div
                         className={cn(
                           bgColor === "red"
-                            ? "bg-red-700"
+                            ? "bg-red-500 dark:bg-red-700"
                             : bgColor === "green"
-                              ? "bg-green-700"
+                              ? "bg-green-500 dark:bg-green-700"
                               : bgColor === "yellow"
-                                ? "bg-yellow-700"
+                                ? "bg-yellow-500 dark:bg-yellow-700"
                                 : "",
                           "flex h-full w-full flex-row items-center justify-center p-1",
                         )}
