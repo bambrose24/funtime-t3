@@ -96,7 +96,7 @@ export function ClientNav(props: NavData) {
               <DropdownMenu>
                 <DropdownMenuTrigger>
                   <>
-                    <Button variant="ghost" className="hidden sm:block">
+                    <Button variant="outline" className="hidden sm:block">
                       {user.username}
                     </Button>
                     <Avatar className="sm:hidden">
