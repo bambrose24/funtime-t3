@@ -34,6 +34,7 @@ import {
 import { capitalize } from "lodash";
 import { type IconProps } from "@radix-ui/react-icons/dist/types";
 import { useLogout } from "../(auth)/auth/useLogout";
+import { usePathname } from "next/navigation";
 
 type NavData = {
   data: Awaited<ReturnType<(typeof serverApi)["home"]["nav"]>>;
@@ -43,6 +44,8 @@ type NavData = {
  * TODO model the top right after Vercel
  */
 export function ClientNav(props: NavData) {
+  const pathname = usePathname();
+  console.log("pathname?", pathname);
   const logout = useLogout();
   const user = props.data?.dbUser;
   return (

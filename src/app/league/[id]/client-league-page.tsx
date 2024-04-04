@@ -35,7 +35,7 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
       <div className="flex flex-row justify-center py-4">
         <Text.H1>{league.name}</Text.H1>
       </div>
-      <div className="grid grid-cols-5 gap-4">
+      <div className="grid grid-cols-5 gap-4 2xl:grid-cols-7">
         <div className="hidden md:col-span-1 md:col-start-1 md:flex">
           <div className="w-full">
             <Card className="w-full">
@@ -81,7 +81,7 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
             </Card>
           </div>
         </div>
-        <div className="col-span-5 col-start-1 row-start-1 md:col-span-4 md:col-start-2">
+        <div className="col-span-5 col-start-1 md:col-span-4 md:col-start-2 2xl:col-span-6">
           <div className="flex flex-col gap-4">
             <div className="flex flex-row gap-2 overflow-auto">
               {games.map((g) => {
