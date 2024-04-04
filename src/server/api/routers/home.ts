@@ -23,6 +23,14 @@ export const homeRouter = createTRPCRouter({
               in: leagueIds,
             },
           },
+          orderBy: [
+            {
+              season: "desc",
+            },
+            {
+              created_time: "asc", // maybe newer leagues are less prominent? who's to say
+            },
+          ],
         });
         return { leagues, dbUser };
       },

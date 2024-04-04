@@ -6,8 +6,10 @@ import {
   NavigationMenu,
   NavigationMenuContent,
   NavigationMenuItem,
+  NavigationMenuLink,
   NavigationMenuList,
   NavigationMenuTrigger,
+  navigationMenuTriggerStyle,
 } from "~/components/ui/navigation-menu";
 import {
   DesktopIcon,
@@ -34,7 +36,10 @@ import {
 import { capitalize } from "lodash";
 import { type IconProps } from "@radix-ui/react-icons/dist/types";
 import { useLogout } from "../(auth)/auth/useLogout";
-import { usePathname } from "next/navigation";
+import { useLeagueIdFromPath } from "~/utils/hooks/useLeagueIdFromPath";
+import { ChevronsUpDown, HomeIcon, PenIcon, TrophyIcon } from "lucide-react";
+import { cn } from "~/lib/utils";
+import { Card, CardHeader, CardTitle, CardContent } from "~/components/ui/card";
 
 type NavData = {
   data: Awaited<ReturnType<(typeof serverApi)["home"]["nav"]>>;
@@ -44,35 +49,47 @@ type NavData = {
  * TODO model the top right after Vercel
  */
 export function ClientNav(props: NavData) {
-  const pathname = usePathname();
-  console.log("pathname?", pathname);
+  const leagueId = useLeagueIdFromPath();
   const logout = useLogout();
   const user = props.data?.dbUser;
+
+  const chosenLeague =
+    props.data?.leagues.find((l) => l.league_id === leagueId) ??
+    props.data?.leagues?.at(0);
   return (
     <div className="flex w-full flex-col">
       <div className="flex h-12 w-full flex-row justify-between px-2">
-        <NavigationMenu className="h-full w-full items-center">
-          <NavigationMenuList>
-            <NavigationMenuItem>
-              <NavigationMenuTrigger>My Leagues</NavigationMenuTrigger>
-              <NavigationMenuContent className="flex min-w-[400px] flex-col gap-4 p-2">
-                {props.data?.leagues.map((l) => {
-                  if (!l) {
-                    return null;
-                  }
-                  return (
-                    <div
-                      key={`my_leagues_nav_${l.league_id}`}
-                      className="flex flex-row justify-between"
-                    >
-                      <Text.Body>{l.name}</Text.Body>
-                    </div>
-                  );
-                })}
-              </NavigationMenuContent>
-            </NavigationMenuItem>
-          </NavigationMenuList>
-        </NavigationMenu>
+        <div className="flex flex-row items-center gap-4">
+          <NavigationMenu className="h-full w-full items-center">
+            <NavigationMenuList>
+              <NavigationMenuItem>
+                <NavigationMenuTrigger>
+                  {chosenLeague ? chosenLeague.name : "My Leagues"}
+                </NavigationMenuTrigger>
+                <NavigationMenuContent className="flex flex-col gap-4 p-2">
+                  {props.data?.leagues.map((l) => {
+                    if (!l) {
+                      return null;
+                    }
+                    return (
+                      <Link
+                        key={l.league_id}
+                        href={`/league/${l.league_id}`}
+                        className="h-full w-full"
+                        passHref
+                      >
+                        <Card className="flex min-w-[200px] cursor-pointer flex-col gap-2 p-2 hover:bg-accent">
+                          <CardTitle>{l.name}</CardTitle>
+                        </Card>
+                      </Link>
+                    );
+                  })}
+                </NavigationMenuContent>
+              </NavigationMenuItem>
+            </NavigationMenuList>
+          </NavigationMenu>
+          {chosenLeague && <LeagueDropdownMenu chosenLeague={chosenLeague} />}
+        </div>
         {user ? (
           <div className="flex flex-row items-center">
             {!user ? (
@@ -202,4 +219,56 @@ function ThemeIcon({ theme, ...props }: { theme: ThemeChoice } & IconProps) {
     case "system":
       return <DesktopIcon {...props} />;
   }
+}
+
+type ChosenLeague = NonNullable<
+  NonNullable<
+    Awaited<ReturnType<(typeof serverApi)["home"]["nav"]>>
+  >["leagues"][number]
+>;
+
+function LeagueDropdownMenu({ chosenLeague }: { chosenLeague: ChosenLeague }) {
+  return (
+    <>
+      <Separator orientation="vertical" />
+      <DropdownMenu>
+        <DropdownMenuTrigger>
+          <Button variant="outline">
+            <div className="flex flex-row items-center gap-2">
+              <>League Home</>
+              <ChevronsUpDown className="h-3 w-3" />
+            </div>
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent>
+          <DropdownMenuLabel>{chosenLeague.name}</DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <Link href={`/league/${chosenLeague.league_id}`}>
+            <DropdownMenuItem>
+              <div className="flex flex-row items-center gap-3">
+                <HomeIcon className="h-4 w-4" />
+                <>League Home</>
+              </div>
+            </DropdownMenuItem>
+          </Link>
+          <Link href={`/league/${chosenLeague.league_id}/pick`}>
+            <DropdownMenuItem>
+              <div className="flex flex-row items-center gap-3">
+                <PenIcon className="h-4 w-4" />
+                <>Make Picks</>
+              </div>
+            </DropdownMenuItem>
+          </Link>
+          <Link href={`/league/${chosenLeague.league_id}/standings`}>
+            <DropdownMenuItem>
+              <div className="flex flex-row items-center gap-3">
+                <TrophyIcon className="h-4 w-4" />
+                <>Standings</>
+              </div>
+            </DropdownMenuItem>
+          </Link>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </>
+  );
 }
