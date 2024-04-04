@@ -37,7 +37,7 @@ import {
 import { Avatar, AvatarFallback } from "~/components/ui/avatar";
 
 type NavData = {
-  data: Awaited<ReturnType<(typeof serverApi)["home"]["nav"]>>;
+  data: NonNullable<Awaited<ReturnType<(typeof serverApi)["home"]["nav"]>>>;
 };
 
 /**
@@ -46,10 +46,16 @@ type NavData = {
 export function ClientNav(props: NavData) {
   const leagueId = useLeagueIdFromPath();
   const logout = useLogout();
-  const user = props.data?.dbUser;
 
-  const chosenLeague = props.data?.leagues.find(
-    (l) => l.league_id === leagueId,
+  const { dbUser: user, leagues } = props.data;
+
+  const chosenLeague = leagues.find((l) => l.league_id === leagueId);
+
+  const activeLeagues = leagues.filter(
+    (l) => l.status !== "completed" && new Date().getFullYear() - 1 <= l.season,
+  );
+  const inactiveLeagues = leagues.filter(
+    (l) => l.status === "completed" || new Date().getFullYear() - 1 > l.season,
   );
 
   return (
@@ -65,8 +71,25 @@ export function ClientNav(props: NavData) {
                 </div>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="py-2">
-              {props.data?.leagues.map((l) => {
+            <DropdownMenuContent className="p-1">
+              <DropdownMenuLabel>Active Leagues</DropdownMenuLabel>
+              {activeLeagues.map((l) => {
+                return (
+                  <Link
+                    passHref
+                    href={`/league/${l.league_id}`}
+                    key={l.league_id}
+                  >
+                    <DropdownMenuItem>
+                      <MenuRow>{l.name}</MenuRow>
+                    </DropdownMenuItem>
+                  </Link>
+                );
+              })}
+              <DropdownMenuSeparator className="my-2" />
+
+              <DropdownMenuLabel>Prior Leagues</DropdownMenuLabel>
+              {inactiveLeagues.map((l) => {
                 return (
                   <Link
                     passHref
@@ -180,11 +203,9 @@ function ThemeToggler() {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="sm">
-          {capitalize(themeResult)}{" "}
-          <ThemeIcon className="ml-2" theme={themeResult} />
-        </Button>
+      <DropdownMenuTrigger>
+        {capitalize(themeResult)}{" "}
+        <ThemeIcon className="ml-2" theme={themeResult} />
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56">
         <DropdownMenuLabel>Select Theme</DropdownMenuLabel>

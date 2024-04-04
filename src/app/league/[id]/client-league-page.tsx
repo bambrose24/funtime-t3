@@ -44,26 +44,24 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
                   <CardTitle className="text-balance pb-2 text-center">
                     Your picks for Week {firstGame.week}, {firstGame.season}
                   </CardTitle>
-                  <CardDescription>
-                    <div className="flex flex-col gap-1">
-                      <div className="flex w-full flex-row items-center justify-between gap-2">
-                        <Text.Muted>Correct:</Text.Muted>
-                        <Text.Small className="font-semibold text-card-foreground">
-                          {myPicks.correctPicks} / {games.length}
-                        </Text.Small>
-                      </div>
-                      <div className="flex w-full flex-row items-center justify-between gap-2">
-                        <Text.Muted>Tiebreaker Score:</Text.Muted>
-                        <Text.Small className="font-semibold text-card-foreground">
-                          {
-                            myPicks.picks.find(
-                              (p) => p.score !== null && p.score > 0,
-                            )?.score
-                          }
-                        </Text.Small>
-                      </div>
+                  <div className="flex flex-col gap-1">
+                    <div className="flex w-full flex-row items-center justify-between gap-2">
+                      <Text.Muted>Correct:</Text.Muted>
+                      <Text.Small className="font-semibold text-card-foreground">
+                        {myPicks.correctPicks} / {games.length}
+                      </Text.Small>
                     </div>
-                  </CardDescription>
+                    <div className="flex w-full flex-row items-center justify-between gap-2">
+                      <Text.Muted>Tiebreaker Score:</Text.Muted>
+                      <Text.Small className="font-semibold text-card-foreground">
+                        {
+                          myPicks.picks.find(
+                            (p) => p.score !== null && p.score > 0,
+                          )?.score
+                        }
+                      </Text.Small>
+                    </div>
+                  </div>
                   <Separator />
                 </CardHeader>
                 <CardContent>
