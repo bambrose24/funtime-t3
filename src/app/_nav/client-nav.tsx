@@ -34,7 +34,13 @@ import { capitalize } from "lodash";
 import { type IconProps } from "@radix-ui/react-icons/dist/types";
 import { useLogout } from "../(auth)/auth/useLogout";
 import { useLeagueIdFromPath } from "~/utils/hooks/useLeagueIdFromPath";
-import { ChevronsUpDown, HomeIcon, PenIcon, TrophyIcon } from "lucide-react";
+import {
+  ChevronDownIcon,
+  ChevronsUpDown,
+  HomeIcon,
+  PenIcon,
+  TrophyIcon,
+} from "lucide-react";
 import { Card, CardTitle } from "~/components/ui/card";
 import { Avatar, AvatarFallback } from "~/components/ui/avatar";
 
@@ -53,39 +59,36 @@ export function ClientNav(props: NavData) {
   const chosenLeague = props.data?.leagues.find(
     (l) => l.league_id === leagueId,
   );
-  console.log({ leagueIdFromPath: leagueId, chosenLeague });
+
   return (
     <div className="flex w-full flex-col">
       <div className="flex h-12 w-full flex-row justify-between px-2">
         <div className="flex flex-row items-center gap-2 lg:gap-4">
-          <NavigationMenu className="h-full w-full items-center">
-            <NavigationMenuList>
-              <NavigationMenuItem>
-                <NavigationMenuTrigger>
+          <DropdownMenu>
+            <DropdownMenuTrigger>
+              <Button variant="ghost">
+                <div className="flex flex-row items-center gap-2">
                   {chosenLeague ? chosenLeague.name : "My Leagues"}
-                </NavigationMenuTrigger>
-                <NavigationMenuContent className="flex flex-col gap-4 p-2">
-                  {props.data?.leagues.map((l) => {
-                    if (!l) {
-                      return null;
-                    }
-                    return (
-                      <Link
-                        key={l.league_id}
-                        href={`/league/${l.league_id}`}
-                        className="h-full w-full"
-                        passHref
-                      >
-                        <Card className="flex min-w-[200px] cursor-pointer flex-col gap-2 p-2 hover:bg-accent">
-                          <CardTitle>{l.name}</CardTitle>
-                        </Card>
-                      </Link>
-                    );
-                  })}
-                </NavigationMenuContent>
-              </NavigationMenuItem>
-            </NavigationMenuList>
-          </NavigationMenu>
+                  <ChevronDownIcon className="h-4 w-4" />
+                </div>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="py-2">
+              {props.data?.leagues.map((l) => {
+                return (
+                  <Link
+                    passHref
+                    href={`/league/${l.league_id}`}
+                    key={l.league_id}
+                  >
+                    <DropdownMenuItem>
+                      <MenuRow>{l.name}</MenuRow>
+                    </DropdownMenuItem>
+                  </Link>
+                );
+              })}
+            </DropdownMenuContent>
+          </DropdownMenu>
           {chosenLeague && <LeagueDropdownMenu chosenLeague={chosenLeague} />}
         </div>
         {user ? (
