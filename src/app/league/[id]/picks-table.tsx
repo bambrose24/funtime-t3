@@ -15,9 +15,10 @@ import {
   TableHeader,
   TableRow,
 } from "~/components/ui/table";
-import { useMemo } from "react";
+import { Suspense, useMemo } from "react";
 import _ from "lodash";
 import { cn } from "~/lib/utils";
+import { Skeleton } from "~/components/ui/skeleton";
 
 type Props = {
   picksSummary: Awaited<ReturnType<typeof serverApi.league.picksSummary>>;
@@ -29,7 +30,19 @@ type Props = {
 // You can use a Zod schema here if you want.
 export type Pick = Props["picksSummary"][number];
 
-export function PicksTable({ picksSummary, games, teams }: Props) {
+export function PicksTable(props: Props) {
+  return (
+    <Suspense fallback={<PicksTableSkeleton />}>
+      <PicksTableImpl {...props} />
+    </Suspense>
+  );
+}
+
+function PicksTableSkeleton() {
+  return <Skeleton className="h-full w-full rounded-md" />;
+}
+
+function PicksTableImpl({ picksSummary, games, teams }: Props) {
   const teamIdToTeam = useMemo(() => {
     return teams.reduce((prev, curr) => {
       prev.set(curr.teamid, curr);

@@ -42,6 +42,7 @@ export default async function LeaguePage({ params: { id } }: Props) {
       teams={teams}
       games={games}
       league={league}
+      session={session}
     />
   );
 }

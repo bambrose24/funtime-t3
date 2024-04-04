@@ -39,10 +39,7 @@ export function GameCard({
     >
       <div className="grid grid-cols-3 gap-y-2">
         <div className="flex flex-row items-center justify-center">
-          <TeamLogo
-            abbrev={awayTeam.abbrev ?? ""}
-            alt={`Team logo for ${awayTeam.loc} ${awayTeam.name}`}
-          />
+          <TeamLogo abbrev={awayTeam.abbrev ?? ""} />
         </div>
         <div className="flex flex-row items-center justify-center">
           <Button
@@ -60,10 +57,7 @@ export function GameCard({
           {game.awayscore}
         </div>
         <div className="flex flex-row items-center justify-center">
-          <TeamLogo
-            abbrev={homeTeam.abbrev ?? ""}
-            alt={`Team logo for ${homeTeam.loc} ${homeTeam.name}`}
-          />
+          <TeamLogo abbrev={homeTeam.abbrev ?? ""} />
         </div>
         <div className="flex flex-row items-center justify-center">
           <Button
