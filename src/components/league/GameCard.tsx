@@ -29,7 +29,7 @@ export function GameCard({
   return (
     <Card
       className={cn(
-        "min-h-[120px] min-w-[120px] p-2",
+        "min-h-[100px] min-w-[100px] p-1",
         simulated
           ? "border-yellow-300"
           : game.done
@@ -37,7 +37,7 @@ export function GameCard({
             : "",
       )}
     >
-      <div className="grid grid-cols-3 gap-y-2">
+      <div className="grid grid-cols-3 gap-y-1">
         <div className="flex flex-row items-center justify-center">
           <TeamLogo abbrev={awayTeam.abbrev ?? ""} />
         </div>

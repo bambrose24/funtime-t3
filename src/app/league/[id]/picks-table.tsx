@@ -119,7 +119,7 @@ function PicksTableImpl({ picksSummary, games, teams }: Props) {
             <TableRow key={headerGroup.id}>
               {headerGroup.headers.map((header) => {
                 return (
-                  <TableHead key={header.id}>
+                  <TableHead key={header.id} className="text-center">
                     {header.isPlaceholder
                       ? null
                       : flexRender(
@@ -144,16 +144,6 @@ function PicksTableImpl({ picksSummary, games, teams }: Props) {
                   const gid = Number(cell.column.id);
                   let pick;
                   let game;
-
-                  // if (
-                  //   // eslint-disable-next-line @typescript-eslint/prefer-optional-chain
-                  //   cell &&
-                  //   cell.row &&
-                  //   cell.row.original &&
-                  //   cell.row.original.gameIdToPick &&
-                  //   cell.row.original.gameIdToPick.get &&
-                  //   cell.row.original.gameIdToPick.get(gid)
-                  // ) {
                   if (cell?.row?.original?.gameIdToPick?.get?.(gid)) {
                     pick = cell.row.original?.gameIdToPick?.get(gid);
                     game = gameIdToGame.get(gid);
@@ -184,7 +174,7 @@ function PicksTableImpl({ picksSummary, games, teams }: Props) {
                               : bgColor === "yellow"
                                 ? "bg-yellow-500 dark:bg-yellow-700"
                                 : "",
-                          "flex h-full w-full flex-row items-center justify-center overflow-x-hidden p-1",
+                          "flex h-full w-full flex-row items-center justify-center p-1",
                         )}
                       >
                         {flexRender(

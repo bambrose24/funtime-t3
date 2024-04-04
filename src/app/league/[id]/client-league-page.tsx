@@ -1,10 +1,18 @@
 "use client";
 import { GameCard } from "~/components/league/GameCard";
-import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "~/components/ui/card";
 import { Text } from "~/components/ui/text";
 import { type serverApi } from "~/trpc/server";
 import { PicksTable } from "./picks-table";
 import { YourPicksList } from "./your-picks-list";
+import { useMemo } from "react";
+import { Separator } from "~/components/ui/separator";
 
 type ClientLeaguePageProps = {
   picksSummary: Awaited<ReturnType<typeof serverApi.league.picksSummary>>;
@@ -18,6 +26,10 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
   const { picksSummary, games, teams, league, session } = props;
   const firstGame = games.at(0);
 
+  const myPicks = useMemo(() => {
+    return picksSummary.find((p) => p.user_id === session.dbUser?.uid);
+  }, [picksSummary, session]);
+
   return (
     <div className="w-full justify-center p-4">
       <div className="flex flex-row justify-center py-4">
@@ -27,16 +39,45 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
         <div className="hidden md:col-span-1 md:col-start-1 md:flex">
           <div className="w-full">
             <Card className="w-full">
-              {firstGame && (
-                <CardHeader>
-                  <CardTitle>
-                    Your picks for Week {firstGame.week}, {firstGame.season}
-                  </CardTitle>
-                </CardHeader>
+              {myPicks ? (
+                <>
+                  {firstGame && (
+                    <CardHeader>
+                      <CardTitle>
+                        Your picks for Week {firstGame.week}, {firstGame.season}
+                      </CardTitle>
+                      <CardDescription>
+                        <div className="flex flex-col gap-1">
+                          <div className="flex w-full flex-row items-center justify-between gap-2">
+                            <Text.Muted>Correct:</Text.Muted>
+                            <Text.Small className="font-semibold text-card-foreground">
+                              {myPicks.correctPicks} / {games.length}
+                            </Text.Small>
+                          </div>
+                          <div className="flex w-full flex-row items-center justify-between gap-2">
+                            <Text.Muted>Tiebreaker Score:</Text.Muted>
+                            <Text.Small className="font-semibold text-card-foreground">
+                              {
+                                myPicks.picks.find(
+                                  (p) => p.score !== null && p.score > 0,
+                                )?.score
+                              }
+                            </Text.Small>
+                          </div>
+                        </div>
+                      </CardDescription>
+                      <Separator />
+                    </CardHeader>
+                  )}
+                  <CardContent>
+                    <YourPicksList {...props} myPicks={myPicks} />
+                  </CardContent>
+                </>
+              ) : (
+                <CardContent>
+                  <Text.Body>You missed picks this week!</Text.Body>
+                </CardContent>
               )}
-              <CardContent>
-                <YourPicksList {...props} />
-              </CardContent>
             </Card>
           </div>
         </div>

@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 
-export function useIdToValMemo<T, U extends string | number>(
+export function useDictify<T, U extends string | number>(
   vals: Array<T>,
   keyFn: (val: T) => U,
 ): Map<U, T> {

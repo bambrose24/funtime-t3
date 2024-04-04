@@ -4,11 +4,11 @@ import { useMemo } from "react";
 import { Text } from "~/components/ui/text";
 import { TeamLogo } from "~/components/shared/TeamLogo";
 import { type serverApi } from "~/trpc/server";
-import { useIdToValMemo } from "~/utils/hooks/useIdToValMemo";
+import { useDictify } from "~/utils/hooks/useIdToValMemo";
 import { cn } from "~/lib/utils";
 
 type Props = {
-  picksSummary: Awaited<ReturnType<typeof serverApi.league.picksSummary>>;
+  myPicks: Awaited<ReturnType<typeof serverApi.league.picksSummary>>[number];
   games: Awaited<ReturnType<typeof serverApi.games.getGames>>;
   teams: Awaited<ReturnType<typeof serverApi.teams.getTeams>>;
   league: Awaited<ReturnType<typeof serverApi.league.get>>;
@@ -16,14 +16,10 @@ type Props = {
 };
 
 export function YourPicksList(props: Props) {
-  const { picksSummary, games, teams, session } = props;
+  const { myPicks, games, teams } = props;
 
-  const myPicks = useMemo(() => {
-    return picksSummary.find((p) => p.user_id === session.dbUser?.uid);
-  }, [picksSummary, session]);
-
-  const teamIdToTeam = useIdToValMemo(teams, (t) => t.teamid);
-  const gameIdToGame = useIdToValMemo(games, (g) => g.gid);
+  const teamIdToTeam = useDictify(teams, (t) => t.teamid);
+  const gameIdToGame = useDictify(games, (g) => g.gid);
 
   return (
     <div className="flex flex-col gap-4">
@@ -51,6 +47,7 @@ export function YourPicksList(props: Props) {
                   correct
                     ? "border-green-500 dark:border-green-700"
                     : "border-red-500 dark:border-red-700",
+                  !game.done ? "border-blue-500 dark:border-blue-700" : "",
                 )}
               >
                 <TeamLogo
@@ -68,6 +65,8 @@ export function YourPicksList(props: Props) {
                   correct
                     ? "border-green-500 dark:border-green-700"
                     : "border-red-500 dark:border-red-700",
+                  // highest precedence is marking it blue while the game is ongoing
+                  !game.done ? "border-blue-500 dark:border-blue-700" : "",
                 )}
               >
                 <TeamLogo
