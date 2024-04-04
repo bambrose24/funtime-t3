@@ -132,15 +132,16 @@ export function PicksTable({ picksSummary, games, teams }: Props) {
                   let pick;
                   let game;
 
-                  if (
-                    // eslint-disable-next-line @typescript-eslint/prefer-optional-chain
-                    cell &&
-                    cell.row &&
-                    cell.row.original &&
-                    cell.row.original.gameIdToPick &&
-                    cell.row.original.gameIdToPick.get &&
-                    cell.row.original.gameIdToPick.get(gid)
-                  ) {
+                  // if (
+                  //   // eslint-disable-next-line @typescript-eslint/prefer-optional-chain
+                  //   cell &&
+                  //   cell.row &&
+                  //   cell.row.original &&
+                  //   cell.row.original.gameIdToPick &&
+                  //   cell.row.original.gameIdToPick.get &&
+                  //   cell.row.original.gameIdToPick.get(gid)
+                  // ) {
+                  if (cell?.row?.original?.gameIdToPick?.get?.(gid)) {
                     pick = cell.row.original?.gameIdToPick?.get(gid);
                     game = gameIdToGame.get(gid);
                   }
@@ -155,6 +156,9 @@ export function PicksTable({ picksSummary, games, teams }: Props) {
                     } else if (pick?.correct !== null) {
                       bgColor = "red";
                     }
+                  } else if (!game && cell.column.getIndex() > 1) {
+                    // TODO make columnIndexToGame map
+                    bgColor = "yellow";
                   }
                   return (
                     <TableCell key={cell.id} className="p-0">
@@ -167,7 +171,7 @@ export function PicksTable({ picksSummary, games, teams }: Props) {
                               : bgColor === "yellow"
                                 ? "bg-yellow-500 dark:bg-yellow-700"
                                 : "",
-                          "flex h-full w-full flex-row items-center justify-center p-1",
+                          "flex h-full w-full flex-row items-center justify-center overflow-x-hidden p-1",
                         )}
                       >
                         {flexRender(
