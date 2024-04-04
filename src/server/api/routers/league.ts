@@ -25,7 +25,7 @@ export const leagueRouter = createTRPCRouter({
       },
       ["getLeague", leagueId.toString()],
       {
-        revalidate: 60 * 60, // one hour
+        revalidate: 60 * 60, // one hour, doesn't change much
       },
     );
     return await getLeagueImpl();
