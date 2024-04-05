@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Button } from "~/components/ui/button";
+import { Button, buttonVariants } from "~/components/ui/button";
 import {
   DesktopIcon,
   ExitIcon,
@@ -35,6 +35,7 @@ import {
   TrophyIcon,
 } from "lucide-react";
 import { Avatar, AvatarFallback } from "~/components/ui/avatar";
+import { cn } from "~/lib/utils";
 
 type NavData = {
   data: NonNullable<Awaited<ReturnType<(typeof serverApi)["home"]["nav"]>>>;
@@ -63,12 +64,13 @@ export function ClientNav(props: NavData) {
       <div className="flex h-12 w-full flex-row justify-between px-2">
         <div className="flex flex-row items-center gap-2 lg:gap-4">
           <DropdownMenu>
-            <DropdownMenuTrigger>
-              <Button variant="ghost">
-                <div className="flex flex-row items-center gap-2">
-                  {chosenLeague ? chosenLeague.name : "My Leagues"}
-                  <ChevronDownIcon className="h-4 w-4" />
-                </div>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                className="flex flex-row items-center gap-2"
+              >
+                {chosenLeague ? chosenLeague.name : "My Leagues"}
+                <ChevronDownIcon className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="p-1">
@@ -113,19 +115,14 @@ export function ClientNav(props: NavData) {
             ) : (
               <DropdownMenu>
                 <DropdownMenuTrigger>
-                  <>
-                    <Button variant="outline" className="hidden sm:block">
-                      {user.username}
-                    </Button>
-                    <Avatar className="sm:hidden">
-                      <AvatarFallback>
-                        {user.username
-                          .split(" ")
-                          .slice(0, 2)
-                          .map((s) => s.at(0))}
-                      </AvatarFallback>
-                    </Avatar>
-                  </>
+                  <Avatar className="border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground">
+                    <AvatarFallback>
+                      {user.username
+                        .split(" ")
+                        .slice(0, 2)
+                        .map((s) => s.at(0))}
+                    </AvatarFallback>
+                  </Avatar>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="py-2">
                   <div className="flex w-full flex-col items-start gap-1 px-2 py-2">
@@ -203,9 +200,11 @@ function ThemeToggler() {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger>
-        {capitalize(themeResult)}{" "}
-        <ThemeIcon className="ml-2" theme={themeResult} />
+      <DropdownMenuTrigger asChild>
+        <Button size="sm" variant="outline">
+          {capitalize(themeResult)}
+          <ThemeIcon className="ml-2" theme={themeResult} />
+        </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56">
         <DropdownMenuLabel>Select Theme</DropdownMenuLabel>
@@ -258,7 +257,7 @@ function LeagueDropdownMenu({ chosenLeague }: { chosenLeague: ChosenLeague }) {
     <>
       <Separator orientation="vertical" />
       <DropdownMenu>
-        <DropdownMenuTrigger>
+        <DropdownMenuTrigger asChild>
           <Button variant="outline">
             <div className="flex flex-row items-center gap-2">
               <div className="hidden lg:block">League Home</div>

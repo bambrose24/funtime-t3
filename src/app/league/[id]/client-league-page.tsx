@@ -1,18 +1,23 @@
 "use client";
 import { GameCard } from "~/components/league/GameCard";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "~/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Text } from "~/components/ui/text";
 import { type serverApi } from "~/trpc/server";
 import { PicksTable } from "./picks-table";
-import { YourPicksList } from "./your-picks-list";
+import { YourPicksList, CompactYourPicksList } from "./your-picks-list";
 import { useMemo } from "react";
 import { Separator } from "~/components/ui/separator";
+import { Button } from "~/components/ui/button";
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "~/components/ui/drawer";
 
 type ClientLeaguePageProps = {
   picksSummary: Awaited<ReturnType<typeof serverApi.league.picksSummary>>;
@@ -89,6 +94,35 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
                   />
                 );
               })}
+            </div>
+            <div className="flex flex-row md:hidden">
+              {myPicks && firstGame && (
+                <Drawer>
+                  <DrawerTrigger asChild>
+                    <Button variant="secondary" className="w-full">
+                      View Your Picks
+                    </Button>
+                  </DrawerTrigger>
+                  <DrawerContent>
+                    <div className="mx-auto w-full max-w-sm">
+                      <DrawerHeader>
+                        <DrawerTitle>
+                          Your Week {firstGame.week}, {firstGame.season} Picks
+                        </DrawerTitle>
+                        <DrawerDescription>{league.name}</DrawerDescription>
+                      </DrawerHeader>
+                      <div className="overflow-scroll">
+                        <CompactYourPicksList {...props} myPicks={myPicks} />
+                      </div>
+                      <DrawerFooter>
+                        <DrawerClose asChild>
+                          <Button variant="secondary">Close</Button>
+                        </DrawerClose>
+                      </DrawerFooter>
+                    </div>
+                  </DrawerContent>
+                </Drawer>
+              )}
             </div>
             <PicksTable
               picksSummary={picksSummary}

@@ -32,13 +32,16 @@ type Props = {
 export type Pick = Props["picksSummary"][number];
 
 export function PicksTable(props: Props) {
-  // NOTE: could do suspense here
-  return <PicksTableImpl {...props} />;
+  return (
+    <Suspense fallback={<PicksTableSkeleton />}>
+      <PicksTableImpl {...props} />
+    </Suspense>
+  );
 }
 
-// function PicksTableSkeleton() {
-//   return <Skeleton className="h-full w-full rounded-md" />;
-// }
+function PicksTableSkeleton() {
+  return <Skeleton className="h-full w-full rounded-md" />;
+}
 
 function PicksTableImpl({ picksSummary, games, teams }: Props) {
   const teamIdToTeam = useDictify(teams, (t) => t.teamid);
