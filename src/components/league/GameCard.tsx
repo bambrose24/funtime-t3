@@ -29,7 +29,7 @@ export function GameCard({
   return (
     <Card
       className={cn(
-        "min-h-[100px] min-w-[100px] p-1",
+        "max-h-[130px] min-h-[130px] min-w-[130px] max-w-[130px] shrink-0 p-1",
         simulated
           ? "border-yellow-300"
           : game.done
@@ -75,7 +75,7 @@ export function GameCard({
           {game.homescore}
         </div>
         <Separator className="col-span-3" />
-        <div className="col-span-3 text-xs">
+        <div className="col-span-3 text-wrap text-xs">
           {dayjs(game.ts).format("llll")}
         </div>
       </div>

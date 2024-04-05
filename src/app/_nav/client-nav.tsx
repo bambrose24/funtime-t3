@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Button, buttonVariants } from "~/components/ui/button";
+import { Button } from "~/components/ui/button";
 import {
   DesktopIcon,
   ExitIcon,
@@ -35,7 +35,6 @@ import {
   TrophyIcon,
 } from "lucide-react";
 import { Avatar, AvatarFallback } from "~/components/ui/avatar";
-import { cn } from "~/lib/utils";
 
 type NavData = {
   data: NonNullable<Awaited<ReturnType<(typeof serverApi)["home"]["nav"]>>>;

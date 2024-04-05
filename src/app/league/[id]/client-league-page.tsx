@@ -78,7 +78,7 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
         </div>
         <div className="col-span-5 col-start-1 md:col-span-4 md:col-start-2 2xl:col-span-6">
           <div className="flex flex-col gap-4">
-            <div className="flex flex-row gap-2 overflow-auto">
+            <div className="flex flex-row gap-2 overflow-x-scroll">
               {games.map((g) => {
                 const homeTeam = teams.find((t) => t.teamid === g.home)!;
                 const awayTeam = teams.find((t) => t.teamid === g.away)!;
