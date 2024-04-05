@@ -86,7 +86,7 @@ export function ClientNav(props: NavData) {
                   </Link>
                 );
               })}
-              <DropdownMenuSeparator className="my-2" />
+              <DropdownMenuSeparator className="my-4" />
 
               <DropdownMenuLabel>Prior Leagues</DropdownMenuLabel>
               {inactiveLeagues.map((l) => {
