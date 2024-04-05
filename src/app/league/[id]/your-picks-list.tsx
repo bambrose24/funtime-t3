@@ -38,10 +38,10 @@ export function YourPicksList(props: Props) {
         }
         return (
           <div key={p.pickid} className="flex w-full flex-col">
-            <div className="flex w-full flex-row items-center justify-around">
+            <div className="grid w-full grid-cols-7">
               <div
                 className={cn(
-                  "flex flex-col items-center justify-center gap-1 rounded-lg p-1",
+                  "col-span-3 flex flex-row items-center justify-center gap-1 rounded-lg p-1",
                   choseAway ? "border-2" : "",
                   correct
                     ? "border-green-500 dark:border-green-700"
@@ -51,15 +51,17 @@ export function YourPicksList(props: Props) {
               >
                 <TeamLogo
                   abbrev={awayTeam.abbrev ?? ""}
-                  width={32}
-                  height={32}
+                  width={24}
+                  height={24}
                 />
                 <Text.Small>{awayTeam.abbrev}</Text.Small>
               </div>
-              <Text.Small>@</Text.Small>
+              <div className="col-span-1 flex flex-row items-center justify-center">
+                <Text.Small>@</Text.Small>
+              </div>
               <div
                 className={cn(
-                  "flex flex-col items-center justify-center gap-1 rounded-lg p-1",
+                  "col-span-3 flex flex-row items-center justify-center gap-1 rounded-lg p-1",
                   choseHome ? "border-2" : "",
                   correct
                     ? "border-green-500 dark:border-green-700"
@@ -68,12 +70,12 @@ export function YourPicksList(props: Props) {
                   !game.done ? "border-blue-500 dark:border-blue-700" : "",
                 )}
               >
+                <Text.Small>{homeTeam.abbrev}</Text.Small>
                 <TeamLogo
                   abbrev={homeTeam.abbrev ?? ""}
-                  width={32}
-                  height={32}
+                  width={24}
+                  height={24}
                 />
-                <Text.Small>{homeTeam.abbrev}</Text.Small>
               </div>
             </div>
           </div>
