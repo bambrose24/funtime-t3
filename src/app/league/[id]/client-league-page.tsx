@@ -62,7 +62,7 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
                   router.push(`${pathname}?week=${week}`);
                 }}
               >
-                <SelectTrigger className="w-full">
+                <SelectTrigger className="w-full ring-2 ring-input focus:ring-2">
                   <SelectValue placeholder={`Week ${firstGame.week}`} />
                 </SelectTrigger>
                 <SelectContent>
@@ -112,6 +112,30 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
         </div>
         <div className="col-span-5 col-start-1 md:col-span-4 md:col-start-2 2xl:col-span-6">
           <div className="flex flex-col gap-4">
+            <div className="w-full md:hidden">
+              {currentGame && firstGame && (
+                <Select
+                  onValueChange={(value) => {
+                    const week = Number(value);
+                    router.push(`${pathname}?week=${week}`);
+                  }}
+                >
+                  <SelectTrigger className="w-full ring-2 ring-input focus:ring-2">
+                    <SelectValue placeholder={`Week ${firstGame.week}`} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {[...Array(currentGame.week).keys()].map((weekMinusOne) => {
+                      const realWeek = weekMinusOne + 1;
+                      return (
+                        <SelectItem key={realWeek} value={realWeek.toString()}>
+                          Week {realWeek}
+                        </SelectItem>
+                      );
+                    })}
+                  </SelectContent>
+                </Select>
+              )}
+            </div>
             <div className="flex flex-row gap-2 overflow-x-scroll">
               {games.map((g) => {
                 const homeTeam = teams.find((t) => t.teamid === g.home)!;
