@@ -37,7 +37,7 @@ import {
 import { Avatar, AvatarFallback } from "~/components/ui/avatar";
 
 type NavData = {
-  data: NonNullable<Awaited<ReturnType<(typeof serverApi)["home"]["nav"]>>>;
+  data: Awaited<ReturnType<(typeof serverApi)["home"]["nav"]>>;
 };
 
 /**
@@ -47,14 +47,15 @@ export function ClientNav(props: NavData) {
   const leagueId = useLeagueIdFromPath();
   const logout = useLogout();
 
-  const { dbUser: user, leagues } = props.data;
+  const user = props.data?.dbUser;
+  const leagues = props.data?.leagues;
 
-  const chosenLeague = leagues.find((l) => l.league_id === leagueId);
+  const chosenLeague = leagues?.find((l) => l.league_id === leagueId);
 
-  const activeLeagues = leagues.filter(
+  const activeLeagues = leagues?.filter(
     (l) => l.status !== "completed" && new Date().getFullYear() - 1 <= l.season,
   );
-  const inactiveLeagues = leagues.filter(
+  const inactiveLeagues = leagues?.filter(
     (l) => l.status === "completed" || new Date().getFullYear() - 1 > l.season,
   );
 
@@ -65,6 +66,7 @@ export function ClientNav(props: NavData) {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
+                disabled={!leagues?.length}
                 variant="ghost"
                 className="flex flex-row items-center gap-2"
               >
@@ -74,7 +76,7 @@ export function ClientNav(props: NavData) {
             </DropdownMenuTrigger>
             <DropdownMenuContent className="p-1">
               <DropdownMenuLabel>Active Leagues</DropdownMenuLabel>
-              {activeLeagues.map((l) => {
+              {activeLeagues?.map((l) => {
                 return (
                   <Link
                     passHref
@@ -90,7 +92,7 @@ export function ClientNav(props: NavData) {
               <DropdownMenuSeparator className="my-4" />
 
               <DropdownMenuLabel>Prior Leagues</DropdownMenuLabel>
-              {inactiveLeagues.map((l) => {
+              {inactiveLeagues?.map((l) => {
                 return (
                   <Link
                     passHref
