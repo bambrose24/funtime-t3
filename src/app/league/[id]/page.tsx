@@ -7,10 +7,16 @@ type Props = {
   params: {
     id: string;
   };
+  searchParams?: Record<string, string | string[] | undefined>;
 };
 
-export default async function LeaguePage({ params: { id } }: Props) {
+export default async function LeaguePage({
+  params: { id },
+  searchParams,
+}: Props) {
   const leagueId = Number(id);
+  const weekParam = searchParams?.week;
+
   const session = await serverApi.session.current();
   const member = session.dbUser?.leaguemembers.find(
     (m) => m.league_id === leagueId,
@@ -21,19 +27,26 @@ export default async function LeaguePage({ params: { id } }: Props) {
     return notFound();
   }
 
-  const game = await serverApi.time.activeWeekByLeague({ leagueId });
+  const [league, activeGame] = await Promise.all([
+    serverApi.league.get({ leagueId }),
+    serverApi.time.activeWeekByLeague({ leagueId }),
+  ]);
 
-  if (!game) {
-    // I suppose the league hasn't started yet? idk what to do yet
-    return notFound();
+  const season = league.season;
+
+  let week = Number(weekParam);
+  if (!week) {
+    if (!activeGame) {
+      // I suppose the league hasn't started yet? idk what to do yet
+      return notFound();
+    }
+    week = activeGame.week;
   }
-  const { week, season } = game;
 
-  const [data, games, teams, league] = await Promise.all([
+  const [data, games, teams] = await Promise.all([
     serverApi.league.picksSummary({ leagueId, week }),
     serverApi.games.getGames({ week, season }),
     serverApi.teams.getTeams(),
-    serverApi.league.get({ leagueId }),
   ]);
 
   return (
@@ -43,6 +56,7 @@ export default async function LeaguePage({ params: { id } }: Props) {
       games={games}
       league={league}
       session={session}
+      currentGame={activeGame}
     />
   );
 }

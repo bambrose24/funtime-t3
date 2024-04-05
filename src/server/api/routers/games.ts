@@ -22,7 +22,7 @@ export const gamesRouter = createTRPCRouter({
       async () => {
         return await getGamesImpl({ season, week });
       },
-      ["getGamesBySeason", season.toString()],
+      ["getGamesBySeason", season.toString(), week?.toString() ?? ""],
       {
         revalidate: REVALIDATE_SECONDS,
       },

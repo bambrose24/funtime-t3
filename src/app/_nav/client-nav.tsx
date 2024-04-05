@@ -74,7 +74,7 @@ export function ClientNav(props: NavData) {
                 <ChevronDownIcon className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="p-1">
+            <DropdownMenuContent className="w-64 p-1">
               <DropdownMenuLabel>Active Leagues</DropdownMenuLabel>
               {activeLeagues?.map((l) => {
                 return (

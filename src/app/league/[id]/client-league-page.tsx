@@ -18,6 +18,14 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "~/components/ui/drawer";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "~/components/ui/select";
+import { usePathname, useRouter } from "next/navigation";
 
 type ClientLeaguePageProps = {
   picksSummary: Awaited<ReturnType<typeof serverApi.league.picksSummary>>;
@@ -25,11 +33,15 @@ type ClientLeaguePageProps = {
   teams: Awaited<ReturnType<typeof serverApi.teams.getTeams>>;
   league: Awaited<ReturnType<typeof serverApi.league.get>>;
   session: Awaited<ReturnType<typeof serverApi.session.current>>;
+  currentGame: Awaited<ReturnType<typeof serverApi.time.activeWeekByLeague>>;
 };
 
 export function ClientLeaguePage(props: ClientLeaguePageProps) {
-  const { picksSummary, games, teams, league, session } = props;
+  const { picksSummary, games, teams, league, session, currentGame } = props;
   const firstGame = games.at(0);
+
+  const router = useRouter();
+  const pathname = usePathname();
 
   const myPicks = useMemo(() => {
     return picksSummary.find((p) => p.user_id === session.dbUser?.uid);
@@ -42,7 +54,29 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
       </div>
       <div className="grid grid-cols-5 gap-4 2xl:grid-cols-7">
         <div className="hidden md:col-span-1 md:col-start-1 md:flex">
-          <div className="w-full">
+          <div className="flex w-full flex-col gap-4">
+            {currentGame && firstGame && (
+              <Select
+                onValueChange={(value) => {
+                  const week = Number(value);
+                  router.push(`${pathname}?week=${week}`);
+                }}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder={`Week ${firstGame.week}`} />
+                </SelectTrigger>
+                <SelectContent>
+                  {[...Array(currentGame.week).keys()].map((weekMinusOne) => {
+                    const realWeek = weekMinusOne + 1;
+                    return (
+                      <SelectItem key={realWeek} value={realWeek.toString()}>
+                        Week {realWeek}
+                      </SelectItem>
+                    );
+                  })}
+                </SelectContent>
+              </Select>
+            )}
             {myPicks && firstGame && (
               <Card className="w-full">
                 <CardHeader>
