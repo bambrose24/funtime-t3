@@ -35,14 +35,12 @@ import {
   TrophyIcon,
 } from "lucide-react";
 import { Avatar, AvatarFallback } from "~/components/ui/avatar";
+import { BreadcrumbSeparator } from "~/components/ui/breadcrumb";
 
 type NavData = {
   data: Awaited<ReturnType<(typeof serverApi)["home"]["nav"]>>;
 };
 
-/**
- * TODO model the top right after Vercel
- */
 export function ClientNav(props: NavData) {
   const leagueId = useLeagueIdFromPath();
   const logout = useLogout();
@@ -67,7 +65,7 @@ export function ClientNav(props: NavData) {
             <DropdownMenuTrigger asChild>
               <Button
                 disabled={!leagues?.length}
-                variant="ghost"
+                variant="outline"
                 className="flex flex-row items-center gap-2"
               >
                 {chosenLeague ? chosenLeague.name : "My Leagues"}
@@ -107,7 +105,12 @@ export function ClientNav(props: NavData) {
               })}
             </DropdownMenuContent>
           </DropdownMenu>
-          {chosenLeague && <LeagueDropdownMenu chosenLeague={chosenLeague} />}
+          {chosenLeague && (
+            <>
+              <Separator orientation="vertical" className="my-4" />
+              <LeagueDropdownMenu chosenLeague={chosenLeague} />
+            </>
+          )}
         </div>
         {user ? (
           <div className="flex flex-row items-center">
@@ -256,7 +259,6 @@ type ChosenLeague = NonNullable<
 function LeagueDropdownMenu({ chosenLeague }: { chosenLeague: ChosenLeague }) {
   return (
     <>
-      <Separator orientation="vertical" />
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="outline">
