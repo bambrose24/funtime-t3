@@ -35,6 +35,7 @@ import {
   TrophyIcon,
 } from "lucide-react";
 import { Avatar, AvatarFallback } from "~/components/ui/avatar";
+import { usePathname } from "next/navigation";
 
 type NavData = {
   data: Awaited<ReturnType<(typeof serverApi)["home"]["nav"]>>;
@@ -255,6 +256,39 @@ type ChosenLeague = NonNullable<
   >["leagues"][number]
 >;
 
+type TabOption = "home" | "make-picks" | "leaderboard";
+
+function useActiveLeagueSubPath(): TabOption {
+  const pathname = usePathname();
+  if (pathname.includes("/leaderboard")) {
+    return "leaderboard";
+  }
+  if (pathname.includes("pick")) {
+    return "make-picks";
+  }
+  return "home";
+}
+
+function TabLabel() {
+  const activeSubTab = useActiveLeagueSubPath();
+  switch (activeSubTab) {
+    case "home":
+      return (
+        <>
+          <div className="hidden lg:block">League Home</div>
+          <div className="lg:hidden">Home</div>
+        </>
+      );
+    case "leaderboard":
+      return <div>Leaderboard</div>;
+    case "make-picks":
+      <>
+        <div className="hidden lg:block">Make Picks</div>
+        <div className="lg:hidden">Pick</div>
+      </>;
+  }
+}
+
 function LeagueDropdownMenu({ chosenLeague }: { chosenLeague: ChosenLeague }) {
   return (
     <>
@@ -262,8 +296,7 @@ function LeagueDropdownMenu({ chosenLeague }: { chosenLeague: ChosenLeague }) {
         <DropdownMenuTrigger asChild>
           <Button variant="outline">
             <div className="flex flex-row items-center gap-2">
-              <div className="hidden lg:block">League Home</div>
-              <div className="lg:hidden">Home</div>
+              <TabLabel />
               <ChevronsUpDown className="h-3 w-3" />
             </div>
           </Button>
