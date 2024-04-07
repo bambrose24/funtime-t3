@@ -287,11 +287,11 @@ function LeagueDropdownMenu({ chosenLeague }: { chosenLeague: ChosenLeague }) {
               </div>
             </DropdownMenuItem>
           </Link>
-          <Link href={`/league/${chosenLeague.league_id}/standings`}>
+          <Link href={`/league/${chosenLeague.league_id}/leaderboard`}>
             <DropdownMenuItem>
               <div className="flex flex-row items-center gap-3">
                 <TrophyIcon className="h-4 w-4" />
-                <>Standings</>
+                <>Leaderboard</>
               </div>
             </DropdownMenuItem>
           </Link>
