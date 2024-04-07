@@ -99,7 +99,7 @@ export function LeaderboardTable(props: TableProps) {
     <div className="w-full">
       <div className="flex items-center py-4">
         <Input
-          placeholder="Filter users..."
+          placeholder="Filter players..."
           value={
             (table.getColumn("username")?.getFilterValue() as string) ?? ""
           }
