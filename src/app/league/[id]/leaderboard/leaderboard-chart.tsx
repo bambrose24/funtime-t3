@@ -79,6 +79,11 @@ function useChartTheme(): LineProps["theme"] {
         color: shadcnLight,
       },
     },
+    labels: {
+      text: {
+        color: textColor,
+      },
+    },
   };
 }
 
