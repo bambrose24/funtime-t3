@@ -282,10 +282,12 @@ function TabLabel() {
     case "leaderboard":
       return <div>Leaderboard</div>;
     case "make-picks":
-      <>
-        <div className="hidden lg:block">Make Picks</div>
-        <div className="lg:hidden">Pick</div>
-      </>;
+      return (
+        <>
+          <div className="hidden lg:block">Make Picks</div>
+          <div className="lg:hidden">Pick</div>
+        </>
+      );
   }
 }
 
