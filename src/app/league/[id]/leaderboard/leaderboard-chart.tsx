@@ -45,7 +45,7 @@ function useChartTheme(): LineProps["theme"] {
   const shadcnLight = key === "dark" ? "#D1D5DB" : "#F9FAFB";
 
   // Adjust the text color for axis ticks
-  const textColor = key === "dark" ? "#718096" : "#6B7280";
+  const textColor = key === "dark" ? "#F9FAFB" : "#6B7280";
 
   return {
     axis: {

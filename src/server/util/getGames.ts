@@ -2,8 +2,6 @@ import "server-only";
 import { db } from "../db";
 import { cache } from "~/utils/cache";
 
-const REVALIDATE_SECONDS = 60;
-
 export async function getGames({
   season,
   week,
@@ -22,7 +20,7 @@ export async function getGames({
     },
     ["getGamesBySeason", season.toString(), week ? week.toString() : "no_week"],
     {
-      revalidate: REVALIDATE_SECONDS,
+      revalidate: 60, // every minute
     },
   );
   return await getGamesFn();

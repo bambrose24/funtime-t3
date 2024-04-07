@@ -3,8 +3,6 @@ import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import { db } from "~/server/db";
 import { cache } from "~/utils/cache";
 
-const REVALIDATE_SECONDS = 120;
-
 const getGamesSchema = z.object({
   season: z.number().int(),
   week: z.number().int().optional(),
@@ -24,7 +22,7 @@ export const gamesRouter = createTRPCRouter({
       },
       ["getGamesBySeason", season.toString(), week?.toString() ?? ""],
       {
-        revalidate: REVALIDATE_SECONDS,
+        revalidate: 60 * 2,
       },
     );
     return await getGames();

@@ -6,9 +6,6 @@ import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import { cache } from "~/utils/cache";
 import { withRankings } from "~/utils/withRankings";
 
-// const LEADERBOARD_REVALIDATE_SECONDS = 60 * 60; // 1 hour
-const LEADERBOARD_REVALIDATE_SECONDS = 1; // for dev
-
 export const leaderboardRouter = createTRPCRouter({
   league: publicProcedure
     .input(z.object({ leagueId: z.number().int() }))
@@ -107,7 +104,9 @@ export const leaderboardRouter = createTRPCRouter({
           return { league, weekTotals, correctCountsSorted };
         },
         [leagueId.toString()],
-        { revalidate: LEADERBOARD_REVALIDATE_SECONDS },
+        {
+          revalidate: 60 * 60, // 1 hour
+        },
       );
 
       return await getLeagueLeaderboard();
