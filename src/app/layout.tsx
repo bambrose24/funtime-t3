@@ -26,8 +26,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" suppressHydrationWarning className="overflow-y-scroll">
-      <body className={cn(inter.variable, `h-full w-full font-sans`)}>
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className="min-h-screen overflow-y-scroll"
+    >
+      <body
+        className={cn(inter.variable, `min-w-screen min-h-screen font-sans`)}
+      >
         <TRPCReactProvider>
           <ThemeProvider
             attribute="class"

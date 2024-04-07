@@ -35,7 +35,6 @@ import {
   TrophyIcon,
 } from "lucide-react";
 import { Avatar, AvatarFallback } from "~/components/ui/avatar";
-import { BreadcrumbSeparator } from "~/components/ui/breadcrumb";
 
 type NavData = {
   data: Awaited<ReturnType<(typeof serverApi)["home"]["nav"]>>;
