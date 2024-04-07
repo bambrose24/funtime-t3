@@ -55,23 +55,25 @@ export const leaderboardRouter = createTRPCRouter({
             },
           });
 
-          const groupedPicksSorted = sortBy(groupedPicks, (p) => p.week);
-          const weekTotals = groupedPicksSorted.reduce((prev, curr) => {
-            const { _count, member_id, week } = curr;
-            if (!member_id) return prev;
-            if (!prev.has(member_id)) {
-              prev.set(member_id, new Map());
+          const maxWeek = Math.max(...groupedPicks.map((p) => p.week));
+
+          const weekTotals = new Map<number, Map<number, number>>();
+          [...memberIdToMember.keys()].map((memberId) => {
+            weekTotals.set(memberId, new Map());
+            const memberPicks = groupedPicks.filter(
+              (p) => p.member_id === memberId,
+            );
+            let weekIter = 1;
+            while (weekIter <= maxWeek) {
+              const total = memberPicks
+                .filter((p) => p.week <= weekIter)
+                .reduce((prev, curr) => {
+                  return prev + curr._count.correct;
+                }, 0);
+              weekTotals.get(memberId)?.set(weekIter, total);
+              weekIter += 1;
             }
-
-            const memberMap = prev.get(member_id)!;
-
-            const memberCurrentTotal =
-              (week > 1 ? memberMap.get(week - 1) : 0) ?? 0;
-
-            memberMap.set(week, memberCurrentTotal + _count.correct);
-
-            return prev;
-          }, new Map<number, Map<number, number>>());
+          });
 
           const memberToTotal = groupedPicks.reduce((prev, curr) => {
             if (!curr.member_id) {
