@@ -136,12 +136,14 @@ export function ClientNav(props: NavData) {
 
                   <DropdownMenuSeparator />
 
-                  <DropdownMenuItem>
-                    <MenuRow>
-                      Settings
-                      <GearIcon />
-                    </MenuRow>
-                  </DropdownMenuItem>
+                  <Link href="/settings">
+                    <DropdownMenuItem>
+                      <MenuRow>
+                        Settings
+                        <GearIcon />
+                      </MenuRow>
+                    </DropdownMenuItem>
+                  </Link>
                   <DropdownMenuItem>
                     <MenuRow>
                       Theme
