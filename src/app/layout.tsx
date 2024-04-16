@@ -43,7 +43,7 @@ export default function RootLayout({
           >
             <Nav />
             {children}
-            <Toaster />
+            <Toaster position="bottom-right" />
           </ThemeProvider>
         </TRPCReactProvider>
       </body>

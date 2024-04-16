@@ -1,4 +1,5 @@
 import { type AppConfigDynamic } from "next/dist/build/utils";
+import { redirect } from "next/navigation";
 import { HomeLeagueCard } from "~/components/home/HomeLeagueCard";
 import { serverApi } from "~/trpc/server";
 
@@ -7,6 +8,10 @@ export const dynamic: AppConfigDynamic = "force-dynamic";
 
 export default async function Home() {
   const data = await serverApi.home.summary({ season: 2023 });
+
+  if (!data?.length) {
+    redirect("/login");
+  }
 
   return (
     <main className="h-full w-full px-3">

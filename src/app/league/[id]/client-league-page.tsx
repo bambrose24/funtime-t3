@@ -40,9 +40,6 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
   const { picksSummary, games, teams, league, session, currentGame } = props;
   const firstGame = games.at(0);
 
-  const url = process.env.NEXT_PUBLIC_VERCEL_URL;
-  console.log("url?", url);
-
   const router = useRouter();
   const pathname = usePathname();
 
