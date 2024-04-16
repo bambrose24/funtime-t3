@@ -49,7 +49,9 @@ function UsernameForm({ data }: Props) {
   const { mutateAsync: updateUsername } =
     clientApi.settings.updateUsername.useMutation({
       onSuccess: () => {
-        toast.success(`Successfully updated your username!`);
+        toast.success(
+          `Successfully updated your username. It will take up to an hour to see the change reflected.`,
+        );
         router.refresh();
       },
       onError: (error) => {

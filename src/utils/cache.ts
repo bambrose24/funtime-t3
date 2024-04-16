@@ -18,3 +18,8 @@ export const cache = <T, P extends unknown[]>(
     return parse(result);
   };
 };
+
+// uid or email
+export function getCoreUserTag(key: number | string) {
+  return `coreUser_${key}`;
+}

@@ -11,7 +11,7 @@ import superjson from "superjson";
 import { ZodError } from "zod";
 
 import { db } from "~/server/db";
-import { cache } from "~/utils/cache";
+import { cache, getCoreUserTag } from "~/utils/cache";
 import { supabaseServer } from "~/utils/supabase/server";
 
 /**
@@ -53,7 +53,7 @@ export const createTRPCContext = async (opts: { headers: Headers }) => {
       ["getUserByEmail", supabaseUser.email],
       {
         revalidate: 30, // 5 minutes but revalidate via tag below
-        tags: ["getUserByEmail"],
+        tags: [getCoreUserTag(supabaseUser.email)],
       },
     );
     dbUser = await getDbUser();

@@ -2,6 +2,7 @@ import { TRPCError } from "@trpc/server";
 import { revalidateTag } from "next/cache";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import { db } from "~/server/db";
+import { getCoreUserTag } from "~/utils/cache";
 import { updateUsernameSchema } from "~/utils/schemas/updateUsername";
 
 export const settingsRouter = createTRPCRouter({
@@ -38,6 +39,7 @@ export const settingsRouter = createTRPCRouter({
         },
       });
 
-      revalidateTag("getUserByEmail");
+      revalidateTag(getCoreUserTag(dbUser.uid));
+      revalidateTag(getCoreUserTag(dbUser.email));
     }),
 });

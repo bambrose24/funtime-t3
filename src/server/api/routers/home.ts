@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
-import { cache } from "~/utils/cache";
+import { cache, getCoreUserTag } from "~/utils/cache";
 
 const HOME_REVALIDATE_SECONDS = 60 * 3; // 3 minutes should be good
 
@@ -35,7 +35,10 @@ export const homeRouter = createTRPCRouter({
         return { leagues, dbUser };
       },
       leagueIds.map((league_id) => league_id.toString()),
-      { revalidate: HOME_REVALIDATE_SECONDS },
+      {
+        revalidate: HOME_REVALIDATE_SECONDS,
+        tags: [getCoreUserTag(dbUser.uid)],
+      },
     );
 
     return await getLeagues();
