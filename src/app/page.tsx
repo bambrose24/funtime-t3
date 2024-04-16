@@ -1,7 +1,6 @@
 import { type AppConfigDynamic } from "next/dist/build/utils";
 import { redirect } from "next/navigation";
 import { HomeLeagueCard } from "~/components/home/HomeLeagueCard";
-import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { serverApi } from "~/trpc/server";
 import { JoinOrCreateALeague } from "./JoinOrCreateALeague";
 

@@ -1,6 +1,6 @@
 "use client";
 import { usePathname } from "next/navigation";
-import { Suspense, type ReactNode } from "react";
+import { type ReactNode } from "react";
 import { type SettingsTabId, settingsTabIds, settingsTabs } from "./types";
 import { Button } from "~/components/ui/button";
 import Link from "next/link";

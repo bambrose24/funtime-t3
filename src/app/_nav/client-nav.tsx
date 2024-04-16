@@ -34,7 +34,7 @@ import {
   PenIcon,
   TrophyIcon,
 } from "lucide-react";
-import { Avatar, AvatarFallback } from "~/components/ui/avatar";
+import { Avatar } from "~/components/ui/avatar";
 import { usePathname } from "next/navigation";
 import { FuntimeAvatarFallback } from "./AvatarFallback";
 
