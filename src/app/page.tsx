@@ -1,15 +1,20 @@
 import { type AppConfigDynamic } from "next/dist/build/utils";
 import { redirect } from "next/navigation";
 import { HomeLeagueCard } from "~/components/home/HomeLeagueCard";
+import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { serverApi } from "~/trpc/server";
+import { JoinOrCreateALeague } from "./JoinOrCreateALeague";
 
 // Almost all of the Funtime pages will need this
 export const dynamic: AppConfigDynamic = "force-dynamic";
 
 export default async function Home() {
-  const data = await serverApi.home.summary({ season: 2023 });
+  const [data, session] = await Promise.all([
+    serverApi.home.summary({ season: 2023 }),
+    serverApi.session.current(),
+  ]);
 
-  if (!data?.length) {
+  if (!session) {
     redirect("/login");
   }
 
@@ -22,6 +27,8 @@ export default async function Home() {
           }
           return <HomeLeagueCard key={d.league_id} data={d} />;
         })}
+        {!data?.length ? <JoinOrCreateALeague /> : <></>}
+        {/* {data?.length ? <JoinOrCreateALeague /> : <></>} */}
       </div>
     </main>
   );
