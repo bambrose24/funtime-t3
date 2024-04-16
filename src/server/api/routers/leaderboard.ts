@@ -3,6 +3,7 @@ import { sortBy } from "lodash";
 import { z } from "zod";
 
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
+import { UnauthorizedError } from "~/server/util/errors/unauthorized";
 import { cache } from "~/utils/cache";
 import { withRankings } from "~/utils/withRankings";
 
@@ -18,10 +19,7 @@ export const leaderboardRouter = createTRPCRouter({
 
       const { leagueId } = input;
       if (!dbUser.leaguemembers.find((m) => m.league_id === leagueId)) {
-        throw new TRPCError({
-          code: "UNAUTHORIZED",
-          message: "You do not have access to this league",
-        });
+        throw UnauthorizedError;
       }
 
       const getLeagueLeaderboard = cache(
