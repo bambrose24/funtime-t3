@@ -52,7 +52,8 @@ export const createTRPCContext = async (opts: { headers: Headers }) => {
       },
       ["getUserByEmail", supabaseUser.email],
       {
-        revalidate: 60 * 5, // every 5 minutes, short of there being an update to the username this should be fine
+        revalidate: 30, // 5 minutes but revalidate via tag below
+        tags: ["getUserByEmail"],
       },
     );
     dbUser = await getDbUser();
