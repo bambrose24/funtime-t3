@@ -8,16 +8,18 @@ import { updateUsernameSchema } from "~/utils/schemas/updateUsername";
 
 export const settingsRouter = createTRPCRouter({
   get: publicProcedure.query(async ({ ctx }) => {
-    const { supabaseUser, dbUser } = ctx;
+    const { dbUser: dbUserCached } = ctx;
 
-    if (!dbUser) {
+    if (!dbUserCached) {
       throw UnauthorizedError;
     }
 
     // no caching on purpose
-    return await db.people.findFirstOrThrow({
-      where: { uid: dbUser.uid },
+    const dbUser = await db.people.findFirstOrThrow({
+      where: { uid: dbUserCached.uid },
     });
+
+    return { dbUser };
   }),
   updateUsername: publicProcedure
     .input(updateUsernameSchema)

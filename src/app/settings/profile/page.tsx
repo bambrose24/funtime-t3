@@ -4,9 +4,8 @@ import { serverApi } from "~/trpc/server";
 import { UserInfoSettings } from "./UserInfoSettings";
 
 export default async function ProfileSettingsPage() {
-  const settingsData = await serverApi.settings.get();
-  const dbUser = settingsData?.dbUser;
-  if (!dbUser) {
+  const settings = await serverApi.settings.get();
+  if (!settings) {
     redirect("/login");
   }
 
@@ -14,7 +13,7 @@ export default async function ProfileSettingsPage() {
     <Card>
       <CardContent className="py-4">
         <div className="flex flex-row gap-3">
-          <UserInfoSettings data={settingsData} />
+          <UserInfoSettings data={settings} />
         </div>
       </CardContent>
     </Card>
