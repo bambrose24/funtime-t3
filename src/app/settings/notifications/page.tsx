@@ -10,8 +10,7 @@ async function wait(ms: number) {
 }
 
 export default async function NotificationsSettingsPage() {
-  const session = await serverApi.settings.get();
-  const dbUser = session?.dbUser;
+  const dbUser = await serverApi.settings.get();
   if (!dbUser) {
     redirect("/login");
   }
