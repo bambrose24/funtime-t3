@@ -1,11 +1,11 @@
 import { redirect } from "next/navigation";
-import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
-import { Text } from "~/components/ui/text";
+import { Card, CardContent } from "~/components/ui/card";
 import { serverApi } from "~/trpc/server";
+import { UserInfoSettings } from "./UserInfoSettings";
 
 export default async function ProfileSettingsPage() {
-  const session = await serverApi.session.settings();
-  const dbUser = session?.dbUser;
+  const settingsData = await serverApi.settings.get();
+  const dbUser = settingsData?.dbUser;
   if (!dbUser) {
     redirect("/login");
   }
@@ -13,8 +13,9 @@ export default async function ProfileSettingsPage() {
   return (
     <Card>
       <CardContent className="py-4">
-        <Text.H2>My Profile</Text.H2>
-        More coming soon.
+        <div className="flex flex-row gap-3">
+          <UserInfoSettings data={settingsData} />
+        </div>
       </CardContent>
     </Card>
   );

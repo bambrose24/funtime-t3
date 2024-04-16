@@ -6,8 +6,4 @@ export const sessionRouter = createTRPCRouter({
 
     return { dbUser, supabaseUser };
   }),
-  settings: publicProcedure.query(async ({ ctx }) => {
-    const { supabaseUser, dbUser } = ctx;
-    return { dbUser, supabaseUser };
-  }),
 });

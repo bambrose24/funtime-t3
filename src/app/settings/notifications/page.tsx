@@ -3,12 +3,20 @@ import { Card, CardContent } from "~/components/ui/card";
 import { Text } from "~/components/ui/text";
 import { serverApi } from "~/trpc/server";
 
+async function wait(ms: number) {
+  return new Promise((resolve) => {
+    return setTimeout(resolve, ms);
+  });
+}
+
 export default async function NotificationsSettingsPage() {
-  const session = await serverApi.session.settings();
+  const session = await serverApi.settings.get();
   const dbUser = session?.dbUser;
   if (!dbUser) {
     redirect("/login");
   }
+
+  await wait(3000);
 
   return (
     <Card>

@@ -6,6 +6,7 @@ import { leagueRouter } from "./routers/league";
 import { teamsRouter } from "./routers/teams";
 import { gamesRouter } from "./routers/games";
 import { leaderboardRouter } from "./routers/leaderboard";
+import { settingsRouter } from "./routers/settings";
 
 /**
  * This is the primary router for your server.
@@ -15,6 +16,7 @@ import { leaderboardRouter } from "./routers/leaderboard";
 export const appRouter = createTRPCRouter({
   home: homeRouter,
   session: sessionRouter,
+  settings: settingsRouter,
   time: timeRouter,
   league: leagueRouter,
   teams: teamsRouter,

@@ -36,6 +36,7 @@ import {
 } from "lucide-react";
 import { Avatar, AvatarFallback } from "~/components/ui/avatar";
 import { usePathname } from "next/navigation";
+import { FuntimeAvatarFallback } from "./AvatarFallback";
 
 type NavData = {
   data: Awaited<ReturnType<(typeof serverApi)["home"]["nav"]>>;
@@ -120,12 +121,7 @@ export function ClientNav(props: NavData) {
               <DropdownMenu>
                 <DropdownMenuTrigger>
                   <Avatar className="border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground">
-                    <AvatarFallback>
-                      {user.username
-                        .split(" ")
-                        .slice(0, 2)
-                        .map((s) => s.at(0))}
-                    </AvatarFallback>
+                    <FuntimeAvatarFallback username={user.username} />
                   </Avatar>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="py-2">
