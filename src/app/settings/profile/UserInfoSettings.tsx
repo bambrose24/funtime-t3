@@ -50,7 +50,7 @@ function UsernameForm({ data }: Props) {
     clientApi.settings.updateUsername.useMutation({
       onSuccess: () => {
         toast.success(
-          `Successfully updated your username. It will take up to an hour to see the change reflected.`,
+          `Successfully updated your username. It make take 15 minutes to see the change reflected.`,
         );
         router.refresh();
       },
