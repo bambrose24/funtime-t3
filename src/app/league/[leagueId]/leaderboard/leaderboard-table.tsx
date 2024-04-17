@@ -70,7 +70,7 @@ export const columns: ColumnDef<Column>[] = [
       return d;
     },
     header: "Player",
-    cell: ({ row, cell }) => {
+    cell: ({ cell }) => {
       const c = cell.getValue() as Column;
       return (
         <Link
