@@ -5,16 +5,16 @@ import { ClientLeaguePage } from "./client-league-page";
 // dynamic route params come in as `params` arg
 type Props = {
   params: {
-    id: string;
+    leagueId: string;
   };
   searchParams?: Record<string, string | string[] | undefined>;
 };
 
 export default async function LeaguePage({
-  params: { id },
+  params: { leagueId: leagueIdParam },
   searchParams,
 }: Props) {
-  const leagueId = Number(id);
+  const leagueId = Number(leagueIdParam);
   const weekParam = searchParams?.week;
 
   const session = await serverApi.session.current();

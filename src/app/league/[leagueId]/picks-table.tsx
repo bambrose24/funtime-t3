@@ -20,6 +20,7 @@ import _ from "lodash";
 import { cn } from "~/lib/utils";
 import { Skeleton } from "~/components/ui/skeleton";
 import { useDictify } from "~/utils/hooks/useIdToValMemo";
+import Link from "next/link";
 
 type Props = {
   picksSummary: Awaited<ReturnType<typeof serverApi.league.picksSummary>>;
@@ -62,7 +63,18 @@ function PicksTableImpl({ picksSummary, games, teams }: Props) {
     {
       maxSize: 30,
       accessorFn: (data) => {
-        return data?.people?.username;
+        return data;
+      },
+      cell: (c) => {
+        const value = c.cell.getValue() as Pick;
+        return (
+          <Link
+            href={`/league/${value.league_id}/player/${value.membership_id}`}
+            className="hover:underline"
+          >
+            {value.people.username}
+          </Link>
+        );
       },
       header: "Player",
       id: "player",

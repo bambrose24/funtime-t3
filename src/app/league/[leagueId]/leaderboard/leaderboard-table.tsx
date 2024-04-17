@@ -7,6 +7,7 @@ import {
   getFilteredRowModel,
   flexRender,
 } from "@tanstack/react-table";
+import Link from "next/link";
 import React from "react";
 import { Checkbox } from "~/components/ui/checkbox";
 import { Input } from "~/components/ui/input";
@@ -66,10 +67,20 @@ export const columns: ColumnDef<Column>[] = [
   {
     id: "username",
     accessorFn: (d) => {
-      return d.member.people.username;
+      return d;
     },
     header: "Player",
-    cell: ({ row }) => <div>{row.getValue("username")}</div>,
+    cell: ({ row, cell }) => {
+      const c = cell.getValue() as Column;
+      return (
+        <Link
+          href={`/league/${c.member.league_id}/player/${c.member.membership_id}`}
+          className="hover:underline"
+        >
+          {c.member.people.username}
+        </Link>
+      );
+    },
   },
   {
     id: "correct",
