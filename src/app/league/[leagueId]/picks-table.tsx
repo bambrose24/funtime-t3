@@ -71,7 +71,6 @@ function PicksTableImpl({ picksSummary, games, teams }: Props) {
       cell: (c) => {
         const value = c.cell.getValue() as Pick;
         const href = `/league/${value.league_id}/player/${value.membership_id}`;
-        console.log(`prefetching ${href}`);
         router.prefetch(href, {
           kind: PrefetchKind.FULL,
         });
