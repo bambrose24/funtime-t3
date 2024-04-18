@@ -28,14 +28,14 @@ export function UserInfoSettings(props: Props) {
   );
 }
 
-type UsernameForm = z.infer<typeof updateUsernameSchema>;
+type UsernameFormType = z.infer<typeof updateUsernameSchema>;
 
 function UsernameForm({ data }: Props) {
   const {
     register,
     handleSubmit,
     formState: { errors, isDirty, isSubmitting },
-  } = useForm<UsernameForm>({
+  } = useForm<UsernameFormType>({
     resolver: zodResolver(updateUsernameSchema),
     values: {
       username: data.dbUser?.username ?? "",

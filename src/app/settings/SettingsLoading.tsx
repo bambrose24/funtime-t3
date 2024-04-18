@@ -3,7 +3,7 @@ import { Skeleton } from "~/components/ui/skeleton";
 
 export function SettingsLoading() {
   return (
-    <Card>
+    <Card className="bg-background">
       <CardHeader>
         <Skeleton className="h-[50px] w-full" />
       </CardHeader>

@@ -18,7 +18,7 @@ export default async function NotificationsSettingsPage() {
   await wait(3000);
 
   return (
-    <Card>
+    <Card className="bg-background">
       <CardContent className="py-4">
         <Text.H2>Notifications</Text.H2>
         More coming soon.

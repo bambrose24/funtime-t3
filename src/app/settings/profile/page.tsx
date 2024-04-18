@@ -10,7 +10,7 @@ export default async function ProfileSettingsPage() {
   }
 
   return (
-    <Card>
+    <Card className="bg-background">
       <CardContent className="py-4">
         <div className="flex flex-row gap-3">
           <UserInfoSettings data={settings} />
