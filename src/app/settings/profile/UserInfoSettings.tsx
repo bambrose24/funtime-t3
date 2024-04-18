@@ -59,7 +59,7 @@ function UsernameForm({ data }: Props) {
       },
     });
 
-  const onSubmit = async (data: UsernameForm) => {
+  const onSubmit = async (data: UsernameFormType) => {
     await updateUsername(data);
   };
 
