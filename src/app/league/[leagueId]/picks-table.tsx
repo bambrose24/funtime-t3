@@ -21,6 +21,8 @@ import { cn } from "~/lib/utils";
 import { Skeleton } from "~/components/ui/skeleton";
 import { useDictify } from "~/utils/hooks/useIdToValMemo";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { PrefetchKind } from "next/dist/client/components/router-reducer/router-reducer-types";
 
 type Props = {
   picksSummary: Awaited<ReturnType<typeof serverApi.league.picksSummary>>;
@@ -45,8 +47,9 @@ function PicksTableSkeleton() {
 }
 
 function PicksTableImpl({ picksSummary, games, teams }: Props) {
-  const teamIdToTeam = useDictify(teams, (t) => t.teamid);
+  const router = useRouter();
 
+  const teamIdToTeam = useDictify(teams, (t) => t.teamid);
   const gameIdToGame = useDictify(games, (g) => g.gid);
 
   const sortedData = useMemo(() => {
@@ -67,11 +70,13 @@ function PicksTableImpl({ picksSummary, games, teams }: Props) {
       },
       cell: (c) => {
         const value = c.cell.getValue() as Pick;
+        const href = `/league/${value.league_id}/player/${value.membership_id}`;
+        console.log(`prefetching ${href}`);
+        router.prefetch(href, {
+          kind: PrefetchKind.FULL,
+        });
         return (
-          <Link
-            href={`/league/${value.league_id}/player/${value.membership_id}`}
-            className="hover:underline"
-          >
+          <Link href={href} className="hover:underline">
             {value.people.username}
           </Link>
         );
