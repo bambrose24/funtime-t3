@@ -53,7 +53,7 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
         <Text.H1>{league.name}</Text.H1>
       </div>
       <div className="grid grid-cols-5 gap-4 2xl:grid-cols-7">
-        <div className="hidden md:col-span-1 md:col-start-1 md:flex">
+        <div className="hidden lg:col-span-1 lg:col-start-1 lg:flex">
           <div className="flex w-full flex-col gap-4">
             {currentGame && firstGame && (
               <Select
@@ -110,9 +110,9 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
             )}
           </div>
         </div>
-        <div className="col-span-5 col-start-1 md:col-span-4 md:col-start-2 2xl:col-span-6">
+        <div className="col-span-5 col-start-1 lg:col-span-4 lg:col-start-2 2xl:col-span-6">
           <div className="flex flex-col gap-4">
-            <div className="w-full md:hidden">
+            <div className="w-full lg:hidden">
               {currentGame && firstGame && (
                 <Select
                   onValueChange={(value) => {
@@ -153,7 +153,7 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
                 );
               })}
             </div>
-            <div className="flex flex-row md:hidden">
+            <div className="flex flex-row lg:hidden">
               {myPicks && firstGame && (
                 <Drawer>
                   <DrawerTrigger asChild>
