@@ -5,7 +5,7 @@ import { Text } from "~/components/ui/text";
 import { type serverApi } from "~/trpc/server";
 import { PicksTable } from "./picks-table";
 import { YourPicksList, CompactYourPicksList } from "./your-picks-list";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Separator } from "~/components/ui/separator";
 import { Button } from "~/components/ui/button";
 import {
@@ -50,6 +50,7 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
     currentGame,
   } = props;
   const firstGame = games.at(0);
+  const week = firstGame?.week;
 
   const router = useRouter();
   const pathname = usePathname();
@@ -57,6 +58,10 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
   const [overrideGidToWinner, setOverrideGidToWinner] = useState<
     Record<number, number>
   >({});
+
+  useEffect(() => {
+    setOverrideGidToWinner({});
+  }, [week]);
 
   const gameToGid = useDictify(games, (g) => g.gid);
 
@@ -211,10 +216,20 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
                   variant="default"
                   className="flex w-full flex-row items-center"
                 >
-                  <AlertTitle className="flex flex-row items-center gap-2">
-                    <AlertCircleIcon className="h-4 w-4" />
-                    {simulatedGameCount} game{simulatedGameCount > 1 ? "s" : ""}{" "}
-                    simluated
+                  <AlertTitle className="flex w-full  flex-row items-center justify-between">
+                    <div className="flex flex-row gap-2">
+                      <AlertCircleIcon className="h-4 w-4" />
+                      {simulatedGameCount} game
+                      {simulatedGameCount > 1 ? "s" : ""} simluated
+                    </div>
+                    <Button
+                      onClick={() => {
+                        setOverrideGidToWinner({});
+                      }}
+                      variant="outline"
+                    >
+                      Reset
+                    </Button>
                   </AlertTitle>
                 </Alert>
               </div>
