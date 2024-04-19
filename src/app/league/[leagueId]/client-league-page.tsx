@@ -227,6 +227,7 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
                         setOverrideGidToWinner({});
                       }}
                       variant="outline"
+                      size="sm"
                     >
                       Reset
                     </Button>
