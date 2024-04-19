@@ -7,12 +7,15 @@ import { Text } from "../ui/text";
 import { useMemo } from "react";
 import { Badge } from "../ui/badge";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { PrefetchKind } from "next/dist/client/components/router-reducer/router-reducer-types";
 
 type LeagueCardData = NonNullable<
   Awaited<ReturnType<(typeof serverApi)["home"]["summary"]>>
 >[number];
 
 export function HomeLeagueCard({ data }: { data: LeagueCardData }) {
+  const router = useRouter();
   const { correct, total } = useMemo(() => {
     const correct = data.leaguemembers.reduce((prev, curr) => {
       const correctPicks = curr.picks.filter((p) => p.correct).length;
@@ -30,6 +33,12 @@ export function HomeLeagueCard({ data }: { data: LeagueCardData }) {
       return { week: w.week, league_id: data.league_id };
     });
   }, [data]);
+
+  const href = `/league/${data.league_id}`;
+
+  router.prefetch(href, {
+    kind: PrefetchKind.FULL,
+  });
 
   return (
     <Link href={`/league/${data.league_id}`} passHref>
