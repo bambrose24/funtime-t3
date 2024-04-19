@@ -27,6 +27,9 @@ import {
 } from "~/components/ui/select";
 import { usePathname, useRouter } from "next/navigation";
 import { cloneDeep } from "lodash";
+import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
+import { AlertCircleIcon, Terminal } from "lucide-react";
+import { useDictify } from "~/utils/hooks/useIdToValMemo";
 
 type ClientLeaguePageProps = {
   picksSummary: Awaited<ReturnType<typeof serverApi.league.picksSummary>>;
@@ -55,6 +58,8 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
     Record<number, number>
   >({});
 
+  const gameToGid = useDictify(games, (g) => g.gid);
+
   const picksSummary = cloneDeep(picksSummaryProp);
   picksSummary.forEach((p) => {
     p.picks = p.picks.map((p) => {
@@ -75,8 +80,14 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
   const selectGame = useCallback(
     (gid: number, winner: number) => {
       setOverrideGidToWinner((prev) => {
-        if (gid in prev && prev[gid] === winner) {
-          delete prev[gid];
+        const realWinner = gameToGid.get(gid)?.winner;
+        if (gid in prev) {
+          if (prev[gid] === winner || winner === realWinner) {
+            delete prev[gid];
+            return { ...prev };
+          }
+        }
+        if (winner === realWinner) {
           return { ...prev };
         }
         return { ...prev, [gid]: winner };
@@ -84,6 +95,8 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
     },
     [setOverrideGidToWinner],
   );
+
+  const simulatedGameCount = Object.keys(overrideGidToWinner).length;
 
   return (
     <div className="w-full justify-center p-4">
@@ -192,6 +205,20 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
                 );
               })}
             </div>
+            {simulatedGameCount > 0 && (
+              <div className="w-full">
+                <Alert
+                  variant="default"
+                  className="flex w-full flex-row items-center"
+                >
+                  <AlertTitle className="flex flex-row items-center gap-2">
+                    <AlertCircleIcon className="h-4 w-4" />
+                    {simulatedGameCount} game{simulatedGameCount > 1 ? "s" : ""}{" "}
+                    simluated
+                  </AlertTitle>
+                </Alert>
+              </div>
+            )}
             <div className="flex flex-row lg:hidden">
               {myPicks && firstGame && (
                 <Drawer>
