@@ -15,13 +15,12 @@ import {
   TableHeader,
   TableRow,
 } from "~/components/ui/table";
-import { Suspense, useMemo } from "react";
+import { Suspense, useMemo, useState } from "react";
 import _ from "lodash";
 import { cn } from "~/lib/utils";
 import { Skeleton } from "~/components/ui/skeleton";
 import { useDictify } from "~/utils/hooks/useIdToValMemo";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 
 type Props = {
   picksSummary: Awaited<ReturnType<typeof serverApi.league.picksSummary>>;
@@ -46,19 +45,13 @@ function PicksTableSkeleton() {
 }
 
 function PicksTableImpl({ picksSummary, games, teams }: Props) {
-  const router = useRouter();
-
   const teamIdToTeam = useDictify(teams, (t) => t.teamid);
   const gameIdToGame = useDictify(games, (g) => g.gid);
 
   const sortedData = useMemo(() => {
-    return _.sortBy(
-      picksSummary,
-
-      (p) => {
-        return -p.correctPicks;
-      },
-    );
+    return _.sortBy(picksSummary, (p) => {
+      return -p.correctPicks;
+    });
   }, [picksSummary]);
 
   const columns: ColumnDef<Pick>[] = [

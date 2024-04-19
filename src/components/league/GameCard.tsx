@@ -16,7 +16,7 @@ type Props = {
   homeTeam: Awaited<ReturnType<typeof serverApi.teams.getTeams>>[number];
   awayTeam: Awaited<ReturnType<typeof getTeams>>[number];
   onClickTeamId: (teamId: number) => void;
-  simulated?: boolean;
+  simulatedWinner: number | undefined;
 };
 
 export function GameCard({
@@ -24,14 +24,17 @@ export function GameCard({
   homeTeam,
   awayTeam,
   onClickTeamId,
-  simulated = false,
+  simulatedWinner,
 }: Props) {
+  const isSimulated = simulatedWinner && simulatedWinner !== game.winner;
+  const winner = simulatedWinner ?? game.winner;
+
   return (
     <Card
       className={cn(
         "max-h-[130px] min-h-[130px] min-w-[130px] max-w-[130px] shrink-0 p-1",
-        simulated
-          ? "border-yellow-300"
+        Boolean(isSimulated)
+          ? "border-2 border-yellow-500 dark:border-yellow-700"
           : game.done
             ? "border-2 border-primary"
             : "",
@@ -44,7 +47,15 @@ export function GameCard({
         <div className="flex flex-row items-center justify-center">
           <Button
             variant="link"
-            className="text-card-foreground"
+            className={cn(
+              "px-1 py-0.5 text-card-foreground",
+              winner === awayTeam.teamid
+                ? "text-green-600 dark:text-green-700"
+                : "",
+              winner !== awayTeam.teamid
+                ? "text-red-600 dark:text-red-700"
+                : "",
+            )}
             onClick={(e) => {
               e.preventDefault();
               onClickTeamId(awayTeam.teamid);
@@ -62,7 +73,14 @@ export function GameCard({
         <div className="flex flex-row items-center justify-center">
           <Button
             variant="link"
-            className="text-card-foreground"
+            className={cn(
+              "text-card-foreground",
+              winner === homeTeam.teamid
+                ? "text-green-600 dark:text-green-700"
+                : Boolean(winner)
+                  ? "text-red-600 dark:text-red-700"
+                  : "",
+            )}
             onClick={(e) => {
               e.preventDefault();
               onClickTeamId(homeTeam.teamid);

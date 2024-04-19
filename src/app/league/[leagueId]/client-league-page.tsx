@@ -5,7 +5,7 @@ import { Text } from "~/components/ui/text";
 import { type serverApi } from "~/trpc/server";
 import { PicksTable } from "./picks-table";
 import { YourPicksList, CompactYourPicksList } from "./your-picks-list";
-import { useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { Separator } from "~/components/ui/separator";
 import { Button } from "~/components/ui/button";
 import {
@@ -26,6 +26,7 @@ import {
   SelectValue,
 } from "~/components/ui/select";
 import { usePathname, useRouter } from "next/navigation";
+import { cloneDeep } from "lodash";
 
 type ClientLeaguePageProps = {
   picksSummary: Awaited<ReturnType<typeof serverApi.league.picksSummary>>;
@@ -37,15 +38,52 @@ type ClientLeaguePageProps = {
 };
 
 export function ClientLeaguePage(props: ClientLeaguePageProps) {
-  const { picksSummary, games, teams, league, session, currentGame } = props;
+  const {
+    picksSummary: picksSummaryProp,
+    games,
+    teams,
+    league,
+    session,
+    currentGame,
+  } = props;
   const firstGame = games.at(0);
 
   const router = useRouter();
   const pathname = usePathname();
 
-  const myPicks = useMemo(() => {
-    return picksSummary.find((p) => p.user_id === session.dbUser?.uid);
-  }, [picksSummary, session]);
+  const [overrideGidToWinner, setOverrideGidToWinner] = useState<
+    Record<number, number>
+  >({});
+
+  const picksSummary = cloneDeep(picksSummaryProp);
+  picksSummary.forEach((p) => {
+    p.picks = p.picks.map((p) => {
+      const gid = p.gid;
+      if (gid in overrideGidToWinner) {
+        p.correct = overrideGidToWinner[gid] === p.winner ? 1 : 0;
+      }
+      return p;
+    });
+    p.correctPicks = p.picks.reduce(
+      (prev, curr) => prev + (curr.correct ?? 0),
+      0,
+    );
+  });
+
+  const myPicks = picksSummary.find((p) => p.user_id === session.dbUser?.uid);
+
+  const selectGame = useCallback(
+    (gid: number, winner: number) => {
+      setOverrideGidToWinner((prev) => {
+        if (gid in prev && prev[gid] === winner) {
+          delete prev[gid];
+          return { ...prev };
+        }
+        return { ...prev, [gid]: winner };
+      });
+    },
+    [setOverrideGidToWinner],
+  );
 
   return (
     <div className="w-full justify-center p-4">
@@ -146,8 +184,9 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
                     game={g}
                     awayTeam={awayTeam}
                     homeTeam={homeTeam}
+                    simulatedWinner={overrideGidToWinner[g.gid]}
                     onClickTeamId={(teamId) => {
-                      console.log(teamId);
+                      selectGame(g.gid, teamId);
                     }}
                   />
                 );
