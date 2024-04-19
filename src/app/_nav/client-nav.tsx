@@ -35,8 +35,9 @@ import {
   TrophyIcon,
 } from "lucide-react";
 import { Avatar } from "~/components/ui/avatar";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { FuntimeAvatarFallback } from "./AvatarFallback";
+import { PrefetchKind } from "next/dist/client/components/router-reducer/router-reducer-types";
 
 type NavData = {
   data: Awaited<ReturnType<(typeof serverApi)["home"]["nav"]>>;
@@ -45,6 +46,7 @@ type NavData = {
 export function ClientNav(props: NavData) {
   const leagueId = useLeagueIdFromPath();
   const logout = useLogout();
+  const router = useRouter();
 
   const user = props.data?.dbUser;
   const leagues = props.data?.leagues;
@@ -57,6 +59,13 @@ export function ClientNav(props: NavData) {
   const inactiveLeagues = leagues?.filter(
     (l) => l.status === "completed" || new Date().getFullYear() - 1 > l.season,
   );
+
+  const settingsHref = "/settings";
+  if (user) {
+    router.prefetch(settingsHref, {
+      kind: PrefetchKind.FULL,
+    });
+  }
 
   return (
     <div className="flex w-full flex-col">
@@ -132,7 +141,7 @@ export function ClientNav(props: NavData) {
 
                   <DropdownMenuSeparator />
 
-                  <Link href="/settings">
+                  <Link href={settingsHref}>
                     <DropdownMenuItem>
                       <MenuRow>
                         Settings
@@ -290,6 +299,18 @@ function TabLabel() {
 }
 
 function LeagueDropdownMenu({ chosenLeague }: { chosenLeague: ChosenLeague }) {
+  const router = useRouter();
+
+  const leaderboardHref = `/league/${chosenLeague.league_id}/leaderboard`;
+  router.prefetch(leaderboardHref, {
+    kind: PrefetchKind.FULL,
+  });
+
+  const pickHref = `/league/${chosenLeague.league_id}/pick`;
+  router.prefetch(pickHref, {
+    kind: PrefetchKind.FULL,
+  });
+
   return (
     <>
       <DropdownMenu>
@@ -312,7 +333,7 @@ function LeagueDropdownMenu({ chosenLeague }: { chosenLeague: ChosenLeague }) {
               </div>
             </DropdownMenuItem>
           </Link>
-          <Link href={`/league/${chosenLeague.league_id}/pick`}>
+          <Link href={pickHref}>
             <DropdownMenuItem>
               <div className="flex flex-row items-center gap-3">
                 <PenIcon className="h-4 w-4" />
@@ -320,7 +341,7 @@ function LeagueDropdownMenu({ chosenLeague }: { chosenLeague: ChosenLeague }) {
               </div>
             </DropdownMenuItem>
           </Link>
-          <Link href={`/league/${chosenLeague.league_id}/leaderboard`}>
+          <Link href={leaderboardHref}>
             <DropdownMenuItem>
               <div className="flex flex-row items-center gap-3">
                 <TrophyIcon className="h-4 w-4" />
