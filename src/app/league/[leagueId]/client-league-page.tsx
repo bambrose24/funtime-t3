@@ -224,6 +224,7 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
                     </div>
                     <Button
                       onClick={() => {
+                        console.log("unsetting overridden winners");
                         setOverrideGidToWinner({});
                       }}
                       variant="outline"
