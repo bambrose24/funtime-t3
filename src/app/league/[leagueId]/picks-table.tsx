@@ -166,9 +166,9 @@ function PicksTableImpl({ picksSummary, games, teams }: Props) {
                       <div
                         className={cn(
                           bgColor === "red"
-                            ? "bg-red-500 dark:bg-red-700"
+                            ? "bg-wrong text-wrong-foreground"
                             : bgColor === "green"
-                              ? "bg-green-500 dark:bg-green-700"
+                              ? "bg-correct text-correct-foreground"
                               : bgColor === "yellow"
                                 ? "bg-yellow-500 dark:bg-yellow-700"
                                 : "",

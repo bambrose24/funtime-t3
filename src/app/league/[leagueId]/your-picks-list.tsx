@@ -43,9 +43,7 @@ export function YourPicksList(props: Props) {
                 className={cn(
                   "col-span-3 flex flex-row items-center justify-center gap-1 rounded-lg p-1",
                   choseAway ? "border-2" : "",
-                  correct
-                    ? "border-green-500 dark:border-green-700"
-                    : "border-red-500 dark:border-red-700",
+                  correct ? "border-correct" : "border-wrong",
                   !game.done ? "border-blue-500 dark:border-blue-700" : "",
                 )}
               >
@@ -63,9 +61,7 @@ export function YourPicksList(props: Props) {
                 className={cn(
                   "col-span-3 flex flex-row items-center justify-center gap-1 rounded-lg p-1",
                   choseHome ? "border-2" : "",
-                  correct
-                    ? "border-green-500 dark:border-green-700"
-                    : "border-red-500 dark:border-red-700",
+                  correct ? "border-correct" : "border-wrong",
                   // highest precedence is marking it blue while the game is ongoing
                   !game.done ? "border-blue-500 dark:border-blue-700" : "",
                 )}
@@ -124,9 +120,7 @@ export function CompactYourPicksList(props: Props) {
                 className={cn(
                   "col-span-2 flex flex-row items-center justify-center rounded-lg p-1",
                   choseAway ? "border-2" : "",
-                  correct
-                    ? "border-green-500 dark:border-green-700"
-                    : "border-red-500 dark:border-red-700",
+                  correct ? "border-correct" : "border-wrong",
                   !game.done ? "border-blue-500 dark:border-blue-700" : "",
                 )}
               >
@@ -139,9 +133,7 @@ export function CompactYourPicksList(props: Props) {
                 className={cn(
                   "col-span-2 flex flex-row items-center justify-center rounded-lg p-1",
                   choseHome ? "border-2" : "",
-                  correct
-                    ? "border-green-500 dark:border-green-700"
-                    : "border-red-500 dark:border-red-700",
+                  correct ? "border-correct" : "border-wrong",
                   // highest precedence is marking it blue while the game is ongoing
                   !game.done ? "border-blue-500 dark:border-blue-700" : "",
                 )}

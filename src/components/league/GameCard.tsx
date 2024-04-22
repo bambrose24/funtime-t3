@@ -49,12 +49,8 @@ export function GameCard({
             variant="link"
             className={cn(
               "px-1 py-0.5 text-card-foreground",
-              winner === awayTeam.teamid
-                ? "text-green-600 dark:text-green-700"
-                : "",
-              winner !== awayTeam.teamid
-                ? "text-red-600 dark:text-red-700"
-                : "",
+              winner === awayTeam.teamid ? "text-correct" : "",
+              winner !== awayTeam.teamid ? "text-wrong" : "",
             )}
             onClick={(e) => {
               e.preventDefault();
@@ -76,9 +72,9 @@ export function GameCard({
             className={cn(
               "text-card-foreground",
               winner === homeTeam.teamid
-                ? "text-green-600 dark:text-green-700"
+                ? "text-correct"
                 : Boolean(winner)
-                  ? "text-red-600 dark:text-red-700"
+                  ? "text-wrong"
                   : "",
             )}
             onClick={(e) => {
