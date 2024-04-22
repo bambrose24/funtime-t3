@@ -6,6 +6,7 @@ import {
   getSortedRowModel,
   getFilteredRowModel,
   flexRender,
+  filterFns,
 } from "@tanstack/react-table";
 import Link from "next/link";
 import React from "react";
@@ -69,9 +70,17 @@ export const columns: ColumnDef<Column>[] = [
     accessorFn: (d) => {
       return d;
     },
+    filterFn: (row, column, filterValue) => {
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+      const val = row.getValue(column) as Column;
+      return val.member.people.username
+        .toLowerCase()
+        .includes((filterValue as string).toLowerCase());
+    },
     header: "Player",
-    cell: ({ cell }) => {
-      const c = cell.getValue() as Column;
+    cell: ({ getValue }) => {
+      const c = getValue() as Column;
+
       return (
         <Link
           href={`/league/${c.member.league_id}/player/${c.member.membership_id}`}
