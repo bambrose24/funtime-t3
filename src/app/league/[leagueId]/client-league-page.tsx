@@ -5,7 +5,7 @@ import { Text } from "~/components/ui/text";
 import { type serverApi } from "~/trpc/server";
 import { PicksTable } from "./picks-table";
 import { YourPicksList, CompactYourPicksList } from "./your-picks-list";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Separator } from "~/components/ui/separator";
 import { Button } from "~/components/ui/button";
 import {
@@ -27,9 +27,10 @@ import {
 } from "~/components/ui/select";
 import { usePathname, useRouter } from "next/navigation";
 import { cloneDeep } from "lodash";
-import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
-import { AlertCircleIcon, Terminal } from "lucide-react";
+import { Alert, AlertTitle } from "~/components/ui/alert";
+import { AlertCircleIcon } from "lucide-react";
 import { useDictify } from "~/utils/hooks/useIdToValMemo";
+import { ScrollArea, ScrollBar } from "~/components/ui/scroll-area";
 
 type ClientLeaguePageProps = {
   picksSummary: Awaited<ReturnType<typeof serverApi.league.picksSummary>>;
@@ -98,7 +99,7 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
         return { ...prev, [gid]: winner };
       });
     },
-    [setOverrideGidToWinner],
+    [gameToGid],
   );
 
   const simulatedGameCount = Object.keys(overrideGidToWinner).length;
@@ -192,24 +193,27 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
                 </Select>
               )}
             </div>
-            <div className="flex flex-row gap-2 overflow-x-scroll">
-              {games.map((g) => {
-                const homeTeam = teams.find((t) => t.teamid === g.home)!;
-                const awayTeam = teams.find((t) => t.teamid === g.away)!;
-                return (
-                  <GameCard
-                    key={g.gid}
-                    game={g}
-                    awayTeam={awayTeam}
-                    homeTeam={homeTeam}
-                    simulatedWinner={overrideGidToWinner[g.gid]}
-                    onClickTeamId={(teamId) => {
-                      selectGame(g.gid, teamId);
-                    }}
-                  />
-                );
-              })}
-            </div>
+            <ScrollArea>
+              <div className="flex flex-row gap-2">
+                {games.map((g) => {
+                  const homeTeam = teams.find((t) => t.teamid === g.home)!;
+                  const awayTeam = teams.find((t) => t.teamid === g.away)!;
+                  return (
+                    <GameCard
+                      key={g.gid}
+                      game={g}
+                      awayTeam={awayTeam}
+                      homeTeam={homeTeam}
+                      simulatedWinner={overrideGidToWinner[g.gid]}
+                      onClickTeamId={(teamId) => {
+                        selectGame(g.gid, teamId);
+                      }}
+                    />
+                  );
+                })}
+              </div>
+              <ScrollBar orientation="horizontal" />
+            </ScrollArea>
             {simulatedGameCount > 0 && (
               <div className="w-full">
                 <Alert

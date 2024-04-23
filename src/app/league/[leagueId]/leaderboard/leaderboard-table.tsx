@@ -6,7 +6,6 @@ import {
   getSortedRowModel,
   getFilteredRowModel,
   flexRender,
-  filterFns,
 } from "@tanstack/react-table";
 import Link from "next/link";
 import React from "react";

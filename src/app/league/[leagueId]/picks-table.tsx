@@ -15,7 +15,7 @@ import {
   TableHeader,
   TableRow,
 } from "~/components/ui/table";
-import { Suspense, useMemo, useState } from "react";
+import { Suspense, useMemo } from "react";
 import _ from "lodash";
 import { cn } from "~/lib/utils";
 import { Skeleton } from "~/components/ui/skeleton";

@@ -47,11 +47,7 @@ export function YourPicksList(props: Props) {
                   !game.done ? "border-blue-500 dark:border-blue-700" : "",
                 )}
               >
-                <TeamLogo
-                  abbrev={awayTeam.abbrev ?? ""}
-                  width={24}
-                  height={24}
-                />
+                <TeamLogo abbrev={awayTeam.abbrev ?? ""} />
                 <Text.Small>{awayTeam.abbrev}</Text.Small>
               </div>
               <div className="col-span-1 flex flex-row items-center justify-center">
@@ -67,11 +63,7 @@ export function YourPicksList(props: Props) {
                 )}
               >
                 <Text.Small>{homeTeam.abbrev}</Text.Small>
-                <TeamLogo
-                  abbrev={homeTeam.abbrev ?? ""}
-                  width={24}
-                  height={24}
-                />
+                <TeamLogo abbrev={homeTeam.abbrev ?? ""} />
               </div>
             </div>
           </div>
