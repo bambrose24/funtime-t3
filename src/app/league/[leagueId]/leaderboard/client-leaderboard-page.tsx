@@ -16,6 +16,7 @@ import { LeaderboardTable } from "./leaderboard-table";
 import { LeaderboardChart } from "./leaderboard-chart";
 import { Defined } from "~/utils/defined";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { ScrollArea } from "~/components/ui/scroll-area";
 
 type Props = {
   leaderboard: Awaited<ReturnType<typeof serverApi.leaderboard.league>>;
@@ -80,20 +81,25 @@ export function ClientLeaderboardPage(props: Props) {
   }, [rowSelection, searchParams, props, pathname, router]);
 
   return (
-    <div className="h-full w-full justify-center p-4">
+    <div className="w-full justify-center p-4">
       <div className="grid w-full grid-cols-5 gap-4 md:grid-cols-7">
         <div className="col-span-5 md:col-span-2">
-          <Card className="overflow-scroll px-2">
-            <CardHeader>
-              <CardTitle>
-                {props.leaderboard?.league?.name} Leaderboard
-              </CardTitle>
-            </CardHeader>
-            <LeaderboardTable
-              {...props}
-              rowSelection={rowSelection}
-              setRowSelection={setRowSelection}
-            />
+          <Card className="p-2">
+            <ScrollArea>
+              <div className="max-h-[90vh]">
+                <CardHeader>
+                  <CardTitle>
+                    {props.leaderboard?.league?.name} Leaderboard
+                  </CardTitle>
+                </CardHeader>
+
+                <LeaderboardTable
+                  {...props}
+                  rowSelection={rowSelection}
+                  setRowSelection={setRowSelection}
+                />
+              </div>
+            </ScrollArea>
           </Card>
         </div>
         <div className="col-span-4 hidden md:col-span-5 md:block">
