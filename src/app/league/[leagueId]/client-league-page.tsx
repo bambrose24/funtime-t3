@@ -161,7 +161,11 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
                   <Separator />
                 </CardHeader>
                 <CardContent>
-                  <YourPicksList {...props} myPicks={myPicks} />
+                  <YourPicksList
+                    {...props}
+                    selectGame={selectGame}
+                    myPicks={myPicks}
+                  />
                 </CardContent>
               </Card>
             )}

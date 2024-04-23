@@ -5,6 +5,7 @@ import { TeamLogo } from "~/components/shared/TeamLogo";
 import { type serverApi } from "~/trpc/server";
 import { useDictify } from "~/utils/hooks/useIdToValMemo";
 import { cn } from "~/lib/utils";
+import { Button } from "~/components/ui/button";
 
 type Props = {
   myPicks: Awaited<ReturnType<typeof serverApi.league.picksSummary>>[number];
@@ -12,6 +13,7 @@ type Props = {
   teams: Awaited<ReturnType<typeof serverApi.teams.getTeams>>;
   league: Awaited<ReturnType<typeof serverApi.league.get>>;
   session: Awaited<ReturnType<typeof serverApi.session.current>>;
+  selectGame: (gid: number, winner: number) => void;
 };
 
 export function YourPicksList(props: Props) {
@@ -39,7 +41,11 @@ export function YourPicksList(props: Props) {
         return (
           <div key={p.pickid} className="flex w-full flex-col">
             <div className="grid w-full grid-cols-7">
-              <div
+              <Button
+                variant="ghost"
+                onClick={() => {
+                  props.selectGame(p.gid, awayTeam.teamid);
+                }}
                 className={cn(
                   "col-span-3 flex flex-row items-center justify-center gap-1 rounded-lg p-1",
                   choseAway ? "border-2" : "",
@@ -49,11 +55,15 @@ export function YourPicksList(props: Props) {
               >
                 <TeamLogo abbrev={awayTeam.abbrev ?? ""} />
                 <Text.Small>{awayTeam.abbrev}</Text.Small>
-              </div>
+              </Button>
               <div className="col-span-1 flex flex-row items-center justify-center">
                 <Text.Small>@</Text.Small>
               </div>
-              <div
+              <Button
+                variant="ghost"
+                onClick={() => {
+                  props.selectGame(p.gid, homeTeam.teamid);
+                }}
                 className={cn(
                   "col-span-3 flex flex-row items-center justify-center gap-1 rounded-lg p-1",
                   choseHome ? "border-2" : "",
@@ -64,7 +74,7 @@ export function YourPicksList(props: Props) {
               >
                 <Text.Small>{homeTeam.abbrev}</Text.Small>
                 <TeamLogo abbrev={homeTeam.abbrev ?? ""} />
-              </div>
+              </Button>
             </div>
           </div>
         );
