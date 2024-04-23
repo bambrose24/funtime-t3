@@ -84,7 +84,7 @@ export function YourPicksList(props: Props) {
 }
 
 export function CompactYourPicksList(props: Props) {
-  const { myPicks, games, teams } = props;
+  const { myPicks, games, teams, selectGame } = props;
 
   const teamIdToTeam = useDictify(teams, (t) => t.teamid);
   const gameIdToGame = useDictify(games, (g) => g.gid);
@@ -118,7 +118,12 @@ export function CompactYourPicksList(props: Props) {
                 "grid w-[120px] grid-cols-5 flex-row items-center justify-between",
               )}
             >
-              <div
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  selectGame(p.gid, awayTeam.teamid);
+                }}
                 className={cn(
                   "col-span-2 flex flex-row items-center justify-center rounded-lg p-1",
                   choseAway ? "border-2" : "",
@@ -127,11 +132,16 @@ export function CompactYourPicksList(props: Props) {
                 )}
               >
                 <Text.Small>{awayTeam.abbrev}</Text.Small>
-              </div>
+              </Button>
               <div className="col-span-1 flex flex-row justify-center">
                 <Text.Small>@</Text.Small>
               </div>
-              <div
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  selectGame(p.gid, homeTeam.teamid);
+                }}
                 className={cn(
                   "col-span-2 flex flex-row items-center justify-center rounded-lg p-1",
                   choseHome ? "border-2" : "",
@@ -141,7 +151,7 @@ export function CompactYourPicksList(props: Props) {
                 )}
               >
                 <Text.Small>{homeTeam.abbrev}</Text.Small>
-              </div>
+              </Button>
             </div>
           </div>
         );

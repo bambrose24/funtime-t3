@@ -261,7 +261,11 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
                         <DrawerDescription>{league.name}</DrawerDescription>
                       </DrawerHeader>
                       <div className="overflow-scroll">
-                        <CompactYourPicksList {...props} myPicks={myPicks} />
+                        <CompactYourPicksList
+                          {...props}
+                          selectGame={selectGame}
+                          myPicks={myPicks}
+                        />
                       </div>
                       <DrawerFooter>
                         <DrawerClose asChild>
