@@ -8,6 +8,7 @@ import { ThemeProvider } from "../components/theme-provider";
 import { cn } from "~/lib/utils";
 import { Toaster } from "~/components/ui/sonner";
 import { Nav } from "./_nav/nav";
+import { AxiomWebVitals } from "next-axiom";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -44,6 +45,7 @@ export default function RootLayout({
             <Nav />
             {children}
             <Toaster position="bottom-right" />
+            <AxiomWebVitals />
           </ThemeProvider>
         </TRPCReactProvider>
       </body>

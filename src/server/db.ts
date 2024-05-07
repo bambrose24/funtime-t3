@@ -17,7 +17,7 @@ const createPrismaClient = () => {
   });
 
   prisma.$on("query", (e) => {
-    getServerLogger().log(`${LOG_PREFIX} Query executed`, {
+    getServerLogger().info(`${LOG_PREFIX} Query executed`, {
       prismaQueryDurationMs: e.duration,
       prismaQuery: e.query,
     });
