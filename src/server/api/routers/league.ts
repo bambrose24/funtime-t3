@@ -52,6 +52,7 @@ export const leagueRouter = createTRPCRouter({
 
           const [memberPicks, games] = await Promise.all([
             db.leaguemembers.findMany({
+              relationLoadStrategy: "join",
               where: {
                 league_id: leagueId,
               },

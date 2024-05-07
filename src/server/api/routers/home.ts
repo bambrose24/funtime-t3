@@ -57,6 +57,7 @@ export const homeRouter = createTRPCRouter({
       const getSummaries = cache(
         async () => {
           const leagues = await db.leagues.findMany({
+            relationLoadStrategy: "join",
             where: {
               league_id: {
                 in: leagueIds,
