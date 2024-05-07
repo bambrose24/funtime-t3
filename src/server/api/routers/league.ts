@@ -34,6 +34,7 @@ export const leagueRouter = createTRPCRouter({
     .input(picksSummarySchema)
     .query(async ({ input }) => {
       const { leagueId, week } = input;
+      console.log("in picks summary");
 
       const REVALIDATE_SECONDS = 60;
       const getLeagueData = cache(
