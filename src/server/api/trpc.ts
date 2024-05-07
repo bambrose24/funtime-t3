@@ -12,6 +12,7 @@ import { ZodError } from "zod";
 
 import { db } from "~/server/db";
 import { cache, getCoreUserTag } from "~/utils/cache";
+import { getServerLogger } from "~/utils/logging";
 import { supabaseServer } from "~/utils/supabase/server";
 
 /**
@@ -109,6 +110,35 @@ export const createCallerFactory = t.createCallerFactory;
  */
 export const createTRPCRouter = t.router;
 
+const LOG_PREFIX = `[trpc]`;
+
+/**
+ * Global procedure with top-level logging middleware.
+ */
+const procedure = t.procedure.use(async ({ path, type, next }) => {
+  const start = Date.now();
+  const typeAndPath = { trpcPath: path, trpcType: type };
+  getServerLogger().info(`${LOG_PREFIX} starting trpc request handling`, {
+    ...typeAndPath,
+  });
+  const result = await next();
+  const durationMs = Date.now() - start;
+
+  getServerLogger().info(`${LOG_PREFIX} tRPC request ended`, {
+    ...typeAndPath,
+    trpcRequestDurationMs: durationMs,
+    ok: result.ok,
+    ...(result.ok === false
+      ? {
+          trpcError: result.error.message,
+          trpcErrorCode: result.error.code,
+          ...(result.error.stack ? { trpcErrorStack: result.error.stack } : {}),
+        }
+      : {}),
+  });
+  return result;
+});
+
 /**
  * Public (unauthenticated) procedure
  *
@@ -116,4 +146,4 @@ export const createTRPCRouter = t.router;
  * guarantee that a user querying is authorized, but you can still access user session data if they
  * are logged in.
  */
-export const publicProcedure = t.procedure;
+export const publicProcedure = procedure;

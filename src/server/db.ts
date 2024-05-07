@@ -2,13 +2,28 @@ import "server-only";
 import { PrismaClient } from "@prisma/client";
 
 import { env } from "~/env";
+import { getServerLogger } from "~/utils/logging";
 
-const createPrismaClient = () =>
-  new PrismaClient({
-    // log:
-    //   env.NODE_ENV === "development" ? ["query", "error", "warn"] : ["error"],
-    log: ["error", "warn"],
+const LOG_PREFIX = `[prisma client]`;
+
+const createPrismaClient = () => {
+  const prisma = new PrismaClient({
+    log: [
+      {
+        emit: "event",
+        level: "query",
+      },
+    ],
   });
+
+  prisma.$on("query", (e) => {
+    getServerLogger().log(`${LOG_PREFIX} Query executed`, {
+      prismaQueryDurationMs: e.duration,
+      prismaQuery: e.query,
+    });
+  });
+  return prisma;
+};
 
 const globalForPrisma = globalThis as unknown as {
   prisma: ReturnType<typeof createPrismaClient> | undefined;
