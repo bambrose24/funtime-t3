@@ -1,5 +1,3 @@
-import type { Logger } from "winston";
-
 import * as winston from "winston";
 import { config, env } from "../config";
 import { RequestContext } from "../requestContext";

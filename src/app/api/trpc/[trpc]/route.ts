@@ -1,6 +1,5 @@
 import { fetchRequestHandler } from "@trpc/server/adapters/fetch";
-import { AxiomRequest, withAxiom } from "next-axiom";
-import { type NextRequest } from "next/server";
+import { type AxiomRequest, withAxiom } from "next-axiom";
 
 import { env } from "~/env";
 import { appRouter } from "~/server/api/root";
