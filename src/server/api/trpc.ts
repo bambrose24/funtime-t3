@@ -12,7 +12,8 @@ import { ZodError } from "zod";
 
 import { db } from "~/server/db";
 import { cache, getCoreUserTag } from "~/utils/cache";
-import { getLogger } from "~/utils/logging";
+import { createLogger, getLogger } from "~/utils/logging";
+import { RequestContext } from "~/utils/requestContext";
 import { supabaseServer } from "~/utils/supabase/server";
 
 /**
@@ -60,13 +61,30 @@ export const createTRPCContext = async (opts: { headers: Headers }) => {
     dbUser = await getDbUser();
   }
 
-  return {
+  const context = {
     db,
     supabaseUser,
     dbUser,
     ...opts,
   };
+
+  await setupRequestContext(context);
+
+  return context;
 };
+
+async function setupRequestContext(
+  context: Awaited<ReturnType<typeof createTRPCContext>>,
+) {
+  const userId = context.dbUser?.uid ?? "";
+  RequestContext.set("userId", userId.toString());
+
+  const logger = createLogger({
+    userId,
+  });
+
+  RequestContext.set("logger", logger);
+}
 
 /**
  * 2. INITIALIZATION

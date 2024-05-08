@@ -14,7 +14,6 @@ const baseLogger = winston.createLogger({
 });
 
 type LoggerMeta = {
-  requestId: string;
   userId: number | string;
   functionName?: string;
 };
