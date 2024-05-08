@@ -2,7 +2,7 @@ import "server-only";
 import { PrismaClient } from "@prisma/client";
 
 import { env } from "~/env";
-import { getServerLogger } from "~/utils/logging";
+import { getLogger } from "~/utils/logging";
 
 const LOG_PREFIX = `[prisma client]`;
 
@@ -17,7 +17,7 @@ const createPrismaClient = () => {
   });
 
   prisma.$on("query", (e) => {
-    getServerLogger().info(`${LOG_PREFIX} Query executed`, {
+    getLogger().info(`${LOG_PREFIX} Query executed`, {
       prismaQueryDurationMs: e.duration,
       prismaQuery: e.query,
     });

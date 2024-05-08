@@ -12,7 +12,7 @@ import { ZodError } from "zod";
 
 import { db } from "~/server/db";
 import { cache, getCoreUserTag } from "~/utils/cache";
-import { getServerLogger } from "~/utils/logging";
+import { getLogger } from "~/utils/logging";
 import { supabaseServer } from "~/utils/supabase/server";
 
 /**
@@ -118,13 +118,13 @@ const LOG_PREFIX = `[trpc]`;
 const procedure = t.procedure.use(async ({ path, type, next }) => {
   const start = Date.now();
   const typeAndPath = { trpcPath: path, trpcType: type };
-  getServerLogger().info(`${LOG_PREFIX} starting trpc request handling`, {
+  getLogger().info(`${LOG_PREFIX} starting trpc request handling`, {
     ...typeAndPath,
   });
   const result = await next();
   const durationMs = Date.now() - start;
 
-  getServerLogger().info(`${LOG_PREFIX} tRPC request ended`, {
+  getLogger().info(`${LOG_PREFIX} tRPC request ended`, {
     ...typeAndPath,
     trpcRequestDurationMs: durationMs,
     ok: result.ok,
