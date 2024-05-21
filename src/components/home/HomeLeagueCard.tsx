@@ -17,6 +17,8 @@ type LeagueCardData = NonNullable<
 export function HomeLeagueCard({ data }: { data: LeagueCardData }) {
   const router = useRouter();
 
+  console.log("data??", data);
+
   const weekWins = useMemo(() => {
     return data.league.WeekWinners.map((w) => {
       return { week: w.week, league_id: data.league.league_id };
