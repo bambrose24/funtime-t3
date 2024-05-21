@@ -75,7 +75,7 @@ export function ClientNav(props: NavData) {
             <DropdownMenuTrigger asChild>
               <Button
                 disabled={!leagues?.length}
-                variant="outline"
+                variant="ghost"
                 className="flex flex-row items-center gap-2"
               >
                 {chosenLeague ? chosenLeague.name : "My Leagues"}
@@ -315,7 +315,7 @@ function LeagueDropdownMenu({ chosenLeague }: { chosenLeague: ChosenLeague }) {
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="outline">
+          <Button variant="ghost">
             <div className="flex flex-row items-center gap-2">
               <TabLabel />
               <ChevronsUpDown className="h-3 w-3" />
