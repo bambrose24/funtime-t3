@@ -4,7 +4,8 @@ import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import { cache, getCoreUserTag } from "~/utils/cache";
 
-const HOME_REVALIDATE_SECONDS = 60 * 3; // 3 minutes should be good
+// const HOME_REVALIDATE_SECONDS = 60 * 3; // 3 minutes should be good
+const HOME_REVALIDATE_SECONDS = 10; // testing
 
 export const homeRouter = createTRPCRouter({
   nav: publicProcedure.query(async ({ ctx }) => {
