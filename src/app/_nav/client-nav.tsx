@@ -27,13 +27,7 @@ import { capitalize } from "lodash";
 import { type IconProps } from "@radix-ui/react-icons/dist/types";
 import { useLogout } from "../(auth)/auth/useLogout";
 import { useLeagueIdFromPath } from "~/utils/hooks/useLeagueIdFromPath";
-import {
-  ChevronDownIcon,
-  ChevronsUpDown,
-  HomeIcon,
-  PenIcon,
-  TrophyIcon,
-} from "lucide-react";
+import { ChevronsUpDown, HomeIcon, PenIcon, TrophyIcon } from "lucide-react";
 import { Avatar } from "~/components/ui/avatar";
 import { usePathname, useRouter } from "next/navigation";
 import { FuntimeAvatarFallback } from "./AvatarFallback";
@@ -70,7 +64,7 @@ export function ClientNav(props: NavData) {
   return (
     <div className="flex w-full flex-col">
       <div className="flex h-12 w-full flex-row justify-between px-2">
-        <div className="flex flex-row items-center gap-2 lg:gap-4">
+        <div className="flex flex-row items-center gap-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
@@ -79,7 +73,7 @@ export function ClientNav(props: NavData) {
                 className="flex flex-row items-center gap-2"
               >
                 {chosenLeague ? chosenLeague.name : "My Leagues"}
-                <ChevronDownIcon className="h-4 w-4" />
+                <ChevronsUpDown className="h-3 w-3" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-64 p-1">
