@@ -36,16 +36,22 @@ export const playerProfileRouter = createTRPCRouter({
         throw UnauthorizedError;
       }
 
-      const [correctPicks, wrongPicks] = await Promise.all([
-        db.picks.count({
-          where: {
-            correct: 1,
-            member_id: memberId,
-          },
-        }),
-        db.picks.count({ where: { correct: 0, member_id: memberId } }),
-      ]);
+      const picksGrouped = await db.picks.groupBy({
+        by: "correct",
+        where: {
+          member_id: memberId,
+          done: 1,
+        },
+        _count: true,
+      });
 
-      return { member, correctPicks, wrongPicks };
+      const correctPicks = picksGrouped
+        .filter((p) => p.correct === 1)
+        .reduce((prev, curr) => prev + curr._count, 0);
+      const wrongPicks = picksGrouped
+        .filter((p) => p.correct !== 1)
+        .reduce((prev, curr) => prev + curr._count, 0);
+
+      return { member, correctPicks: correctPicks, wrongPicks };
     }),
 });
