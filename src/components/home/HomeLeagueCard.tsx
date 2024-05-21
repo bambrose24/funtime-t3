@@ -16,40 +16,32 @@ type LeagueCardData = NonNullable<
 
 export function HomeLeagueCard({ data }: { data: LeagueCardData }) {
   const router = useRouter();
-  const { correct, total } = useMemo(() => {
-    const correct = data.leaguemembers.reduce((prev, curr) => {
-      const correctPicks = curr.picks.filter((p) => p.correct).length;
-      return prev + correctPicks;
-    }, 0);
-    const total = data.leaguemembers.reduce((prev, curr) => {
-      const correctPicks = curr.picks.length;
-      return prev + correctPicks;
-    }, 0);
-    return { correct, total };
-  }, [data]);
 
   const weekWins = useMemo(() => {
-    return data.WeekWinners.map((w) => {
-      return { week: w.week, league_id: data.league_id };
+    return data.league.WeekWinners.map((w) => {
+      return { week: w.week, league_id: data.league.league_id };
     });
   }, [data]);
 
-  const href = `/league/${data.league_id}`;
+  const href = `/league/${data.league.league_id}`;
 
   router.prefetch(href, {
     kind: PrefetchKind.FULL,
   });
 
   return (
-    <Link href={`/league/${data.league_id}`} passHref>
+    <Link href={`/league/${data.league.league_id}`} passHref>
       <Card className="min-w-[240px] flex-grow hover:border-primary">
-        <CardHeader className="text-center font-bold">{data.name}</CardHeader>
+        <CardHeader className="text-center font-bold">
+          {data.league.name}
+        </CardHeader>
         <CardContent>
           <div className="flex w-full flex-col gap-3">
             <div className="flex w-full flex-row justify-between">
               <Text.Small>Correct Picks</Text.Small>
               <Text.Small className="font-semibold">
-                {correct} / {total}
+                {data.pickCounts.correct ?? 0} /{" "}
+                {(data.pickCounts.correct ?? 0) + (data.pickCounts.wrong ?? 0)}
               </Text.Small>
             </div>
             <Separator />

@@ -24,7 +24,7 @@ export default async function Home() {
           if (!d) {
             return null;
           }
-          return <HomeLeagueCard key={d.league_id} data={d} />;
+          return <HomeLeagueCard key={d.league?.league_id} data={d} />;
         })}
         {!data?.length ? <JoinOrCreateALeague /> : <></>}
         {/* {data?.length ? <JoinOrCreateALeague /> : <></>} */}
