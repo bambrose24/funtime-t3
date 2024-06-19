@@ -50,6 +50,8 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
     session,
     currentGame,
   } = props;
+
+  // TODO pass these to trpc useQuery's as initialData instead of just relying on these pieces of info so that we can pollInterval for every 5 minutes or something
   const firstGame = games.at(0);
   const week = firstGame?.week;
 
@@ -109,7 +111,7 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
       <div className="col-span-12 flex flex-row justify-center py-4">
         <Text.H1>{league.name}</Text.H1>
       </div>
-      <div className="hidden lg:col-span-3 lg:flex">
+      <div className="hidden lg:col-span-2 lg:flex">
         <div className="flex w-full flex-col gap-4">
           {currentGame && firstGame && (
             <Select
@@ -170,7 +172,7 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
           )}
         </div>
       </div>
-      <div className="col-span-12 lg:col-span-9">
+      <div className="col-span-12 lg:col-span-10">
         <div className="flex flex-col gap-4">
           <div className="w-full lg:hidden">
             {currentGame && firstGame && (
