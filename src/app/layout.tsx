@@ -43,6 +43,7 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             <Nav />
+
             {children}
             <Toaster position="bottom-right" />
             <AxiomWebVitals />

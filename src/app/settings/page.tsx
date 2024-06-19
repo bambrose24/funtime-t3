@@ -8,6 +8,4 @@ export default async function SettingsPage() {
   } else {
     redirect("/login");
   }
-
-  return <div></div>;
 }

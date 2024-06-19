@@ -65,7 +65,7 @@ export function ClientNav(props: NavData) {
     <div className="flex w-full flex-col">
       <div className="flex h-12 w-full flex-row justify-between px-2">
         <div className="flex flex-row items-center gap-2">
-          {leagues && leagues.length ? (
+          {leagues?.length ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
