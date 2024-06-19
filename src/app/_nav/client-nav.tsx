@@ -65,50 +65,53 @@ export function ClientNav(props: NavData) {
     <div className="flex w-full flex-col">
       <div className="flex h-12 w-full flex-row justify-between px-2">
         <div className="flex flex-row items-center gap-2">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                disabled={!leagues?.length}
-                variant="ghost"
-                className="flex flex-row items-center gap-2"
-              >
-                {chosenLeague ? chosenLeague.name : "My Leagues"}
-                <ChevronsUpDown className="h-3 w-3" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-64 p-1">
-              <DropdownMenuLabel>Active Leagues</DropdownMenuLabel>
-              {activeLeagues?.map((l) => {
-                return (
-                  <Link
-                    passHref
-                    href={`/league/${l.league_id}`}
-                    key={l.league_id}
-                  >
-                    <DropdownMenuItem>
-                      <MenuRow>{l.name}</MenuRow>
-                    </DropdownMenuItem>
-                  </Link>
-                );
-              })}
-              <DropdownMenuSeparator className="my-4" />
+          {leagues && leagues.length ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  className="flex flex-row items-center gap-2"
+                >
+                  {chosenLeague ? chosenLeague.name : "My Leagues"}
+                  <ChevronsUpDown className="h-3 w-3" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-64 p-1">
+                <DropdownMenuLabel>Active Leagues</DropdownMenuLabel>
+                {activeLeagues?.map((l) => {
+                  return (
+                    <Link
+                      passHref
+                      href={`/league/${l.league_id}`}
+                      key={l.league_id}
+                    >
+                      <DropdownMenuItem>
+                        <MenuRow>{l.name}</MenuRow>
+                      </DropdownMenuItem>
+                    </Link>
+                  );
+                })}
+                <DropdownMenuSeparator className="my-4" />
 
-              <DropdownMenuLabel>Prior Leagues</DropdownMenuLabel>
-              {inactiveLeagues?.map((l) => {
-                return (
-                  <Link
-                    passHref
-                    href={`/league/${l.league_id}`}
-                    key={l.league_id}
-                  >
-                    <DropdownMenuItem>
-                      <MenuRow>{l.name}</MenuRow>
-                    </DropdownMenuItem>
-                  </Link>
-                );
-              })}
-            </DropdownMenuContent>
-          </DropdownMenu>
+                <DropdownMenuLabel>Prior Leagues</DropdownMenuLabel>
+                {inactiveLeagues?.map((l) => {
+                  return (
+                    <Link
+                      passHref
+                      href={`/league/${l.league_id}`}
+                      key={l.league_id}
+                    >
+                      <DropdownMenuItem>
+                        <MenuRow>{l.name}</MenuRow>
+                      </DropdownMenuItem>
+                    </Link>
+                  );
+                })}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <></>
+          )}
           {chosenLeague && (
             <>
               <Separator orientation="vertical" className="my-4" />

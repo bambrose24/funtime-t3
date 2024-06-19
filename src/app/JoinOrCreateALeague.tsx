@@ -57,6 +57,7 @@ function JoinLeagueCard() {
   });
 
   const onSubmit = (data: JoinLeagueData) => {
+    // TODO handle URL's and codes
     console.log(data); // You can handle form submission here
   };
 
@@ -70,15 +71,17 @@ function JoinLeagueCard() {
       </CardContent>
       <CardFooter>
         <form onSubmit={handleSubmit(onSubmit)}>
-          <Input id="leagueCode" {...register("leagueCode")} />
-          {errors.leagueCode && <span>This field is required.</span>}
-          <Button
-            type="submit"
-            className="w-full"
-            disabled={Object.keys(errors).length > 0}
-          >
-            Join League
-          </Button>
+          <div className="flex flex-col gap-2">
+            <Input id="leagueCode" {...register("leagueCode")} />
+            {errors.leagueCode && <span>This field is required.</span>}
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={Object.keys(errors).length > 0}
+            >
+              Join League
+            </Button>
+          </div>
         </form>
       </CardFooter>
     </Card>
