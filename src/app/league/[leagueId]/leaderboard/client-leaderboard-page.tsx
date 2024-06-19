@@ -77,69 +77,69 @@ export function ClientLeaderboardPage(props: Props) {
     if (memberIds) {
       params.set("members", memberIds);
       router.replace(`${pathname}?${params.toString()}`);
+    } else {
+      router.replace(`${pathname}`);
     }
   }, [rowSelection, searchParams, props, pathname, router]);
 
   return (
-    <div className="w-full justify-center p-4">
-      <div className="grid w-full grid-cols-5 gap-4 md:grid-cols-7">
-        <div className="col-span-5 md:col-span-2">
-          <Card className="p-2">
-            <ScrollArea>
-              <div className="max-h-[90vh]">
-                <CardHeader>
-                  <CardTitle>
-                    {props.leaderboard?.league?.name} Leaderboard
-                  </CardTitle>
-                </CardHeader>
+    <>
+      <div className="col-span-12 max-h-[1000px] md:col-span-4">
+        <Card className="p-2">
+          <ScrollArea>
+            <div className="max-h-[90vh]">
+              <CardHeader>
+                <CardTitle>
+                  {props.leaderboard?.league?.name} Leaderboard
+                </CardTitle>
+              </CardHeader>
 
-                <LeaderboardTable
-                  {...props}
-                  rowSelection={rowSelection}
-                  setRowSelection={setRowSelection}
-                />
-              </div>
-            </ScrollArea>
-          </Card>
-        </div>
-        <div className="col-span-4 hidden md:col-span-5 md:block">
-          <Card className="w-full">
-            <CardHeader>
-              <CardTitle>Weekly Standings</CardTitle>
-              <CardDescription>
-                Select players to view them in the graph
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="flex h-full w-full justify-center">
-              <LeaderboardChart
-                className="h-[70vh] w-[50vw]"
-                entries={[...(props.leaderboard?.weekTotals.entries() ?? [])]
-                  .filter((m) => {
-                    return memberIds.has(m[0]);
-                  })
-                  .map((m) => {
-                    const [memberId, weekTotals] = m;
-                    const id =
-                      props.leaderboard?.correctCountsSorted?.find(
-                        (m) => m.member.membership_id === Number(memberId),
-                      )?.member?.people?.username ?? "";
-
-                    const data = [...weekTotals].map(([week, total]) => {
-                      return {
-                        x: week,
-                        y: total,
-                      };
-                    });
-                    return {
-                      id,
-                      data,
-                    };
-                  })}
+              <LeaderboardTable
+                {...props}
+                rowSelection={rowSelection}
+                setRowSelection={setRowSelection}
               />
-            </CardContent>
-          </Card>
-        </div>
+            </div>
+          </ScrollArea>
+        </Card>
       </div>
-    </div>
+      <div className="col-span-12 hidden md:col-span-8 md:block">
+        <Card className="w-full">
+          <CardHeader>
+            <CardTitle>Weekly Standings</CardTitle>
+            <CardDescription>
+              Select players to view them in the graph
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="flex h-full w-full justify-center">
+            <LeaderboardChart
+              className="h-[70vh] w-[50vw]"
+              entries={[...(props.leaderboard?.weekTotals.entries() ?? [])]
+                .filter((m) => {
+                  return memberIds.has(m[0]);
+                })
+                .map((m) => {
+                  const [memberId, weekTotals] = m;
+                  const id =
+                    props.leaderboard?.correctCountsSorted?.find(
+                      (m) => m.member.membership_id === Number(memberId),
+                    )?.member?.people?.username ?? "";
+
+                  const data = [...weekTotals].map(([week, total]) => {
+                    return {
+                      x: week,
+                      y: total,
+                    };
+                  });
+                  return {
+                    id,
+                    data,
+                  };
+                })}
+            />
+          </CardContent>
+        </Card>
+      </div>
+    </>
   );
 }

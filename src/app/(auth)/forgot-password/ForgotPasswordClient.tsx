@@ -40,7 +40,7 @@ export function ForgotPasswordClient() {
   };
 
   return (
-    <div className="flex h-full w-full flex-col items-center p-2 pt-8">
+    <div className="col-span-10 flex h-full w-full flex-col items-center p-2 pt-8 md:col-span-4 md:col-start-5">
       <Card className="md:w-[300px]">
         <CardHeader>Reset Password</CardHeader>
         <CardContent>

@@ -43,8 +43,7 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             <Nav />
-
-            {children}
+            <div className="grid grid-cols-12 gap-4 p-2">{children}</div>
             <Toaster position="bottom-right" />
             <AxiomWebVitals />
           </ThemeProvider>

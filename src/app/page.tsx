@@ -18,17 +18,15 @@ export default async function Home() {
   }
 
   return (
-    <main className="h-full w-full px-3">
-      <div className="flex w-full grow flex-row flex-wrap justify-around gap-4 py-4">
-        {data?.map((d) => {
-          if (!d) {
-            return null;
-          }
-          return <HomeLeagueCard key={d.league?.league_id} data={d} />;
-        })}
-        {!data?.length ? <JoinOrCreateALeague /> : <></>}
-        {/* {data?.length ? <JoinOrCreateALeague /> : <></>} */}
-      </div>
-    </main>
+    <div className="col-span-10 col-start-2 flex w-full grow flex-row flex-wrap justify-around gap-4 py-4">
+      {data?.map((d) => {
+        if (!d) {
+          return null;
+        }
+        return <HomeLeagueCard key={d.league?.league_id} data={d} />;
+      })}
+      {!data?.length ? <JoinOrCreateALeague /> : <></>}
+      {/* {data?.length ? <JoinOrCreateALeague /> : <></>} */}
+    </div>
   );
 }

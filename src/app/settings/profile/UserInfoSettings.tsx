@@ -21,7 +21,7 @@ type Props = {
 
 export function UserInfoSettings(props: Props) {
   return (
-    <div className="grid w-full grid-cols-1 flex-row justify-between md:grid-cols-2">
+    <div className="grid w-full grid-cols-5 flex-row justify-between gap-2">
       <UsernameForm {...props} />
       <AvatarForm {...props} />
     </div>
@@ -64,7 +64,7 @@ function UsernameForm({ data }: Props) {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <form onSubmit={handleSubmit(onSubmit)} className="col-span-3">
       <div className="flex w-full flex-col gap-3">
         <Label htmlFor="username">Username</Label>
         <Input id="username" {...register("username")} />
@@ -87,7 +87,7 @@ function UsernameForm({ data }: Props) {
 
 function AvatarForm({ data }: Props) {
   return (
-    <div className="flex w-full flex-col items-end">
+    <div className="col-span-2 flex w-full flex-col items-center">
       <Avatar className="h-16 w-16 lg:h-32 lg:w-32">
         <FuntimeAvatarFallback username={data.dbUser?.username ?? ""} />
       </Avatar>

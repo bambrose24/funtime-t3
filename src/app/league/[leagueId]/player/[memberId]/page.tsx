@@ -32,56 +32,54 @@ export default async function MemberPage({
   const superbowlLoser = teams.find((t) => t.teamid === superbowl?.loser);
 
   return (
-    <div className="flex w-full flex-row justify-center py-4">
-      <div className="min-w-[400px]">
-        <Card className="w-full">
-          <CardHeader className="text-center">
-            <CardTitle>{response.member.people.username}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex w-full flex-col gap-2">
-              <div className="flex w-full flex-row justify-between">
-                <div>Correct Picks</div>
-                <div>
-                  {response.correctPicks} /{" "}
-                  {response.wrongPicks + response.correctPicks} (
-                  {Math.floor(
-                    (response.correctPicks /
-                      (response.wrongPicks + response.correctPicks)) *
-                      100,
-                  )}
-                  %)
-                </div>
-              </div>
-              <Separator />
-              <div className="flex w-full flex-row justify-between">
-                <div>Messages Sent</div>
-                <div>{response.member.leaguemessages.length}</div>
-              </div>
-              <Separator />
-              <div className="flex w-full flex-row justify-between">
-                <div>Weeks Won</div>
-                <div className="flex flex-row gap-1">
-                  {response.member.WeekWinners.length === 0 && (
-                    <div className="text-sm">None</div>
-                  )}
-                  {response.member.WeekWinners.map((w, i) => {
-                    return <div key={i}>Week {w.week}</div>;
-                  })}
-                </div>
-              </div>
-              <Separator />
-              <div className="flex w-full flex-row justify-between">
-                <div>Super Bowl</div>
-                <div>
-                  {superbowlWinner?.abbrev} over {superbowlLoser?.abbrev} (score{" "}
-                  {superbowl?.score})
-                </div>
+    <div className="col-span-12 flex w-full flex-row justify-center py-4 md:col-span-6 md:col-start-4">
+      <Card className="w-full">
+        <CardHeader className="text-center">
+          <CardTitle>{response.member.people.username}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex w-full flex-col gap-2">
+            <div className="flex w-full flex-row justify-between">
+              <div>Correct Picks</div>
+              <div>
+                {response.correctPicks} /{" "}
+                {response.wrongPicks + response.correctPicks} (
+                {Math.floor(
+                  (response.correctPicks /
+                    (response.wrongPicks + response.correctPicks)) *
+                    100,
+                )}
+                %)
               </div>
             </div>
-          </CardContent>
-        </Card>
-      </div>
+            <Separator />
+            <div className="flex w-full flex-row justify-between">
+              <div>Messages Sent</div>
+              <div>{response.member.leaguemessages.length}</div>
+            </div>
+            <Separator />
+            <div className="flex w-full flex-row justify-between">
+              <div>Weeks Won</div>
+              <div className="flex flex-row gap-1">
+                {response.member.WeekWinners.length === 0 && (
+                  <div className="text-sm">None</div>
+                )}
+                {response.member.WeekWinners.map((w, i) => {
+                  return <div key={i}>Week {w.week}</div>;
+                })}
+              </div>
+            </div>
+            <Separator />
+            <div className="flex w-full flex-row justify-between">
+              <div>Super Bowl</div>
+              <div>
+                {superbowlWinner?.abbrev} over {superbowlLoser?.abbrev} (score{" "}
+                {superbowl?.score})
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

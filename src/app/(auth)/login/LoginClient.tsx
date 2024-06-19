@@ -24,8 +24,8 @@ export default function LoginPage() {
   });
 
   return (
-    <div className="flex h-full w-full flex-col items-center p-2 pt-8">
-      <Card className="md:w-[300px]">
+    <div className="col-span-8 col-start-3 flex h-full w-full flex-col items-center p-2 pt-8 md:col-span-4 md:col-start-5">
+      <Card className="w-full">
         <CardHeader>Login</CardHeader>
         <CardContent>
           <div className="flex flex-col">
