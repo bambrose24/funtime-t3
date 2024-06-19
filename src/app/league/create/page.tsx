@@ -1,3 +1,3 @@
-export function CreateLeaguePage() {
+export default function CreateLeaguePage() {
   return <></>;
 }
