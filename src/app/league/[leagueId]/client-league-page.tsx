@@ -5,7 +5,7 @@ import { Text } from "~/components/ui/text";
 import { type serverApi } from "~/trpc/server";
 import { PicksTable } from "./picks-table";
 import { YourPicksList, CompactYourPicksList } from "./your-picks-list";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Separator } from "~/components/ui/separator";
 import { Button } from "~/components/ui/button";
 import {
@@ -31,25 +31,43 @@ import { Alert, AlertTitle } from "~/components/ui/alert";
 import { AlertCircleIcon } from "lucide-react";
 import { useDictify } from "~/utils/hooks/useIdToValMemo";
 import { ScrollArea, ScrollBar } from "~/components/ui/scroll-area";
+import { type RouterOutputs } from "~/trpc/types";
+import { clientApi } from "~/trpc/react";
 
 type ClientLeaguePageProps = {
-  picksSummary: Awaited<ReturnType<typeof serverApi.league.picksSummary>>;
-  games: Awaited<ReturnType<typeof serverApi.games.getGames>>;
-  teams: Awaited<ReturnType<typeof serverApi.teams.getTeams>>;
-  league: Awaited<ReturnType<typeof serverApi.league.get>>;
-  session: Awaited<ReturnType<typeof serverApi.session.current>>;
-  currentGame: Awaited<ReturnType<typeof serverApi.time.activeWeekByLeague>>;
+  week: number;
+  leagueId: number;
+  season: number;
+  picksSummary: RouterOutputs["league"]["picksSummary"];
+  games: RouterOutputs["games"]["getGames"];
+  teams: RouterOutputs["teams"]["getTeams"];
+  league: RouterOutputs["league"]["get"];
+  session: RouterOutputs["session"]["current"];
+  currentGame: RouterOutputs["time"]["activeWeekByLeague"];
 };
 
+const REFETCH_INTERVAL_MS = 1000 * 30;
+
 export function ClientLeaguePage(props: ClientLeaguePageProps) {
-  const {
-    picksSummary: picksSummaryProp,
-    games,
-    teams,
-    league,
-    session,
-    currentGame,
-  } = props;
+  const { teams, league, session, currentGame } = props;
+
+  const { data: games } = clientApi.games.getGames.useQuery(
+    {
+      week: props.week,
+      season: props.season,
+    },
+    {
+      initialData: props.games,
+      refetchInterval: REFETCH_INTERVAL_MS,
+    },
+  );
+  const { data: picksSummaryData } = clientApi.league.picksSummary.useQuery(
+    {
+      leagueId: props.leagueId,
+      week: props.week,
+    },
+    { initialData: props.picksSummary, refetchInterval: REFETCH_INTERVAL_MS },
+  );
 
   // TODO pass these to trpc useQuery's as initialData instead of just relying on these pieces of info so that we can pollInterval for every 5 minutes or something
   const firstGame = games.at(0);
@@ -68,20 +86,23 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
 
   const gameToGid = useDictify(games, (g) => g.gid);
 
-  const picksSummary = cloneDeep(picksSummaryProp);
-  picksSummary.forEach((p) => {
-    p.picks = p.picks.map((p) => {
-      const gid = p.gid;
-      if (gid in overrideGidToWinner) {
-        p.correct = overrideGidToWinner[gid] === p.winner ? 1 : 0;
-      }
-      return p;
+  const picksSummary = useMemo(() => {
+    const picksSummaryCloned = cloneDeep(picksSummaryData);
+    picksSummaryCloned.forEach((p) => {
+      p.picks = p.picks.map((p) => {
+        const gid = p.gid;
+        if (gid in overrideGidToWinner) {
+          p.correct = overrideGidToWinner[gid] === p.winner ? 1 : 0;
+        }
+        return p;
+      });
+      p.correctPicks = p.picks.reduce(
+        (prev, curr) => prev + (curr.correct ?? 0),
+        0,
+      );
     });
-    p.correctPicks = p.picks.reduce(
-      (prev, curr) => prev + (curr.correct ?? 0),
-      0,
-    );
-  });
+    return picksSummaryCloned;
+  }, [picksSummaryData, overrideGidToWinner]);
 
   const myPicks = picksSummary.find((p) => p.user_id === session.dbUser?.uid);
 
@@ -111,7 +132,7 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
       <div className="col-span-12 flex flex-row justify-center py-4">
         <Text.H1>{league.name}</Text.H1>
       </div>
-      <div className="hidden lg:col-span-2 lg:flex">
+      <div className="hidden xl:col-span-2 xl:flex">
         <div className="flex w-full flex-col gap-4">
           {currentGame && firstGame && (
             <Select
@@ -172,9 +193,9 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
           )}
         </div>
       </div>
-      <div className="col-span-12 lg:col-span-10">
+      <div className="col-span-12 xl:col-span-10">
         <div className="flex flex-col gap-4">
-          <div className="w-full lg:hidden">
+          <div className="w-full xl:hidden">
             {currentGame && firstGame && (
               <Select
                 onValueChange={(value) => {
@@ -245,7 +266,7 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
               </Alert>
             </div>
           )}
-          <div className="flex flex-row lg:hidden">
+          <div className="flex flex-row xl:hidden">
             {myPicks && firstGame && (
               <Drawer>
                 <DrawerTrigger asChild>

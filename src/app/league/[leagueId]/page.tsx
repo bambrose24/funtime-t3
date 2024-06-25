@@ -51,6 +51,9 @@ export default async function LeaguePage({
 
   return (
     <ClientLeaguePage
+      week={week}
+      leagueId={leagueId}
+      season={season}
       picksSummary={data}
       teams={teams}
       games={games}
