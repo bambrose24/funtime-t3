@@ -1,9 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 import { env } from "~/env";
-import {
-  createServerClient as supabaseCreateServerClient,
-  type CookieOptions,
-} from "@supabase/ssr";
+import { createServerClient as supabaseCreateServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 
 export const supabaseServer = () => {
@@ -13,27 +10,8 @@ export const supabaseServer = () => {
     env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
     {
       cookies: {
-        get(name: string) {
-          const res = cookieStore.get(name)?.value;
-          return res;
-        },
-        set(name: string, value: string, options: CookieOptions) {
-          try {
-            cookieStore.set({ name, value, ...options });
-          } catch (error) {
-            // The `set` method was called from a Server Component.
-            // This can be ignored if you have middleware refreshing
-            // user sessions.
-          }
-        },
-        remove(name: string, options: CookieOptions) {
-          try {
-            cookieStore.set({ name, value: "", ...options });
-          } catch (error) {
-            // The `delete` method was called from a Server Component.
-            // This can be ignored if you have middleware refreshing
-            // user sessions.
-          }
+        getAll() {
+          return cookieStore.getAll();
         },
       },
     },
