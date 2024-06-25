@@ -1,21 +1,26 @@
 import { z } from "zod";
-import { createTRPCRouter, publicProcedure } from "../trpc";
+import {
+  authorizedProcedure,
+  createTRPCRouter,
+  publicProcedure,
+} from "../trpc";
 import { db } from "~/server/db";
 import _ from "lodash";
 import { getGames } from "~/server/util/getGames";
 import { cache } from "~/utils/cache";
+import { TRPCError } from "@trpc/server";
 
 const picksSummarySchema = z.object({
   leagueId: z.number().int(),
   week: z.number().int().optional(),
 });
 
-const getLeagueSchema = z.object({
+const leagueIdSchema = z.object({
   leagueId: z.number().int(),
 });
 
 export const leagueRouter = createTRPCRouter({
-  get: publicProcedure.input(getLeagueSchema).query(async ({ input }) => {
+  get: publicProcedure.input(leagueIdSchema).query(async ({ input }) => {
     const { leagueId } = input;
     const getLeagueImpl = cache(
       async () => {
@@ -30,6 +35,58 @@ export const leagueRouter = createTRPCRouter({
     );
     return await getLeagueImpl();
   }),
+  weekToPick: authorizedProcedure
+    .input(leagueIdSchema)
+    .query(async ({ input, ctx }) => {
+      const { leagueId } = input;
+
+      const data = await ctx.db.leagues.findUnique({
+        where: {
+          league_id: leagueId,
+        },
+        select: {
+          season: true,
+        },
+      });
+      if (!data?.season) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+        });
+      }
+
+      const { season } = data;
+
+      const mostRecentUnstartedGame = await ctx.db.games.findFirst({
+        where: {
+          season,
+          // ts: {
+          //   gte: new Date(),
+          // },
+        },
+        orderBy: {
+          ts: "asc",
+        },
+      });
+
+      if (!mostRecentUnstartedGame) {
+        return { week: null, season: null, games: [] };
+      }
+
+      const { week } = mostRecentUnstartedGame;
+
+      const games = await ctx.db.games.findMany({
+        where: {
+          season,
+          week,
+        },
+      });
+
+      return {
+        season,
+        week,
+        games,
+      };
+    }),
   picksSummary: publicProcedure
     .input(picksSummarySchema)
     .query(async ({ input }) => {

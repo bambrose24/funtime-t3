@@ -6,7 +6,7 @@
  * TL;DR - This is where all the tRPC server stuff is created and plugged in. The pieces you will
  * need to use are documented accordingly near the end.
  */
-import { initTRPC } from "@trpc/server";
+import { TRPCError, initTRPC } from "@trpc/server";
 import superjson from "superjson";
 import { ZodError } from "zod";
 
@@ -169,3 +169,12 @@ export const publicProcedure = procedure;
 /**
  * A procedure that can only run if the user is authenticated via Supabase.
  */
+export const authorizedProcedure = procedure.use(async ({ ctx, next }) => {
+  if (!ctx.dbUser) {
+    throw new TRPCError({
+      code: "UNAUTHORIZED",
+      message: "You must be logged in to do that.",
+    });
+  }
+  return next();
+});
