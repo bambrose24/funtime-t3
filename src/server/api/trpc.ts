@@ -54,7 +54,7 @@ export const createTRPCContext = async (opts: { headers: Headers }) => {
       },
       ["getUserByEmail", supabaseUser.email],
       {
-        revalidate: 30, // 5 minutes but revalidate via tag below
+        revalidate: 10, // 10 seconds but revalidate via tag below
         tags: [getCoreUserTag(supabaseUser.email)],
       },
     );
@@ -165,3 +165,7 @@ const procedure = t.procedure.use(async ({ path, type, next }) => {
  * are logged in.
  */
 export const publicProcedure = procedure;
+
+/**
+ * A procedure that can only run if the user is authenticated via Supabase.
+ */
