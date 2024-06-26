@@ -17,15 +17,25 @@ import { LeaderboardChart } from "./leaderboard-chart";
 import { Defined } from "~/utils/defined";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { ScrollArea } from "~/components/ui/scroll-area";
+import { type RouterOutputs } from "~/trpc/types";
+import { clientApi } from "~/trpc/react";
 
 type Props = {
-  leaderboard: Awaited<ReturnType<typeof serverApi.leaderboard.league>>;
+  leagueId: number;
+  leaderboard: RouterOutputs["leaderboard"]["league"];
 };
 
 export function ClientLeaderboardPage(props: Props) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+
+  const { data: leaderboard } = clientApi.leaderboard.league.useQuery(
+    {
+      leagueId: props.leagueId,
+    },
+    { initialData: props.leaderboard },
+  );
 
   const membersParam = searchParams.get("members");
 
@@ -49,7 +59,7 @@ export function ClientLeaderboardPage(props: Props) {
   >(() => {
     return [...memberIds].reduce(
       (prev, curr) => {
-        const idx = props.leaderboard?.correctCountsSorted.findIndex(
+        const idx = leaderboard?.correctCountsSorted.findIndex(
           (p) => p.member.membership_id === curr,
         );
         if (idx) {
@@ -67,7 +77,7 @@ export function ClientLeaderboardPage(props: Props) {
     const memberIds = (
       Object.keys(rowSelection)
         .map((idx) => {
-          return props.leaderboard?.correctCountsSorted
+          return leaderboard?.correctCountsSorted
             ?.at(Number(idx))
             ?.member?.membership_id?.toString();
         })
@@ -80,7 +90,7 @@ export function ClientLeaderboardPage(props: Props) {
     } else {
       router.replace(`${pathname}`);
     }
-  }, [rowSelection, searchParams, props, pathname, router]);
+  }, [rowSelection, searchParams, leaderboard, pathname, router]);
 
   return (
     <>
@@ -89,13 +99,11 @@ export function ClientLeaderboardPage(props: Props) {
           <ScrollArea>
             <div className="max-h-[90vh]">
               <CardHeader>
-                <CardTitle>
-                  {props.leaderboard?.league?.name} Leaderboard
-                </CardTitle>
+                <CardTitle>{leaderboard?.league?.name} Leaderboard</CardTitle>
               </CardHeader>
 
               <LeaderboardTable
-                {...props}
+                leaderboard={leaderboard}
                 rowSelection={rowSelection}
                 setRowSelection={setRowSelection}
               />
@@ -114,14 +122,14 @@ export function ClientLeaderboardPage(props: Props) {
           <CardContent className="flex h-full w-full justify-center">
             <LeaderboardChart
               className="h-[70vh] w-[50vw]"
-              entries={[...(props.leaderboard?.weekTotals.entries() ?? [])]
+              entries={[...(leaderboard?.weekTotals.entries() ?? [])]
                 .filter((m) => {
                   return memberIds.has(m[0]);
                 })
                 .map((m) => {
                   const [memberId, weekTotals] = m;
                   const id =
-                    props.leaderboard?.correctCountsSorted?.find(
+                    leaderboard?.correctCountsSorted?.find(
                       (m) => m.member.membership_id === Number(memberId),
                     )?.member?.people?.username ?? "";
 
