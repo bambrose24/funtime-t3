@@ -12,5 +12,5 @@ type Props = {
 export default async function Leaderboard({ params: { leagueId: id } }: Props) {
   const leagueId = Number(id);
   const res = await serverApi.leaderboard.league({ leagueId });
-  return <ClientLeaderboardPage leaderboard={res} />;
+  return <ClientLeaderboardPage leagueId={leagueId} leaderboard={res} />;
 }
