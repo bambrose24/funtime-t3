@@ -9,7 +9,7 @@ export const dynamic: AppConfigDynamic = "force-dynamic";
 
 export default async function Home() {
   const [data, session] = await Promise.all([
-    serverApi.home.summary({ season: 2023 }),
+    serverApi.home.summary(),
     serverApi.session.current(),
   ]);
 

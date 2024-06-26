@@ -1,6 +1,5 @@
 "use client";
 
-import { type serverApi } from "~/trpc/server";
 import { Card, CardContent, CardHeader } from "~/components/ui/card";
 import { Separator } from "~/components/ui/separator";
 import { Text } from "../ui/text";
@@ -9,10 +8,9 @@ import { Badge } from "../ui/badge";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { PrefetchKind } from "next/dist/client/components/router-reducer/router-reducer-types";
+import type { RouterOutputs } from "~/trpc/types";
 
-type LeagueCardData = NonNullable<
-  Awaited<ReturnType<(typeof serverApi)["home"]["summary"]>>
->[number];
+type LeagueCardData = NonNullable<RouterOutputs["home"]["summary"]>[number];
 
 export function HomeLeagueCard({ data }: { data: LeagueCardData }) {
   const router = useRouter();

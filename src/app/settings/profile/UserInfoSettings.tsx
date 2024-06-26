@@ -12,18 +12,21 @@ import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { Text } from "~/components/ui/text";
 import { clientApi } from "~/trpc/react";
-import { type serverApi } from "~/trpc/server";
+import { type RouterOutputs } from "~/trpc/types";
 import { updateUsernameSchema } from "~/utils/schemas/updateUsername";
 
 type Props = {
-  data: Awaited<ReturnType<typeof serverApi.settings.get>>;
+  data: RouterOutputs["settings"]["get"];
 };
 
 export function UserInfoSettings(props: Props) {
+  const { data } = clientApi.settings.get.useQuery(undefined, {
+    initialData: props.data,
+  });
   return (
     <div className="grid w-full grid-cols-5 flex-row justify-between gap-2">
-      <UsernameForm {...props} />
-      <AvatarForm {...props} />
+      <UsernameForm data={data} />
+      <AvatarForm data={data} />
     </div>
   );
 }
