@@ -2,7 +2,6 @@
 import { GameCard } from "~/components/league/GameCard";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Text } from "~/components/ui/text";
-import { type serverApi } from "~/trpc/server";
 import { PicksTable } from "./picks-table";
 import { YourPicksList, CompactYourPicksList } from "./your-picks-list";
 import { useCallback, useEffect, useMemo, useState } from "react";

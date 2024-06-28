@@ -1,5 +1,4 @@
 import { groupBy } from "lodash";
-import { z } from "zod";
 
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import { cache, getCoreUserTag } from "~/utils/cache";

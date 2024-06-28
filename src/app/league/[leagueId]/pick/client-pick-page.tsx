@@ -1,8 +1,10 @@
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useFieldArray, useForm } from "react-hook-form";
+import { z } from "zod";
 import { TeamLogo } from "~/components/shared/TeamLogo";
 import { Card, CardContent, CardHeader } from "~/components/ui/card";
-import { Label } from "~/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "~/components/ui/radio-group";
 import { Text } from "~/components/ui/text";
 import { type RouterOutputs } from "~/trpc/types";
@@ -14,10 +16,33 @@ type Props = {
   teams: RouterOutputs["teams"]["getTeams"];
 };
 
+const picksSchema = z.object({
+  picks: z.array(
+    z.object({
+      gid: z.number().int(),
+      winner: z.number().int(),
+    }),
+  ),
+  tiebreakerScore: z.object({
+    gid: z.number().int(),
+    score: z.number().int(),
+  }),
+});
+
 export function ClientPickPage({ weekToPick, teams }: Props) {
   const { week, season, games } = weekToPick;
 
   const teamById = useDictify(teams, (t) => t.teamid);
+
+  const form = useForm<z.infer<typeof picksSchema>>({
+    resolver: zodResolver(picksSchema),
+  });
+  const picksField = useFieldArray({
+    control: form.control, // control props comes from useForm (optional: if you are using FormProvider)
+    name: "picks",
+  });
+
+  console.log("picksField", picksField);
 
   if (!week || !season || !games.length) {
     return (
@@ -34,7 +59,7 @@ export function ClientPickPage({ weekToPick, teams }: Props) {
     );
   }
   return (
-    <div className="col-span-12 flex max-w-[1000px] flex-col items-center gap-4 ">
+    <div className="col-span-12 flex flex-col items-center gap-4">
       <div className="flex flex-col items-center">
         <Text.H2>Make Your Picks</Text.H2>
         <div>
