@@ -68,40 +68,42 @@ export function ConfirmResetPasswordClient() {
   };
 
   return (
-    <div className="flex h-full w-full flex-col items-center p-2 pt-8">
+    <div className="col-span-8 col-start-3 flex flex-col items-center p-2 pt-8 md:col-span-4 md:col-start-5 2xl:col-span-2 2xl:col-start-6">
       <Card className="md:w-[300px]">
         <CardHeader>Confirm Password Reset</CardHeader>
         <CardContent>
-          <div className="flex flex-col">
-            <form onSubmit={handleSubmit(onSubmit)}>
-              <Input
-                placeholder="New Password"
-                type="password"
-                {...register("password1")}
-              />
-              <div className="pt-4" />
-              <Input
-                placeholder="Confirm Password"
-                type="password"
-                {...register("password2")}
-              />
-              <div className="pt-4" />
-              {errors.password2?.message && (
-                <span>{errors.password2.message}</span>
-              )}
-              <Button
-                className="w-full"
-                disabled={
-                  Boolean(errors.password2?.message) ||
-                  isLoading ||
-                  isSubmitting
-                }
-                loading={isLoading || isSubmitting}
-              >
-                Confirm Reset
-              </Button>
-            </form>
-          </div>
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-2">
+                <Input
+                  placeholder="New Password"
+                  type="password"
+                  {...register("password1")}
+                />
+                <Input
+                  placeholder="Confirm Password"
+                  type="password"
+                  {...register("password2")}
+                />
+                {errors.password2?.message && (
+                  <span>{errors.password2.message}</span>
+                )}
+              </div>
+              <div className="flex flex-col gap-2">
+                <Button
+                  className="w-full"
+                  disabled={
+                    Boolean(errors.password2?.message) ||
+                    isLoading ||
+                    isSubmitting
+                  }
+                  loading={isLoading || isSubmitting}
+                >
+                  Confirm Reset
+                </Button>
+              </div>
+            </div>
+          </form>
         </CardContent>
       </Card>
     </div>
