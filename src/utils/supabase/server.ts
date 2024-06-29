@@ -10,8 +10,13 @@ export const supabaseServer = () => {
     env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
     {
       cookies: {
-        getAll() {
+        getAll: () => {
           return cookieStore.getAll();
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value }) => {
+            cookieStore.set(name, value);
+          });
         },
       },
     },
