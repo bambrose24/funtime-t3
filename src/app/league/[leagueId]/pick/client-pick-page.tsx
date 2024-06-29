@@ -13,6 +13,7 @@ import { format } from "date-fns-tz";
 import { Alert, AlertTitle } from "~/components/ui/alert";
 import { AlertCircleIcon } from "lucide-react";
 import { useUserEnforced } from "~/utils/hooks/useUserEnforced";
+import { Defined } from "~/utils/defined";
 import { cn } from "~/lib/utils";
 
 type Props = {
@@ -126,6 +127,12 @@ export function ClientPickPage({ weekToPick, teams }: Props) {
               `Could not find home or away team for game ${game.gid}`,
             );
           }
+          const winnerTeam = winner ? teamById.get(winner) : undefined;
+          const winnerColors = [
+            winnerTeam?.primary_color,
+            winnerTeam?.secondary_color,
+            winnerTeam?.tertiary_color,
+          ].filter(Defined);
 
           const pick = (winner: number) => {
             onTeamPick({
@@ -134,95 +141,102 @@ export function ClientPickPage({ weekToPick, teams }: Props) {
               winner,
             });
           };
+
+          const gradientStyle = winnerTeam
+            ? {
+                background: `linear-gradient(to right, ${winnerTeam.primary_color}, ${winnerTeam.secondary_color})`,
+              }
+            : {};
+
           return (
-            <Card
-              key={game.gid}
-              className={cn(
-                "w-full transition-all",
-                typeof winner !== "number" && "",
-                typeof winner === "number" && "border-4 border-correct",
-              )}
-            >
-              <CardContent className="flex flex-col gap-2 py-2">
-                <RadioGroup
-                  value={winner?.toString()}
-                  onValueChange={(val) => {
-                    pick(Number(val));
-                  }}
-                >
-                  <div className="grid w-full grid-cols-5 gap-2">
-                    <div
-                      className="col-span-1 flex cursor-pointer items-center justify-center"
-                      onClick={() => {
-                        pick(away.teamid);
-                      }}
-                    >
-                      <TeamLogo
-                        abbrev={away.abbrev ?? ""}
-                        width={40}
-                        height={40}
-                      />
-                    </div>
-                    <div
-                      className="col-span-1 flex cursor-pointer items-center justify-start pl-2"
-                      onClick={() => pick(away.teamid)}
-                    >
-                      <div className="flex items-center gap-2">
-                        <RadioGroupItem
-                          value={away.teamid.toString()}
-                          id={`pick_option_${away.teamid.toString()}`}
+            <Card key={game.gid} className="w-full transition-all">
+              <div
+                style={gradientStyle}
+                className={cn(
+                  "w-full rounded-lg bg-gradient-to-r p-1 transition-all",
+                )}
+              >
+                <CardContent className="flex flex-col gap-2 rounded-sm bg-card py-2">
+                  <RadioGroup
+                    value={winner?.toString()}
+                    onValueChange={(val) => {
+                      pick(Number(val));
+                    }}
+                  >
+                    <div className="grid w-full grid-cols-5 gap-2">
+                      <div
+                        className="col-span-1 flex cursor-pointer items-center justify-center"
+                        onClick={() => {
+                          pick(away.teamid);
+                        }}
+                      >
+                        <TeamLogo
+                          abbrev={away.abbrev ?? ""}
+                          width={40}
+                          height={40}
                         />
-                        <Text.Small>{away.abbrev}</Text.Small>
                       </div>
-                    </div>
-                    <div className="col-span-1 flex items-center justify-center">
-                      @
-                    </div>
-                    <div
-                      className="col-span-1 flex cursor-pointer items-center justify-end pr-2"
-                      onClick={() => pick(home.teamid)}
-                    >
-                      <div className="flex items-center gap-2">
-                        <Text.Small>{home.abbrev}</Text.Small>
-                        <div className="flex items-center justify-center">
+                      <div
+                        className="col-span-1 flex cursor-pointer items-center justify-start pl-2"
+                        onClick={() => pick(away.teamid)}
+                      >
+                        <div className="flex items-center gap-2">
                           <RadioGroupItem
-                            value={home.teamid.toString()}
-                            id={`pick_option_${home.teamid.toString()}`}
+                            value={away.teamid.toString()}
+                            id={`pick_option_${away.teamid.toString()}`}
                           />
+                          <Text.Small>{away.abbrev}</Text.Small>
                         </div>
                       </div>
-                    </div>
+                      <div className="col-span-1 flex items-center justify-center">
+                        @
+                      </div>
+                      <div
+                        className="col-span-1 flex cursor-pointer items-center justify-end pr-2"
+                        onClick={() => pick(home.teamid)}
+                      >
+                        <div className="flex items-center gap-2">
+                          <Text.Small>{home.abbrev}</Text.Small>
+                          <div className="flex items-center justify-center">
+                            <RadioGroupItem
+                              value={home.teamid.toString()}
+                              id={`pick_option_${home.teamid.toString()}`}
+                            />
+                          </div>
+                        </div>
+                      </div>
 
-                    <div
-                      className="col-span-1 flex cursor-pointer items-center justify-center"
-                      onClick={() => pick(home.teamid)}
-                    >
-                      <TeamLogo
-                        abbrev={home.abbrev ?? ""}
-                        width={40}
-                        height={40}
-                      />
+                      <div
+                        className="col-span-1 flex cursor-pointer items-center justify-center"
+                        onClick={() => pick(home.teamid)}
+                      >
+                        <TeamLogo
+                          abbrev={home.abbrev ?? ""}
+                          width={40}
+                          height={40}
+                        />
+                      </div>
+                      <div className="col-span-1 flex justify-center">
+                        <Text.Small className="text-xs text-muted-foreground">
+                          {game.awayrecord}
+                        </Text.Small>
+                      </div>
+                      <div className="col-span-3 flex justify-center">
+                        <Text.Small className="text-xs">
+                          {format(game.ts, "EEE MMM d yyyy, h:mm a zzz", {
+                            timeZone: EASTERN_TIMEZONE,
+                          })}
+                        </Text.Small>
+                      </div>
+                      <div className="col-span-1 flex justify-center">
+                        <Text.Small className="text-xs text-muted-foreground">
+                          {game.homerecord}
+                        </Text.Small>
+                      </div>
                     </div>
-                    <div className="col-span-1 flex justify-center">
-                      <Text.Small className="text-xs text-muted-foreground">
-                        {game.awayrecord}
-                      </Text.Small>
-                    </div>
-                    <div className="col-span-3 flex justify-center">
-                      <Text.Small className="text-xs">
-                        {format(game.ts, "EEE MMM d yyyy, h:mm a zzz", {
-                          timeZone: EASTERN_TIMEZONE,
-                        })}
-                      </Text.Small>
-                    </div>
-                    <div className="col-span-1 flex justify-center">
-                      <Text.Small className="text-xs text-muted-foreground">
-                        {game.homerecord}
-                      </Text.Small>
-                    </div>
-                  </div>
-                </RadioGroup>
-              </CardContent>
+                  </RadioGroup>
+                </CardContent>
+              </div>
             </Card>
           );
         })}
