@@ -188,6 +188,7 @@ model picks {
   teams         teams?         @relation(fields: [winner], references: [teamid])
 
   @@index([gid], map: "idx_18437_gid")
+  @@index([winner])
   @@index([member_id], map: "idx_18437_picks_ibfk_3")
   @@index([season], map: "idx_18437_season")
   @@index([ts], map: "idx_18437_ts")
@@ -211,6 +212,8 @@ model superbowl {
   leaguemembers                 leaguemembers? @relation(fields: [member_id], references: [membership_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_member_id")
   teams_superbowl_winnerToteams teams          @relation("superbowl_winnerToteams", fields: [winner], references: [teamid], onDelete: NoAction, onUpdate: NoAction, map: "fk_winner_team")
 
+  @@index([loser])
+  @@index([winner])
   @@index([member_id], map: "idx_18448_member_id")
   @@index([season], map: "idx_18448_season")
   @@index([ts], map: "idx_18448_ts")
