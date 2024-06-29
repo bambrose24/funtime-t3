@@ -169,12 +169,14 @@ export const publicProcedure = procedure;
 /**
  * A procedure that can only run if the user is authenticated via Supabase.
  */
-export const authorizedProcedure = procedure.use(async ({ ctx, next }) => {
-  if (!ctx.dbUser) {
-    throw new TRPCError({
-      code: "UNAUTHORIZED",
-      message: "You must be logged in to do that.",
-    });
-  }
-  return next();
-});
+export const authorizedProcedure = procedure.use(
+  async ({ ctx, next, path }) => {
+    if (!ctx.dbUser) {
+      throw new TRPCError({
+        code: "UNAUTHORIZED",
+        message: `You must be logged in to do that. Path ${path}`,
+      });
+    }
+    return next();
+  },
+);

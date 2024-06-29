@@ -20,7 +20,7 @@ const picksSchema = z.object({
   picks: z.array(
     z.object({
       gid: z.number().int(),
-      winner: z.number().int(),
+      winner: z.number().int().nullable(),
     }),
   ),
   tiebreakerScore: z.object({
@@ -33,16 +33,27 @@ export function ClientPickPage({ weekToPick, teams }: Props) {
   const { week, season, games } = weekToPick;
 
   const teamById = useDictify(teams, (t) => t.teamid);
+  const gameById = useDictify(games, (g) => g.gid);
 
   const form = useForm<z.infer<typeof picksSchema>>({
     resolver: zodResolver(picksSchema),
+    defaultValues: {
+      picks: games.map((g) => {
+        return {
+          gid: g.gid,
+          winner: undefined,
+        };
+      }),
+      tiebreakerScore: {
+        gid: games.find((g) => g.is_tiebreaker)?.gid,
+        score: 0,
+      },
+    },
   });
   const picksField = useFieldArray({
     control: form.control, // control props comes from useForm (optional: if you are using FormProvider)
     name: "picks",
   });
-
-  console.log("picksField", picksField);
 
   if (!week || !season || !games.length) {
     return (
@@ -59,7 +70,7 @@ export function ClientPickPage({ weekToPick, teams }: Props) {
     );
   }
   return (
-    <div className="col-span-12 flex flex-col items-center gap-4">
+    <div className="col-span-12 flex flex-col items-center gap-4 py-4">
       <div className="flex flex-col items-center">
         <Text.H2>Make Your Picks</Text.H2>
         <div>
@@ -69,7 +80,11 @@ export function ClientPickPage({ weekToPick, teams }: Props) {
       <Card>
         <CardContent className="flex flex-col gap-2 py-1">
           <div className="flex flex-col gap-6">
-            {games.map((game) => {
+            {picksField.fields.map(({ gid, winner }, idx) => {
+              const game = gameById.get(gid);
+              if (!game) {
+                return null;
+              }
               const home = teamById.get(game.home);
               const away = teamById.get(game.away);
               if (!home || !away) {
@@ -78,7 +93,16 @@ export function ClientPickPage({ weekToPick, teams }: Props) {
                 );
               }
               return (
-                <RadioGroup key={game.gid}>
+                <RadioGroup
+                  key={game.gid}
+                  value={winner?.toString()}
+                  onValueChange={(val) => {
+                    picksField.update(idx, {
+                      gid: game.gid,
+                      winner: Number(val),
+                    });
+                  }}
+                >
                   <div className="grid w-full grid-cols-5 gap-2">
                     <div className="col-span-2 flex items-center justify-between gap-2">
                       <div className="flex items-center justify-center">
