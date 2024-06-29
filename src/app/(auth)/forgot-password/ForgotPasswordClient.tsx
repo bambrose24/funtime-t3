@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader } from "~/components/ui/card";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "~/components/ui/input";
 import { Button } from "~/components/ui/button";
-import { clientSupabase } from "~/utils/supabase/client";
+import { createSupabaseBrowser } from "~/utils/supabase/client";
 import { toast } from "sonner";
 import { revalidatePathServerAction } from "../actions";
 
@@ -24,6 +24,7 @@ export function ForgotPasswordClient() {
 
   const onSubmit: SubmitHandler<ForgotPasswordFormType> = async ({ email }) => {
     const redirectTo = `${typeof window !== "undefined" ? window.location.origin : "http://localhost:3000"}/confirm-reset-password`;
+    const clientSupabase = createSupabaseBrowser();
     const { error } = await clientSupabase.auth.resetPasswordForEmail(email, {
       redirectTo,
     });

@@ -8,7 +8,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { Input } from "~/components/ui/input";
 
 import { Button } from "~/components/ui/button";
-import { clientSupabase } from "~/utils/supabase/client";
+import { createSupabaseBrowser } from "~/utils/supabase/client";
 import { toast } from "sonner";
 import { clientApi } from "~/trpc/react";
 import { revalidatePathServerAction } from "../actions";
@@ -48,6 +48,7 @@ export function ConfirmResetPasswordClient() {
     if (password1 !== password2) {
       throw new Error("Passwords must matchhhh");
     }
+    const clientSupabase = createSupabaseBrowser();
     const { error } = await clientSupabase.auth.updateUser({
       password: password1,
     });
