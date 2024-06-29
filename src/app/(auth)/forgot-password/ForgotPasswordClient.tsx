@@ -18,9 +18,12 @@ export function ForgotPasswordClient() {
     register,
     handleSubmit,
     formState: { errors, isLoading, isSubmitting, isSubmitted },
+    watch,
   } = useForm<ForgotPasswordFormType>({
     resolver: zodResolver(forgotPasswordSchema),
   });
+
+  const email = watch("email");
 
   const onSubmit: SubmitHandler<ForgotPasswordFormType> = async ({ email }) => {
     const redirectTo = `${typeof window !== "undefined" ? window.location.origin : "http://localhost:3000"}/confirm-reset-password`;
@@ -41,12 +44,12 @@ export function ForgotPasswordClient() {
   };
 
   return (
-    <div className="col-span-10 flex h-full w-full flex-col items-center p-2 pt-8 md:col-span-4 md:col-start-5">
+    <div className="col-span-8 col-start-3 flex flex-col items-center p-2 pt-8 md:col-span-4 md:col-start-5 2xl:col-span-2 2xl:col-start-6">
       <Card className="md:w-[300px]">
         <CardHeader>Reset Password</CardHeader>
         <CardContent>
-          <div className="flex flex-col">
-            <form onSubmit={handleSubmit(onSubmit)}>
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <div className="flex flex-col gap-4">
               <input
                 type="hidden"
                 name="redirectTo"
@@ -57,12 +60,11 @@ export function ForgotPasswordClient() {
                 }
               />
               <Input placeholder="Email" type="email" {...register("email")} />
-              <div className="pt-4" />
               {errors.email && <span>{errors.email.message?.toString()}</span>}
-              <div className="pt-4" />
               <Button
                 className="w-full"
                 disabled={
+                  !email ||
                   Boolean(errors.email) ||
                   isLoading ||
                   isSubmitting ||
@@ -72,8 +74,8 @@ export function ForgotPasswordClient() {
               >
                 Reset Password
               </Button>
-            </form>
-          </div>
+            </div>
+          </form>
         </CardContent>
       </Card>
     </div>
