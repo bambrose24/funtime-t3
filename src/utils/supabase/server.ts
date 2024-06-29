@@ -2,6 +2,7 @@
 import { env } from "~/env";
 import { createServerClient as supabaseCreateServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
+import { COOKIE_TIME_MS } from "./types";
 
 export const supabaseServer = () => {
   const cookieStore = cookies();
@@ -15,7 +16,9 @@ export const supabaseServer = () => {
         },
         setAll(cookiesToSet) {
           cookiesToSet.forEach(({ name, value }) => {
-            cookieStore.set(name, value);
+            cookieStore.set(name, value, {
+              expires: COOKIE_TIME_MS,
+            });
           });
         },
       },
