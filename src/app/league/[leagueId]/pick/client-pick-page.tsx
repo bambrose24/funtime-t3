@@ -10,6 +10,10 @@ import { Text } from "~/components/ui/text";
 import { type RouterOutputs } from "~/trpc/types";
 import { useDictify } from "~/utils/hooks/useIdToValMemo";
 import { format } from "date-fns-tz";
+import { Alert, AlertTitle } from "~/components/ui/alert";
+import { AlertCircleIcon } from "lucide-react";
+import { useUserEnforced } from "~/utils/hooks/useUserEnforced";
+import { cn } from "~/lib/utils";
 
 type Props = {
   leagueId: number;
@@ -34,6 +38,8 @@ const picksSchema = z.object({
 
 export function ClientPickPage({ weekToPick, teams }: Props) {
   const { week, season, games } = weekToPick;
+
+  const { dbUser } = useUserEnforced();
 
   const teamById = useDictify(teams, (t) => t.teamid);
   const gameById = useDictify(games, (g) => g.gid);
@@ -88,15 +94,26 @@ export function ClientPickPage({ weekToPick, teams }: Props) {
     );
   }
   return (
-    <div className="col-span-12 flex flex-col items-center gap-4">
-      <div className="flex flex-col items-center">
+    <>
+      <div className="col-span-12 flex flex-col items-center justify-center">
         <Text.H2>Make Your Picks</Text.H2>
         <div>
           Week {week}, {season}
         </div>
       </div>
-
-      <div className="flex flex-col gap-3">
+      <Alert
+        variant="default"
+        className="col-span-8 col-start-3 row-start-2 flex flex-row items-center lg:col-span-4 lg:col-start-5"
+      >
+        <AlertTitle className="flex w-full flex-row items-center justify-center gap-2">
+          <AlertCircleIcon className="h-4 w-4" />
+          <div>
+            You are picking as{" "}
+            <span className="font-bold">{dbUser.username}</span>
+          </div>
+        </AlertTitle>
+      </Alert>
+      <div className="col-span-8 col-start-3 row-start-3 flex flex-col gap-3 lg:col-span-4 lg:col-start-5">
         {picksField.fields.map(({ gid, winner }, idx) => {
           const game = gameById.get(gid);
           if (!game) {
@@ -118,7 +135,14 @@ export function ClientPickPage({ weekToPick, teams }: Props) {
             });
           };
           return (
-            <Card key={game.gid}>
+            <Card
+              key={game.gid}
+              className={cn(
+                "w-full transition-all",
+                typeof winner !== "number" && "",
+                typeof winner === "number" && "border-4 border-correct",
+              )}
+            >
               <CardContent className="flex flex-col gap-2 py-2">
                 <RadioGroup
                   value={winner?.toString()}
@@ -186,7 +210,7 @@ export function ClientPickPage({ weekToPick, teams }: Props) {
                     </div>
                     <div className="col-span-3 flex justify-center">
                       <Text.Small className="text-xs">
-                        {format(game.ts, "MMM d yyyy, h:mm a zzz", {
+                        {format(game.ts, "EEE MMM d yyyy, h:mm a zzz", {
                           timeZone: EASTERN_TIMEZONE,
                         })}
                       </Text.Small>
@@ -203,6 +227,6 @@ export function ClientPickPage({ weekToPick, teams }: Props) {
           );
         })}
       </div>
-    </div>
+    </>
   );
 }

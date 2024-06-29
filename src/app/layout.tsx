@@ -9,6 +9,7 @@ import { cn } from "~/lib/utils";
 import { Toaster } from "~/components/ui/sonner";
 import { Nav } from "./_nav/nav";
 import { AxiomWebVitals } from "next-axiom";
+import { UserProviderServer } from "./(auth)/provider/UserProviderServer";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -36,17 +37,19 @@ export default function RootLayout({
         className={cn(inter.variable, `min-w-screen min-h-screen font-sans`)}
       >
         <TRPCReactProvider>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="dark"
-            enableSystem
-            disableTransitionOnChange
-          >
-            <Nav />
-            <div className="grid grid-cols-12 gap-4 p-2">{children}</div>
-            <Toaster position="bottom-right" />
-            <AxiomWebVitals />
-          </ThemeProvider>
+          <UserProviderServer>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="dark"
+              enableSystem
+              disableTransitionOnChange
+            >
+              <Nav />
+              <div className="grid grid-cols-12 gap-4 p-2">{children}</div>
+              <Toaster position="bottom-right" />
+              <AxiomWebVitals />
+            </ThemeProvider>
+          </UserProviderServer>
         </TRPCReactProvider>
       </body>
     </html>

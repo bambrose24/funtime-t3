@@ -34,7 +34,7 @@ export function GameCard({
       className={cn(
         "max-h-[130px] min-h-[130px] min-w-[130px] max-w-[130px] shrink-0 p-1",
         Boolean(isSimulated)
-          ? "border-2 border-yellow-500 dark:border-yellow-700"
+          ? "border-warning border-2"
           : game.done
             ? "border-2 border-primary"
             : "",

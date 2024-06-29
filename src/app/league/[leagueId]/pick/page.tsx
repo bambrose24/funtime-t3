@@ -13,6 +13,8 @@ type Props = {
 export default async function PickPage({ params: { leagueId: id } }: Props) {
   const leagueId = Number.isInteger(Number(id)) ? Number(id) : null;
 
+  console.log("pick page for league", leagueId);
+
   if (!leagueId) {
     return notFound();
   }
