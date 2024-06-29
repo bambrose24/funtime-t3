@@ -34,7 +34,8 @@ export async function updateSession(request: NextRequest) {
   // supabase.auth.getUser(). A simple mistake could make it very hard to debug
   // issues with users being randomly logged out.
 
-  await supabase.auth.getUser();
+  const response = await supabase.auth.getUser();
+  console.log("supabase middleware response", JSON.stringify(response));
 
   // IMPORTANT: You *must* return the supabaseResponse object as it is. If you're
   // creating a new response object with NextResponse.next() make sure to:
