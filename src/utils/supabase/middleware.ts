@@ -1,6 +1,5 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
-import { COOKIE_TIME_MS } from "./types";
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
@@ -16,18 +15,14 @@ export async function updateSession(request: NextRequest) {
           return request.cookies.getAll();
         },
         setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) =>
+          cookiesToSet.forEach(({ name, value, options }) =>
             request.cookies.set(name, value),
           );
           supabaseResponse = NextResponse.next({
             request,
           });
           cookiesToSet.forEach(({ name, value, options }) =>
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-            supabaseResponse.cookies.set(name, value, {
-              ...options,
-              expires: COOKIE_TIME_MS,
-            }),
+            supabaseResponse.cookies.set(name, value, options),
           );
         },
       },
@@ -38,8 +33,18 @@ export async function updateSession(request: NextRequest) {
   // supabase.auth.getUser(). A simple mistake could make it very hard to debug
   // issues with users being randomly logged out.
 
-  const response = await supabase.auth.getUser();
-  console.log("supabase middleware response", JSON.stringify(response));
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  console.log("user?", user);
+
+  // if (!user && !request.nextUrl.pathname.startsWith('/login')) {
+  //   // no user, potentially respond by redirecting the user to the login page
+  //   const url = request.nextUrl.clone()
+  //   url.pathname = '/login'
+  //   return NextResponse.redirect(url)
+  // }
 
   // IMPORTANT: You *must* return the supabaseResponse object as it is. If you're
   // creating a new response object with NextResponse.next() make sure to:
