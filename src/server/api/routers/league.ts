@@ -9,6 +9,8 @@ import _ from "lodash";
 import { getGames } from "~/server/util/getGames";
 import { cache } from "~/utils/cache";
 import { TRPCError } from "@trpc/server";
+import { Defined } from "~/utils/defined";
+import { UnauthorizedError } from "~/server/util/errors/unauthorized";
 
 const picksSummarySchema = z.object({
   leagueId: z.number().int(),
@@ -20,21 +22,42 @@ const leagueIdSchema = z.object({
 });
 
 export const leagueRouter = createTRPCRouter({
-  get: publicProcedure.input(leagueIdSchema).query(async ({ input }) => {
-    const { leagueId } = input;
-    const getLeagueImpl = cache(
-      async () => {
-        return await db.leagues.findFirstOrThrow({
-          where: { league_id: leagueId },
-        });
-      },
-      ["getLeague", leagueId.toString()],
-      {
-        revalidate: 60 * 60, // one hour, doesn't change much
-      },
-    );
-    return await getLeagueImpl();
-  }),
+  get: authorizedProcedure
+    .input(leagueIdSchema)
+    .query(async ({ input, ctx }) => {
+      const { leagueId } = input;
+      const getLeagueImpl = cache(
+        async () => {
+          const usersLeagueIds = (
+            ctx.dbUser?.leaguemembers.map((m) => m.league_id) ?? []
+          ).filter(Defined);
+          if (!usersLeagueIds.includes(leagueId)) {
+            throw UnauthorizedError;
+          }
+          return await db.leagues.findFirstOrThrow({
+            where: {
+              AND: [
+                {
+                  league_id: {
+                    in: ctx.dbUser?.leaguemembers
+                      .map((m) => m.league_id)
+                      .filter(Defined),
+                  },
+                },
+                {
+                  league_id: leagueId,
+                },
+              ],
+            },
+          });
+        },
+        ["getLeague", leagueId.toString()],
+        {
+          revalidate: 60 * 60, // one hour, doesn't change much
+        },
+      );
+      return await getLeagueImpl();
+    }),
   weekToPick: authorizedProcedure
     .input(leagueIdSchema)
     .query(async ({ input, ctx }) => {

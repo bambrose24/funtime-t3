@@ -10,6 +10,7 @@ export default async function LeagueAuthLayout({
     leagueId: string;
   };
 }) {
+  console.log("hiii");
   try {
     const league = await serverApi.league.get({ leagueId: Number(leagueId) });
     if (!league) {
