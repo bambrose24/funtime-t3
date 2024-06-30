@@ -15,6 +15,7 @@ import { AlertCircleIcon } from "lucide-react";
 import { useUserEnforced } from "~/utils/hooks/useUserEnforced";
 import { cn } from "~/lib/utils";
 import { Button } from "~/components/ui/button";
+import { useLogout } from "~/app/(auth)/auth/useLogout";
 
 type Props = {
   leagueId: number;
@@ -42,6 +43,8 @@ export function ClientPickPage({ weekToPick, teams }: Props) {
   const { week, season, games } = weekToPick;
 
   const { dbUser } = useUserEnforced();
+
+  const logout = useLogout();
 
   const teamById = useDictify(teams, (t) => t.teamid);
   const gameById = useDictify(games, (g) => g.gid);
@@ -129,7 +132,18 @@ export function ClientPickPage({ weekToPick, teams }: Props) {
             <AlertCircleIcon className="h-4 w-4" />
             <div>
               You are picking as{" "}
-              <span className="font-bold">{dbUser.username}</span>
+              <span className="font-bold">{dbUser.username}</span>. Not you?{" "}
+              <Button
+                variant="link"
+                className="p-0 text-foreground underline"
+                type="button"
+                onClick={async () => {
+                  await logout();
+                }}
+              >
+                Log out
+              </Button>
+              .
             </div>
           </AlertTitle>
         </Alert>
