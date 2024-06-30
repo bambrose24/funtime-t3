@@ -311,12 +311,6 @@ export function ClientPickPage({ weekToPick, teams }: Props) {
                                 fieldState.isTouched &&
                                 !fieldState.error &&
                                 !fieldState.invalid;
-
-                              console.log(
-                                "fieldState",
-                                { ...fieldState },
-                                valid,
-                              );
                               return (
                                 <FormItem>
                                   <FormLabel>Tiebreaker Score</FormLabel>
@@ -327,11 +321,19 @@ export function ClientPickPage({ weekToPick, teams }: Props) {
                                       step="1"
                                       className={cn(
                                         "focus-visible:ring-2",
-                                        !valid ? "ring-warning ring-2" : "",
+                                        fieldState.invalid
+                                          ? "ring-2 ring-wrong"
+                                          : valid
+                                            ? "ring-2 ring-correct"
+                                            : "",
                                       )}
                                     />
                                   </FormControl>
-                                  <FormMessage />
+                                  {fieldState.error && (
+                                    <FormMessage>
+                                      {fieldState.error.message}
+                                    </FormMessage>
+                                  )}
                                 </FormItem>
                               );
                             }}
