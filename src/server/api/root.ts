@@ -8,6 +8,7 @@ import { gamesRouter } from "./routers/games";
 import { leaderboardRouter } from "./routers/leaderboard";
 import { settingsRouter } from "./routers/settings";
 import { playerProfileRouter } from "./routers/playerProfileRouter";
+import { picksRouter } from "./routers/picks";
 
 /**
  * This is the primary router for your server.
@@ -16,6 +17,7 @@ import { playerProfileRouter } from "./routers/playerProfileRouter";
  */
 export const appRouter = createTRPCRouter({
   home: homeRouter,
+  picks: picksRouter,
   session: sessionRouter,
   settings: settingsRouter,
   time: timeRouter,
