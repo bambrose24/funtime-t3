@@ -163,6 +163,13 @@ export function ClientPickPage({ weekToPick, teams }: Props) {
             });
           };
 
+          const getGradient = (team: NonNullable<typeof winnerTeam>) => {
+            const { primary_color, secondary_color, tertiary_color } = team;
+            return tertiary_color
+              ? `linear-gradient(to right, ${primary_color}, ${secondary_color}, ${tertiary_color})`
+              : `linear-gradient(to right, ${primary_color}, ${secondary_color})`;
+          };
+
           return (
             <Card
               key={game.gid}
@@ -170,7 +177,7 @@ export function ClientPickPage({ weekToPick, teams }: Props) {
             >
               <div
                 style={{
-                  background: winnerTeam ? winnerTeam.primary_color ?? "" : "",
+                  background: winnerTeam ? getGradient(winnerTeam) : "",
                 }}
                 className="w-full rounded-lg p-1 transition-all lg:p-1.5"
               >
