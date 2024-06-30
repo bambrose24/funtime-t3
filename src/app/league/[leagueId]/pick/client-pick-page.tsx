@@ -26,6 +26,7 @@ import {
   FormLabel,
 } from "~/components/ui/form";
 import { clientApi } from "~/trpc/react";
+import { toast } from "sonner";
 
 type Props = {
   leagueId: number;
@@ -61,7 +62,7 @@ const picksSchema = z.object({
   }),
 });
 
-export function ClientPickPage({ weekToPick, teams }: Props) {
+export function ClientPickPage({ weekToPick, teams, leagueId }: Props) {
   const { week, season, games } = weekToPick;
 
   const { dbUser } = useUserEnforced();
@@ -101,7 +102,21 @@ export function ClientPickPage({ weekToPick, teams }: Props) {
     clientApi.picks.submitPicks.useMutation();
 
   const onSubmit: Parameters<typeof form.handleSubmit>[0] = async (data) => {
-    console.log("picks", data, submitPicks);
+    try {
+      await submitPicks({
+        picks: data.picks.map((p) => {
+          return { ...p, winner: p.winner! };
+        }),
+        leagueId,
+        overrideMemberId: undefined,
+      });
+      toast.success(`Your picks have been submitted!`);
+    } catch (e) {
+      console.error(`Error submitting picks`, e);
+      toast.error(
+        `There was an error submitting your picks. Contact Bob at bambrose24@gmail.com`,
+      );
+    }
   };
 
   const onTeamPick = ({
@@ -134,8 +149,6 @@ export function ClientPickPage({ weekToPick, teams }: Props) {
       });
     });
   };
-
-  console.log("form state?", form.formState.errors);
 
   if (!week || !season || !games.length) {
     return (
@@ -317,11 +330,6 @@ export function ClientPickPage({ weekToPick, teams }: Props) {
                                 control={form.control}
                                 name="tiebreakerScore.score"
                                 render={({ field, fieldState }) => {
-                                  console.log(
-                                    "fieldState.",
-                                    form.formState.isValid,
-                                    form.formState.errors,
-                                  );
                                   const valid =
                                     fieldState.isTouched &&
                                     !fieldState.error &&
