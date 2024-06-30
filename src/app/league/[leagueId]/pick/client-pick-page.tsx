@@ -165,15 +165,18 @@ export function ClientPickPage({ weekToPick, teams, leagueId }: Props) {
     );
   }
   return (
-    <form onSubmit={form.handleSubmit(onSubmit)}>
+    <form
+      onSubmit={form.handleSubmit(onSubmit)}
+      className="col-span-12 flex flex-col gap-3 md:col-span-8 md:col-start-3 lg:col-span-4 lg:col-start-5"
+    >
       <Form {...form}>
-        <div className="col-span-12 flex flex-col items-center justify-center">
+        <div className="flex flex-col items-center justify-center">
           <Text.H2>Make Your Picks</Text.H2>
           <div>
             Week {week}, {season}
           </div>
         </div>
-        <div className="col-span-12 mb-4 flex flex-col gap-3 md:col-span-8 md:col-start-3 lg:col-span-4 lg:col-start-5">
+        <div className="mb-4 flex flex-col gap-3 ">
           <Alert
             variant="default"
             className="col-span-8 col-start-3 row-start-2 flex flex-row items-center lg:col-span-4 lg:col-start-5"
