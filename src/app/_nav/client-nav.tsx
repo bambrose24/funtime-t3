@@ -62,7 +62,7 @@ export function ClientNav(props: NavData) {
   }
 
   return (
-    <div className="sticky top-0 z-10 flex w-full flex-col bg-background">
+    <div className="flex w-full flex-col bg-background">
       <div className="flex h-12 w-full flex-row justify-between px-2">
         <div className="flex flex-row items-center gap-2">
           {leagues?.length ? (

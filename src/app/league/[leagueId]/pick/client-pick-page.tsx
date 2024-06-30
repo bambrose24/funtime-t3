@@ -114,7 +114,7 @@ export function ClientPickPage({ weekToPick, teams }: Props) {
           </div>
         </AlertTitle>
       </Alert>
-      <div className="col-span-8 col-start-3 row-start-3 flex flex-col gap-3 lg:col-span-4 lg:col-start-5">
+      <div className="col-span-12 row-start-3 flex flex-col gap-3 md:col-span-8 md:col-start-3 lg:col-span-4 lg:col-start-5">
         {picksField.fields.map(({ gid, winner }, idx) => {
           const game = gameById.get(gid);
           if (!game) {
@@ -146,12 +146,9 @@ export function ClientPickPage({ weekToPick, teams }: Props) {
             <Card key={game.gid} className="w-full border-none">
               <div
                 style={{
-                  // background: winnerTeam
-                  //   ? `linear-gradient(to right, ${winnerTeam.primary_color}, ${winnerTeam.secondary_color})`
-                  //   : "",
                   background: winnerTeam ? winnerTeam.primary_color ?? "" : "",
                 }}
-                className="w-full rounded-lg p-2 transition-all"
+                className="w-full rounded-lg p-1 transition-all lg:p-2"
               >
                 <CardContent className="flex flex-col gap-2 rounded-sm bg-card py-2">
                   <RadioGroup
