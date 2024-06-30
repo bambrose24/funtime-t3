@@ -102,6 +102,13 @@ export const leagueRouter = createTRPCRouter({
           season,
           week,
         },
+        orderBy: [
+          {
+            is_tiebreaker: "asc",
+          },
+          { ts: "asc" },
+          { gid: "asc" },
+        ],
       });
 
       return {

@@ -16,6 +16,16 @@ import { useUserEnforced } from "~/utils/hooks/useUserEnforced";
 import { cn } from "~/lib/utils";
 import { Button } from "~/components/ui/button";
 import { useLogout } from "~/app/(auth)/auth/useLogout";
+import { Separator } from "~/components/ui/separator";
+import { Input } from "~/components/ui/input";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "~/components/ui/form";
 
 type Props = {
   leagueId: number;
@@ -35,7 +45,19 @@ const picksSchema = z.object({
   ),
   tiebreakerScore: z.object({
     gid: z.number().int(),
-    score: z.number().int(),
+    score: z
+      .string()
+      .min(1, "You must pick a score")
+      .refine(
+        (val) =>
+          !isNaN(Number(val)) &&
+          Number.isInteger(Number(val)) &&
+          Number(val) > 0 &&
+          Number(val) < 200,
+        {
+          message: "Score must be between 1 and 200",
+        },
+      ),
   }),
 });
 
@@ -49,6 +71,8 @@ export function ClientPickPage({ weekToPick, teams }: Props) {
   const teamById = useDictify(teams, (t) => t.teamid);
   const gameById = useDictify(games, (g) => g.gid);
 
+  const tiebreakerGame = games.find((g) => g.is_tiebreaker);
+
   const form = useForm<z.infer<typeof picksSchema>>({
     resolver: zodResolver(picksSchema),
     defaultValues: {
@@ -60,11 +84,13 @@ export function ClientPickPage({ weekToPick, teams }: Props) {
         };
       }),
       tiebreakerScore: {
-        gid: games.find((g) => g.is_tiebreaker)?.gid,
-        score: 0,
+        gid: tiebreakerGame?.gid,
+        score: "",
       },
     },
+    reValidateMode: "onChange",
   });
+
   const picksField = useFieldArray({
     control: form.control, // control props comes from useForm (optional: if you are using FormProvider)
     name: "picks",
@@ -101,6 +127,8 @@ export function ClientPickPage({ weekToPick, teams }: Props) {
     });
   };
 
+  console.log("form state?", form.formState.errors);
+
   if (!week || !season || !games.length) {
     return (
       <div className="col-span-12 flex max-w-[1000px] flex-col gap-4 md:col-span-6 md:col-start-4 xl:col-span-4 xl:col-start-5">
@@ -116,14 +144,14 @@ export function ClientPickPage({ weekToPick, teams }: Props) {
     );
   }
   return (
-    <>
+    <Form {...form}>
       <div className="col-span-12 flex flex-col items-center justify-center">
         <Text.H2>Make Your Picks</Text.H2>
         <div>
           Week {week}, {season}
         </div>
       </div>
-      <div className="col-span-12 flex flex-col gap-3 md:col-span-8 md:col-start-3 lg:col-span-4 lg:col-start-5">
+      <div className="col-span-12 mb-4 flex flex-col gap-3 md:col-span-8 md:col-start-3 lg:col-span-4 lg:col-start-5">
         <Alert
           variant="default"
           className="col-span-8 col-start-3 row-start-2 flex flex-row items-center lg:col-span-4 lg:col-start-5"
@@ -272,6 +300,44 @@ export function ClientPickPage({ weekToPick, teams }: Props) {
                           {game.homerecord}
                         </Text.Small>
                       </div>
+                      {game.is_tiebreaker === true && (
+                        <div className="col-span-5 mt-2 flex flex-col items-center gap-2 text-center">
+                          <Separator />
+                          <FormField
+                            control={form.control}
+                            name="tiebreakerScore.score"
+                            render={({ field, fieldState }) => {
+                              const valid =
+                                fieldState.isTouched &&
+                                !fieldState.error &&
+                                !fieldState.invalid;
+
+                              console.log(
+                                "fieldState",
+                                { ...fieldState },
+                                valid,
+                              );
+                              return (
+                                <FormItem>
+                                  <FormLabel>Tiebreaker Score</FormLabel>
+                                  <FormControl>
+                                    <Input
+                                      {...field}
+                                      type="number"
+                                      step="1"
+                                      className={cn(
+                                        "focus-visible:ring-2",
+                                        !valid ? "ring-warning ring-2" : "",
+                                      )}
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              );
+                            }}
+                          />
+                        </div>
+                      )}
                     </div>
                   </RadioGroup>
                 </CardContent>
@@ -279,7 +345,18 @@ export function ClientPickPage({ weekToPick, teams }: Props) {
             </Card>
           );
         })}
+        <Separator className="col-span-5" />
+        <Button
+          type="submit"
+          disabled={
+            form.formState.isSubmitted ||
+            form.formState.isSubmitting ||
+            !form.formState.isValid
+          }
+        >
+          Submit Picks
+        </Button>
       </div>
-    </>
+    </Form>
   );
 }
