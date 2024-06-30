@@ -143,12 +143,15 @@ export function ClientPickPage({ weekToPick, teams }: Props) {
           };
 
           return (
-            <Card key={game.gid} className="w-full border-none">
+            <Card
+              key={game.gid}
+              className={cn("w-full", winnerTeam && "border-none")}
+            >
               <div
                 style={{
                   background: winnerTeam ? winnerTeam.primary_color ?? "" : "",
                 }}
-                className="w-full rounded-lg p-1 transition-all lg:p-2"
+                className="w-full rounded-lg p-1 transition-all lg:p-1.5"
               >
                 <CardContent className="flex flex-col gap-2 rounded-sm bg-card py-2">
                   <RadioGroup
@@ -171,7 +174,7 @@ export function ClientPickPage({ weekToPick, teams }: Props) {
                         />
                       </div>
                       <div
-                        className="col-span-1 flex cursor-pointer items-center justify-start pl-2"
+                        className="col-span-1 flex cursor-pointer items-center justify-start md:pl-2"
                         onClick={() => pick(away.teamid)}
                       >
                         <div className="flex items-center gap-2">
@@ -182,11 +185,11 @@ export function ClientPickPage({ weekToPick, teams }: Props) {
                           <Text.Small>{away.abbrev}</Text.Small>
                         </div>
                       </div>
-                      <div className="col-span-1 flex items-center justify-center">
+                      <div className="col-span-1 flex items-center justify-center pb-0.5">
                         @
                       </div>
                       <div
-                        className="col-span-1 flex cursor-pointer items-center justify-end pr-2"
+                        className="col-span-1 flex cursor-pointer items-center justify-end md:pr-2"
                         onClick={() => pick(home.teamid)}
                       >
                         <div className="flex items-center gap-2">
