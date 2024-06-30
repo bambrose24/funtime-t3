@@ -1,7 +1,7 @@
 "use client";
 
 import { clientApi } from "~/trpc/react";
-import { RouterOutputs } from "~/trpc/types";
+import { type RouterOutputs } from "~/trpc/types";
 
 type Props = {
   data: RouterOutputs["session"]["current"];
