@@ -2,19 +2,19 @@
 
 import { Card } from "../ui/card";
 import { TeamLogo } from "../shared/TeamLogo";
-import { type getTeams } from "~/server/util/getTeams";
 import dayjs from "dayjs";
 import localizedFormat from "dayjs/plugin/localizedFormat";
 import { Separator } from "../ui/separator";
 import { Button } from "../ui/button";
 import { cn } from "~/lib/utils";
-import { type serverApi } from "~/trpc/server";
+import { type RouterOutputs } from "~/trpc/types";
 dayjs.extend(localizedFormat);
 
 type Props = {
-  game: Awaited<ReturnType<typeof serverApi.games.getGames>>[number];
-  homeTeam: Awaited<ReturnType<typeof serverApi.teams.getTeams>>[number];
-  awayTeam: Awaited<ReturnType<typeof getTeams>>[number];
+  game: RouterOutputs["games"]["getGames"][number];
+  homeTeam: RouterOutputs["teams"]["getTeams"][number];
+  awayTeam: RouterOutputs["teams"]["getTeams"][number];
+  myChosenTeam: number | undefined | null;
   onClickTeamId: (teamId: number) => void;
   simulatedWinner: number | undefined;
 };
@@ -22,6 +22,7 @@ type Props = {
 export function GameCard({
   game,
   homeTeam,
+  myChosenTeam,
   awayTeam,
   onClickTeamId,
   simulatedWinner,
@@ -36,7 +37,11 @@ export function GameCard({
         Boolean(isSimulated)
           ? "border-warning border-2"
           : game.done
-            ? "border-2 border-primary"
+            ? !myChosenTeam
+              ? "border-2 border-blue-500 dark:border-blue-700"
+              : myChosenTeam === game.winner
+                ? "border-2 border-correct"
+                : "border-2 border-wrong"
             : "",
       )}
     >

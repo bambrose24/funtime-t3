@@ -227,6 +227,7 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
                   <GameCard
                     key={g.gid}
                     game={g}
+                    myChosenTeam={myPicks?.gameIdToPick.get(g.gid)?.winner}
                     awayTeam={awayTeam}
                     homeTeam={homeTeam}
                     simulatedWinner={overrideGidToWinner[g.gid]}
