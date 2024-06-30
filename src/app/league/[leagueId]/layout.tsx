@@ -10,13 +10,13 @@ export default async function LeagueAuthLayout({
     leagueId: string;
   };
 }) {
-  console.log("hiii");
   try {
     const league = await serverApi.league.get({ leagueId: Number(leagueId) });
     if (!league) {
       throw new Error("Cannot find league");
     }
   } catch (e) {
+    console.error("Error getting league", e);
     redirect("/");
   }
   return children;
