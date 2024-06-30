@@ -8,6 +8,7 @@ const job = new CronJob(
   async () => {
     console.log("done with cron");
   },
-  true, // start
+  false, // start
   "America/Los_Angeles", // timeZone
 );
+job.start();
