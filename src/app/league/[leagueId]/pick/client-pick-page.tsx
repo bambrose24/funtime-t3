@@ -15,6 +15,7 @@ import { AlertCircleIcon } from "lucide-react";
 import { useUserEnforced } from "~/utils/hooks/useUserEnforced";
 import { Defined } from "~/utils/defined";
 import { cn } from "~/lib/utils";
+import { Button } from "~/components/ui/button";
 
 type Props = {
   leagueId: number;
@@ -29,6 +30,7 @@ const picksSchema = z.object({
     z.object({
       gid: z.number().int(),
       winner: z.number().int().nullable(),
+      isRandom: z.boolean().default(false),
     }),
   ),
   tiebreakerScore: z.object({
@@ -52,6 +54,7 @@ export function ClientPickPage({ weekToPick, teams }: Props) {
         return {
           gid: g.gid,
           winner: undefined,
+          isRandom: false,
         };
       }),
       tiebreakerScore: {
@@ -77,6 +80,22 @@ export function ClientPickPage({ weekToPick, teams }: Props) {
     picksField.update(idx, {
       gid,
       winner,
+      isRandom: false,
+    });
+  };
+
+  const randomizePicks = () => {
+    picksField.fields.forEach((f, idx) => {
+      const game = gameById.get(f.gid);
+      if (!game) {
+        return;
+      }
+      const winner = Math.random() < 0.5 ? game.away : game?.home;
+      picksField.update(idx, {
+        gid: f.gid,
+        winner,
+        isRandom: true,
+      });
     });
   };
 
@@ -102,19 +121,27 @@ export function ClientPickPage({ weekToPick, teams }: Props) {
           Week {week}, {season}
         </div>
       </div>
-      <Alert
-        variant="default"
-        className="col-span-8 col-start-3 row-start-2 flex flex-row items-center lg:col-span-4 lg:col-start-5"
-      >
-        <AlertTitle className="flex w-full flex-row items-center justify-center gap-2">
-          <AlertCircleIcon className="h-4 w-4" />
-          <div>
-            You are picking as{" "}
-            <span className="font-bold">{dbUser.username}</span>
-          </div>
-        </AlertTitle>
-      </Alert>
-      <div className="col-span-12 row-start-3 flex flex-col gap-3 md:col-span-8 md:col-start-3 lg:col-span-4 lg:col-start-5">
+      <div className="col-span-12 flex flex-col gap-3 md:col-span-8 md:col-start-3 lg:col-span-4 lg:col-start-5">
+        <Alert
+          variant="default"
+          className="col-span-8 col-start-3 row-start-2 flex flex-row items-center lg:col-span-4 lg:col-start-5"
+        >
+          <AlertTitle className="flex w-full flex-row items-center justify-center gap-2">
+            <AlertCircleIcon className="h-4 w-4" />
+            <div>
+              You are picking as{" "}
+              <span className="font-bold">{dbUser.username}</span>
+            </div>
+          </AlertTitle>
+        </Alert>
+        <Button
+          type="button"
+          variant="secondary"
+          className="w-full"
+          onClick={randomizePicks}
+        >
+          Randomize Picks
+        </Button>
         {picksField.fields.map(({ gid, winner }, idx) => {
           const game = gameById.get(gid);
           if (!game) {
@@ -128,11 +155,6 @@ export function ClientPickPage({ weekToPick, teams }: Props) {
             );
           }
           const winnerTeam = winner ? teamById.get(winner) : undefined;
-          const winnerColors = [
-            winnerTeam?.primary_color,
-            winnerTeam?.secondary_color,
-            winnerTeam?.tertiary_color,
-          ].filter(Defined);
 
           const pick = (winner: number) => {
             onTeamPick({
