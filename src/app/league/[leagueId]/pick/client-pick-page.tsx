@@ -142,19 +142,16 @@ export function ClientPickPage({ weekToPick, teams }: Props) {
             });
           };
 
-          const gradientStyle = winnerTeam
-            ? {
-                background: `linear-gradient(to right, ${winnerTeam.primary_color}, ${winnerTeam.secondary_color})`,
-              }
-            : {};
-
           return (
-            <Card key={game.gid} className="w-full transition-all">
+            <Card key={game.gid} className="w-full border-none">
               <div
-                style={gradientStyle}
-                className={cn(
-                  "w-full rounded-lg bg-gradient-to-r p-1 transition-all",
-                )}
+                style={{
+                  // background: winnerTeam
+                  //   ? `linear-gradient(to right, ${winnerTeam.primary_color}, ${winnerTeam.secondary_color})`
+                  //   : "",
+                  background: winnerTeam ? winnerTeam.primary_color ?? "" : "",
+                }}
+                className="w-full rounded-lg p-2 transition-all"
               >
                 <CardContent className="flex flex-col gap-2 rounded-sm bg-card py-2">
                   <RadioGroup
