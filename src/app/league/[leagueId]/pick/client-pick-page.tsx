@@ -145,7 +145,7 @@ export function ClientPickPage({ weekToPick, teams }: Props) {
           return (
             <Card
               key={game.gid}
-              className={cn("w-full", winnerTeam && "border-none")}
+              className={cn("w-full", winnerTeam && "border-transparent")}
             >
               <div
                 style={{
