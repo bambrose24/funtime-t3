@@ -21,6 +21,9 @@ FROM base AS prerelease
 COPY --from=install /temp/dev/node_modules node_modules
 COPY . .
 
+# Run Prisma generate
+RUN bunx prisma generate
+
 # [optional] tests & build
 ENV NODE_ENV=production
 
@@ -32,4 +35,4 @@ COPY --from=prerelease /usr/src/app .
 # run the app
 USER bun
 EXPOSE 3000/tcp
-ENTRYPOINT [ "bun", "run", "cron" ]
+ENTRYPOINT [ "bun", "run", "src/cron.ts" ]
