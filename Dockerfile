@@ -22,7 +22,7 @@ COPY --from=install /temp/dev/node_modules node_modules
 COPY . .
 
 # Generate Prisma Client
-RUN npx prisma generate
+RUN bunx prisma generate
 
 # [optional] tests & build
 ENV NODE_ENV=production
