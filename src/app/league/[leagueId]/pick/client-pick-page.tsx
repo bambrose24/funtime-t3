@@ -103,13 +103,13 @@ export function ClientPickPage({ weekToPick, teams, leagueId }: Props) {
 
   const onSubmit: Parameters<typeof form.handleSubmit>[0] = async (data) => {
     try {
-      await submitPicks({
-        picks: data.picks.map((p) => {
-          return { ...p, winner: p.winner! };
-        }),
-        leagueId,
-        overrideMemberId: undefined,
-      });
+      // await submitPicks({
+      //   picks: data.picks.map((p) => {
+      //     return { ...p, winner: p.winner! };
+      //   }),
+      //   leagueId,
+      //   overrideMemberId: undefined,
+      // });
       toast.success(`Your picks have been submitted!`);
     } catch (e) {
       console.error(`Error submitting picks`, e);
