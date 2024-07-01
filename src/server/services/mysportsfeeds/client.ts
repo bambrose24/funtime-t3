@@ -31,7 +31,6 @@ export class MSFClient {
     const base64Key = Buffer.from(`${this.key}:${API_PASSWORD}`).toString(
       "base64",
     );
-    console.log("base64 key??", base64Key);
 
     return {
       Authorization: `Basic ${base64Key}`,
