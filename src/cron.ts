@@ -3,7 +3,8 @@ import { msf } from "~/server/services/mysportsfeeds";
 import { db } from "~/server/db";
 
 const job = new CronJob(
-  "*/5 * * * *", // cronTime: every 5 minutes
+  // "*/5 * * * *", // cronTime: every 5 minutes
+  "*/1 * * * *", // cronTime: every 1 minute
   async function () {
     const games = await db.games.count();
     console.log(`found ${games} games`);
