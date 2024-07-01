@@ -4,7 +4,7 @@ import { db } from "~/server/db";
 async function run() {
   console.log("starting cron...");
   const games = await db.games.count();
-  console.log(`found ${games} games`);
+  console.log(`newly found ${games} games`);
 }
 
 run().catch((e) => {
