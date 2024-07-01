@@ -6,6 +6,6 @@ async function run() {
   console.log(`newly found ${games} games`);
 }
 
-run().catch((e) => {
+await run().catch((e) => {
   console.error("error running cron", e);
 });
