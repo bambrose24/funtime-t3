@@ -1,4 +1,3 @@
-import { msf } from "~/server/services/mysportsfeeds";
 import { db } from "~/server/db";
 
 async function run() {

@@ -121,7 +121,7 @@ export const homeRouter = createTRPCRouter({
           };
         });
       },
-      ["members", ...memberIds.map((m) => m.toString())],
+      ["members", ...memberIds.map((m) => `member_${m}`)],
       { revalidate: HOME_REVALIDATE_SECONDS },
     );
     return await getSummaries();
