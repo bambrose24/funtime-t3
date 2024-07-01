@@ -8,7 +8,11 @@ WORKDIR /usr/src/app
 FROM base AS install
 RUN mkdir -p /temp/dev
 COPY package.json bun.lockb /temp/dev/
+COPY prisma ./prisma
 RUN cd /temp/dev && bun install --frozen-lockfile
+
+# Generate Prisma Client
+RUN cd /temp/dev && bunx prisma generate
 
 # install with --production (exclude devDependencies)
 RUN mkdir -p /temp/prod
@@ -20,9 +24,6 @@ RUN cd /temp/prod && bun install --frozen-lockfile --production
 FROM base AS prerelease
 COPY --from=install /temp/dev/node_modules node_modules
 COPY . .
-
-# Generate Prisma Client
-RUN bunx prisma generate
 
 # [optional] tests & build
 ENV NODE_ENV=production
