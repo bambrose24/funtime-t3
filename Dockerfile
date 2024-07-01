@@ -23,9 +23,10 @@ RUN bunx prisma generate
 FROM base AS prerelease
 COPY --from=install /temp/dev/node_modules node_modules
 COPY . .
+RUN bunx prisma generat
 COPY ./prisma prisma
 COPY ./src src
-RUN bun run prisma generate
+
 
 
 # [optional] tests & build
