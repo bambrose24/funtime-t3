@@ -223,6 +223,7 @@ export function ClientPickPage({ weekToPick, teams, leagueId }: Props) {
             const winnerTeam = winner ? teamById.get(winner) : undefined;
 
             const pick = (winner: number) => {
+              console.log(`going to pick ${winner} for ${game.gid}`);
               onTeamPick({
                 idx,
                 gid: game.gid,
