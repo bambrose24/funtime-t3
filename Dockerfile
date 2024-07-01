@@ -32,4 +32,4 @@ COPY --from=prerelease /usr/src/app .
 # run the app
 USER bun
 EXPOSE 3000/tcp
-ENTRYPOINT [ "bun", "run", "src/cron.ts" ]
+ENTRYPOINT [ "bun", "run", "cron" ]
