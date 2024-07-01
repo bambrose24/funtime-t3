@@ -11,7 +11,7 @@ COPY prisma ./prisma
 RUN bunx prisma generate
 
 # Verify Prisma client generation
-RUN ls -la node_modules/.prisma
+RUN ls -la node_modules/.prisma && ls -la node_modules/@prisma/client
 
 # Copy the rest of the application code
 COPY . .
