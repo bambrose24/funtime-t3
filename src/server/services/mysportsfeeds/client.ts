@@ -31,6 +31,7 @@ export class MSFClient {
     const base64Key = Buffer.from(`${this.key}:${API_PASSWORD}`).toString(
       "base64",
     );
+    console.log("base64 key??", base64Key);
 
     return {
       Authorization: `Basic ${base64Key}`,
@@ -61,6 +62,9 @@ export class MSFClient {
     });
 
     const games = gamesResponseSchema.safeParse(await res.json());
+    if (!games.success) {
+      console.error(`Error parsing MSF games ${games.error.message}`);
+    }
     return games.success ? games.data.games : [];
   }
 }
