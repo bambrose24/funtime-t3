@@ -13,7 +13,7 @@
     "postinstall": "prisma generate",
     "lint": "next lint",
     "start": "next start",
-    "cron": "bun run db:generate && bun run src/cron.ts",
+    "cron": "bunx prisma generate && bun run src/cron.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
