@@ -6,15 +6,14 @@ WORKDIR /usr/src/app
 COPY package.json bun.lockb ./
 RUN bun install --frozen-lockfile
 
-# Copy the Prisma schema and generate the Prisma client
-COPY prisma ./prisma
+# Copy the rest of the application code
+COPY . .
+
+# Generate Prisma client
 RUN bunx prisma generate
 
 # Verify Prisma client generation
 RUN ls -la node_modules/.prisma && ls -la node_modules/@prisma/client
-
-# Copy the rest of the application code
-COPY . .
 
 # Ensure correct ownership for the bun user
 RUN chown -R bun:bun /usr/src/app
