@@ -36,4 +36,5 @@ COPY --from=prerelease /usr/src/app .
 # run the app
 USER bun
 RUN chown -R node:node node_modules/.prisma
+RUN npx prisma generate
 ENTRYPOINT [ "bun", "run", "cron" ]
