@@ -128,6 +128,7 @@ export function ClientPickPage({ weekToPick, teams, leagueId }: Props) {
     idx: number;
     winner: number;
   }) => {
+    console.log(`going to update idx ${idx} gid ${gid} winner ${winner}`);
     picksField.update(idx, {
       gid,
       winner,
@@ -222,15 +223,6 @@ export function ClientPickPage({ weekToPick, teams, leagueId }: Props) {
             }
             const winnerTeam = winner ? teamById.get(winner) : undefined;
 
-            const pick = (winner: number) => {
-              console.log(`going to pick ${winner} for ${game.gid}`);
-              onTeamPick({
-                idx,
-                gid: game.gid,
-                winner,
-              });
-            };
-
             const getGradient = (team: NonNullable<typeof winnerTeam>) => {
               const { primary_color, secondary_color, tertiary_color } = team;
               return tertiary_color
@@ -259,9 +251,12 @@ export function ClientPickPage({ weekToPick, teams, leagueId }: Props) {
                       <div className="grid w-full grid-cols-5 gap-2">
                         <div
                           className="col-span-1 flex cursor-pointer items-center justify-center"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            pick(away.teamid);
+                          onClick={() => {
+                            onTeamPick({
+                              idx,
+                              gid: game.gid,
+                              winner: away.teamid,
+                            });
                           }}
                         >
                           <TeamLogo
@@ -272,9 +267,12 @@ export function ClientPickPage({ weekToPick, teams, leagueId }: Props) {
                         </div>
                         <div
                           className="col-span-1 flex cursor-pointer items-center justify-start md:pl-2"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            pick(away.teamid);
+                          onClick={() => {
+                            onTeamPick({
+                              idx,
+                              gid: game.gid,
+                              winner: away.teamid,
+                            });
                           }}
                         >
                           <div className="flex items-center gap-2">
@@ -290,9 +288,12 @@ export function ClientPickPage({ weekToPick, teams, leagueId }: Props) {
                         </div>
                         <div
                           className="col-span-1 flex cursor-pointer items-center justify-end md:pr-2"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            pick(home.teamid);
+                          onClick={() => {
+                            onTeamPick({
+                              idx,
+                              gid: game.gid,
+                              winner: home.teamid,
+                            });
                           }}
                         >
                           <div className="flex items-center gap-2">
@@ -308,9 +309,12 @@ export function ClientPickPage({ weekToPick, teams, leagueId }: Props) {
 
                         <div
                           className="col-span-1 flex cursor-pointer items-center justify-center"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            pick(home.teamid);
+                          onClick={() => {
+                            onTeamPick({
+                              idx,
+                              gid: game.gid,
+                              winner: home.teamid,
+                            });
                           }}
                         >
                           <TeamLogo
