@@ -1,4 +1,3 @@
-import "module-alias/register";
 import { CronJob } from "cron";
 import { msf } from "~/server/services/mysportsfeeds";
 import { db } from "~/server/db";
