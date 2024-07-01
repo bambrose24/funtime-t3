@@ -1,0 +1,300 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["relationJoins"]
+  output          = "../src/generated/prisma-client"
+  binaryTargets   = ["native", "debian-openssl-1.1.x"]
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model EmailLogs {
+  email_log_id  String        @id
+  league_id     Int
+  member_id     Int
+  email_type    EmailType
+  ts            DateTime      @default(now()) @db.Timestamptz(6)
+  week          Int?
+  resend_id     String
+  leagues       leagues       @relation(fields: [league_id], references: [league_id], onUpdate: Restrict)
+  leaguemembers leaguemembers @relation(fields: [member_id], references: [membership_id], onDelete: Cascade)
+
+  @@index([league_id], map: "idx_emaillogs_league_id")
+  @@index([league_id, member_id], map: "idx_emaillogs_league_member")
+  @@index([league_id, member_id, week], map: "idx_emaillogs_league_member_week")
+  @@index([league_id, week], map: "idx_emaillogs_league_week")
+  @@index([member_id], map: "idx_emaillogs_member_id")
+  @@index([member_id, week], map: "idx_emaillogs_member_week")
+  @@index([resend_id], map: "idx_emaillogs_resend_id")
+  @@index([week], map: "idx_emaillogs_week")
+}
+
+model WeekWinners {
+  id            Int           @id(map: "idx_184XX_primary") @default(autoincrement())
+  league_id     Int
+  membership_id Int
+  week          Int
+  correct_count Int
+  score_diff    Int
+  leagues       leagues       @relation(fields: [league_id], references: [league_id])
+  leaguemembers leaguemembers @relation(fields: [membership_id], references: [membership_id])
+
+  @@index([league_id, membership_id], map: "idx_184XX_league_and_membership")
+  @@index([league_id], map: "idx_184XX_league_id")
+  @@index([membership_id], map: "idx_184XX_membership_id")
+}
+
+model games {
+  gid                     Int      @id(map: "idx_18403_primary") @default(autoincrement())
+  season                  Int
+  week                    Int
+  ts                      DateTime @db.Timestamptz(6)
+  home                    Int
+  away                    Int
+  homescore               Int?     @default(0)
+  awayscore               Int?     @default(0)
+  done                    Boolean? @default(false)
+  winner                  Int?     @default(0)
+  international           Boolean? @default(false)
+  seconds                 Int?
+  current_record          String?  @default("0-0,0-0") @db.VarChar(50)
+  is_tiebreaker           Boolean?
+  homerecord              String?  @db.VarChar(10)
+  awayrecord              String?  @db.VarChar(10)
+  msf_id                  Int?
+  teams_games_homeToteams teams    @relation("games_homeToteams", fields: [home], references: [teamid], onUpdate: Restrict, map: "games_ibfk_1")
+  teams_games_awayToteams teams    @relation("games_awayToteams", fields: [away], references: [teamid], onUpdate: Restrict, map: "games_ibfk_2")
+  picks                   picks[]
+
+  @@index([away], map: "idx_18403_away")
+  @@index([home], map: "idx_18403_home")
+  @@index([msf_id], map: "idx_18403_msf_id")
+  @@index([season], map: "idx_18403_season")
+  @@index([ts], map: "idx_18403_ts")
+  @@index([week], map: "idx_18403_week")
+}
+
+model leaguemembers {
+  membership_id  Int              @id(map: "idx_18414_primary") @default(autoincrement())
+  league_id      Int
+  user_id        Int
+  ts             DateTime         @default(now()) @db.Timestamptz(6)
+  role           MemberRole?      @default(player)
+  paid           Boolean?         @default(false)
+  EmailLogs      EmailLogs[]
+  WeekWinners    WeekWinners[]
+  people         people           @relation(fields: [user_id], references: [uid], onDelete: Cascade, onUpdate: Restrict, map: "leaguemembers_ibfk_1")
+  leagues        leagues          @relation(fields: [league_id], references: [league_id], onUpdate: Restrict, map: "leaguemembers_ibfk_2")
+  leaguemessages leaguemessages[]
+  picks          picks[]
+  superbowl      superbowl[]
+
+  @@index([league_id], map: "idx_18414_league_id")
+  @@index([paid], map: "idx_18414_paid")
+  @@index([role], map: "idx_18414_role")
+  @@index([ts], map: "idx_18414_ts")
+  @@index([user_id], map: "idx_18414_user_id")
+}
+
+model leaguemessages {
+  message_id    String        @id
+  content       String
+  member_id     Int
+  league_id     Int
+  week          Int?
+  message_type  MessageType
+  createdAt     DateTime      @default(now())
+  status        MessageStatus @default(PUBLISHED)
+  leagues       leagues       @relation(fields: [league_id], references: [league_id])
+  leaguemembers leaguemembers @relation(fields: [member_id], references: [membership_id])
+
+  @@index([createdAt])
+  @@index([league_id])
+  @@index([league_id, member_id])
+  @@index([league_id, message_type])
+  @@index([league_id, message_type, status])
+  @@index([member_id])
+  @@index([message_type])
+}
+
+model leagues {
+  league_id             Int              @id(map: "idx_18422_primary") @default(autoincrement())
+  created_by_user_id    Int
+  name                  String
+  created_time          DateTime         @default(now()) @db.Timestamptz(6)
+  season                Int
+  late_policy           LatePolicy?      @default(allow_late_whole_week)
+  pick_policy           PickPolicy?      @default(choose_winner)
+  reminder_policy       ReminderPolicy?  @default(three_hours_before)
+  scoring_type          ScoringType?     @default(game_winner)
+  share_code            String?          @unique
+  superbowl_competition Boolean?         @default(true)
+  prior_league_id       Int?             @unique
+  status                LeagueStatus     @default(not_started)
+  EmailLogs             EmailLogs[]
+  WeekWinners           WeekWinners[]
+  leaguemembers         leaguemembers[]
+  leaguemessages        leaguemessages[]
+  people                people           @relation(fields: [created_by_user_id], references: [uid], onUpdate: Restrict, map: "leagues_ibfk_1")
+  leagues               leagues?         @relation("leaguesToleagues", fields: [prior_league_id], references: [league_id])
+  other_leagues         leagues?         @relation("leaguesToleagues")
+
+  @@index([created_by_user_id], map: "idx_18422_created_by_user_id")
+  @@index([created_time], map: "idx_18422_created_time")
+  @@index([name], map: "idx_18422_name")
+  @@index([season], map: "idx_18422_season")
+  @@index([share_code], map: "idx_share_code")
+}
+
+model people {
+  uid              Int             @id(map: "idx_18430_primary") @default(autoincrement())
+  username         String          @db.VarChar(255)
+  fname            String          @db.VarChar(255)
+  lname            String          @db.VarChar(255)
+  email            String          @unique @db.VarChar(255)
+  season           Int
+  email2           String?         @db.VarChar(255)
+  google_photo_url String?
+  google_email     String?
+  google_userid    String?
+  supabase_id      String?         @unique @db.VarChar(255)
+  leaguemembers    leaguemembers[]
+  leagues          leagues[]
+  picks            picks[]
+
+  @@index([email], map: "idx_18430_email_index")
+  @@index([season], map: "idx_18430_season")
+  @@index([supabase_id], map: "idx_18430_supabase_id")
+}
+
+model picks {
+  pickid        Int            @id(map: "idx_18437_primary") @default(autoincrement())
+  uid           Int
+  season        Int
+  week          Int
+  gid           Int
+  winner        Int?           @default(0)
+  loser         Int?           @default(0)
+  score         Int?           @default(0)
+  ts            DateTime       @default(now()) @db.Timestamptz(6)
+  correct       Int?           @default(0)
+  done          Int?           @default(0)
+  is_random     Boolean?
+  member_id     Int?
+  games         games          @relation(fields: [gid], references: [gid], onUpdate: Restrict, map: "picks_ibfk_1")
+  people        people         @relation(fields: [uid], references: [uid], onDelete: Cascade, map: "picks_ibfk_2")
+  leaguemembers leaguemembers? @relation(fields: [member_id], references: [membership_id], onDelete: Cascade, onUpdate: Restrict, map: "picks_ibfk_3")
+  teams         teams?         @relation(fields: [winner], references: [teamid])
+
+  @@index([gid], map: "idx_18437_gid")
+  @@index([winner])
+  @@index([member_id], map: "idx_18437_picks_ibfk_3")
+  @@index([season], map: "idx_18437_season")
+  @@index([ts], map: "idx_18437_ts")
+  @@index([uid], map: "idx_18437_uid")
+  @@index([week], map: "idx_18437_week")
+  @@index([week, member_id], map: "idx_week_member")
+  @@index([week, season], map: "idx_week_season")
+  @@index([week, season, member_id], map: "idx_week_season_member")
+}
+
+model superbowl {
+  pickid                        Int            @id(map: "idx_18448_primary") @default(autoincrement())
+  uid                           Int
+  winner                        Int
+  loser                         Int
+  score                         Int
+  ts                            DateTime?      @default(now()) @db.Timestamptz(6)
+  season                        Int?
+  member_id                     Int?
+  teams_superbowl_loserToteams  teams          @relation("superbowl_loserToteams", fields: [loser], references: [teamid], onDelete: NoAction, onUpdate: NoAction, map: "fk_loser_team")
+  leaguemembers                 leaguemembers? @relation(fields: [member_id], references: [membership_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_member_id")
+  teams_superbowl_winnerToteams teams          @relation("superbowl_winnerToteams", fields: [winner], references: [teamid], onDelete: NoAction, onUpdate: NoAction, map: "fk_winner_team")
+
+  @@index([loser])
+  @@index([winner])
+  @@index([member_id], map: "idx_18448_member_id")
+  @@index([season], map: "idx_18448_season")
+  @@index([ts], map: "idx_18448_ts")
+}
+
+model superbowlsquares {
+  square_id       Int      @id(map: "idx_18454_primary") @default(autoincrement())
+  uid             Int
+  league_id       Int
+  afc_score_index Int
+  nfc_score_index Int
+  correct         Boolean
+  ts              DateTime @default(now()) @db.Timestamptz(6)
+
+  @@index([ts], map: "idx_18454_ts")
+}
+
+model teams {
+  teamid                            Int         @id(map: "idx_18460_primary") @default(autoincrement())
+  abbrev                            String?     @db.VarChar(50)
+  loc                               String      @db.VarChar(255)
+  name                              String      @db.VarChar(255)
+  conference                        String?     @db.VarChar(50)
+  primary_color                     String?     @db.VarChar(50)
+  secondary_color                   String?     @db.VarChar(50)
+  tertiary_color                    String?     @db.VarChar(50)
+  games_games_homeToteams           games[]     @relation("games_homeToteams")
+  games_games_awayToteams           games[]     @relation("games_awayToteams")
+  picks                             picks[]
+  superbowl_superbowl_loserToteams  superbowl[] @relation("superbowl_loserToteams")
+  superbowl_superbowl_winnerToteams superbowl[] @relation("superbowl_winnerToteams")
+
+  @@index([abbrev], map: "idx_18460_abbrev")
+  @@index([conference], map: "idx_18460_conference")
+  @@index([loc], map: "idx_18460_loc")
+}
+
+enum EmailType {
+  week_reminder
+  week_summary
+  week_picks
+  league_registration
+}
+
+enum LatePolicy {
+  allow_late_whole_week
+  close_at_first_game_start
+  allow_late_and_lock_after_start
+}
+
+enum MemberRole {
+  player
+  admin
+}
+
+enum MessageStatus {
+  PUBLISHED
+  DELETED
+}
+
+enum MessageType {
+  WEEK_COMMENT
+  LEAGUE_MESSAGE
+}
+
+enum PickPolicy {
+  choose_winner
+}
+
+enum ReminderPolicy {
+  three_hours_before
+}
+
+enum LeagueStatus {
+  not_started
+  in_progress
+  completed
+}
+
+enum ScoringType {
+  game_winner
+}
