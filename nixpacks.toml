@@ -1,0 +1,10 @@
+[phases]
+setup = "npm install"
+
+[build]
+cmds = [
+  "npx prisma generate"
+]
+
+[start]
+cmd = "npx tsx src/cron.ts"

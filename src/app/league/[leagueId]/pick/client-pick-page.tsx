@@ -242,12 +242,7 @@ export function ClientPickPage({ weekToPick, teams, leagueId }: Props) {
                   className="w-full rounded-lg p-1 transition-all lg:p-1.5"
                 >
                   <CardContent className="flex flex-col gap-2 rounded-sm bg-card py-2">
-                    <RadioGroup
-                      value={winner?.toString()}
-                      // onValueChange={(val) => {
-                      //   pick(Number(val));
-                      // }}
-                    >
+                    <RadioGroup value={winner?.toString()}>
                       <div className="grid w-full grid-cols-5 gap-2">
                         <div
                           className="col-span-1 flex cursor-pointer items-center justify-center"
