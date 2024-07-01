@@ -10,6 +10,9 @@ RUN bun install --frozen-lockfile
 COPY prisma ./prisma
 RUN bunx prisma generate
 
+# Verify Prisma client generation
+RUN ls -la node_modules/.prisma
+
 # Copy the rest of the application code
 COPY . .
 
