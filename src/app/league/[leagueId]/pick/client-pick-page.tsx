@@ -259,7 +259,8 @@ export function ClientPickPage({ weekToPick, teams, leagueId }: Props) {
                       <div className="grid w-full grid-cols-5 gap-2">
                         <div
                           className="col-span-1 flex cursor-pointer items-center justify-center"
-                          onClick={() => {
+                          onClick={(e) => {
+                            e.stopPropagation();
                             pick(away.teamid);
                           }}
                         >
@@ -271,7 +272,10 @@ export function ClientPickPage({ weekToPick, teams, leagueId }: Props) {
                         </div>
                         <div
                           className="col-span-1 flex cursor-pointer items-center justify-start md:pl-2"
-                          onClick={() => pick(away.teamid)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            pick(away.teamid);
+                          }}
                         >
                           <div className="flex items-center gap-2">
                             <RadioGroupItem
@@ -286,7 +290,10 @@ export function ClientPickPage({ weekToPick, teams, leagueId }: Props) {
                         </div>
                         <div
                           className="col-span-1 flex cursor-pointer items-center justify-end md:pr-2"
-                          onClick={() => pick(home.teamid)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            pick(home.teamid);
+                          }}
                         >
                           <div className="flex items-center gap-2">
                             <Text.Small>{home.abbrev}</Text.Small>
@@ -301,7 +308,10 @@ export function ClientPickPage({ weekToPick, teams, leagueId }: Props) {
 
                         <div
                           className="col-span-1 flex cursor-pointer items-center justify-center"
-                          onClick={() => pick(home.teamid)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            pick(home.teamid);
+                          }}
                         >
                           <TeamLogo
                             abbrev={home.abbrev ?? ""}
