@@ -359,13 +359,11 @@ export function ClientPickPage({ weekToPick, teams, leagueId }: Props) {
                                             "w-full focus-visible:ring-2",
                                             fieldState.invalid
                                               ? "ring-2 ring-wrong"
-                                              : valid
-                                                ? "ring-2 ring-correct"
-                                                : "",
+                                              : "ring-2 ring-correct",
                                           )}
                                         />
                                       </FormControl>
-                                      <Text.Small>
+                                      <Text.Small className="mt-2">
                                         You must enter a score between 1 and 200
                                       </Text.Small>
                                     </FormItem>
