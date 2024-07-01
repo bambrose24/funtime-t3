@@ -21,4 +21,4 @@ RUN chown -R bun:bun /usr/src/app
 # Run the application
 USER bun
 EXPOSE 3000/tcp
-ENTRYPOINT [ "sh", "-c", "bunx prisma generate && bun run src/cron.ts" ]
+ENTRYPOINT [ "sh", "-c", "NODE_OPTIONS=--max-old-space-size=4096 bunx prisma generate && bun run src/cron.ts" ]
