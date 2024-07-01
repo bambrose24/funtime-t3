@@ -1,24 +1,9 @@
 app = "funtime-cron"
 primary_region = "bos"
 
-
 [build]
-builder = "heroku/buildpacks:20"
+  dockerfile = "Dockerfile"
 
-[build.env]
-NPM_CONFIG_PRODUCTION = "false"
-
-[deploy]
-release_command = "bunx prisma generate"
 
 [experimental]
   allowed_runtime = "bun"
-
-[phases.setup]
-cmds = ["bun install"]
-
-[phases.build]
-cmds = ["bunx prisma generate"]
-
-[phases.start]
-cmd = "bun run cron"
