@@ -1,18 +1,12 @@
-import { CronJob } from "cron";
 import { msf } from "~/server/services/mysportsfeeds";
 import { db } from "~/server/db";
 
-const job = new CronJob(
-  // "*/5 * * * *", // cronTime: every 5 minutes
-  "*/1 * * * *", // cronTime: every 1 minute
-  async function () {
-    const games = await db.games.count();
-    console.log(`found ${games} games`);
-  }, // onTick
-  async () => {
-    console.log("closing down cron");
-  },
-  false, // start
-  "America/Los_Angeles", // timeZone
-);
-job.start();
+async function run() {
+  console.log("starting cron...");
+  const games = await db.games.count();
+  console.log(`found ${games} games`);
+}
+
+run().catch((e) => {
+  console.error("error running cron", e);
+});
