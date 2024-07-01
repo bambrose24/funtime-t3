@@ -21,4 +21,4 @@ RUN ls -la node_modules/.prisma && ls -la node_modules/@prisma/client
 # Run the application
 USER bun
 EXPOSE 3000/tcp
-ENTRYPOINT [ "bun", "run", "src/cron.ts" ]
+ENTRYPOINT [ "sh", "-c", "bunx prisma generate && bun run src/cron.ts" ]
