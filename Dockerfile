@@ -16,6 +16,8 @@ COPY package.json bun.lockb /temp/prod/
 RUN cd /temp/prod && bun install --frozen-lockfile --production
 
 # Run Prisma generate
+RUN mkdir -p /usr/src/app
+COPY . .
 RUN bunx prisma generate
 
 # copy node_modules from temp directory
@@ -23,7 +25,6 @@ RUN bunx prisma generate
 FROM base AS prerelease
 COPY --from=install /temp/dev/node_modules node_modules
 COPY . .
-
 
 # [optional] tests & build
 ENV NODE_ENV=production
@@ -33,8 +34,10 @@ FROM base AS release
 COPY --from=install /temp/prod/node_modules node_modules
 COPY --from=prerelease /usr/src/app .
 
+# Ensure correct ownership for the bun user
+RUN chown -R bun:bun /usr/src/app
+
 # run the app
 USER bun
-RUN chown -R node:node node_modules/.prisma
-RUN npx prisma generate
-ENTRYPOINT [ "bun", "run", "cron" ]
+EXPOSE 3000/tcp
+ENTRYPOINT [ "bun", "run", "src/cron.ts" ]
