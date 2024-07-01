@@ -16,7 +16,7 @@ RUN bunx prisma generate
 RUN ls -la node_modules/.prisma && ls -la node_modules/@prisma/client
 
 # Ensure correct ownership for the bun user
-# RUN chown -R bun:bun /usr/src/app
+RUN chown -R bun:bun /usr/src/app
 
 # Run the application
 USER bun
