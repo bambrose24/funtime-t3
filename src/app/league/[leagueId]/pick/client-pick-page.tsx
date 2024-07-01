@@ -232,7 +232,7 @@ export function ClientPickPage({ weekToPick, teams, leagueId }: Props) {
 
             return (
               <Card
-                key={game.gid}
+                key={`${idx}_${winner}`}
                 className={cn("w-full", winnerTeam && "border-transparent")}
               >
                 <div
