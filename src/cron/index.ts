@@ -8,4 +8,7 @@ async function run() {
 
 await run().catch((e) => {
   console.error("error running cron", e);
+  process.exit(1);
 });
+
+process.exit(0);
