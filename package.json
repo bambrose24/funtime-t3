@@ -13,8 +13,11 @@
     "postinstall": "prisma generate",
     "lint": "next lint",
     "start": "next start",
-    "cron": "npx ts-node src/cron.ts",
+    "cron": "npx tsx -r tsconfig-paths/register src/cron.ts",
     "typecheck": "tsc --noEmit"
+  },
+  "_moduleAliases": {
+    "~": "src"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.6.0",
@@ -59,6 +62,7 @@
     "dayjs": "^1.11.10",
     "lodash": "^4.17.21",
     "lucide-react": "^0.363.0",
+    "module-alias": "^2.2.3",
     "next": "^14.2.4",
     "next-axiom": "^1.2.0",
     "next-themes": "^0.3.0",
@@ -70,6 +74,7 @@
     "superjson": "^2.2.1",
     "tailwind-merge": "^2.2.2",
     "tailwindcss-animate": "^1.0.7",
+    "tsconfig-paths": "^4.2.0",
     "vaul": "^0.9.0",
     "winston": "^3.13.0",
     "yup": "^1.4.0",
@@ -90,6 +95,7 @@
     "prettier-plugin-tailwindcss": "^0.5.11",
     "prisma": "^5.16.1",
     "tailwindcss": "^3.4.1",
+    "ts-node": "^10.9.2",
     "typescript": "^5.4.2"
   },
   "ct3aMetadata": {

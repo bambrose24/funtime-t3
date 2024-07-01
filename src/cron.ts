@@ -1,5 +1,7 @@
+import "module-alias/register";
 import { CronJob } from "cron";
-import { db } from "./server/db";
+import { msf } from "~/server/services/mysportsfeeds";
+import { db } from "~/server/db";
 
 const job = new CronJob(
   "*/5 * * * *", // cronTime: every 5 minutes
