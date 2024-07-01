@@ -111,49 +111,48 @@ export const picksRouter = createTRPCRouter({
         },
       });
       const existingPicksByGid = groupBy(existingPicks, (p) => p.gid);
-
-      await db.$transaction(async (tx) => {
-        await Promise.all(
-          finalPicks.map(async (pick) => {
-            const game = gamesById[pick.gid]?.at(0);
-            if (!game) {
-              throw new TRPCError({
-                code: "INTERNAL_SERVER_ERROR",
-                message: `Error finding game to save pick to ${pick.gid}`,
-              });
-            }
-            const existingPick = existingPicksByGid[game.gid]?.at(0);
-            if (existingPick) {
-              return tx.picks.update({
-                data: {
-                  winner: pick.winner,
-                  score: pick.score,
-                  gid: pick.gid,
-                  is_random: pick.isRandom,
-                },
-                where: {
-                  pickid: existingPick.pickid,
-                },
-              });
-            }
-            return tx.picks.create({
-              data: {
-                winner: pick.winner,
-                gid: pick.gid,
-                score: pick.score,
-                member_id: member.membership_id,
-                season: member.leagues.season,
-                uid: member.user_id,
-                is_random: pick.isRandom,
-                week: game.week,
-                ts: new Date(),
-                loser: game.away + game.home - pick.winner,
-              },
-            });
-          }),
-        );
-      });
-
       return { pickedGames };
+      // await db.$transaction(async (tx) => {
+      //   await Promise.all(
+      //     finalPicks.map(async (pick) => {
+      //       const game = gamesById[pick.gid]?.at(0);
+      //       if (!game) {
+      //         throw new TRPCError({
+      //           code: "INTERNAL_SERVER_ERROR",
+      //           message: `Error finding game to save pick to ${pick.gid}`,
+      //         });
+      //       }
+      //       const existingPick = existingPicksByGid[game.gid]?.at(0);
+      //       if (existingPick) {
+      //         return tx.picks.update({
+      //           data: {
+      //             winner: pick.winner,
+      //             score: pick.score,
+      //             gid: pick.gid,
+      //             is_random: pick.isRandom,
+      //           },
+      //           where: {
+      //             pickid: existingPick.pickid,
+      //           },
+      //         });
+      //       }
+      //       return tx.picks.create({
+      //         data: {
+      //           winner: pick.winner,
+      //           gid: pick.gid,
+      //           score: pick.score,
+      //           member_id: member.membership_id,
+      //           season: member.leagues.season,
+      //           uid: member.user_id,
+      //           is_random: pick.isRandom,
+      //           week: game.week,
+      //           ts: new Date(),
+      //           loser: game.away + game.home - pick.winner,
+      //         },
+      //       });
+      //     }),
+      //   );
+      // });
+      // return { pickedGames };
     }),
 });

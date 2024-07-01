@@ -5,12 +5,12 @@ import { db } from "~/server/db";
 
 const job = new CronJob(
   "*/5 * * * *", // cronTime: every 5 minutes
-  function () {
-    console.log("hello from cron after 5 minutes");
-  }, // onTick
-  async () => {
+  async function () {
     const games = await db.games.count();
     console.log(`found ${games} games`);
+  }, // onTick
+  async () => {
+    console.log("closing down cron");
   },
   false, // start
   "America/Los_Angeles", // timeZone
