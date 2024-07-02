@@ -6,7 +6,7 @@ import { Defined } from "~/utils/defined";
 
 const LOG_PREFIX = "[cron]";
 
-async function run() {
+export async function run() {
   const _startTime = Date.now();
 
   console.log(`${LOG_PREFIX} starting cron...`);
@@ -287,10 +287,3 @@ async function run() {
     `${LOG_PREFIX} Cron finished successfully in ${Math.round((Date.now() - _startTime) / 1000)}s`,
   );
 }
-
-await run().catch((e) => {
-  console.error("error running cron", e);
-  process.exit(1);
-});
-
-process.exit(0);
