@@ -287,3 +287,10 @@ export async function run() {
     `${LOG_PREFIX} Cron finished successfully in ${Math.round((Date.now() - _startTime) / 1000)}s`,
   );
 }
+
+await run().catch((e) => {
+  console.error("error running cron", e);
+  process.exit(1);
+});
+
+process.exit(0);
