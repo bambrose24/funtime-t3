@@ -25,8 +25,8 @@ async function run() {
   for (const groupedGames of Object.values(groupedByWeek)) {
     const sortedGames = orderBy(
       groupedGames,
-      (g) => new Date(g.schedule.startTime),
-      "asc",
+      [(g) => new Date(g.schedule.startTime), (g) => g.schedule.id],
+      ["asc", "asc"],
     );
     const lastGame = sortedGames.at(-1);
     if (lastGame) {

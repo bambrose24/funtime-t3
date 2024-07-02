@@ -15,12 +15,14 @@ const createPrismaClient = () => {
     ],
   });
 
-  prisma.$on("query", (e) => {
-    getLogger().info(`${LOG_PREFIX} Query executed`, {
-      prismaQueryDurationMs: e.duration,
-      prismaQuery: e.query,
+  if (env.VERCEL_ENV === "production") {
+    prisma.$on("query", (e) => {
+      getLogger().info(`${LOG_PREFIX} Query executed`, {
+        prismaQueryDurationMs: e.duration,
+        prismaQuery: e.query,
+      });
     });
-  });
+  }
   return prisma;
 };
 
