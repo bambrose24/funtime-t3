@@ -7,7 +7,10 @@ export async function GET(request: Request) {
   if (
     request.headers.get("Authorization") !== `Bearer ${process.env.CRON_SECRET}`
   ) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json(
+      { error: "Unauthorized to run cron" },
+      { status: 401 },
+    );
   }
   const now = Date.now();
   getLogger().info(`[cron] Starting cron request handling`);
