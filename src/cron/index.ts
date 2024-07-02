@@ -2,10 +2,13 @@ import { groupBy, orderBy } from "lodash";
 import { db } from "~/server/db";
 import { msf } from "~/server/services/mysportsfeeds";
 import { DEFAULT_SEASON } from "~/utils/const";
+import { Defined } from "~/utils/defined";
 
 const LOG_PREFIX = "[cron]";
 
 async function run() {
+  const _startTime = Date.now();
+
   console.log(`${LOG_PREFIX} starting cron...`);
 
   const season = DEFAULT_SEASON;
@@ -22,47 +25,53 @@ async function run() {
   const gamesByMsfId = groupBy(games, (g) => g.msf_id);
   const msfGamesById = groupBy(msfGames, (g) => g.schedule.id);
 
-  for (const msfGame of msfGames) {
-    const game = gamesByMsfId[msfGame.schedule.id]?.at(0);
-    const awayTeam =
-      teamByAbbrev[msfGame.schedule.awayTeam.abbreviation]?.at(0);
-    const homeTeam =
-      teamByAbbrev[msfGame.schedule.homeTeam.abbreviation]?.at(0);
-    if (!awayTeam || !homeTeam || !game || game.done) {
-      continue;
-    }
-    const done = msfGame.schedule.playedStatus === "COMPLETED";
+  await db.$transaction(
+    msfGames
+      .map((msfGame) => {
+        const game = gamesByMsfId[msfGame.schedule.id]?.at(0);
+        const awayTeam =
+          teamByAbbrev[msfGame.schedule.awayTeam.abbreviation]?.at(0);
+        const homeTeam =
+          teamByAbbrev[msfGame.schedule.homeTeam.abbreviation]?.at(0);
+        if (!awayTeam || !homeTeam || !game || game.done) {
+          return null;
+        }
+        const done = msfGame.schedule.playedStatus === "COMPLETED";
 
-    let winner: number | null = null;
-    if (
-      done &&
-      msfGame.score.homeScoreTotal !== null &&
-      msfGame.score.awayScoreTotal !== null
-    ) {
-      if (msfGame.score.homeScoreTotal > msfGame.score.awayScoreTotal) {
-        winner = game.home;
-      } else if (msfGame.score.awayScoreTotal > msfGame.score.homeScoreTotal) {
-        winner = game.away;
-      }
-    }
-    const data = {
-      awayscore: msfGame.score.awayScoreTotal,
-      homescore: msfGame.score.homeScoreTotal,
-      done,
-      winner,
-    } satisfies Parameters<typeof db.games.update>[0]["data"];
+        let winner: number | null = null;
+        if (
+          done &&
+          msfGame.score.homeScoreTotal !== null &&
+          msfGame.score.awayScoreTotal !== null
+        ) {
+          if (msfGame.score.homeScoreTotal > msfGame.score.awayScoreTotal) {
+            winner = game.home;
+          } else if (
+            msfGame.score.awayScoreTotal > msfGame.score.homeScoreTotal
+          ) {
+            winner = game.away;
+          }
+        }
+        const data = {
+          awayscore: msfGame.score.awayScoreTotal,
+          homescore: msfGame.score.homeScoreTotal,
+          done,
+          winner,
+        } satisfies Parameters<typeof db.games.update>[0]["data"];
 
-    console.log(
-      `${LOG_PREFIX} going to update game ${game.gid} with data ${JSON.stringify(data)}`,
-    );
+        console.log(
+          `${LOG_PREFIX} going to update game ${game.gid} with data ${JSON.stringify(data)}`,
+        );
 
-    await db.games.update({
-      where: {
-        gid: game.gid,
-      },
-      data,
-    });
-  }
+        return db.games.update({
+          where: {
+            gid: game.gid,
+          },
+          data,
+        });
+      })
+      .filter(Defined),
+  );
 
   games = await db.games.findMany({
     where: {
@@ -128,51 +137,62 @@ async function run() {
     return acc;
   }, new Map<number, typeof games>());
 
-  for (const game of games) {
-    const homePriorGames =
-      gamesByTeamId
-        .get(game.home)
-        ?.filter(
-          (g) =>
-            (g.home === game.home || g.away === game.home) &&
-            g.week < game.week,
-        ) ?? [];
-    const awayPriorGames =
-      gamesByTeamId
-        .get(game.away)
-        ?.filter(
-          (g) =>
-            (g.home === game.away || g.away === game.away) &&
-            g.week < game.week,
-        ) ?? [];
+  const updates: Parameters<typeof db.games.updateMany>[0] = [];
 
-    const homeWins = homePriorGames.reduce(
-      (prev, curr) => prev + (curr.winner === curr.home ? 1 : 0),
-      0,
-    );
-    const awayWins = awayPriorGames.reduce(
-      (prev, curr) => prev + (curr.winner === curr.away ? 1 : 0),
-      0,
-    );
+  await db.$transaction(
+    games.map((game) => {
+      const homePriorGames =
+        gamesByTeamId
+          .get(game.home)
+          ?.filter(
+            (g) =>
+              (g.home === game.home || g.away === game.home) &&
+              g.week < game.week,
+          ) ?? [];
+      const awayPriorGames =
+        gamesByTeamId
+          .get(game.away)
+          ?.filter(
+            (g) =>
+              (g.home === game.away || g.away === game.away) &&
+              g.week < game.week,
+          ) ?? [];
 
-    const awayLosses = awayPriorGames.length - awayWins;
-    const homeLosses = homePriorGames.length - homeWins;
-    const awayrecord = `${awayWins}-${awayLosses}`;
-    const homerecord = `${homeWins}-${homeLosses}`;
+      const homeDonePriorGames = homePriorGames.filter((g) => g.done);
+      const awayDonePriorGames = awayPriorGames.filter((g) => g.done);
 
-    console.log(
-      `${LOG_PREFIX} going to update ${game.gid} with awayrecord ${awayrecord} homerecord ${homerecord}`,
-    );
-    await db.games.update({
-      where: {
-        gid: game.gid,
-      },
-      data: {
-        awayrecord,
-        homerecord,
-      },
-    });
-  }
+      const homeWins = homeDonePriorGames.reduce(
+        (prev, curr) => prev + (curr.winner === curr.home ? 1 : 0),
+        0,
+      );
+      const awayWins = awayDonePriorGames.reduce(
+        (prev, curr) => prev + (curr.winner === curr.away ? 1 : 0),
+        0,
+      );
+
+      const awayLosses = awayDonePriorGames.length - awayWins;
+      const homeLosses = homeDonePriorGames.length - homeWins;
+      const awayrecord = `${awayWins}-${awayLosses}`;
+      const homerecord = `${homeWins}-${homeLosses}`;
+
+      console.log(
+        `${LOG_PREFIX} going to update game ${game.gid} with awayrecord ${awayrecord} homerecord ${homerecord}`,
+      );
+      return db.games.update({
+        where: {
+          gid: game.gid,
+        },
+        data: {
+          awayrecord,
+          homerecord,
+        },
+      });
+    }),
+  );
+
+  console.log(
+    `${LOG_PREFIX} updated all games schedules and records (total time ${_startTime - Date.now()})`,
+  );
 
   // update startTimes (should do it for weeks even that have picks?)
   games = await db.games.findMany({
@@ -195,6 +215,9 @@ async function run() {
       msfGame &&
       msfGame.schedule.week > firstUnstartedGameWeek
     ) {
+      console.log(
+        `${LOG_PREFIX} going to update time for game ${game.gid} to ${msfGame.schedule.startTime}`,
+      );
       await db.games.update({
         where: {
           gid: game.gid,
@@ -248,6 +271,9 @@ async function run() {
       },
     });
     if (calculatedTiebreakerGame) {
+      console.log(
+        `${LOG_PREFIX} going to set game ${calculatedTiebreakerGame.gid} as tiebreaker (for week ${calculatedTiebreakerGame.week}, ${calculatedTiebreakerGame.season})`,
+      );
       await db.games.update({
         where: {
           gid: calculatedTiebreakerGame.gid,
@@ -258,6 +284,10 @@ async function run() {
       });
     }
   }
+
+  console.log(
+    `${LOG_PREFIX} Cron finished successfully in ${_startTime - Date.now()}ms`,
+  );
 }
 
 await run().catch((e) => {
