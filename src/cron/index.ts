@@ -189,7 +189,7 @@ async function run() {
   );
 
   console.log(
-    `${LOG_PREFIX} updated all games schedules and records (total time ${_startTime - Date.now()})`,
+    `${LOG_PREFIX} updated all games schedules and records (total time ${Math.round((Date.now() - _startTime) / 1000)}s)`,
   );
 
   // update startTimes (should do it for weeks even that have picks?)
@@ -284,7 +284,7 @@ async function run() {
   }
 
   console.log(
-    `${LOG_PREFIX} Cron finished successfully in ${_startTime - Date.now()}ms`,
+    `${LOG_PREFIX} Cron finished successfully in ${Math.round((Date.now() - _startTime) / 1000)}s`,
   );
 }
 
