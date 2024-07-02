@@ -137,8 +137,6 @@ async function run() {
     return acc;
   }, new Map<number, typeof games>());
 
-  const updates: Parameters<typeof db.games.updateMany>[0] = [];
-
   await db.$transaction(
     games.map((game) => {
       const homePriorGames =
