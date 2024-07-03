@@ -1,4 +1,4 @@
-import { groupBy, orderBy, sortBy } from "lodash";
+import { groupBy, orderBy } from "lodash";
 import { db } from "~/server/db";
 import { msf } from "~/server/services/mysportsfeeds";
 

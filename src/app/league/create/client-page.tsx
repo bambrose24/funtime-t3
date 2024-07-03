@@ -20,7 +20,6 @@ import { Alert, AlertTitle } from "~/components/ui/alert";
 import { type RouterOutputs } from "~/trpc/types";
 import { AlertCircleIcon } from "lucide-react";
 import Link from "next/link";
-import { Separator } from "~/components/ui/separator";
 import {
   Select,
   SelectContent,
