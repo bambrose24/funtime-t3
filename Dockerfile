@@ -21,4 +21,4 @@ RUN chown -R bun:bun /usr/src/app
 # Run the application
 USER bun
 EXPOSE 3000/tcp
-ENTRYPOINT [ "sh", "-c", "bun run cron" ]
+ENTRYPOINT [ "sh", "-c", "bun run src/cron/index.ts" ]
