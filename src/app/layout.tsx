@@ -31,7 +31,7 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className="min-h-screen overflow-y-scroll"
+      className="min-h-screen overflow-y-auto"
     >
       <body
         className={cn(inter.variable, `min-w-screen min-h-screen font-sans`)}
