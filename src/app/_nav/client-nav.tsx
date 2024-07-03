@@ -29,10 +29,8 @@ import { useLogout } from "../(auth)/auth/useLogout";
 import { useLeagueIdFromPath } from "~/utils/hooks/useLeagueIdFromPath";
 import { ChevronsUpDown, HomeIcon, PenIcon, TrophyIcon } from "lucide-react";
 import { Avatar } from "~/components/ui/avatar";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { FuntimeAvatarFallback } from "./AvatarFallback";
-import { PrefetchKind } from "next/dist/client/components/router-reducer/router-reducer-types";
-import { useEffect } from "react";
 
 type NavData = {
   data: Awaited<ReturnType<(typeof serverApi)["home"]["nav"]>>;
@@ -41,7 +39,6 @@ type NavData = {
 export function ClientNav(props: NavData) {
   const leagueId = useLeagueIdFromPath();
   const logout = useLogout();
-  const router = useRouter();
 
   const user = props.data?.dbUser;
   const leagues = props.data?.leagues;
@@ -56,12 +53,6 @@ export function ClientNav(props: NavData) {
   );
 
   const settingsHref = "/settings";
-
-  useEffect(() => {
-    router.prefetch(settingsHref, {
-      kind: PrefetchKind.FULL,
-    });
-  }, [router, user]);
 
   return (
     <div className="flex w-full flex-col bg-background">
@@ -298,23 +289,8 @@ function TabLabel() {
 }
 
 function LeagueDropdownMenu({ chosenLeague }: { chosenLeague: ChosenLeague }) {
-  const router = useRouter();
-
   const leaderboardHref = `/league/${chosenLeague.league_id}/leaderboard`;
-
-  useEffect(() => {
-    router.prefetch(leaderboardHref, {
-      kind: PrefetchKind.FULL,
-    });
-  }, [router, leaderboardHref]);
-
   const pickHref = `/league/${chosenLeague.league_id}/pick`;
-
-  useEffect(() => {
-    router.prefetch(pickHref, {
-      kind: PrefetchKind.FULL,
-    });
-  }, [router, pickHref]);
 
   return (
     <>

@@ -3,31 +3,19 @@
 import { Card, CardContent, CardHeader } from "~/components/ui/card";
 import { Separator } from "~/components/ui/separator";
 import { Text } from "../ui/text";
-import { useEffect, useMemo } from "react";
+import { useMemo } from "react";
 import { Badge } from "../ui/badge";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { PrefetchKind } from "next/dist/client/components/router-reducer/router-reducer-types";
 import type { RouterOutputs } from "~/trpc/types";
 
 type LeagueCardData = NonNullable<RouterOutputs["home"]["summary"]>[number];
 
 export function HomeLeagueCard({ data }: { data: LeagueCardData }) {
-  const router = useRouter();
-
   const weekWins = useMemo(() => {
     return data.league.WeekWinners.map((w) => {
       return { week: w.week, league_id: data.league.league_id };
     });
   }, [data]);
-
-  const href = `/league/${data.league.league_id}`;
-
-  useEffect(() => {
-    router.prefetch(href, {
-      kind: PrefetchKind.FULL,
-    });
-  }, [router, href]);
 
   return (
     <Link href={`/league/${data.league.league_id}`} passHref>
