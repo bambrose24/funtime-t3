@@ -54,7 +54,7 @@ function Body({ children, className }: TextProps) {
 
 function Small({ children, className }: TextProps) {
   return (
-    <small className={cn("text-sm font-medium leading-none", className)}>
+    <small className={cn("text-sm font-medium leading-tight", className)}>
       {children}
     </small>
   );

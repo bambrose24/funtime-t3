@@ -11,6 +11,12 @@ import { cache } from "~/utils/cache";
 import { TRPCError } from "@trpc/server";
 import { Defined } from "~/utils/defined";
 import { UnauthorizedError } from "~/server/util/errors/unauthorized";
+import {
+  LatePolicy,
+  PickPolicy,
+  ReminderPolicy,
+  ScoringType,
+} from "~/generated/prisma-client";
 
 const picksSummarySchema = z.object({
   leagueId: z.number().int(),
@@ -62,6 +68,15 @@ export const leagueRouter = createTRPCRouter({
     .input(leagueIdSchema)
     .query(async ({ input, ctx }) => {
       const { leagueId } = input;
+      const member = ctx.dbUser?.leaguemembers.find(
+        (m) => m.league_id === leagueId,
+      );
+      if (!member) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: `You are not in that league ${leagueId} user ${ctx.dbUser?.uid}`,
+        });
+      }
 
       const data = await ctx.db.leagues.findUnique({
         where: {
@@ -111,10 +126,20 @@ export const leagueRouter = createTRPCRouter({
         ],
       });
 
+      const memberPicks = await ctx.db.picks.findMany({
+        where: {
+          gid: {
+            in: games.map((g) => g.gid),
+          },
+          member_id: member.membership_id,
+        },
+      });
+
       return {
         season,
         week,
         games,
+        picks: memberPicks,
       };
     }),
   picksSummary: publicProcedure
@@ -198,4 +223,13 @@ export const leagueRouter = createTRPCRouter({
       );
       return await getLeagueData();
     }),
+
+  createForm: authorizedProcedure.query(() => {
+    return {
+      latePolicy: LatePolicy,
+      pickPolicy: PickPolicy,
+      reminderPolicy: ReminderPolicy,
+      scoringType: ScoringType,
+    };
+  }),
 });
