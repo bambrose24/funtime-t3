@@ -32,6 +32,7 @@ import { Avatar } from "~/components/ui/avatar";
 import { usePathname, useRouter } from "next/navigation";
 import { FuntimeAvatarFallback } from "./AvatarFallback";
 import { PrefetchKind } from "next/dist/client/components/router-reducer/router-reducer-types";
+import { useEffect } from "react";
 
 type NavData = {
   data: Awaited<ReturnType<(typeof serverApi)["home"]["nav"]>>;
@@ -55,11 +56,12 @@ export function ClientNav(props: NavData) {
   );
 
   const settingsHref = "/settings";
-  if (user) {
+
+  useEffect(() => {
     router.prefetch(settingsHref, {
       kind: PrefetchKind.FULL,
     });
-  }
+  }, [router, user]);
 
   return (
     <div className="flex w-full flex-col bg-background">
@@ -299,14 +301,20 @@ function LeagueDropdownMenu({ chosenLeague }: { chosenLeague: ChosenLeague }) {
   const router = useRouter();
 
   const leaderboardHref = `/league/${chosenLeague.league_id}/leaderboard`;
-  router.prefetch(leaderboardHref, {
-    kind: PrefetchKind.FULL,
-  });
+
+  useEffect(() => {
+    router.prefetch(leaderboardHref, {
+      kind: PrefetchKind.FULL,
+    });
+  }, [router, leaderboardHref]);
 
   const pickHref = `/league/${chosenLeague.league_id}/pick`;
-  router.prefetch(pickHref, {
-    kind: PrefetchKind.FULL,
-  });
+
+  useEffect(() => {
+    router.prefetch(pickHref, {
+      kind: PrefetchKind.FULL,
+    });
+  }, [router, pickHref]);
 
   return (
     <>

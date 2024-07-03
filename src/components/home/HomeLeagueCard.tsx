@@ -3,7 +3,7 @@
 import { Card, CardContent, CardHeader } from "~/components/ui/card";
 import { Separator } from "~/components/ui/separator";
 import { Text } from "../ui/text";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { Badge } from "../ui/badge";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -23,9 +23,11 @@ export function HomeLeagueCard({ data }: { data: LeagueCardData }) {
 
   const href = `/league/${data.league.league_id}`;
 
-  router.prefetch(href, {
-    kind: PrefetchKind.FULL,
-  });
+  useEffect(() => {
+    router.prefetch(href, {
+      kind: PrefetchKind.FULL,
+    });
+  }, [router, href]);
 
   return (
     <Link href={`/league/${data.league.league_id}`} passHref>
