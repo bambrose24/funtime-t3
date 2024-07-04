@@ -208,7 +208,7 @@ export function CreateLeagueClientPage({
                 <FormField
                   control={form.control}
                   name="superbowlCompetition"
-                  render={({ field, fieldState }) => (
+                  render={({ field }) => (
                     <FormItem>
                       <FormLabel>Super Bowl Competition</FormLabel>
                       <FormDescription>

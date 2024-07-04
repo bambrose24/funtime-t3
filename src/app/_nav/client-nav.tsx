@@ -27,10 +27,19 @@ import { capitalize } from "lodash";
 import { type IconProps } from "@radix-ui/react-icons/dist/types";
 import { useLogout } from "../(auth)/auth/useLogout";
 import { useLeagueIdFromPath } from "~/utils/hooks/useLeagueIdFromPath";
-import { ChevronsUpDown, HomeIcon, PenIcon, TrophyIcon } from "lucide-react";
+import {
+  ChevronsUpDown,
+  HomeIcon,
+  PenIcon,
+  SettingsIcon,
+  TrophyIcon,
+} from "lucide-react";
 import { Avatar } from "~/components/ui/avatar";
 import { usePathname } from "next/navigation";
 import { FuntimeAvatarFallback } from "./AvatarFallback";
+import { type RouterOutputs } from "~/trpc/types";
+import { clientApi } from "~/trpc/react";
+import { MemberRole } from "~/generated/prisma-client";
 
 type NavData = {
   data: Awaited<ReturnType<(typeof serverApi)["home"]["nav"]>>;
@@ -248,12 +257,10 @@ function ThemeIcon({ theme, ...props }: { theme: ThemeChoice } & IconProps) {
 }
 
 type ChosenLeague = NonNullable<
-  NonNullable<
-    Awaited<ReturnType<(typeof serverApi)["home"]["nav"]>>
-  >["leagues"][number]
+  NonNullable<RouterOutputs["home"]["nav"]>["leagues"][number]
 >;
 
-type TabOption = "home" | "make-picks" | "leaderboard";
+type TabOption = "home" | "make-picks" | "leaderboard" | "admin";
 
 function useActiveLeagueSubPath(): TabOption {
   const pathname = usePathname();
@@ -262,6 +269,9 @@ function useActiveLeagueSubPath(): TabOption {
   }
   if (pathname.includes("pick")) {
     return "make-picks";
+  }
+  if (pathname.includes("admin")) {
+    return "admin";
   }
   return "home";
 }
@@ -285,12 +295,26 @@ function TabLabel() {
           <div className="lg:hidden">Pick</div>
         </>
       );
+    case "admin":
+      return (
+        <>
+          <div className="hidden lg:block">Admin Settings</div>
+          <div className="lg:hidden">Admin</div>
+        </>
+      );
   }
 }
 
 function LeagueDropdownMenu({ chosenLeague }: { chosenLeague: ChosenLeague }) {
   const leaderboardHref = `/league/${chosenLeague.league_id}/leaderboard`;
   const pickHref = `/league/${chosenLeague.league_id}/pick`;
+  const adminHref = `/league/${chosenLeague.league_id}/admin`;
+
+  const { data: session } = clientApi.session.current.useQuery();
+  const isAdmin =
+    session?.dbUser?.leaguemembers?.find(
+      (m) => m.league_id === chosenLeague.league_id,
+    )?.role === MemberRole.admin;
 
   return (
     <>
@@ -330,6 +354,16 @@ function LeagueDropdownMenu({ chosenLeague }: { chosenLeague: ChosenLeague }) {
               </div>
             </DropdownMenuItem>
           </Link>
+          {isAdmin && (
+            <Link href={adminHref}>
+              <DropdownMenuItem>
+                <div className="flex flex-row items-center gap-3">
+                  <SettingsIcon className="h-4 w-4" />
+                  <>Admin Settings</>
+                </div>
+              </DropdownMenuItem>
+            </Link>
+          )}
         </DropdownMenuContent>
       </DropdownMenu>
     </>

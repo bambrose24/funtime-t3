@@ -3,7 +3,7 @@ import {
   authorizedProcedure,
   createTRPCRouter,
   publicProcedure,
-} from "../trpc";
+} from "../../trpc";
 import { db } from "~/server/db";
 import _ from "lodash";
 import { getGames } from "~/server/util/getGames";
@@ -17,6 +17,7 @@ import {
   ReminderPolicy,
   ScoringType,
 } from "~/generated/prisma-client";
+import { leagueAdminRouter } from "./admin";
 
 const picksSummarySchema = z.object({
   leagueId: z.number().int(),
@@ -28,6 +29,7 @@ const leagueIdSchema = z.object({
 });
 
 export const leagueRouter = createTRPCRouter({
+  admin: leagueAdminRouter,
   get: authorizedProcedure
     .input(leagueIdSchema)
     .query(async ({ input, ctx }) => {

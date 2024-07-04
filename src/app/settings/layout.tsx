@@ -17,7 +17,7 @@ export default function SettingsLayout({ children }: { children: ReactNode }) {
   return (
     <div className="col-span-12 flex w-full flex-row justify-center py-4 md:col-span-8 md:col-start-3">
       {/* TODO add settings menu for mobile that is hidden above md */}
-      <div className="flex w-full max-w-[800px] flex-col px-2 lg:grid lg:grid-cols-4 lg:gap-3">
+      <div className="flex w-full flex-col lg:grid lg:grid-cols-4 lg:gap-3">
         <div className="col-span-1 hidden flex-col gap-1 lg:flex">
           {settingsTabs.map((t) => {
             return (
