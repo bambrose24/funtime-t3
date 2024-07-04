@@ -4,8 +4,8 @@ import { Loader2 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Card, CardContent, CardHeader } from "~/components/ui/card";
-import { loginSchema } from "~/lib/schemas/auth";
-import { z } from "zod";
+import { loginSchema, loginSearchParamsSchema } from "~/lib/schemas/auth";
+import { type z } from "zod";
 import { Input } from "~/components/ui/input";
 import { Button } from "~/components/ui/button";
 import { Text } from "~/components/ui/text";
@@ -16,10 +16,6 @@ import { Alert, AlertDescription } from "~/components/ui/alert";
 
 type LoginFormType = z.infer<typeof loginSchema>;
 
-const searchParamsSchema = z.object({
-  message: z.enum(["create-league"]).optional(),
-});
-
 export default function LoginPage() {
   const form = useForm<LoginFormType>({
     resolver: zodResolver(loginSchema),
@@ -27,8 +23,8 @@ export default function LoginPage() {
   });
 
   const searchParamsRaw = useSearchParams();
-  const searchParams = searchParamsSchema.safeParse({
-    message: searchParamsRaw.get("message"),
+  const searchParams = loginSearchParamsSchema.safeParse({
+    action: searchParamsRaw.get("action"),
   });
 
   const {
@@ -45,9 +41,17 @@ export default function LoginPage() {
         <CardContent>
           <form action={login}>
             <div className="flex flex-col gap-4">
-              {searchParams.data?.message && (
-                <LoginMessage message={searchParams.data.message} />
+              {searchParams.data?.action && (
+                <>
+                  <LoginMessage action={searchParams.data.action} />
+                  <input
+                    type="hidden"
+                    name="action"
+                    value={searchParams.data.action}
+                  />
+                </>
               )}
+
               <div className="flex flex-col gap-3">
                 <Input
                   placeholder="Email"
@@ -108,11 +112,11 @@ function LoginButton({ hasErrors }: { hasErrors: boolean }) {
 }
 
 function LoginMessage({
-  message,
+  action,
 }: {
-  message: NonNullable<z.infer<typeof searchParamsSchema>["message"]>;
+  action: NonNullable<z.infer<typeof searchParamsSchema>["action"]>;
 }) {
-  switch (message) {
+  switch (action) {
     case "create-league":
       return (
         <Alert>

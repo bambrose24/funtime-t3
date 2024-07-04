@@ -2,15 +2,16 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { loginSchema } from "~/lib/schemas/auth";
+import { fullLoginFormSchema } from "~/lib/schemas/auth";
 import { supabaseServer } from "~/utils/supabase/server";
 
 export async function login(formData: FormData) {
   const supabase = supabaseServer();
 
-  const { email, password } = loginSchema.parse({
+  const { email, password, action } = fullLoginFormSchema.parse({
     email: formData.get("email"),
     password: formData.get("password"),
+    action: formData.get("action"),
   });
 
   const { error } = await supabase.auth.signInWithPassword({ email, password });
@@ -19,7 +20,13 @@ export async function login(formData: FormData) {
     redirect("/error");
   }
   revalidatePath("/", "layout");
-  redirect("/");
+
+  switch (action) {
+    case "create-league":
+      redirect("/league/create");
+    default:
+      redirect("/");
+  }
 }
 
 export async function signup(formData: FormData) {
