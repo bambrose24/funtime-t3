@@ -3,7 +3,7 @@ import "~/styles/globals.css";
 import { Inter } from "next/font/google";
 
 import { TRPCReactProvider } from "~/trpc/react";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { ThemeProvider } from "../components/theme-provider";
 import { cn } from "~/lib/utils";
 import { Toaster } from "~/components/ui/sonner";
@@ -22,6 +22,13 @@ export const metadata: Metadata = {
   icons: [{ rel: "icon", url: "/favicon.ico" }],
 };
 
+export const viewport: Viewport = {
+  initialScale: 1,
+  width: "device-width",
+  maximumScale: 1,
+  viewportFit: "cover",
+};
+
 export default function RootLayout({
   children,
 }: {
@@ -33,12 +40,6 @@ export default function RootLayout({
       suppressHydrationWarning
       className="min-h-screen overflow-y-auto"
     >
-      <head>
-        <meta
-          name="viewport"
-          content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover"
-        />
-      </head>
       <body
         className={cn(inter.variable, `min-w-screen min-h-screen font-sans`)}
       >
