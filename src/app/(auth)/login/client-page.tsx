@@ -5,20 +5,30 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Card, CardContent, CardHeader } from "~/components/ui/card";
 import { loginSchema } from "~/lib/schemas/auth";
-import { type z } from "zod";
+import { z } from "zod";
 import { Input } from "~/components/ui/input";
 import { Button } from "~/components/ui/button";
 import { Text } from "~/components/ui/text";
 import { login } from "./actions";
 import { useFormStatus } from "react-dom";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Alert, AlertDescription } from "~/components/ui/alert";
 
 type LoginFormType = z.infer<typeof loginSchema>;
+
+const searchParamsSchema = z.object({
+  message: z.enum(["create-league"]).optional(),
+});
 
 export default function LoginPage() {
   const form = useForm<LoginFormType>({
     resolver: zodResolver(loginSchema),
     reValidateMode: "onChange",
+  });
+
+  const searchParamsRaw = useSearchParams();
+  const searchParams = searchParamsSchema.safeParse({
+    message: searchParamsRaw.get("message"),
   });
 
   const {
@@ -35,6 +45,9 @@ export default function LoginPage() {
         <CardContent>
           <form action={login}>
             <div className="flex flex-col gap-4">
+              {searchParams.data?.message && (
+                <LoginMessage message={searchParams.data.message} />
+              )}
               <div className="flex flex-col gap-3">
                 <Input
                   placeholder="Email"
@@ -92,4 +105,21 @@ function LoginButton({ hasErrors }: { hasErrors: boolean }) {
       Login
     </Button>
   );
+}
+
+function LoginMessage({
+  message,
+}: {
+  message: NonNullable<z.infer<typeof searchParamsSchema>["message"]>;
+}) {
+  switch (message) {
+    case "create-league":
+      return (
+        <Alert>
+          <AlertDescription>
+            You need to log in or sign up to create a league.
+          </AlertDescription>
+        </Alert>
+      );
+  }
 }

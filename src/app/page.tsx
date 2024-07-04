@@ -13,12 +13,8 @@ export default async function Home() {
     serverApi.session.current(),
   ]);
 
-  if (!session) {
-    redirect("/login");
-  }
-
   return (
-    <div className="col-span-10 col-start-2 flex w-full grow flex-row flex-wrap justify-around gap-4 py-4">
+    <div className="col-span-12 flex w-full grow flex-row flex-wrap justify-around gap-4 py-4">
       {data?.map((d) => {
         if (!d) {
           return null;

@@ -3,7 +3,7 @@
 import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Button } from "~/components/ui/button";
+import { Button, buttonVariants } from "~/components/ui/button";
 import {
   Card,
   CardContent,
@@ -13,17 +13,19 @@ import {
 } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
 import { z } from "zod";
+import Link from "next/link";
+import { cn } from "~/lib/utils";
 
 export function JoinOrCreateALeague() {
   return (
-    <div className="grid max-w-[900px] grid-cols-1 justify-between gap-4 lg:grid-cols-2">
-      <div className="col-span-1">
+    <>
+      <div className="col-span-12">
         <JoinLeagueCard />
       </div>
-      <div className="col-span-1">
+      <div className="col-span-12">
         <CreateLeagueCard />
       </div>
-    </div>
+    </>
   );
 }
 
@@ -38,7 +40,12 @@ function CreateLeagueCard() {
         here.
       </CardContent>
       <CardFooter>
-        <Button>Create a League</Button>
+        <Link
+          className={cn(buttonVariants({ variant: "default" }), "w-full")}
+          href="/league/create"
+        >
+          Create a League
+        </Link>
       </CardFooter>
     </Card>
   );
@@ -70,7 +77,7 @@ function JoinLeagueCard() {
         If you know about a league, you can enter the code here.
       </CardContent>
       <CardFooter>
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <form onSubmit={handleSubmit(onSubmit)} className="w-full">
           <div className="flex flex-col gap-2">
             <Input id="leagueCode" {...register("leagueCode")} />
             {errors.leagueCode && <span>This field is required.</span>}
