@@ -5,7 +5,7 @@ export const loginSchema = z.object({
 });
 
 export const loginSearchParamsSchema = z.object({
-  action: z.enum(["create-league"]).optional(),
+  action: z.enum(["create-league"]).nullable().optional(),
 });
 
 export const fullLoginFormSchema = loginSearchParamsSchema.merge(loginSchema);
