@@ -226,7 +226,10 @@ export const leagueRouter = createTRPCRouter({
 
   createForm: authorizedProcedure.query(() => {
     return {
-      latePolicy: LatePolicy,
+      latePolicy: [
+        LatePolicy.allow_late_and_lock_after_start,
+        LatePolicy.close_at_first_game_start,
+      ],
       pickPolicy: PickPolicy,
       reminderPolicy: ReminderPolicy,
       scoringType: ScoringType,
