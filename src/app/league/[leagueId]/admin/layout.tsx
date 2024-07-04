@@ -34,7 +34,7 @@ export default async function LeagueAdminPage({
       <div className="col-span-5 flex justify-center">
         <Text.H2>{league.name} — Admin Settings</Text.H2>
       </div>
-      <div className="col-span-1 hidden flex-col lg:flex">
+      <div className="col-span-1 hidden flex-col gap-2 lg:flex">
         <AdminNav leagueId={league.league_id} />
       </div>
       <div className="col-span-5 lg:col-span-4">{children}</div>
