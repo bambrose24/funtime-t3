@@ -27,6 +27,7 @@ export function ForgotPasswordClient() {
 
   const onSubmit: SubmitHandler<ForgotPasswordFormType> = async ({ email }) => {
     const redirectTo = `${typeof window !== "undefined" ? window.location.origin : "http://localhost:3000"}/confirm-reset-password`;
+    console.log("redirectTo?", redirectTo);
     const clientSupabase = createSupabaseBrowser();
     const { error } = await clientSupabase.auth.resetPasswordForEmail(email, {
       redirectTo,
