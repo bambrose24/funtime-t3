@@ -46,7 +46,7 @@ export function ConfirmResetPasswordClient() {
     password2,
   }) => {
     if (password1 !== password2) {
-      throw new Error("Passwords must matchhhh");
+      throw new Error("Passwords must match");
     }
     const clientSupabase = createSupabaseBrowser();
     const { error } = await clientSupabase.auth.updateUser({
@@ -68,8 +68,8 @@ export function ConfirmResetPasswordClient() {
   };
 
   return (
-    <div className="col-span-8 col-start-3 flex flex-col items-center p-2 pt-8 md:col-span-4 md:col-start-5 2xl:col-span-2 2xl:col-start-6">
-      <Card className="md:w-[300px]">
+    <div className="col-span-12 flex flex-col items-center p-2 pt-8 md:col-span-4 md:col-start-5 2xl:col-span-2 2xl:col-start-5">
+      <Card className="w-full">
         <CardHeader>Confirm Password Reset</CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)}>

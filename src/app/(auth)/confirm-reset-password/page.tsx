@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { ConfirmResetPasswordClient } from "./ConfirmResetPasswordClient";
+import { ConfirmResetPasswordClient } from "./client-page";
 
 export default async function ConfirmResetPasswordPage({
   searchParams,

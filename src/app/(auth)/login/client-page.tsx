@@ -29,8 +29,8 @@ export default function LoginPage() {
   const router = useRouter();
 
   return (
-    <div className="col-span-8 col-start-3 flex flex-col items-center p-2 pt-8 md:col-span-4 md:col-start-5 2xl:col-span-2 2xl:col-start-6">
-      <Card className="md:w-[300px]">
+    <div className="col-span-12 flex flex-col items-center p-2 pt-8 md:col-span-4 md:col-start-5 2xl:col-span-2 2xl:col-start-5">
+      <Card className="w-full">
         <CardHeader>Login</CardHeader>
         <CardContent>
           <form action={login}>
