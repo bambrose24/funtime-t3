@@ -114,7 +114,7 @@ function LoginButton({ hasErrors }: { hasErrors: boolean }) {
 function LoginMessage({
   action,
 }: {
-  action: NonNullable<z.infer<typeof searchParamsSchema>["action"]>;
+  action: NonNullable<z.infer<typeof loginSearchParamsSchema>["action"]>;
 }) {
   switch (action) {
     case "create-league":

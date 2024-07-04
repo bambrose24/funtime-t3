@@ -24,9 +24,8 @@ export async function login(formData: FormData) {
   switch (action) {
     case "create-league":
       redirect("/league/create");
-    default:
-      redirect("/");
   }
+  redirect("/");
 }
 
 export async function signup(formData: FormData) {
