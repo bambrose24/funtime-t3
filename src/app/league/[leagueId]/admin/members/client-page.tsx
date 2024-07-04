@@ -57,7 +57,7 @@ export function LeagueAdminMembersClientPage({
                 <TableRow key={member.membership_id}>
                   <TableCell className="font-medium">
                     <Link
-                      href={`/league/${leagueId}/member/${member.membership_id}`}
+                      href={`/league/${leagueId}/player/${member.membership_id}`}
                       className="hover:underline"
                     >
                       {member.people.username}
