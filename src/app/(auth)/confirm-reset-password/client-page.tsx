@@ -36,8 +36,6 @@ export function ConfirmResetPasswordClient() {
     mode: "onBlur",
   });
 
-  const router = useRouter();
-
   // eslint-disable-next-line @typescript-eslint/unbound-method
   const { invalidate } = clientApi.useUtils();
 

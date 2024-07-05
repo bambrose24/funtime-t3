@@ -26,8 +26,6 @@ import {
 } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
 import { clientApi } from "~/trpc/react";
-import { useRedirectToParam } from "~/utils/hooks/useRedirectToParam";
-import { createSupabaseBrowser } from "~/utils/supabase/client";
 
 const signupFormSchema = z.object({
   username: z.string().min(5),
@@ -50,13 +48,11 @@ export function ConfirmSignupClientPage() {
   const onSubmit: Parameters<typeof form.handleSubmit>[0] = async (data) => {
     const { username, firstName, lastName } = data;
 
-    const supabase = createSupabaseBrowser();
+    await funtimeSignup({ firstName, lastName, username });
 
-    const emailRedirectTo = `${window.location.href}/confirm-signup`;
+    toast.success(`Successfully signed up!`);
 
-    await funtimeSignup({});
-
-    toast.success(`Check your email to confirm your signup.`);
+    window.location.href = "/";
   };
 
   return (

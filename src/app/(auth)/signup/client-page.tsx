@@ -25,8 +25,6 @@ import {
   FormMessage,
 } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
-import { clientApi } from "~/trpc/react";
-import { useRedirectToParam } from "~/utils/hooks/useRedirectToParam";
 import { createSupabaseBrowser } from "~/utils/supabase/client";
 
 const signupFormSchema = z
