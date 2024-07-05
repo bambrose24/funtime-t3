@@ -4,26 +4,16 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { buttonVariants } from "~/components/ui/button";
 import { cn } from "~/lib/utils";
+import { getNavOptions } from "./nav-options";
 
 export function AdminNav({ leagueId }: { leagueId: number }) {
   const baseHref = `/league/${leagueId}/admin`;
 
   const pathname = usePathname();
 
-  const links: Array<{ href: string; display: string }> = [
-    {
-      href: baseHref,
-      display: "General",
-    },
-    {
-      href: `${baseHref}/members`,
-      display: "Members",
-    },
-  ];
-
   return (
     <>
-      {links.map(({ href, display }, idx) => {
+      {getNavOptions(baseHref).map(({ href, display }, idx) => {
         return (
           <Link
             key={idx}

@@ -3,6 +3,17 @@ import { MemberRole } from "~/generated/prisma-client";
 import { serverApi } from "~/trpc/server";
 import { Text } from "~/components/ui/text";
 import { AdminNav } from "./admin-nav";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "~/components/ui/dropdown-menu";
+import { Button } from "~/components/ui/button";
+import Link from "next/link";
+import { getNavOptions } from "./nav-options";
+import { AdminTabTitle } from "./tab-title";
+import { ChevronsUpDown } from "lucide-react";
 
 type Props = {
   params: {
@@ -29,10 +40,37 @@ export default async function LeagueAdminPage({
     notFound();
   }
 
+  const baseHref = `/league/${leagueId}/admin`;
+
   return (
     <div className="col-span-12 grid w-full grid-cols-5 justify-center gap-2 py-4 md:col-span-10 md:col-start-2">
-      <div className="col-span-5 flex justify-center">
-        <Text.H2>{league.name} — Admin Settings</Text.H2>
+      <div className="col-span-5 flex flex-col items-center">
+        <Text.H2>{league.name} — Admin</Text.H2>
+      </div>
+      <div className="col-span-5 grid lg:hidden">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" className="w-full">
+              <div className="flex flex-row items-center gap-2">
+                <AdminTabTitle leagueId={leagueId} />
+                <ChevronsUpDown className="h-3 w-3" />
+              </div>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            {getNavOptions(baseHref).map((option, idx) => {
+              return (
+                <Link key={idx} href={option.href}>
+                  <DropdownMenuItem>
+                    <div className="flex flex-row items-center gap-3">
+                      {option.display}
+                    </div>
+                  </DropdownMenuItem>
+                </Link>
+              );
+            })}
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
       <div className="col-span-1 hidden flex-col gap-2 lg:flex">
         <AdminNav leagueId={league.league_id} />
