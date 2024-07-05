@@ -1,6 +1,6 @@
 "use client";
 
-import { Card, CardContent, CardHeader } from "~/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { clientApi } from "~/trpc/react";
 import { type RouterOutputs } from "~/trpc/types";
 import { Text } from "~/components/ui/text";
@@ -36,7 +36,7 @@ export function LeagueAdminMembersClientPage({
   return (
     <Card>
       <CardHeader>
-        <Text.H3>Members</Text.H3>
+        <CardTitle>Members</CardTitle>
       </CardHeader>
       <CardContent>
         <Table>

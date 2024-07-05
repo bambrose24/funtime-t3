@@ -1,6 +1,6 @@
 "use client";
 
-import { Card, CardContent, CardHeader } from "~/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { type RouterOutputs } from "~/trpc/types";
 import { Text } from "~/components/ui/text";
 import { Button } from "~/components/ui/button";
@@ -15,7 +15,7 @@ export function LeagueAdminClientPage({ league }: Props) {
   return (
     <Card>
       <CardHeader>
-        <Text.H3>General</Text.H3>
+        <CardTitle>General</CardTitle>
       </CardHeader>
       <CardContent className="w-full">
         <div className="flex flex-row">
