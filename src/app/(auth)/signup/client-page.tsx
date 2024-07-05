@@ -60,15 +60,14 @@ export function SignupClientPage() {
     const { email, password1: password } = data;
 
     const supabase = createSupabaseBrowser();
-    const params = new URLSearchParams({
-      ...(redirectTo && { redirectTo }),
-    });
+
+    const emailRedirectTo = `${window.location.href}/confirm-signup`;
 
     const signupResponse = await supabase.auth.signUp({
       email,
       password,
       options: {
-        emailRedirectTo: `${window.location.href}/confirm-signup?${params.toString()}`,
+        emailRedirectTo,
       },
     });
 
@@ -209,7 +208,9 @@ export function SignupClientPage() {
                   type="submit"
                   className="w-full"
                   disabled={
-                    !form.formState.isValid || form.formState.isSubmitting
+                    !form.formState.isValid ||
+                    form.formState.isSubmitting ||
+                    form.formState.isSubmitSuccessful
                   }
                 >
                   {form.formState.isSubmitting && (
