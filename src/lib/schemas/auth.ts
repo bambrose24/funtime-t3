@@ -4,12 +4,6 @@ export const loginSchema = z.object({
   password: z.string(),
 });
 
-export const loginSearchParamsSchema = z.object({
-  action: z.enum(["create-league"]).nullable().optional(),
-});
-
-export const fullLoginFormSchema = loginSearchParamsSchema.merge(loginSchema);
-
 export const forgotPasswordSchema = z.object({
   email: z.string().email(),
 });

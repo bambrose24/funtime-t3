@@ -53,7 +53,7 @@ export default function RootLayout({
             >
               <Nav />
               <div className="grid grid-cols-12 gap-4 p-2">{children}</div>
-              <Toaster position="bottom-right" />
+              <Toaster position="bottom-right" richColors duration={5000} />
               <AxiomWebVitals />
             </ThemeProvider>
           </UserProviderServer>

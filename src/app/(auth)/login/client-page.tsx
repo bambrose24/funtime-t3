@@ -3,127 +3,163 @@
 import { Loader2 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Card, CardContent, CardHeader } from "~/components/ui/card";
-import { loginSchema, loginSearchParamsSchema } from "~/lib/schemas/auth";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "~/components/ui/card";
+import { loginSchema } from "~/lib/schemas/auth";
 import { type z } from "zod";
 import { Input } from "~/components/ui/input";
 import { Button } from "~/components/ui/button";
-import { Text } from "~/components/ui/text";
-import { login } from "./actions";
-import { useFormStatus } from "react-dom";
-import { useRouter, useSearchParams } from "next/navigation";
 import { Alert, AlertDescription } from "~/components/ui/alert";
+import Link from "next/link";
+import { Label } from "~/components/ui/label";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "~/components/ui/form";
+import { toast } from "sonner";
+import { createSupabaseBrowser } from "~/utils/supabase/client";
+import { useRedirectToParam } from "~/utils/hooks/useRedirectToParam";
 
 type LoginFormType = z.infer<typeof loginSchema>;
 
-export default function LoginPage() {
+export function LoginClientPage() {
   const form = useForm<LoginFormType>({
     resolver: zodResolver(loginSchema),
     reValidateMode: "onChange",
   });
 
-  const searchParamsRaw = useSearchParams();
-  const searchParams = loginSearchParamsSchema.safeParse({
-    action: searchParamsRaw.get("action"),
-  });
+  const redirectTo = useRedirectToParam();
 
-  const {
-    register,
-    formState: { errors },
-  } = form;
+  const onSubmit: Parameters<typeof form.handleSubmit>[0] = async (data) => {
+    const { email, password } = data;
+    const supabase = createSupabaseBrowser();
+    const authResponse = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
 
-  const router = useRouter();
+    if (authResponse.error) {
+      toast.error(`Error signing in - ${authResponse.error.message}`);
+      return;
+    }
+
+    toast.success(`Successfully logged in.`);
+
+    window.location.href = redirectTo ?? "/";
+  };
 
   return (
-    <div className="col-span-12 flex flex-col items-center p-2 pt-8 md:col-span-4 md:col-start-5 2xl:col-span-2 2xl:col-start-5">
-      <Card className="w-full">
-        <CardHeader>Login</CardHeader>
-        <CardContent>
-          <form action={login}>
-            <div className="flex flex-col gap-4">
-              {searchParams.data?.action && (
-                <>
-                  <LoginMessage action={searchParams.data.action} />
-                  <input
-                    type="hidden"
-                    name="action"
-                    value={searchParams.data.action}
-                  />
-                </>
+    <div className="col-span-12 flex flex-col items-center p-2 pt-8 md:col-span-6 md:col-start-4 lg:col-span-4 lg:col-start-5 2xl:col-span-2 2xl:col-start-6">
+      <form onSubmit={form.handleSubmit(onSubmit)}>
+        <Form {...form}>
+          <Card className="w-full">
+            <CardHeader>
+              <CardTitle className="text-2xl">Login</CardTitle>
+              <CardDescription>
+                Enter your email below to login to your account
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {redirectTo && (
+                <div className="pb-3">
+                  <LoginMessage redirectTo={redirectTo} />
+                </div>
               )}
-
-              <div className="flex flex-col gap-3">
-                <Input
-                  placeholder="Email"
-                  type="email"
-                  {...register("email")}
-                />
-                {errors.email && (
-                  <span>{errors.email.message?.toString()}</span>
-                )}
-                <Input
-                  placeholder="Password"
-                  type="password"
-                  {...register("password")}
-                />
-                {errors.password && (
-                  <span>
-                    <Text.Small>
-                      {errors.password.message?.toString()}
-                    </Text.Small>
-                  </span>
-                )}
-              </div>
-              <div className="flex flex-col gap-2">
-                <LoginButton
-                  hasErrors={Boolean(errors.email) || Boolean(errors.password)}
-                />
+              <div className="grid gap-4">
+                <div className="grid gap-2">
+                  <FormField
+                    control={form.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Email</FormLabel>
+                        <FormControl>
+                          <Input {...field} type="email" required />
+                        </FormControl>
+                        <FormDescription />
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <FormField
+                    control={form.control}
+                    name="password"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>
+                          <div className="flex items-center">
+                            <Label htmlFor="password">Password</Label>
+                            <Link
+                              href="/forgot-password"
+                              className="ml-auto inline-block text-sm underline"
+                            >
+                              Forgot your password?
+                            </Link>
+                          </div>
+                        </FormLabel>
+                        <FormControl>
+                          <Input {...field} type="password" required />
+                        </FormControl>
+                        <FormDescription />
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
                 <Button
                   className="w-full"
-                  variant="outline"
-                  type="button"
-                  onClick={() => {
-                    router.push("/forgot-password");
-                  }}
+                  type="submit"
+                  disabled={
+                    form.formState.isSubmitting ||
+                    form.formState.isSubmitted ||
+                    !form.formState.isValid
+                  }
                 >
-                  Forgot Password?
+                  {form.formState.isSubmitting && (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  )}
+                  Login
                 </Button>
               </div>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
+              <div className="mt-4 text-center text-sm">
+                Don&apos;t have an account?{" "}
+                <Link href="/signup" className="underline">
+                  Sign up
+                </Link>
+              </div>
+            </CardContent>
+          </Card>
+        </Form>
+      </form>
     </div>
   );
 }
 
-function LoginButton({ hasErrors }: { hasErrors: boolean }) {
-  const { pending } = useFormStatus();
-  return (
-    <Button
-      className="w-full"
-      formAction={login}
-      disabled={hasErrors || pending}
-    >
-      {pending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-      Login
-    </Button>
-  );
-}
-
-function LoginMessage({
-  action,
-}: {
-  action: NonNullable<z.infer<typeof loginSearchParamsSchema>["action"]>;
-}) {
-  switch (action) {
-    case "create-league":
-      return (
-        <Alert>
-          <AlertDescription>
-            You need to log in or sign up to create a league.
-          </AlertDescription>
-        </Alert>
-      );
+function LoginMessage({ redirectTo }: { redirectTo: string }) {
+  if (redirectTo.includes("/league/create")) {
+    return (
+      <Alert>
+        <AlertDescription>
+          You need to log in or{" "}
+          <Link href="/signup" className="underline">
+            sign up
+          </Link>{" "}
+          to create a league.
+        </AlertDescription>
+      </Alert>
+    );
   }
+  return null;
 }

@@ -68,7 +68,7 @@ export function ConfirmResetPasswordClient() {
   };
 
   return (
-    <div className="col-span-12 flex flex-col items-center p-2 pt-8 md:col-span-4 md:col-start-5 2xl:col-span-2 2xl:col-start-5">
+    <div className="col-span-12 flex flex-col items-center p-2 pt-8 md:col-span-6 md:col-start-4 lg:col-span-4 lg:col-start-5 2xl:col-span-2 2xl:col-start-6">
       <Card className="w-full">
         <CardHeader>Confirm Password Reset</CardHeader>
         <CardContent>

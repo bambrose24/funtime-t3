@@ -14,7 +14,10 @@ export default async function CreateLeaguePage({
 }) {
   const session = await serverApi.session.current();
   if (!session.dbUser) {
-    redirect("/login?action=create-league");
+    const params = new URLSearchParams({
+      redirectTo: "/league/create",
+    });
+    redirect(`/login?${params.toString()}`);
   }
   const params = paramsSchema.safeParse(searchParams);
   const priorLeagueId = params.data?.priorLeagueId;

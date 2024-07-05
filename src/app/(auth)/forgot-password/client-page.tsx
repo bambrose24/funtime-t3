@@ -3,7 +3,13 @@
 import { type SubmitHandler, useForm } from "react-hook-form";
 import { forgotPasswordSchema } from "~/lib/schemas/auth";
 import { type z } from "zod";
-import { Card, CardContent, CardHeader } from "~/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "~/components/ui/card";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "~/components/ui/input";
 import { Button } from "~/components/ui/button";
@@ -27,7 +33,6 @@ export function ForgotPasswordClient() {
 
   const onSubmit: SubmitHandler<ForgotPasswordFormType> = async ({ email }) => {
     const redirectTo = `${typeof window !== "undefined" ? window.location.origin : "http://localhost:3000"}/confirm-reset-password`;
-    console.log("redirectTo?", redirectTo);
     const clientSupabase = createSupabaseBrowser();
     const { error } = await clientSupabase.auth.resetPasswordForEmail(email, {
       redirectTo,
@@ -45,9 +50,14 @@ export function ForgotPasswordClient() {
   };
 
   return (
-    <div className="col-span-12 flex flex-col items-center p-2 pt-8 md:col-span-4 md:col-start-5 2xl:col-span-2 2xl:col-start-5">
+    <div className="col-span-12 flex flex-col items-center p-2 pt-8 md:col-span-6 md:col-start-4 lg:col-span-4 lg:col-start-5 2xl:col-span-2 2xl:col-start-6">
       <Card className="w-full">
-        <CardHeader>Reset Password</CardHeader>
+        <CardHeader>
+          <CardTitle className="text-2xl">Reset Password</CardTitle>
+          <CardDescription>
+            Enter your email to get a password-reset email.
+          </CardDescription>
+        </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="flex flex-col gap-4">
