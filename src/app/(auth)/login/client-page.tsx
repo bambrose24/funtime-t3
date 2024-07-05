@@ -84,7 +84,12 @@ export function LoginClientPage() {
                       <FormItem>
                         <FormLabel>Email</FormLabel>
                         <FormControl>
-                          <Input {...field} type="email" required />
+                          <Input
+                            {...field}
+                            type="email"
+                            required
+                            tabIndex={1}
+                          />
                         </FormControl>
                         <FormDescription />
                         <FormMessage />
@@ -104,13 +109,19 @@ export function LoginClientPage() {
                             <Link
                               href="/forgot-password"
                               className="ml-auto inline-block text-sm underline"
+                              tabIndex={3}
                             >
                               Forgot your password?
                             </Link>
                           </div>
                         </FormLabel>
                         <FormControl>
-                          <Input {...field} type="password" required />
+                          <Input
+                            {...field}
+                            type="password"
+                            required
+                            tabIndex={2}
+                          />
                         </FormControl>
                         <FormDescription />
                         <FormMessage />
@@ -135,7 +146,7 @@ export function LoginClientPage() {
               </div>
               <div className="mt-4 text-center text-sm">
                 Don&apos;t have an account?{" "}
-                <Link href="/signup" className="underline">
+                <Link href="/signup" className="underline" tabIndex={4}>
                   Sign up
                 </Link>
               </div>
