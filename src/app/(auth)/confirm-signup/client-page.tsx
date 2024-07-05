@@ -29,62 +29,32 @@ import { clientApi } from "~/trpc/react";
 import { useRedirectToParam } from "~/utils/hooks/useRedirectToParam";
 import { createSupabaseBrowser } from "~/utils/supabase/client";
 
-const signupFormSchema = z
-  .object({
-    email: z.string().email(),
-    password1: z.string().min(8, "Must be at least 8 characters"),
-    password2: z.string().min(8, "Must be at least 8 characters"),
+const signupFormSchema = z.object({
+  username: z.string().min(5),
+  firstName: z.string(),
+  lastName: z.string(),
+});
 
-    // on confirm-signup page
-    // username: z.string().min(5),
-    // firstName: z.string(),
-    // lastName: z.string(),
-  })
-  .superRefine((data, ctx) => {
-    if (data.password1 !== data.password2) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["password2"],
-        message: "Passwords don't match",
-      });
-    }
-  });
-
-export function SignupClientPage() {
+export function ConfirmSignupClientPage() {
   const form = useForm<z.infer<typeof signupFormSchema>>({
     resolver: zodResolver(signupFormSchema),
     defaultValues: {
-      email: "",
-      password1: "",
-      password2: "",
+      username: "",
+      firstName: "",
+      lastName: "",
     },
   });
 
+  const { mutateAsync: funtimeSignup } = clientApi.auth.signup.useMutation();
+
   const onSubmit: Parameters<typeof form.handleSubmit>[0] = async (data) => {
-    const { email, password1: password } = data;
+    const { username, firstName, lastName } = data;
 
     const supabase = createSupabaseBrowser();
 
     const emailRedirectTo = `${window.location.href}/confirm-signup`;
 
-    const signupResponse = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo,
-      },
-    });
-
-    if (signupResponse.error) {
-      toast.error(`Error signing up - ${signupResponse.error.message}`);
-      throw signupResponse.error;
-    }
-
-    if (!signupResponse.data.user?.id) {
-      const message = `Error signing up. That email might be taken already.`;
-      toast.error(message);
-      throw new Error(message);
-    }
+    await funtimeSignup({});
 
     toast.success(`Check your email to confirm your signup.`);
   };
@@ -103,7 +73,7 @@ export function SignupClientPage() {
             </CardHeader>
             <CardContent>
               <div className="grid">
-                {/* <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-4">
                   <div className="grid gap-2">
                     <FormField
                       control={form.control}
@@ -136,29 +106,8 @@ export function SignupClientPage() {
                       )}
                     />
                   </div>
-                </div> */}
-                <div className="grid gap-2">
-                  <FormField
-                    control={form.control}
-                    name="email"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Email</FormLabel>
-                        <FormControl>
-                          <Input
-                            {...field}
-                            type="email"
-                            required
-                            placeholder="example@gmail.com"
-                          />
-                        </FormControl>
-                        <FormDescription />
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
                 </div>
-                {/* <div className="grid gap-2">
+                <div className="grid gap-2">
                   <FormField
                     control={form.control}
                     name="username"
@@ -171,38 +120,6 @@ export function SignupClientPage() {
                             required
                             placeholder="john_doe123"
                           />
-                        </FormControl>
-                        <FormDescription />
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div> */}
-                <div className="grid gap-2">
-                  <FormField
-                    control={form.control}
-                    name="password1"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Password</FormLabel>
-                        <FormControl>
-                          <Input {...field} type="password" required />
-                        </FormControl>
-                        <FormDescription />
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <FormField
-                    control={form.control}
-                    name="password2"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Confirm Password</FormLabel>
-                        <FormControl>
-                          <Input {...field} type="password" required />
                         </FormControl>
                         <FormDescription />
                         <FormMessage />
@@ -226,9 +143,7 @@ export function SignupClientPage() {
                   {form.formState.isSubmitting && (
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   )}
-                  {form.formState.isSubmitSuccessful
-                    ? "Check your email"
-                    : "Create an account"}
+                  Finish Signup
                 </Button>
                 <div>
                   Already have an account?{" "}

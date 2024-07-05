@@ -11,11 +11,9 @@ export const supabaseServer = () => {
     {
       cookies: {
         getAll() {
-          console.log("getting all cookies...");
           return cookieStore.getAll();
         },
         setAll(cookiesToSet) {
-          console.log("setting all cookies...", cookiesToSet);
           cookiesToSet.forEach(({ name, value, options }) =>
             cookieStore.set(name, value, options),
           );

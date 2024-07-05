@@ -59,12 +59,11 @@ export function ConfirmResetPasswordClient() {
     }
 
     await revalidatePathServerAction("/", "layout");
-
     await invalidate();
 
     toast.success("Successfully reset your password.");
 
-    router.push("/");
+    window.location.href = "/";
   };
 
   return (
