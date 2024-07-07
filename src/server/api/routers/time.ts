@@ -31,7 +31,7 @@ export const timeRouter = createTRPCRouter({
           ts: true,
         },
         orderBy: {
-          ts: "asc",
+          ts: "desc",
         },
       });
 
