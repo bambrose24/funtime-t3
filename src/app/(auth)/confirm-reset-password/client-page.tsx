@@ -13,7 +13,6 @@ import { toast } from "sonner";
 import { clientApi } from "~/trpc/react";
 import { revalidatePathServerAction } from "../actions";
 import * as Yup from "yup";
-import { useRouter } from "next/navigation";
 
 type ForgotPasswordFormType = z.infer<typeof confirmResetPasswordSchema>;
 

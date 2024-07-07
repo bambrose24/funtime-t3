@@ -49,6 +49,9 @@ export const leaderboardRouter = createTRPCRouter({
             _count: {
               correct: true,
             },
+            orderBy: {
+              week: "asc",
+            },
           });
 
           const maxWeek = Math.max(...groupedPicks.map((p) => p.week));
@@ -85,6 +88,30 @@ export const leaderboardRouter = createTRPCRouter({
             return prev;
           }, new Map<number, number>());
 
+          const weeksSorted = [
+            ...new Set(groupedPicks.map((p) => p.week)),
+          ].sort((a, b) => a - b);
+
+          const chartableMembersData: Array<
+            {
+              weekLabel: string;
+              week: number;
+            } & Record<number, number>
+          > = weeksSorted.map((week) => {
+            const memberToWeekTotal = [...weekTotals.entries()].reduce(
+              (prev, [memberId, weekToTotal]) => {
+                prev[memberId] = weekToTotal.get(week) ?? 0;
+                return prev;
+              },
+              {} as Record<number, number>,
+            );
+            return {
+              week,
+              weekLabel: `Week ${week}`,
+              ...memberToWeekTotal,
+            };
+          });
+
           const correctCounts = [...memberToTotal.entries()].map(
             ([member_id, correct]) => {
               return { member: memberIdToMember.get(member_id)!, correct };
@@ -99,7 +126,12 @@ export const leaderboardRouter = createTRPCRouter({
             (x) => x.correct,
           );
 
-          return { league, weekTotals, correctCountsSorted };
+          return {
+            league,
+            weekTotals,
+            chartableMembersData,
+            correctCountsSorted,
+          };
         },
         ["leaderboard_league", leagueId.toString()],
         {

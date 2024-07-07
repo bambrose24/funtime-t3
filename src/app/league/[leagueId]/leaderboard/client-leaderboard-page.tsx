@@ -13,6 +13,7 @@ import * as React from "react";
 
 import { LeaderboardTable } from "./leaderboard-table";
 import { LeaderboardChart } from "./leaderboard-chart";
+import { LeaderboardChart2 } from "./leaderboard-chart-2";
 import { Defined } from "~/utils/defined";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { ScrollArea } from "~/components/ui/scroll-area";
@@ -70,6 +71,21 @@ export function ClientLeaderboardPage(props: Props) {
     );
   });
 
+  const members = [...memberIds]
+    .map((memberId) => {
+      const member = leaderboard?.correctCountsSorted.find(
+        (m) => m.member.membership_id === memberId,
+      );
+      if (!member) {
+        return null;
+      }
+      return {
+        memberId,
+        username: member.member.people.username ?? "",
+      };
+    })
+    .filter(Defined);
+
   useEffect(() => {
     const params = new URLSearchParams(searchParams);
 
@@ -90,6 +106,8 @@ export function ClientLeaderboardPage(props: Props) {
       router.replace(`${pathname}`);
     }
   }, [rowSelection, searchParams, leaderboard, pathname, router]);
+
+  const chartData = leaderboard?.chartableMembersData;
 
   return (
     <>
@@ -119,31 +137,13 @@ export function ClientLeaderboardPage(props: Props) {
             </CardDescription>
           </CardHeader>
           <CardContent className="flex h-full w-full justify-center">
-            <LeaderboardChart
+            {/* <LeaderboardChart
               className="h-[70vh] w-[50vw]"
-              entries={[...(leaderboard?.weekTotals.entries() ?? [])]
-                .filter((m) => {
-                  return memberIds.has(m[0]);
-                })
-                .map((m) => {
-                  const [memberId, weekTotals] = m;
-                  const id =
-                    leaderboard?.correctCountsSorted?.find(
-                      (m) => m.member.membership_id === Number(memberId),
-                    )?.member?.people?.username ?? "";
-
-                  const data = [...weekTotals].map(([week, total]) => {
-                    return {
-                      x: week,
-                      y: total,
-                    };
-                  });
-                  return {
-                    id,
-                    data,
-                  };
-                })}
-            />
+              entries={}
+            /> */}
+            {chartData && (
+              <LeaderboardChart2 data={chartData} members={members} />
+            )}
           </CardContent>
         </Card>
       </div>

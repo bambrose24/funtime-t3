@@ -9,34 +9,47 @@ import {
   CardTitle,
   CardDescription,
   CardContent,
-  CardFooter,
 } from "~/components/ui/card";
 import {
+  type ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
 } from "~/components/ui/chart";
 import { LineChart, CartesianGrid, XAxis, Line } from "recharts";
+import { useMemo } from "react";
+import { type RouterOutputs } from "~/trpc/types";
 
-export default function LeaderboardChart2() {
-  const chartConfig = {
-    desktop: {
-      label: "Desktop",
-      color: "hsl(var(--chart-1))",
-    },
-    mobile: {
-      label: "Mobile",
-      color: "hsl(var(--chart-2))",
-    },
-  };
-  const chartData = [
-    { month: "January", desktop: 186, mobile: 80 },
-    { month: "February", desktop: 305, mobile: 200 },
-    { month: "March", desktop: 237, mobile: 120 },
-    { month: "April", desktop: 73, mobile: 190 },
-    { month: "May", desktop: 209, mobile: 130 },
-    { month: "June", desktop: 214, mobile: 140 },
-  ];
+type Props = {
+  data: NonNullable<
+    RouterOutputs["leaderboard"]["league"]
+  >["chartableMembersData"];
+  members: {
+    memberId: number;
+    username: string;
+  }[];
+};
+
+export function LeaderboardChart2({ data, members }: Props) {
+  const chartConfig = useMemo(() => {
+    return members.reduce((prev, curr, idx) => {
+      prev[curr.memberId] = {
+        color: `hsl(var(--chart-${(idx % 5) + 1}))`,
+        label: curr.username,
+      };
+      return prev;
+    }, {} as ChartConfig);
+  }, [members]);
+
+  // const chartData = [
+  //   { month: "January", desktop: 186, mobile: 80 },
+  //   { month: "February", desktop: 305, mobile: 200 },
+  //   { month: "March", desktop: 237, mobile: 120 },
+  //   { month: "April", desktop: 73, mobile: 190 },
+  //   { month: "May", desktop: 209, mobile: 130 },
+  //   { month: "June", desktop: 214, mobile: 140 },
+  // ];
+
   return (
     <Card>
       <CardHeader>
@@ -44,10 +57,10 @@ export default function LeaderboardChart2() {
         <CardDescription>January - June 2024</CardDescription>
       </CardHeader>
       <CardContent>
-        <ChartContainer config={chartConfig}>
+        <ChartContainer config={chartConfig} className="min-h-[200px]">
           <LineChart
             accessibilityLayer
-            data={chartData}
+            data={data}
             margin={{ left: 12, right: 12 }}
           >
             <CartesianGrid vertical={false} />
@@ -56,7 +69,7 @@ export default function LeaderboardChart2() {
               tickLine={false}
               axisLine={false}
               tickMargin={8}
-              tickFormatter={(value) => value.slice(0, 3)}
+              tickFormatter={(value) => (value as string).slice(0, 3)}
             />
             <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
             <Line
@@ -76,39 +89,6 @@ export default function LeaderboardChart2() {
           </LineChart>
         </ChartContainer>
       </CardContent>
-      <CardFooter>
-        <div className="flex w-full items-start gap-2 text-sm">
-          <div className="grid gap-2">
-            <div className="flex items-center gap-2 font-medium leading-none">
-              Trending up by 5.2% this month{" "}
-              <TrendingUpIcon className="h-4 w-4" />
-            </div>
-            <div className="flex items-center gap-2 leading-none text-muted-foreground">
-              Showing total visitors for the last 6 months
-            </div>
-          </div>
-        </div>
-      </CardFooter>
     </Card>
-  );
-}
-
-function TrendingUpIcon(props) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
-      <polyline points="16 7 22 7 22 13" />
-    </svg>
   );
 }

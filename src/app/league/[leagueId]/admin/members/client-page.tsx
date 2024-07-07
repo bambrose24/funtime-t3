@@ -3,7 +3,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { clientApi } from "~/trpc/react";
 import { type RouterOutputs } from "~/trpc/types";
-import { Text } from "~/components/ui/text";
 import {
   Table,
   TableBody,

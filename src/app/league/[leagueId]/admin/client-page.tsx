@@ -2,7 +2,6 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { type RouterOutputs } from "~/trpc/types";
-import { Text } from "~/components/ui/text";
 import { Button } from "~/components/ui/button";
 import { toast } from "sonner";
 
