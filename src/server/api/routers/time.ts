@@ -10,7 +10,7 @@ const currentWeekSeasonInputSchema = z.object({
 export const timeRouter = createTRPCRouter({
   activeWeekByLeague: publicProcedure
     .input(currentWeekSeasonInputSchema)
-    .query(async ({ input }) => {
+    .query(async ({ input, ctx }) => {
       const { leagueId } = input;
 
       const league = await db.leagues.findFirstOrThrow({
@@ -19,15 +19,23 @@ export const timeRouter = createTRPCRouter({
 
       const { season } = league;
 
-      const gamesBySeason = await getGames({ season });
-
       const now = new Date();
-      const firstGameIdxAfterNow = gamesBySeason.findIndex((g) => {
-        return g.ts > now;
+      const mostRecentStartedGame = await ctx.db.games.findFirst({
+        where: {
+          season,
+          ts: {
+            lte: now,
+          },
+        },
+        select: {
+          week: true,
+          ts: true,
+        },
+        orderBy: {
+          ts: "asc",
+        },
       });
-      if (firstGameIdxAfterNow === -1) {
-        return gamesBySeason.at(firstGameIdxAfterNow);
-      }
-      return gamesBySeason.at(firstGameIdxAfterNow - 1);
+
+      return mostRecentStartedGame;
     }),
 });
