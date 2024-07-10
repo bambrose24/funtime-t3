@@ -3,18 +3,6 @@ import { MemberRole } from "~/generated/prisma-client";
 import { serverApi } from "~/trpc/server";
 import { Text } from "~/components/ui/text";
 import { AdminNav } from "./admin-nav";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "~/components/ui/dropdown-menu";
-import { Button } from "~/components/ui/button";
-import Link from "next/link";
-import { getNavOptions } from "./nav-options";
-import { AdminTabTitle } from "./tab-title";
-import { ChevronsUpDown } from "lucide-react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { MobileAdminNav } from "./mobile-admin-nav";
 
 type Props = {

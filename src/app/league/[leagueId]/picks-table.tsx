@@ -1,6 +1,5 @@
 "use client";
 
-import { type serverApi } from "~/trpc/server";
 import {
   flexRender,
   type ColumnDef,

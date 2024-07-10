@@ -26,7 +26,6 @@ import {
 import { ExternalLink, X } from "lucide-react";
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
