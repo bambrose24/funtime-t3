@@ -140,7 +140,7 @@ export function ClientLeaderboardPage(props: Props) {
               <LeaderboardChart2
                 data={chartData}
                 members={members}
-                className="h-[70vh] w-[50vw]"
+                className="h-[65vh] w-[50vw]"
               />
             )}
           </CardContent>
