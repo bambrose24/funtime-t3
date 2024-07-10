@@ -2,7 +2,6 @@ import { notFound } from "next/navigation";
 import { MemberRole } from "~/generated/prisma-client";
 import { serverApi } from "~/trpc/server";
 import { Text } from "~/components/ui/text";
-import { AdminNav } from "./admin-nav";
 import { MobileAdminNav } from "./mobile-admin-nav";
 
 type Props = {
