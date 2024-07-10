@@ -4,32 +4,31 @@ import { Card, CardContent, CardHeader } from "~/components/ui/card";
 import { Separator } from "~/components/ui/separator";
 import { Text } from "../ui/text";
 import { useMemo } from "react";
-import { Badge } from "../ui/badge";
+import { Badge } from "~/components/ui/badge";
 import Link from "next/link";
 import type { RouterOutputs } from "~/trpc/types";
+import { clientApi } from "~/trpc/react";
+import { Skeleton } from "~/components/ui/skeleton";
 
 type LeagueCardData = NonNullable<RouterOutputs["home"]["summary"]>[number];
 
 export function HomeLeagueCard({ data }: { data: LeagueCardData }) {
   const weekWins = useMemo(() => {
-    return data.league.WeekWinners.map((w) => {
-      return { week: w.week, league_id: data.league.league_id };
+    return data.WeekWinners.map((w) => {
+      return { week: w.week, league_id: data.league_id };
     });
   }, [data]);
 
   return (
-    <Link href={`/league/${data.league.league_id}`} passHref>
+    <Link href={`/league/${data.league_id}`} passHref>
       <Card className="min-w-[240px] flex-grow hover:border-primary">
-        <CardHeader className="text-center font-bold">
-          {data.league.name}
-        </CardHeader>
+        <CardHeader className="text-center font-bold">{data.name}</CardHeader>
         <CardContent>
           <div className="flex w-full flex-col gap-3">
             <div className="flex w-full flex-row justify-between">
               <Text.Small>Correct Picks</Text.Small>
-              <Text.Small className="font-semibold">
-                {data.pickCounts.correct ?? 0} /{" "}
-                {(data.pickCounts.correct ?? 0) + (data.pickCounts.wrong ?? 0)}
+              <Text.Small>
+                <CorrectPicksCounts leagueId={data.league_id} />
               </Text.Small>
             </div>
             <Separator />
@@ -51,5 +50,20 @@ export function HomeLeagueCard({ data }: { data: LeagueCardData }) {
         </CardContent>
       </Card>
     </Link>
+  );
+}
+
+function CorrectPicksCounts({ leagueId }: { leagueId: number }) {
+  const counts = clientApi.league.correctPickCount.useQuery({
+    leagueId,
+  });
+
+  if (counts.isPending || !counts.data) {
+    return <Skeleton className="h-[18px] w-[60px]" />;
+  }
+  return (
+    <>
+      {counts.data.correct} / {counts.data.total}
+    </>
   );
 }

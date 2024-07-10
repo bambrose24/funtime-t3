@@ -237,4 +237,39 @@ export const leagueRouter = createTRPCRouter({
       scoringType: ScoringType,
     };
   }),
+
+  correctPickCount: authorizedProcedure
+    .input(leagueIdSchema)
+    .query(async ({ ctx, input }) => {
+      const { dbUser } = ctx;
+      const { leagueId } = input;
+      const member = dbUser?.leaguemembers.find(
+        (m) => m.league_id === leagueId,
+      );
+      if (!member) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: `User ${dbUser?.uid} is not in league ${leagueId}`,
+        });
+      }
+
+      const [correct, wrong] = await Promise.all([
+        ctx.db.picks.count({
+          where: {
+            correct: 1,
+            done: 1,
+            member_id: member.membership_id,
+          },
+        }),
+        ctx.db.picks.count({
+          where: {
+            correct: 0,
+            done: 1,
+            member_id: member.membership_id,
+          },
+        }),
+      ]);
+
+      return { leagueId, correct, wrong, total: correct + wrong };
+    }),
 });

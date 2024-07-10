@@ -1,4 +1,4 @@
-import { groupBy } from "lodash";
+import { groupBy, orderBy } from "lodash";
 
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import { cache, getCoreUserTag } from "~/utils/cache";
@@ -53,77 +53,27 @@ export const homeRouter = createTRPCRouter({
     const leagueIds = dbUser.leaguemembers.map((m) => m.league_id).sort();
     const memberIds = dbUser.leaguemembers.map((m) => m.membership_id).sort();
 
-    const leagueIdToMembers = groupBy(dbUser.leaguemembers, (m) => m.league_id);
-
-    const getSummaries = cache(
-      async () => {
-        const [leagues, pickCounts] = await Promise.all([
-          db.leagues.findMany({
-            where: {
-              league_id: {
-                in: leagueIds,
-              },
-            },
-            orderBy: {
-              season: "desc",
-            },
-            include: {
-              WeekWinners: {
-                where: {
-                  membership_id: {
-                    in: memberIds,
-                  },
-                },
-                select: {
-                  correct_count: true,
-                  week: true,
-                },
-              },
-            },
-          }),
-          db.picks.groupBy({
-            by: ["member_id", "correct"],
-            where: {
-              member_id: {
-                in: memberIds,
-              },
-              done: 1,
-            },
-            _count: true,
-          }),
-        ]);
-
-        return leagues.map((l) => {
-          const memberIds = (leagueIdToMembers?.[l.league_id] ?? []).map(
-            (m) => m.membership_id,
-          );
-
-          const correct = pickCounts.find(
-            (pc) =>
-              pc.member_id &&
-              memberIds.includes(pc.member_id) &&
-              pc.correct === 1,
-          )?._count;
-
-          const wrong = pickCounts.find(
-            (pc) =>
-              pc.member_id &&
-              memberIds.includes(pc.member_id) &&
-              pc.correct === 0,
-          )?._count;
-
-          return {
-            league: l,
-            pickCounts: {
-              correct,
-              wrong,
-            },
-          };
-        });
+    const leagues = await db.leagues.findMany({
+      where: {
+        league_id: {
+          in: leagueIds,
+        },
       },
-      ["members", ...memberIds.map((m) => `member_${m}`)],
-      { revalidate: HOME_REVALIDATE_SECONDS },
-    );
-    return await getSummaries();
+      include: {
+        WeekWinners: {
+          where: {
+            membership_id: {
+              in: memberIds,
+            },
+          },
+          select: {
+            correct_count: true,
+            week: true,
+          },
+        },
+      },
+    });
+
+    return orderBy(leagues, (l) => l.season, "desc");
   }),
 });

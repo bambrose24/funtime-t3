@@ -7,7 +7,7 @@ import { JoinOrCreateALeague } from "./JoinOrCreateALeague";
 export const dynamic: AppConfigDynamic = "force-dynamic";
 
 export default async function Home() {
-  const [data] = await Promise.all([serverApi.home.summary()]);
+  const data = await serverApi.home.summary();
 
   return (
     <div className="col-span-12 flex w-full grow flex-row flex-wrap justify-around gap-4 py-4">
@@ -15,7 +15,7 @@ export default async function Home() {
         if (!d) {
           return null;
         }
-        return <HomeLeagueCard key={d.league?.league_id} data={d} />;
+        return <HomeLeagueCard key={d.league_id} data={d} />;
       })}
       {!data?.length ? <JoinOrCreateALeague /> : <></>}
     </div>
