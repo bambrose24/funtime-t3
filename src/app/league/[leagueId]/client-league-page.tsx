@@ -147,14 +147,16 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
                 <SelectValue placeholder={`Week ${firstGame.week}`} />
               </SelectTrigger>
               <SelectContent>
-                {[...Array(currentGame.week).keys()].map((weekMinusOne) => {
-                  const realWeek = weekMinusOne + 1;
-                  return (
-                    <SelectItem key={realWeek} value={realWeek.toString()}>
-                      Week {realWeek}
-                    </SelectItem>
-                  );
-                })}
+                {[...Array(currentGame.week).keys()]
+                  .reverse()
+                  .map((weekMinusOne) => {
+                    const realWeek = weekMinusOne + 1;
+                    return (
+                      <SelectItem key={realWeek} value={realWeek.toString()}>
+                        Week {realWeek}
+                      </SelectItem>
+                    );
+                  })}
               </SelectContent>
             </Select>
           )}
@@ -210,14 +212,16 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
                   <SelectValue placeholder={`Week ${firstGame.week}`} />
                 </SelectTrigger>
                 <SelectContent>
-                  {[...Array(currentGame.week).keys()].map((weekMinusOne) => {
-                    const realWeek = weekMinusOne + 1;
-                    return (
-                      <SelectItem key={realWeek} value={realWeek.toString()}>
-                        Week {realWeek}
-                      </SelectItem>
-                    );
-                  })}
+                  {[...Array(currentGame.week).keys()]
+                    .reverse()
+                    .map((weekMinusOne) => {
+                      const realWeek = weekMinusOne + 1;
+                      return (
+                        <SelectItem key={realWeek} value={realWeek.toString()}>
+                          Week {realWeek}
+                        </SelectItem>
+                      );
+                    })}
                 </SelectContent>
               </Select>
             )}
