@@ -246,12 +246,9 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
           </ScrollArea>
           {simulatedGameCount > 0 && (
             <div className="w-full">
-              <Alert
-                variant="default"
-                className="flex w-full flex-row items-center"
-              >
-                <AlertTitle className="flex w-full  flex-row items-center justify-between">
-                  <div className="flex flex-row gap-2">
+              <Alert variant="default" className="flex w-full items-center">
+                <AlertTitle className="flex w-full items-center gap-4">
+                  <div className="flex items-center gap-2">
                     <AlertCircleIcon className="h-4 w-4" />
                     {simulatedGameCount} game
                     {simulatedGameCount > 1 ? "s" : ""} simluated
