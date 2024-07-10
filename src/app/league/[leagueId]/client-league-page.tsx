@@ -124,7 +124,10 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
     [gameToGid],
   );
 
-  const simulatedGameCount = Object.keys(overrideGidToWinner).length;
+  const simulatedGids = Object.keys(overrideGidToWinner).map((gid) =>
+    Number(gid),
+  );
+  const simulatedGameCount = simulatedGids.length;
 
   return (
     <>
@@ -184,6 +187,7 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
               <CardContent>
                 <YourPicksList
                   {...props}
+                  simulatedGids={simulatedGids}
                   selectGame={selectGame}
                   myPicks={myPicks}
                 />
@@ -285,6 +289,7 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
                     <div className="overflow-scroll">
                       <CompactYourPicksList
                         {...props}
+                        simulatedGids={simulatedGids}
                         selectGame={selectGame}
                         myPicks={myPicks}
                       />

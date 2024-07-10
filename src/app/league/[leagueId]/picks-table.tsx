@@ -21,11 +21,12 @@ import { cn } from "~/lib/utils";
 import { Skeleton } from "~/components/ui/skeleton";
 import { useDictify } from "~/utils/hooks/useIdToValMemo";
 import Link from "next/link";
+import { type RouterOutputs } from "~/trpc/types";
 
 type Props = {
-  picksSummary: Awaited<ReturnType<typeof serverApi.league.picksSummary>>;
-  games: Awaited<ReturnType<typeof serverApi.games.getGames>>;
-  teams: Awaited<ReturnType<typeof serverApi.teams.getTeams>>;
+  picksSummary: RouterOutputs["league"]["picksSummary"];
+  games: RouterOutputs["games"]["getGames"];
+  teams: RouterOutputs["teams"]["getTeams"];
 };
 
 // This type is used to define the shape of our data.
@@ -115,9 +116,15 @@ function PicksTableImpl({ picksSummary, games, teams }: Props) {
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow key={headerGroup.id}>
-              {headerGroup.headers.map((header) => {
+              {headerGroup.headers.map((header, index) => {
                 return (
-                  <TableHead key={header.id} className="text-center">
+                  <TableHead
+                    key={header.id}
+                    className={cn(
+                      "text-center",
+                      index === 0 && "sticky left-0 z-10 bg-background",
+                    )}
+                  >
                     {header.isPlaceholder
                       ? null
                       : flexRender(
@@ -138,7 +145,7 @@ function PicksTableImpl({ picksSummary, games, teams }: Props) {
                 data-state={row.getIsSelected() && "selected"}
                 className="py-2"
               >
-                {row.getVisibleCells().map((cell) => {
+                {row.getVisibleCells().map((cell, index) => {
                   const gid = Number(cell.column.id);
                   let pick;
                   let game;
@@ -162,7 +169,13 @@ function PicksTableImpl({ picksSummary, games, teams }: Props) {
                     bgColor = "yellow";
                   }
                   return (
-                    <TableCell key={cell.id} className="p-0">
+                    <TableCell
+                      key={cell.id}
+                      className={cn(
+                        "p-0",
+                        index === 0 && "sticky left-0 z-10 -ml-1 bg-background",
+                      )}
+                    >
                       <div
                         className={cn(
                           bgColor === "red"

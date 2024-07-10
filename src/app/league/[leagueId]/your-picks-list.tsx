@@ -2,17 +2,18 @@
 
 import { Text } from "~/components/ui/text";
 import { TeamLogo } from "~/components/shared/TeamLogo";
-import { type serverApi } from "~/trpc/server";
 import { useDictify } from "~/utils/hooks/useIdToValMemo";
 import { cn } from "~/lib/utils";
 import { Button } from "~/components/ui/button";
+import { type RouterOutputs } from "~/trpc/types";
 
 type Props = {
-  myPicks: Awaited<ReturnType<typeof serverApi.league.picksSummary>>[number];
-  games: Awaited<ReturnType<typeof serverApi.games.getGames>>;
-  teams: Awaited<ReturnType<typeof serverApi.teams.getTeams>>;
-  league: Awaited<ReturnType<typeof serverApi.league.get>>;
-  session: Awaited<ReturnType<typeof serverApi.session.current>>;
+  myPicks: RouterOutputs["league"]["picksSummary"][number];
+  games: RouterOutputs["games"]["getGames"];
+  teams: RouterOutputs["teams"]["getTeams"];
+  league: RouterOutputs["league"]["get"];
+  session: RouterOutputs["session"]["current"];
+  simulatedGids: Array<number>;
   selectGame: (gid: number, winner: number) => void;
 };
 
@@ -23,7 +24,7 @@ export function YourPicksList(props: Props) {
   const gameIdToGame = useDictify(games, (g) => g.gid);
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-2">
       {myPicks?.picks?.map((p) => {
         const game = gameIdToGame.get(p.gid);
         if (!game) {
@@ -39,7 +40,13 @@ export function YourPicksList(props: Props) {
           return null;
         }
         return (
-          <div key={p.pickid} className="flex w-full flex-col">
+          <div
+            key={p.pickid}
+            className={cn(
+              "flex w-full flex-col rounded-xl border-2 border-transparent p-1",
+              props.simulatedGids.includes(p.gid) && "border-warning",
+            )}
+          >
             <div className="grid w-full grid-cols-7">
               <Button
                 variant="ghost"
@@ -90,7 +97,7 @@ export function CompactYourPicksList(props: Props) {
   const gameIdToGame = useDictify(games, (g) => g.gid);
 
   return (
-    <div className="grid grid-cols-2 gap-x-8 gap-y-1">
+    <div className="grid grid-cols-2 gap-x-8 gap-y-0.5">
       {myPicks?.picks?.map((p, idx) => {
         const game = gameIdToGame.get(p.gid);
         if (!game) {
@@ -115,7 +122,8 @@ export function CompactYourPicksList(props: Props) {
           >
             <div
               className={cn(
-                "grid w-[120px] grid-cols-5 flex-row items-center justify-between",
+                "grid w-[120px] grid-cols-5 flex-row items-center justify-between rounded-xl border-2 border-transparent p-0.5",
+                props.simulatedGids.includes(p.gid) && "border-warning",
               )}
             >
               <Button
