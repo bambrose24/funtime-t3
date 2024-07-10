@@ -13,6 +13,28 @@ import {
   TableRow,
 } from "~/components/ui/table";
 import Link from "next/link";
+import { Button } from "~/components/ui/button";
+import { DotsHorizontalIcon } from "@radix-ui/react-icons";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "~/components/ui/dropdown-menu";
+import { ExternalLink, X } from "lucide-react";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "~/components/ui/dialog";
+import { useState } from "react";
 
 type Props = {
   leagueId: number;
@@ -22,6 +44,7 @@ type Props = {
 
 export function LeagueAdminMembersClientPage({
   leagueId,
+  league,
   members: membersProp,
 }: Props) {
   const {
@@ -42,12 +65,10 @@ export function LeagueAdminMembersClientPage({
           <TableCaption>{members.length} total</TableCaption>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-[100px]">Name</TableHead>
-              <TableHead>Email</TableHead>
-              <TableHead>Wins</TableHead>
-              <TableHead className="text-right">Correct Picks</TableHead>
-              <TableHead className="text-right">Wrong Picks</TableHead>
-              <TableHead className="text-right">Missed Picks</TableHead>
+              <TableHead className="w-[100px]">Player</TableHead>
+              <TableHead className="text-center">Wins</TableHead>
+              <TableHead className="text-center">Missed Picks</TableHead>
+              <TableHead />
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -59,19 +80,22 @@ export function LeagueAdminMembersClientPage({
                       href={`/league/${leagueId}/player/${member.membership_id}`}
                       className="hover:underline"
                     >
-                      {member.people.username}
+                      <div className="flex flex-col items-start">
+                        <div className="text-sm font-medium">
+                          {member.people.username}
+                        </div>
+                        <div className="text-xs font-light">
+                          {member.people.email}
+                        </div>
+                      </div>
                     </Link>
                   </TableCell>
-                  <TableCell>{member.people.email}</TableCell>
                   <TableCell>None</TableCell>
-                  <TableCell className="text-right">
-                    {member.correctPicks}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    {member.wrongPicks}
-                  </TableCell>
-                  <TableCell className="text-right">
+                  <TableCell className="text-center">
                     {member.misssedPicks}
+                  </TableCell>
+                  <TableCell className="flex items-center justify-end">
+                    <MemberActions member={member} league={league} />
                   </TableCell>
                 </TableRow>
               );
@@ -80,5 +104,76 @@ export function LeagueAdminMembersClientPage({
         </Table>
       </CardContent>
     </Card>
+  );
+}
+
+function MemberActions({
+  member,
+  league,
+}: {
+  league: Props["league"];
+  member: Props["members"]["members"][number];
+}) {
+  const [open, setOpen] = useState(false);
+  const { mutateAsync: removeMember } =
+    clientApi.league.admin.removeMember.useMutation();
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button size="icon" variant="ghost">
+            <DotsHorizontalIcon className="h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent>
+          <DropdownMenuLabel>{member.people.username}</DropdownMenuLabel>
+          <DropdownMenuItem asChild>
+            <Link
+              href={`/league/${member.league_id}/player/${member.membership_id}`}
+            >
+              <div className="flex items-center gap-2">
+                Profile <ExternalLink className="h-4 w-4" />
+              </div>
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DialogTrigger asChild>
+            <DropdownMenuItem
+              onSelect={(e) => {
+                e.preventDefault();
+              }}
+            >
+              <div className="flex items-center gap-2">
+                <X className="h-4 w-4" /> Remove Player
+              </div>
+            </DropdownMenuItem>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Are you absolutely sure?</DialogTitle>
+              <DialogDescription>
+                This action cannot be undone. This will permanently remove{" "}
+                <span className="font-bold">{member.people.username}</span> from
+                the <span className="font-bold">{league.name}</span> league.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter className="flex w-full justify-between">
+              <Button
+                variant="secondary"
+                type="button"
+                onClick={() => {
+                  setOpen(false);
+                }}
+              >
+                Cancel
+              </Button>
+              <Button variant="destructive" type="button" loading={}>
+                Remove {member.people.username}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </Dialog>
   );
 }

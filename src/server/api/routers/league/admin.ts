@@ -20,6 +20,30 @@ const leagueAdminProcedure = authorizedProcedure
   });
 
 export const leagueAdminRouter = createTRPCRouter({
+  removeMember: leagueAdminProcedure
+    .input(
+      z.object({
+        memberId: z.number().int(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { db } = ctx;
+      const { leagueId, memberId } = input;
+      const memberInLeague = await db.leaguemembers.findFirstOrThrow({
+        where: {
+          membership_id: memberId,
+          league_id: leagueId,
+        },
+      });
+
+      // const response = await db.leaguemembers.delete({
+      //   where: {
+      //     membership_id: memberInLeague.membership_id,
+      //   },
+      // });
+
+      return memberInLeague;
+    }),
   members: leagueAdminProcedure.query(async ({ ctx, input }) => {
     const { db } = ctx;
     const { leagueId } = input;
