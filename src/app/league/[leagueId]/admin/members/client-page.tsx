@@ -66,15 +66,15 @@ export function LeagueAdminMembersClientPage({
           <TableHeader>
             <TableRow>
               <TableHead className="w-[100px]">Player</TableHead>
-              <TableHead className="text-center">Wins</TableHead>
-              <TableHead className="text-center">Missed Picks</TableHead>
+              <TableHead>Wins</TableHead>
+              <TableHead>Missed Picks</TableHead>
               <TableHead />
             </TableRow>
           </TableHeader>
           <TableBody>
             {members.map((member) => {
               return (
-                <TableRow key={member.membership_id}>
+                <TableRow key={member.membership_id} className="group">
                   <TableCell className="font-medium">
                     <Link
                       href={`/league/${leagueId}/player/${member.membership_id}`}
@@ -91,11 +91,11 @@ export function LeagueAdminMembersClientPage({
                     </Link>
                   </TableCell>
                   <TableCell>None</TableCell>
-                  <TableCell className="text-center">
-                    {member.misssedPicks}
-                  </TableCell>
-                  <TableCell className="flex items-center justify-end">
-                    <MemberActions member={member} league={league} />
+                  <TableCell>{member.misssedPicks}</TableCell>
+                  <TableCell className="sticky right-0 flex items-center justify-end">
+                    <div className="border-x border-border bg-card px-2 transition-colors group-hover:bg-transparent md:border-none">
+                      <MemberActions member={member} league={league} />
+                    </div>
                   </TableCell>
                 </TableRow>
               );

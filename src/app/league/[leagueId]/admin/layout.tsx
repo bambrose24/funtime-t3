@@ -31,17 +31,14 @@ export default async function LeagueAdminPage({
   }
 
   return (
-    <div className="col-span-12 grid w-full grid-cols-5 justify-center gap-2 py-4 md:col-span-10 md:col-start-2">
+    <div className="col-span-12 flex w-full flex-col justify-center gap-2 px-2 py-4 md:col-span-12">
       <div className="col-span-5 flex flex-col items-center">
         <Text.H2>{league.name} — Admin</Text.H2>
       </div>
-      <div className="col-span-5 grid lg:hidden">
+      <div>
         <MobileAdminNav leagueId={league.league_id} />
       </div>
-      <div className="col-span-1 hidden flex-col gap-2 lg:flex">
-        <AdminNav leagueId={league.league_id} />
-      </div>
-      <div className="col-span-5 lg:col-span-4">{children}</div>
+      <div>{children}</div>
     </div>
   );
 }

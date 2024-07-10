@@ -20,10 +20,14 @@ export function MobileAdminNav({ leagueId }: { leagueId: number }) {
       }}
       className="w-full"
     >
-      <TabsList className="w-full justify-stretch">
+      <TabsList className="w-full md:w-auto">
         {getNavOptions(baseHref).map((opt, idx) => {
           return (
-            <Link href={opt.href} key={idx} className="flex-grow">
+            <Link
+              href={opt.href}
+              key={idx}
+              className="flex-grow md:flex-grow-0"
+            >
               <TabsTrigger value={opt.id} className="w-full">
                 {opt.display}
               </TabsTrigger>
