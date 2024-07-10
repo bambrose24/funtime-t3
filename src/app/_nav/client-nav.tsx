@@ -35,11 +35,13 @@ import {
   TrophyIcon,
 } from "lucide-react";
 import { Avatar } from "~/components/ui/avatar";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { FuntimeAvatarFallback } from "./AvatarFallback";
 import { type RouterOutputs } from "~/trpc/types";
 import { clientApi } from "~/trpc/react";
 import { MemberRole } from "~/generated/prisma-client";
+import { useEffect } from "react";
+import { PrefetchKind } from "next/dist/client/components/router-reducer/router-reducer-types";
 
 type NavData = {
   data: Awaited<ReturnType<(typeof serverApi)["home"]["nav"]>>;
@@ -48,6 +50,7 @@ type NavData = {
 export function ClientNav(props: NavData) {
   const leagueId = useLeagueIdFromPath();
   const logout = useLogout();
+  const router = useRouter();
 
   const user = props.data?.dbUser;
   const leagues = props.data?.leagues;
@@ -60,6 +63,14 @@ export function ClientNav(props: NavData) {
   const inactiveLeagues = leagues?.filter(
     (l) => l.status === "completed" || new Date().getFullYear() - 1 > l.season,
   );
+
+  useEffect(() => {
+    activeLeagues?.forEach((league) => {
+      router.prefetch(`/league/${league.league_id}`, {
+        kind: PrefetchKind.FULL,
+      });
+    });
+  }, [router, activeLeagues]);
 
   const settingsHref = "/settings";
 
