@@ -35,6 +35,7 @@ import {
   DialogTrigger,
 } from "~/components/ui/dialog";
 import { useState } from "react";
+import { toast } from "sonner";
 
 type Props = {
   leagueId: number;
@@ -115,8 +116,12 @@ function MemberActions({
   member: Props["members"]["members"][number];
 }) {
   const [open, setOpen] = useState(false);
-  const { mutateAsync: removeMember } =
-    clientApi.league.admin.removeMember.useMutation();
+  const utils = clientApi.useUtils();
+  const removeMember = clientApi.league.admin.removeMember.useMutation({
+    onSettled: async () => {
+      await utils.league.admin.invalidate();
+    },
+  });
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DropdownMenu>
@@ -167,7 +172,22 @@ function MemberActions({
               >
                 Cancel
               </Button>
-              <Button variant="destructive" type="button" loading={}>
+              <Button
+                variant="destructive"
+                type="button"
+                loading={removeMember.isPending}
+                disabled={removeMember.isPending}
+                onClick={async () => {
+                  await removeMember.mutateAsync({
+                    memberId: member.membership_id,
+                    leagueId: member.league_id,
+                  });
+                  toast.success(
+                    `Successfully removed ${member.people.username} from ${league.name}.`,
+                  );
+                  setOpen(false);
+                }}
+              >
                 Remove {member.people.username}
               </Button>
             </DialogFooter>
