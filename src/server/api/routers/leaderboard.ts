@@ -106,8 +106,8 @@ export const leaderboardRouter = createTRPCRouter({
               {} as Record<number, number>,
             );
             return {
-              week,
               weekLabel: `Week ${week}`,
+              week,
               ...memberToWeekTotal,
             };
           });

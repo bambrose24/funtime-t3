@@ -1,4 +1,4 @@
-import { groupBy, orderBy } from "lodash";
+import { orderBy } from "lodash";
 
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import { cache, getCoreUserTag } from "~/utils/cache";

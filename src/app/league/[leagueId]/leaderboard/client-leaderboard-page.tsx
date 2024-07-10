@@ -12,7 +12,6 @@ import {
 import * as React from "react";
 
 import { LeaderboardTable } from "./leaderboard-table";
-import { LeaderboardChart } from "./leaderboard-chart";
 import { LeaderboardChart2 } from "./leaderboard-chart-2";
 import { Defined } from "~/utils/defined";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
@@ -137,12 +136,12 @@ export function ClientLeaderboardPage(props: Props) {
             </CardDescription>
           </CardHeader>
           <CardContent className="flex h-full w-full justify-center">
-            {/* <LeaderboardChart
-              className="h-[70vh] w-[50vw]"
-              entries={}
-            /> */}
             {chartData && (
-              <LeaderboardChart2 data={chartData} members={members} />
+              <LeaderboardChart2
+                data={chartData}
+                members={members}
+                className="h-[70vh] w-[50vw]"
+              />
             )}
           </CardContent>
         </Card>

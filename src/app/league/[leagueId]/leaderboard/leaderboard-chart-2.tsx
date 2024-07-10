@@ -16,9 +16,12 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "~/components/ui/chart";
-import { LineChart, CartesianGrid, XAxis, Line } from "recharts";
+import { LineChart, CartesianGrid, XAxis, Line, YAxis } from "recharts";
 import { useMemo } from "react";
 import { type RouterOutputs } from "~/trpc/types";
+import { useLeagueIdFromPath } from "~/utils/hooks/useLeagueIdFromPath";
+import { clientApi } from "~/trpc/react";
+import { cn } from "~/lib/utils";
 
 type Props = {
   data: NonNullable<
@@ -28,9 +31,10 @@ type Props = {
     memberId: number;
     username: string;
   }[];
+  className?: string;
 };
 
-export function LeaderboardChart2({ data, members }: Props) {
+export function LeaderboardChart2({ data, members, className }: Props) {
   const chartConfig = useMemo(() => {
     return members.reduce((prev, curr, idx) => {
       prev[curr.memberId] = {
@@ -41,51 +45,57 @@ export function LeaderboardChart2({ data, members }: Props) {
     }, {} as ChartConfig);
   }, [members]);
 
-  // const chartData = [
-  //   { month: "January", desktop: 186, mobile: 80 },
-  //   { month: "February", desktop: 305, mobile: 200 },
-  //   { month: "March", desktop: 237, mobile: 120 },
-  //   { month: "April", desktop: 73, mobile: 190 },
-  //   { month: "May", desktop: 209, mobile: 130 },
-  //   { month: "June", desktop: 214, mobile: 140 },
-  // ];
+  const leagueId = useLeagueIdFromPath();
+  const league = clientApi.league.get.useQuery(
+    { leagueId: leagueId ?? 0 },
+    { enabled: !!leagueId },
+  );
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Line Chart - Multiple</CardTitle>
-        <CardDescription>January - June 2024</CardDescription>
+        <CardTitle>Correct Picks by Week</CardTitle>
+        <CardDescription>{league.data?.name}</CardDescription>
       </CardHeader>
       <CardContent>
-        <ChartContainer config={chartConfig} className="min-h-[200px]">
+        <ChartContainer
+          config={chartConfig}
+          className={cn("h-[500px] w-[700px]", className)}
+        >
           <LineChart
             accessibilityLayer
             data={data}
             margin={{ left: 12, right: 12 }}
           >
             <CartesianGrid vertical={false} />
-            <XAxis
-              dataKey="month"
-              tickLine={false}
-              axisLine={false}
-              tickMargin={8}
-              tickFormatter={(value) => (value as string).slice(0, 3)}
+            <XAxis dataKey="week" tickLine={false} axisLine={false} />
+            <YAxis />
+            <ChartTooltip
+              cursor={false}
+              content={
+                <ChartTooltipContent
+                  itemSorter={(item) => {
+                    return item.value as number;
+                  }}
+                  labelFormatter={(label, payload) => {
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+                    return (payload.at(0)?.payload.weekLabel ?? "") as string;
+                  }}
+                />
+              }
             />
-            <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
-            <Line
-              dataKey="desktop"
-              type="monotone"
-              stroke="var(--color-desktop)"
-              strokeWidth={2}
-              dot={false}
-            />
-            <Line
-              dataKey="mobile"
-              type="monotone"
-              stroke="var(--color-mobile)"
-              strokeWidth={2}
-              dot={false}
-            />
+            {members.map((member, idx) => {
+              return (
+                <Line
+                  key={member.memberId}
+                  dataKey={member.memberId}
+                  type="monotone"
+                  stroke={`hsl(var(--chart-${(idx % 5) + 1}))`}
+                  strokeWidth={2}
+                  dot={false}
+                />
+              );
+            })}
           </LineChart>
         </ChartContainer>
       </CardContent>
