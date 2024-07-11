@@ -1954,6 +1954,7 @@ export namespace Prisma {
     WeekWinners: number
     leaguemembers: number
     leaguemessages: number
+    future_leagues: number
   }
 
   export type LeaguesCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -1961,6 +1962,7 @@ export namespace Prisma {
     WeekWinners?: boolean | LeaguesCountOutputTypeCountWeekWinnersArgs
     leaguemembers?: boolean | LeaguesCountOutputTypeCountLeaguemembersArgs
     leaguemessages?: boolean | LeaguesCountOutputTypeCountLeaguemessagesArgs
+    future_leagues?: boolean | LeaguesCountOutputTypeCountFuture_leaguesArgs
   }
 
   // Custom InputTypes
@@ -2000,6 +2002,13 @@ export namespace Prisma {
    */
   export type LeaguesCountOutputTypeCountLeaguemessagesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: leaguemessagesWhereInput
+  }
+
+  /**
+   * LeaguesCountOutputType without action
+   */
+  export type LeaguesCountOutputTypeCountFuture_leaguesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: leaguesWhereInput
   }
 
 
@@ -7768,8 +7777,8 @@ export namespace Prisma {
     leaguemembers?: boolean | leagues$leaguemembersArgs<ExtArgs>
     leaguemessages?: boolean | leagues$leaguemessagesArgs<ExtArgs>
     people?: boolean | peopleDefaultArgs<ExtArgs>
-    leagues?: boolean | leagues$leaguesArgs<ExtArgs>
-    other_leagues?: boolean | leagues$other_leaguesArgs<ExtArgs>
+    prior_league?: boolean | leagues$prior_leagueArgs<ExtArgs>
+    future_leagues?: boolean | leagues$future_leaguesArgs<ExtArgs>
     _count?: boolean | LeaguesCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["leagues"]>
 
@@ -7788,7 +7797,7 @@ export namespace Prisma {
     prior_league_id?: boolean
     status?: boolean
     people?: boolean | peopleDefaultArgs<ExtArgs>
-    leagues?: boolean | leagues$leaguesArgs<ExtArgs>
+    prior_league?: boolean | leagues$prior_leagueArgs<ExtArgs>
   }, ExtArgs["result"]["leagues"]>
 
   export type leaguesSelectScalar = {
@@ -7813,13 +7822,13 @@ export namespace Prisma {
     leaguemembers?: boolean | leagues$leaguemembersArgs<ExtArgs>
     leaguemessages?: boolean | leagues$leaguemessagesArgs<ExtArgs>
     people?: boolean | peopleDefaultArgs<ExtArgs>
-    leagues?: boolean | leagues$leaguesArgs<ExtArgs>
-    other_leagues?: boolean | leagues$other_leaguesArgs<ExtArgs>
+    prior_league?: boolean | leagues$prior_leagueArgs<ExtArgs>
+    future_leagues?: boolean | leagues$future_leaguesArgs<ExtArgs>
     _count?: boolean | LeaguesCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type leaguesIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     people?: boolean | peopleDefaultArgs<ExtArgs>
-    leagues?: boolean | leagues$leaguesArgs<ExtArgs>
+    prior_league?: boolean | leagues$prior_leagueArgs<ExtArgs>
   }
 
   export type $leaguesPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -7830,8 +7839,8 @@ export namespace Prisma {
       leaguemembers: Prisma.$leaguemembersPayload<ExtArgs>[]
       leaguemessages: Prisma.$leaguemessagesPayload<ExtArgs>[]
       people: Prisma.$peoplePayload<ExtArgs>
-      leagues: Prisma.$leaguesPayload<ExtArgs> | null
-      other_leagues: Prisma.$leaguesPayload<ExtArgs> | null
+      prior_league: Prisma.$leaguesPayload<ExtArgs> | null
+      future_leagues: Prisma.$leaguesPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       league_id: number
@@ -8216,8 +8225,8 @@ export namespace Prisma {
     leaguemembers<T extends leagues$leaguemembersArgs<ExtArgs> = {}>(args?: Subset<T, leagues$leaguemembersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$leaguemembersPayload<ExtArgs>, T, "findMany"> | Null>
     leaguemessages<T extends leagues$leaguemessagesArgs<ExtArgs> = {}>(args?: Subset<T, leagues$leaguemessagesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$leaguemessagesPayload<ExtArgs>, T, "findMany"> | Null>
     people<T extends peopleDefaultArgs<ExtArgs> = {}>(args?: Subset<T, peopleDefaultArgs<ExtArgs>>): Prisma__peopleClient<$Result.GetResult<Prisma.$peoplePayload<ExtArgs>, T, "findUniqueOrThrow"> | Null, Null, ExtArgs>
-    leagues<T extends leagues$leaguesArgs<ExtArgs> = {}>(args?: Subset<T, leagues$leaguesArgs<ExtArgs>>): Prisma__leaguesClient<$Result.GetResult<Prisma.$leaguesPayload<ExtArgs>, T, "findUniqueOrThrow"> | null, null, ExtArgs>
-    other_leagues<T extends leagues$other_leaguesArgs<ExtArgs> = {}>(args?: Subset<T, leagues$other_leaguesArgs<ExtArgs>>): Prisma__leaguesClient<$Result.GetResult<Prisma.$leaguesPayload<ExtArgs>, T, "findUniqueOrThrow"> | null, null, ExtArgs>
+    prior_league<T extends leagues$prior_leagueArgs<ExtArgs> = {}>(args?: Subset<T, leagues$prior_leagueArgs<ExtArgs>>): Prisma__leaguesClient<$Result.GetResult<Prisma.$leaguesPayload<ExtArgs>, T, "findUniqueOrThrow"> | null, null, ExtArgs>
+    future_leagues<T extends leagues$future_leaguesArgs<ExtArgs> = {}>(args?: Subset<T, leagues$future_leaguesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$leaguesPayload<ExtArgs>, T, "findMany"> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -8667,9 +8676,9 @@ export namespace Prisma {
   }
 
   /**
-   * leagues.leagues
+   * leagues.prior_league
    */
-  export type leagues$leaguesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type leagues$prior_leagueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the leagues
      */
@@ -8682,9 +8691,9 @@ export namespace Prisma {
   }
 
   /**
-   * leagues.other_leagues
+   * leagues.future_leagues
    */
-  export type leagues$other_leaguesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type leagues$future_leaguesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the leagues
      */
@@ -8694,6 +8703,11 @@ export namespace Prisma {
      */
     include?: leaguesInclude<ExtArgs> | null
     where?: leaguesWhereInput
+    orderBy?: leaguesOrderByWithRelationInput | leaguesOrderByWithRelationInput[]
+    cursor?: leaguesWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: LeaguesScalarFieldEnum | LeaguesScalarFieldEnum[]
   }
 
   /**
@@ -14981,8 +14995,8 @@ export namespace Prisma {
     leaguemembers?: LeaguemembersListRelationFilter
     leaguemessages?: LeaguemessagesListRelationFilter
     people?: XOR<PeopleRelationFilter, peopleWhereInput>
-    leagues?: XOR<LeaguesNullableRelationFilter, leaguesWhereInput> | null
-    other_leagues?: XOR<LeaguesNullableRelationFilter, leaguesWhereInput> | null
+    prior_league?: XOR<LeaguesNullableRelationFilter, leaguesWhereInput> | null
+    future_leagues?: LeaguesListRelationFilter
   }
 
   export type leaguesOrderByWithRelationInput = {
@@ -15004,14 +15018,13 @@ export namespace Prisma {
     leaguemembers?: leaguemembersOrderByRelationAggregateInput
     leaguemessages?: leaguemessagesOrderByRelationAggregateInput
     people?: peopleOrderByWithRelationInput
-    leagues?: leaguesOrderByWithRelationInput
-    other_leagues?: leaguesOrderByWithRelationInput
+    prior_league?: leaguesOrderByWithRelationInput
+    future_leagues?: leaguesOrderByRelationAggregateInput
   }
 
   export type leaguesWhereUniqueInput = Prisma.AtLeast<{
     league_id?: number
     share_code?: string
-    prior_league_id?: number
     AND?: leaguesWhereInput | leaguesWhereInput[]
     OR?: leaguesWhereInput[]
     NOT?: leaguesWhereInput | leaguesWhereInput[]
@@ -15024,15 +15037,16 @@ export namespace Prisma {
     reminder_policy?: EnumReminderPolicyNullableFilter<"leagues"> | $Enums.ReminderPolicy | null
     scoring_type?: EnumScoringTypeNullableFilter<"leagues"> | $Enums.ScoringType | null
     superbowl_competition?: BoolNullableFilter<"leagues"> | boolean | null
+    prior_league_id?: IntNullableFilter<"leagues"> | number | null
     status?: EnumLeagueStatusFilter<"leagues"> | $Enums.LeagueStatus
     EmailLogs?: EmailLogsListRelationFilter
     WeekWinners?: WeekWinnersListRelationFilter
     leaguemembers?: LeaguemembersListRelationFilter
     leaguemessages?: LeaguemessagesListRelationFilter
     people?: XOR<PeopleRelationFilter, peopleWhereInput>
-    leagues?: XOR<LeaguesNullableRelationFilter, leaguesWhereInput> | null
-    other_leagues?: XOR<LeaguesNullableRelationFilter, leaguesWhereInput> | null
-  }, "league_id" | "share_code" | "prior_league_id">
+    prior_league?: XOR<LeaguesNullableRelationFilter, leaguesWhereInput> | null
+    future_leagues?: LeaguesListRelationFilter
+  }, "league_id" | "share_code">
 
   export type leaguesOrderByWithAggregationInput = {
     league_id?: SortOrder
@@ -15933,8 +15947,8 @@ export namespace Prisma {
     leaguemembers?: leaguemembersCreateNestedManyWithoutLeaguesInput
     leaguemessages?: leaguemessagesCreateNestedManyWithoutLeaguesInput
     people: peopleCreateNestedOneWithoutLeaguesInput
-    leagues?: leaguesCreateNestedOneWithoutOther_leaguesInput
-    other_leagues?: leaguesCreateNestedOneWithoutLeaguesInput
+    prior_league?: leaguesCreateNestedOneWithoutFuture_leaguesInput
+    future_leagues?: leaguesCreateNestedManyWithoutPrior_leagueInput
   }
 
   export type leaguesUncheckedCreateInput = {
@@ -15955,7 +15969,7 @@ export namespace Prisma {
     WeekWinners?: WeekWinnersUncheckedCreateNestedManyWithoutLeaguesInput
     leaguemembers?: leaguemembersUncheckedCreateNestedManyWithoutLeaguesInput
     leaguemessages?: leaguemessagesUncheckedCreateNestedManyWithoutLeaguesInput
-    other_leagues?: leaguesUncheckedCreateNestedOneWithoutLeaguesInput
+    future_leagues?: leaguesUncheckedCreateNestedManyWithoutPrior_leagueInput
   }
 
   export type leaguesUpdateInput = {
@@ -15974,8 +15988,8 @@ export namespace Prisma {
     leaguemembers?: leaguemembersUpdateManyWithoutLeaguesNestedInput
     leaguemessages?: leaguemessagesUpdateManyWithoutLeaguesNestedInput
     people?: peopleUpdateOneRequiredWithoutLeaguesNestedInput
-    leagues?: leaguesUpdateOneWithoutOther_leaguesNestedInput
-    other_leagues?: leaguesUpdateOneWithoutLeaguesNestedInput
+    prior_league?: leaguesUpdateOneWithoutFuture_leaguesNestedInput
+    future_leagues?: leaguesUpdateManyWithoutPrior_leagueNestedInput
   }
 
   export type leaguesUncheckedUpdateInput = {
@@ -15996,7 +16010,7 @@ export namespace Prisma {
     WeekWinners?: WeekWinnersUncheckedUpdateManyWithoutLeaguesNestedInput
     leaguemembers?: leaguemembersUncheckedUpdateManyWithoutLeaguesNestedInput
     leaguemessages?: leaguemessagesUncheckedUpdateManyWithoutLeaguesNestedInput
-    other_leagues?: leaguesUncheckedUpdateOneWithoutLeaguesNestedInput
+    future_leagues?: leaguesUncheckedUpdateManyWithoutPrior_leagueNestedInput
   }
 
   export type leaguesCreateManyInput = {
@@ -17092,7 +17106,17 @@ export namespace Prisma {
     isNot?: leaguesWhereInput | null
   }
 
+  export type LeaguesListRelationFilter = {
+    every?: leaguesWhereInput
+    some?: leaguesWhereInput
+    none?: leaguesWhereInput
+  }
+
   export type leaguemembersOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type leaguesOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -17206,16 +17230,6 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumLeagueStatusFilter<$PrismaModel>
     _max?: NestedEnumLeagueStatusFilter<$PrismaModel>
-  }
-
-  export type LeaguesListRelationFilter = {
-    every?: leaguesWhereInput
-    some?: leaguesWhereInput
-    none?: leaguesWhereInput
-  }
-
-  export type leaguesOrderByRelationAggregateInput = {
-    _count?: SortOrder
   }
 
   export type peopleCountOrderByAggregateInput = {
@@ -18023,16 +18037,17 @@ export namespace Prisma {
     connect?: peopleWhereUniqueInput
   }
 
-  export type leaguesCreateNestedOneWithoutOther_leaguesInput = {
-    create?: XOR<leaguesCreateWithoutOther_leaguesInput, leaguesUncheckedCreateWithoutOther_leaguesInput>
-    connectOrCreate?: leaguesCreateOrConnectWithoutOther_leaguesInput
+  export type leaguesCreateNestedOneWithoutFuture_leaguesInput = {
+    create?: XOR<leaguesCreateWithoutFuture_leaguesInput, leaguesUncheckedCreateWithoutFuture_leaguesInput>
+    connectOrCreate?: leaguesCreateOrConnectWithoutFuture_leaguesInput
     connect?: leaguesWhereUniqueInput
   }
 
-  export type leaguesCreateNestedOneWithoutLeaguesInput = {
-    create?: XOR<leaguesCreateWithoutLeaguesInput, leaguesUncheckedCreateWithoutLeaguesInput>
-    connectOrCreate?: leaguesCreateOrConnectWithoutLeaguesInput
-    connect?: leaguesWhereUniqueInput
+  export type leaguesCreateNestedManyWithoutPrior_leagueInput = {
+    create?: XOR<leaguesCreateWithoutPrior_leagueInput, leaguesUncheckedCreateWithoutPrior_leagueInput> | leaguesCreateWithoutPrior_leagueInput[] | leaguesUncheckedCreateWithoutPrior_leagueInput[]
+    connectOrCreate?: leaguesCreateOrConnectWithoutPrior_leagueInput | leaguesCreateOrConnectWithoutPrior_leagueInput[]
+    createMany?: leaguesCreateManyPrior_leagueInputEnvelope
+    connect?: leaguesWhereUniqueInput | leaguesWhereUniqueInput[]
   }
 
   export type EmailLogsUncheckedCreateNestedManyWithoutLeaguesInput = {
@@ -18063,10 +18078,11 @@ export namespace Prisma {
     connect?: leaguemessagesWhereUniqueInput | leaguemessagesWhereUniqueInput[]
   }
 
-  export type leaguesUncheckedCreateNestedOneWithoutLeaguesInput = {
-    create?: XOR<leaguesCreateWithoutLeaguesInput, leaguesUncheckedCreateWithoutLeaguesInput>
-    connectOrCreate?: leaguesCreateOrConnectWithoutLeaguesInput
-    connect?: leaguesWhereUniqueInput
+  export type leaguesUncheckedCreateNestedManyWithoutPrior_leagueInput = {
+    create?: XOR<leaguesCreateWithoutPrior_leagueInput, leaguesUncheckedCreateWithoutPrior_leagueInput> | leaguesCreateWithoutPrior_leagueInput[] | leaguesUncheckedCreateWithoutPrior_leagueInput[]
+    connectOrCreate?: leaguesCreateOrConnectWithoutPrior_leagueInput | leaguesCreateOrConnectWithoutPrior_leagueInput[]
+    createMany?: leaguesCreateManyPrior_leagueInputEnvelope
+    connect?: leaguesWhereUniqueInput | leaguesWhereUniqueInput[]
   }
 
   export type NullableEnumLatePolicyFieldUpdateOperationsInput = {
@@ -18153,24 +18169,28 @@ export namespace Prisma {
     update?: XOR<XOR<peopleUpdateToOneWithWhereWithoutLeaguesInput, peopleUpdateWithoutLeaguesInput>, peopleUncheckedUpdateWithoutLeaguesInput>
   }
 
-  export type leaguesUpdateOneWithoutOther_leaguesNestedInput = {
-    create?: XOR<leaguesCreateWithoutOther_leaguesInput, leaguesUncheckedCreateWithoutOther_leaguesInput>
-    connectOrCreate?: leaguesCreateOrConnectWithoutOther_leaguesInput
-    upsert?: leaguesUpsertWithoutOther_leaguesInput
+  export type leaguesUpdateOneWithoutFuture_leaguesNestedInput = {
+    create?: XOR<leaguesCreateWithoutFuture_leaguesInput, leaguesUncheckedCreateWithoutFuture_leaguesInput>
+    connectOrCreate?: leaguesCreateOrConnectWithoutFuture_leaguesInput
+    upsert?: leaguesUpsertWithoutFuture_leaguesInput
     disconnect?: leaguesWhereInput | boolean
     delete?: leaguesWhereInput | boolean
     connect?: leaguesWhereUniqueInput
-    update?: XOR<XOR<leaguesUpdateToOneWithWhereWithoutOther_leaguesInput, leaguesUpdateWithoutOther_leaguesInput>, leaguesUncheckedUpdateWithoutOther_leaguesInput>
+    update?: XOR<XOR<leaguesUpdateToOneWithWhereWithoutFuture_leaguesInput, leaguesUpdateWithoutFuture_leaguesInput>, leaguesUncheckedUpdateWithoutFuture_leaguesInput>
   }
 
-  export type leaguesUpdateOneWithoutLeaguesNestedInput = {
-    create?: XOR<leaguesCreateWithoutLeaguesInput, leaguesUncheckedCreateWithoutLeaguesInput>
-    connectOrCreate?: leaguesCreateOrConnectWithoutLeaguesInput
-    upsert?: leaguesUpsertWithoutLeaguesInput
-    disconnect?: leaguesWhereInput | boolean
-    delete?: leaguesWhereInput | boolean
-    connect?: leaguesWhereUniqueInput
-    update?: XOR<XOR<leaguesUpdateToOneWithWhereWithoutLeaguesInput, leaguesUpdateWithoutLeaguesInput>, leaguesUncheckedUpdateWithoutLeaguesInput>
+  export type leaguesUpdateManyWithoutPrior_leagueNestedInput = {
+    create?: XOR<leaguesCreateWithoutPrior_leagueInput, leaguesUncheckedCreateWithoutPrior_leagueInput> | leaguesCreateWithoutPrior_leagueInput[] | leaguesUncheckedCreateWithoutPrior_leagueInput[]
+    connectOrCreate?: leaguesCreateOrConnectWithoutPrior_leagueInput | leaguesCreateOrConnectWithoutPrior_leagueInput[]
+    upsert?: leaguesUpsertWithWhereUniqueWithoutPrior_leagueInput | leaguesUpsertWithWhereUniqueWithoutPrior_leagueInput[]
+    createMany?: leaguesCreateManyPrior_leagueInputEnvelope
+    set?: leaguesWhereUniqueInput | leaguesWhereUniqueInput[]
+    disconnect?: leaguesWhereUniqueInput | leaguesWhereUniqueInput[]
+    delete?: leaguesWhereUniqueInput | leaguesWhereUniqueInput[]
+    connect?: leaguesWhereUniqueInput | leaguesWhereUniqueInput[]
+    update?: leaguesUpdateWithWhereUniqueWithoutPrior_leagueInput | leaguesUpdateWithWhereUniqueWithoutPrior_leagueInput[]
+    updateMany?: leaguesUpdateManyWithWhereWithoutPrior_leagueInput | leaguesUpdateManyWithWhereWithoutPrior_leagueInput[]
+    deleteMany?: leaguesScalarWhereInput | leaguesScalarWhereInput[]
   }
 
   export type EmailLogsUncheckedUpdateManyWithoutLeaguesNestedInput = {
@@ -18229,14 +18249,18 @@ export namespace Prisma {
     deleteMany?: leaguemessagesScalarWhereInput | leaguemessagesScalarWhereInput[]
   }
 
-  export type leaguesUncheckedUpdateOneWithoutLeaguesNestedInput = {
-    create?: XOR<leaguesCreateWithoutLeaguesInput, leaguesUncheckedCreateWithoutLeaguesInput>
-    connectOrCreate?: leaguesCreateOrConnectWithoutLeaguesInput
-    upsert?: leaguesUpsertWithoutLeaguesInput
-    disconnect?: leaguesWhereInput | boolean
-    delete?: leaguesWhereInput | boolean
-    connect?: leaguesWhereUniqueInput
-    update?: XOR<XOR<leaguesUpdateToOneWithWhereWithoutLeaguesInput, leaguesUpdateWithoutLeaguesInput>, leaguesUncheckedUpdateWithoutLeaguesInput>
+  export type leaguesUncheckedUpdateManyWithoutPrior_leagueNestedInput = {
+    create?: XOR<leaguesCreateWithoutPrior_leagueInput, leaguesUncheckedCreateWithoutPrior_leagueInput> | leaguesCreateWithoutPrior_leagueInput[] | leaguesUncheckedCreateWithoutPrior_leagueInput[]
+    connectOrCreate?: leaguesCreateOrConnectWithoutPrior_leagueInput | leaguesCreateOrConnectWithoutPrior_leagueInput[]
+    upsert?: leaguesUpsertWithWhereUniqueWithoutPrior_leagueInput | leaguesUpsertWithWhereUniqueWithoutPrior_leagueInput[]
+    createMany?: leaguesCreateManyPrior_leagueInputEnvelope
+    set?: leaguesWhereUniqueInput | leaguesWhereUniqueInput[]
+    disconnect?: leaguesWhereUniqueInput | leaguesWhereUniqueInput[]
+    delete?: leaguesWhereUniqueInput | leaguesWhereUniqueInput[]
+    connect?: leaguesWhereUniqueInput | leaguesWhereUniqueInput[]
+    update?: leaguesUpdateWithWhereUniqueWithoutPrior_leagueInput | leaguesUpdateWithWhereUniqueWithoutPrior_leagueInput[]
+    updateMany?: leaguesUpdateManyWithWhereWithoutPrior_leagueInput | leaguesUpdateManyWithWhereWithoutPrior_leagueInput[]
+    deleteMany?: leaguesScalarWhereInput | leaguesScalarWhereInput[]
   }
 
   export type leaguemembersCreateNestedManyWithoutPeopleInput = {
@@ -19069,8 +19093,8 @@ export namespace Prisma {
     leaguemembers?: leaguemembersCreateNestedManyWithoutLeaguesInput
     leaguemessages?: leaguemessagesCreateNestedManyWithoutLeaguesInput
     people: peopleCreateNestedOneWithoutLeaguesInput
-    leagues?: leaguesCreateNestedOneWithoutOther_leaguesInput
-    other_leagues?: leaguesCreateNestedOneWithoutLeaguesInput
+    prior_league?: leaguesCreateNestedOneWithoutFuture_leaguesInput
+    future_leagues?: leaguesCreateNestedManyWithoutPrior_leagueInput
   }
 
   export type leaguesUncheckedCreateWithoutEmailLogsInput = {
@@ -19090,7 +19114,7 @@ export namespace Prisma {
     WeekWinners?: WeekWinnersUncheckedCreateNestedManyWithoutLeaguesInput
     leaguemembers?: leaguemembersUncheckedCreateNestedManyWithoutLeaguesInput
     leaguemessages?: leaguemessagesUncheckedCreateNestedManyWithoutLeaguesInput
-    other_leagues?: leaguesUncheckedCreateNestedOneWithoutLeaguesInput
+    future_leagues?: leaguesUncheckedCreateNestedManyWithoutPrior_leagueInput
   }
 
   export type leaguesCreateOrConnectWithoutEmailLogsInput = {
@@ -19154,8 +19178,8 @@ export namespace Prisma {
     leaguemembers?: leaguemembersUpdateManyWithoutLeaguesNestedInput
     leaguemessages?: leaguemessagesUpdateManyWithoutLeaguesNestedInput
     people?: peopleUpdateOneRequiredWithoutLeaguesNestedInput
-    leagues?: leaguesUpdateOneWithoutOther_leaguesNestedInput
-    other_leagues?: leaguesUpdateOneWithoutLeaguesNestedInput
+    prior_league?: leaguesUpdateOneWithoutFuture_leaguesNestedInput
+    future_leagues?: leaguesUpdateManyWithoutPrior_leagueNestedInput
   }
 
   export type leaguesUncheckedUpdateWithoutEmailLogsInput = {
@@ -19175,7 +19199,7 @@ export namespace Prisma {
     WeekWinners?: WeekWinnersUncheckedUpdateManyWithoutLeaguesNestedInput
     leaguemembers?: leaguemembersUncheckedUpdateManyWithoutLeaguesNestedInput
     leaguemessages?: leaguemessagesUncheckedUpdateManyWithoutLeaguesNestedInput
-    other_leagues?: leaguesUncheckedUpdateOneWithoutLeaguesNestedInput
+    future_leagues?: leaguesUncheckedUpdateManyWithoutPrior_leagueNestedInput
   }
 
   export type leaguemembersUpsertWithoutEmailLogsInput = {
@@ -19229,8 +19253,8 @@ export namespace Prisma {
     leaguemembers?: leaguemembersCreateNestedManyWithoutLeaguesInput
     leaguemessages?: leaguemessagesCreateNestedManyWithoutLeaguesInput
     people: peopleCreateNestedOneWithoutLeaguesInput
-    leagues?: leaguesCreateNestedOneWithoutOther_leaguesInput
-    other_leagues?: leaguesCreateNestedOneWithoutLeaguesInput
+    prior_league?: leaguesCreateNestedOneWithoutFuture_leaguesInput
+    future_leagues?: leaguesCreateNestedManyWithoutPrior_leagueInput
   }
 
   export type leaguesUncheckedCreateWithoutWeekWinnersInput = {
@@ -19250,7 +19274,7 @@ export namespace Prisma {
     EmailLogs?: EmailLogsUncheckedCreateNestedManyWithoutLeaguesInput
     leaguemembers?: leaguemembersUncheckedCreateNestedManyWithoutLeaguesInput
     leaguemessages?: leaguemessagesUncheckedCreateNestedManyWithoutLeaguesInput
-    other_leagues?: leaguesUncheckedCreateNestedOneWithoutLeaguesInput
+    future_leagues?: leaguesUncheckedCreateNestedManyWithoutPrior_leagueInput
   }
 
   export type leaguesCreateOrConnectWithoutWeekWinnersInput = {
@@ -19314,8 +19338,8 @@ export namespace Prisma {
     leaguemembers?: leaguemembersUpdateManyWithoutLeaguesNestedInput
     leaguemessages?: leaguemessagesUpdateManyWithoutLeaguesNestedInput
     people?: peopleUpdateOneRequiredWithoutLeaguesNestedInput
-    leagues?: leaguesUpdateOneWithoutOther_leaguesNestedInput
-    other_leagues?: leaguesUpdateOneWithoutLeaguesNestedInput
+    prior_league?: leaguesUpdateOneWithoutFuture_leaguesNestedInput
+    future_leagues?: leaguesUpdateManyWithoutPrior_leagueNestedInput
   }
 
   export type leaguesUncheckedUpdateWithoutWeekWinnersInput = {
@@ -19335,7 +19359,7 @@ export namespace Prisma {
     EmailLogs?: EmailLogsUncheckedUpdateManyWithoutLeaguesNestedInput
     leaguemembers?: leaguemembersUncheckedUpdateManyWithoutLeaguesNestedInput
     leaguemessages?: leaguemessagesUncheckedUpdateManyWithoutLeaguesNestedInput
-    other_leagues?: leaguesUncheckedUpdateOneWithoutLeaguesNestedInput
+    future_leagues?: leaguesUncheckedUpdateManyWithoutPrior_leagueNestedInput
   }
 
   export type leaguemembersUpsertWithoutWeekWinnersInput = {
@@ -19700,8 +19724,8 @@ export namespace Prisma {
     WeekWinners?: WeekWinnersCreateNestedManyWithoutLeaguesInput
     leaguemessages?: leaguemessagesCreateNestedManyWithoutLeaguesInput
     people: peopleCreateNestedOneWithoutLeaguesInput
-    leagues?: leaguesCreateNestedOneWithoutOther_leaguesInput
-    other_leagues?: leaguesCreateNestedOneWithoutLeaguesInput
+    prior_league?: leaguesCreateNestedOneWithoutFuture_leaguesInput
+    future_leagues?: leaguesCreateNestedManyWithoutPrior_leagueInput
   }
 
   export type leaguesUncheckedCreateWithoutLeaguemembersInput = {
@@ -19721,7 +19745,7 @@ export namespace Prisma {
     EmailLogs?: EmailLogsUncheckedCreateNestedManyWithoutLeaguesInput
     WeekWinners?: WeekWinnersUncheckedCreateNestedManyWithoutLeaguesInput
     leaguemessages?: leaguemessagesUncheckedCreateNestedManyWithoutLeaguesInput
-    other_leagues?: leaguesUncheckedCreateNestedOneWithoutLeaguesInput
+    future_leagues?: leaguesUncheckedCreateNestedManyWithoutPrior_leagueInput
   }
 
   export type leaguesCreateOrConnectWithoutLeaguemembersInput = {
@@ -19952,8 +19976,8 @@ export namespace Prisma {
     WeekWinners?: WeekWinnersUpdateManyWithoutLeaguesNestedInput
     leaguemessages?: leaguemessagesUpdateManyWithoutLeaguesNestedInput
     people?: peopleUpdateOneRequiredWithoutLeaguesNestedInput
-    leagues?: leaguesUpdateOneWithoutOther_leaguesNestedInput
-    other_leagues?: leaguesUpdateOneWithoutLeaguesNestedInput
+    prior_league?: leaguesUpdateOneWithoutFuture_leaguesNestedInput
+    future_leagues?: leaguesUpdateManyWithoutPrior_leagueNestedInput
   }
 
   export type leaguesUncheckedUpdateWithoutLeaguemembersInput = {
@@ -19973,7 +19997,7 @@ export namespace Prisma {
     EmailLogs?: EmailLogsUncheckedUpdateManyWithoutLeaguesNestedInput
     WeekWinners?: WeekWinnersUncheckedUpdateManyWithoutLeaguesNestedInput
     leaguemessages?: leaguemessagesUncheckedUpdateManyWithoutLeaguesNestedInput
-    other_leagues?: leaguesUncheckedUpdateOneWithoutLeaguesNestedInput
+    future_leagues?: leaguesUncheckedUpdateManyWithoutPrior_leagueNestedInput
   }
 
   export type leaguemessagesUpsertWithWhereUniqueWithoutLeaguemembersInput = {
@@ -20067,8 +20091,8 @@ export namespace Prisma {
     WeekWinners?: WeekWinnersCreateNestedManyWithoutLeaguesInput
     leaguemembers?: leaguemembersCreateNestedManyWithoutLeaguesInput
     people: peopleCreateNestedOneWithoutLeaguesInput
-    leagues?: leaguesCreateNestedOneWithoutOther_leaguesInput
-    other_leagues?: leaguesCreateNestedOneWithoutLeaguesInput
+    prior_league?: leaguesCreateNestedOneWithoutFuture_leaguesInput
+    future_leagues?: leaguesCreateNestedManyWithoutPrior_leagueInput
   }
 
   export type leaguesUncheckedCreateWithoutLeaguemessagesInput = {
@@ -20088,7 +20112,7 @@ export namespace Prisma {
     EmailLogs?: EmailLogsUncheckedCreateNestedManyWithoutLeaguesInput
     WeekWinners?: WeekWinnersUncheckedCreateNestedManyWithoutLeaguesInput
     leaguemembers?: leaguemembersUncheckedCreateNestedManyWithoutLeaguesInput
-    other_leagues?: leaguesUncheckedCreateNestedOneWithoutLeaguesInput
+    future_leagues?: leaguesUncheckedCreateNestedManyWithoutPrior_leagueInput
   }
 
   export type leaguesCreateOrConnectWithoutLeaguemessagesInput = {
@@ -20152,8 +20176,8 @@ export namespace Prisma {
     WeekWinners?: WeekWinnersUpdateManyWithoutLeaguesNestedInput
     leaguemembers?: leaguemembersUpdateManyWithoutLeaguesNestedInput
     people?: peopleUpdateOneRequiredWithoutLeaguesNestedInput
-    leagues?: leaguesUpdateOneWithoutOther_leaguesNestedInput
-    other_leagues?: leaguesUpdateOneWithoutLeaguesNestedInput
+    prior_league?: leaguesUpdateOneWithoutFuture_leaguesNestedInput
+    future_leagues?: leaguesUpdateManyWithoutPrior_leagueNestedInput
   }
 
   export type leaguesUncheckedUpdateWithoutLeaguemessagesInput = {
@@ -20173,7 +20197,7 @@ export namespace Prisma {
     EmailLogs?: EmailLogsUncheckedUpdateManyWithoutLeaguesNestedInput
     WeekWinners?: WeekWinnersUncheckedUpdateManyWithoutLeaguesNestedInput
     leaguemembers?: leaguemembersUncheckedUpdateManyWithoutLeaguesNestedInput
-    other_leagues?: leaguesUncheckedUpdateOneWithoutLeaguesNestedInput
+    future_leagues?: leaguesUncheckedUpdateManyWithoutPrior_leagueNestedInput
   }
 
   export type leaguemembersUpsertWithoutLeaguemessagesInput = {
@@ -20366,7 +20390,7 @@ export namespace Prisma {
     create: XOR<peopleCreateWithoutLeaguesInput, peopleUncheckedCreateWithoutLeaguesInput>
   }
 
-  export type leaguesCreateWithoutOther_leaguesInput = {
+  export type leaguesCreateWithoutFuture_leaguesInput = {
     name: string
     created_time?: Date | string
     season: number
@@ -20382,10 +20406,10 @@ export namespace Prisma {
     leaguemembers?: leaguemembersCreateNestedManyWithoutLeaguesInput
     leaguemessages?: leaguemessagesCreateNestedManyWithoutLeaguesInput
     people: peopleCreateNestedOneWithoutLeaguesInput
-    leagues?: leaguesCreateNestedOneWithoutOther_leaguesInput
+    prior_league?: leaguesCreateNestedOneWithoutFuture_leaguesInput
   }
 
-  export type leaguesUncheckedCreateWithoutOther_leaguesInput = {
+  export type leaguesUncheckedCreateWithoutFuture_leaguesInput = {
     league_id?: number
     created_by_user_id: number
     name: string
@@ -20405,12 +20429,12 @@ export namespace Prisma {
     leaguemessages?: leaguemessagesUncheckedCreateNestedManyWithoutLeaguesInput
   }
 
-  export type leaguesCreateOrConnectWithoutOther_leaguesInput = {
+  export type leaguesCreateOrConnectWithoutFuture_leaguesInput = {
     where: leaguesWhereUniqueInput
-    create: XOR<leaguesCreateWithoutOther_leaguesInput, leaguesUncheckedCreateWithoutOther_leaguesInput>
+    create: XOR<leaguesCreateWithoutFuture_leaguesInput, leaguesUncheckedCreateWithoutFuture_leaguesInput>
   }
 
-  export type leaguesCreateWithoutLeaguesInput = {
+  export type leaguesCreateWithoutPrior_leagueInput = {
     name: string
     created_time?: Date | string
     season: number
@@ -20426,10 +20450,10 @@ export namespace Prisma {
     leaguemembers?: leaguemembersCreateNestedManyWithoutLeaguesInput
     leaguemessages?: leaguemessagesCreateNestedManyWithoutLeaguesInput
     people: peopleCreateNestedOneWithoutLeaguesInput
-    other_leagues?: leaguesCreateNestedOneWithoutLeaguesInput
+    future_leagues?: leaguesCreateNestedManyWithoutPrior_leagueInput
   }
 
-  export type leaguesUncheckedCreateWithoutLeaguesInput = {
+  export type leaguesUncheckedCreateWithoutPrior_leagueInput = {
     league_id?: number
     created_by_user_id: number
     name: string
@@ -20446,12 +20470,17 @@ export namespace Prisma {
     WeekWinners?: WeekWinnersUncheckedCreateNestedManyWithoutLeaguesInput
     leaguemembers?: leaguemembersUncheckedCreateNestedManyWithoutLeaguesInput
     leaguemessages?: leaguemessagesUncheckedCreateNestedManyWithoutLeaguesInput
-    other_leagues?: leaguesUncheckedCreateNestedOneWithoutLeaguesInput
+    future_leagues?: leaguesUncheckedCreateNestedManyWithoutPrior_leagueInput
   }
 
-  export type leaguesCreateOrConnectWithoutLeaguesInput = {
+  export type leaguesCreateOrConnectWithoutPrior_leagueInput = {
     where: leaguesWhereUniqueInput
-    create: XOR<leaguesCreateWithoutLeaguesInput, leaguesUncheckedCreateWithoutLeaguesInput>
+    create: XOR<leaguesCreateWithoutPrior_leagueInput, leaguesUncheckedCreateWithoutPrior_leagueInput>
+  }
+
+  export type leaguesCreateManyPrior_leagueInputEnvelope = {
+    data: leaguesCreateManyPrior_leagueInput | leaguesCreateManyPrior_leagueInput[]
+    skipDuplicates?: boolean
   }
 
   export type EmailLogsUpsertWithWhereUniqueWithoutLeaguesInput = {
@@ -20572,18 +20601,18 @@ export namespace Prisma {
     picks?: picksUncheckedUpdateManyWithoutPeopleNestedInput
   }
 
-  export type leaguesUpsertWithoutOther_leaguesInput = {
-    update: XOR<leaguesUpdateWithoutOther_leaguesInput, leaguesUncheckedUpdateWithoutOther_leaguesInput>
-    create: XOR<leaguesCreateWithoutOther_leaguesInput, leaguesUncheckedCreateWithoutOther_leaguesInput>
+  export type leaguesUpsertWithoutFuture_leaguesInput = {
+    update: XOR<leaguesUpdateWithoutFuture_leaguesInput, leaguesUncheckedUpdateWithoutFuture_leaguesInput>
+    create: XOR<leaguesCreateWithoutFuture_leaguesInput, leaguesUncheckedCreateWithoutFuture_leaguesInput>
     where?: leaguesWhereInput
   }
 
-  export type leaguesUpdateToOneWithWhereWithoutOther_leaguesInput = {
+  export type leaguesUpdateToOneWithWhereWithoutFuture_leaguesInput = {
     where?: leaguesWhereInput
-    data: XOR<leaguesUpdateWithoutOther_leaguesInput, leaguesUncheckedUpdateWithoutOther_leaguesInput>
+    data: XOR<leaguesUpdateWithoutFuture_leaguesInput, leaguesUncheckedUpdateWithoutFuture_leaguesInput>
   }
 
-  export type leaguesUpdateWithoutOther_leaguesInput = {
+  export type leaguesUpdateWithoutFuture_leaguesInput = {
     name?: StringFieldUpdateOperationsInput | string
     created_time?: DateTimeFieldUpdateOperationsInput | Date | string
     season?: IntFieldUpdateOperationsInput | number
@@ -20599,10 +20628,10 @@ export namespace Prisma {
     leaguemembers?: leaguemembersUpdateManyWithoutLeaguesNestedInput
     leaguemessages?: leaguemessagesUpdateManyWithoutLeaguesNestedInput
     people?: peopleUpdateOneRequiredWithoutLeaguesNestedInput
-    leagues?: leaguesUpdateOneWithoutOther_leaguesNestedInput
+    prior_league?: leaguesUpdateOneWithoutFuture_leaguesNestedInput
   }
 
-  export type leaguesUncheckedUpdateWithoutOther_leaguesInput = {
+  export type leaguesUncheckedUpdateWithoutFuture_leaguesInput = {
     league_id?: IntFieldUpdateOperationsInput | number
     created_by_user_id?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
@@ -20622,54 +20651,39 @@ export namespace Prisma {
     leaguemessages?: leaguemessagesUncheckedUpdateManyWithoutLeaguesNestedInput
   }
 
-  export type leaguesUpsertWithoutLeaguesInput = {
-    update: XOR<leaguesUpdateWithoutLeaguesInput, leaguesUncheckedUpdateWithoutLeaguesInput>
-    create: XOR<leaguesCreateWithoutLeaguesInput, leaguesUncheckedCreateWithoutLeaguesInput>
-    where?: leaguesWhereInput
+  export type leaguesUpsertWithWhereUniqueWithoutPrior_leagueInput = {
+    where: leaguesWhereUniqueInput
+    update: XOR<leaguesUpdateWithoutPrior_leagueInput, leaguesUncheckedUpdateWithoutPrior_leagueInput>
+    create: XOR<leaguesCreateWithoutPrior_leagueInput, leaguesUncheckedCreateWithoutPrior_leagueInput>
   }
 
-  export type leaguesUpdateToOneWithWhereWithoutLeaguesInput = {
-    where?: leaguesWhereInput
-    data: XOR<leaguesUpdateWithoutLeaguesInput, leaguesUncheckedUpdateWithoutLeaguesInput>
+  export type leaguesUpdateWithWhereUniqueWithoutPrior_leagueInput = {
+    where: leaguesWhereUniqueInput
+    data: XOR<leaguesUpdateWithoutPrior_leagueInput, leaguesUncheckedUpdateWithoutPrior_leagueInput>
   }
 
-  export type leaguesUpdateWithoutLeaguesInput = {
-    name?: StringFieldUpdateOperationsInput | string
-    created_time?: DateTimeFieldUpdateOperationsInput | Date | string
-    season?: IntFieldUpdateOperationsInput | number
-    late_policy?: NullableEnumLatePolicyFieldUpdateOperationsInput | $Enums.LatePolicy | null
-    pick_policy?: NullableEnumPickPolicyFieldUpdateOperationsInput | $Enums.PickPolicy | null
-    reminder_policy?: NullableEnumReminderPolicyFieldUpdateOperationsInput | $Enums.ReminderPolicy | null
-    scoring_type?: NullableEnumScoringTypeFieldUpdateOperationsInput | $Enums.ScoringType | null
-    share_code?: NullableStringFieldUpdateOperationsInput | string | null
-    superbowl_competition?: NullableBoolFieldUpdateOperationsInput | boolean | null
-    status?: EnumLeagueStatusFieldUpdateOperationsInput | $Enums.LeagueStatus
-    EmailLogs?: EmailLogsUpdateManyWithoutLeaguesNestedInput
-    WeekWinners?: WeekWinnersUpdateManyWithoutLeaguesNestedInput
-    leaguemembers?: leaguemembersUpdateManyWithoutLeaguesNestedInput
-    leaguemessages?: leaguemessagesUpdateManyWithoutLeaguesNestedInput
-    people?: peopleUpdateOneRequiredWithoutLeaguesNestedInput
-    other_leagues?: leaguesUpdateOneWithoutLeaguesNestedInput
+  export type leaguesUpdateManyWithWhereWithoutPrior_leagueInput = {
+    where: leaguesScalarWhereInput
+    data: XOR<leaguesUpdateManyMutationInput, leaguesUncheckedUpdateManyWithoutPrior_leagueInput>
   }
 
-  export type leaguesUncheckedUpdateWithoutLeaguesInput = {
-    league_id?: IntFieldUpdateOperationsInput | number
-    created_by_user_id?: IntFieldUpdateOperationsInput | number
-    name?: StringFieldUpdateOperationsInput | string
-    created_time?: DateTimeFieldUpdateOperationsInput | Date | string
-    season?: IntFieldUpdateOperationsInput | number
-    late_policy?: NullableEnumLatePolicyFieldUpdateOperationsInput | $Enums.LatePolicy | null
-    pick_policy?: NullableEnumPickPolicyFieldUpdateOperationsInput | $Enums.PickPolicy | null
-    reminder_policy?: NullableEnumReminderPolicyFieldUpdateOperationsInput | $Enums.ReminderPolicy | null
-    scoring_type?: NullableEnumScoringTypeFieldUpdateOperationsInput | $Enums.ScoringType | null
-    share_code?: NullableStringFieldUpdateOperationsInput | string | null
-    superbowl_competition?: NullableBoolFieldUpdateOperationsInput | boolean | null
-    status?: EnumLeagueStatusFieldUpdateOperationsInput | $Enums.LeagueStatus
-    EmailLogs?: EmailLogsUncheckedUpdateManyWithoutLeaguesNestedInput
-    WeekWinners?: WeekWinnersUncheckedUpdateManyWithoutLeaguesNestedInput
-    leaguemembers?: leaguemembersUncheckedUpdateManyWithoutLeaguesNestedInput
-    leaguemessages?: leaguemessagesUncheckedUpdateManyWithoutLeaguesNestedInput
-    other_leagues?: leaguesUncheckedUpdateOneWithoutLeaguesNestedInput
+  export type leaguesScalarWhereInput = {
+    AND?: leaguesScalarWhereInput | leaguesScalarWhereInput[]
+    OR?: leaguesScalarWhereInput[]
+    NOT?: leaguesScalarWhereInput | leaguesScalarWhereInput[]
+    league_id?: IntFilter<"leagues"> | number
+    created_by_user_id?: IntFilter<"leagues"> | number
+    name?: StringFilter<"leagues"> | string
+    created_time?: DateTimeFilter<"leagues"> | Date | string
+    season?: IntFilter<"leagues"> | number
+    late_policy?: EnumLatePolicyNullableFilter<"leagues"> | $Enums.LatePolicy | null
+    pick_policy?: EnumPickPolicyNullableFilter<"leagues"> | $Enums.PickPolicy | null
+    reminder_policy?: EnumReminderPolicyNullableFilter<"leagues"> | $Enums.ReminderPolicy | null
+    scoring_type?: EnumScoringTypeNullableFilter<"leagues"> | $Enums.ScoringType | null
+    share_code?: StringNullableFilter<"leagues"> | string | null
+    superbowl_competition?: BoolNullableFilter<"leagues"> | boolean | null
+    prior_league_id?: IntNullableFilter<"leagues"> | number | null
+    status?: EnumLeagueStatusFilter<"leagues"> | $Enums.LeagueStatus
   }
 
   export type leaguemembersCreateWithoutPeopleInput = {
@@ -20722,8 +20736,8 @@ export namespace Prisma {
     WeekWinners?: WeekWinnersCreateNestedManyWithoutLeaguesInput
     leaguemembers?: leaguemembersCreateNestedManyWithoutLeaguesInput
     leaguemessages?: leaguemessagesCreateNestedManyWithoutLeaguesInput
-    leagues?: leaguesCreateNestedOneWithoutOther_leaguesInput
-    other_leagues?: leaguesCreateNestedOneWithoutLeaguesInput
+    prior_league?: leaguesCreateNestedOneWithoutFuture_leaguesInput
+    future_leagues?: leaguesCreateNestedManyWithoutPrior_leagueInput
   }
 
   export type leaguesUncheckedCreateWithoutPeopleInput = {
@@ -20743,7 +20757,7 @@ export namespace Prisma {
     WeekWinners?: WeekWinnersUncheckedCreateNestedManyWithoutLeaguesInput
     leaguemembers?: leaguemembersUncheckedCreateNestedManyWithoutLeaguesInput
     leaguemessages?: leaguemessagesUncheckedCreateNestedManyWithoutLeaguesInput
-    other_leagues?: leaguesUncheckedCreateNestedOneWithoutLeaguesInput
+    future_leagues?: leaguesUncheckedCreateNestedManyWithoutPrior_leagueInput
   }
 
   export type leaguesCreateOrConnectWithoutPeopleInput = {
@@ -20825,25 +20839,6 @@ export namespace Prisma {
   export type leaguesUpdateManyWithWhereWithoutPeopleInput = {
     where: leaguesScalarWhereInput
     data: XOR<leaguesUpdateManyMutationInput, leaguesUncheckedUpdateManyWithoutPeopleInput>
-  }
-
-  export type leaguesScalarWhereInput = {
-    AND?: leaguesScalarWhereInput | leaguesScalarWhereInput[]
-    OR?: leaguesScalarWhereInput[]
-    NOT?: leaguesScalarWhereInput | leaguesScalarWhereInput[]
-    league_id?: IntFilter<"leagues"> | number
-    created_by_user_id?: IntFilter<"leagues"> | number
-    name?: StringFilter<"leagues"> | string
-    created_time?: DateTimeFilter<"leagues"> | Date | string
-    season?: IntFilter<"leagues"> | number
-    late_policy?: EnumLatePolicyNullableFilter<"leagues"> | $Enums.LatePolicy | null
-    pick_policy?: EnumPickPolicyNullableFilter<"leagues"> | $Enums.PickPolicy | null
-    reminder_policy?: EnumReminderPolicyNullableFilter<"leagues"> | $Enums.ReminderPolicy | null
-    scoring_type?: EnumScoringTypeNullableFilter<"leagues"> | $Enums.ScoringType | null
-    share_code?: StringNullableFilter<"leagues"> | string | null
-    superbowl_competition?: BoolNullableFilter<"leagues"> | boolean | null
-    prior_league_id?: IntNullableFilter<"leagues"> | number | null
-    status?: EnumLeagueStatusFilter<"leagues"> | $Enums.LeagueStatus
   }
 
   export type picksUpsertWithWhereUniqueWithoutPeopleInput = {
@@ -21985,6 +21980,21 @@ export namespace Prisma {
     status?: $Enums.MessageStatus
   }
 
+  export type leaguesCreateManyPrior_leagueInput = {
+    league_id?: number
+    created_by_user_id: number
+    name: string
+    created_time?: Date | string
+    season: number
+    late_policy?: $Enums.LatePolicy | null
+    pick_policy?: $Enums.PickPolicy | null
+    reminder_policy?: $Enums.ReminderPolicy | null
+    scoring_type?: $Enums.ScoringType | null
+    share_code?: string | null
+    superbowl_competition?: boolean | null
+    status?: $Enums.LeagueStatus
+  }
+
   export type EmailLogsUpdateWithoutLeaguesInput = {
     email_log_id?: StringFieldUpdateOperationsInput | string
     email_type?: EnumEmailTypeFieldUpdateOperationsInput | $Enums.EmailType
@@ -22098,6 +22108,60 @@ export namespace Prisma {
     status?: EnumMessageStatusFieldUpdateOperationsInput | $Enums.MessageStatus
   }
 
+  export type leaguesUpdateWithoutPrior_leagueInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    created_time?: DateTimeFieldUpdateOperationsInput | Date | string
+    season?: IntFieldUpdateOperationsInput | number
+    late_policy?: NullableEnumLatePolicyFieldUpdateOperationsInput | $Enums.LatePolicy | null
+    pick_policy?: NullableEnumPickPolicyFieldUpdateOperationsInput | $Enums.PickPolicy | null
+    reminder_policy?: NullableEnumReminderPolicyFieldUpdateOperationsInput | $Enums.ReminderPolicy | null
+    scoring_type?: NullableEnumScoringTypeFieldUpdateOperationsInput | $Enums.ScoringType | null
+    share_code?: NullableStringFieldUpdateOperationsInput | string | null
+    superbowl_competition?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    status?: EnumLeagueStatusFieldUpdateOperationsInput | $Enums.LeagueStatus
+    EmailLogs?: EmailLogsUpdateManyWithoutLeaguesNestedInput
+    WeekWinners?: WeekWinnersUpdateManyWithoutLeaguesNestedInput
+    leaguemembers?: leaguemembersUpdateManyWithoutLeaguesNestedInput
+    leaguemessages?: leaguemessagesUpdateManyWithoutLeaguesNestedInput
+    people?: peopleUpdateOneRequiredWithoutLeaguesNestedInput
+    future_leagues?: leaguesUpdateManyWithoutPrior_leagueNestedInput
+  }
+
+  export type leaguesUncheckedUpdateWithoutPrior_leagueInput = {
+    league_id?: IntFieldUpdateOperationsInput | number
+    created_by_user_id?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    created_time?: DateTimeFieldUpdateOperationsInput | Date | string
+    season?: IntFieldUpdateOperationsInput | number
+    late_policy?: NullableEnumLatePolicyFieldUpdateOperationsInput | $Enums.LatePolicy | null
+    pick_policy?: NullableEnumPickPolicyFieldUpdateOperationsInput | $Enums.PickPolicy | null
+    reminder_policy?: NullableEnumReminderPolicyFieldUpdateOperationsInput | $Enums.ReminderPolicy | null
+    scoring_type?: NullableEnumScoringTypeFieldUpdateOperationsInput | $Enums.ScoringType | null
+    share_code?: NullableStringFieldUpdateOperationsInput | string | null
+    superbowl_competition?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    status?: EnumLeagueStatusFieldUpdateOperationsInput | $Enums.LeagueStatus
+    EmailLogs?: EmailLogsUncheckedUpdateManyWithoutLeaguesNestedInput
+    WeekWinners?: WeekWinnersUncheckedUpdateManyWithoutLeaguesNestedInput
+    leaguemembers?: leaguemembersUncheckedUpdateManyWithoutLeaguesNestedInput
+    leaguemessages?: leaguemessagesUncheckedUpdateManyWithoutLeaguesNestedInput
+    future_leagues?: leaguesUncheckedUpdateManyWithoutPrior_leagueNestedInput
+  }
+
+  export type leaguesUncheckedUpdateManyWithoutPrior_leagueInput = {
+    league_id?: IntFieldUpdateOperationsInput | number
+    created_by_user_id?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    created_time?: DateTimeFieldUpdateOperationsInput | Date | string
+    season?: IntFieldUpdateOperationsInput | number
+    late_policy?: NullableEnumLatePolicyFieldUpdateOperationsInput | $Enums.LatePolicy | null
+    pick_policy?: NullableEnumPickPolicyFieldUpdateOperationsInput | $Enums.PickPolicy | null
+    reminder_policy?: NullableEnumReminderPolicyFieldUpdateOperationsInput | $Enums.ReminderPolicy | null
+    scoring_type?: NullableEnumScoringTypeFieldUpdateOperationsInput | $Enums.ScoringType | null
+    share_code?: NullableStringFieldUpdateOperationsInput | string | null
+    superbowl_competition?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    status?: EnumLeagueStatusFieldUpdateOperationsInput | $Enums.LeagueStatus
+  }
+
   export type leaguemembersCreateManyPeopleInput = {
     membership_id?: number
     league_id: number
@@ -22184,8 +22248,8 @@ export namespace Prisma {
     WeekWinners?: WeekWinnersUpdateManyWithoutLeaguesNestedInput
     leaguemembers?: leaguemembersUpdateManyWithoutLeaguesNestedInput
     leaguemessages?: leaguemessagesUpdateManyWithoutLeaguesNestedInput
-    leagues?: leaguesUpdateOneWithoutOther_leaguesNestedInput
-    other_leagues?: leaguesUpdateOneWithoutLeaguesNestedInput
+    prior_league?: leaguesUpdateOneWithoutFuture_leaguesNestedInput
+    future_leagues?: leaguesUpdateManyWithoutPrior_leagueNestedInput
   }
 
   export type leaguesUncheckedUpdateWithoutPeopleInput = {
@@ -22205,7 +22269,7 @@ export namespace Prisma {
     WeekWinners?: WeekWinnersUncheckedUpdateManyWithoutLeaguesNestedInput
     leaguemembers?: leaguemembersUncheckedUpdateManyWithoutLeaguesNestedInput
     leaguemessages?: leaguemessagesUncheckedUpdateManyWithoutLeaguesNestedInput
-    other_leagues?: leaguesUncheckedUpdateOneWithoutLeaguesNestedInput
+    future_leagues?: leaguesUncheckedUpdateManyWithoutPrior_leagueNestedInput
   }
 
   export type leaguesUncheckedUpdateManyWithoutPeopleInput = {

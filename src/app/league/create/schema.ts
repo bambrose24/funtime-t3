@@ -13,5 +13,5 @@ export const createLeagueFormSchema = z.object({
   reminderPolicy: z.nativeEnum(ReminderPolicy).or(z.literal("none")),
   scoringType: z.nativeEnum(ScoringType).optional(),
   superbowlCompetition: z.boolean(),
-  priorLeagueId: z.number().int().optional(),
+  priorLeagueId: z.string().optional(),
 });

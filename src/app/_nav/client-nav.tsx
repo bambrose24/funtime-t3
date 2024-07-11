@@ -31,6 +31,7 @@ import {
   ChevronsUpDown,
   HomeIcon,
   PenIcon,
+  PlusIcon,
   SettingsIcon,
   TrophyIcon,
 } from "lucide-react";
@@ -104,6 +105,16 @@ export function ClientNav(props: NavData) {
                     </Link>
                   );
                 })}
+                <DropdownMenuSeparator className="my-2" />
+                <DropdownMenuItem
+                  className="flex gap-2"
+                  onSelect={() => {
+                    router.push("/league/create");
+                  }}
+                >
+                  <PlusIcon className="h-4 w-4 text-foreground" />
+                  <span>Create a League</span>
+                </DropdownMenuItem>
                 <DropdownMenuSeparator className="my-2" />
 
                 <DropdownMenuLabel>Prior Leagues</DropdownMenuLabel>

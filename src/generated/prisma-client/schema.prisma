@@ -130,17 +130,17 @@ model leagues {
   pick_policy           PickPolicy?      @default(choose_winner)
   reminder_policy       ReminderPolicy?  @default(three_hours_before)
   scoring_type          ScoringType?     @default(game_winner)
-  share_code            String?          @unique
+  share_code            String?          @unique @default(cuid())
   superbowl_competition Boolean?         @default(true)
-  prior_league_id       Int?             @unique
+  prior_league_id       Int?
   status                LeagueStatus     @default(not_started)
   EmailLogs             EmailLogs[]
   WeekWinners           WeekWinners[]
   leaguemembers         leaguemembers[]
   leaguemessages        leaguemessages[]
   people                people           @relation(fields: [created_by_user_id], references: [uid], onUpdate: Restrict, map: "leagues_ibfk_1")
-  leagues               leagues?         @relation("leaguesToleagues", fields: [prior_league_id], references: [league_id])
-  other_leagues         leagues?         @relation("leaguesToleagues")
+  prior_league          leagues?         @relation("leaguesToleagues", fields: [prior_league_id], references: [league_id])
+  future_leagues        leagues[]        @relation("leaguesToleagues")
 
   @@index([created_by_user_id], map: "idx_18422_created_by_user_id")
   @@index([created_time], map: "idx_18422_created_time")

@@ -28,27 +28,37 @@ import Link from "next/link";
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from "~/components/ui/select";
 import { ReminderPolicy } from "~/generated/prisma-client";
 import { Button } from "~/components/ui/button";
+import { clientApi } from "~/trpc/react";
+import { DEFAULT_SEASON } from "~/utils/const";
+import { toast } from "sonner";
 
 type Props = {
   priorLeague: RouterOutputs["league"]["get"] | undefined;
   createLeagueForm: RouterOutputs["league"]["createForm"];
+  navInitialData: RouterOutputs["home"]["nav"];
 };
 
 export function CreateLeagueClientPage({
   priorLeague,
   createLeagueForm,
+  navInitialData,
 }: Props) {
+  const { data: nav } = clientApi.home.nav.useQuery(undefined, {
+    initialData: navInitialData,
+  });
+
   const form = useForm<z.infer<typeof createLeagueFormSchema>>({
     resolver: zodResolver(createLeagueFormSchema),
     defaultValues: {
       name: "",
-      priorLeagueId: priorLeague?.league_id,
+      priorLeagueId: priorLeague?.league_id?.toString(),
       latePolicy: priorLeague?.late_policy ?? "allow_late_and_lock_after_start",
       pickPolicy: priorLeague?.pick_policy ?? "choose_winner",
       reminderPolicy: priorLeague?.reminder_policy ?? "three_hours_before",
@@ -57,8 +67,24 @@ export function CreateLeagueClientPage({
     },
   });
 
+  const { mutateAsync: createLeague } = clientApi.league.create.useMutation();
+
   const onSubmit: Parameters<typeof form.handleSubmit>[0] = async (data) => {
     console.log("submitted data", data);
+
+    const newLeague = await createLeague({
+      latePolicy: data.latePolicy,
+      name: data.name,
+      ...(data.pickPolicy && { pickPolicy: data.pickPolicy }),
+      ...(data.reminderPolicy &&
+        data.reminderPolicy !== "none" && {
+          reminderPolicy: data.reminderPolicy,
+        }),
+      superbowlCompetition: data.superbowlCompetition,
+      priorLeagueId: Number(data.priorLeagueId),
+    });
+
+    toast.success(`The league ${newLeague.name} was created.`);
   };
 
   return (
@@ -124,6 +150,42 @@ export function CreateLeagueClientPage({
                         <Input {...field} />
                       </FormControl>
                       <FormDescription />
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="priorLeagueId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Prior League?</FormLabel>
+                      <FormControl>
+                        <Select {...field} onValueChange={field.onChange}>
+                          <SelectTrigger className="w-full ring-2 ring-input focus:ring-2">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {nav?.leagues
+                              .filter((l) => l.season < DEFAULT_SEASON)
+                              .map((league, idx) => {
+                                return (
+                                  <SelectItem
+                                    key={idx}
+                                    value={league.league_id.toString()}
+                                  >
+                                    {league.name}
+                                  </SelectItem>
+                                );
+                              })}
+                          </SelectContent>
+                        </Select>
+                      </FormControl>
+                      <FormDescription>
+                        If you&apos;re making a league from a prior league, mark
+                        it here. You&apos;ll be able to invite folks from the
+                        prior league easily.
+                      </FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}

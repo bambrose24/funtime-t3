@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { string, z } from "zod";
 import {
   authorizedProcedure,
   createTRPCRouter,
@@ -18,6 +18,7 @@ import {
   ScoringType,
 } from "~/generated/prisma-client";
 import { leagueAdminRouter } from "./admin";
+import { DEFAULT_SEASON } from "~/utils/const";
 
 const picksSummarySchema = z.object({
   leagueId: z.number().int(),
@@ -30,6 +31,48 @@ const leagueIdSchema = z.object({
 
 export const leagueRouter = createTRPCRouter({
   admin: leagueAdminRouter,
+  create: authorizedProcedure
+    .input(
+      z.object({
+        name: z.string(),
+        priorLeagueId: z.number().optional(),
+        latePolicy: z
+          .nativeEnum(LatePolicy)
+          .default(LatePolicy.allow_late_and_lock_after_start),
+        pickPolicy: z.nativeEnum(PickPolicy).default(PickPolicy.choose_winner),
+        scoringType: z.nativeEnum(ScoringType).default(ScoringType.game_winner),
+        reminderPolicy: z
+          .nativeEnum(ReminderPolicy)
+          .default(ReminderPolicy.three_hours_before),
+        superbowlCompetition: z.boolean(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { dbUser } = ctx;
+      if (!dbUser) {
+        throw new TRPCError({ code: "UNAUTHORIZED" });
+      }
+      const response = await ctx.db.leagues.create({
+        data: {
+          name: input.name,
+          season: DEFAULT_SEASON,
+          prior_league_id: input.priorLeagueId ?? null,
+          late_policy: input.latePolicy,
+          pick_policy: input.pickPolicy,
+          reminder_policy: input.reminderPolicy,
+          superbowl_competition: input.superbowlCompetition,
+          created_by_user_id: dbUser.uid,
+          created_time: new Date(),
+          leaguemembers: {
+            create: {
+              user_id: dbUser.uid,
+              role: "admin",
+            },
+          },
+        },
+      });
+      return response;
+    }),
   get: authorizedProcedure
     .input(leagueIdSchema)
     .query(async ({ input, ctx }) => {
