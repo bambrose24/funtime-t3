@@ -20,6 +20,7 @@ export default async function LeagueAdminPage({
     serverApi.session.current(),
     serverApi.league.get({ leagueId }),
   ]);
+
   if (
     !session.dbUser ||
     !league ||
