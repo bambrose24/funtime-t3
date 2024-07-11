@@ -59,10 +59,10 @@ export function ClientNav(props: NavData) {
   const chosenLeague = leagues?.find((l) => l.league_id === leagueId);
 
   const activeLeagues = leagues?.filter(
-    (l) => l.status !== "completed" && new Date().getFullYear() - 1 <= l.season,
+    (l) => l.status !== "completed" && new Date().getFullYear() - 1 < l.season,
   );
   const inactiveLeagues = leagues?.filter(
-    (l) => l.status === "completed" || new Date().getFullYear() - 1 > l.season,
+    (l) => l.status === "completed" || new Date().getFullYear() - 1 >= l.season,
   );
 
   useEffect(() => {
