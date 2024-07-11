@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { serverApi } from "~/trpc/server";
 import { ClientLeaguePage } from "./client-league-page";
+import { NotStartedLeaguePage } from "./not-started/NotStartedLeaguePage";
 
 // dynamic route params come in as `params` arg
 type Props = {
@@ -22,6 +23,8 @@ export default async function LeaguePage({
     (m) => m.league_id === leagueId,
   );
 
+  console.log("member?", member);
+
   if (!member) {
     // not in the league
     return notFound();
@@ -38,7 +41,7 @@ export default async function LeaguePage({
   if (!week) {
     if (!activeGame) {
       // I suppose the league hasn't started yet? idk what to do yet
-      return notFound();
+      return <NotStartedLeaguePage league={league} session={session} />;
     }
     week = activeGame.week;
   }
