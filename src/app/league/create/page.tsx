@@ -12,7 +12,10 @@ export default async function CreateLeaguePage({
 }: {
   searchParams?: Record<string, string>;
 }) {
-  const session = await serverApi.session.current();
+  const [session, nav] = await Promise.all([
+    serverApi.session.current(),
+    serverApi.home.nav(),
+  ]);
   if (!session.dbUser) {
     const params = new URLSearchParams({
       redirectTo: "/league/create",
@@ -32,6 +35,7 @@ export default async function CreateLeaguePage({
     <CreateLeagueClientPage
       priorLeague={priorLeague}
       createLeagueForm={createLeagueForm}
+      navInitialData={nav}
     />
   );
 }
