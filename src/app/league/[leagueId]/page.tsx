@@ -40,7 +40,7 @@ export default async function LeaguePage({
   let week = Number(weekParam);
   if (!week) {
     if (!activeGame) {
-      // I suppose the league hasn't started yet? idk what to do yet
+      // TODO show the regular page if the person has made a pick, but hide picks table
       return <NotStartedLeaguePage league={league} session={session} />;
     }
     week = activeGame.week;
