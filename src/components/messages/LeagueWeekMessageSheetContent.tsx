@@ -7,6 +7,8 @@ import {
   SheetTitle,
 } from "../ui/sheet";
 import { MESSAGES_REFETCH_INTERVAL_MS } from "./const";
+import { Textarea } from "../ui/textarea";
+import { Button } from "../ui/button";
 
 export function LeagueWeekMessageSheetContent({
   week,
@@ -42,8 +44,11 @@ export function LeagueWeekMessageSheetContent({
             })}
           </div>
         </SheetHeader>
-        <SheetFooter className="absolute bottom-0 left-0 right-0 h-[100px] bg-red-400">
-          hi
+        <SheetFooter className="absolute bottom-0 left-0 right-0">
+          <div className="flex flex-col gap-4">
+            <Textarea autoFocus className="h-[100px] w-full" />
+            <Button>Send Message</Button>
+          </div>
         </SheetFooter>
       </SheetContent>
     </>
