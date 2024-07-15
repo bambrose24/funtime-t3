@@ -9,6 +9,8 @@ import {
 import { MESSAGES_REFETCH_INTERVAL_MS } from "./const";
 import { Textarea } from "../ui/textarea";
 import { Button } from "../ui/button";
+import { cn } from "~/lib/utils";
+import MessageComposer from "./Composer";
 
 export function LeagueWeekMessageSheetContent({
   week,
@@ -33,8 +35,8 @@ export function LeagueWeekMessageSheetContent({
 
   return (
     <>
-      <SheetContent className={className}>
-        <SheetHeader className="pt-2">
+      <SheetContent className={cn("p-2 lg:p-3", className)}>
+        <SheetHeader className="pt-6">
           <SheetTitle>
             {league.name} - Week {week} Message Board
           </SheetTitle>
@@ -44,11 +46,13 @@ export function LeagueWeekMessageSheetContent({
             })}
           </div>
         </SheetHeader>
-        <SheetFooter className="absolute bottom-0 left-0 right-0">
-          <div className="flex flex-col gap-4">
-            <Textarea autoFocus className="h-[100px] w-full" />
-            <Button>Send Message</Button>
-          </div>
+        <SheetFooter className="absolute bottom-0 left-2 right-2 lg:left-3 lg:right-3">
+          <MessageComposer
+            className="mb-2 px-2"
+            onSubmit={async (data) => {
+              console.log("data??", data);
+            }}
+          />
         </SheetFooter>
       </SheetContent>
     </>
