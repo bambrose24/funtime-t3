@@ -32,14 +32,7 @@ import { useDictify } from "~/utils/hooks/useIdToValMemo";
 import { ScrollArea, ScrollBar } from "~/components/ui/scroll-area";
 import { type RouterOutputs } from "~/trpc/types";
 import { clientApi } from "~/trpc/react";
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "~/components/ui/sheet";
+import { Sheet, SheetTrigger } from "~/components/ui/sheet";
 import { LeagueWeekMessageSheetContent } from "~/components/messages/LeagueWeekMessageSheetContent";
 
 type ClientLeaguePageProps = {
