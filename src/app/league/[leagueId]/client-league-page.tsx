@@ -32,6 +32,15 @@ import { useDictify } from "~/utils/hooks/useIdToValMemo";
 import { ScrollArea, ScrollBar } from "~/components/ui/scroll-area";
 import { type RouterOutputs } from "~/trpc/types";
 import { clientApi } from "~/trpc/react";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "~/components/ui/sheet";
+import { LeagueWeekMessageSheetContent } from "~/components/messages/LeagueWeekMessageSheetContent";
 
 type ClientLeaguePageProps = {
   week: number;
@@ -271,7 +280,7 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
               </Alert>
             </div>
           )}
-          <div className="flex flex-row xl:hidden">
+          <div className="flex flex-col xl:hidden">
             {myPicks && firstGame && (
               <Drawer>
                 <DrawerTrigger asChild>
@@ -303,6 +312,20 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
                   </div>
                 </DrawerContent>
               </Drawer>
+            )}
+          </div>
+          <div className="flex flex-col xl:hidden">
+            {week !== undefined && (
+              <Sheet>
+                <SheetTrigger asChild>
+                  <Button variant="outline">Chat</Button>
+                </SheetTrigger>
+                <LeagueWeekMessageSheetContent
+                  className="w-full"
+                  week={week}
+                  leagueId={league.league_id}
+                />
+              </Sheet>
             )}
           </div>
           <PicksTable picksSummary={picksSummary} teams={teams} games={games} />
