@@ -100,7 +100,7 @@ model leaguemembers {
 }
 
 model leaguemessages {
-  message_id    String        @id
+  message_id    String        @id @default(cuid())
   content       String
   member_id     Int
   league_id     Int

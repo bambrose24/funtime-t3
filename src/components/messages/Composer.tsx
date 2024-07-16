@@ -8,6 +8,7 @@ import { Label } from "~/components/ui/label";
 import { Textarea } from "~/components/ui/textarea";
 import { Form, FormControl, FormField, FormItem } from "~/components/ui/form";
 import { cn } from "~/lib/utils";
+import { useEffect } from "react";
 
 const schema = z.object({ message: z.string().min(1) });
 
@@ -20,6 +21,19 @@ export default function MessageComposer({ onSubmit, className }: Props) {
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
   });
+
+  const {
+    reset,
+    formState: { isSubmitSuccessful },
+  } = form;
+
+  useEffect(() => {
+    if (isSubmitSuccessful) {
+      reset({
+        message: "",
+      });
+    }
+  }, [reset, isSubmitSuccessful]);
 
   const handleKeyPress = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (event.key === "Enter" && event.metaKey) {

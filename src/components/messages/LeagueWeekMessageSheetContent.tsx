@@ -33,12 +33,18 @@ export function LeagueWeekMessageSheetContent({
       },
     );
   const { data: session } = clientApi.session.current.useQuery();
+  const utils = clientApi.useUtils();
+  const { mutateAsync: sendMessage } =
+    clientApi.messages.writeWeekMessage.useMutation({
+      onSettled: async () => {
+        await utils.messages.leagueWeekMessageBoard.invalidate({
+          leagueId,
+          week,
+        });
+      },
+    });
 
-  const messages = [
-    ...(messagesData ?? []),
-    ...(messagesData ?? []),
-    ...(messagesData ?? []),
-  ];
+  const messages = messagesData ?? [];
 
   const lastMessageIdx = messages.length - 1;
 
@@ -83,10 +89,7 @@ export function LeagueWeekMessageSheetContent({
         <Separator />
       </SheetHeader>
 
-      <ScrollArea
-        className="row-span-1 h-full overflow-y-auto"
-        id="messagesScroll"
-      >
+      <ScrollArea className="row-span-1 h-full overflow-y-auto">
         <div className="flex flex-col gap-3">
           {messages.map((message, idx) => {
             const name = message.leaguemembers.people.username;
@@ -135,7 +138,11 @@ export function LeagueWeekMessageSheetContent({
         <MessageComposer
           className="mb-4 w-full px-2"
           onSubmit={async (data) => {
-            console.log("data??????", data);
+            await sendMessage({
+              content: data.message,
+              leagueId,
+              week,
+            });
           }}
         />
       </SheetFooter>

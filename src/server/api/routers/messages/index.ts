@@ -38,4 +38,38 @@ export const messagesRouter = createTRPCRouter({
         },
       });
     }),
+  writeWeekMessage: authorizedProcedure
+    .input(
+      z.object({
+        week: z.number().int(),
+        leagueId: z.number().int(),
+        content: z.string().min(1).max(300),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { dbUser } = ctx;
+      const member = dbUser?.leaguemembers.find(
+        (m) => m.league_id === input.leagueId,
+      );
+      if (!member) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "You arent in that league",
+        });
+      }
+
+      const { week, leagueId, content } = input;
+
+      const created = await ctx.db.leaguemessages.create({
+        data: {
+          content,
+          message_type: "WEEK_COMMENT",
+          week,
+          league_id: leagueId,
+          member_id: member.membership_id,
+          status: "PUBLISHED",
+        },
+      });
+      return created;
+    }),
 });

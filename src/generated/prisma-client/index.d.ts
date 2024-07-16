@@ -15857,7 +15857,7 @@ export namespace Prisma {
   }
 
   export type leaguemessagesCreateInput = {
-    message_id: string
+    message_id?: string
     content: string
     week?: number | null
     message_type: $Enums.MessageType
@@ -15868,7 +15868,7 @@ export namespace Prisma {
   }
 
   export type leaguemessagesUncheckedCreateInput = {
-    message_id: string
+    message_id?: string
     content: string
     member_id: number
     league_id: number
@@ -15901,7 +15901,7 @@ export namespace Prisma {
   }
 
   export type leaguemessagesCreateManyInput = {
-    message_id: string
+    message_id?: string
     content: string
     member_id: number
     league_id: number
@@ -19754,7 +19754,7 @@ export namespace Prisma {
   }
 
   export type leaguemessagesCreateWithoutLeaguemembersInput = {
-    message_id: string
+    message_id?: string
     content: string
     week?: number | null
     message_type: $Enums.MessageType
@@ -19764,7 +19764,7 @@ export namespace Prisma {
   }
 
   export type leaguemessagesUncheckedCreateWithoutLeaguemembersInput = {
-    message_id: string
+    message_id?: string
     content: string
     league_id: number
     week?: number | null
@@ -20325,7 +20325,7 @@ export namespace Prisma {
   }
 
   export type leaguemessagesCreateWithoutLeaguesInput = {
-    message_id: string
+    message_id?: string
     content: string
     week?: number | null
     message_type: $Enums.MessageType
@@ -20335,7 +20335,7 @@ export namespace Prisma {
   }
 
   export type leaguemessagesUncheckedCreateWithoutLeaguesInput = {
-    message_id: string
+    message_id?: string
     content: string
     member_id: number
     week?: number | null
@@ -21758,7 +21758,7 @@ export namespace Prisma {
   }
 
   export type leaguemessagesCreateManyLeaguemembersInput = {
-    message_id: string
+    message_id?: string
     content: string
     league_id: number
     week?: number | null
@@ -21971,7 +21971,7 @@ export namespace Prisma {
   }
 
   export type leaguemessagesCreateManyLeaguesInput = {
-    message_id: string
+    message_id?: string
     content: string
     member_id: number
     week?: number | null
