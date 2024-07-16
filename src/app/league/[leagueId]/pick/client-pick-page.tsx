@@ -343,10 +343,10 @@ export function ClientPickPage({ weekToPick, teams, leagueId }: Props) {
                                 control={form.control}
                                 name="tiebreakerScore.score"
                                 render={({ field, fieldState }) => {
-                                  const valid =
-                                    fieldState.isTouched &&
-                                    !fieldState.error &&
-                                    !fieldState.invalid;
+                                  // const valid =
+                                  //   fieldState.isTouched &&
+                                  //   !fieldState.error &&
+                                  //   !fieldState.invalid;
                                   return (
                                     <FormItem>
                                       <FormLabel>Tiebreaker Score</FormLabel>
