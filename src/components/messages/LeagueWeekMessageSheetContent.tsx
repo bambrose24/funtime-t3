@@ -117,7 +117,11 @@ export function LeagueWeekMessageSheetContent({
                     {message.content}
                   </div>
                   {isSender && (
-                    <DeleteMessageButton messageId={message.message_id} />
+                    <DeleteMessageButton
+                      messageId={message.message_id}
+                      week={week}
+                      leagueId={leagueId}
+                    />
                   )}
                 </div>
                 <div
