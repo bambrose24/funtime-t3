@@ -27,7 +27,7 @@ import {
 import { usePathname, useRouter } from "next/navigation";
 import { cloneDeep } from "lodash";
 import { Alert, AlertTitle } from "~/components/ui/alert";
-import { AlertCircleIcon } from "lucide-react";
+import { AlertCircleIcon, MessagesSquare } from "lucide-react";
 import { useDictify } from "~/utils/hooks/useIdToValMemo";
 import { ScrollArea, ScrollBar } from "~/components/ui/scroll-area";
 import { type RouterOutputs } from "~/trpc/types";
@@ -172,7 +172,13 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
               }}
             >
               <SheetTrigger asChild>
-                <Button variant="outline">Chat</Button>
+                <Button
+                  variant="secondary"
+                  className="flex items-center gap-2 text-muted-foreground"
+                >
+                  <MessagesSquare className="h-4 w-4 text-muted-foreground" />
+                  Chat
+                </Button>
               </SheetTrigger>
               <LeagueWeekMessageSheetContent
                 className="w-[600px]"
@@ -224,30 +230,61 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
       </div>
       <div className="col-span-12 xl:col-span-10">
         <div className="flex flex-col gap-4">
-          <div className="w-full xl:hidden">
+          <div className="flex w-full justify-between gap-2 xl:hidden">
+            {week !== undefined && (
+              <div className="w-full">
+                <Sheet
+                  open={chatSheetOpen}
+                  onOpenChange={(open) => setChatSheetOpen(open)}
+                >
+                  <SheetTrigger asChild>
+                    <Button
+                      variant="secondary"
+                      className="flex items-center gap-2 text-muted-foreground"
+                    >
+                      <MessagesSquare className="h-4 w-4 text-muted-foreground" />
+                      Chat
+                    </Button>
+                  </SheetTrigger>
+                  <LeagueWeekMessageSheetContent
+                    className="w-full"
+                    week={week}
+                    leagueId={league.league_id}
+                    closeSheet={() => {
+                      setChatSheetOpen(false);
+                    }}
+                  />
+                </Sheet>
+              </div>
+            )}
             {currentGame && firstGame && (
-              <Select
-                onValueChange={(value) => {
-                  const week = Number(value);
-                  router.push(`${pathname}?week=${week}`);
-                }}
-              >
-                <SelectTrigger className="w-full ring-2 ring-input focus:ring-2">
-                  <SelectValue placeholder={`Week ${firstGame.week}`} />
-                </SelectTrigger>
-                <SelectContent>
-                  {[...Array(currentGame.week).keys()]
-                    .reverse()
-                    .map((weekMinusOne) => {
-                      const realWeek = weekMinusOne + 1;
-                      return (
-                        <SelectItem key={realWeek} value={realWeek.toString()}>
-                          Week {realWeek}
-                        </SelectItem>
-                      );
-                    })}
-                </SelectContent>
-              </Select>
+              <div className="w-full">
+                <Select
+                  onValueChange={(value) => {
+                    const week = Number(value);
+                    router.push(`${pathname}?week=${week}`);
+                  }}
+                >
+                  <SelectTrigger className="w-full ring-2 ring-input focus:ring-2">
+                    <SelectValue placeholder={`Week ${firstGame.week}`} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {[...Array(currentGame.week).keys()]
+                      .reverse()
+                      .map((weekMinusOne) => {
+                        const realWeek = weekMinusOne + 1;
+                        return (
+                          <SelectItem
+                            key={realWeek}
+                            value={realWeek.toString()}
+                          >
+                            Week {realWeek}
+                          </SelectItem>
+                        );
+                      })}
+                  </SelectContent>
+                </Select>
+              </div>
             )}
           </div>
           <ScrollArea>
@@ -327,26 +364,6 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
                   </div>
                 </DrawerContent>
               </Drawer>
-            )}
-          </div>
-          <div className="flex flex-col xl:hidden">
-            {week !== undefined && (
-              <Sheet
-                open={chatSheetOpen}
-                onOpenChange={(open) => setChatSheetOpen(open)}
-              >
-                <SheetTrigger asChild>
-                  <Button variant="outline">Chat</Button>
-                </SheetTrigger>
-                <LeagueWeekMessageSheetContent
-                  className="w-full"
-                  week={week}
-                  leagueId={league.league_id}
-                  closeSheet={() => {
-                    setChatSheetOpen(false);
-                  }}
-                />
-              </Sheet>
             )}
           </div>
           <PicksTable picksSummary={picksSummary} teams={teams} games={games} />
