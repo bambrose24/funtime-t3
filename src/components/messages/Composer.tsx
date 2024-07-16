@@ -70,13 +70,13 @@ export default function MessageComposer({
                   {...field}
                   onKeyDown={handleKeyPress}
                   placeholder="Type your message here..."
-                  className="min-h-12 resize-none border-0 p-3 shadow-none focus-visible:ring-0"
+                  className="min-h-[60px] resize-none border-0 p-3 shadow-none focus-visible:ring-0"
                 />
               </FormControl>
             </FormItem>
           )}
         />
-        <div className="flex justify-between gap-2">
+        <div className="flex justify-between gap-2 pb-2">
           <Button
             className="w-full"
             variant="secondary"
