@@ -16,6 +16,7 @@ import { ScrollArea, ScrollBar } from "../ui/scroll-area";
 import { useEffect } from "react";
 import { Button } from "../ui/button";
 import { Trash2 } from "lucide-react";
+import { toast } from "sonner";
 
 export function LeagueWeekMessageSheetContent({
   week,
@@ -39,7 +40,7 @@ export function LeagueWeekMessageSheetContent({
   const { data: session } = clientApi.session.current.useQuery();
   const utils = clientApi.useUtils();
 
-  const onSettled = async () => {
+  const onSuccess = async () => {
     await utils.messages.leagueWeekMessageBoard.invalidate({
       leagueId,
       week,
@@ -47,7 +48,7 @@ export function LeagueWeekMessageSheetContent({
   };
   const { mutateAsync: sendMessage } =
     clientApi.messages.writeWeekMessage.useMutation({
-      onSettled,
+      onSuccess,
     });
 
   const messages = messagesData ?? [];
@@ -178,11 +179,12 @@ function DeleteMessageButton({
   const utils = clientApi.useUtils();
   const { mutateAsync: deleteMessage, isPending } =
     clientApi.messages.deleteMessage.useMutation({
-      onSettled: async () => {
+      onSuccess: async () => {
         await utils.messages.leagueWeekMessageBoard.invalidate({
           leagueId,
           week,
         });
+        toast.success(`Deleted message`);
       },
     });
   return (
