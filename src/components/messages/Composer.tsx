@@ -76,21 +76,6 @@ export default function MessageComposer({
             </FormItem>
           )}
         />
-
-        {/* <div className="flex items-center p-3 pt-0">
-          <Button
-            type="submit"
-            size="sm"
-            className="ml-auto gap-1.5"
-            disabled={form.formState.isSubmitting}
-          >
-            {form.formState.isSubmitting && (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            )}
-            Send Message
-            <CornerDownLeft className="size-3.5" />
-          </Button>
-        </div> */}
         <div className="flex justify-between gap-2">
           <Button
             className="w-full"
@@ -98,6 +83,7 @@ export default function MessageComposer({
             type="button"
             onClick={(e) => {
               e.preventDefault();
+              console.log("going to close sheet");
               closeSheet();
             }}
           >

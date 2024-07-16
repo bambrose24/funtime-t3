@@ -26,7 +26,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "../ui/dialog";
-import { RouterOutputs } from "~/trpc/types";
+import { type RouterOutputs } from "~/trpc/types";
 
 export function LeagueWeekMessageSheetContent({
   week,
