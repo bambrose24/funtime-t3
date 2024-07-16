@@ -14,10 +14,15 @@ const schema = z.object({ message: z.string().min(1) });
 
 type Props = {
   onSubmit: (data: z.infer<typeof schema>) => Promise<void>;
+  closeSheet: () => void;
   className?: string;
 };
 
-export default function MessageComposer({ onSubmit, className }: Props) {
+export default function MessageComposer({
+  onSubmit,
+  className,
+  closeSheet,
+}: Props) {
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
   });
@@ -72,7 +77,7 @@ export default function MessageComposer({ onSubmit, className }: Props) {
           )}
         />
 
-        <div className="flex items-center p-3 pt-0">
+        {/* <div className="flex items-center p-3 pt-0">
           <Button
             type="submit"
             size="sm"
@@ -84,6 +89,29 @@ export default function MessageComposer({ onSubmit, className }: Props) {
             )}
             Send Message
             <CornerDownLeft className="size-3.5" />
+          </Button>
+        </div> */}
+        <div className="flex justify-between gap-2">
+          <Button
+            className="w-full"
+            variant="secondary"
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              closeSheet();
+            }}
+          >
+            Close
+          </Button>
+          <Button
+            type="submit"
+            className="w-full"
+            disabled={form.formState.isSubmitting}
+          >
+            {form.formState.isSubmitting && (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            )}
+            Send Message
           </Button>
         </div>
       </Form>

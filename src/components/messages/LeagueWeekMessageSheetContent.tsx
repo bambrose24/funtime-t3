@@ -21,10 +21,12 @@ export function LeagueWeekMessageSheetContent({
   week,
   leagueId,
   className,
+  closeSheet,
 }: {
   week: number;
   leagueId: number;
   className?: string;
+  closeSheet: () => void;
 }) {
   const { data: league } = clientApi.league.get.useQuery({ leagueId });
   const { data: messagesData } =
@@ -150,6 +152,7 @@ export function LeagueWeekMessageSheetContent({
       <SheetFooter className="row-span-1">
         <MessageComposer
           className="mb-4 w-full px-2"
+          closeSheet={closeSheet}
           onSubmit={async (data) => {
             await sendMessage({
               content: data.message,

@@ -70,6 +70,8 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
     { initialData: props.picksSummary, refetchInterval: REFETCH_INTERVAL_MS },
   );
 
+  const [chatSheetOpen, setChatSheetOpen] = useState(false);
+
   // TODO pass these to trpc useQuery's as initialData instead of just relying on these pieces of info so that we can pollInterval for every 5 minutes or something
   const firstGame = games.at(0);
   const week = firstGame?.week;
@@ -163,7 +165,12 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
             </Select>
           )}
           {week !== undefined && (
-            <Sheet>
+            <Sheet
+              open={chatSheetOpen}
+              onOpenChange={(open) => {
+                setChatSheetOpen(open);
+              }}
+            >
               <SheetTrigger asChild>
                 <Button variant="outline">Chat</Button>
               </SheetTrigger>
@@ -171,6 +178,9 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
                 className="w-[600px]"
                 week={week}
                 leagueId={league.league_id}
+                closeSheet={() => {
+                  setChatSheetOpen(false);
+                }}
               />
             </Sheet>
           )}
