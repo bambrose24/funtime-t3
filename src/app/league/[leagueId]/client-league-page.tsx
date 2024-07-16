@@ -339,6 +339,9 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
                   className="w-full"
                   week={week}
                   leagueId={league.league_id}
+                  closeSheet={() => {
+                    setChatSheetOpen(false);
+                  }}
                 />
               </Sheet>
             )}
