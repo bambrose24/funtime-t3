@@ -162,6 +162,18 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
               </SelectContent>
             </Select>
           )}
+          {week !== undefined && (
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="outline">Chat</Button>
+              </SheetTrigger>
+              <LeagueWeekMessageSheetContent
+                className="w-[600px]"
+                week={week}
+                leagueId={league.league_id}
+              />
+            </Sheet>
+          )}
           {myPicks && firstGame && (
             <Card className="w-full">
               <CardHeader>

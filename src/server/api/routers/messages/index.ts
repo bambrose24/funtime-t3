@@ -27,7 +27,7 @@ export const messagesRouter = createTRPCRouter({
           status: "PUBLISHED",
         },
         orderBy: {
-          createdAt: "desc",
+          createdAt: "asc",
         },
         include: {
           leaguemembers: {
