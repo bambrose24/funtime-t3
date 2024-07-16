@@ -14,6 +14,8 @@ import Link from "next/link";
 import { Separator } from "~/components/ui/separator";
 import { ScrollArea, ScrollBar } from "../ui/scroll-area";
 import { useEffect } from "react";
+import { Button } from "../ui/button";
+import { Trash2 } from "lucide-react";
 
 export function LeagueWeekMessageSheetContent({
   week,
@@ -34,14 +36,16 @@ export function LeagueWeekMessageSheetContent({
     );
   const { data: session } = clientApi.session.current.useQuery();
   const utils = clientApi.useUtils();
+
+  const onSettled = async () => {
+    await utils.messages.leagueWeekMessageBoard.invalidate({
+      leagueId,
+      week,
+    });
+  };
   const { mutateAsync: sendMessage } =
     clientApi.messages.writeWeekMessage.useMutation({
-      onSettled: async () => {
-        await utils.messages.leagueWeekMessageBoard.invalidate({
-          leagueId,
-          week,
-        });
-      },
+      onSettled,
     });
 
   const messages = messagesData ?? [];
@@ -102,14 +106,19 @@ export function LeagueWeekMessageSheetContent({
                 className="flex flex-col"
                 id={`message_${idx}`}
               >
-                <div
-                  className={cn(
-                    "rounded-xl border-2 border-border px-2 py-1 text-sm",
-                    isSender && "ml-10 border-primary",
-                    !isSender && "mr-10",
+                <div className="flex items-center justify-between gap-1">
+                  <div
+                    className={cn(
+                      "flex-grow rounded-xl border-2 border-border px-2 py-1 text-sm",
+                      isSender && "ml-10 border-primary",
+                      !isSender && "mr-10",
+                    )}
+                  >
+                    {message.content}
+                  </div>
+                  {isSender && (
+                    <DeleteMessageButton messageId={message.message_id} />
                   )}
-                >
-                  {message.content}
                 </div>
                 <div
                   className={cn(
@@ -147,5 +156,41 @@ export function LeagueWeekMessageSheetContent({
         />
       </SheetFooter>
     </SheetContent>
+  );
+}
+
+function DeleteMessageButton({
+  messageId,
+  week,
+  leagueId,
+}: {
+  messageId: string;
+  week: number;
+  leagueId: number;
+}) {
+  const utils = clientApi.useUtils();
+  const { mutateAsync: deleteMessage, isPending } =
+    clientApi.messages.deleteMessage.useMutation({
+      onSettled: async () => {
+        await utils.messages.leagueWeekMessageBoard.invalidate({
+          leagueId,
+          week,
+        });
+      },
+    });
+  return (
+    <Button
+      size="sm"
+      type="button"
+      variant="outline"
+      className="px-2 py-1"
+      disabled={isPending}
+      onClick={async (e) => {
+        e.preventDefault();
+        await deleteMessage({ messageId });
+      }}
+    >
+      <Trash2 className="h-4 w-4 text-muted-foreground" />
+    </Button>
   );
 }

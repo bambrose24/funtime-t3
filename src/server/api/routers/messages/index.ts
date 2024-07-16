@@ -72,4 +72,37 @@ export const messagesRouter = createTRPCRouter({
       });
       return created;
     }),
+
+  deleteMessage: authorizedProcedure
+    .input(
+      z.object({
+        messageId: z.string(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { dbUser } = ctx;
+
+      const message = await ctx.db.leaguemessages.findFirstOrThrow({
+        where: {
+          message_id: input.messageId,
+        },
+      });
+
+      if (
+        !dbUser?.leaguemembers.some(
+          (m) => m.membership_id === message.member_id,
+        )
+      ) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "You cant delete a message that is not yours",
+        });
+      }
+
+      await ctx.db.leaguemessages.delete({
+        where: {
+          message_id: message.message_id,
+        },
+      });
+    }),
 });
