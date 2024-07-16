@@ -73,7 +73,7 @@ export function LeagueWeekMessageSheetContent({
       className={cn(
         "w-[600px] p-4 lg:p-3",
         className,
-        "grid grid-rows-[90px_1fr_100px] gap-1",
+        "grid grid-rows-[90px_1fr_130px] gap-1",
       )}
     >
       <SheetHeader className="row-span-1 flex flex-col justify-between space-y-0">
