@@ -331,7 +331,10 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
           </div>
           <div className="flex flex-col xl:hidden">
             {week !== undefined && (
-              <Sheet>
+              <Sheet
+                open={chatSheetOpen}
+                onOpenChange={(open) => setChatSheetOpen(open)}
+              >
                 <SheetTrigger asChild>
                   <Button variant="outline">Chat</Button>
                 </SheetTrigger>
