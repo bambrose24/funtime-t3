@@ -13,10 +13,20 @@ import { format, formatDistanceToNow, differenceInMinutes } from "date-fns";
 import Link from "next/link";
 import { Separator } from "~/components/ui/separator";
 import { ScrollArea, ScrollBar } from "../ui/scroll-area";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import { Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "../ui/dialog";
+import { RouterOutputs } from "~/trpc/types";
 
 export function LeagueWeekMessageSheetContent({
   week,
@@ -119,13 +129,12 @@ export function LeagueWeekMessageSheetContent({
                   >
                     {message.content}
                   </div>
-                  {isSender && (
-                    <DeleteMessageButton
-                      messageId={message.message_id}
-                      week={week}
-                      leagueId={leagueId}
-                    />
-                  )}
+
+                  <DeleteMessageButton
+                    message={message}
+                    week={week}
+                    leagueId={leagueId}
+                  />
                 </div>
                 <div
                   className={cn(
@@ -168,15 +177,16 @@ export function LeagueWeekMessageSheetContent({
 }
 
 function DeleteMessageButton({
-  messageId,
+  message,
   week,
   leagueId,
 }: {
-  messageId: string;
+  message: RouterOutputs["messages"]["leagueWeekMessageBoard"][number];
   week: number;
   leagueId: number;
 }) {
   const utils = clientApi.useUtils();
+  const { data: session } = clientApi.session.current.useQuery();
   const { mutateAsync: deleteMessage, isPending } =
     clientApi.messages.deleteMessage.useMutation({
       onSuccess: async () => {
@@ -187,19 +197,71 @@ function DeleteMessageButton({
         toast.success(`Deleted message`);
       },
     });
+  const [dialogOpen, setDialogOpen] = useState(false);
+
+  const member = session?.dbUser?.leaguemembers.find(
+    (m) => m.league_id === leagueId,
+  );
+  const isViewers = session?.dbUser?.leaguemembers.some(
+    (m) => m.membership_id === message.member_id,
+  );
+
+  const canDelete = isViewers === true || member?.role === "admin";
+
+  if (!canDelete) {
+    return null;
+  }
+
   return (
-    <Button
-      size="sm"
-      type="button"
-      variant="outline"
-      className="px-2 py-1"
-      disabled={isPending}
-      onClick={async (e) => {
-        e.preventDefault();
-        await deleteMessage({ messageId });
+    <Dialog
+      open={dialogOpen}
+      onOpenChange={(open) => {
+        setDialogOpen(open);
       }}
     >
-      <Trash2 className="h-4 w-4 text-muted-foreground" />
-    </Button>
+      <DialogTrigger asChild>
+        <Button size="sm" type="button" variant="outline" className="px-2 py-1">
+          <Trash2 className="h-4 w-4 text-muted-foreground" />
+        </Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Are you sure?</DialogTitle>
+          <DialogDescription>
+            Deleting this message cannot be undone.{" "}
+            {isViewers === false && (
+              <>
+                You are deleting a message from{" "}
+                <span className="font-bold">
+                  {message.leaguemembers.people.username}
+                </span>
+              </>
+            )}
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter className="flex w-full items-center justify-between">
+          <Button
+            variant="secondary"
+            onClick={() => {
+              setDialogOpen(false);
+            }}
+          >
+            Cancel
+          </Button>
+          <Button
+            type="button"
+            variant="destructive"
+            className="flex gap-2"
+            disabled={isPending}
+            onClick={async (e) => {
+              e.preventDefault();
+              await deleteMessage({ messageId: message.message_id });
+            }}
+          >
+            <Trash2 className="h-4 w-4 text-muted-foreground" /> Delete
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
