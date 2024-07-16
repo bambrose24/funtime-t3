@@ -1,12 +1,12 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2, CornerDownLeft, Mic, Paperclip } from "lucide-react";
+import { Loader2, CornerDownLeft } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 import { Button } from "~/components/ui/button";
 import { Label } from "~/components/ui/label";
 import { Textarea } from "~/components/ui/textarea";
-import { Form } from "~/components/ui/form";
+import { Form, FormControl, FormField, FormItem } from "~/components/ui/form";
 import { cn } from "~/lib/utils";
 
 const schema = z.object({ message: z.string().min(1) });
@@ -21,6 +21,13 @@ export default function MessageComposer({ onSubmit, className }: Props) {
     resolver: zodResolver(schema),
   });
 
+  const handleKeyPress = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (event.key === "Enter" && event.metaKey) {
+      event.preventDefault();
+      void form.handleSubmit(onSubmit)();
+    }
+  };
+
   return (
     <form
       onSubmit={form.handleSubmit(onSubmit)}
@@ -33,11 +40,24 @@ export default function MessageComposer({ onSubmit, className }: Props) {
         <Label htmlFor="message" className="sr-only">
           Message
         </Label>
-        <Textarea
-          id="message"
-          placeholder="Type your message here..."
-          className="min-h-12 resize-none border-0 p-3 shadow-none focus-visible:ring-0"
+
+        <FormField
+          control={form.control}
+          name="message"
+          render={({ field }) => (
+            <FormItem>
+              <FormControl>
+                <Textarea
+                  {...field}
+                  onKeyDown={handleKeyPress}
+                  placeholder="Type your message here..."
+                  className="min-h-12 resize-none border-0 p-3 shadow-none focus-visible:ring-0"
+                />
+              </FormControl>
+            </FormItem>
+          )}
         />
+
         <div className="flex items-center p-3 pt-0">
           <Button
             type="submit"
