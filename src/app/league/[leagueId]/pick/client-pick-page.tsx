@@ -27,6 +27,16 @@ import {
 } from "~/components/ui/form";
 import { clientApi } from "~/trpc/react";
 import { toast } from "sonner";
+import { useEffect, useState } from "react";
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+} from "~/components/ui/drawer";
 
 type Props = {
   leagueId: number;
@@ -110,7 +120,9 @@ export function ClientPickPage({
     name: "picks",
   });
 
-  const { mutateAsync: submitPicks } =
+  const [picksDrawerOpen, setPicksDrawerOpen] = useState(false);
+
+  const { mutateAsync: submitPicks, data: submitResponse } =
     clientApi.picks.submitPicks.useMutation();
 
   const onSubmit: Parameters<typeof form.handleSubmit>[0] = async (data) => {
@@ -131,7 +143,8 @@ export function ClientPickPage({
         leagueId,
         overrideMemberId: undefined,
       });
-      toast.success(`Your picks have been submitted!`);
+
+      setPicksDrawerOpen(true);
     } catch (e) {
       console.error(`Error submitting picks`, e);
       toast.error(
@@ -187,234 +200,324 @@ export function ClientPickPage({
     );
   }
   return (
-    <form
-      onSubmit={form.handleSubmit(onSubmit)}
-      className="col-span-12 flex flex-col gap-3 md:col-span-8 md:col-start-3 lg:col-span-4 lg:col-start-5"
-    >
-      <Form {...form}>
-        <div className="flex flex-col items-center justify-center">
-          <Text.H2>Make Your Picks</Text.H2>
-          <div>
-            Week {week}, {season}
+    <>
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="col-span-12 flex flex-col gap-3 md:col-span-8 md:col-start-3 lg:col-span-4 lg:col-start-5"
+      >
+        <Form {...form}>
+          <div className="flex flex-col items-center justify-center">
+            <Text.H2>Make Your Picks</Text.H2>
+            <div>
+              Week {week}, {season}
+            </div>
           </div>
-        </div>
-        <div className="mb-4 flex flex-col gap-3 ">
-          <Alert
-            variant="default"
-            className="col-span-8 col-start-3 row-start-2 flex flex-row items-center lg:col-span-4 lg:col-start-5"
-          >
-            <AlertTitle className="flex w-full flex-row items-center justify-center gap-2">
-              <AlertCircleIcon className="h-4 w-4" />
-              <div>
-                You are picking as{" "}
-                <span className="font-bold">{dbUser.username}</span>. Not you?{" "}
-                <Button
-                  variant="link"
-                  className="p-0 text-foreground underline"
-                  type="button"
-                  onClick={async () => {
-                    await logout();
-                  }}
-                >
-                  Log out
-                </Button>
-                .
-              </div>
-            </AlertTitle>
-          </Alert>
-          <Button
-            type="button"
-            variant="secondary"
-            className="w-full"
-            onClick={randomizePicks}
-          >
-            Randomize Picks
-          </Button>
-          {picksField.fields.map(({ gid, winner }, idx) => {
-            const game = gameById.get(gid);
-            if (!game) {
-              return null;
-            }
-            const home = teamById.get(game.home);
-            const away = teamById.get(game.away);
-            if (!home || !away) {
-              throw new Error(
-                `Could not find home or away team for game ${game.gid}`,
-              );
-            }
-            const winnerTeam = winner ? teamById.get(winner) : undefined;
-
-            const getGradient = (team: NonNullable<typeof winnerTeam>) => {
-              const { primary_color, secondary_color, tertiary_color } = team;
-              return tertiary_color
-                ? `linear-gradient(to right, ${primary_color}, ${secondary_color}, ${tertiary_color})`
-                : `linear-gradient(to right, ${primary_color}, ${secondary_color})`;
-            };
-
-            return (
-              <Card
-                key={`${idx}_${winner}`}
-                className={cn("w-full", winnerTeam && "border-transparent")}
-              >
-                <div
-                  style={{
-                    background: winnerTeam ? getGradient(winnerTeam) : "",
-                  }}
-                  className="w-full rounded-lg p-1 transition-all lg:p-1.5"
-                >
-                  <CardContent className="flex flex-col gap-2 rounded-sm bg-card py-2">
-                    <RadioGroup value={winner?.toString()}>
-                      <div className="grid w-full grid-cols-5 gap-2">
-                        <div
-                          className="col-span-1 flex cursor-pointer items-center justify-center"
-                          onClick={() => {
-                            onTeamPick({
-                              idx,
-                              gid: game.gid,
-                              winner: away.teamid,
-                            });
-                          }}
-                        >
-                          <TeamLogo
-                            abbrev={away.abbrev ?? ""}
-                            width={40}
-                            height={40}
-                          />
-                        </div>
-                        <div
-                          className="col-span-1 flex cursor-pointer items-center justify-start md:pl-2"
-                          onClick={() => {
-                            onTeamPick({
-                              idx,
-                              gid: game.gid,
-                              winner: away.teamid,
-                            });
-                          }}
-                        >
-                          <div className="flex items-center gap-2">
-                            <RadioGroupItem
-                              value={away.teamid.toString()}
-                              id={`pick_option_${away.teamid.toString()}`}
-                            />
-                            <Text.Small>{away.abbrev}</Text.Small>
-                          </div>
-                        </div>
-                        <div className="col-span-1 flex items-center justify-center pb-0.5">
-                          @
-                        </div>
-                        <div
-                          className="col-span-1 flex cursor-pointer items-center justify-end md:pr-2"
-                          onClick={() => {
-                            onTeamPick({
-                              idx,
-                              gid: game.gid,
-                              winner: home.teamid,
-                            });
-                          }}
-                        >
-                          <div className="flex items-center gap-2">
-                            <Text.Small>{home.abbrev}</Text.Small>
-                            <div className="flex items-center justify-center">
-                              <RadioGroupItem
-                                value={home.teamid.toString()}
-                                id={`pick_option_${home.teamid.toString()}`}
-                              />
-                            </div>
-                          </div>
-                        </div>
-
-                        <div
-                          className="col-span-1 flex cursor-pointer items-center justify-center"
-                          onClick={() => {
-                            onTeamPick({
-                              idx,
-                              gid: game.gid,
-                              winner: home.teamid,
-                            });
-                          }}
-                        >
-                          <TeamLogo
-                            abbrev={home.abbrev ?? ""}
-                            width={40}
-                            height={40}
-                          />
-                        </div>
-                        <div className="col-span-1 flex justify-center">
-                          <Text.Small className="text-xs text-muted-foreground">
-                            {game.awayrecord}
-                          </Text.Small>
-                        </div>
-                        <div className="col-span-3 flex justify-center">
-                          <Text.Small className="text-xs">
-                            {format(game.ts, "EEE MMM d yyyy, h:mm a zzz", {
-                              timeZone: EASTERN_TIMEZONE,
-                            })}
-                          </Text.Small>
-                        </div>
-                        <div className="col-span-1 flex justify-center">
-                          <Text.Small className="text-xs text-muted-foreground">
-                            {game.homerecord}
-                          </Text.Small>
-                        </div>
-                        {game.is_tiebreaker === true && (
-                          <div className="col-span-5 mt-2 flex w-full flex-col items-center gap-2 text-center">
-                            <Separator />
-                            <div className="w-full">
-                              <FormField
-                                control={form.control}
-                                name="tiebreakerScore.score"
-                                render={({ field, fieldState }) => {
-                                  // const valid =
-                                  //   fieldState.isTouched &&
-                                  //   !fieldState.error &&
-                                  //   !fieldState.invalid;
-                                  return (
-                                    <FormItem>
-                                      <FormLabel>Tiebreaker Score</FormLabel>
-                                      <FormControl>
-                                        <Input
-                                          {...field}
-                                          type="number"
-                                          step="1"
-                                          className={cn(
-                                            "w-full focus-visible:ring-2",
-                                            fieldState.invalid
-                                              ? "ring-2 ring-wrong"
-                                              : "ring-2 ring-correct",
-                                          )}
-                                        />
-                                      </FormControl>
-                                      <Text.Small className="mt-2">
-                                        You must enter a score between 1 and 200
-                                      </Text.Small>
-                                    </FormItem>
-                                  );
-                                }}
-                              />
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    </RadioGroup>
-                  </CardContent>
+          <div className="mb-4 flex flex-col gap-3 ">
+            <Alert
+              variant="default"
+              className="col-span-8 col-start-3 row-start-2 flex flex-row items-center lg:col-span-4 lg:col-start-5"
+            >
+              <AlertTitle className="flex w-full flex-row items-center justify-center gap-2">
+                <AlertCircleIcon className="h-4 w-4" />
+                <div>
+                  You are picking as{" "}
+                  <span className="font-bold">{dbUser.username}</span>. Not you?{" "}
+                  <Button
+                    variant="link"
+                    className="p-0 text-foreground underline"
+                    type="button"
+                    onClick={async () => {
+                      await logout();
+                    }}
+                  >
+                    Log out
+                  </Button>
+                  .
                 </div>
-              </Card>
-            );
-          })}
-          <Separator className="col-span-5" />
-          <Button
-            type="submit"
-            disabled={
-              form.formState.isSubmitted ||
-              form.formState.isSubmitting ||
-              !form.formState.isValid ||
-              !form.formState.isDirty
-            }
-          >
-            {hasSubmittedAlready ? "Update Picks" : "Submit Picks"}
-          </Button>
-        </div>
-      </Form>
-    </form>
+              </AlertTitle>
+            </Alert>
+            <Button
+              type="button"
+              variant="secondary"
+              className="w-full"
+              onClick={randomizePicks}
+            >
+              Randomize Picks
+            </Button>
+            {picksField.fields.map(({ gid, winner }, idx) => {
+              const game = gameById.get(gid);
+              if (!game) {
+                return null;
+              }
+              const home = teamById.get(game.home);
+              const away = teamById.get(game.away);
+              if (!home || !away) {
+                throw new Error(
+                  `Could not find home or away team for game ${game.gid}`,
+                );
+              }
+              const winnerTeam = winner ? teamById.get(winner) : undefined;
+
+              const getGradient = (team: NonNullable<typeof winnerTeam>) => {
+                const { primary_color, secondary_color, tertiary_color } = team;
+                return tertiary_color
+                  ? `linear-gradient(to right, ${primary_color}, ${secondary_color}, ${tertiary_color})`
+                  : `linear-gradient(to right, ${primary_color}, ${secondary_color})`;
+              };
+
+              return (
+                <Card
+                  key={`${idx}_${winner}`}
+                  className={cn("w-full", winnerTeam && "border-transparent")}
+                >
+                  <div
+                    style={{
+                      background: winnerTeam ? getGradient(winnerTeam) : "",
+                    }}
+                    className="w-full rounded-lg p-1 transition-all lg:p-1.5"
+                  >
+                    <CardContent className="flex flex-col gap-2 rounded-sm bg-card py-2">
+                      <RadioGroup value={winner?.toString()}>
+                        <div className="grid w-full grid-cols-5 gap-2">
+                          <div
+                            className="col-span-1 flex cursor-pointer items-center justify-center"
+                            onClick={() => {
+                              onTeamPick({
+                                idx,
+                                gid: game.gid,
+                                winner: away.teamid,
+                              });
+                            }}
+                          >
+                            <TeamLogo
+                              abbrev={away.abbrev ?? ""}
+                              width={40}
+                              height={40}
+                            />
+                          </div>
+                          <div
+                            className="col-span-1 flex cursor-pointer items-center justify-start md:pl-2"
+                            onClick={() => {
+                              onTeamPick({
+                                idx,
+                                gid: game.gid,
+                                winner: away.teamid,
+                              });
+                            }}
+                          >
+                            <div className="flex items-center gap-2">
+                              <RadioGroupItem
+                                value={away.teamid.toString()}
+                                id={`pick_option_${away.teamid.toString()}`}
+                              />
+                              <Text.Small>{away.abbrev}</Text.Small>
+                            </div>
+                          </div>
+                          <div className="col-span-1 flex items-center justify-center pb-0.5">
+                            @
+                          </div>
+                          <div
+                            className="col-span-1 flex cursor-pointer items-center justify-end md:pr-2"
+                            onClick={() => {
+                              onTeamPick({
+                                idx,
+                                gid: game.gid,
+                                winner: home.teamid,
+                              });
+                            }}
+                          >
+                            <div className="flex items-center gap-2">
+                              <Text.Small>{home.abbrev}</Text.Small>
+                              <div className="flex items-center justify-center">
+                                <RadioGroupItem
+                                  value={home.teamid.toString()}
+                                  id={`pick_option_${home.teamid.toString()}`}
+                                />
+                              </div>
+                            </div>
+                          </div>
+
+                          <div
+                            className="col-span-1 flex cursor-pointer items-center justify-center"
+                            onClick={() => {
+                              onTeamPick({
+                                idx,
+                                gid: game.gid,
+                                winner: home.teamid,
+                              });
+                            }}
+                          >
+                            <TeamLogo
+                              abbrev={home.abbrev ?? ""}
+                              width={40}
+                              height={40}
+                            />
+                          </div>
+                          <div className="col-span-1 flex justify-center">
+                            <Text.Small className="text-xs text-muted-foreground">
+                              {game.awayrecord}
+                            </Text.Small>
+                          </div>
+                          <div className="col-span-3 flex justify-center">
+                            <Text.Small className="text-xs">
+                              {format(game.ts, "EEE MMM d yyyy, h:mm a zzz", {
+                                timeZone: EASTERN_TIMEZONE,
+                              })}
+                            </Text.Small>
+                          </div>
+                          <div className="col-span-1 flex justify-center">
+                            <Text.Small className="text-xs text-muted-foreground">
+                              {game.homerecord}
+                            </Text.Small>
+                          </div>
+                          {game.is_tiebreaker === true && (
+                            <div className="col-span-5 mt-2 flex w-full flex-col items-center gap-2 text-center">
+                              <Separator />
+                              <div className="w-full">
+                                <FormField
+                                  control={form.control}
+                                  name="tiebreakerScore.score"
+                                  render={({ field, fieldState }) => {
+                                    // const valid =
+                                    //   fieldState.isTouched &&
+                                    //   !fieldState.error &&
+                                    //   !fieldState.invalid;
+                                    return (
+                                      <FormItem>
+                                        <FormLabel>Tiebreaker Score</FormLabel>
+                                        <FormControl>
+                                          <Input
+                                            {...field}
+                                            type="number"
+                                            step="1"
+                                            className={cn(
+                                              "w-full focus-visible:ring-2",
+                                              fieldState.invalid
+                                                ? "ring-2 ring-wrong"
+                                                : "ring-2 ring-correct",
+                                            )}
+                                          />
+                                        </FormControl>
+                                        <Text.Small className="mt-2">
+                                          You must enter a score between 1 and
+                                          200
+                                        </Text.Small>
+                                      </FormItem>
+                                    );
+                                  }}
+                                />
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </RadioGroup>
+                    </CardContent>
+                  </div>
+                </Card>
+              );
+            })}
+            <Separator className="col-span-5" />
+            <Button
+              type="submit"
+              disabled={
+                form.formState.isSubmitted ||
+                form.formState.isSubmitting ||
+                !form.formState.isValid ||
+                !form.formState.isDirty
+              }
+            >
+              {hasSubmittedAlready ? "Update Picks" : "Submit Picks"}
+            </Button>
+          </div>
+        </Form>
+      </form>
+      <Drawer
+        open={picksDrawerOpen}
+        onOpenChange={(val) => {
+          setPicksDrawerOpen(val);
+        }}
+      >
+        <DrawerContent>
+          <DrawerHeader>
+            <DrawerTitle className="text-center">
+              Your picks are in for week {week}
+            </DrawerTitle>
+            <DrawerDescription className="text-center">
+              You can come back to this page to update them until the week
+              starts.
+            </DrawerDescription>
+          </DrawerHeader>
+          <div className="grid grid-cols-2 gap-x-8 gap-y-1.5">
+            {submitResponse?.picks?.map((p, idx) => {
+              const game = gameById.get(p.gid);
+              if (!game) {
+                return null;
+              }
+              const homeTeam = teamById.get(game.home);
+              const awayTeam = teamById.get(game.away);
+              const choseHome = p.winner === game.home;
+              const choseAway = p.winner === game.away;
+
+              if (!homeTeam || !awayTeam) {
+                return null;
+              }
+              return (
+                <div
+                  key={p.pickid}
+                  className={cn(
+                    "col-span-1 flex w-full flex-row items-center",
+                    idx % 2 === 0 ? "justify-end" : "justify-start",
+                  )}
+                >
+                  <Card className="h-full">
+                    <div
+                      className={cn(
+                        "grid w-[120px] grid-cols-5 flex-row items-center justify-between rounded-xl border-2 border-transparent p-0.5",
+                      )}
+                    >
+                      <div
+                        className={cn(
+                          "col-span-2 flex flex-row items-center justify-center rounded-lg p-1",
+                          choseAway
+                            ? "border-2 border-blue-500 dark:border-blue-700"
+                            : "",
+                        )}
+                      >
+                        <Text.Small>{awayTeam.abbrev}</Text.Small>
+                      </div>
+                      <div className="col-span-1 flex flex-row justify-center">
+                        <Text.Small>@</Text.Small>
+                      </div>
+                      <div
+                        className={cn(
+                          "col-span-2 flex flex-row items-center justify-center rounded-lg p-1",
+                          choseHome
+                            ? "border-2 border-blue-500 dark:border-blue-700"
+                            : "",
+                        )}
+                      >
+                        <Text.Small>{homeTeam.abbrev}</Text.Small>
+                      </div>
+                      {p.score !== null && p.score > 0 ? (
+                        <div className="col-span-5 flex justify-center text-xs text-muted-foreground">
+                          Score: {p.score}
+                        </div>
+                      ) : null}
+                    </div>
+                  </Card>
+                </div>
+              );
+            })}
+          </div>
+          <DrawerFooter>
+            <DrawerClose className="w-full">
+              <Button variant="secondary" className="w-full">
+                Close
+              </Button>
+            </DrawerClose>
+          </DrawerFooter>
+        </DrawerContent>
+      </Drawer>
+    </>
   );
 }
