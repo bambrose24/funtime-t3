@@ -37,37 +37,48 @@ export const picksRouter = createTRPCRouter({
         },
       });
 
-      const [overrideMember, viewerMember] = await Promise.all([
+      const viewerMember = dbUser.leaguemembers.find(
+        (m) => m.league_id === input.leagueId,
+      );
+
+      if (!viewerMember) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: `You are not a member of this league (user ${dbUser.uid} leagueId ${input.leagueId})`,
+        });
+      }
+
+      const memberInclude: NonNullable<
+        Parameters<typeof db.leaguemembers.findFirstOrThrow>[0]
+      >["include"] = {
+        leagues: true,
+      };
+
+      const [overrideMember, fullViewerMember] = await Promise.all([
         input.overrideMemberId
           ? db.leaguemembers.findFirstOrThrow({
               where: {
                 membership_id: input.overrideMemberId,
                 league_id: leagueId,
               },
-              include: {
-                leagues: true,
-              },
+              include: memberInclude,
             })
           : null,
         db.leaguemembers.findFirstOrThrow({
           where: {
-            membership_id:
-              dbUser.leaguemembers.find((m) => m.league_id === leagueId)
-                ?.membership_id ?? -1,
+            membership_id: viewerMember.membership_id,
           },
-          include: {
-            leagues: true,
-          },
+          include: memberInclude,
         }),
       ]);
 
       if (overrideMember && viewerMember.role !== "admin") {
         throw new TRPCError({
           code: "BAD_REQUEST",
-          message: `The viewer member ${viewerMember.membership_id} is not an admin of the league ${leagueId}`,
+          message: `The viewer member ${viewerMember?.membership_id} is not an admin of the league ${leagueId}`,
         });
       }
-      const member = overrideMember ?? viewerMember;
+      const member = overrideMember ?? fullViewerMember;
 
       const gamesById = groupBy(pickedGames, (g) => g.gid);
 
@@ -102,57 +113,62 @@ export const picksRouter = createTRPCRouter({
           });
 
       const weeks = Array.from(new Set(pickedGames.map((g) => g.week)));
-      const existingPicks = await db.picks.findMany({
-        where: {
-          member_id: member.membership_id,
-          week: {
-            in: weeks,
+
+      const picksSearch: NonNullable<Parameters<typeof db.picks.findMany>[0]> =
+        {
+          where: {
+            member_id: member.membership_id,
+            week: {
+              in: weeks,
+            },
           },
-        },
-      });
+        };
+
+      const existingPicks = await db.picks.findMany(picksSearch);
       const existingPicksByGid = groupBy(existingPicks, (p) => p.gid);
-      return { pickedGames };
-      // await db.$transaction(async (tx) => {
-      //   await Promise.all(
-      //     finalPicks.map(async (pick) => {
-      //       const game = gamesById[pick.gid]?.at(0);
-      //       if (!game) {
-      //         throw new TRPCError({
-      //           code: "INTERNAL_SERVER_ERROR",
-      //           message: `Error finding game to save pick to ${pick.gid}`,
-      //         });
-      //       }
-      //       const existingPick = existingPicksByGid[game.gid]?.at(0);
-      //       if (existingPick) {
-      //         return tx.picks.update({
-      //           data: {
-      //             winner: pick.winner,
-      //             score: pick.score,
-      //             gid: pick.gid,
-      //             is_random: pick.isRandom,
-      //           },
-      //           where: {
-      //             pickid: existingPick.pickid,
-      //           },
-      //         });
-      //       }
-      //       return tx.picks.create({
-      //         data: {
-      //           winner: pick.winner,
-      //           gid: pick.gid,
-      //           score: pick.score,
-      //           member_id: member.membership_id,
-      //           season: member.leagues.season,
-      //           uid: member.user_id,
-      //           is_random: pick.isRandom,
-      //           week: game.week,
-      //           ts: new Date(),
-      //           loser: game.away + game.home - pick.winner,
-      //         },
-      //       });
-      //     }),
-      //   );
-      // });
-      // return { pickedGames };
+      await db.$transaction(async (tx) => {
+        await Promise.all(
+          finalPicks.map(async (pick) => {
+            const game = gamesById[pick.gid]?.at(0);
+            if (!game) {
+              throw new TRPCError({
+                code: "INTERNAL_SERVER_ERROR",
+                message: `Error finding game to save pick to ${pick.gid}`,
+              });
+            }
+            const existingPick = existingPicksByGid[game.gid]?.at(0);
+            if (existingPick) {
+              return tx.picks.update({
+                data: {
+                  winner: pick.winner,
+                  score: pick.score,
+                  gid: pick.gid,
+                  is_random: pick.isRandom,
+                },
+                where: {
+                  pickid: existingPick.pickid,
+                },
+              });
+            }
+            return tx.picks.create({
+              data: {
+                winner: pick.winner,
+                gid: pick.gid,
+                score: pick.score,
+                member_id: member.membership_id,
+                season: member.leagues.season,
+                uid: member.user_id,
+                is_random: pick.isRandom,
+                week: game.week,
+                ts: new Date(),
+                loser: game.away + game.home - pick.winner,
+              },
+            });
+          }),
+        );
+      });
+
+      const picksForWeeks = await db.picks.findMany(picksSearch);
+      return { pickedGames, picks: picksForWeeks };
     }),
 });

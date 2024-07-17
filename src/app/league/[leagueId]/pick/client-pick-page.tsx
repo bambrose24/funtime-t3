@@ -32,6 +32,7 @@ type Props = {
   leagueId: number;
   weekToPick: RouterOutputs["league"]["weekToPick"];
   teams: RouterOutputs["teams"]["getTeams"];
+  existingPicks: RouterOutputs["member"]["picksForWeek"];
 };
 
 const EASTERN_TIMEZONE = "America/New_York";
@@ -62,7 +63,12 @@ const picksSchema = z.object({
   }),
 });
 
-export function ClientPickPage({ weekToPick, teams, leagueId }: Props) {
+export function ClientPickPage({
+  weekToPick,
+  teams,
+  leagueId,
+  existingPicks,
+}: Props) {
   const { week, season, games } = weekToPick;
 
   const { dbUser } = useUserEnforced();
@@ -74,19 +80,25 @@ export function ClientPickPage({ weekToPick, teams, leagueId }: Props) {
 
   const tiebreakerGame = games.find((g) => g.is_tiebreaker);
 
+  const hasSubmittedAlready = existingPicks.length > 0;
+
   const form = useForm<z.infer<typeof picksSchema>>({
     resolver: zodResolver(picksSchema),
     defaultValues: {
       picks: games.map((g) => {
+        const p = existingPicks.find((p) => p.gid === g.gid);
         return {
           gid: g.gid,
-          winner: undefined,
-          isRandom: false,
+          winner: p?.winner ?? undefined,
+          isRandom: p?.is_random ?? undefined,
         };
       }),
       tiebreakerScore: {
         gid: tiebreakerGame?.gid,
-        score: "",
+        score:
+          existingPicks
+            .find((p) => p.gid === tiebreakerGame?.gid)
+            ?.score?.toString() ?? "",
       },
     },
     reValidateMode: "onChange",
@@ -103,13 +115,22 @@ export function ClientPickPage({ weekToPick, teams, leagueId }: Props) {
 
   const onSubmit: Parameters<typeof form.handleSubmit>[0] = async (data) => {
     try {
-      // await submitPicks({
-      //   picks: data.picks.map((p) => {
-      //     return { ...p, winner: p.winner! };
-      //   }),
-      //   leagueId,
-      //   overrideMemberId: undefined,
-      // });
+      await submitPicks({
+        picks: data.picks.map((p) => {
+          const score =
+            data.tiebreakerScore.gid === p.gid &&
+            Number.isInteger(Number(data.tiebreakerScore.score))
+              ? Number(data.tiebreakerScore.score)
+              : undefined;
+          return {
+            ...p,
+            winner: p.winner!,
+            ...(score !== undefined ? { score } : {}),
+          };
+        }),
+        leagueId,
+        overrideMemberId: undefined,
+      });
       toast.success(`Your picks have been submitted!`);
     } catch (e) {
       console.error(`Error submitting picks`, e);
@@ -386,10 +407,11 @@ export function ClientPickPage({ weekToPick, teams, leagueId }: Props) {
             disabled={
               form.formState.isSubmitted ||
               form.formState.isSubmitting ||
-              !form.formState.isValid
+              !form.formState.isValid ||
+              !form.formState.isDirty
             }
           >
-            Submit Picks
+            {hasSubmittedAlready ? "Update Picks" : "Submit Picks"}
           </Button>
         </div>
       </Form>
