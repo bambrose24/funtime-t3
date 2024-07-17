@@ -27,7 +27,7 @@ import {
 } from "~/components/ui/form";
 import { clientApi } from "~/trpc/react";
 import { toast } from "sonner";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   Drawer,
   DrawerClose,
@@ -199,6 +199,7 @@ export function ClientPickPage({
       </div>
     );
   }
+
   return (
     <>
       <form
@@ -378,10 +379,6 @@ export function ClientPickPage({
                                   control={form.control}
                                   name="tiebreakerScore.score"
                                   render={({ field, fieldState }) => {
-                                    // const valid =
-                                    //   fieldState.isTouched &&
-                                    //   !fieldState.error &&
-                                    //   !fieldState.invalid;
                                     return (
                                       <FormItem>
                                         <FormLabel>Tiebreaker Score</FormLabel>
@@ -510,8 +507,8 @@ export function ClientPickPage({
             })}
           </div>
           <DrawerFooter>
-            <DrawerClose className="w-full">
-              <Button variant="secondary" className="w-full">
+            <DrawerClose className="flex w-full justify-center">
+              <Button variant="secondary" className="w-full max-w-[400px]">
                 Close
               </Button>
             </DrawerClose>

@@ -45,6 +45,7 @@ type ClientLeaguePageProps = {
   league: RouterOutputs["league"]["get"];
   session: RouterOutputs["session"]["current"];
   currentGame: RouterOutputs["time"]["activeWeekByLeague"];
+  viewerHasPicks: boolean;
 };
 
 const REFETCH_INTERVAL_MS = 1000 * 30;
@@ -138,6 +139,7 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
       <div className="col-span-12 flex flex-row justify-center py-4">
         <Text.H1>{league.name}</Text.H1>
       </div>
+      {/* TODO put viewerHasPicks banner here to make picks */}
       <div className="hidden xl:col-span-2 xl:flex">
         <div className="flex w-full flex-col gap-4">
           {currentGame && firstGame && (

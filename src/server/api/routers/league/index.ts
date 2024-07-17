@@ -4,10 +4,8 @@ import {
   createTRPCRouter,
   publicProcedure,
 } from "../../trpc";
-import { db } from "~/server/db";
-import _ from "lodash";
+import { orderBy } from "lodash";
 import { getGames } from "~/server/util/getGames";
-import { cache } from "~/utils/cache";
 import { TRPCError } from "@trpc/server";
 import { Defined } from "~/utils/defined";
 import { UnauthorizedError } from "~/server/util/errors/unauthorized";
@@ -77,37 +75,29 @@ export const leagueRouter = createTRPCRouter({
     .input(leagueIdSchema)
     .query(async ({ input, ctx }) => {
       const { leagueId } = input;
-      const getLeagueImpl = cache(
-        async () => {
-          const usersLeagueIds = (
-            ctx.dbUser?.leaguemembers.map((m) => m.league_id) ?? []
-          ).filter(Defined);
-          if (!usersLeagueIds.includes(leagueId)) {
-            throw UnauthorizedError;
-          }
-          return await db.leagues.findFirstOrThrow({
-            where: {
-              AND: [
-                {
-                  league_id: {
-                    in: ctx.dbUser?.leaguemembers
-                      .map((m) => m.league_id)
-                      .filter(Defined),
-                  },
-                },
-                {
-                  league_id: leagueId,
-                },
-              ],
+      const { db } = ctx;
+      const usersLeagueIds = (
+        ctx.dbUser?.leaguemembers.map((m) => m.league_id) ?? []
+      ).filter(Defined);
+      if (!usersLeagueIds.includes(leagueId)) {
+        throw UnauthorizedError;
+      }
+      return await db.leagues.findFirstOrThrow({
+        where: {
+          AND: [
+            {
+              league_id: {
+                in: ctx.dbUser?.leaguemembers
+                  .map((m) => m.league_id)
+                  .filter(Defined),
+              },
             },
-          });
+            {
+              league_id: leagueId,
+            },
+          ],
         },
-        ["getLeague", leagueId.toString()],
-        {
-          revalidate: 60 * 60, // one hour, doesn't change much
-        },
-      );
-      return await getLeagueImpl();
+      });
     }),
   weekToPick: authorizedProcedure
     .input(leagueIdSchema)
@@ -142,9 +132,9 @@ export const leagueRouter = createTRPCRouter({
       const mostRecentUnstartedGame = await ctx.db.games.findFirst({
         where: {
           season,
-          // ts: {
-          //   gte: new Date(),
-          // },
+          ts: {
+            gte: new Date(),
+          },
         },
         orderBy: {
           ts: "asc",
@@ -189,84 +179,90 @@ export const leagueRouter = createTRPCRouter({
     }),
   picksSummary: publicProcedure
     .input(picksSummarySchema)
-    .query(async ({ input }) => {
+    .query(async ({ input, ctx }) => {
+      const { dbUser, db } = ctx;
       const { leagueId, week } = input;
-
-      const REVALIDATE_SECONDS = 60;
-      const getLeagueData = cache(
-        async () => {
-          const weekWhere = week
-            ? {
-                where: {
-                  week,
-                },
-              }
-            : {};
-
-          const { season } = await db.leagues.findFirstOrThrow({
-            where: { league_id: leagueId },
-          });
-
-          const [memberPicks, games] = await Promise.all([
-            db.leaguemembers.findMany({
-              where: {
-                league_id: leagueId,
-              },
-              include: {
-                people: {
-                  select: { username: true, email: true, uid: true },
-                },
-                picks: {
-                  select: {
-                    correct: true,
-                    winner: true,
-                    gid: true,
-                    done: true,
-                    pickid: true,
-                    score: true,
-                    is_random: true,
-                  },
-                  ...weekWhere,
-                },
-              },
-            }),
-            getGames({ season, week }),
-          ]);
-
-          const gidToIndex = games.reduce((prev, curr, idx) => {
-            prev.set(curr.gid, idx);
-            return prev;
-          }, new Map<number, number>());
-
-          const mps = memberPicks.map((mp) => {
-            mp.picks = _.sortBy(
-              mp.picks,
-              [(p) => gidToIndex.get(p.gid), (p) => p.gid],
-              ["asc", "asc"],
-            );
-            return {
-              ...mp,
-              correctPicks: mp.picks.reduce((prev, curr) => {
-                return prev + (curr.correct ? 1 : 0);
-              }, 0),
-              gameIdToPick: mp.picks.reduce((prev, curr) => {
-                prev.set(curr.gid, curr);
-                return prev;
-              }, new Map<number, (typeof mp.picks)[number]>()),
-            };
-          });
-          return mps;
-        },
-        [
-          "leagueRouter.picksSummary",
-          leagueId.toString(),
-          week ? week.toString() : "",
-        ],
-        {
-          revalidate: REVALIDATE_SECONDS,
-        },
+      const member = dbUser?.leaguemembers.find(
+        (m) => m.league_id === leagueId,
       );
-      return await getLeagueData();
+      if (!member) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: `You are not in the league (league ${leagueId} user ${dbUser?.uid})`,
+        });
+      }
+      const weekWhere = week
+        ? {
+            where: {
+              week,
+            },
+          }
+        : {};
+
+      const { season } = await db.leagues.findFirstOrThrow({
+        where: { league_id: leagueId },
+      });
+
+      const [memberPicks, games] = await Promise.all([
+        db.leaguemembers.findMany({
+          where: {
+            league_id: leagueId,
+          },
+          include: {
+            people: {
+              select: { username: true, email: true, uid: true },
+            },
+            picks: {
+              select: {
+                correct: true,
+                winner: true,
+                gid: true,
+                done: true,
+                pickid: true,
+                score: true,
+                is_random: true,
+              },
+              ...weekWhere,
+            },
+          },
+        }),
+        getGames({ season, week }),
+      ]);
+
+      const viewerHasPicks = !memberPicks.some(
+        (p) => member.membership_id === p.membership_id,
+      );
+
+      console.log("viewerHasPicks", viewerHasPicks);
+      const gidToIndex = games.reduce((prev, curr, idx) => {
+        prev.set(curr.gid, idx);
+        return prev;
+      }, new Map<number, number>());
+
+      const mps = memberPicks.map((mp) => {
+        mp.picks = orderBy(
+          mp.picks,
+          [(p) => gidToIndex.get(p.gid), (p) => p.gid],
+          ["asc", "asc"],
+        );
+        mp.picks = mp.picks.map((p) => {
+          if (!viewerHasPicks) {
+            return { ...p, winner: null };
+          }
+          return p;
+        });
+        return {
+          ...mp,
+          correctPicks: mp.picks.reduce((prev, curr) => {
+            return prev + (curr.correct ? 1 : 0);
+          }, 0),
+          gameIdToPick: mp.picks.reduce((prev, curr) => {
+            prev.set(curr.gid, curr);
+            return prev;
+          }, new Map<number, (typeof mp.picks)[number]>()),
+        };
+      });
+      return mps;
     }),
 
   createForm: authorizedProcedure.query(() => {
