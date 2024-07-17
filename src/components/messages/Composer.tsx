@@ -14,7 +14,7 @@ const schema = z.object({ message: z.string().min(1) });
 
 type Props = {
   onSubmit: (data: z.infer<typeof schema>) => Promise<void>;
-  closeSheet: () => void;
+  closeSheet?: () => void;
   className?: string;
 };
 
@@ -83,8 +83,9 @@ export default function MessageComposer({
             type="button"
             onClick={(e) => {
               e.preventDefault();
-              console.log("going to close sheet");
-              closeSheet();
+              if (closeSheet) {
+                closeSheet();
+              }
             }}
           >
             Close
