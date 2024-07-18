@@ -24,7 +24,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "~/components/ui/select";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { cloneDeep } from "lodash";
 import { Alert, AlertTitle } from "~/components/ui/alert";
 import { AlertCircleIcon, MessagesSquare } from "lucide-react";
@@ -34,6 +34,7 @@ import { type RouterOutputs } from "~/trpc/types";
 import { clientApi } from "~/trpc/react";
 import { Sheet, SheetTrigger } from "~/components/ui/sheet";
 import { LeagueWeekMessageSheetContent } from "~/components/messages/LeagueWeekMessageSheetContent";
+import Link from "next/link";
 
 type ClientLeaguePageProps = {
   week: number;
@@ -79,6 +80,7 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
 
   const router = useRouter();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
 
   const [overrideGidToWinner, setOverrideGidToWinner] = useState<
     Record<number, number>
@@ -140,13 +142,28 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
         <Text.H1>{league.name}</Text.H1>
       </div>
       {/* TODO put viewerHasPicks banner here to make picks */}
+      {!props.viewerHasPicks && !searchParams.get("week") ? (
+        <Alert>
+          <AlertTitle>
+            You need to make your picks for this week. Make them{" "}
+            <Link
+              href={`/league/${league.league_id}/pick`}
+              className="underline"
+            >
+              here
+            </Link>
+            .
+          </AlertTitle>
+        </Alert>
+      ) : (
+        <></>
+      )}
       <div className="hidden xl:col-span-2 xl:flex">
         <div className="flex w-full flex-col gap-4">
           {currentGame && firstGame && (
             <Select
               onValueChange={(value) => {
-                const week = Number(value);
-                router.push(`${pathname}?week=${week}`);
+                router.push(`${pathname}?week=${value}`);
               }}
             >
               <SelectTrigger className="w-full ring-2 ring-input focus:ring-2">

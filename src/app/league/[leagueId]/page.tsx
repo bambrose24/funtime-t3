@@ -35,15 +35,20 @@ export default async function LeaguePage({
     serverApi.time.activeWeekByLeague({ leagueId }),
   ]);
 
+  const picks = await serverApi.member.picksForWeek({
+    leagueId,
+    week: activeGame?.week ?? 1,
+  });
+
   const season = league.season;
 
   let week = Number(weekParam);
   if (!week) {
-    if (!activeGame) {
+    if (!activeGame && !picks.length) {
       // TODO show the regular page if the person has made a pick, but hide picks table
       return <NotStartedLeaguePage league={league} session={session} />;
     }
-    week = activeGame.week;
+    week = activeGame?.week ?? picks.at(0)?.week ?? 1;
   }
 
   const viewerMember = session.dbUser?.leaguemembers.find(
