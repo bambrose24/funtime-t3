@@ -238,7 +238,7 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
               <CardContent>
                 <YourPicksList
                   {...props}
-                  simulatedGids={simulatedGids}
+                  simulatedGames={overrideGidToWinner}
                   selectGame={selectGame}
                   myPicks={myPicks}
                 />
