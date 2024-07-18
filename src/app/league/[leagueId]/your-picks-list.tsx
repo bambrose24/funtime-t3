@@ -34,7 +34,6 @@ export function YourPicksList(props: Props) {
         const awayTeam = teamIdToTeam.get(game.away);
         const choseHome = p.winner === game.home;
         const choseAway = p.winner === game.away;
-        const correct = p.correct;
         const isSimulated = props.simulatedGids.includes(p.gid);
 
         const status: "simulated" | "empty-state" | "correct" | "wrong" =
