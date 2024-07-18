@@ -35,7 +35,7 @@ export function GameCard({
       className={cn(
         "max-h-[130px] min-h-[130px] min-w-[130px] max-w-[130px] shrink-0 p-1",
         Boolean(isSimulated)
-          ? "border-warning border-2"
+          ? "border-2 border-warning"
           : game.done
             ? !myChosenTeam
               ? "border-2 border-blue-500 dark:border-blue-700"
@@ -54,8 +54,8 @@ export function GameCard({
             variant="link"
             className={cn(
               "px-1 py-0.5 text-card-foreground",
-              winner === awayTeam.teamid ? "text-correct" : "",
-              winner !== awayTeam.teamid ? "text-wrong" : "",
+              winner && winner === awayTeam.teamid ? "text-correct" : "",
+              winner && winner !== awayTeam.teamid ? "text-wrong" : "",
             )}
             onClick={(e) => {
               e.preventDefault();
@@ -76,11 +76,8 @@ export function GameCard({
             variant="link"
             className={cn(
               "text-card-foreground",
-              winner === homeTeam.teamid
-                ? "text-correct"
-                : Boolean(winner)
-                  ? "text-wrong"
-                  : "",
+              winner && winner === homeTeam.teamid ? "text-correct" : "",
+              winner && winner === awayTeam.teamid ? "text-wrong" : "",
             )}
             onClick={(e) => {
               e.preventDefault();

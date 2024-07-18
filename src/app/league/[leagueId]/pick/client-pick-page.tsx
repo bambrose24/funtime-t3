@@ -208,7 +208,9 @@ export function ClientPickPage({
       >
         <Form {...form}>
           <div className="flex flex-col items-center justify-center">
-            <Text.H2>Make Your Picks</Text.H2>
+            <Text.H2>
+              {hasSubmittedAlready ? "Update Your Picks" : "Make Your Picks"}
+            </Text.H2>
             <div>
               Week {week}, {season}
             </div>
