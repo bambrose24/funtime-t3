@@ -370,7 +370,7 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
                     <div className="overflow-scroll">
                       <CompactYourPicksList
                         {...props}
-                        simulatedGids={simulatedGids}
+                        simulatedGames={overrideGidToWinner}
                         selectGame={selectGame}
                         myPicks={myPicks}
                       />
