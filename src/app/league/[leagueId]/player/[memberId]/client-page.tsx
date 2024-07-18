@@ -36,6 +36,10 @@ export function ClientMemberPage({
   const superbowlWinner = teams.find((t) => t.teamid === superbowl?.winner);
   const superbowlLoser = teams.find((t) => t.teamid === superbowl?.loser);
 
+  const correct = playerProfile.correctPicks;
+  const wrong = playerProfile.wrongPicks;
+  const total = correct + wrong;
+
   return (
     <div className="col-span-12 flex w-full flex-row justify-center py-4 md:col-span-6 md:col-start-4">
       <Card className="w-full">
@@ -47,14 +51,15 @@ export function ClientMemberPage({
             <div className="flex w-full flex-row justify-between">
               <div>Correct Picks</div>
               <div>
-                {playerProfile.correctPicks} /{" "}
-                {playerProfile.wrongPicks + playerProfile.correctPicks} (
-                {Math.floor(
-                  (playerProfile.correctPicks /
-                    (playerProfile.wrongPicks + playerProfile.correctPicks)) *
-                    100,
-                )}
-                %)
+                {correct} / {total}
+                {total > 0
+                  ? `(${Math.floor(
+                      (playerProfile.correctPicks /
+                        (playerProfile.wrongPicks +
+                          playerProfile.correctPicks)) *
+                        100,
+                    )})%`
+                  : null}
               </div>
             </div>
             <Separator />
@@ -75,13 +80,15 @@ export function ClientMemberPage({
               </div>
             </div>
             <Separator />
-            <div className="flex w-full flex-row justify-between">
-              <div>Super Bowl</div>
-              <div>
-                {superbowlWinner?.abbrev} over {superbowlLoser?.abbrev} (score{" "}
-                {superbowl?.score})
+            {superbowlWinner && (
+              <div className="flex w-full flex-row justify-between">
+                <div>Super Bowl</div>
+                <div>
+                  {superbowlWinner?.abbrev} over {superbowlLoser?.abbrev} (score{" "}
+                  {superbowl?.score})
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </CardContent>
       </Card>

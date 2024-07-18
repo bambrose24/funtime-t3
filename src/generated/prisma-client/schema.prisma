@@ -143,6 +143,7 @@ model leagues {
   future_leagues        leagues[]        @relation("leaguesToleagues")
 
   @@index([created_by_user_id], map: "idx_18422_created_by_user_id")
+  @@index([prior_league_id])
   @@index([created_time], map: "idx_18422_created_time")
   @@index([name], map: "idx_18422_name")
   @@index([season], map: "idx_18422_season")
