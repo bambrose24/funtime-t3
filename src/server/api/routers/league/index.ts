@@ -229,11 +229,11 @@ export const leagueRouter = createTRPCRouter({
         getGames({ season, week }),
       ]);
 
-      const viewerHasPicks = !memberPicks.some(
-        (p) => member.membership_id === p.membership_id,
+      const viewerMemberPicks = memberPicks.find(
+        (mp) => mp.membership_id === member.membership_id,
       );
+      const viewerHasPicks = Boolean(viewerMemberPicks?.picks?.length);
 
-      console.log("viewerHasPicks", viewerHasPicks);
       const gidToIndex = games.reduce((prev, curr, idx) => {
         prev.set(curr.gid, idx);
         return prev;
@@ -247,7 +247,7 @@ export const leagueRouter = createTRPCRouter({
         );
         mp.picks = mp.picks.map((p) => {
           if (!viewerHasPicks) {
-            return { ...p, winner: null };
+            return { ...p, winner: null, correct: null, score: null };
           }
           return p;
         });
