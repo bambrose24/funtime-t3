@@ -37,6 +37,14 @@ const config = {
           DEFAULT: "hsl(var(--wrong))",
           foreground: "hsl(var(--wrong-foreground))",
         },
+        simulated: {
+          DEFAULT: "hsl(var(--simulated))",
+          foreground: "hsl(var(--simulated-foreground))",
+        },
+        pending: {
+          DEFAULT: "hsl(var(--pending))",
+          foreground: "hsl(var(--pending-foreground))",
+        },
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
           foreground: "hsl(var(--secondary-foreground))",

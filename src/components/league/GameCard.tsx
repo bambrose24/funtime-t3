@@ -30,19 +30,31 @@ export function GameCard({
   const isSimulated = simulatedWinner && simulatedWinner !== game.winner;
   const winner = simulatedWinner ?? game.winner;
 
+  const status: "simulated" | "empty-state" | "correct" | "wrong" = isSimulated
+    ? "simulated"
+    : !winner || !myChosenTeam
+      ? "empty-state"
+      : myChosenTeam === winner
+        ? "correct"
+        : "wrong";
+
   return (
     <Card
       className={cn(
         "max-h-[130px] min-h-[130px] min-w-[130px] max-w-[130px] shrink-0 p-1",
-        Boolean(isSimulated)
-          ? "border-2 border-warning"
-          : game.done
-            ? !myChosenTeam
-              ? "border-2 border-blue-500 dark:border-blue-700"
-              : myChosenTeam === game.winner
-                ? "border-2 border-correct"
-                : "border-2 border-wrong"
-            : "",
+        status === "simulated" && "border-2 border-warning",
+        status === "empty-state" && "border-pending border-2",
+        status === "correct" && "border-2 border-correct",
+        status === "wrong" && "border-2 border-wrong",
+        // Boolean(isSimulated)
+        //   ? "border-2 border-warning"
+        //   : game.done
+        //     ? !myChosenTeam
+        //       ? "border-2 border-blue-500 dark:border-blue-700"
+        //       : myChosenTeam === game.winner
+        //         ? "border-2 border-correct"
+        //         : "border-2 border-wrong"
+        //     : "",
       )}
     >
       <div className="grid grid-cols-3 gap-y-1">
