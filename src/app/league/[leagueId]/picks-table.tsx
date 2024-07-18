@@ -26,6 +26,7 @@ type Props = {
   picksSummary: RouterOutputs["league"]["picksSummary"];
   games: RouterOutputs["games"]["getGames"];
   teams: RouterOutputs["teams"]["getTeams"];
+  simulatedGames: Record<number, number>;
 };
 
 // This type is used to define the shape of our data.
@@ -44,6 +45,7 @@ function PicksTableSkeleton() {
   return <Skeleton className="h-full w-full rounded-md" />;
 }
 
+// TODO use simulatedGames
 function PicksTableImpl({ picksSummary, games, teams }: Props) {
   const teamIdToTeam = useDictify(teams, (t) => t.teamid);
   const gameIdToGame = useDictify(games, (g) => g.gid);

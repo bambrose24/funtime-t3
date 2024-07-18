@@ -385,7 +385,12 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
               </Drawer>
             )}
           </div>
-          <PicksTable picksSummary={picksSummary} teams={teams} games={games} />
+          <PicksTable
+            picksSummary={picksSummary}
+            teams={teams}
+            games={games}
+            simulatedGames={overrideGidToWinner}
+          />
         </div>
       </div>
     </>
