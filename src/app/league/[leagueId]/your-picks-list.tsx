@@ -55,6 +55,7 @@ export function YourPicksList(props: Props) {
             key={p.pickid}
             className={cn(
               "flex w-full flex-col rounded-xl border-2 border-transparent p-1",
+              status === "simulated" && "border-simulated",
             )}
           >
             <div className="grid w-full grid-cols-7">
@@ -65,9 +66,9 @@ export function YourPicksList(props: Props) {
                 }}
                 className={cn(
                   "col-span-3 flex flex-row items-center justify-center gap-1 rounded-lg p-1",
-                  status === "simulated" &&
-                    gameWinner === awayTeam.teamid &&
-                    "border-simulated border-2",
+                  // status === "simulated" &&
+                  //   gameWinner === awayTeam.teamid &&
+                  //   "border-simulated border-2",
                   status === "correct" &&
                     choseAway &&
                     "border-2 border-correct",
@@ -81,7 +82,17 @@ export function YourPicksList(props: Props) {
                 )}
               >
                 <TeamLogo abbrev={awayTeam.abbrev ?? ""} />
-                <Text.Small>{awayTeam.abbrev}</Text.Small>
+                <Text.Small
+                  className={cn(
+                    gameWinner !== undefined
+                      ? gameWinner === awayTeam.teamid
+                        ? "text-correct"
+                        : "text-wrong"
+                      : "",
+                  )}
+                >
+                  {awayTeam.abbrev}
+                </Text.Small>
               </Button>
               <div className="col-span-1 flex flex-row items-center justify-center">
                 <Text.Small>@</Text.Small>
@@ -93,9 +104,9 @@ export function YourPicksList(props: Props) {
                 }}
                 className={cn(
                   "col-span-3 flex flex-row items-center justify-center gap-1 rounded-lg p-1",
-                  status === "simulated" &&
-                    gameWinner === homeTeam.teamid &&
-                    "border-simulated border-2",
+                  // status === "simulated" &&
+                  //   gameWinner === homeTeam.teamid &&
+                  //   "border-simulated border-2",
                   status === "correct" &&
                     choseHome &&
                     "border-2 border-correct",
@@ -105,7 +116,17 @@ export function YourPicksList(props: Props) {
                     "border-pending border-2",
                 )}
               >
-                <Text.Small>{homeTeam.abbrev}</Text.Small>
+                <Text.Small
+                  className={cn(
+                    gameWinner !== undefined
+                      ? gameWinner === homeTeam.teamid
+                        ? "text-correct"
+                        : "text-wrong"
+                      : "",
+                  )}
+                >
+                  {homeTeam.abbrev}
+                </Text.Small>
                 <TeamLogo abbrev={homeTeam.abbrev ?? ""} />
               </Button>
             </div>
