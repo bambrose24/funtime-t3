@@ -182,10 +182,10 @@ export const leagueRouter = createTRPCRouter({
     .query(async ({ input, ctx }) => {
       const { dbUser, db } = ctx;
       const { leagueId, week } = input;
-      const member = dbUser?.leaguemembers.find(
+      const viewerMember = dbUser?.leaguemembers.find(
         (m) => m.league_id === leagueId,
       );
-      if (!member) {
+      if (!viewerMember) {
         throw new TRPCError({
           code: "UNAUTHORIZED",
           message: `You are not in the league (league ${leagueId} user ${dbUser?.uid})`,
@@ -230,7 +230,7 @@ export const leagueRouter = createTRPCRouter({
       ]);
 
       const viewerMemberPicks = memberPicks.find(
-        (mp) => mp.membership_id === member.membership_id,
+        (mp) => mp.membership_id === viewerMember.membership_id,
       );
       const viewerHasPicks = Boolean(viewerMemberPicks?.picks?.length);
       const firstGameTs = orderBy(games, (g) => g.ts, "asc").at(0)?.ts;
@@ -250,7 +250,7 @@ export const leagueRouter = createTRPCRouter({
         mp.picks = mp.picks.map((p) => {
           if (
             (!viewerHasPicks || !weekStarted) &&
-            mp.membership_id !== member.membership_id
+            mp.membership_id !== viewerMember.membership_id
           ) {
             return { ...p, winner: null, correct: null, score: null };
           }
