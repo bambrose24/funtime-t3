@@ -248,7 +248,10 @@ export const leagueRouter = createTRPCRouter({
           ["asc", "asc"],
         );
         mp.picks = mp.picks.map((p) => {
-          if (!viewerHasPicks || !weekStarted) {
+          if (
+            (!viewerHasPicks || !weekStarted) &&
+            mp.membership_id !== member.membership_id
+          ) {
             return { ...p, winner: null, correct: null, score: null };
           }
           return p;
