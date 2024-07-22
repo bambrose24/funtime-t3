@@ -136,19 +136,18 @@ export const leagueRouter = createTRPCRouter({
 
       const { week } = mostRecentUnstartedGame;
 
-      const games = await ctx.db.games.findMany({
+      const gamesResp = await ctx.db.games.findMany({
         where: {
           season,
           week,
         },
-        orderBy: [
-          {
-            is_tiebreaker: "asc",
-          },
-          { ts: "asc" },
-          { gid: "asc" },
-        ],
       });
+
+      const games = orderBy(
+        gamesResp,
+        [(g) => g.is_tiebreaker, (g) => g.ts, (g) => g.gid],
+        ["asc", "asc", "asc"],
+      );
 
       const memberPicks = await ctx.db.picks.findMany({
         where: {
