@@ -100,7 +100,14 @@ function PicksTableImpl({ picksSummary, games, teams }: Props) {
           }
           return winnerTeam?.abbrev;
         },
-        header: `${teamIdToTeam.get(g.away)?.abbrev} ${teamIdToTeam.get(g.home)?.abbrev}`,
+        header: () => {
+          return (
+            <div className="flex flex-col">
+              <div>{teamIdToTeam.get(g.away)?.abbrev}</div>
+              <div>{teamIdToTeam.get(g.home)?.abbrev}</div>
+            </div>
+          );
+        },
       };
     }),
   ];
