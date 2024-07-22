@@ -4,7 +4,7 @@ import { RequestContext } from "../requestContext";
 import { WinstonTransport as AxiomTransport } from "@axiomhq/winston";
 
 const baseLogger = winston.createLogger({
-  level: "info",
+  level: config.logging.level,
   format: winston.format.json(),
   transports: [
     // TODO add Axiom transport

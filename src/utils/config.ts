@@ -7,6 +7,7 @@ type Config = {
   logging: {
     shouldLogToConsole: boolean;
     shouldLogToAxiom: boolean;
+    level: "debug" | "info" | "error";
   };
 };
 
@@ -15,12 +16,14 @@ const configMap: Record<Env, Config> = {
     logging: {
       shouldLogToConsole: true,
       shouldLogToAxiom: false,
+      level: "debug",
     },
   },
   preview: {
     logging: {
       shouldLogToConsole: true,
       shouldLogToAxiom: true,
+      level: "info",
     },
   },
   production: {
@@ -28,6 +31,7 @@ const configMap: Record<Env, Config> = {
       // TODO can we stop logging to console now that we are directly logging to axiom?
       shouldLogToConsole: true,
       shouldLogToAxiom: true,
+      level: "info',
     },
   },
 };
