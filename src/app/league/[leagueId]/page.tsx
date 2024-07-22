@@ -23,8 +23,6 @@ export default async function LeaguePage({
     (m) => m.league_id === leagueId,
   );
 
-  console.log("member?", member);
-
   if (!member) {
     // not in the league
     return notFound();
