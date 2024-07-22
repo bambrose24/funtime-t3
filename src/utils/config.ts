@@ -31,7 +31,7 @@ const configMap: Record<Env, Config> = {
       // TODO can we stop logging to console now that we are directly logging to axiom?
       shouldLogToConsole: true,
       shouldLogToAxiom: true,
-      level: "info',
+      level: "info",
     },
   },
 };
