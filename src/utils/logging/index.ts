@@ -1,6 +1,7 @@
 import * as winston from "winston";
 import { config, env } from "../config";
 import { RequestContext } from "../requestContext";
+import { WinstonTransport as AxiomTransport } from "@axiomhq/winston";
 
 const baseLogger = winston.createLogger({
   level: "info",
@@ -9,7 +10,17 @@ const baseLogger = winston.createLogger({
     // TODO add Axiom transport
     // new winston.transports.File({ filename: 'error.log', level: 'error' }),
     // new winston.transports.File({ filename: 'combined.log' }),
-    ...(config.shouldLogToConsole ? [new winston.transports.Console()] : []),
+    ...(config.logging.shouldLogToConsole
+      ? [new winston.transports.Console()]
+      : []),
+    ...(config.logging.shouldLogToAxiom
+      ? [
+          new AxiomTransport({
+            dataset: "funtime-t3-winston",
+            token: process.env.AXIOM_TOKEN ?? "",
+          }),
+        ]
+      : []),
   ],
 });
 

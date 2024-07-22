@@ -17,6 +17,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@axiomhq/winston": "^1.0.0",
     "@hookform/resolvers": "^3.6.0",
     "@nivo/line": "^0.85.1",
     "@prisma/client": "^5.16.2",

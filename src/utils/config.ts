@@ -4,19 +4,31 @@
 type Env = "production" | "preview" | "development";
 
 type Config = {
-  shouldLogToConsole: boolean;
+  logging: {
+    shouldLogToConsole: boolean;
+    shouldLogToAxiom: boolean;
+  };
 };
 
 const configMap: Record<Env, Config> = {
   development: {
-    shouldLogToConsole: true,
+    logging: {
+      shouldLogToConsole: true,
+      shouldLogToAxiom: false,
+    },
   },
   preview: {
-    shouldLogToConsole: true,
+    logging: {
+      shouldLogToConsole: true,
+      shouldLogToAxiom: true,
+    },
   },
   production: {
-    // until we figure out how to send logs to Axiom, let's log to console in prod as well
-    shouldLogToConsole: true,
+    logging: {
+      // TODO can we stop logging to console now that we are directly logging to axiom?
+      shouldLogToConsole: true,
+      shouldLogToAxiom: true,
+    },
   },
 };
 
