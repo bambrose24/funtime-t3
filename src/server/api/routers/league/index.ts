@@ -84,18 +84,7 @@ export const leagueRouter = createTRPCRouter({
       }
       return await db.leagues.findFirstOrThrow({
         where: {
-          AND: [
-            {
-              league_id: {
-                in: ctx.dbUser?.leaguemembers
-                  .map((m) => m.league_id)
-                  .filter(Defined),
-              },
-            },
-            {
-              league_id: leagueId,
-            },
-          ],
+          league_id: leagueId,
         },
       });
     }),
