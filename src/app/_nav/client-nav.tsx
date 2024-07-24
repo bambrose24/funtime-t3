@@ -11,7 +11,6 @@ import {
 } from "@radix-ui/react-icons";
 
 import { Separator } from "~/components/ui/separator";
-import { type serverApi } from "~/trpc/server";
 import { useTheme } from "next-themes";
 import {
   DropdownMenu,
