@@ -48,7 +48,7 @@ export function LeagueAdminChangeNameSetting({ league }: Props) {
 
     toast.success(`Successfully changed the league name`);
 
-    router.refresh();
+    window.location.reload();
   };
   return (
     <div className="flex w-full flex-col gap-4">
