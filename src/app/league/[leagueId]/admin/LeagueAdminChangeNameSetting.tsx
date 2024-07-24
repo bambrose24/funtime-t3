@@ -15,10 +15,8 @@ import {
 } from "~/components/ui/form";
 import { clientApi } from "~/trpc/react";
 import { type RouterOutputs } from "~/trpc/types";
-import { Text } from "~/components/ui/text";
 import { Input } from "~/components/ui/input";
 import { Button } from "~/components/ui/button";
-import { useRouter } from "next/navigation";
 
 const schema = z.object({
   leagueName: z.string().min(5).max(50),
@@ -35,8 +33,6 @@ export function LeagueAdminChangeNameSetting({ league }: Props) {
       leagueName: league.name,
     },
   });
-
-  const router = useRouter();
 
   const { mutateAsync: changeName } =
     clientApi.league.admin.changeName.useMutation();
