@@ -38,7 +38,7 @@ export default async function LeagueAdminPage({
       <div>
         <MobileAdminNav leagueId={league.league_id} />
       </div>
-      <div>{children}</div>
+      {children}
     </div>
   );
 }

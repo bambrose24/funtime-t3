@@ -4,6 +4,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { type RouterOutputs } from "~/trpc/types";
 import { Button } from "~/components/ui/button";
 import { toast } from "sonner";
+import { Input } from "~/components/ui/input";
+import { CopyIcon } from "lucide-react";
+import { Text } from "~/components/ui/text";
+import { Separator } from "~/components/ui/separator";
 
 type Props = {
   league: RouterOutputs["league"]["get"];
@@ -12,30 +16,41 @@ type Props = {
 export function LeagueAdminClientPage({ league }: Props) {
   const shareLink = `${window.location?.origin}/join-league/${league.share_code}`;
   return (
-    <Card>
+    <Card className="w-full">
       <CardHeader>
-        <CardTitle>General</CardTitle>
+        <CardTitle className="text-2xl">General Admin Settings</CardTitle>
       </CardHeader>
-      <CardContent className="w-full">
-        <div className="flex flex-row">
-          <div className="flex items-center rounded-md rounded-r-none border-2 border-r-0 border-input p-2 text-sm">
-            {shareLink}
+      <CardContent className="flex flex-col items-center">
+        <div className="flex w-full flex-col items-center gap-4 xl:w-[600px]">
+          <Separator />
+          <div className="flex flex-col gap-1">
+            <Text.H4>League Share Link</Text.H4>
+            <span className="text-muted-foreground">
+              Send this link to people you want to join this league. They have
+              until the season starts to register.
+            </span>
           </div>
-          <div className="border-y-[2px] border-input px-1">
-            <div className="h-full w-[2px] bg-input" />
-          </div>
-          <div className="rounded-md rounded-l-none border-2 border-l-0 border-input p-2">
+          <div className="flex w-full items-center space-x-2">
+            <Input
+              type="text"
+              value={shareLink}
+              disabled
+              className="flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+            />
             <Button
-              variant="ghost"
-              size="sm"
+              variant="secondary"
               onClick={async () => {
                 await navigator.clipboard.writeText(shareLink);
-                toast.success(`Copied share link to clipboard`);
+                toast.success(`Copied join link to clipboard`);
               }}
+              className="inline-flex items-center space-x-2"
             >
-              Copy
+              <CopyIcon className="h-4 w-4" />
+              <span className="hidden lg:block">Copy League Link</span>
+              <span className="lg:hidden">Copy</span>
             </Button>
           </div>
+          <Separator />
         </div>
       </CardContent>
     </Card>

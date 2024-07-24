@@ -44,6 +44,19 @@ function H3({ children, className }: TextProps) {
   );
 }
 
+function H4({ children, className }: TextProps) {
+  return (
+    <h4
+      className={cn(
+        "scroll-m-20 text-xl font-semibold tracking-wide",
+        className,
+      )}
+    >
+      {children}
+    </h4>
+  );
+}
+
 function Body({ children, className }: TextProps) {
   return (
     <p className={cn("leading-7 [&:not(:first-child)]:mt-6", className)}>
@@ -66,4 +79,4 @@ function Muted({ children, className }: TextProps) {
   );
 }
 
-export const Text = { H1, H2, H3, Body, Small, Muted };
+export const Text = { H1, H2, H3, H4, Body, Small, Muted };
