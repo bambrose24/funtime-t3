@@ -45,16 +45,20 @@ import { useEffect } from "react";
 import { PrefetchKind } from "next/dist/client/components/router-reducer/router-reducer-types";
 
 type NavData = {
-  data: Awaited<ReturnType<(typeof serverApi)["home"]["nav"]>>;
+  data: RouterOutputs["home"]["nav"];
 };
 
-export function ClientNav(props: NavData) {
+export function ClientNav({ data: initialData }: NavData) {
   const leagueId = useLeagueIdFromPath();
   const logout = useLogout();
   const router = useRouter();
 
-  const user = props.data?.dbUser;
-  const leagues = props.data?.leagues;
+  const { data } = clientApi.home.nav.useQuery(undefined, {
+    initialData,
+  });
+
+  const user = data?.dbUser;
+  const leagues = data?.leagues;
 
   const chosenLeague = leagues?.find((l) => l.league_id === leagueId);
 

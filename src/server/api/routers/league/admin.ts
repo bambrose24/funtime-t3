@@ -108,4 +108,23 @@ export const leagueAdminRouter = createTRPCRouter({
 
     return { members };
   }),
+  changeName: leagueAdminProcedure
+    .input(
+      z.object({
+        leagueName: z.string().min(5).max(50),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { db } = ctx;
+      const { leagueId, leagueName } = input;
+      const updatedLeague = await db.leagues.update({
+        where: {
+          league_id: leagueId,
+        },
+        data: {
+          name: leagueName,
+        },
+      });
+      return updatedLeague;
+    }),
 });

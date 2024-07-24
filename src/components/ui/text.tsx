@@ -46,12 +46,7 @@ function H3({ children, className }: TextProps) {
 
 function H4({ children, className }: TextProps) {
   return (
-    <h4
-      className={cn(
-        "scroll-m-20 text-xl font-semibold tracking-wide",
-        className,
-      )}
-    >
+    <h4 className={cn("scroll-m-20 text-xl font-semibold", className)}>
       {children}
     </h4>
   );
