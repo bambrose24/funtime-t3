@@ -53,8 +53,8 @@ export async function run() {
           }
         }
         const data = {
-          awayscore: msfGame.score.awayScoreTotal,
-          homescore: msfGame.score.homeScoreTotal,
+          awayscore: msfGame.score.awayScoreTotal ?? 0,
+          homescore: msfGame.score.homeScoreTotal ?? 0,
           done,
           winner,
         } satisfies Parameters<typeof db.games.update>[0]["data"];
