@@ -38,15 +38,21 @@ export function JoinLeagueClientPage({ data, session, teams }: Props) {
             <CardTitle>Join {data.name}</CardTitle>
             <CardDescription>
               Register below to join. You are logged in as{" "}
-              {session.dbUser?.username}. Not you?{" "}
-              <Button asChild onClick={logout}>
-                <span className="cursor-pointer underline">Log out</span>
-              </Button>
+              <span className="font-bold">{session.dbUser?.username}</span>. Not
+              you?{" "}
+              <span onClick={logout} className="cursor-pointer underline">
+                Log out
+              </span>
             </CardDescription>
           </CardHeader>
           <CardContent>hi</CardContent>
           <CardFooter>
-            <Button className="w-full">Register</Button>
+            <Button
+              className="w-full"
+              disabled={form.formState.isSubmitting || !form.formState.isValid}
+            >
+              Register
+            </Button>
           </CardFooter>
         </Card>
       </div>
