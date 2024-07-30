@@ -9,7 +9,14 @@ import { redirect } from "next/navigation";
 export const dynamic: AppConfigDynamic = "force-dynamic";
 
 export default async function Home() {
-  const data = await serverApi.home.summary();
+  const [data, session] = await Promise.all([
+    serverApi.home.summary(),
+    serverApi.session.current(),
+  ]);
+
+  if (!session) {
+    redirect("/login");
+  }
 
   const activeLeagues = data?.filter((l) => l.season === DEFAULT_SEASON) ?? [];
   if (activeLeagues.length === 1) {
