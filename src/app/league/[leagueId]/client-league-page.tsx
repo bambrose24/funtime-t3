@@ -61,7 +61,7 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
     },
     {
       initialData: props.games,
-      refetchInterval: REFETCH_INTERVAL_MS,
+      // refetchInterval: REFETCH_INTERVAL_MS,
     },
   );
   const { data: picksSummaryData } = clientApi.league.picksSummary.useQuery(
@@ -69,7 +69,10 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
       leagueId: props.leagueId,
       week: props.week,
     },
-    { initialData: props.picksSummary, refetchInterval: REFETCH_INTERVAL_MS },
+    {
+      initialData: props.picksSummary,
+      // refetchInterval: REFETCH_INTERVAL_MS
+    },
   );
 
   const [chatSheetOpen, setChatSheetOpen] = useState(false);

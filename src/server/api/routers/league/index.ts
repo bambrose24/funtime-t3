@@ -32,7 +32,7 @@ export const leagueRouter = createTRPCRouter({
   fromJoinCode: authorizedProcedure
     .input(
       z.object({
-        code: z.string().cuid(),
+        code: z.string(),
       }),
     )
     .query(async ({ input, ctx }) => {
@@ -46,6 +46,71 @@ export const leagueRouter = createTRPCRouter({
         return null;
       }
       return league;
+    }),
+  register: authorizedProcedure
+    .input(
+      z.object({
+        code: z.string().min(1),
+        superbowl: z
+          .object({
+            winnerTeamId: z.number().int(),
+            loserTeamId: z.number().int(),
+            score: z.number().int().min(1),
+          })
+          .optional(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { dbUser } = ctx;
+      if (!dbUser) {
+        throw new TRPCError({ code: "UNAUTHORIZED" });
+      }
+      const { code, superbowl } = input;
+      const league = await ctx.db.leagues.findFirstOrThrow({
+        where: {
+          share_code: code,
+        },
+      });
+
+      const isInLeague = dbUser.leaguemembers.find(
+        (m) => m.league_id === league.league_id,
+      );
+      if (isInLeague) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: `User ${dbUser.uid} is already in league ${league.league_id}`,
+        });
+      }
+
+      if (league.superbowl_competition && !superbowl) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: `Superbowl competition requires superbowl data`,
+        });
+      }
+
+      const leagueMember = await ctx.db.leaguemembers.create({
+        data: {
+          league_id: league.league_id,
+          user_id: dbUser.uid,
+          role: "player",
+        },
+      });
+
+      if (superbowl) {
+        await ctx.db.superbowl.create({
+          data: {
+            winner: superbowl.winnerTeamId,
+            loser: superbowl.loserTeamId,
+            uid: dbUser.uid,
+            season: league.season,
+            member_id: leagueMember.membership_id,
+            score: superbowl.score,
+          },
+        });
+      }
+
+      return leagueMember;
     }),
   create: authorizedProcedure
     .input(

@@ -164,6 +164,7 @@ function PicksTableImpl({ picksSummary, games, teams }: Props) {
 
                   let bgColor: "yellow" | "green" | "red" | undefined =
                     undefined;
+
                   if (game?.done) {
                     if (!pick) {
                       bgColor = "yellow";
@@ -174,7 +175,9 @@ function PicksTableImpl({ picksSummary, games, teams }: Props) {
                     }
                   } else if (!game && cell.column.getIndex() > 1) {
                     // TODO make columnIndexToGame map
-                    bgColor = "yellow";
+                    // TODO is this for missing picks? or picks we can't see yet?
+                    // seems like it's both
+                    // bgColor = "yellow";
                   }
                   return (
                     <TableCell

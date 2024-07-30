@@ -28,8 +28,8 @@ export function AlreadyInLeague({ data }: Props) {
           </CardDescription>
         </CardHeader>
         <CardFooter>
-          <Link href="/" className="w-full">
-            <Button className="w-full">Go Home</Button>
+          <Link href={`/league/${data.league_id}`} className="w-full">
+            <Button className="w-full">League Home</Button>
           </Link>
         </CardFooter>
       </Card>

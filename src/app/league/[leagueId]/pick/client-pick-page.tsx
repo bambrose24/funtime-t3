@@ -124,6 +124,7 @@ export function ClientPickPage({
 
   const { mutateAsync: submitPicks, data: submitResponse } =
     clientApi.picks.submitPicks.useMutation();
+  const trpcUtils = clientApi.useUtils();
 
   const onSubmit: Parameters<typeof form.handleSubmit>[0] = async (data) => {
     try {
@@ -145,6 +146,8 @@ export function ClientPickPage({
       });
 
       setPicksDrawerOpen(true);
+
+      await trpcUtils.invalidate();
     } catch (e) {
       console.error(`Error submitting picks`, e);
       toast.error(
