@@ -1,6 +1,6 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
+import { Card, CardContent, CardTitle } from "~/components/ui/card";
 import { type RouterOutputs } from "~/trpc/types";
 import { Button } from "~/components/ui/button";
 import { toast } from "sonner";

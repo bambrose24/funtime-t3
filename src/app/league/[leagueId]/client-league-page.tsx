@@ -49,7 +49,7 @@ type ClientLeaguePageProps = {
   viewerHasPicks: boolean;
 };
 
-const REFETCH_INTERVAL_MS = 1000 * 30;
+// const REFETCH_INTERVAL_MS = 1000 * 30;
 
 export function ClientLeaguePage(props: ClientLeaguePageProps) {
   const { teams, league, session, currentGame } = props;

@@ -38,7 +38,6 @@ import { TeamLogo } from "~/components/shared/TeamLogo";
 import { useEffect } from "react";
 import { Input } from "~/components/ui/input";
 import { clientApi } from "~/trpc/react";
-import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 type Props = {
@@ -66,8 +65,6 @@ const schema = z.object({
 });
 
 export function JoinLeagueClientPage({ data, session, teams }: Props) {
-  const router = useRouter();
-
   const { mutateAsync: register } = clientApi.league.register.useMutation();
   const trpcUtils = clientApi.useUtils();
 
