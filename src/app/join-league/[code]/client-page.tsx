@@ -33,7 +33,7 @@ export function JoinLeagueClientPage({ data, session, teams }: Props) {
   return (
     <Form {...form}>
       <div className="col-span-12 flex justify-center">
-        <Card className="max-w-[400px]">
+        <Card className="max-w-[600px]">
           <CardHeader>
             <CardTitle>Join {data.name}</CardTitle>
             <CardDescription>
