@@ -18,11 +18,11 @@ export function LeagueAdminClientPage({ league }: Props) {
   const shareLink = `${window.location?.origin}/join-league/${league.share_code}`;
   return (
     <Card className="w-full">
-      <CardHeader>
-        <CardTitle className="text-2xl">General Admin Settings</CardTitle>
-      </CardHeader>
       <CardContent className="flex flex-col items-center">
         <div className="flex w-full flex-col items-center gap-4 md:w-[600px]">
+          <CardTitle className="py-2 text-2xl">
+            General Admin Settings
+          </CardTitle>
           <LeagueAdminChangeNameSetting league={league} />
           <Separator />
           <div className="flex w-full flex-col gap-4">
@@ -54,7 +54,7 @@ export function LeagueAdminClientPage({ league }: Props) {
               </Button>
             </div>
           </div>
-          <Separator />
+          {/* <Separator /> */}
         </div>
       </CardContent>
     </Card>
