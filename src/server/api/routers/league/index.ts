@@ -29,6 +29,24 @@ const leagueIdSchema = z.object({
 
 export const leagueRouter = createTRPCRouter({
   admin: leagueAdminRouter,
+  fromJoinCode: authorizedProcedure
+    .input(
+      z.object({
+        code: z.string().cuid(),
+      }),
+    )
+    .query(async ({ input, ctx }) => {
+      const { code } = input;
+      const league = await ctx.db.leagues.findFirst({
+        where: {
+          share_code: code,
+        },
+      });
+      if (!league) {
+        return null;
+      }
+      return league;
+    }),
   create: authorizedProcedure
     .input(
       z.object({

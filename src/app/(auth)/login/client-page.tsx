@@ -133,9 +133,7 @@ export function LoginClientPage() {
                   className="w-full"
                   type="submit"
                   disabled={
-                    form.formState.isSubmitting ||
-                    form.formState.isSubmitted ||
-                    !form.formState.isValid
+                    form.formState.isSubmitting || !form.formState.isValid
                   }
                 >
                   {form.formState.isSubmitting && (
