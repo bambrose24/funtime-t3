@@ -11,7 +11,7 @@ export const dynamic: AppConfigDynamic = "force-dynamic";
 export default async function Home() {
   const [session] = await Promise.all([serverApi.session.current()]);
 
-  if (!session) {
+  if (!session.dbUser) {
     redirect("/login");
   }
 

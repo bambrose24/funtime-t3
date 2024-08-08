@@ -21,8 +21,8 @@ export default async function JoinLeaguePage(props: Props) {
     notFound();
   }
 
-  if (!session) {
-    redirect(`/login?redirectTo=/join-league/${code}`);
+  if (!session.dbUser) {
+    redirect(`/login?upsell=registration&redirectTo=/join-league/${code}`);
   }
   const teams = await serverApi.teams.getTeams();
   const isInLeague = session.dbUser?.leaguemembers?.find(

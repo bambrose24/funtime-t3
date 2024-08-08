@@ -26,6 +26,7 @@ import {
 } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
 import { clientApi } from "~/trpc/react";
+import { useRedirectToParam } from "~/utils/hooks/useRedirectToParam";
 
 const signupFormSchema = z.object({
   username: z.string().min(5),
@@ -43,6 +44,8 @@ export function ConfirmSignupClientPage() {
     },
   });
 
+  const redirectTo = useRedirectToParam();
+
   const { mutateAsync: funtimeSignup } = clientApi.auth.signup.useMutation();
 
   const onSubmit: Parameters<typeof form.handleSubmit>[0] = async (data) => {
@@ -52,7 +55,7 @@ export function ConfirmSignupClientPage() {
 
     toast.success(`Successfully signed up!`);
 
-    window.location.href = "/";
+    window.location.href = redirectTo ?? "/";
   };
 
   return (

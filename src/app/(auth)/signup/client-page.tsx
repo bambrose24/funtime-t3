@@ -2,6 +2,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -49,6 +50,7 @@ const signupFormSchema = z
   });
 
 export function SignupClientPage() {
+  const searchParams = useSearchParams();
   const form = useForm<z.infer<typeof signupFormSchema>>({
     resolver: zodResolver(signupFormSchema),
     defaultValues: {
@@ -63,7 +65,7 @@ export function SignupClientPage() {
 
     const supabase = createSupabaseBrowser();
 
-    const emailRedirectTo = `${window.location.href}/confirm-signup`;
+    const emailRedirectTo = `${window.location.href}/confirm-signup?${searchParams.toString()}`;
 
     const signupResponse = await supabase.auth.signUp({
       email,

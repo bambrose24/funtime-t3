@@ -11,10 +11,10 @@ import {
   CardTitle,
 } from "~/components/ui/card";
 import { loginSchema } from "~/lib/schemas/auth";
-import { type z } from "zod";
+import { z } from "zod";
 import { Input } from "~/components/ui/input";
 import { Button } from "~/components/ui/button";
-import { Alert, AlertDescription } from "~/components/ui/alert";
+import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
 import Link from "next/link";
 import { Label } from "~/components/ui/label";
 import {
@@ -29,8 +29,11 @@ import {
 import { toast } from "sonner";
 import { createSupabaseBrowser } from "~/utils/supabase/client";
 import { useRedirectToParam } from "~/utils/hooks/useRedirectToParam";
+import { useSearchParams } from "next/navigation";
 
 type LoginFormType = z.infer<typeof loginSchema>;
+
+const loginUpsellSchema = z.enum(["registration"]);
 
 export function LoginClientPage() {
   const form = useForm<LoginFormType>({
@@ -39,6 +42,8 @@ export function LoginClientPage() {
   });
 
   const redirectTo = useRedirectToParam();
+  const searchParams = useSearchParams();
+  const upsell = loginUpsellSchema.safeParse(searchParams.get("upsell"));
 
   const onSubmit: Parameters<typeof form.handleSubmit>[0] = async (data) => {
     const { email, password } = data;
@@ -50,7 +55,7 @@ export function LoginClientPage() {
 
     if (authResponse.error) {
       toast.error(`Error signing in - ${authResponse.error.message}`);
-      return;
+      throw authResponse.error;
     }
 
     toast.success(`Successfully logged in.`);
@@ -70,6 +75,13 @@ export function LoginClientPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
+              {upsell.success && upsell.data === "registration" && (
+                <Alert>
+                  <AlertTitle>
+                    You can register for the league after you are logged in.
+                  </AlertTitle>
+                </Alert>
+              )}
               {redirectTo && (
                 <div className="pb-3">
                   <LoginMessage redirectTo={redirectTo} />
@@ -146,7 +158,11 @@ export function LoginClientPage() {
               </div>
               <div className="mt-4 text-center text-sm">
                 Don&apos;t have an account?{" "}
-                <Link href="/signup" className="underline" tabIndex={4}>
+                <Link
+                  href={`/signup?${searchParams.toString()}`}
+                  className="underline"
+                  tabIndex={4}
+                >
                   Sign up
                 </Link>
               </div>
