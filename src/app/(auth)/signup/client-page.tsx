@@ -65,7 +65,7 @@ export function SignupClientPage() {
 
     const supabase = createSupabaseBrowser();
 
-    const emailRedirectTo = `${window.location.href}/confirm-signup?${searchParams.toString()}`;
+    const emailRedirectTo = `${window.location.href}/auth/confirm?${searchParams.toString()}`;
 
     const signupResponse = await supabase.auth.signUp({
       email,
