@@ -29,7 +29,7 @@ const leagueIdSchema = z.object({
 
 export const leagueRouter = createTRPCRouter({
   admin: leagueAdminRouter,
-  fromJoinCode: authorizedProcedure
+  fromJoinCode: publicProcedure
     .input(
       z.object({
         code: z.string(),
