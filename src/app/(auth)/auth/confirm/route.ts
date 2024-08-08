@@ -11,8 +11,12 @@ export async function GET(request: NextRequest) {
   console.log(
     `got search params in auth confirm route: ${searchParams.toString()}`,
   );
+
+  const redirectTo = searchParams.get("redirectTo");
   const next =
-    searchParams.get("next") ?? type === "signup" ? "/confirm-signup" : "/";
+    searchParams.get("next") ?? type === "signup"
+      ? `/confirm-signup?${redirectTo ? `redirectTo=${redirectTo}` : ``}`
+      : redirectTo ?? "/";
 
   if (token_hash && type) {
     const supabase = supabaseServer();
