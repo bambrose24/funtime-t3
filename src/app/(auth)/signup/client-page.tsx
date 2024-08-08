@@ -1,6 +1,7 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
+import { getURL } from "next/dist/shared/lib/utils";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
@@ -26,6 +27,8 @@ import {
   FormMessage,
 } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
+import { config } from "~/utils/config";
+import { getBaseUrl } from "~/utils/getBaseUrl";
 import { createSupabaseBrowser } from "~/utils/supabase/client";
 
 const signupFormSchema = z
@@ -65,7 +68,7 @@ export function SignupClientPage() {
 
     const supabase = createSupabaseBrowser();
 
-    const emailRedirectTo = `${window.location.href}/auth/confirm?${searchParams.toString()}`;
+    const emailRedirectTo = `${getBaseUrl()}/auth/confirm?${searchParams.toString()}`;
 
     const signupResponse = await supabase.auth.signUp({
       email,
