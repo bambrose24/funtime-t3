@@ -9,22 +9,25 @@ import { redirect } from "next/navigation";
 export const dynamic: AppConfigDynamic = "force-dynamic";
 
 export default async function Home() {
-  const [data, session] = await Promise.all([
-    serverApi.home.summary(),
-    serverApi.session.current(),
-  ]);
+  const [session] = await Promise.all([serverApi.session.current()]);
 
   if (!session) {
     redirect("/login");
   }
 
-  const activeLeagues = data?.filter((l) => l.season === DEFAULT_SEASON) ?? [];
+  const activeLeagues =
+    session?.dbUser?.leaguemembers?.filter(
+      (m) => m.leagues.season === DEFAULT_SEASON,
+    ) ?? [];
+
   if (activeLeagues.length === 1) {
     const activeLeague = activeLeagues.at(0);
     if (activeLeague) {
       redirect(`/league/${activeLeague.league_id}`);
     }
   }
+
+  const data = await serverApi.home.summary();
 
   return (
     <div className="col-span-12 flex w-full grow flex-row flex-wrap justify-around gap-4 py-4">

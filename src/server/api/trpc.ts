@@ -48,6 +48,12 @@ export const createTRPCContext = async (opts: { headers: Headers }) => {
                 league_id: true,
                 membership_id: true,
                 role: true,
+                leagues: {
+                  select: {
+                    season: true,
+                    name: true,
+                  },
+                },
               },
             },
           },
