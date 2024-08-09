@@ -1,7 +1,6 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
-import { getURL } from "next/dist/shared/lib/utils";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
@@ -27,7 +26,6 @@ import {
   FormMessage,
 } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
-import { config } from "~/utils/config";
 import { getBaseUrl } from "~/utils/getBaseUrl";
 import { createSupabaseBrowser } from "~/utils/supabase/client";
 
