@@ -35,7 +35,7 @@ const signupFormSchema = z
     password1: z.string().min(8, "Must be at least 8 characters"),
     password2: z.string().min(8, "Must be at least 8 characters"),
 
-    // on confirm-signup page
+    // on confirm-signup page so don't need here
     // username: z.string().min(5),
     // firstName: z.string(),
     // lastName: z.string(),
