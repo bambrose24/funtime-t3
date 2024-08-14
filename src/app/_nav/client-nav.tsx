@@ -28,6 +28,7 @@ import { useLogout } from "../(auth)/auth/useLogout";
 import { useLeagueIdFromPath } from "~/utils/hooks/useLeagueIdFromPath";
 import {
   ChevronsUpDown,
+  CircleUser,
   HomeIcon,
   PenIcon,
   PlusIcon,
@@ -285,7 +286,7 @@ type ChosenLeague = NonNullable<
   NonNullable<RouterOutputs["home"]["nav"]>["leagues"][number]
 >;
 
-type TabOption = "home" | "make-picks" | "leaderboard" | "admin";
+type TabOption = "home" | "make-picks" | "leaderboard" | "admin" | "my-profile";
 
 function useActiveLeagueSubPath(): TabOption {
   const pathname = usePathname();
@@ -297,6 +298,9 @@ function useActiveLeagueSubPath(): TabOption {
   }
   if (pathname.includes("admin")) {
     return "admin";
+  }
+  if (pathname.includes("my-profile")) {
+    return "my-profile";
   }
   return "home";
 }
@@ -327,6 +331,13 @@ function TabLabel() {
           <div className="lg:hidden">Admin</div>
         </>
       );
+    case "my-profile":
+      return (
+        <>
+          <div className="hidden lg:block">My Profile</div>
+          <div className="lg:hidden">Profile</div>
+        </>
+      );
   }
 }
 
@@ -334,6 +345,7 @@ function LeagueDropdownMenu({ chosenLeague }: { chosenLeague: ChosenLeague }) {
   const leaderboardHref = `/league/${chosenLeague.league_id}/leaderboard`;
   const pickHref = `/league/${chosenLeague.league_id}/pick`;
   const adminHref = `/league/${chosenLeague.league_id}/admin`;
+  const myProfileHref = `/league/${chosenLeague.league_id}/my-profile`;
 
   const { data: session } = clientApi.session.current.useQuery();
   const isAdmin =
@@ -376,6 +388,14 @@ function LeagueDropdownMenu({ chosenLeague }: { chosenLeague: ChosenLeague }) {
               <div className="flex flex-row items-center gap-3">
                 <TrophyIcon className="h-4 w-4" />
                 <>Leaderboard</>
+              </div>
+            </DropdownMenuItem>
+          </Link>
+          <Link href={myProfileHref}>
+            <DropdownMenuItem>
+              <div className="flex flex-row items-center gap-3">
+                <CircleUser className="h-4 w-4" />
+                <>My Profile</>
               </div>
             </DropdownMenuItem>
           </Link>
