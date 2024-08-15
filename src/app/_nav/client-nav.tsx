@@ -30,6 +30,7 @@ import {
   ChevronsUpDown,
   CircleUser,
   HomeIcon,
+  InfoIcon,
   PenIcon,
   PlusIcon,
   SettingsIcon,
@@ -346,6 +347,7 @@ function LeagueDropdownMenu({ chosenLeague }: { chosenLeague: ChosenLeague }) {
   const pickHref = `/league/${chosenLeague.league_id}/pick`;
   const adminHref = `/league/${chosenLeague.league_id}/admin`;
   const myProfileHref = `/league/${chosenLeague.league_id}/my-profile`;
+  const infoHref = `/league/${chosenLeague.league_id}/info`;
 
   const { data: session } = clientApi.session.current.useQuery();
   const isAdmin =
@@ -396,6 +398,14 @@ function LeagueDropdownMenu({ chosenLeague }: { chosenLeague: ChosenLeague }) {
               <div className="flex flex-row items-center gap-3">
                 <CircleUser className="h-4 w-4" />
                 <>My Profile</>
+              </div>
+            </DropdownMenuItem>
+          </Link>
+          <Link href={infoHref}>
+            <DropdownMenuItem>
+              <div className="flex items-center gap-3">
+                <InfoIcon className="h-4 w-4" />
+                <>League Info</>
               </div>
             </DropdownMenuItem>
           </Link>

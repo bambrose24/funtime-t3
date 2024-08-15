@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Separator } from "~/components/ui/separator";
 import { clientApi } from "~/trpc/react";
@@ -40,6 +41,8 @@ export function ClientMemberPage({
   const wrong = playerProfile.wrongPicks;
   const total = correct + wrong;
 
+  const email = playerProfile.member.people.email;
+
   return (
     <div className="col-span-12 flex w-full flex-row justify-center py-4 md:col-span-6 md:col-start-4">
       <Card className="w-full">
@@ -48,6 +51,19 @@ export function ClientMemberPage({
         </CardHeader>
         <CardContent>
           <div className="flex w-full flex-col gap-2">
+            <div className="flex w-full flex-row justify-between">
+              <div>Email</div>
+              <div className="flex flex-row gap-1">
+                {!Boolean(email) ? (
+                  <div className="text-sm">None</div>
+                ) : (
+                  <Link href={`mailto:${email}`} className="underline">
+                    {playerProfile.member.people.email}
+                  </Link>
+                )}
+              </div>
+            </div>
+            <Separator />
             <div className="flex w-full flex-row justify-between">
               <div>Correct Picks</div>
               <div>
@@ -81,13 +97,16 @@ export function ClientMemberPage({
             </div>
             <Separator />
             {superbowlWinner && (
-              <div className="flex w-full flex-row justify-between">
-                <div>Super Bowl</div>
-                <div>
-                  {superbowlWinner?.abbrev} over {superbowlLoser?.abbrev} (score{" "}
-                  {superbowl?.score})
+              <>
+                <div className="flex w-full flex-row justify-between">
+                  <div>Super Bowl</div>
+                  <div>
+                    {superbowlWinner?.abbrev} over {superbowlLoser?.abbrev}{" "}
+                    (score {superbowl?.score})
+                  </div>
                 </div>
-              </div>
+                <Separator />
+              </>
             )}
           </div>
         </CardContent>

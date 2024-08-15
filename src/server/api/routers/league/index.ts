@@ -171,6 +171,26 @@ export const leagueRouter = createTRPCRouter({
         },
       });
     }),
+  members: authorizedProcedure
+    .input(leagueIdSchema)
+    .query(async ({ input, ctx }) => {
+      const { leagueId } = input;
+      const { db } = ctx;
+      const usersLeagueIds = (
+        ctx.dbUser?.leaguemembers.map((m) => m.league_id) ?? []
+      ).filter(Defined);
+      if (!usersLeagueIds.includes(leagueId)) {
+        throw UnauthorizedError;
+      }
+      return await db.leaguemembers.findMany({
+        where: {
+          league_id: leagueId,
+        },
+        include: {
+          people: true,
+        },
+      });
+    }),
   weekToPick: authorizedProcedure
     .input(leagueIdSchema)
     .query(async ({ input, ctx }) => {
