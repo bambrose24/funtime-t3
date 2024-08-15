@@ -315,6 +315,13 @@ export function ClientPickPage({
                               <RadioGroupItem
                                 value={away.teamid.toString()}
                                 id={`pick_option_${away.teamid.toString()}`}
+                                onClick={() => {
+                                  onTeamPick({
+                                    idx,
+                                    gid: game.gid,
+                                    winner: away.teamid,
+                                  });
+                                }}
                               />
                               <Text.Small>{away.abbrev}</Text.Small>
                             </div>
@@ -338,6 +345,13 @@ export function ClientPickPage({
                                 <RadioGroupItem
                                   value={home.teamid.toString()}
                                   id={`pick_option_${home.teamid.toString()}`}
+                                  onClick={() => {
+                                    onTeamPick({
+                                      idx,
+                                      gid: game.gid,
+                                      winner: home.teamid,
+                                    });
+                                  }}
                                 />
                               </div>
                             </div>
