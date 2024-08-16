@@ -35,30 +35,107 @@ export function ClientLeagueInfoPage({
       <Card className="w-full">
         <CardContent>
           <CardHeader className="w-full text-center">
-            <CardTitle>League Information</CardTitle>
+            <Text.H2>League Information</Text.H2>
           </CardHeader>
           <div className="flex flex-col gap-4">
+            {/* League Admins Section */}
             <div className="grid w-full grid-cols-2 gap-2">
               <div className="flex w-full items-center">
                 <Text.Body className="font-bold">League Admin(s)</Text.Body>
               </div>
               <div className="flex w-full overflow-y-visible">
-                {admins.map((admin) => {
-                  return (
-                    <div key={admin.membership_id}>
-                      <Link
-                        href={`/league/${league.league_id}/player/${admin.membership_id}`}
-                      >
-                        <span className="underline">
-                          {admin.people.username}
-                        </span>
-                      </Link>
-                    </div>
-                  );
-                })}
+                {admins.map((admin) => (
+                  <div key={admin.membership_id}>
+                    <Link
+                      href={`/league/${league.league_id}/player/${admin.membership_id}`}
+                    >
+                      <span className="underline">{admin.people.username}</span>
+                    </Link>
+                  </div>
+                ))}
               </div>
             </div>
             <Separator />
+
+            {/* Rules Section */}
+            <div className="flex flex-col gap-2">
+              <div className="flex w-full justify-center">
+                <Text.H3>League Rules</Text.H3>
+              </div>
+              <div className="flex w-full flex-col gap-4">
+                {/* Weekly Picks */}
+                <div>
+                  <Text.Body className="font-bold">Weekly Picks</Text.Body>
+                  <Text.Body>
+                    Each week you make picks for the upcoming week's NFL games.
+                    You predict who will win each one and pick a total score for
+                    the last chronological game of the week. The winner is
+                    determined by:
+                    <ul className="list-disc pl-5">
+                      <li>
+                        The person who picked the most correctly will win the
+                        week.
+                      </li>
+                      <li>
+                        If there is a tie, the person with the closest total
+                        score for the last chronological game will win.
+                      </li>
+                      <li>
+                        If there is still a tie, there are co-winners for that
+                        week.
+                      </li>
+                    </ul>
+                  </Text.Body>
+                </div>
+                <Separator />
+
+                {/* Seasonal Picks */}
+                <div>
+                  <Text.Body className="font-bold">Seasonal Picks</Text.Body>
+                  <Text.Body>
+                    This competition runs the duration of the season. It is
+                    similar to Weekly Picks in that you aim to have the highest
+                    total correct picks. The top 3 players will be winners.
+                    There is no tiebreaker for point differences over the course
+                    of the season.
+                  </Text.Body>
+                </div>
+                <Separator />
+
+                {/* Super Bowl Pick */}
+                {league.superbowl_competition === true ? (
+                  <div>
+                    <Text.Body className="font-bold">Super Bowl Pick</Text.Body>
+                    <Text.Body>
+                      At the beginning of the season, users register and pick
+                      their Super Bowl pick. You pick:
+                      <ul className="list-disc pl-5">
+                        <li>A winning team.</li>
+                        <li>A losing team.</li>
+                        <li>A total score of the game.</li>
+                      </ul>
+                      The winner of the Super Bowl competition is determined by
+                      the following:
+                      <ul className="list-disc pl-5">
+                        <li>
+                          The person who picked the winner correctly wins.
+                        </li>
+                        <li>
+                          If there is a tie or no one picked the winner
+                          correctly, the person who picked the loser correctly
+                          will win.
+                        </li>
+                        <li>
+                          If there is a tie or no one picked the loser
+                          correctly, the person closest to the total score will
+                          win.
+                        </li>
+                      </ul>
+                    </Text.Body>
+                  </div>
+                ) : null}
+              </div>
+            </div>
           </div>
         </CardContent>
       </Card>
