@@ -22,11 +22,12 @@ export default async function PickPage({ params: { leagueId: id } }: Props) {
   if (!leagueId) {
     return notFound();
   }
-  const [weekToPick, teams] = await Promise.all([
+  const [weekToPick, teams, league] = await Promise.all([
     serverApi.league.weekToPick({
       leagueId,
     }),
     serverApi.teams.getTeams(),
+    serverApi.league.get({ leagueId }),
   ]);
 
   if (!weekToPick.week) {
@@ -39,7 +40,7 @@ export default async function PickPage({ params: { leagueId: id } }: Props) {
 
   return (
     <ClientPickPage
-      leagueId={leagueId}
+      league={league}
       weekToPick={weekToPick}
       teams={teams}
       existingPicks={existingPicks}

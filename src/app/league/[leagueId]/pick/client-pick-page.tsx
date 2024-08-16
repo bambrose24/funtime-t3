@@ -37,9 +37,11 @@ import {
   DrawerHeader,
   DrawerTitle,
 } from "~/components/ui/drawer";
+import { Checkbox } from "~/components/ui/checkbox";
+import { orderBy } from "lodash";
 
 type Props = {
-  leagueId: number;
+  league: RouterOutputs["league"]["get"];
   weekToPick: RouterOutputs["league"]["weekToPick"];
   teams: RouterOutputs["teams"]["getTeams"];
   existingPicks: RouterOutputs["member"]["picksForWeek"];
@@ -48,6 +50,7 @@ type Props = {
 const EASTERN_TIMEZONE = "America/New_York";
 
 const picksSchema = z.object({
+  applyToAllSeasonLeagues: z.boolean().default(false),
   picks: z.array(
     z.object({
       gid: z.number().int(),
@@ -76,12 +79,18 @@ const picksSchema = z.object({
 export function ClientPickPage({
   weekToPick,
   teams,
-  leagueId,
+  league,
   existingPicks,
 }: Props) {
   const { week, season, games } = weekToPick;
+  const { league_id: leagueId } = league;
 
   const { dbUser } = useUserEnforced();
+
+  const sameSeasonMemberships = dbUser.leaguemembers.filter(
+    (m) => m.leagues.season === league.season,
+  );
+  const hasMultipleLeagues = sameSeasonMemberships.length > 1;
 
   const logout = useLogout();
 
@@ -95,6 +104,7 @@ export function ClientPickPage({
   const form = useForm<z.infer<typeof picksSchema>>({
     resolver: zodResolver(picksSchema),
     defaultValues: {
+      applyToAllSeasonLeagues: false,
       picks: games.map((g) => {
         const p = existingPicks.find((p) => p.gid === g.gid);
         return {
@@ -115,6 +125,8 @@ export function ClientPickPage({
     criteriaMode: "all",
   });
 
+  const applyToAllSeasonLeagues = form.watch("applyToAllSeasonLeagues");
+
   const picksField = useFieldArray({
     control: form.control, // control props comes from useForm (optional: if you are using FormProvider)
     name: "picks",
@@ -128,26 +140,36 @@ export function ClientPickPage({
 
   const onSubmit: Parameters<typeof form.handleSubmit>[0] = async (data) => {
     try {
-      await submitPicks({
-        picks: data.picks.map((p) => {
-          const score =
-            data.tiebreakerScore.gid === p.gid &&
-            Number.isInteger(Number(data.tiebreakerScore.score))
-              ? Number(data.tiebreakerScore.score)
-              : undefined;
-          return {
-            ...p,
-            winner: p.winner!,
-            ...(score !== undefined ? { score } : {}),
-          };
+      const leagueIds = data.applyToAllSeasonLeagues
+        ? sameSeasonMemberships.map((m) => m.league_id)
+        : [leagueId];
+      console.log("going to submit picks...", leagueIds.length);
+      await Promise.all(
+        leagueIds.map(async (leagueIdToSubmit) => {
+          console.log(`going to submit picks for ${leagueIdToSubmit}`);
+          await submitPicks({
+            picks: data.picks.map((p) => {
+              const score =
+                data.tiebreakerScore.gid === p.gid &&
+                Number.isInteger(Number(data.tiebreakerScore.score))
+                  ? Number(data.tiebreakerScore.score)
+                  : undefined;
+              return {
+                ...p,
+                winner: p.winner!,
+                ...(score !== undefined ? { score } : {}),
+              };
+            }),
+            leagueId: leagueIdToSubmit,
+            overrideMemberId: undefined,
+          });
+          console.log(`submitted picks for ${leagueIdToSubmit}`);
         }),
-        leagueId,
-        overrideMemberId: undefined,
-      });
+      );
 
       setPicksDrawerOpen(true);
 
-      await trpcUtils.invalidate();
+      trpcUtils.invalidate();
     } catch (e) {
       console.error(`Error submitting picks`, e);
       toast.error(
@@ -221,7 +243,7 @@ export function ClientPickPage({
           <div className="mb-4 flex flex-col gap-3 ">
             <Alert
               variant="default"
-              className="col-span-8 col-start-3 row-start-2 flex flex-row items-center lg:col-span-4 lg:col-start-5"
+              className="col-span-8 col-start-3 flex flex-row items-center lg:col-span-4 lg:col-start-5"
             >
               <AlertTitle className="flex w-full flex-row items-center justify-center gap-2">
                 <AlertCircleIcon className="h-4 w-4" />
@@ -242,6 +264,34 @@ export function ClientPickPage({
                 </div>
               </AlertTitle>
             </Alert>
+            {hasMultipleLeagues && (
+              <Alert
+                variant="default"
+                className="col-span-8 col-start-3 flex flex-row items-center lg:col-span-4 lg:col-start-5"
+              >
+                <AlertTitle className="flex w-full flex-row items-center justify-center gap-2">
+                  <FormField
+                    control={form.control}
+                    name="applyToAllSeasonLeagues"
+                    render={({ field }) => (
+                      <FormItem className="flex justify-between">
+                        <FormLabel>
+                          You have multiple leagues for the {league.season}{" "}
+                          season. Do you want these picks to apply for all of
+                          them?
+                        </FormLabel>
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                </AlertTitle>
+              </Alert>
+            )}
             <Button
               type="button"
               variant="secondary"
@@ -460,11 +510,16 @@ export function ClientPickPage({
             </DrawerTitle>
             <DrawerDescription className="text-center">
               You can come back to this page to update them until the week
-              starts.
+              starts.{" "}
+              {hasMultipleLeagues &&
+                applyToAllSeasonLeagues &&
+                `These picks apply to all ${sameSeasonMemberships.length} of your leagues for the season.`}
             </DrawerDescription>
           </DrawerHeader>
           <div className="grid grid-cols-2 gap-x-8 gap-y-1.5">
-            {submitResponse?.picks?.map((p, idx) => {
+            {orderBy(submitResponse?.picks ?? [], (p) =>
+              p.score && p.score > 0 ? 1 : 0,
+            ).map((p, idx) => {
               const game = gameById.get(p.gid);
               if (!game) {
                 return null;
