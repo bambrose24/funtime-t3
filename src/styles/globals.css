@@ -2,7 +2,87 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
+:root {
+  --background: 142.1 100% 96%;
+  --foreground: 142.1 5% 10%;
+  --card: 142.1 50% 96%;
+  --card-foreground: 142.1 5% 15%;
+  --popover: 142.1 100% 96%;
+  --popover-foreground: 142.1 100% 10%;
+  --primary: 142.1 76.2% 36.3%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 142.1 30% 90%;
+  --secondary-foreground: 0 0% 0%;
+  --muted: 104.1 30% 95%;
+  --muted-foreground: 142.1 5% 40%;
+  --accent: 104.1 30% 90%;
+  --accent-foreground: 142.1 5% 15%;
+  --destructive: 0 100% 50%;
+  --destructive-foreground: 142.1 5% 96%;
+  --border: 142.1 30% 82%;
+  --input: 142.1 30% 50%;
+  --ring: 142.1 76.2% 36.3%;
+  --radius: 0.5rem;
+
+  --correct: 142 76% 36%;
+  --correct-foreground: 240 10% 3.9%;
+  --wrong: 0 84% 60%;
+  --wrong-foreground: 240 10% 3.9%;
+  --warning: #f59e0b;
+  --warning-foreground: 240 10% 3.9%;
+  --simulated: 45.4 93.4% 47.5%;
+  --simulated-foreground: 240 10% 3.9%;
+  --pending: 217.2 91.2% 59.8;
+  --pending-foreground: 240 10% 3.9%;
+
+  --chart-1: 12 76% 61%;
+  --chart-2: 173 58% 39%;
+  --chart-3: 197 37% 24%;
+  --chart-4: 43 74% 66%;
+  --chart-5: 27 87% 67%;
+}
+
+.dark {
+  --background: 142.1 50% 5%;
+  --foreground: 142.1 5% 90%;
+  --card: 142.1 50% 4%;
+  --card-foreground: 142.1 5% 90%;
+  --popover: 142.1 50% 5%;
+  --popover-foreground: 142.1 5% 90%;
+  --primary: 142.1 76.2% 36.3%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 142.1 30% 10%;
+  --secondary-foreground: 0 0% 100%;
+  --muted: 104.1 30% 15%;
+  --muted-foreground: 142.1 5% 60%;
+  --accent: 104.1 30% 15%;
+  --accent-foreground: 142.1 5% 90%;
+  --destructive: 0 100% 30%;
+  --destructive-foreground: 142.1 5% 90%;
+  --border: 142.1 30% 18%;
+  --input: 142.1 30% 18%;
+  --ring: 142.1 76.2% 36.3%;
+  --radius: 0.5rem;
+
+  --correct: 142 72% 29%;
+  --correct-foreground: 0 0% 95%;
+  --wrong: 0 74% 42%;
+  --wrong-foreground: 0 0% 95%;
+  --warning: #f59e0b;
+  --warning-foreground: 0 0% 95%;
+  --simulated: 35.5 91.7% 32.9%;
+  --simulated-foreground: 0 0% 95%;
+  --pending: 224.3 76.3% 48%;
+  --pending-foreground: 0 0% 95%;
+
+  --chart-1: 220 70% 50%;
+  --chart-2: 160 60% 45%;
+  --chart-3: 30 80% 55%;
+  --chart-4: 280 65% 60%;
+  --chart-5: 340 75% 55%;
+}
+
+/* @layer base {
   :root {
     --background: 0 0% 100%;
     --foreground: 240 10% 3.9%;
@@ -12,18 +92,6 @@
     --popover-foreground: 240 10% 3.9%;
     --primary: 142.1 76.2% 36.3%;
     --primary-foreground: 355.7 100% 97.3%;
-
-    --correct: 142 76% 36%;
-    --correct-foreground: 240 10% 3.9%;
-    --wrong: 0 84% 60%;
-    --wrong-foreground: 240 10% 3.9%;
-    --warning: #f59e0b;
-    --warning-foreground: 240 10% 3.9%;
-    --simulated: 45.4 93.4% 47.5%;
-    --simulated-foreground: 240 10% 3.9%;
-    --pending: 217.2 91.2% 59.8;
-    --pending-foreground: 240 10% 3.9%;
-
     --secondary: 240 4.8% 95.9%;
     --secondary-foreground: 240 5.9% 10%;
     --muted: 240 4.8% 95.9%;
@@ -36,6 +104,17 @@
     --input: 240 5.9% 90%;
     --ring: 142.1 76.2% 36.3%;
     --radius: 0.5rem;
+
+    --correct: 142 76% 36%;
+    --correct-foreground: 240 10% 3.9%;
+    --wrong: 0 84% 60%;
+    --wrong-foreground: 240 10% 3.9%;
+    --warning: #f59e0b;
+    --warning-foreground: 240 10% 3.9%;
+    --simulated: 45.4 93.4% 47.5%;
+    --simulated-foreground: 240 10% 3.9%;
+    --pending: 217.2 91.2% 59.8;
+    --pending-foreground: 240 10% 3.9%;
 
     --chart-1: 12 76% 61%;
     --chart-2: 173 58% 39%;
@@ -53,18 +132,6 @@
     --popover-foreground: 0 0% 95%;
     --primary: 142.1 70.6% 45.3%;
     --primary-foreground: 144.9 80.4% 10%;
-
-    --correct: 142 72% 29%;
-    --correct-foreground: 0 0% 95%;
-    --wrong: 0 74% 42%;
-    --wrong-foreground: 0 0% 95%;
-    --warning: #f59e0b;
-    --warning-foreground: 0 0% 95%;
-    --simulated: 35.5 91.7% 32.9%;
-    --simulated-foreground: 0 0% 95%;
-    --pending: 224.3 76.3% 48%;
-    --pending-foreground: 0 0% 95%;
-
     --secondary: 240 3.7% 15.9%;
     --secondary-foreground: 0 0% 98%;
     --muted: 0 0% 15%;
@@ -77,13 +144,24 @@
     --input: 240 3.7% 15.9%;
     --ring: 142.4 71.8% 29.2%;
 
+    --correct: 142 72% 29%;
+    --correct-foreground: 0 0% 95%;
+    --wrong: 0 74% 42%;
+    --wrong-foreground: 0 0% 95%;
+    --warning: #f59e0b;
+    --warning-foreground: 0 0% 95%;
+    --simulated: 35.5 91.7% 32.9%;
+    --simulated-foreground: 0 0% 95%;
+    --pending: 224.3 76.3% 48%;
+    --pending-foreground: 0 0% 95%;
+
     --chart-1: 220 70% 50%;
     --chart-2: 160 60% 45%;
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
   }
-}
+} */
 
 @layer base {
   * {

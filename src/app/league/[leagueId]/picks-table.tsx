@@ -119,9 +119,9 @@ function PicksTableImpl({ picksSummary, games, teams }: Props) {
   });
 
   return (
-    <div className="rounded-md border">
+    <div className="rounded-lg border p-[2px]">
       <Table>
-        <TableHeader>
+        <TableHeader className="rounded-t-lg">
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow key={headerGroup.id}>
               {headerGroup.headers.map((header, index) => {
@@ -130,7 +130,7 @@ function PicksTableImpl({ picksSummary, games, teams }: Props) {
                     key={header.id}
                     className={cn(
                       "text-center",
-                      index === 0 && "sticky left-0 z-10 bg-background",
+                      index === 0 && "sticky left-0 z-10",
                     )}
                   >
                     {header.isPlaceholder
@@ -184,7 +184,7 @@ function PicksTableImpl({ picksSummary, games, teams }: Props) {
                       key={cell.id}
                       className={cn(
                         "p-0",
-                        index === 0 && "sticky left-0 z-10 -ml-1 bg-background",
+                        index === 0 && "sticky left-0 z-10 -ml-1",
                       )}
                     >
                       <div
