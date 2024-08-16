@@ -45,7 +45,7 @@ export const resendApi = {
           email: admin?.people.email ?? "",
           username: admin?.people.username ?? "",
         },
-        leagueHomeHref: `https://play-funtime.com/league/${league.league_id}`,
+        leagueHomeHref: `https://www.play-funtime.com/league/${league.league_id}`,
         leagueName: league.name,
         season: league.season,
         username: member.people.username,

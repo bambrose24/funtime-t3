@@ -17,7 +17,7 @@ type Props = {
 export default function LeagueWelcome({
   username = "Bob",
   leagueName = "Funtime 2024",
-  leagueHomeHref = "https://play-funtime.com/league/9",
+  leagueHomeHref = "https://www.play-funtime.com/league/9",
   season = 2024,
   admin = { email: "bambrose24@gmail.com", username: "bambrose" },
 }: Props) {
