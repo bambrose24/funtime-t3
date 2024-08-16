@@ -57,7 +57,7 @@ export function CreateLeagueClientPage({
     resolver: zodResolver(createLeagueFormSchema),
     defaultValues: {
       name: "",
-      priorLeagueId: priorLeague?.league_id?.toString(),
+      priorLeagueId: priorLeague?.league_id?.toString() ?? "none",
       latePolicy: priorLeague?.late_policy ?? "allow_late_and_lock_after_start",
       pickPolicy: priorLeague?.pick_policy ?? "choose_winner",
       reminderPolicy: priorLeague?.reminder_policy ?? "three_hours_before",
@@ -80,7 +80,8 @@ export function CreateLeagueClientPage({
           reminderPolicy: data.reminderPolicy,
         }),
       superbowlCompetition: data.superbowlCompetition,
-      priorLeagueId: Number(data.priorLeagueId),
+      priorLeagueId:
+        data.priorLeagueId !== "none" ? Number(data.priorLeagueId) : undefined,
     });
 
     toast.success(`The league ${newLeague.name} was created.`);
@@ -165,6 +166,7 @@ export function CreateLeagueClientPage({
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
+                            <SelectItem value={"none"}>None</SelectItem>
                             {nav?.leagues
                               .filter((l) => l.season < DEFAULT_SEASON)
                               .map((league, idx) => {

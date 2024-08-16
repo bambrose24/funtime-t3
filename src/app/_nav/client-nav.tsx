@@ -393,6 +393,7 @@ function LeagueDropdownMenu({ chosenLeague }: { chosenLeague: ChosenLeague }) {
               </div>
             </DropdownMenuItem>
           </Link>
+          <DropdownMenuSeparator />
           <Link href={myProfileHref}>
             <DropdownMenuItem>
               <div className="flex flex-row items-center gap-3">
