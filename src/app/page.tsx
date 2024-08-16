@@ -4,6 +4,7 @@ import { serverApi } from "~/trpc/server";
 import { JoinOrCreateALeague } from "./JoinOrCreateALeague";
 import { DEFAULT_SEASON } from "~/utils/const";
 import { redirect } from "next/navigation";
+import { FuntimeWelcomeCard } from "./FuntimeWelcomeCard";
 
 // Almost all of the Funtime pages will need this
 export const dynamic: AppConfigDynamic = "force-dynamic";
@@ -12,6 +13,11 @@ export default async function Home() {
   const [session] = await Promise.all([serverApi.session.current()]);
 
   if (!session.dbUser) {
+    return (
+      <div className="col-span-12 flex justify-center">
+        <FuntimeWelcomeCard />
+      </div>
+    );
     redirect("/login");
   }
 
