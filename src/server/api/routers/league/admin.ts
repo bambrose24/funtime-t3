@@ -20,6 +20,31 @@ const leagueAdminProcedure = authorizedProcedure
   });
 
 export const leagueAdminRouter = createTRPCRouter({
+  changeMemberRole: leagueAdminProcedure
+    .input(
+      z.object({ memberId: z.number().int(), role: z.nativeEnum(MemberRole) }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { db } = ctx;
+      const { leagueId, memberId, role } = input;
+      const memberInLeague = await db.leaguemembers.findFirstOrThrow({
+        where: {
+          membership_id: memberId,
+          league_id: leagueId,
+        },
+      });
+
+      const updatedMember = await db.leaguemembers.update({
+        where: {
+          membership_id: memberInLeague.membership_id,
+        },
+        data: {
+          role,
+        },
+      });
+
+      return updatedMember;
+    }),
   removeMember: leagueAdminProcedure
     .input(
       z.object({
@@ -36,13 +61,13 @@ export const leagueAdminRouter = createTRPCRouter({
         },
       });
 
-      // const response = await db.leaguemembers.delete({
-      //   where: {
-      //     membership_id: memberInLeague.membership_id,
-      //   },
-      // });
+      await db.leaguemembers.delete({
+        where: {
+          membership_id: memberInLeague.membership_id,
+        },
+      });
 
-      return memberInLeague;
+      return { success: true };
     }),
   members: leagueAdminProcedure.query(async ({ ctx, input }) => {
     const { db } = ctx;
@@ -55,6 +80,7 @@ export const leagueAdminRouter = createTRPCRouter({
         },
         include: {
           people: true,
+          WeekWinners: true,
         },
       }),
       db.leagues.findFirstOrThrow({

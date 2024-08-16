@@ -23,7 +23,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
-import { ExternalLink, X } from "lucide-react";
+import { ExternalLink, Pencil } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -35,6 +35,26 @@ import {
 } from "~/components/ui/dialog";
 import { useState } from "react";
 import { toast } from "sonner";
+import { capitalize, orderBy } from "lodash";
+import { Badge } from "~/components/ui/badge";
+import { Separator } from "~/components/ui/separator";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "~/components/ui/select";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+} from "~/components/ui/form";
 
 type Props = {
   leagueId: number;
@@ -48,13 +68,18 @@ export function LeagueAdminMembersClientPage({
   members: membersProp,
 }: Props) {
   const {
-    data: { members },
+    data: { members: membersData },
   } = clientApi.league.admin.members.useQuery(
     {
       leagueId,
     },
     { initialData: membersProp },
   );
+
+  const members = orderBy(membersData, (m) =>
+    m.people.username.toLocaleLowerCase(),
+  );
+
   return (
     <Card>
       <CardHeader>
@@ -66,6 +91,7 @@ export function LeagueAdminMembersClientPage({
           <TableHeader>
             <TableRow>
               <TableHead className="w-[100px]">Player</TableHead>
+              <TableHead>Role</TableHead>
               <TableHead>Wins</TableHead>
               <TableHead>Missed Picks</TableHead>
               <TableHead />
@@ -90,7 +116,14 @@ export function LeagueAdminMembersClientPage({
                       </div>
                     </Link>
                   </TableCell>
-                  <TableCell>None</TableCell>
+                  <TableCell>{capitalize(member.role ?? "")}</TableCell>
+                  <TableCell className="flex gap-1">
+                    {member.WeekWinners.length === 0
+                      ? "--"
+                      : member.WeekWinners.map((weekWin, idx) => (
+                          <Badge key={idx}>Week {weekWin.week}</Badge>
+                        ))}
+                  </TableCell>
                   <TableCell>{member.misssedPicks}</TableCell>
                   <TableCell className="sticky right-0 flex items-center justify-end">
                     <div className="border-x border-border bg-card px-2 transition-colors group-hover:bg-transparent md:border-none">
@@ -107,13 +140,12 @@ export function LeagueAdminMembersClientPage({
   );
 }
 
-function MemberActions({
-  member,
-  league,
-}: {
+type MemberProps = {
   league: Props["league"];
   member: Props["members"]["members"][number];
-}) {
+};
+
+function MemberActions({ member, league }: MemberProps) {
   const [open, setOpen] = useState(false);
   const utils = clientApi.useUtils();
   const removeMember = clientApi.league.admin.removeMember.useMutation({
@@ -148,51 +180,155 @@ function MemberActions({
               }}
             >
               <div className="flex items-center gap-2">
-                <X className="h-4 w-4" /> Remove Player
+                <Pencil className="h-4 w-4" /> Edit Player
               </div>
             </DropdownMenuItem>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Are you absolutely sure?</DialogTitle>
+              <DialogTitle>Edit {member.people.username}</DialogTitle>
               <DialogDescription>
-                This action cannot be undone. This will permanently remove{" "}
-                <span className="font-bold">{member.people.username}</span> from
-                the <span className="font-bold">{league.name}</span> league.
+                Make changes to {member.people.username}&apos;s membership in
+                this league.
               </DialogDescription>
             </DialogHeader>
-            <DialogFooter className="flex w-full justify-between">
+            <div className="flex flex-col gap-3">
+              <RoleChangeRow member={member} league={league} />
+              <Separator />
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="destructive">
+                    Remove {member.people.username} from {league.name}
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>Are you sure?</DialogHeader>
+                  <DialogDescription>
+                    This action cannot be undone. By confirming, you are
+                    removing {member.people.username} from the league.
+                  </DialogDescription>
+                  <DialogFooter>
+                    <Button
+                      variant="destructive"
+                      type="button"
+                      className="w-full"
+                      loading={removeMember.isPending}
+                      disabled={removeMember.isPending}
+                      onClick={async () => {
+                        await removeMember.mutateAsync({
+                          memberId: member.membership_id,
+                          leagueId: member.league_id,
+                        });
+                        toast.success(
+                          `Successfully removed ${member.people.username} from ${league.name}.`,
+                        );
+                        setOpen(false);
+                      }}
+                    >
+                      Yes, remove {member.people.username} from {league.name}
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+            </div>
+            <DialogFooter className="flex w-full">
               <Button
                 variant="secondary"
+                className="w-full"
                 type="button"
                 onClick={() => {
                   setOpen(false);
                 }}
               >
-                Cancel
-              </Button>
-              <Button
-                variant="destructive"
-                type="button"
-                loading={removeMember.isPending}
-                disabled={removeMember.isPending}
-                onClick={async () => {
-                  await removeMember.mutateAsync({
-                    memberId: member.membership_id,
-                    leagueId: member.league_id,
-                  });
-                  toast.success(
-                    `Successfully removed ${member.people.username} from ${league.name}.`,
-                  );
-                  setOpen(false);
-                }}
-              >
-                Remove {member.people.username}
+                Close
               </Button>
             </DialogFooter>
           </DialogContent>
         </DropdownMenuContent>
       </DropdownMenu>
     </Dialog>
+  );
+}
+
+const roles = ["admin", "player"] as const;
+const roleChangeSchema = z.object({
+  role: z.enum(roles),
+});
+
+function RoleChangeRow({ member, league }: MemberProps) {
+  const form = useForm<z.infer<typeof roleChangeSchema>>({
+    resolver: zodResolver(roleChangeSchema),
+    defaultValues: {
+      role: member.role ?? "player",
+    },
+  });
+
+  const trpcUtils = clientApi.useUtils();
+  const { mutateAsync: changeMemberRole } =
+    clientApi.league.admin.changeMemberRole.useMutation({
+      onSettled: async () => {
+        await trpcUtils.league.admin.invalidate();
+      },
+    });
+
+  const onSubmit: Parameters<typeof form.handleSubmit>[0] = async (data) => {
+    await changeMemberRole({
+      leagueId: league.league_id,
+      memberId: member.membership_id,
+      role: data.role,
+    });
+    toast.success(
+      `Updated ${member.people.username}'s role to ${capitalize(data.role)}`,
+    );
+    form.reset();
+  };
+
+  const invalid = !form.formState.isValid || !form.formState.isDirty;
+  const loading = form.formState.isSubmitting;
+  const disabled = invalid || loading;
+
+  return (
+    <form className="w-full" onSubmit={form.handleSubmit(onSubmit)}>
+      <Form {...form}>
+        <div className="grid grid-cols-3 gap-3">
+          <div className="flex items-center text-lg">Role</div>
+          <FormField
+            control={form.control}
+            name="role"
+            render={({ field }) => (
+              <FormItem>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Role" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {roles.map((role) => {
+                      return (
+                        <SelectItem key={role} value={role}>
+                          {capitalize(role)}
+                        </SelectItem>
+                      );
+                    })}
+                  </SelectContent>
+                </Select>
+              </FormItem>
+            )}
+          />
+          <Button
+            variant="secondary"
+            type="submit"
+            disabled={disabled}
+            loading={loading}
+          >
+            Save
+          </Button>
+        </div>
+      </Form>
+    </form>
   );
 }

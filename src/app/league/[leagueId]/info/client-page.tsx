@@ -43,7 +43,7 @@ export function ClientLeagueInfoPage({
               <div className="flex w-full items-center">
                 <Text.Body className="font-bold">League Admin(s)</Text.Body>
               </div>
-              <div className="flex w-full overflow-y-visible">
+              <div className="flex w-full gap-2 overflow-y-visible">
                 {admins.map((admin) => (
                   <div key={admin.membership_id}>
                     <Link
@@ -64,9 +64,9 @@ export function ClientLeagueInfoPage({
               </div>
               <div className="flex w-full flex-col gap-4">
                 {/* Weekly Picks */}
-                <div>
-                  <Text.Body className="font-bold">Weekly Picks</Text.Body>
-                  <Text.Body>
+                <div className="flex flex-col gap-3">
+                  <div className="font-bold">Weekly Picks</div>
+                  <div>
                     Each week you make picks for the upcoming week&apos;s NFL
                     games. You predict who will win each one and pick a total
                     score for the last chronological game of the week. The
@@ -85,28 +85,28 @@ export function ClientLeagueInfoPage({
                         week.
                       </li>
                     </ul>
-                  </Text.Body>
+                  </div>
                 </div>
                 <Separator />
 
                 {/* Seasonal Picks */}
-                <div>
-                  <Text.Body className="font-bold">Seasonal Picks</Text.Body>
-                  <Text.Body>
+                <div className="flex flex-col gap-3">
+                  <div className="font-bold">Seasonal Picks</div>
+                  <div>
                     This competition runs the duration of the season. It is
                     similar to Weekly Picks in that you aim to have the highest
                     total correct picks. The top 3 players will be winners.
                     There is no tiebreaker for point differences over the course
                     of the season.
-                  </Text.Body>
+                  </div>
                 </div>
                 <Separator />
 
                 {/* Super Bowl Pick */}
                 {league.superbowl_competition === true ? (
-                  <div>
-                    <Text.Body className="font-bold">Super Bowl Pick</Text.Body>
-                    <Text.Body>
+                  <div className="flex flex-col gap-3">
+                    <div className="font-bold">Super Bowl Pick</div>
+                    <div>
                       At the beginning of the season, users register and pick
                       their Super Bowl pick. You pick:
                       <ul className="list-disc pl-5">
@@ -131,7 +131,7 @@ export function ClientLeagueInfoPage({
                           win.
                         </li>
                       </ul>
-                    </Text.Body>
+                    </div>
                   </div>
                 ) : null}
               </div>
