@@ -15,6 +15,7 @@ import { Input } from "~/components/ui/input";
 import { z } from "zod";
 import Link from "next/link";
 import { cn } from "~/lib/utils";
+import { useRouter } from "next/navigation";
 
 export function JoinOrCreateALeague() {
   return (
@@ -59,13 +60,22 @@ function JoinLeagueCard() {
     register,
     handleSubmit,
     formState: { errors },
+    watch,
   } = useForm<JoinLeagueData>({
     resolver: zodResolver(joinLeagueSchema),
   });
 
+  const leagueCodeValue = watch("leagueCode");
+
+  const router = useRouter();
+
   const onSubmit = (data: JoinLeagueData) => {
     // TODO handle URL's and codes
-    console.log(data); // You can handle form submission here
+    if (data.leagueCode.includes("play-funtime.com")) {
+      router.push(data.leagueCode);
+    } else {
+      router.push(`/join-league/${data.leagueCode}`);
+    }
   };
 
   return (
@@ -80,11 +90,10 @@ function JoinLeagueCard() {
         <form onSubmit={handleSubmit(onSubmit)} className="w-full">
           <div className="flex flex-col gap-2">
             <Input id="leagueCode" {...register("leagueCode")} />
-            {errors.leagueCode && <span>This field is required.</span>}
             <Button
               type="submit"
               className="w-full"
-              disabled={Object.keys(errors).length > 0}
+              disabled={leagueCodeValue.length === 0}
             >
               Join League
             </Button>
