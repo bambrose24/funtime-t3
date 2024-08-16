@@ -22,6 +22,12 @@ export default async function CreateLeaguePage({
     });
     redirect(`/login?${params.toString()}`);
   }
+
+  const canCreate = await serverApi.league.canCreate();
+
+  if (!canCreate) {
+    redirect("/league");
+  }
   const params = paramsSchema.safeParse(searchParams);
   const priorLeagueId = params.data?.priorLeagueId;
 

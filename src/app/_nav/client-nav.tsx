@@ -47,9 +47,10 @@ import { PrefetchKind } from "next/dist/client/components/router-reducer/router-
 
 type NavData = {
   data: RouterOutputs["home"]["nav"];
+  canCreateLeague: RouterOutputs["league"]["canCreate"];
 };
 
-export function ClientNav({ data: initialData }: NavData) {
+export function ClientNav({ data: initialData, canCreateLeague }: NavData) {
   const leagueId = useLeagueIdFromPath();
   const logout = useLogout();
   const router = useRouter();
@@ -110,16 +111,20 @@ export function ClientNav({ data: initialData }: NavData) {
                     </Link>
                   );
                 })}
-                <DropdownMenuSeparator className="my-2" />
-                <DropdownMenuItem
-                  className="flex gap-2"
-                  onSelect={() => {
-                    router.push("/league/create");
-                  }}
-                >
-                  <PlusIcon className="h-4 w-4 text-foreground" />
-                  <span>Create a League</span>
-                </DropdownMenuItem>
+                {!canCreateLeague ? null : (
+                  <>
+                    <DropdownMenuSeparator className="my-2" />
+                    <DropdownMenuItem
+                      className="flex gap-2"
+                      onSelect={() => {
+                        router.push("/league/create");
+                      }}
+                    >
+                      <PlusIcon className="h-4 w-4 text-foreground" />
+                      <span>Create a League</span>
+                    </DropdownMenuItem>
+                  </>
+                )}
                 <DropdownMenuSeparator className="my-2" />
 
                 <DropdownMenuLabel>Prior Leagues</DropdownMenuLabel>

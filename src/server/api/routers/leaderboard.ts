@@ -88,6 +88,12 @@ export const leaderboardRouter = createTRPCRouter({
             return prev;
           }, new Map<number, number>());
 
+          for (const member of leagueMembers) {
+            if (!memberToTotal.has(member.membership_id)) {
+              memberToTotal.set(member.membership_id, 0);
+            }
+          }
+
           const weeksSorted = [
             ...new Set(groupedPicks.map((p) => p.week)),
           ].sort((a, b) => a - b);
