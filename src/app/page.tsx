@@ -6,7 +6,6 @@ import { DEFAULT_SEASON } from "~/utils/const";
 import { redirect } from "next/navigation";
 import { FuntimeWelcomeCard } from "./FuntimeWelcomeCard";
 import { Text } from "~/components/ui/text";
-import { ScrollArea } from "~/components/ui/scroll-area";
 
 // Almost all of the Funtime pages will need this
 export const dynamic: AppConfigDynamic = "force-dynamic";
