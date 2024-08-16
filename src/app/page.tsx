@@ -19,7 +19,6 @@ export default async function Home() {
         <FuntimeWelcomeCard />
       </div>
     );
-    redirect("/login");
   }
 
   const activeLeagues =

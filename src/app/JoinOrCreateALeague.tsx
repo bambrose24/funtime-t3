@@ -56,12 +56,7 @@ const joinLeagueSchema = z.object({ leagueCode: z.string().min(1) });
 type JoinLeagueData = z.infer<typeof joinLeagueSchema>;
 
 function JoinLeagueCard() {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    watch,
-  } = useForm<JoinLeagueData>({
+  const { register, handleSubmit, watch } = useForm<JoinLeagueData>({
     resolver: zodResolver(joinLeagueSchema),
   });
 
