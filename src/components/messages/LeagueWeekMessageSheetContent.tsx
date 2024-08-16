@@ -100,9 +100,7 @@ export function LeagueWeekMessageSheetContent({
       )}
     >
       <SheetHeader className="row-span-1 flex flex-col justify-between space-y-0">
-        <SheetTitle>
-          {league.name} - Week {week} Message Board
-        </SheetTitle>
+        <SheetTitle>Week {week} Message Board</SheetTitle>
         <Separator />
       </SheetHeader>
 
