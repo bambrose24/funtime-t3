@@ -67,10 +67,10 @@ export function ClientLeagueInfoPage({
                 <div>
                   <Text.Body className="font-bold">Weekly Picks</Text.Body>
                   <Text.Body>
-                    Each week you make picks for the upcoming week's NFL games.
-                    You predict who will win each one and pick a total score for
-                    the last chronological game of the week. The winner is
-                    determined by:
+                    Each week you make picks for the upcoming week&apos;s NFL
+                    games. You predict who will win each one and pick a total
+                    score for the last chronological game of the week. The
+                    winner is determined by:
                     <ul className="list-disc pl-5">
                       <li>
                         The person who picked the most correctly will win the

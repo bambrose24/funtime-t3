@@ -1,5 +1,4 @@
 import { notFound } from "next/navigation";
-import { clientApi } from "~/trpc/react";
 import { serverApi } from "~/trpc/server";
 import { ClientLeagueInfoPage } from "./client-page";
 
