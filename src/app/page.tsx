@@ -5,6 +5,8 @@ import { JoinOrCreateALeague } from "./JoinOrCreateALeague";
 import { DEFAULT_SEASON } from "~/utils/const";
 import { redirect } from "next/navigation";
 import { FuntimeWelcomeCard } from "./FuntimeWelcomeCard";
+import { Text } from "~/components/ui/text";
+import { ScrollArea } from "~/components/ui/scroll-area";
 
 // Almost all of the Funtime pages will need this
 export const dynamic: AppConfigDynamic = "force-dynamic";
@@ -35,15 +37,45 @@ export default async function Home() {
 
   const data = await serverApi.home.summary();
 
+  const thisSeasonLeagues = data?.filter((l) => l.season === DEFAULT_SEASON);
+  const priorLeagues = data?.filter((l) => l.season !== DEFAULT_SEASON);
+
   return (
-    <div className="col-span-12 flex w-full grow flex-row flex-wrap justify-around gap-4 py-4">
-      {data?.map((d) => {
-        if (!d) {
-          return null;
-        }
-        return <HomeLeagueCard key={d.league_id} data={d} />;
-      })}
+    <>
       {!data?.length ? <JoinOrCreateALeague /> : <></>}
-    </div>
+      <div className="col-span-12 flex justify-center">
+        <Text.H2>Active Leagues</Text.H2>
+      </div>
+
+      <div className="col-span-12 flex w-full flex-row flex-wrap justify-center gap-4 py-4">
+        {!thisSeasonLeagues || thisSeasonLeagues.length === 0 ? (
+          <Text.Body>
+            No active leagues for the {DEFAULT_SEASON} season.
+          </Text.Body>
+        ) : null}
+        {thisSeasonLeagues?.map((d) => {
+          if (!d) {
+            return null;
+          }
+          return <HomeLeagueCard key={d.league_id} data={d} />;
+        })}
+      </div>
+
+      {priorLeagues?.length ? (
+        <>
+          <div className="col-span-12 flex justify-center">
+            <Text.H2>Prior Leagues</Text.H2>
+          </div>
+          <div className="col-span-12 flex w-full flex-row flex-wrap justify-center gap-4 py-4">
+            {priorLeagues.map((d) => {
+              if (!d) {
+                return null;
+              }
+              return <HomeLeagueCard key={d.league_id} data={d} />;
+            })}
+          </div>
+        </>
+      ) : null}
+    </>
   );
 }

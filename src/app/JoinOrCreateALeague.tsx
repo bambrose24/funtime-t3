@@ -20,10 +20,10 @@ import { useRouter } from "next/navigation";
 export function JoinOrCreateALeague() {
   return (
     <>
-      <div className="col-span-12">
+      <div className="col-span-12 md:col-span-6">
         <JoinLeagueCard />
       </div>
-      <div className="col-span-12">
+      <div className="col-span-12 md:col-span-6">
         <CreateLeagueCard />
       </div>
     </>
