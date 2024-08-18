@@ -143,7 +143,10 @@ export const picksRouter = createTRPCRouter({
         };
 
       const existingPicks = await db.picks.findMany(picksSearch);
-      const existingPicksByGid = groupBy(existingPicks, (p) => p.gid);
+      const existingPicksByGid = groupBy(
+        existingPicks,
+        (p) => `${p.member_id}_${p.gid}`,
+      );
       await db.$transaction(async (tx) => {
         await Promise.all(
           finalPicks.map(async (pick) => {
@@ -156,7 +159,10 @@ export const picksRouter = createTRPCRouter({
                     message: `Error finding game to save pick to ${pick.gid}`,
                   });
                 }
-                const existingPick = existingPicksByGid[game.gid]?.at(0);
+                const existingPick =
+                  existingPicksByGid[`${member.membership_id}_${game.gid}`]?.at(
+                    0,
+                  );
                 if (existingPick) {
                   return tx.picks.update({
                     data: {
