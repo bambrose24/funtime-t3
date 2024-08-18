@@ -50,7 +50,7 @@ export default async function PickPage({ params: { leagueId: id } }: Props) {
 
 function SeasonOver() {
   return (
-    <div className="col-span-12 w-full justify-center">
+    <div className="col-span-12 flex w-full justify-center">
       <Card>
         <CardHeader>
           <CardTitle>The season is over</CardTitle>
