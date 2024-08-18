@@ -101,6 +101,7 @@ export function ClientNav({ data: initialData, canCreateLeague }: NavData) {
                 {activeLeagues?.map((l) => {
                   return (
                     <Link
+                      prefetch
                       passHref
                       href={`/league/${l.league_id}`}
                       key={l.league_id}
@@ -131,6 +132,7 @@ export function ClientNav({ data: initialData, canCreateLeague }: NavData) {
                 {inactiveLeagues?.map((l) => {
                   return (
                     <Link
+                      prefetch
                       passHref
                       href={`/league/${l.league_id}`}
                       key={l.league_id}
@@ -172,7 +174,7 @@ export function ClientNav({ data: initialData, canCreateLeague }: NavData) {
 
                   <DropdownMenuSeparator />
 
-                  <Link href={settingsHref}>
+                  <Link href={settingsHref} prefetch>
                     <DropdownMenuItem>
                       <MenuRow>
                         Settings
@@ -206,7 +208,7 @@ export function ClientNav({ data: initialData, canCreateLeague }: NavData) {
           </div>
         ) : (
           <div className="flex h-full flex-col justify-center">
-            <Link href="/login">
+            <Link href="/login" prefetch>
               <Button variant="outline">Login</Button>
             </Link>
           </div>
@@ -227,7 +229,7 @@ function MenuRow({ children }: { children: React.ReactNode }) {
 
 function LoginButton() {
   return (
-    <Link href="/login">
+    <Link href="/login" prefetch>
       <Button>Login</Button>
     </Link>
   );
@@ -390,7 +392,7 @@ function LeagueDropdownMenu({ chosenLeague }: { chosenLeague: ChosenLeague }) {
         <DropdownMenuContent>
           <DropdownMenuLabel>{chosenLeague.name}</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <Link href={`/league/${chosenLeague.league_id}`}>
+          <Link href={`/league/${chosenLeague.league_id}`} prefetch>
             <DropdownMenuItem>
               <div className="flex flex-row items-center gap-3">
                 <HomeIcon className="h-4 w-4" />
@@ -398,7 +400,7 @@ function LeagueDropdownMenu({ chosenLeague }: { chosenLeague: ChosenLeague }) {
               </div>
             </DropdownMenuItem>
           </Link>
-          <Link href={pickHref}>
+          <Link href={pickHref} prefetch>
             <DropdownMenuItem>
               <div className="flex flex-row items-center gap-3">
                 <PenIcon className="h-4 w-4" />
@@ -406,7 +408,7 @@ function LeagueDropdownMenu({ chosenLeague }: { chosenLeague: ChosenLeague }) {
               </div>
             </DropdownMenuItem>
           </Link>
-          <Link href={leaderboardHref}>
+          <Link href={leaderboardHref} prefetch>
             <DropdownMenuItem>
               <div className="flex flex-row items-center gap-3">
                 <TrophyIcon className="h-4 w-4" />
@@ -415,7 +417,7 @@ function LeagueDropdownMenu({ chosenLeague }: { chosenLeague: ChosenLeague }) {
             </DropdownMenuItem>
           </Link>
           <DropdownMenuSeparator />
-          <Link href={myProfileHref}>
+          <Link href={myProfileHref} prefetch>
             <DropdownMenuItem>
               <div className="flex flex-row items-center gap-3">
                 <CircleUser className="h-4 w-4" />
@@ -423,7 +425,7 @@ function LeagueDropdownMenu({ chosenLeague }: { chosenLeague: ChosenLeague }) {
               </div>
             </DropdownMenuItem>
           </Link>
-          <Link href={infoHref}>
+          <Link href={infoHref} prefetch>
             <DropdownMenuItem>
               <div className="flex items-center gap-3">
                 <InfoIcon className="h-4 w-4" />
@@ -432,7 +434,7 @@ function LeagueDropdownMenu({ chosenLeague }: { chosenLeague: ChosenLeague }) {
             </DropdownMenuItem>
           </Link>
           {isAdmin && (
-            <Link href={adminHref}>
+            <Link href={adminHref} prefetch>
               <DropdownMenuItem>
                 <div className="flex flex-row items-center gap-3">
                   <SettingsIcon className="h-4 w-4" />

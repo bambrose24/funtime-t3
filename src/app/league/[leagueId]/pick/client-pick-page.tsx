@@ -142,29 +142,25 @@ export function ClientPickPage({
       const leagueIds = data.applyToAllSeasonLeagues
         ? sameSeasonMemberships.map((m) => m.league_id)
         : [leagueId];
-      console.log("going to submit picks...", leagueIds.length);
-      await Promise.all(
-        leagueIds.map(async (leagueIdToSubmit) => {
-          console.log(`going to submit picks for ${leagueIdToSubmit}`);
-          await submitPicks({
-            picks: data.picks.map((p) => {
-              const score =
-                data.tiebreakerScore.gid === p.gid &&
-                Number.isInteger(Number(data.tiebreakerScore.score))
-                  ? Number(data.tiebreakerScore.score)
-                  : undefined;
-              return {
-                ...p,
-                winner: p.winner!,
-                ...(score !== undefined ? { score } : {}),
-              };
-            }),
-            leagueId: leagueIdToSubmit,
-            overrideMemberId: undefined,
-          });
-          console.log(`submitted picks for ${leagueIdToSubmit}`);
-        }),
+      console.log(
+        `going to submit picks for league(s): ${leagueIds.join(",")}`,
       );
+      await submitPicks({
+        picks: data.picks.map((p) => {
+          const score =
+            data.tiebreakerScore.gid === p.gid &&
+            Number.isInteger(Number(data.tiebreakerScore.score))
+              ? Number(data.tiebreakerScore.score)
+              : undefined;
+          return {
+            ...p,
+            winner: p.winner!,
+            ...(score !== undefined ? { score } : {}),
+          };
+        }),
+        leagueIds,
+        overrideMemberId: undefined,
+      });
 
       setPicksDrawerOpen(true);
     } catch (e) {
