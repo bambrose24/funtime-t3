@@ -147,53 +147,50 @@ export const picksRouter = createTRPCRouter({
         existingPicks,
         (p) => `${p.member_id}_${p.gid}`,
       );
+
       await db.$transaction(async (tx) => {
-        await Promise.all(
-          finalPicks.map(async (pick) => {
-            await Promise.all(
-              members.map(async (member) => {
-                const game = gamesById[pick.gid]?.at(0);
-                if (!game) {
-                  throw new TRPCError({
-                    code: "INTERNAL_SERVER_ERROR",
-                    message: `Error finding game to save pick to ${pick.gid}`,
-                  });
-                }
-                const existingPick =
-                  existingPicksByGid[`${member.membership_id}_${game.gid}`]?.at(
-                    0,
-                  );
-                if (existingPick) {
-                  return tx.picks.update({
-                    data: {
-                      winner: pick.winner,
-                      score: pick.score,
-                      gid: pick.gid,
-                      is_random: pick.isRandom,
-                    },
-                    where: {
-                      pickid: existingPick.pickid,
-                    },
-                  });
-                }
-                return tx.picks.create({
-                  data: {
-                    winner: pick.winner,
-                    gid: pick.gid,
-                    score: pick.score,
-                    member_id: member.membership_id,
-                    season: member.leagues.season,
-                    uid: member.user_id,
-                    is_random: pick.isRandom,
-                    week: game.week,
-                    ts: new Date(),
-                    loser: game.away + game.home - pick.winner,
-                  },
-                });
-              }),
-            );
-          }),
-        );
+        for (const member of members) {
+          for (const pick of finalPicks) {
+            const game = gamesById[pick.gid]?.at(0);
+            if (!game) {
+              throw new TRPCError({
+                code: "INTERNAL_SERVER_ERROR",
+                message: `Error finding game to save pick to ${pick.gid}`,
+              });
+            }
+            const existingPick =
+              existingPicksByGid[`${member.membership_id}_${game.gid}`]?.at(0);
+
+            if (existingPick) {
+              await tx.picks.update({
+                data: {
+                  winner: pick.winner,
+                  score: pick.score,
+                  gid: pick.gid,
+                  is_random: pick.isRandom,
+                },
+                where: {
+                  pickid: existingPick.pickid,
+                },
+              });
+            } else {
+              await tx.picks.create({
+                data: {
+                  winner: pick.winner,
+                  gid: pick.gid,
+                  score: pick.score,
+                  member_id: member.membership_id,
+                  season: member.leagues.season,
+                  uid: member.user_id,
+                  is_random: pick.isRandom,
+                  week: game.week,
+                  ts: new Date(),
+                  loser: game.away + game.home - pick.winner,
+                },
+              });
+            }
+          }
+        }
       });
 
       const picksForWeeks = await db.picks.findMany({

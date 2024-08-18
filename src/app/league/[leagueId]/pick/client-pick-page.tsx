@@ -422,7 +422,7 @@ export function ClientPickPage({
                             </Text.Small>
                           </div>
                           <div className="col-span-3 flex justify-center">
-                            <Text.Small className="text-xs">
+                            <Text.Small className="text-xs text-muted-foreground">
                               {format(game.ts, "EEE MMM d yyyy, h:mm a zzz", {
                                 timeZone: EASTERN_TIMEZONE,
                               })}
@@ -457,7 +457,7 @@ export function ClientPickPage({
                                             )}
                                           />
                                         </FormControl>
-                                        <Text.Small className="mt-2">
+                                        <Text.Small className="mt-2 text-xs text-muted-foreground">
                                           You must enter a score between 1 and
                                           200
                                         </Text.Small>
@@ -509,69 +509,67 @@ export function ClientPickPage({
                 `These picks apply to all ${sameSeasonMemberships.length} of your leagues for the season.`}
             </DrawerDescription>
           </DrawerHeader>
-          <div className="grid grid-cols-2 gap-x-8 gap-y-1.5">
-            {orderBy(submitResponse?.picks ?? [], (p) =>
-              p.score && p.score > 0 ? 1 : 0,
-            ).map((p, idx) => {
-              const game = gameById.get(p.gid);
-              if (!game) {
-                return null;
-              }
-              const homeTeam = teamById.get(game.home);
-              const awayTeam = teamById.get(game.away);
-              const choseHome = p.winner === game.home;
-              const choseAway = p.winner === game.away;
+          <div className="flex w-full justify-center">
+            <div className="grid grid-cols-2 gap-x-8 gap-y-1.5">
+              {orderBy(submitResponse?.picks ?? [], (p) =>
+                p.score && p.score > 0 ? 1 : 0,
+              ).map((p, idx) => {
+                const game = gameById.get(p.gid);
+                if (!game) {
+                  return null;
+                }
+                const homeTeam = teamById.get(game.home);
+                const awayTeam = teamById.get(game.away);
+                const choseHome = p.winner === game.home;
+                const choseAway = p.winner === game.away;
 
-              if (!homeTeam || !awayTeam) {
-                return null;
-              }
-              return (
-                <div
-                  key={p.pickid}
-                  className={cn(
-                    "col-span-1 flex w-full flex-row items-center",
-                    idx % 2 === 0 ? "justify-end" : "justify-start",
-                  )}
-                >
-                  <Card className="h-full">
-                    <div
-                      className={cn(
-                        "grid w-[120px] grid-cols-5 flex-row items-center justify-between rounded-xl border-2 border-transparent p-0.5",
-                      )}
-                    >
+                if (!homeTeam || !awayTeam) {
+                  return null;
+                }
+                return (
+                  <div
+                    key={p.pickid}
+                    className={cn(
+                      "col-span-1 flex w-full flex-row items-center",
+                      idx % 2 === 0 ? "justify-end" : "justify-start",
+                    )}
+                  >
+                    <Card className="h-full">
                       <div
                         className={cn(
-                          "col-span-2 flex flex-row items-center justify-center rounded-lg p-1",
-                          choseAway
-                            ? "border-2 border-blue-500 dark:border-blue-700"
-                            : "",
+                          "grid w-[120px] grid-cols-5 flex-row items-center justify-between rounded-xl border-2 border-transparent p-0.5",
                         )}
                       >
-                        <Text.Small>{awayTeam.abbrev}</Text.Small>
-                      </div>
-                      <div className="col-span-1 flex flex-row justify-center">
-                        <Text.Small>@</Text.Small>
-                      </div>
-                      <div
-                        className={cn(
-                          "col-span-2 flex flex-row items-center justify-center rounded-lg p-1",
-                          choseHome
-                            ? "border-2 border-blue-500 dark:border-blue-700"
-                            : "",
-                        )}
-                      >
-                        <Text.Small>{homeTeam.abbrev}</Text.Small>
-                      </div>
-                      {p.score !== null && p.score > 0 ? (
-                        <div className="col-span-5 flex justify-center text-xs text-muted-foreground">
-                          Score: {p.score}
+                        <div
+                          className={cn(
+                            "col-span-2 flex flex-row items-center justify-center rounded-lg p-1",
+                            choseAway ? "border-2 border-pending" : "",
+                          )}
+                        >
+                          <Text.Small>{awayTeam.abbrev}</Text.Small>
                         </div>
-                      ) : null}
-                    </div>
-                  </Card>
-                </div>
-              );
-            })}
+                        <div className="col-span-1 flex flex-row justify-center">
+                          <Text.Small>@</Text.Small>
+                        </div>
+                        <div
+                          className={cn(
+                            "col-span-2 flex flex-row items-center justify-center rounded-lg p-1",
+                            choseHome ? "border-2 border-pending" : "",
+                          )}
+                        >
+                          <Text.Small>{homeTeam.abbrev}</Text.Small>
+                        </div>
+                        {p.score !== null && p.score > 0 ? (
+                          <div className="col-span-5 flex justify-center text-xs text-muted-foreground">
+                            Score: {p.score}
+                          </div>
+                        ) : null}
+                      </div>
+                    </Card>
+                  </div>
+                );
+              })}
+            </div>
           </div>
           <DrawerFooter>
             <DrawerClose className="flex w-full justify-center">
