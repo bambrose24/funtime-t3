@@ -69,6 +69,16 @@ export const resendApi = {
         { data },
       );
     }
-    console.log("got resend response...", data, error);
+
+    if (data?.id) {
+      await db.emailLogs.create({
+        data: {
+          email_type: "league_registration",
+          resend_id: data.id,
+          league_id: league.league_id,
+          member_id: member.membership_id,
+        },
+      });
+    }
   },
 };

@@ -12,7 +12,7 @@ datasource db {
 }
 
 model EmailLogs {
-  email_log_id  String        @id
+  email_log_id  String        @id @default(cuid())
   league_id     Int
   member_id     Int
   email_type    EmailType

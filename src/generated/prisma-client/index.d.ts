@@ -15514,7 +15514,7 @@ export namespace Prisma {
   }
 
   export type EmailLogsCreateInput = {
-    email_log_id: string
+    email_log_id?: string
     email_type: $Enums.EmailType
     ts?: Date | string
     week?: number | null
@@ -15524,7 +15524,7 @@ export namespace Prisma {
   }
 
   export type EmailLogsUncheckedCreateInput = {
-    email_log_id: string
+    email_log_id?: string
     league_id: number
     member_id: number
     email_type: $Enums.EmailType
@@ -15554,7 +15554,7 @@ export namespace Prisma {
   }
 
   export type EmailLogsCreateManyInput = {
-    email_log_id: string
+    email_log_id?: string
     league_id: number
     member_id: number
     email_type: $Enums.EmailType
@@ -19621,7 +19621,7 @@ export namespace Prisma {
   }
 
   export type EmailLogsCreateWithoutLeaguemembersInput = {
-    email_log_id: string
+    email_log_id?: string
     email_type: $Enums.EmailType
     ts?: Date | string
     week?: number | null
@@ -19630,7 +19630,7 @@ export namespace Prisma {
   }
 
   export type EmailLogsUncheckedCreateWithoutLeaguemembersInput = {
-    email_log_id: string
+    email_log_id?: string
     league_id: number
     email_type: $Enums.EmailType
     ts?: Date | string
@@ -20237,7 +20237,7 @@ export namespace Prisma {
   }
 
   export type EmailLogsCreateWithoutLeaguesInput = {
-    email_log_id: string
+    email_log_id?: string
     email_type: $Enums.EmailType
     ts?: Date | string
     week?: number | null
@@ -20246,7 +20246,7 @@ export namespace Prisma {
   }
 
   export type EmailLogsUncheckedCreateWithoutLeaguesInput = {
-    email_log_id: string
+    email_log_id?: string
     member_id: number
     email_type: $Enums.EmailType
     ts?: Date | string
@@ -21741,7 +21741,7 @@ export namespace Prisma {
   }
 
   export type EmailLogsCreateManyLeaguemembersInput = {
-    email_log_id: string
+    email_log_id?: string
     league_id: number
     email_type: $Enums.EmailType
     ts?: Date | string
@@ -21946,7 +21946,7 @@ export namespace Prisma {
   }
 
   export type EmailLogsCreateManyLeaguesInput = {
-    email_log_id: string
+    email_log_id?: string
     member_id: number
     email_type: $Enums.EmailType
     ts?: Date | string
