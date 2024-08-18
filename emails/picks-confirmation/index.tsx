@@ -131,7 +131,7 @@ export default function PicksConfirmationEmail({
             );
           })}
         </Container>
-        <Container className="flex justify-center">
+        <Container className="flex w-full justify-center">
           {leagues.length > 1 ? (
             <EmailButton href={`https://www.play-funtime.com`}>
               Funtime Home
