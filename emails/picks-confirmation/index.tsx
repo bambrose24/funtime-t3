@@ -133,12 +133,16 @@ export default function PicksConfirmationEmail({
         </Container>
         <Container className="flex w-full justify-center">
           {leagues.length > 1 ? (
-            <EmailButton href={`https://www.play-funtime.com`}>
+            <EmailButton
+              href={`https://www.play-funtime.com`}
+              className="w-full"
+            >
               Funtime Home
             </EmailButton>
           ) : (
             <EmailButton
               href={`https://www.play-funtime.com/league/${leagues.at(0)?.leagueId}`}
+              className="w-full"
             >
               League Home
             </EmailButton>
