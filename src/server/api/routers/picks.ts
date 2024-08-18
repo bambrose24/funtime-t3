@@ -98,7 +98,7 @@ export const picksRouter = createTRPCRouter({
         });
       }
 
-      const members = overrideMember ? [overrideMember] : fullViewerMembers;
+      const members = overrideMember ? [overrideMember] : viewerMembers;
 
       const gamesById = groupBy(pickedGames, (g) => g.gid);
 
