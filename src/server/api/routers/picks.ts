@@ -201,6 +201,12 @@ export const picksRouter = createTRPCRouter({
         distinct: ["gid"],
       });
 
+      console.log(
+        "picksForWeeksLength and picksSearch.where",
+        picksForWeeks.length,
+        picksSearch.where,
+      );
+
       await resendApi.sendWeekPicksEmail({
         leagueIds,
         pickIds: picksForWeeks.map((p) => p.pickid),

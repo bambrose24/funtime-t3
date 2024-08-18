@@ -93,8 +93,8 @@ export default function PicksConfirmationEmail({
               <Row key={chunkIdx}>
                 {pickChunk.map((pick, pickIdx) => {
                   return (
-                    <Column key={pickIdx}>
-                      <div className="m-2 flex flex-col items-center justify-center gap-2 rounded bg-slate-200 p-2">
+                    <Column key={pickIdx} className="p-2">
+                      <Container className="m-2 flex flex-col items-center justify-center gap-2 rounded bg-slate-200 p-2">
                         <Row className="flex gap-2">
                           <span
                             className={cn("font-mono text-lg", {
@@ -103,7 +103,7 @@ export default function PicksConfirmationEmail({
                           >
                             {pick.awayTeam}
                           </span>
-                          <span className="font-mono text-lg">@</span>
+                          <span className="px-2 font-mono text-lg">@</span>
                           <span
                             className={cn("font-mono text-lg", {
                               underline: pick.chosen === "home",
@@ -120,7 +120,7 @@ export default function PicksConfirmationEmail({
                             Score: {pick.score}
                           </Row>
                         ) : null}
-                      </div>
+                      </Container>
                     </Column>
                   );
                 })}
