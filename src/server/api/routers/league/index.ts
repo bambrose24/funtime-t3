@@ -17,6 +17,7 @@ import {
 } from "~/generated/prisma-client";
 import { leagueAdminRouter } from "./admin";
 import { DEFAULT_SEASON } from "~/utils/const";
+import { resendApi } from "~/server/services/resend";
 
 const picksSummarySchema = z.object({
   leagueId: z.number().int(),
@@ -129,6 +130,8 @@ export const leagueRouter = createTRPCRouter({
           },
         });
       }
+
+      await resendApi.sendLeagueRegistrationEmail(leagueMember.membership_id);
 
       return leagueMember;
     }),

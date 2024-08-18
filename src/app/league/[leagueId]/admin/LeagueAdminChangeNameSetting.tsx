@@ -60,6 +60,7 @@ export function LeagueAdminChangeNameSetting({ league }: Props) {
                   <div className="flex items-center gap-2">
                     <Input {...field} required />
                     <Button
+                      variant="secondary"
                       type="submit"
                       disabled={
                         form.formState.isSubmitting || !form.formState.isDirty
