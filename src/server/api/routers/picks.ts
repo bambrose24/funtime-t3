@@ -4,6 +4,7 @@ import { z } from "zod";
 
 import { authorizedProcedure, createTRPCRouter } from "~/server/api/trpc";
 import { resendApi } from "~/server/services/resend";
+import { getLogger } from "~/utils/logging";
 
 const pickSchema = z.object({
   gid: z.number().int(),
@@ -201,10 +202,8 @@ export const picksRouter = createTRPCRouter({
         distinct: ["gid"],
       });
 
-      console.log(
-        "picksForWeeksLength and picksSearch.where",
-        picksForWeeks.length,
-        picksSearch.where,
+      getLogger().info(
+        `picksForWeeksLength and picksSearch.where ${picksForWeeks.length}, ${JSON.stringify(picksSearch.where)}`,
       );
 
       await resendApi.sendWeekPicksEmail({
