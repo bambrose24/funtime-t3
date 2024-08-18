@@ -4,7 +4,8 @@ import { Provider } from "../../emails/provider";
 import { EmailButton } from "../../emails/components/email-button";
 import { chunk, orderBy } from "lodash";
 import { cn } from "~/lib/utils";
-import { format } from "date-fns";
+import { format } from "date-fns-tz";
+import { EASTERN_TIMEZONE } from "emails/util";
 
 type League = {
   name: string;
@@ -113,7 +114,9 @@ export default function PicksConfirmationEmail({
                           </span>
                         </Row>
                         <Row className="flex justify-center font-mono text-xs">
-                          {format(pick.time, "M/d/yy h:mm a")}
+                          {format(pick.time, "M/d/yy h:mm a", {
+                            timeZone: EASTERN_TIMEZONE,
+                          })}
                         </Row>
                         {pick.score && pick.score > 0 ? (
                           <Row className="flex justify-center font-mono text-sm">
