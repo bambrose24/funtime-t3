@@ -292,7 +292,13 @@ type ChosenLeague = NonNullable<
   NonNullable<RouterOutputs["home"]["nav"]>["leagues"][number]
 >;
 
-type TabOption = "home" | "make-picks" | "leaderboard" | "admin" | "my-profile";
+type TabOption =
+  | "home"
+  | "make-picks"
+  | "leaderboard"
+  | "admin"
+  | "my-profile"
+  | "league-info";
 
 function useActiveLeagueSubPath(): TabOption {
   const pathname = usePathname();
@@ -307,6 +313,9 @@ function useActiveLeagueSubPath(): TabOption {
   }
   if (pathname.includes("my-profile")) {
     return "my-profile";
+  }
+  if (pathname.includes("/info")) {
+    return "league-info";
   }
   return "home";
 }
@@ -342,6 +351,13 @@ function TabLabel() {
         <>
           <div className="hidden lg:block">My Profile</div>
           <div className="lg:hidden">Profile</div>
+        </>
+      );
+    case "league-info":
+      return (
+        <>
+          <div className="hidden lg:block">League Info</div>
+          <div className="lg:hidden">Info</div>
         </>
       );
   }
