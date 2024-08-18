@@ -1,9 +1,12 @@
 import LeagueWelcome from "emails/league-welcome";
 import { Resend } from "resend";
 import { db } from "~/server/db";
+import { getLogger } from "~/utils/logging";
 const resend = new Resend(process.env.RESEND_API_KEY ?? "");
 
 const FROM = "Funtime System <no-reply@play-funtime.com>";
+
+const LOG_PREFIX = "[resend-api]";
 
 export const resendApi = {
   sendLeagueRegistrationEmail: async (memberId: number) => {
@@ -36,6 +39,9 @@ export const resendApi = {
     const league = member.leagues;
     const email = member.people.email;
 
+    getLogger().info(
+      `${LOG_PREFIX} Going to send league registration email for league ${league.league_id} for member ${memberId}`,
+    );
     const { data, error } = await resend.emails.send({
       from: FROM,
       to: [email],
@@ -52,6 +58,17 @@ export const resendApi = {
       }),
     });
 
+    if (error) {
+      getLogger().error(
+        `${LOG_PREFIX} Error sending registration email for league ${league.league_id} member ${memberId}: ${error.message}`,
+        { error },
+      );
+    } else {
+      getLogger().info(
+        `${LOG_PREFIX} Sent registration email for league ${league.league_id} member ${memberId}`,
+        { data },
+      );
+    }
     console.log("got resend response...", data, error);
   },
 };
