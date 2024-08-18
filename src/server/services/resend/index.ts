@@ -160,7 +160,7 @@ export const resendApi = {
             homeTeam: teamById.get(p.games.home)?.abbrev ?? "",
             chosen: p.winner === p.games.home ? "home" : "away",
             score: p.score ?? undefined,
-            time: p.ts,
+            time: p.games.ts,
           };
         }),
       }),
