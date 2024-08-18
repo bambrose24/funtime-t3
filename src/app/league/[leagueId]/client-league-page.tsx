@@ -310,7 +310,7 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
             )}
           </div>
           <ScrollArea>
-            <div className="flex flex-row gap-2 pb-2">
+            <div className="flex flex-row gap-2">
               {games.map((g) => {
                 const homeTeam = teams.find((t) => t.teamid === g.home)!;
                 const awayTeam = teams.find((t) => t.teamid === g.away)!;
@@ -329,7 +329,7 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
                 );
               })}
             </div>
-            <ScrollBar orientation="horizontal" className="-mt-2" />
+            <ScrollBar orientation="horizontal" />
           </ScrollArea>
           {simulatedGameCount > 0 && (
             <div className="w-full">
