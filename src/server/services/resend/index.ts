@@ -144,7 +144,7 @@ export const resendApi = {
     const { data, error } = await resend.emails.send({
       from: FROM,
       to: [email],
-      subject: `Your Funtime picks for Week ${week}!`,
+      subject: `Your ${leagues.length === 1 ? leagues.at(0)?.name ?? "" : "Funtime"} picks for Week ${week}!`,
       react: PicksConfirmationEmail({
         leagues: leagues.map((l) => {
           return {

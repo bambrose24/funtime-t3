@@ -95,7 +95,7 @@ export default function PicksConfirmationEmail({
                   return (
                     <Column key={pickIdx}>
                       <div className="m-2 flex flex-col items-center justify-center gap-2 rounded bg-slate-200 p-2">
-                        <div className="flex gap-2">
+                        <Row className="flex gap-2">
                           <span
                             className={cn("font-mono text-lg", {
                               underline: pick.chosen === "away",
@@ -111,14 +111,14 @@ export default function PicksConfirmationEmail({
                           >
                             {pick.homeTeam}
                           </span>
-                        </div>
-                        <div className="flex justify-center font-mono text-xs">
+                        </Row>
+                        <Row className="flex justify-center font-mono text-xs">
                           {format(pick.time, "M/d/yy h:mm a")}
-                        </div>
+                        </Row>
                         {pick.score && pick.score > 0 ? (
-                          <div className="flex justify-center font-mono text-sm">
+                          <Row className="flex justify-center font-mono text-sm">
                             Score: {pick.score}
-                          </div>
+                          </Row>
                         ) : null}
                       </div>
                     </Column>
