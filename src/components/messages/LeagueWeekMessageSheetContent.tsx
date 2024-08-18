@@ -120,8 +120,10 @@ export function LeagueWeekMessageSheetContent({
                   <div
                     className={cn(
                       "flex-grow rounded-xl border-2 border-border px-2 py-1 text-sm",
-                      isSender && "ml-10 border-primary",
-                      !isSender && "mr-10",
+                      {
+                        "ml-10 bg-primary text-primary-foreground": isSender,
+                        "mr-10": !isSender,
+                      },
                     )}
                   >
                     {message.content}
@@ -134,11 +136,10 @@ export function LeagueWeekMessageSheetContent({
                   />
                 </div>
                 <div
-                  className={cn(
-                    "mx-1 mt-px text-xs text-muted-foreground",
-                    isSender && "text-end",
-                    !isSender && "text-start",
-                  )}
+                  className={cn("mx-1 mt-px text-xs text-muted-foreground", {
+                    "text-end": isSender,
+                    "text-start": !isSender,
+                  })}
                   title={message.createdAt.toLocaleString()}
                 >
                   <Link
