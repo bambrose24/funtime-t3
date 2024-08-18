@@ -93,7 +93,7 @@ export default function PicksConfirmationEmail({
               <Row key={chunkIdx}>
                 {pickChunk.map((pick, pickIdx) => {
                   return (
-                    <Column key={pickIdx} className="p-2">
+                    <Column key={pickIdx} className="px-2 py-1">
                       <Container className="m-2 flex flex-col items-center justify-center gap-2 rounded bg-slate-200 p-2">
                         <Row className="flex gap-2">
                           <span
