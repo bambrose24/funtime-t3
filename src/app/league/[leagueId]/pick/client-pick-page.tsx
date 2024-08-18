@@ -39,6 +39,7 @@ import {
 } from "~/components/ui/drawer";
 import { Checkbox } from "~/components/ui/checkbox";
 import { orderBy } from "lodash";
+import { useRouter } from "next/navigation";
 
 type Props = {
   league: RouterOutputs["league"]["get"];
@@ -86,6 +87,8 @@ export function ClientPickPage({
   const { league_id: leagueId } = league;
 
   const { dbUser } = useUserEnforced();
+
+  const router = useRouter();
 
   const sameSeasonMemberships = dbUser.leaguemembers.filter(
     (m) => m.leagues.season === league.season,
@@ -493,6 +496,9 @@ export function ClientPickPage({
       <Drawer
         open={picksDrawerOpen}
         onOpenChange={(val) => {
+          if (!val) {
+            router.push(`/league/${leagueId}`);
+          }
           setPicksDrawerOpen(val);
         }}
       >
