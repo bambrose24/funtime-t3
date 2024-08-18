@@ -3,6 +3,7 @@ import { groupBy } from "lodash";
 import { z } from "zod";
 
 import { authorizedProcedure, createTRPCRouter } from "~/server/api/trpc";
+import { resendApi } from "~/server/services/resend";
 
 const pickSchema = z.object({
   gid: z.number().int(),
@@ -199,6 +200,13 @@ export const picksRouter = createTRPCRouter({
         },
         distinct: ["gid"],
       });
+
+      await resendApi.sendWeekPicksEmail({
+        leagueIds,
+        pickIds: picksForWeeks.map((p) => p.pickid),
+        userId: members.at(0)?.user_id ?? 0,
+      });
+
       return { pickedGames, picks: picksForWeeks };
     }),
 });
