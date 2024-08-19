@@ -484,6 +484,7 @@ export function ClientPickPage({
                 !form.formState.isValid ||
                 !form.formState.isDirty
               }
+              loading={form.formState.isSubmitting}
             >
               {hasSubmittedAlready ? "Update Picks" : "Submit Picks"}
             </Button>
