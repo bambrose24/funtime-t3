@@ -94,7 +94,7 @@ export default function PicksConfirmationEmail({
               <Row key={chunkIdx}>
                 {pickChunk.map((pick, pickIdx) => {
                   return (
-                    <Column key={pickIdx} className="px-2 py-1">
+                    <Column key={pickIdx} className="w-[150px] px-2 py-1">
                       <Container className="m-2 flex flex-col items-center justify-center gap-2 rounded bg-slate-200 p-1">
                         <Row className="flex gap-2">
                           <span
@@ -119,7 +119,7 @@ export default function PicksConfirmationEmail({
                           })}
                         </Row> */}
                         {pick.score && pick.score > 0 ? (
-                          <Row className="flex justify-center font-mono text-sm">
+                          <Row className="flex justify-center font-mono text-sm text-muted-foreground">
                             Score: {pick.score}
                           </Row>
                         ) : null}
