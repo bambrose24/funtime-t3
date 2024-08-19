@@ -95,29 +95,29 @@ export default function PicksConfirmationEmail({
                 {pickChunk.map((pick, pickIdx) => {
                   return (
                     <Column key={pickIdx} className="px-2 py-1">
-                      <Container className="m-2 flex flex-col items-center justify-center gap-2 rounded bg-slate-200 p-2">
+                      <Container className="m-2 flex flex-col items-center justify-center gap-2 rounded bg-slate-200 p-1">
                         <Row className="flex gap-2">
                           <span
-                            className={cn("font-mono text-lg", {
+                            className={cn("font-mono text-base", {
                               underline: pick.chosen === "away",
                             })}
                           >
                             {pick.awayTeam}
                           </span>
-                          <span className="px-2 font-mono text-lg">@</span>
+                          <span className="px-2 font-mono text-base">@</span>
                           <span
-                            className={cn("font-mono text-lg", {
+                            className={cn("font-mono text-base", {
                               underline: pick.chosen === "home",
                             })}
                           >
                             {pick.homeTeam}
                           </span>
                         </Row>
-                        <Row className="flex justify-center font-mono text-xs">
+                        {/* <Row className="flex justify-center font-mono text-xs">
                           {format(pick.time, "M/d/yy h:mm a", {
                             timeZone: EASTERN_TIMEZONE,
                           })}
-                        </Row>
+                        </Row> */}
                         {pick.score && pick.score > 0 ? (
                           <Row className="flex justify-center font-mono text-sm">
                             Score: {pick.score}
@@ -147,6 +147,9 @@ export default function PicksConfirmationEmail({
               League Home
             </EmailButton>
           )}
+        </Container>
+        <Container>
+          This email was sent at {format(new Date(), "M/d/yy h:mm a")}.
         </Container>
       </Html>
     </Provider>
