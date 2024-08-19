@@ -148,8 +148,8 @@ export default function PicksConfirmationEmail({
             </EmailButton>
           )}
         </Container>
-        <Container className="mt-4 text-muted-foreground">
-          This email was sent at {format(new Date(), "M/d/yy h:mm a")}.
+        <Container className="mt-4 text-xs text-muted-foreground">
+          This email was sent at {format(new Date(), "M/d/yy h:mm a")} UTC.
         </Container>
       </Html>
     </Provider>
