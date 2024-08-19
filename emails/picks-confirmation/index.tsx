@@ -148,7 +148,7 @@ export default function PicksConfirmationEmail({
             </EmailButton>
           )}
         </Container>
-        <Container>
+        <Container className="mt-4">
           This email was sent at {format(new Date(), "M/d/yy h:mm a")}.
         </Container>
       </Html>
