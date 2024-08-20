@@ -11,6 +11,7 @@ type Props = {
   leagueId: number;
   memberId: number;
   playerProfile: RouterOutputs["playerProfile"]["get"];
+  hasLeagueStarted: RouterOutputs["league"]["hasStarted"];
   teams: RouterOutputs["teams"]["getTeams"];
 };
 
@@ -18,6 +19,7 @@ export function ClientMemberPage({
   leagueId,
   memberId,
   playerProfile: initialPlayerProfile,
+  hasLeagueStarted: hasLeagueStartedProp,
   teams: initialTeams,
 }: Props) {
   const user = useUserEnforced();
@@ -35,9 +37,14 @@ export function ClientMemberPage({
     },
   );
 
-  const { data: hasLeagueStarted } = clientApi.league.hasStarted.useQuery({
-    leagueId,
-  });
+  const { data: hasLeagueStarted } = clientApi.league.hasStarted.useQuery(
+    {
+      leagueId,
+    },
+    {
+      initialData: hasLeagueStartedProp,
+    },
+  );
 
   const { data: teams } = clientApi.teams.getTeams.useQuery(undefined, {
     initialData: initialTeams,

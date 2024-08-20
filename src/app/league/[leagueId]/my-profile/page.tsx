@@ -21,12 +21,13 @@ export default async function MyProfilePage({
     notFound();
   }
 
-  const [playerProfile, teams] = await Promise.all([
+  const [playerProfile, teams, hasLeagueStarted] = await Promise.all([
     serverApi.playerProfile.get({
       leagueId: member.league_id,
       memberId: member.membership_id,
     }),
     serverApi.teams.getTeams(),
+    serverApi.league.hasStarted({ leagueId: member.league_id }),
   ]);
 
   // TODO make a real personalized page
@@ -35,6 +36,7 @@ export default async function MyProfilePage({
       leagueId={member.league_id}
       memberId={member.membership_id}
       playerProfile={playerProfile}
+      hasLeagueStarted={hasLeagueStarted}
       teams={teams}
     />
   );
