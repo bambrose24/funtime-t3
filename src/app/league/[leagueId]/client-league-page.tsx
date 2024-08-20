@@ -380,7 +380,9 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
                     </div>
                     <DrawerFooter>
                       <DrawerClose asChild>
-                        <Button variant="secondary">Close</Button>
+                        <Button variant="secondary" type="button">
+                          Close
+                        </Button>
                       </DrawerClose>
                     </DrawerFooter>
                   </div>

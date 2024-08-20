@@ -177,6 +177,30 @@ export const leagueRouter = createTRPCRouter({
       });
       return response;
     }),
+  hasStarted: authorizedProcedure
+    .input(leagueIdSchema)
+    .query(async ({ ctx, input }) => {
+      const { leagueId } = input;
+      const viewerInLeague =
+        ctx.dbUser?.leaguemembers.map((m) => m.league_id) ?? [];
+      if (!viewerInLeague.includes(leagueId)) {
+        throw UnauthorizedError;
+      }
+      const league = await ctx.db.leagues.findFirstOrThrow({
+        where: {
+          league_id: leagueId,
+        },
+      });
+      const firstGame = await ctx.db.games.findFirst({
+        where: {
+          season: league.season,
+        },
+        orderBy: {
+          ts: "asc",
+        },
+      });
+      return firstGame && firstGame.ts < new Date();
+    }),
   get: authorizedProcedure
     .input(leagueIdSchema)
     .query(async ({ input, ctx }) => {

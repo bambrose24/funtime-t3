@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Separator } from "~/components/ui/separator";
 import { clientApi } from "~/trpc/react";
 import { type RouterOutputs } from "~/trpc/types";
+import { useUserEnforced } from "~/utils/hooks/useUserEnforced";
 
 type Props = {
   leagueId: number;
@@ -19,6 +20,11 @@ export function ClientMemberPage({
   playerProfile: initialPlayerProfile,
   teams: initialTeams,
 }: Props) {
+  const user = useUserEnforced();
+  const isViewer = user.dbUser.leaguemembers.some(
+    (m) => m.membership_id === memberId,
+  );
+
   const { data: playerProfile } = clientApi.playerProfile.get.useQuery(
     {
       leagueId,
@@ -28,6 +34,10 @@ export function ClientMemberPage({
       initialData: initialPlayerProfile,
     },
   );
+
+  const { data: hasLeagueStarted } = clientApi.league.hasStarted.useQuery({
+    leagueId,
+  });
 
   const { data: teams } = clientApi.teams.getTeams.useQuery(undefined, {
     initialData: initialTeams,
@@ -96,7 +106,7 @@ export function ClientMemberPage({
               </div>
             </div>
             <Separator />
-            {superbowlWinner && (
+            {superbowlWinner && (hasLeagueStarted === true || isViewer) && (
               <>
                 <div className="flex w-full flex-row justify-between">
                   <div>Super Bowl</div>

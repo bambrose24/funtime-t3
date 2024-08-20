@@ -577,7 +577,11 @@ export function ClientPickPage({
           </div>
           <DrawerFooter>
             <DrawerClose className="flex w-full justify-center" asChild>
-              <Button variant="secondary" className="w-full max-w-[400px]">
+              <Button
+                variant="secondary"
+                className="w-full max-w-[400px]"
+                type="button"
+              >
                 Close
               </Button>
             </DrawerClose>
