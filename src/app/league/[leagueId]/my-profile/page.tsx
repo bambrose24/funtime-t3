@@ -21,12 +21,13 @@ export default async function MyProfilePage({
     notFound();
   }
 
-  const [playerProfile, teams, hasLeagueStarted] = await Promise.all([
+  const [playerProfile, teams, league, hasLeagueStarted] = await Promise.all([
     serverApi.playerProfile.get({
       leagueId: member.league_id,
       memberId: member.membership_id,
     }),
     serverApi.teams.getTeams(),
+    serverApi.league.get({ leagueId: member.league_id }),
     serverApi.league.hasStarted({ leagueId: member.league_id }),
   ]);
 
@@ -36,6 +37,7 @@ export default async function MyProfilePage({
       leagueId={member.league_id}
       memberId={member.membership_id}
       playerProfile={playerProfile}
+      league={league}
       hasLeagueStarted={hasLeagueStarted}
       teams={teams}
     />

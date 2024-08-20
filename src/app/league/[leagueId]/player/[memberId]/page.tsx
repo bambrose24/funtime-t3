@@ -21,9 +21,10 @@ export default async function MemberPage({
     return notFound();
   }
 
-  const [playerProfile, teams, hasLeagueStarted] = await Promise.all([
+  const [playerProfile, teams, league, hasLeagueStarted] = await Promise.all([
     serverApi.playerProfile.get({ leagueId, memberId }),
     serverApi.teams.getTeams(),
+    serverApi.league.get({ leagueId }),
     serverApi.league.hasStarted({ leagueId }),
   ]);
 
@@ -31,6 +32,7 @@ export default async function MemberPage({
     <ClientMemberPage
       leagueId={leagueId}
       memberId={memberId}
+      league={league}
       playerProfile={playerProfile}
       hasLeagueStarted={hasLeagueStarted}
       teams={teams}

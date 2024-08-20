@@ -44,6 +44,7 @@ type Props = {
   memberId: number;
   playerProfile: RouterOutputs["playerProfile"]["get"];
   hasLeagueStarted: RouterOutputs["league"]["hasStarted"];
+  league: RouterOutputs["league"]["get"];
   teams: RouterOutputs["teams"]["getTeams"];
 };
 
@@ -52,6 +53,7 @@ export function ClientMemberPage({
   memberId,
   playerProfile: initialPlayerProfile,
   hasLeagueStarted: hasLeagueStartedProp,
+  league: initialLeague,
   teams: initialTeams,
 }: Props) {
   const user = useUserEnforced();
@@ -69,6 +71,13 @@ export function ClientMemberPage({
     {
       initialData: initialPlayerProfile,
     },
+  );
+
+  const { data: league } = clientApi.league.get.useQuery(
+    {
+      leagueId,
+    },
+    { initialData: initialLeague },
   );
 
   const { data: hasLeagueStarted } = clientApi.league.hasStarted.useQuery(
@@ -151,50 +160,54 @@ export function ClientMemberPage({
               </div>
             </div>
             <Separator />
-            {superbowlWinner && (hasLeagueStarted === true || isViewer) && (
-              <>
-                <div className="flex w-full flex-row justify-between">
-                  <div>Super Bowl</div>
-                  <div className="flex gap-4">
-                    <div>
-                      {superbowlWinner?.abbrev} over {superbowlLoser?.abbrev}{" "}
-                      (score {superbowl?.score})
+            {league.superbowl_competition === true &&
+              (hasLeagueStarted === true || isViewer) && (
+                <>
+                  <div className="flex w-full flex-row justify-between">
+                    <div>Super Bowl</div>
+                    <div className="flex gap-4">
+                      <div className="flex items-center text-sm">
+                        {superbowlWinner
+                          ? `${superbowlWinner?.abbrev} over ${superbowlLoser?.abbrev} (score ${superbowl?.score})`
+                          : `No pick`}
+                      </div>
+                      {isViewer && hasLeagueStarted !== true ? (
+                        <Dialog
+                          open={editSuperBowlDialogOpen}
+                          onOpenChange={setEditSuperBowlDialogOpen}
+                        >
+                          <DialogTrigger asChild>
+                            <Button variant="secondary">Edit</Button>
+                          </DialogTrigger>
+                          <DialogContent>
+                            <DialogHeader>
+                              <DialogTitle>
+                                Edit your Super Bowl pick
+                              </DialogTitle>
+                              <DialogDescription>
+                                You can edit your Super Bowl pick while the
+                                season has not started. When it starts, your
+                                pick will be locked in.
+                              </DialogDescription>
+                            </DialogHeader>
+                            <div className="flex w-full flex-col gap-4">
+                              <EditSuperbowlForm
+                                memberId={memberId}
+                                leagueId={leagueId}
+                                playerProfile={playerProfile}
+                                closeDialog={() => {
+                                  setEditSuperBowlDialogOpen(false);
+                                }}
+                              />
+                            </div>
+                          </DialogContent>
+                        </Dialog>
+                      ) : null}
                     </div>
-                    {isViewer && hasLeagueStarted !== true ? (
-                      <Dialog
-                        open={editSuperBowlDialogOpen}
-                        onOpenChange={setEditSuperBowlDialogOpen}
-                      >
-                        <DialogTrigger asChild>
-                          <Button variant="secondary">Edit</Button>
-                        </DialogTrigger>
-                        <DialogContent>
-                          <DialogHeader>
-                            <DialogTitle>Edit your Super Bowl pick</DialogTitle>
-                            <DialogDescription>
-                              You can edit your Super Bowl pick while the season
-                              has not started. When it starts, your pick will be
-                              locked in.
-                            </DialogDescription>
-                          </DialogHeader>
-                          <div className="flex w-full flex-col gap-4">
-                            <EditSuperbowlForm
-                              memberId={memberId}
-                              leagueId={leagueId}
-                              playerProfile={playerProfile}
-                              closeDialog={() => {
-                                setEditSuperBowlDialogOpen(false);
-                              }}
-                            />
-                          </div>
-                        </DialogContent>
-                      </Dialog>
-                    ) : null}
                   </div>
-                </div>
-                <Separator />
-              </>
-            )}
+                  <Separator />
+                </>
+              )}
           </div>
         </CardContent>
       </Card>
