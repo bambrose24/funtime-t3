@@ -37,4 +37,69 @@ export const memberRouter = createTRPCRouter({
         },
       });
     }),
+  updateOrCreateSuperbowlPick: authorizedProcedure
+    .input(
+      z.object({
+        memberId: z.number().int(),
+        winnerTeamId: z.number().int(),
+        loserTeamId: z.number().int(),
+        score: z.number().int().min(1).max(200),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { db, dbUser } = ctx;
+      const { memberId, winnerTeamId, loserTeamId, score } = input;
+      const leagueMembmer = dbUser?.leaguemembers.find(
+        (m) => m.membership_id === memberId,
+      );
+      if (!leagueMembmer || !dbUser) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: `You are not in that league (member ${memberId})`,
+        });
+      }
+
+      const [existingSuperbowlPick, league] = await Promise.all([
+        db.superbowl.findFirst({
+          where: {
+            member_id: memberId,
+          },
+        }),
+        db.leagues.findFirstOrThrow({
+          where: {
+            league_id: leagueMembmer.league_id,
+          },
+        }),
+      ]);
+
+      if (!league.superbowl_competition) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Superbowl competition is not enabled for this league",
+        });
+      }
+
+      if (existingSuperbowlPick) {
+        await db.superbowl.update({
+          where: {
+            pickid: existingSuperbowlPick.pickid,
+          },
+          data: {
+            winner: winnerTeamId,
+            loser: loserTeamId,
+            score,
+          },
+        });
+      } else {
+        await db.superbowl.create({
+          data: {
+            uid: dbUser.uid,
+            score,
+            member_id: memberId,
+            winner: winnerTeamId,
+            loser: loserTeamId,
+          },
+        });
+      }
+    }),
 });

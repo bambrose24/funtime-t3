@@ -1,10 +1,42 @@
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { z } from "zod";
+import { Badge } from "~/components/ui/badge";
+import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "~/components/ui/dialog";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+} from "~/components/ui/form";
+import { Input } from "~/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "~/components/ui/select";
 import { Separator } from "~/components/ui/separator";
 import { clientApi } from "~/trpc/react";
 import { type RouterOutputs } from "~/trpc/types";
+import { Defined } from "~/utils/defined";
 import { useUserEnforced } from "~/utils/hooks/useUserEnforced";
 
 type Props = {
@@ -26,6 +58,8 @@ export function ClientMemberPage({
   const isViewer = user.dbUser.leaguemembers.some(
     (m) => m.membership_id === memberId,
   );
+
+  const [editSuperBowlDialogOpen, setEditSuperBowlDialogOpen] = useState(false);
 
   const { data: playerProfile } = clientApi.playerProfile.get.useQuery(
     {
@@ -83,16 +117,20 @@ export function ClientMemberPage({
             <Separator />
             <div className="flex w-full flex-row justify-between">
               <div>Correct Picks</div>
-              <div>
-                {correct} / {total}
-                {total > 0
-                  ? `(${Math.floor(
-                      (playerProfile.correctPicks /
-                        (playerProfile.wrongPicks +
-                          playerProfile.correctPicks)) *
-                        100,
-                    )})%`
-                  : null}
+              <div className="flex">
+                <span className="flex items-center">
+                  {correct} / {total}
+                </span>
+                <span className="ml-2">
+                  {total > 0
+                    ? `(${Math.floor(
+                        (playerProfile.correctPicks /
+                          (playerProfile.wrongPicks +
+                            playerProfile.correctPicks)) *
+                          100,
+                      )}%)`
+                    : null}
+                </span>
               </div>
             </div>
             <Separator />
@@ -108,7 +146,7 @@ export function ClientMemberPage({
                   <div className="text-sm">None</div>
                 )}
                 {playerProfile.member.WeekWinners.map((w, i) => {
-                  return <div key={i}>Week {w.week}</div>;
+                  return <Badge key={i}>Week {w.week}</Badge>;
                 })}
               </div>
             </div>
@@ -117,9 +155,41 @@ export function ClientMemberPage({
               <>
                 <div className="flex w-full flex-row justify-between">
                   <div>Super Bowl</div>
-                  <div>
-                    {superbowlWinner?.abbrev} over {superbowlLoser?.abbrev}{" "}
-                    (score {superbowl?.score})
+                  <div className="flex gap-4">
+                    <div>
+                      {superbowlWinner?.abbrev} over {superbowlLoser?.abbrev}{" "}
+                      (score {superbowl?.score})
+                    </div>
+                    {isViewer && hasLeagueStarted !== true ? (
+                      <Dialog
+                        open={editSuperBowlDialogOpen}
+                        onOpenChange={setEditSuperBowlDialogOpen}
+                      >
+                        <DialogTrigger asChild>
+                          <Button variant="secondary">Edit</Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                          <DialogHeader>
+                            <DialogTitle>Edit your Super Bowl pick</DialogTitle>
+                            <DialogDescription>
+                              You can edit your Super Bowl pick while the season
+                              has not started. When it starts, your pick will be
+                              locked in.
+                            </DialogDescription>
+                          </DialogHeader>
+                          <div className="flex w-full flex-col gap-4">
+                            <EditSuperbowlForm
+                              memberId={memberId}
+                              leagueId={leagueId}
+                              playerProfile={playerProfile}
+                              closeDialog={() => {
+                                setEditSuperBowlDialogOpen(false);
+                              }}
+                            />
+                          </div>
+                        </DialogContent>
+                      </Dialog>
+                    ) : null}
                   </div>
                 </div>
                 <Separator />
@@ -129,5 +199,241 @@ export function ClientMemberPage({
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+const superbowlFormSchema = z.object({
+  afcTeamId: z.string(),
+  nfcTeamId: z.string(),
+  winnerTeamId: z.string(),
+  score: z.string().min(1),
+});
+
+function EditSuperbowlForm({
+  memberId,
+  leagueId,
+  playerProfile: playerProfileProp,
+  closeDialog,
+}: {
+  memberId: number;
+  leagueId: number;
+  playerProfile: RouterOutputs["playerProfile"]["get"];
+  closeDialog: () => void;
+}) {
+  const { data: teams } = clientApi.teams.getTeams.useQuery();
+
+  const nfcTeams = teams?.filter((t) => t.conference === "NFC");
+  const afcTeams = teams?.filter((t) => t.conference === "AFC");
+
+  const { data: playerProfile } = clientApi.playerProfile.get.useQuery(
+    {
+      leagueId,
+      memberId,
+    },
+    { initialData: playerProfileProp },
+  );
+
+  const initialWinnerTeamId = playerProfile.member.superbowl.at(0)?.winner;
+
+  const initialTeamIds = [
+    playerProfile.member.superbowl.at(0)?.loser,
+    playerProfile.member.superbowl.at(0)?.winner,
+  ].filter(Defined);
+  const initialAfcTeamId = afcTeams?.find((t) =>
+    initialTeamIds.includes(t.teamid),
+  )?.teamid;
+  const initialNfcTeamId = nfcTeams?.find((t) =>
+    initialTeamIds.includes(t.teamid),
+  )?.teamid;
+  const initialScore = playerProfile.member.superbowl.at(0)?.score;
+  const form = useForm<z.infer<typeof superbowlFormSchema>>({
+    resolver: zodResolver(superbowlFormSchema),
+    defaultValues: {
+      winnerTeamId: initialWinnerTeamId?.toString() ?? "",
+      afcTeamId: initialAfcTeamId?.toString() ?? "",
+      nfcTeamId: initialNfcTeamId?.toString() ?? "",
+      score: initialScore?.toString() ?? "",
+    },
+  });
+
+  const nfcTeamId = form.watch("nfcTeamId");
+  const afcTeamId = form.watch("afcTeamId");
+
+  const resetScoreAndWinner = () => {
+    form.setValue("score", "");
+    form.setValue("winnerTeamId", "");
+  };
+
+  console.log("nfc and afc team ids", nfcTeamId, afcTeamId);
+
+  const trpcUtils = clientApi.useUtils();
+  const { mutateAsync: updateOrCreateSuperbowlPick } =
+    clientApi.member.updateOrCreateSuperbowlPick.useMutation({
+      onSettled: async () => {
+        await trpcUtils.playerProfile.get.refetch({ leagueId, memberId });
+      },
+    });
+
+  const onSubmit: Parameters<typeof form.handleSubmit>[0] = async (data) => {
+    const loserTeamId = Number(
+      data.winnerTeamId === data.afcTeamId ? data.nfcTeamId : data.afcTeamId,
+    );
+    const winnerTeamId = Number(data.winnerTeamId);
+    const score = Number(data.score);
+
+    if (!winnerTeamId || !score || !loserTeamId) {
+      throw new Error("Invalid data in form");
+    }
+    await updateOrCreateSuperbowlPick({
+      winnerTeamId,
+      memberId,
+      loserTeamId,
+      score,
+    });
+
+    toast.success(`Super Bowl pick updated`);
+
+    closeDialog();
+  };
+
+  return (
+    <form onSubmit={form.handleSubmit(onSubmit)}>
+      <Form {...form}>
+        <div className="grid grid-cols-2 gap-3">
+          <FormField
+            control={form.control}
+            name="afcTeamId"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>AFC Team</FormLabel>
+                <FormControl>
+                  <Select
+                    value={field.value}
+                    onValueChange={(val) => {
+                      resetScoreAndWinner();
+                      field.onChange(val);
+                    }}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="AFC Team" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {teams
+                        ?.filter((t) => t.conference === "AFC")
+                        .map((team) => {
+                          return (
+                            <SelectItem
+                              key={team.teamid}
+                              value={team.teamid.toString()}
+                            >
+                              {team.loc} {team.name}
+                            </SelectItem>
+                          );
+                        })}
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="nfcTeamId"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>NFC Team</FormLabel>
+                <FormControl>
+                  <Select
+                    value={field.value}
+                    onValueChange={(val) => {
+                      resetScoreAndWinner();
+                      field.onChange(val);
+                    }}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="NFC Team" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {teams
+                        ?.filter((t) => t.conference === "NFC")
+                        .map((team) => {
+                          return (
+                            <SelectItem
+                              key={team.teamid}
+                              value={team.teamid.toString()}
+                            >
+                              {team.loc} {team.name}
+                            </SelectItem>
+                          );
+                        })}
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="winnerTeamId"
+            render={({ field }) => (
+              <FormItem className="col-span-2">
+                <FormLabel>Winner</FormLabel>
+                <FormControl>
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Winner" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {teams
+                        ?.filter((t) =>
+                          [afcTeamId, nfcTeamId].includes(t.teamid.toString()),
+                        )
+                        .map((team) => {
+                          return (
+                            <SelectItem
+                              key={team.teamid}
+                              value={team.teamid.toString()}
+                            >
+                              {team.loc} {team.name}
+                            </SelectItem>
+                          );
+                        })}
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="score"
+            render={({ field }) => (
+              <FormItem className="col-span-2">
+                <FormLabel>Total Score</FormLabel>
+                <FormControl>
+                  <Input type="number" {...field} />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+          <DialogClose asChild>
+            <Button variant="secondary" type="button">
+              Cancel
+            </Button>
+          </DialogClose>
+          <Button
+            type="submit"
+            loading={form.formState.isSubmitting}
+            disabled={
+              form.formState.isSubmitting ||
+              form.formState.isSubmitSuccessful ||
+              !form.formState.isValid
+            }
+          >
+            Save
+          </Button>
+        </div>
+      </Form>
+    </form>
   );
 }

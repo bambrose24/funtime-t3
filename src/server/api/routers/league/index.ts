@@ -68,6 +68,37 @@ export const leagueRouter = createTRPCRouter({
       }
       return league;
     }),
+  weekWinners: authorizedProcedure
+    .input(
+      z.object({
+        leagueId: z.number().int(),
+        week: z.number().int(),
+      }),
+    )
+    .query(async ({ input, ctx }) => {
+      const { leagueId, week } = input;
+      const { db, dbUser } = ctx;
+      const member = dbUser?.leaguemembers.find(
+        (m) => m.league_id === leagueId,
+      );
+      if (!member) {
+        throw UnauthorizedError;
+      }
+      const winners = await db.weekWinners.findMany({
+        where: {
+          league_id: leagueId,
+          week,
+        },
+        include: {
+          leaguemembers: {
+            include: {
+              people: true,
+            },
+          },
+        },
+      });
+      return { winners };
+    }),
   register: authorizedProcedure
     .input(
       z.object({

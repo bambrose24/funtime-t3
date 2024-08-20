@@ -46,6 +46,7 @@ type ClientLeaguePageProps = {
   league: RouterOutputs["league"]["get"];
   session: RouterOutputs["session"]["current"];
   currentGame: RouterOutputs["time"]["activeWeekByLeague"];
+  weekWinners: RouterOutputs["league"]["weekWinners"];
   viewerHasPicks: boolean;
 };
 
@@ -73,6 +74,11 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
       initialData: props.picksSummary,
       // refetchInterval: REFETCH_INTERVAL_MS
     },
+  );
+
+  const { data: weekWinners } = clientApi.league.weekWinners.useQuery(
+    { week: props.week, leagueId: props.leagueId },
+    { initialData: props.weekWinners },
   );
 
   const [chatSheetOpen, setChatSheetOpen] = useState(false);
@@ -139,14 +145,46 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
   );
   const simulatedGameCount = simulatedGids.length;
 
+  const banner: "make-picks" | "winners" | null =
+    weekWinners.winners.length > 0
+      ? "winners"
+      : !props.viewerHasPicks && !searchParams.get("week")
+        ? "make-picks"
+        : null;
+
   return (
     <>
       <div className="col-span-12 flex flex-row justify-center py-4">
         <Text.H1>{league.name}</Text.H1>
       </div>
-      {/* TODO put viewerHasPicks banner here to make picks */}
-      {!props.viewerHasPicks && !searchParams.get("week") ? (
-        <Alert>
+      {banner === "winners" ? (
+        <Alert className="col-span-12 flex justify-center gap-2">
+          <div className="flex flex-row gap-4">
+            Congrats to this week&apos;s{" "}
+            {weekWinners.winners.length > 1 ? "winners" : "winner"}:
+            {weekWinners.winners.map((w, idx) => {
+              const user = w.leaguemembers.people;
+              if (!user) {
+                return null;
+              }
+              return (
+                <div key={idx} className="flex items-center">
+                  <Link
+                    className="font-bold underline"
+                    href={`/league/${league.league_id}/player/${w.membership_id}`}
+                  >
+                    <Text.Small>{user.username}</Text.Small>
+                  </Link>
+                </div>
+              );
+            })}
+          </div>
+        </Alert>
+      ) : (
+        <></>
+      )}
+      {banner === "make-picks" ? (
+        <Alert className="col-span-12 flex items-center">
           <AlertTitle>
             You need to make your picks for this week. Make them{" "}
             <Link
