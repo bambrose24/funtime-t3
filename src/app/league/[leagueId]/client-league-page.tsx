@@ -27,7 +27,7 @@ import {
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { cloneDeep } from "lodash";
 import { Alert, AlertTitle } from "~/components/ui/alert";
-import { AlertCircleIcon, MessagesSquare } from "lucide-react";
+import { AlertCircleIcon, MessagesSquare, Trophy } from "lucide-react";
 import { useDictify } from "~/utils/hooks/useIdToValMemo";
 import { ScrollArea, ScrollBar } from "~/components/ui/scroll-area";
 import { type RouterOutputs } from "~/trpc/types";
@@ -72,7 +72,6 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
     },
     {
       initialData: props.picksSummary,
-      // refetchInterval: REFETCH_INTERVAL_MS
     },
   );
 
@@ -83,7 +82,6 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
 
   const [chatSheetOpen, setChatSheetOpen] = useState(false);
 
-  // TODO pass these to trpc useQuery's as initialData instead of just relying on these pieces of info so that we can pollInterval for every 5 minutes or something
   const firstGame = games.at(0);
   const week = firstGame?.week;
 
@@ -158,28 +156,36 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
         <Text.H1>{league.name}</Text.H1>
       </div>
       {banner === "winners" ? (
-        <Alert className="col-span-12 flex justify-center gap-2">
-          <div className="flex flex-row gap-4">
-            Congrats to this week&apos;s{" "}
-            {weekWinners.winners.length > 1 ? "winners" : "winner"}:
-            {weekWinners.winners.map((w, idx) => {
-              const user = w.leaguemembers.people;
-              if (!user) {
-                return null;
-              }
-              return (
-                <div key={idx} className="flex items-center">
-                  <Link
-                    className="font-bold underline"
-                    href={`/league/${league.league_id}/player/${w.membership_id}`}
-                  >
-                    <Text.Small>{user.username}</Text.Small>
-                  </Link>
-                </div>
-              );
-            })}
+        <div className="col-span-12 flex justify-center">
+          <div>
+            <Alert
+              variant="success"
+              className="flex items-center justify-center gap-2"
+            >
+              <AlertTitle className="flex flex-row items-center gap-4 text-secondary-foreground">
+                <Trophy className="z-40 h-4 w-4" />
+                Congrats to this week&apos;s{" "}
+                {weekWinners.winners.length > 1 ? "winners" : "winner"}:
+                {weekWinners.winners.map((w, idx) => {
+                  const user = w.leaguemembers.people;
+                  if (!user) {
+                    return null;
+                  }
+                  return (
+                    <div key={idx} className="flex items-center">
+                      <Link
+                        className="font-bold underline"
+                        href={`/league/${league.league_id}/player/${w.membership_id}`}
+                      >
+                        <Text.Small>{user.username}</Text.Small>
+                      </Link>
+                    </div>
+                  );
+                })}
+              </AlertTitle>
+            </Alert>
           </div>
-        </Alert>
+        </div>
       ) : (
         <></>
       )}
