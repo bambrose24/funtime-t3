@@ -1,8 +1,10 @@
-import { groupBy, orderBy } from "lodash";
+import { chunk, groupBy, orderBy } from "lodash";
 import { db } from "~/server/db";
 import { msf } from "~/server/services/mysportsfeeds";
 import { DEFAULT_SEASON } from "~/utils/const";
 import { Defined } from "~/utils/defined";
+import { addHours } from 'date-fns';
+import { resendApi } from "~/server/services/resend";
 
 const LOG_PREFIX = "[cron]";
 
@@ -280,6 +282,54 @@ export async function run() {
           is_tiebreaker: true,
         },
       });
+    }
+  }
+
+  // Remind members to make picks for the upcoming week
+  const upcomingWeek = firstUnstartedGameWeek;
+
+  if (upcomingWeek && firstUnstartedGame && addHours(now, 3) >= firstUnstartedGame.ts) {
+    const threeHoursBeforePeople = await db.leaguemembers.findMany({
+      where: {
+        leagues: {
+          reminder_policy: 'three_hours_before',
+          season: DEFAULT_SEASON,
+        },
+        picks: {
+          none: {
+            week: upcomingWeek,
+          }
+        },
+        EmailLogs: {
+          none: {
+            email_type: 'week_reminder',
+            week: upcomingWeek,
+          }
+        }
+      },
+      include: {
+        people: true,
+      }
+    });
+
+    const leagues = await db.leagues.findMany({
+      where: {
+        league_id: {
+          in: Array.from(new Set(threeHoursBeforePeople.map((p) => p.league_id))),
+        },
+      }
+    })
+    const peopleToSendToChunks = chunk(threeHoursBeforePeople, 100);
+    for (const peopleToSendToChunk of peopleToSendToChunks) {
+      await Promise.all(peopleToSendToChunk.map(async (member) => {
+        await resendApi.sendPickReminderEmail({
+          member,
+          user: member.people,
+          league: leagues.find((l) => l.league_id === member.league_id)!,
+          week: upcomingWeek,
+        })
+      }))
+      await new Promise(resolve => setTimeout(resolve, 500));
     }
   }
 

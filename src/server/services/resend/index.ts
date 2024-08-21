@@ -1,6 +1,8 @@
 import LeagueWelcome from "emails/league-welcome";
 import PicksConfirmationEmail from "emails/picks-confirmation";
+import PickReminderEmail from "emails/picks-reminder";
 import { Resend } from "resend";
+import { leaguemembers, leagues, people } from "~/generated/prisma-client";
 import { db } from "~/server/db";
 import { getLogger } from "~/utils/logging";
 const resend = new Resend(process.env.RESEND_API_KEY ?? "");
@@ -194,4 +196,61 @@ export const resendApi = {
       );
     }
   },
+  sendPickReminderEmail: async ({
+    member,
+    user,
+    league,
+    week,
+  }: {
+    member: leaguemembers;
+    user: people;
+    league: leagues;
+    week: number;
+  }) => {
+    if (!user.email || !league) {
+      throw new Error(
+        "User does not have an email or league to send pick reminder to",
+      );
+    }
+
+    getLogger().info(
+      `${LOG_PREFIX} Going to send pick reminder email for league ${league.league_id} for member ${member.membership_id}`,
+    );
+
+    const { data, error } = await resend.emails.send({
+      from: FROM,
+      to: [user.email],
+      subject: `Reminder: Make Your Picks for ${league.name}!`,
+      react: PickReminderEmail({
+        username: user.username,
+        leagueName: league.name,
+        leagueHomeHref: `https://www.play-funtime.com/league/${league.league_id}`,
+      }),
+    });
+
+    if (error) {
+      getLogger().error(
+        `${LOG_PREFIX} Error sending pick reminder email for league ${league.league_id} for member ${member.membership_id}`,
+        { error },
+      );
+    } else {
+      getLogger().info(
+        `${LOG_PREFIX} Sent pick reminder email for league ${league.league_id} for member ${member.membership_id}`,
+        { data },
+      );
+    }
+
+    if (data?.id) {
+      await db.emailLogs.create({
+        data: {
+          email_type: "week_reminder",
+          resend_id: data.id,
+          league_id: league.league_id,
+          member_id: member.membership_id,
+          week,
+        },
+      });
+    }
+
+  }
 };
