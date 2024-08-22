@@ -39,6 +39,7 @@ import {
 } from "~/components/ui/drawer";
 import { Checkbox } from "~/components/ui/checkbox";
 import { orderBy } from "lodash";
+import { useRouter } from "next/navigation";
 
 type Props = {
   league: RouterOutputs["league"]["get"];
@@ -84,6 +85,8 @@ export function ClientPickPage({
 }: Props) {
   const { week, season, games } = weekToPick;
   const { league_id: leagueId } = league;
+
+  const router = useRouter();
 
   const { dbUser } = useUserEnforced();
 
@@ -576,15 +579,20 @@ export function ClientPickPage({
             </div>
           </div>
           <DrawerFooter>
-            <DrawerClose className="flex w-full justify-center" asChild>
-              <Button
-                variant="secondary"
-                className="w-full max-w-[400px]"
-                type="button"
-              >
-                Close
-              </Button>
-            </DrawerClose>
+            <div className="flex justify-center">
+              <DrawerClose asChild>
+                <Button
+                  variant="secondary"
+                  className="w-[400px]"
+                  type="button"
+                  onClick={() => {
+                    router.push(`/league/${leagueId}`);
+                  }}
+                >
+                  Close
+                </Button>
+              </DrawerClose>
+            </div>
           </DrawerFooter>
         </DrawerContent>
       </Drawer>

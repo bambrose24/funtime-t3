@@ -59,12 +59,12 @@ export const picksRouter = createTRPCRouter({
       const [overrideMember, fullViewerMembers] = await Promise.all([
         input.overrideMemberId
           ? db.leaguemembers.findFirstOrThrow({
-              where: {
-                membership_id: input.overrideMemberId,
-                league_id: leagueIds.at(0),
-              },
-              include: memberInclude,
-            })
+            where: {
+              membership_id: input.overrideMemberId,
+              league_id: leagueIds.at(0),
+            },
+            include: memberInclude,
+          })
           : null,
         db.leaguemembers.findMany({
           where: {
@@ -125,24 +125,24 @@ export const picksRouter = createTRPCRouter({
       const finalPicks = input.overrideMemberId
         ? input.picks
         : input.picks.filter((p) => {
-            const game = gamesById[p.gid]?.at(0);
-            if (!game || game.ts < now) {
-              return false;
-            }
-            return true;
-          });
+          const game = gamesById[p.gid]?.at(0);
+          if (!game || game.ts < now) {
+            return false;
+          }
+          return true;
+        });
 
       const weeks = Array.from(new Set(pickedGames.map((g) => g.week)));
 
       const picksSearch: NonNullable<Parameters<typeof db.picks.findMany>[0]> =
-        {
-          where: {
-            member_id: { in: members.map((m) => m.membership_id) },
-            week: {
-              in: weeks,
-            },
+      {
+        where: {
+          member_id: { in: members.map((m) => m.membership_id) },
+          week: {
+            in: weeks,
           },
-        };
+        },
+      };
 
       const existingPicks = await db.picks.findMany(picksSearch);
       const existingPicksByGid = groupBy(
@@ -151,6 +151,7 @@ export const picksRouter = createTRPCRouter({
       );
 
       await db.$transaction(async (tx) => {
+        const promises = [];
         for (const member of members) {
           for (const pick of finalPicks) {
             const game = gamesById[pick.gid]?.at(0);
@@ -164,7 +165,7 @@ export const picksRouter = createTRPCRouter({
               existingPicksByGid[`${member.membership_id}_${game.gid}`]?.at(0);
 
             if (existingPick) {
-              await tx.picks.update({
+              promises.push(tx.picks.update({
                 data: {
                   winner: pick.winner,
                   score: pick.score,
@@ -174,9 +175,9 @@ export const picksRouter = createTRPCRouter({
                 where: {
                   pickid: existingPick.pickid,
                 },
-              });
+              }));
             } else {
-              await tx.picks.create({
+              promises.push(tx.picks.create({
                 data: {
                   winner: pick.winner,
                   gid: pick.gid,
@@ -189,10 +190,11 @@ export const picksRouter = createTRPCRouter({
                   ts: new Date(),
                   loser: game.away + game.home - pick.winner,
                 },
-              });
+              }));
             }
           }
         }
+        await Promise.all(promises);
       });
 
       const picksForWeeks = await db.picks.findMany({

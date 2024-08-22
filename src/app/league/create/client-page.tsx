@@ -23,7 +23,7 @@ import { Input } from "~/components/ui/input";
 import { Text } from "~/components/ui/text";
 import { Alert, AlertTitle } from "~/components/ui/alert";
 import { type RouterOutputs } from "~/trpc/types";
-import { AlertCircleIcon } from "lucide-react";
+import { AlertCircleIcon, Router } from "lucide-react";
 import Link from "next/link";
 import {
   Select,
@@ -37,6 +37,7 @@ import { Button } from "~/components/ui/button";
 import { clientApi } from "~/trpc/react";
 import { DEFAULT_SEASON } from "~/utils/const";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 type Props = {
   priorLeague: RouterOutputs["league"]["get"] | undefined;
@@ -53,6 +54,7 @@ export function CreateLeagueClientPage({
     initialData: navInitialData,
   });
 
+  const router = useRouter();
   const form = useForm<z.infer<typeof createLeagueFormSchema>>({
     resolver: zodResolver(createLeagueFormSchema),
     defaultValues: {
@@ -66,11 +68,14 @@ export function CreateLeagueClientPage({
     },
   });
 
-  const { mutateAsync: createLeague } = clientApi.league.create.useMutation();
+  const trpcUtils = clientApi.useUtils();
+  const { mutateAsync: createLeague } = clientApi.league.create.useMutation({
+    onSettled: async () => {
+      await trpcUtils.league.invalidate();
+    },
+  });
 
   const onSubmit: Parameters<typeof form.handleSubmit>[0] = async (data) => {
-    console.log("submitted data", data);
-
     const newLeague = await createLeague({
       latePolicy: data.latePolicy,
       name: data.name,
@@ -85,6 +90,7 @@ export function CreateLeagueClientPage({
     });
 
     toast.success(`The league ${newLeague.name} was created.`);
+    router.push(`/league/${newLeague.league_id}`);
   };
 
   return (
@@ -316,6 +322,7 @@ export function CreateLeagueClientPage({
                 disabled={
                   !form.formState.isValid || form.formState.isSubmitting
                 }
+                loading={form.formState.isSubmitting}
               >
                 Create League
               </Button>

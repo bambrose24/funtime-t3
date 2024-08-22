@@ -6,6 +6,7 @@ import { DEFAULT_SEASON } from "~/utils/const";
 import { redirect } from "next/navigation";
 import { FuntimeWelcomeCard } from "./FuntimeWelcomeCard";
 import { Text } from "~/components/ui/text";
+import { FuntimeLanding } from "./_components/FuntimeLanding";
 
 // Almost all of the Funtime pages will need this
 export const dynamic: AppConfigDynamic = "force-dynamic";
@@ -16,7 +17,7 @@ export default async function Home() {
   if (!session.dbUser) {
     return (
       <div className="col-span-12 flex justify-center">
-        <FuntimeWelcomeCard />
+        <FuntimeLanding />
       </div>
     );
   }
