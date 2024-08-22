@@ -578,11 +578,11 @@ export function ClientPickPage({
           </div>
           <DrawerFooter>
             <div className="flex justify-center">
-              <Link href={`/league/${leagueId}`}>
+              <Link href={`/league/${leagueId}`} className="w-full">
                 <DrawerClose asChild>
                   <Button
                     variant="secondary"
-                    className="w-[400px]"
+                    className="w-full max-w-[400px]"
                     type="button"
                   >
                     Close
