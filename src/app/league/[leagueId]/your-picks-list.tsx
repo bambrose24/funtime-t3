@@ -77,7 +77,7 @@ export function YourPicksList(props: Props) {
                   status === "wrong" && choseAway && "border-2 border-wrong",
                   status === "empty-state" &&
                     choseAway &&
-                    "border-pending border-2",
+                    "border-2 border-pending",
                   // choseAway ? "border-2" : "",
                   // correct ? "border-correct" : "border-wrong",
                   // !game.done ? "border-blue-500 dark:border-blue-700" : "",
@@ -117,7 +117,7 @@ export function YourPicksList(props: Props) {
                   status === "wrong" && choseHome && "border-2 border-wrong",
                   status === "empty-state" &&
                     choseHome &&
-                    "border-pending border-2",
+                    "border-2 border-pending",
                 )}
               >
                 <Text.Small
@@ -207,7 +207,7 @@ export function CompactYourPicksList(props: Props) {
                   status === "wrong" && choseAway && "border-2 border-wrong",
                   status === "empty-state" &&
                     choseAway &&
-                    "border-pending border-2",
+                    "border-2 border-pending",
                 )}
               >
                 <Text.Small>{awayTeam.abbrev}</Text.Small>
@@ -234,7 +234,7 @@ export function CompactYourPicksList(props: Props) {
                   status === "wrong" && choseHome && "border-2 border-wrong",
                   status === "empty-state" &&
                     choseHome &&
-                    "border-pending border-2",
+                    "border-2 border-pending",
                 )}
               >
                 <Text.Small>{homeTeam.abbrev}</Text.Small>
