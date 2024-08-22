@@ -22,18 +22,12 @@ export default function PickReminderEmail({
         <Preview>{headline}</Preview>
         <Container className="flex flex-col items-center">
           <EmailH1>{headline}</EmailH1>
+          <EmailText>Hi {username},</EmailText>
           <EmailText>
-            Hi {username},
+            This is a friendly reminder to make your picks for {leagueName}. The
+            games are starting soon, and we don&apos;t want you to miss out!
           </EmailText>
-          <EmailText>
-            This is a friendly reminder to make your picks for {leagueName}. The games are starting soon, and we don't want you to miss out!
-          </EmailText>
-          <EmailButton href={leagueHomeHref}>
-            Make Your Picks Now
-          </EmailButton>
-          <EmailText>
-            Good luck!
-          </EmailText>
+          <EmailButton href={leagueHomeHref}>Make Your Picks Now</EmailButton>
           <div className="text-xs text-muted-foreground">
             This is an automated email sent at {new Date().toLocaleString()}.
           </div>
