@@ -21,8 +21,16 @@ type Props = {
 };
 
 export function UserProviderClient({ children, data: initialData }: Props) {
-  clientApi.session.current.useQuery(undefined, {
+  const { data: user } = clientApi.session.current.useQuery(undefined, {
     initialData,
+  });
+  useEffect(() => {
+    if (user.dbUser) {
+      posthog.identify(user.dbUser.email, {
+        userId: user.dbUser.uid,
+        username: user.dbUser.username,
+      });
+    }
   });
   return (
     <PostHogProvider client={posthog}>
