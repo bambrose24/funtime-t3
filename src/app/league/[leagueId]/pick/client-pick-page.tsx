@@ -39,7 +39,6 @@ import {
 } from "~/components/ui/drawer";
 import { Checkbox } from "~/components/ui/checkbox";
 import { orderBy } from "lodash";
-import Link from "next/link";
 
 type Props = {
   league: RouterOutputs["league"]["get"];
@@ -578,17 +577,15 @@ export function ClientPickPage({
           </div>
           <DrawerFooter>
             <div className="flex justify-center">
-              <Link href={`/league/${leagueId}`} className="w-full">
-                <DrawerClose asChild>
-                  <Button
-                    variant="secondary"
-                    className="w-full max-w-[400px]"
-                    type="button"
-                  >
-                    Close
-                  </Button>
-                </DrawerClose>
-              </Link>
+              <DrawerClose asChild>
+                <Button
+                  variant="secondary"
+                  className="w-full max-w-[400px]"
+                  type="button"
+                >
+                  Close
+                </Button>
+              </DrawerClose>
             </div>
           </DrawerFooter>
         </DrawerContent>
