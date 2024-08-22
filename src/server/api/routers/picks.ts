@@ -150,9 +150,10 @@ export const picksRouter = createTRPCRouter({
         (p) => `${p.member_id}_${p.gid}`,
       );
 
-      await db.$transaction(async (tx) => {
-        const promises = [];
-        for (const member of members) {
+      for (const member of members) {
+        await db.$transaction(async (tx) => {
+          const promises = [];
+
           for (const pick of finalPicks) {
             const game = gamesById[pick.gid]?.at(0);
             if (!game) {
@@ -193,9 +194,9 @@ export const picksRouter = createTRPCRouter({
               }));
             }
           }
-        }
-        await Promise.all(promises);
-      });
+          return Promise.all(promises);
+        });
+      }
 
       const picksForWeeks = await db.picks.findMany({
         where: {
