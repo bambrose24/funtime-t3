@@ -132,177 +132,211 @@ export function JoinLeagueClientPage({ data, session, teams }: Props) {
           </CardHeader>
           <CardContent>
             <div className="flex flex-col gap-4">
-              <div className="flex flex-col gap-2">League Rules</div>
-              <Separator />
-              <div className="grid grid-cols-[1fr_32px_1fr] gap-y-3">
-                <FormField
-                  control={form.control}
-                  name="superbowlAfcTeamId"
-                  render={({ field }) => {
-                    return (
-                      <FormItem className="w-full">
-                        <FormLabel>AFC Team</FormLabel>
-                        <FormControl>
-                          <Select
-                            onValueChange={field.onChange}
-                            defaultValue={field.value}
-                          >
-                            <SelectTrigger className="w-full">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {teams
-                                .filter((t) => t.conference === "AFC")
-                                .map((team, idx) => {
-                                  return (
-                                    <SelectItem
-                                      key={idx}
-                                      value={team.teamid.toString()}
-                                    >
-                                      {team.loc} {team.name}
-                                    </SelectItem>
-                                  );
-                                })}
-                            </SelectContent>
-                          </Select>
-                        </FormControl>
-                        <FormDescription />
-                        <FormMessage />
-                      </FormItem>
-                    );
-                  }}
-                />
-                <div />
-                <FormField
-                  control={form.control}
-                  name="superbowlNfcTeamId"
-                  render={({ field }) => {
-                    return (
-                      <FormItem className="w-full">
-                        <FormLabel>NFC Team</FormLabel>
-                        <FormControl>
-                          <Select
-                            onValueChange={field.onChange}
-                            defaultValue={field.value}
-                          >
-                            <SelectTrigger className="w-full">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {teams
-                                .filter((t) => t.conference === "NFC")
-                                .map((team, idx) => {
-                                  return (
-                                    <SelectItem
-                                      key={idx}
-                                      value={team.teamid.toString()}
-                                    >
-                                      {team.loc} {team.name}
-                                    </SelectItem>
-                                  );
-                                })}
-                            </SelectContent>
-                          </Select>
-                        </FormControl>
-                        <FormDescription />
-                        <FormMessage />
-                      </FormItem>
-                    );
-                  }}
-                />
-                <FormField
-                  control={form.control}
-                  name="superbowlWinnerTeam"
-                  render={({ field }) => {
-                    return (
-                      <>
-                        <RadioGroup
-                          name={field.name}
-                          onValueChange={field.onChange}
-                          value={field.value.toString()}
-                          defaultValue={field.value.toString()}
-                          className={cn(
-                            "flex flex-col items-center justify-center ",
-                            {
+              <div className="flex flex-col gap-2">
+                <span className="text-lg font-bold">League Rules</span>
+              </div>
+              <div className="space-y-4">
+                <div className="flex flex-col gap-2">
+                  <span className="text-lg">Late Policy</span>
+                  <Text.Small>
+                    {data.late_policy === "allow_late_and_lock_after_start"
+                      ? "Late picks are allowed. You can make picks for games that haven't started yet, even if you missed earlier games. However, you won't be able to see other players' picks until you submit yours."
+                      : "Picks close at the start of the first game of the week. No late picks are allowed."}
+                  </Text.Small>
+                </div>
+                <Separator />
+                <div className="flex flex-col gap-2">
+                  <span className="text-lg">Pick Policy</span>
+                  <Text.Small>
+                    {data.pick_policy === "choose_winner"
+                      ? "You'll be picking the winner of each game."
+                      : "Pick policy not specified."}
+                  </Text.Small>
+                </div>
+                <Separator />
+                <div className="flex flex-col gap-2">
+                  <span className="text-lg">Reminders</span>
+                  <Text.Small>
+                    {data.reminder_policy === "three_hours_before"
+                      ? "You'll receive a reminder email about 3 hours before the first game of the week if you haven't made your picks yet."
+                      : "No automatic reminders will be sent."}
+                  </Text.Small>
+                </div>
+                <Separator />
+                <div className="flex flex-col gap-2">
+                  <span className="text-lg">Super Bowl Competition</span>
+                  <Text.Small>
+                    {data.superbowl_competition
+                      ? "This league includes a Super Bowl competition. You'll pick the winner, loser, and total score of the Super Bowl. The most accurate prediction wins!"
+                      : "This league does not include a Super Bowl competition."}
+                  </Text.Small>
+                  {data.superbowl_competition && (
+                    <div className="mt-4 grid grid-cols-[1fr_32px_1fr] gap-y-3">
+                      <FormField
+                        control={form.control}
+                        name="superbowlAfcTeamId"
+                        render={({ field }) => (
+                          <FormItem className="w-full">
+                            <FormLabel>AFC Team</FormLabel>
+                            <FormControl>
+                              <Select
+                                onValueChange={field.onChange}
+                                defaultValue={field.value}
+                              >
+                                <SelectTrigger className="w-full">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {teams
+                                    .filter((t) => t.conference === "AFC")
+                                    .map((team, idx) => (
+                                      <SelectItem
+                                        key={idx}
+                                        value={team.teamid.toString()}
+                                      >
+                                        {team.loc} {team.name}
+                                      </SelectItem>
+                                    ))}
+                                </SelectContent>
+                              </Select>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <div />
+                      <FormField
+                        control={form.control}
+                        name="superbowlNfcTeamId"
+                        render={({ field }) => (
+                          <FormItem className="w-full">
+                            <FormLabel>NFC Team</FormLabel>
+                            <FormControl>
+                              <Select
+                                onValueChange={field.onChange}
+                                defaultValue={field.value}
+                              >
+                                <SelectTrigger className="w-full">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {teams
+                                    .filter((t) => t.conference === "NFC")
+                                    .map((team, idx) => (
+                                      <SelectItem
+                                        key={idx}
+                                        value={team.teamid.toString()}
+                                      >
+                                        {team.loc} {team.name}
+                                      </SelectItem>
+                                    ))}
+                                </SelectContent>
+                              </Select>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="superbowlWinnerTeam"
+                        render={({ field }) => (
+                          <>
+                            <RadioGroup
+                              name={field.name}
+                              onValueChange={field.onChange}
+                              value={field.value.toString()}
+                              defaultValue={field.value.toString()}
+                              className={cn(
+                                "flex flex-col items-center justify-center",
+                                {
+                                  "transition-all duration-500": true,
+                                  "h-0 opacity-0": !afcTeam || !nfcTeam,
+                                },
+                              )}
+                            >
+                              {afcTeam && (
+                                <FormLabel>
+                                  <TeamLogo
+                                    abbrev={afcTeam.abbrev ?? ""}
+                                    width={64}
+                                    height={64}
+                                  />
+                                </FormLabel>
+                              )}
+                              <RadioGroupItem
+                                value={afcTeam?.teamid.toString() ?? ""}
+                              />
+                            </RadioGroup>
+                            <Text.Small
+                              className={cn(
+                                "flex items-center justify-center font-normal text-secondary-foreground",
+                                {
+                                  "transition-all duration-500": true,
+                                  "h-0 opacity-0": !afcTeam || !nfcTeam,
+                                },
+                              )}
+                            >
+                              vs
+                            </Text.Small>
+                            <RadioGroup
+                              onValueChange={field.onChange}
+                              defaultValue={field.value.toString()}
+                              value={field.value.toString()}
+                              className={cn(
+                                "flex flex-col items-center gap-2",
+                                {
+                                  "transition-all duration-500": true,
+                                  "h-0 opacity-0": !afcTeam || !nfcTeam,
+                                },
+                              )}
+                            >
+                              {nfcTeam && (
+                                <FormLabel>
+                                  <TeamLogo
+                                    abbrev={nfcTeam.abbrev ?? ""}
+                                    width={64}
+                                    height={64}
+                                  />
+                                </FormLabel>
+                              )}
+                              <RadioGroupItem
+                                value={nfcTeam?.teamid.toString() ?? ""}
+                              />
+                            </RadioGroup>
+                          </>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="superbowlTotalScore"
+                        render={({ field }) => (
+                          <FormItem
+                            className={cn("col-span-3 mt-4 w-full", {
                               "transition-all duration-500": true,
                               "h-0 opacity-0": !afcTeam || !nfcTeam,
-                            },
-                          )}
-                        >
-                          {afcTeam && (
-                            <FormLabel>
-                              <TeamLogo
-                                abbrev={afcTeam.abbrev ?? ""}
-                                width={64}
-                                height={64}
-                              />
-                            </FormLabel>
-                          )}
-                          <RadioGroupItem
-                            value={afcTeam?.teamid.toString() ?? ""}
-                          />
-                        </RadioGroup>
-                        <Text.Small
-                          className={cn(
-                            "flex items-center justify-center font-normal text-secondary-foreground",
-                            {
-                              "transition-all duration-500": true,
-                              "h-0 opacity-0": !afcTeam || !nfcTeam,
-                            },
-                          )}
-                        >
-                          vs
-                        </Text.Small>
-                        <RadioGroup
-                          onValueChange={field.onChange}
-                          defaultValue={field.value.toString()}
-                          value={field.value.toString()}
-                          className={cn("flex flex-col items-center gap-2", {
-                            "transition-all duration-500": true,
-                            "h-0 opacity-0": !afcTeam || !nfcTeam,
-                          })}
-                        >
-                          {nfcTeam && (
-                            <FormLabel>
-                              <TeamLogo
-                                abbrev={nfcTeam.abbrev ?? ""}
-                                width={64}
-                                height={64}
-                              />
-                            </FormLabel>
-                          )}
-                          <RadioGroupItem
-                            value={nfcTeam?.teamid.toString() ?? ""}
-                          />
-                        </RadioGroup>
-                      </>
-                    );
-                  }}
-                />
-                <FormField
-                  control={form.control}
-                  name="superbowlTotalScore"
-                  render={({ field }) => {
-                    return (
-                      <FormItem
-                        className={cn("col-span-3 mt-4 w-full", {
-                          "transition-all duration-500": true,
-                          "h-0 opacity-0": !afcTeam || !nfcTeam,
-                        })}
-                      >
-                        <FormLabel>Total Score</FormLabel>
-                        <Input {...field} type="number" />
-                      </FormItem>
-                    );
-                  }}
-                />
+                            })}
+                          >
+                            <FormLabel>Total Score</FormLabel>
+                            <Input {...field} type="number" />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </CardContent>
           <CardFooter>
             <Button
               className="w-full"
-              disabled={form.formState.isSubmitting || !form.formState.isValid}
+              disabled={
+                form.formState.isSubmitting ||
+                form.formState.isSubmitSuccessful ||
+                !form.formState.isValid
+              }
+              loading={form.formState.isSubmitting}
               type="submit"
             >
               Register

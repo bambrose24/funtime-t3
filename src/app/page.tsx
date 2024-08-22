@@ -4,7 +4,6 @@ import { serverApi } from "~/trpc/server";
 import { JoinOrCreateALeague } from "./JoinOrCreateALeague";
 import { DEFAULT_SEASON } from "~/utils/const";
 import { redirect } from "next/navigation";
-import { FuntimeWelcomeCard } from "./FuntimeWelcomeCard";
 import { Text } from "~/components/ui/text";
 import { FuntimeLanding } from "./_components/FuntimeLanding";
 

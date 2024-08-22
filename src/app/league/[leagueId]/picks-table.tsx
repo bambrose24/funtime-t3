@@ -128,10 +128,10 @@ function PicksTableImpl({ picksSummary, games, teams }: Props) {
                 return (
                   <TableHead
                     key={header.id}
-                    className={cn(
-                      "text-center",
-                      index === 0 && "sticky left-0 z-10",
-                    )}
+                    className={cn("text-center", {
+                      "sticky left-0 z-10 bg-card transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted":
+                        index === 0,
+                    })}
                   >
                     {header.isPlaceholder
                       ? null
@@ -182,10 +182,10 @@ function PicksTableImpl({ picksSummary, games, teams }: Props) {
                   return (
                     <TableCell
                       key={cell.id}
-                      className={cn(
-                        "p-0",
-                        index === 0 && "sticky left-0 z-10 -ml-1",
-                      )}
+                      className={cn("p-0", {
+                        "sticky left-0 z-10 bg-card transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted":
+                          index === 0,
+                      })}
                     >
                       <div
                         className={cn(
