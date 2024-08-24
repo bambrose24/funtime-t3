@@ -23,7 +23,13 @@ export function ForgotPasswordClient() {
   const {
     register,
     handleSubmit,
-    formState: { errors, isLoading, isSubmitting, isSubmitted },
+    formState: {
+      errors,
+      isLoading,
+      isSubmitting,
+      isSubmitted,
+      isSubmitSuccessful,
+    },
     watch,
   } = useForm<ForgotPasswordFormType>({
     resolver: zodResolver(forgotPasswordSchema),
@@ -86,7 +92,7 @@ export function ForgotPasswordClient() {
                 }
                 loading={isLoading || isSubmitting}
               >
-                Reset Password
+                {isSubmitSuccessful ? "Check your email" : "Reset Password"}
               </Button>
             </div>
           </form>
