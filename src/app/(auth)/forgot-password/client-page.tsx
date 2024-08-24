@@ -39,6 +39,9 @@ export function ForgotPasswordClient() {
     });
 
     if (error) {
+      toast.error(
+        "There was an error resetting your password. Contact Bob at bambrose24@gmail.com",
+      );
       throw error;
     }
 
