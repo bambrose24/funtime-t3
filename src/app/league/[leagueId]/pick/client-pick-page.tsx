@@ -580,7 +580,10 @@ export function ClientPickPage({
                 variant="secondary"
                 className="w-full max-w-[400px]"
                 type="button"
-                onClick={() => setPicksDialogOpen(false)}
+                onClick={() => {
+                  setPicksDialogOpen(false);
+                  window.location.href = `/league/${leagueId}`;
+                }}
               >
                 Close
               </Button>
