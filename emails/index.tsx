@@ -1,4 +1,4 @@
-import { Button, Container, Html, Link } from "@react-email/components";
+import { Container, Html } from "@react-email/components";
 import * as React from "react";
 import { Provider } from "./provider";
 import { EmailButton } from "./components/email-button";

@@ -279,7 +279,8 @@ exports.EmailType = exports.$Enums.EmailType = {
   week_reminder: 'week_reminder',
   week_summary: 'week_summary',
   week_picks: 'week_picks',
-  league_registration: 'league_registration'
+  league_registration: 'league_registration',
+  league_broadcast: 'league_broadcast'
 };
 
 exports.MemberRole = exports.$Enums.MemberRole = {

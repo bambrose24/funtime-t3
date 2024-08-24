@@ -1,6 +1,7 @@
 import LeagueWelcome from "emails/league-welcome";
 import PicksConfirmationEmail from "emails/picks-confirmation";
 import PickReminderEmail from "emails/picks-reminder";
+import LeagueBroadcastEmail from "emails/league-broadcast";
 import { Resend } from "resend";
 import type { leaguemembers, leagues, people } from "~/generated/prisma-client";
 import { db } from "~/server/db";
@@ -252,5 +253,56 @@ export const resendApi = {
       });
     }
 
-  }
+  },
+  sendLeagueBroadcast: async ({
+    leagueName,
+    adminName,
+    markdownMessage,
+    to,
+  }: {
+    leagueName: string;
+    adminName: string;
+    markdownMessage: string;
+    to: string[];
+  }) => {
+    getLogger().info(
+      `${LOG_PREFIX} Going to send league broadcast email for league ${leagueName}`,
+    );
+
+    const { data, error } = await resend.emails.send({
+      from: FROM,
+      to: [FROM], // Send to the FROM address
+      bcc: to, // Put all recipients in BCC
+      subject: `Funtime - Message from ${leagueName} Admin`,
+      react: LeagueBroadcastEmail({
+        leagueName,
+        adminName,
+        markdownMessage,
+      }),
+    });
+
+    if (error) {
+      getLogger().error(
+        `${LOG_PREFIX} Error sending league broadcast email for league ${leagueName}`,
+        { error },
+      );
+    } else {
+      getLogger().info(
+        `${LOG_PREFIX} Sent league broadcast email for league ${leagueName}`,
+        { data },
+      );
+    }
+
+    if (data?.id) {
+      // Note: You might want to adjust this based on your actual data model
+      // Since we don't have specific league or member IDs here, we're logging it differently
+      await db.emailLogs.create({
+        data: {
+          email_type: "league_broadcast",
+          resend_id: data.id,
+          // You might want to add more fields here if needed
+        },
+      });
+    }
+  },
 };

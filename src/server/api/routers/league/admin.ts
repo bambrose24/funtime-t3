@@ -3,6 +3,8 @@ import { authorizedProcedure, createTRPCRouter } from "../../trpc";
 import { MemberRole } from "~/generated/prisma-client";
 import { TRPCError } from "@trpc/server";
 import { groupBy, orderBy } from "lodash";
+import { subHours } from 'date-fns';
+import { resendApi } from "~/server/services/resend";
 
 const leagueAdminProcedure = authorizedProcedure
   .input(z.object({ leagueId: z.number().int() }))
@@ -152,5 +154,110 @@ export const leagueAdminRouter = createTRPCRouter({
         },
       });
       return updatedLeague;
+    }),
+  canSendLeagueBroadcast: leagueAdminProcedure
+    .query(async ({ ctx, input }) => {
+      const { db, dbUser } = ctx;
+      const { leagueId } = input;
+
+      // Check if the user is an admin of the league
+      const adminMembership = dbUser?.leaguemembers.find(m => m.role === MemberRole.admin && m.league_id === leagueId);
+      if (!adminMembership || !dbUser) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "You are not an admin of this league",
+        });
+      }
+
+      const oneHourAgo = subHours(new Date(), 1);
+      const recentBroadcast = await db.emailLogs.findFirst({
+        where: {
+          league_id: leagueId,
+          email_type: "league_broadcast",
+          ts: {
+            gte: oneHourAgo
+          }
+        },
+        orderBy: {
+          ts: 'desc'
+        }
+      });
+
+      return { canSendBroadcast: !recentBroadcast };
+    }),
+  sendBroadcast: leagueAdminProcedure
+    .input(
+      z.object({
+        leagueId: z.string(),
+        markdownString: z.string(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { db, dbUser } = ctx;
+      const adminMembership = dbUser?.leaguemembers.find(m => m.role === 'admin' && m.league_id === leagueId);
+      if (!adminMembership || !dbUser) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "You are not an admin of this league",
+        });
+      }
+      const { leagueId, markdownString } = input;
+
+      // Fetch the league and admin information
+      const league = await db.leagues.findFirstOrThrow({
+        where: { league_id: leagueId },
+      });
+
+
+
+      // Check if a broadcast has been sent in the last hour
+      const oneHourAgo = subHours(new Date(), 1);
+      const recentBroadcast = await db.emailLogs.findFirst({
+        where: {
+          league_id: leagueId,
+          email_type: "league_broadcast",
+          ts: {
+            gte: oneHourAgo
+          }
+        },
+        orderBy: {
+          ts: 'desc'
+        }
+      });
+
+      if (recentBroadcast) {
+        throw new TRPCError({
+          code: "TOO_MANY_REQUESTS",
+          message: "You can only send one broadcast per hour. Please try again later.",
+        });
+      }
+
+      // Fetch all league members' email addresses
+      const members = await db.leaguemembers.findMany({
+        where: { league_id: leagueId },
+        include: { people: true },
+      });
+
+      const emailAddresses = members
+        .map((m) => m.people.email)
+        .filter((email): email is string => email !== null);
+
+      // Send the broadcast email
+      try {
+        await resendApi.sendLeagueBroadcast({
+          leagueName: league.name,
+          adminName: dbUser.username,
+          markdownMessage: markdownString,
+          to: emailAddresses,
+        });
+
+        return { success: true, message: "Broadcast sent successfully" };
+      } catch (error) {
+        console.error("Error sending broadcast:", error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to send broadcast",
+        });
+      }
     }),
 });

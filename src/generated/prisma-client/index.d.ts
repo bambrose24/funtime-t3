@@ -77,7 +77,8 @@ export namespace $Enums {
   week_reminder: 'week_reminder',
   week_summary: 'week_summary',
   week_picks: 'week_picks',
-  league_registration: 'league_registration'
+  league_registration: 'league_registration',
+  league_broadcast: 'league_broadcast'
 };
 
 export type EmailType = (typeof EmailType)[keyof typeof EmailType]

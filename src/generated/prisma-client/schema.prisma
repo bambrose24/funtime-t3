@@ -259,6 +259,7 @@ enum EmailType {
   week_summary
   week_picks
   league_registration
+  league_broadcast
 }
 
 enum LatePolicy {
