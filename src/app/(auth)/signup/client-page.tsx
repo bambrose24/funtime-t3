@@ -98,8 +98,15 @@ export function SignupClientPage() {
             <CardHeader>
               <CardTitle className="text-xl">Sign Up</CardTitle>
               <CardDescription>
-                Enter your information to create an account. You&apos;ll have to
-                confirm your email.
+                If you haven&apos;t played Funtime at allEnter your information
+                to create an account. You&apos;ll have to confirm your email.
+                <span className="mt-2 block">
+                  If you have played before, you can{" "}
+                  <Link href="/login" className="underline">
+                    sign in with your existing account
+                  </Link>
+                  .
+                </span>
               </CardDescription>
             </CardHeader>
             <CardContent>
