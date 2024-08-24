@@ -9,13 +9,30 @@ import { CopyIcon } from "lucide-react";
 import { Text } from "~/components/ui/text";
 import { Separator } from "~/components/ui/separator";
 import { LeagueAdminChangeNameSetting } from "./LeagueAdminChangeNameSetting";
+import { LeagueAdminBroadcastSetting } from "./LeagueAdminBroadcastSetting";
+import { clientApi } from "~/trpc/react";
 
 type Props = {
   league: RouterOutputs["league"]["get"];
+  members: RouterOutputs["league"]["members"];
 };
 
-export function LeagueAdminClientPage({ league }: Props) {
+export function LeagueAdminClientPage({
+  league: leagueProp,
+  members: membersProp,
+}: Props) {
+  const { data: league } = clientApi.league.get.useQuery(
+    { leagueId: leagueProp.league_id },
+    { initialData: leagueProp },
+  );
+
+  const { data: members } = clientApi.league.members.useQuery(
+    { leagueId: leagueProp.league_id },
+    { initialData: membersProp },
+  );
+
   const shareLink = `${window.location?.origin}/join-league/${league.share_code}`;
+
   return (
     <Card className="w-full">
       <CardContent className="flex flex-col items-center">
@@ -54,7 +71,12 @@ export function LeagueAdminClientPage({ league }: Props) {
               </Button>
             </div>
           </div>
-          {/* <Separator /> */}
+          <Separator />
+          <LeagueAdminBroadcastSetting
+            // league={league}
+            leagueId={league.league_id}
+            numMembersInLeague={members.length}
+          />
         </div>
       </CardContent>
     </Card>

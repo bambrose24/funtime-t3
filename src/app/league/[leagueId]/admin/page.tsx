@@ -11,7 +11,10 @@ export default async function LeagueAdminPage({
   params: { leagueId: leagueIdProp },
 }: Props) {
   const leagueId = Number(leagueIdProp);
-  const league = await serverApi.league.get({ leagueId });
+  const [league, members] = await Promise.all([
+    serverApi.league.get({ leagueId }),
+    serverApi.league.members({ leagueId }),
+  ]);
 
-  return <LeagueAdminClientPage league={league} />;
+  return <LeagueAdminClientPage league={league} members={members} />;
 }

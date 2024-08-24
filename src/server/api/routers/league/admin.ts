@@ -188,7 +188,7 @@ export const leagueAdminRouter = createTRPCRouter({
   sendBroadcast: leagueAdminProcedure
     .input(
       z.object({
-        leagueId: z.string(),
+        leagueId: z.number().int(),
         markdownString: z.string(),
       }),
     )
