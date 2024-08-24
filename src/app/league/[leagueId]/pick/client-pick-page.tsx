@@ -29,14 +29,13 @@ import { clientApi } from "~/trpc/react";
 import { toast } from "sonner";
 import { useState } from "react";
 import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerDescription,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerTitle,
-} from "~/components/ui/drawer";
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "~/components/ui/dialog";
 import { Checkbox } from "~/components/ui/checkbox";
 import { orderBy } from "lodash";
 
@@ -132,7 +131,7 @@ export function ClientPickPage({
     name: "picks",
   });
 
-  const [picksDrawerOpen, setPicksDrawerOpen] = useState(false);
+  const [picksDialogOpen, setPicksDialogOpen] = useState(false);
 
   const { mutateAsync: submitPicks, data: submitResponse } =
     clientApi.picks.submitPicks.useMutation();
@@ -162,7 +161,7 @@ export function ClientPickPage({
         overrideMemberId: undefined,
       });
 
-      setPicksDrawerOpen(true);
+      setPicksDialogOpen(true);
     } catch (e) {
       console.error(`Error submitting picks`, e);
       toast.error(
@@ -491,28 +490,28 @@ export function ClientPickPage({
           </div>
         </Form>
       </form>
-      <Drawer
-        open={picksDrawerOpen}
+      <Dialog
+        open={picksDialogOpen}
         onOpenChange={(val) => {
-          setPicksDrawerOpen(val);
+          setPicksDialogOpen(val);
           if (!val) {
             window.location.href = `/league/${leagueId}`;
           }
         }}
       >
-        <DrawerContent>
-          <DrawerHeader>
-            <DrawerTitle className="text-center">
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="text-center">
               Your picks are in for week {week}
-            </DrawerTitle>
-            <DrawerDescription className="text-center">
+            </DialogTitle>
+            <DialogDescription className="text-center">
               You can come back to this page to update them until the week
               starts.{" "}
               {hasMultipleLeagues &&
                 applyToAllSeasonLeagues &&
                 `These picks apply to all ${sameSeasonMemberships.length} of your leagues for the season.`}
-            </DrawerDescription>
-          </DrawerHeader>
+            </DialogDescription>
+          </DialogHeader>
           <div className="flex w-full justify-center">
             <div className="grid grid-cols-2 gap-x-8 gap-y-1.5">
               {orderBy(submitResponse?.picks ?? [], (p) =>
@@ -575,21 +574,20 @@ export function ClientPickPage({
               })}
             </div>
           </div>
-          <DrawerFooter>
+          <DialogFooter>
             <div className="flex justify-center">
-              <DrawerClose asChild>
-                <Button
-                  variant="secondary"
-                  className="w-full max-w-[400px]"
-                  type="button"
-                >
-                  Close
-                </Button>
-              </DrawerClose>
+              <Button
+                variant="secondary"
+                className="w-full max-w-[400px]"
+                type="button"
+                onClick={() => setPicksDialogOpen(false)}
+              >
+                Close
+              </Button>
             </div>
-          </DrawerFooter>
-        </DrawerContent>
-      </Drawer>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
