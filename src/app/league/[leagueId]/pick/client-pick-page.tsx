@@ -575,7 +575,7 @@ export function ClientPickPage({
             </div>
           </div>
           <DialogFooter>
-            <div className="flex justify-center">
+            <div className="flex w-full justify-center">
               <Button
                 variant="secondary"
                 className="w-full max-w-[400px]"
