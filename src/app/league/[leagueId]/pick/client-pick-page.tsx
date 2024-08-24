@@ -38,6 +38,7 @@ import {
 } from "~/components/ui/dialog";
 import { Checkbox } from "~/components/ui/checkbox";
 import { orderBy } from "lodash";
+import { useRouter } from "next/navigation";
 
 type Props = {
   league: RouterOutputs["league"]["get"];
@@ -84,6 +85,7 @@ export function ClientPickPage({
   const { week, season, games } = weekToPick;
   const { league_id: leagueId } = league;
 
+  const router = useRouter();
   const { dbUser } = useUserEnforced();
 
   const sameSeasonMemberships = dbUser.leaguemembers.filter(
@@ -582,7 +584,7 @@ export function ClientPickPage({
                 type="button"
                 onClick={() => {
                   setPicksDialogOpen(false);
-                  window.location.href = `/league/${leagueId}`;
+                  router.push(`/league/${leagueId}`);
                 }}
               >
                 Close
