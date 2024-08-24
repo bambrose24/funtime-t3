@@ -23,7 +23,7 @@ import { Input } from "~/components/ui/input";
 import { Text } from "~/components/ui/text";
 import { Alert, AlertTitle } from "~/components/ui/alert";
 import { type RouterOutputs } from "~/trpc/types";
-import { AlertCircleIcon, Router } from "lucide-react";
+import { AlertCircleIcon } from "lucide-react";
 import Link from "next/link";
 import {
   Select,

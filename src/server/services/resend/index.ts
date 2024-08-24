@@ -2,7 +2,7 @@ import LeagueWelcome from "emails/league-welcome";
 import PicksConfirmationEmail from "emails/picks-confirmation";
 import PickReminderEmail from "emails/picks-reminder";
 import { Resend } from "resend";
-import { leaguemembers, leagues, people } from "~/generated/prisma-client";
+import type { leaguemembers, leagues, people } from "~/generated/prisma-client";
 import { db } from "~/server/db";
 import { getLogger } from "~/utils/logging";
 const resend = new Resend(process.env.RESEND_API_KEY ?? "");
