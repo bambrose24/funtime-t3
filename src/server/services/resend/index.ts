@@ -296,13 +296,14 @@ export const resendApi = {
     if (data?.id) {
       // Note: You might want to adjust this based on your actual data model
       // Since we don't have specific league or member IDs here, we're logging it differently
-      await db.emailLogs.create({
-        data: {
-          email_type: "league_broadcast",
-          resend_id: data.id,
-          // You might want to add more fields here if needed
-        },
-      });
+      // await db.emailLogs.create({
+      //   data: {
+      //     email_type: "league_broadcast",
+      //     resend_id: data.id,
+      //     league_id: leagueId,
+      //     // You might want to add more fields here if needed
+      //   },
+      // });
     }
   },
 };
