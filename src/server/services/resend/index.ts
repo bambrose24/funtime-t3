@@ -258,15 +258,13 @@ export const resendApi = {
     adminName,
     markdownMessage,
     leagueId,
-    memberId,
     to,
   }: {
     leagueName: string;
     adminName: string;
     markdownMessage: string;
     leagueId: number;
-    memberId: number;
-    to: string[];
+    to: { email: string; memberId: number }[];
   }) => {
     getLogger().info(
       `${LOG_PREFIX} Going to send league broadcast email for league ${leagueName}`,
@@ -275,7 +273,7 @@ export const resendApi = {
     const { data, error } = await resend.emails.send({
       from: FROM,
       to: [FROM], // Send to the FROM address
-      bcc: to, // Put all recipients in BCC
+      bcc: to.map(t => t.email), // Put all recipients in BCC
       subject: `Funtime - Message from ${leagueName} Admin`,
       react: LeagueBroadcastEmail({
         leagueName,
@@ -299,14 +297,13 @@ export const resendApi = {
     if (data?.id) {
       // Note: You might want to adjust this based on your actual data model
       // Since we don't have specific league or member IDs here, we're logging it differently
-      await db.emailLogs.create({
-        data: {
+      await db.emailLogs.createMany({
+        data: to.map(t => ({
           email_type: "league_broadcast",
           resend_id: data.id,
           league_id: leagueId,
-          member_id: memberId,
-          // You might want to add more fields here if needed
-        },
+          member_id: t.memberId,
+        })),
       });
     }
   },

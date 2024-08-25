@@ -36,6 +36,7 @@ const canSendBroadcastThisWeek = async (db: PrismaClient, leagueId: number) => {
     orderBy: {
       ts: 'desc'
     },
+    distinct: ['resend_id'], // since we log the same email for all the members we send to, we count distinct email instances instead of number of rows here
     take: 2,
     select: {
       ts: true
@@ -241,9 +242,8 @@ export const leagueAdminRouter = createTRPCRouter({
         include: { people: true },
       });
 
-      const emailAddresses = members
-        .map((m) => m.people.email)
-        .filter((email): email is string => email !== null);
+      const to = members
+        .map((m) => { return { email: m.people.email, memberId: m.membership_id } }).filter(t => t.email !== null) as { email: string; memberId: number }[];
 
       // Send the broadcast email
       try {
@@ -251,9 +251,8 @@ export const leagueAdminRouter = createTRPCRouter({
           leagueName: league.name,
           adminName: dbUser.username,
           markdownMessage: markdownString,
-          to: emailAddresses,
+          to,
           leagueId,
-          memberId: adminMembership.membership_id,
         });
 
         return { success: true, message: "Broadcast sent successfully" };
