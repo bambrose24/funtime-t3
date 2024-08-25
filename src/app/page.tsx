@@ -41,7 +41,7 @@ export default async function Home() {
   return (
     <>
       {!data?.length ? <JoinOrCreateALeague /> : <></>}
-      <div className="col-span-12 flex justify-center">
+      <div className="col-span-12 flex justify-center pt-2">
         <Text.H2>Active Leagues</Text.H2>
       </div>
 
