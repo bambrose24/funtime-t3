@@ -19,7 +19,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "~/components/ui/dialog";
-import { ThemeProvider } from "~/components/theme-provider";
 import { ScrollArea } from "~/components/ui/scroll-area";
 
 type Props = {
