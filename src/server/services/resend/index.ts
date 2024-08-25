@@ -252,17 +252,20 @@ export const resendApi = {
         },
       });
     }
-
   },
   sendLeagueBroadcast: async ({
     leagueName,
     adminName,
     markdownMessage,
+    leagueId,
+    memberId,
     to,
   }: {
     leagueName: string;
     adminName: string;
     markdownMessage: string;
+    leagueId: number;
+    memberId: number;
     to: string[];
   }) => {
     getLogger().info(
@@ -296,14 +299,15 @@ export const resendApi = {
     if (data?.id) {
       // Note: You might want to adjust this based on your actual data model
       // Since we don't have specific league or member IDs here, we're logging it differently
-      // await db.emailLogs.create({
-      //   data: {
-      //     email_type: "league_broadcast",
-      //     resend_id: data.id,
-      //     league_id: leagueId,
-      //     // You might want to add more fields here if needed
-      //   },
-      // });
+      await db.emailLogs.create({
+        data: {
+          email_type: "league_broadcast",
+          resend_id: data.id,
+          league_id: leagueId,
+          member_id: memberId,
+          // You might want to add more fields here if needed
+        },
+      });
     }
   },
 };
