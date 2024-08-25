@@ -162,7 +162,7 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
               variant="success"
               className="flex items-center justify-center gap-2"
             >
-              <AlertTitle className="flex flex-row items-center gap-4 text-secondary-foreground">
+              <AlertTitle className="flex flex-row items-center gap-2 text-secondary-foreground">
                 <Trophy className="z-40 h-4 w-4" />
                 Congrats to this week&apos;s{" "}
                 {weekWinners.winners.length > 1 ? "winners" : "winner"}:
