@@ -27,11 +27,11 @@ import { Separator } from "~/components/ui/separator";
 import { Card } from "~/components/ui/card";
 import { InfoCircledIcon } from "@radix-ui/react-icons";
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "~/components/ui/tooltip";
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "~/components/ui/popover";
+import { format } from "date-fns";
 
 interface LeagueAdminBroadcastSettingProps {
   leagueId: number;
@@ -91,21 +91,23 @@ export function LeagueAdminBroadcastSetting({
         </Button>
         {!canSendBroadcastData?.canSend &&
           canSendBroadcastData?.nextAvailableTime && (
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger>
+            <Popover>
+              <PopoverTrigger asChild>
+                <div className="cursor-pointer">
                   <InfoCircledIcon className="h-5 w-5 text-muted-foreground" />
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>
-                    You can send the next broadcast on{" "}
-                    {new Date(
-                      canSendBroadcastData.nextAvailableTime,
-                    ).toLocaleString()}
-                  </p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+                </div>
+              </PopoverTrigger>
+              <PopoverContent className="w-80">
+                <p className="text-xs text-muted-foreground">
+                  You can only send two broadcasts per week. You have sent two
+                  in the past 7 days. Next broadcast available:{" "}
+                  {format(
+                    new Date(canSendBroadcastData.nextAvailableTime),
+                    "M/d/yy 'at' h:mm a",
+                  )}
+                </p>
+              </PopoverContent>
+            </Popover>
           )}
       </div>
 
