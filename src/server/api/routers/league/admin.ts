@@ -43,11 +43,14 @@ const canSendBroadcastThisWeek = async (db: PrismaClient, leagueId: number) => {
   });
 
   if (recentBroadcasts.length < 2) {
-    return { canSend: true };
+    return { canSend: true } as const;
   } else {
-    const secondMostRecent = recentBroadcasts[1].ts;
-    const nextAvailableTime = addDays(secondMostRecent, 7);
-    return { canSend: false, nextAvailableTime };
+    const secondMostRecent = recentBroadcasts[1]?.ts;
+    if (secondMostRecent) {
+      const nextAvailableTime = addDays(secondMostRecent, 7);
+      return { canSend: false, nextAvailableTime } as const;
+    }
+    return { canSend: false, nextAvailableTime: addDays(now, 7) } as const;
   }
 };
 
