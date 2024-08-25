@@ -5,6 +5,7 @@ import { TRPCError } from "@trpc/server";
 import { groupBy, orderBy } from "lodash";
 import { addDays, subDays } from 'date-fns';
 import { resendApi } from "~/server/services/resend";
+import { Defined } from "~/utils/defined";
 
 const leagueAdminProcedure = authorizedProcedure
   .input(z.object({ leagueId: z.number().int() }))
@@ -169,6 +170,58 @@ export const leagueAdminRouter = createTRPCRouter({
     );
 
     return { members };
+  }),
+  memberEmails: leagueAdminProcedure.input(z.object({ memberId: z.number().int() })).query(async ({ ctx, input }) => {
+
+    const { db } = ctx;
+    const { memberId, leagueId } = input;
+
+    // Ensure the member is in the league
+    const memberInLeague = await db.leaguemembers.findFirst({
+      where: {
+        membership_id: memberId,
+        league_id: leagueId,
+      },
+    });
+
+    if (!memberInLeague) {
+      throw new TRPCError({
+        code: 'NOT_FOUND',
+        message: 'Member not found in this league',
+      });
+    }
+
+    // Fetch email logs for the member
+    const emailLogs = await db.emailLogs.findMany({
+      where: {
+        member_id: memberId,
+        league_id: leagueId,
+      },
+      orderBy: {
+        ts: 'desc',
+      },
+    });
+
+    // Fetch email contents from Resend API
+    const emailsResponse = await Promise.all(
+      emailLogs.map(async (log) => {
+        try {
+          const emailContent = await resendApi.get(log.resend_id);
+          const data = emailContent?.data;
+          return {
+            id: log.email_log_id,
+            resend_id: log.resend_id,
+            resend_data: data,
+          };
+        } catch (error) {
+          console.error(`Failed to fetch email content for ID ${log.resend_id}:`, error);
+          return null;
+        }
+      })
+    );
+
+    return { emails: emailsResponse.filter(Defined) }
+
   }),
   changeName: leagueAdminProcedure
     .input(

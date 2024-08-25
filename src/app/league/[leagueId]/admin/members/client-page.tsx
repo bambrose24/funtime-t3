@@ -49,6 +49,7 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormControl, FormField, FormItem } from "~/components/ui/form";
+import { MemberEmailLogs } from "./MemberEmailLogs";
 
 type Props = {
   leagueId: number;
@@ -88,6 +89,7 @@ export function LeagueAdminMembersClientPage({
               <TableHead>Role</TableHead>
               <TableHead>Wins</TableHead>
               <TableHead>Missed Picks</TableHead>
+              <TableHead>Email Logs</TableHead>
               <TableHead />
             </TableRow>
           </TableHeader>
@@ -119,6 +121,26 @@ export function LeagueAdminMembersClientPage({
                         ))}
                   </TableCell>
                   <TableCell>{member.misssedPicks}</TableCell>
+                  <TableCell>
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button variant="outline" size="sm">
+                          View Emails
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>
+                            Email Logs for {member.people.username}
+                          </DialogTitle>
+                        </DialogHeader>
+                        <MemberEmailLogs
+                          memberId={member.membership_id}
+                          leagueId={member.league_id}
+                        />
+                      </DialogContent>
+                    </Dialog>
+                  </TableCell>
                   <TableCell className="sticky right-0 flex items-center justify-end">
                     <div className="border-x border-border bg-card px-2 transition-colors group-hover:bg-transparent md:border-none">
                       <MemberActions member={member} league={league} />

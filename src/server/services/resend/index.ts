@@ -6,6 +6,7 @@ import { Resend } from "resend";
 import type { leaguemembers, leagues, people } from "~/generated/prisma-client";
 import { db } from "~/server/db";
 import { getLogger } from "~/utils/logging";
+import { Defined } from "~/utils/defined";
 const resend = new Resend(process.env.RESEND_API_KEY ?? "");
 
 const FROM = "Funtime System <no-reply@play-funtime.com>";
@@ -13,6 +14,25 @@ const FROM = "Funtime System <no-reply@play-funtime.com>";
 const LOG_PREFIX = "[resend-api]";
 
 export const resendApi = {
+  getMany: async (ids: string[]) => {
+    const emails = await Promise.all(ids.map(async (id) => {
+      try {
+        return await resend.emails.get(id);
+      } catch (error) {
+        getLogger().error(`${LOG_PREFIX} Failed to fetch email with ID ${id}:`, error);
+        return null;
+      }
+    }));
+    return emails.filter(Defined);
+  },
+  get: async (id: string) => {
+    try {
+      return await resend.emails.get(id);
+    } catch (error) {
+      getLogger().error(`${LOG_PREFIX} Failed to fetch email with ID ${id}:`, error);
+      return null;
+    }
+  },
   sendLeagueRegistrationEmail: async (memberId: number) => {
     const member = await db.leaguemembers.findFirstOrThrow({
       where: {
