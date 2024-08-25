@@ -9,12 +9,30 @@ export function FuntimeLanding() {
           <div className="flex flex-col items-center space-y-4 text-center">
             <div className="space-y-2">
               <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl/none">
-                Welcome to Funtime
+                Welcome to Funtime - Free NFL Pick &apos;em
               </h1>
               <p className="mx-auto max-w-[700px] text-foreground md:text-xl">
-                The ultimate NFL pick &apos;em platform. Create or join a
+                The ultimate free NFL pick &apos;em platform. Create or join a
                 season-long league and test your prediction skills!
               </p>
+            </div>
+            <div className="flex items-center justify-center space-x-2 text-primary">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="h-6 w-6"
+              >
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                <polyline points="22 4 12 14.01 9 11.01" />
+              </svg>
+              <span className="font-semibold">Completely Free</span>
             </div>
             <div className="flex w-full max-w-sm flex-col gap-4">
               <Link href="/signup" className="w-full">
