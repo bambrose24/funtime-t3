@@ -46,7 +46,7 @@ export function LeagueAdminBroadcastSetting({
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
   const [message, setMessage] = useState("");
 
-  const { data: canSendBroadcast, data: nextBroadcastTime } =
+  const { data: canSendBroadcastData } =
     clientApi.league.admin.canSendLeagueBroadcast.useQuery({ leagueId });
 
   const { mutateAsync: sendBroadcast, isPending } =
@@ -84,26 +84,29 @@ export function LeagueAdminBroadcastSetting({
           type="button"
           variant="secondary"
           onClick={() => setIsDialogOpen(true)}
-          disabled={!canSendBroadcast}
+          disabled={!canSendBroadcastData?.canSend}
           className="w-full"
         >
           Send message
         </Button>
-        {!canSendBroadcast && nextBroadcastTime && (
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger>
-                <InfoCircledIcon className="h-5 w-5 text-muted-foreground" />
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>
-                  You can send the next broadcast on{" "}
-                  {new Date(nextBroadcastTime).toLocaleString()}
-                </p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        )}
+        {!canSendBroadcastData?.canSend &&
+          canSendBroadcastData?.nextAvailableTime && (
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger>
+                  <InfoCircledIcon className="h-5 w-5 text-muted-foreground" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>
+                    You can send the next broadcast on{" "}
+                    {new Date(
+                      canSendBroadcastData.nextAvailableTime,
+                    ).toLocaleString()}
+                  </p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )}
       </div>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
