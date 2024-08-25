@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { authorizedProcedure, createTRPCRouter } from "../../trpc";
-import { MemberRole, PrismaClient } from "~/generated/prisma-client";
+import { MemberRole, type PrismaClient } from "~/generated/prisma-client";
 import { TRPCError } from "@trpc/server";
 import { groupBy, orderBy } from "lodash";
 import { addDays, subDays } from 'date-fns';
