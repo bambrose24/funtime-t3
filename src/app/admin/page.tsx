@@ -11,8 +11,8 @@ export default async function AdminDashboard() {
     { title: "Total Members", value: membersForSeason, icon: Users },
   ];
   return (
-    <div className="bg-background p-8">
-      <div className="flex gap-8">
+    <div className="col-span-12 w-full p-8">
+      <div className="flex w-full flex-wrap gap-8">
         {stats.map((stat, index) => (
           <Card
             key={index}
