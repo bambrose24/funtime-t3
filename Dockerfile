@@ -2,6 +2,11 @@
 FROM oven/bun:1 AS base
 WORKDIR /usr/src/app
 
+ARG DATABASE_URL
+ARG DIRECT_URL
+ENV DATABASE_URL=${DATABASE_URL}
+ENV DIRECT_URL=${DIRECT_URL}
+
 # Copy the Prisma schema file
 COPY prisma ./prisma
 
