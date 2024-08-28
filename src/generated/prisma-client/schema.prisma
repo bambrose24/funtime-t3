@@ -190,7 +190,7 @@ model picks {
   leaguemembers leaguemembers? @relation(fields: [member_id], references: [membership_id], onDelete: Cascade, onUpdate: Restrict, map: "picks_ibfk_3")
   teams         teams?         @relation(fields: [winner], references: [teamid])
 
-  @@index([gid], map: "idx_18437_gid")
+  @@index([uid])
   @@index([member_id], map: "idx_18437_picks_ibfk_3")
   @@index([season], map: "idx_18437_season")
   @@index([week, member_id], map: "idx_week_member")
