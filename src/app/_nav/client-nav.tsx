@@ -135,7 +135,6 @@ export function ClientNav({ data: initialData, canCreateLeague }: NavData) {
                 {inactiveLeagues?.map((l) => {
                   return (
                     <Link
-                      prefetch
                       passHref
                       href={`/league/${l.league_id}`}
                       key={l.league_id}
