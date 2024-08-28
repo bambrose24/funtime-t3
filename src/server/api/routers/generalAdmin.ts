@@ -1,7 +1,5 @@
 import { TRPCError } from "@trpc/server";
-import { z } from "zod";
 import { createTRPCRouter, authorizedProcedure, publicProcedure } from "../trpc";
-import { DEFAULT_SEASON } from "~/utils/const";
 
 const SUPER_ADMIN_EMAILS = ["bambrose24@gmail.com"];
 
@@ -22,32 +20,41 @@ export const generalAdminRouter = createTRPCRouter({
   getAdminData: adminOnlyProcedure
     .query(async ({ ctx }) => {
       const db = ctx.db;
-      const SEASON = DEFAULT_SEASON;
 
-      const [leaguesForSeason, membersForSeason, picksForSeason] = await Promise.all([
-        db.leagues.count({
-          where: {
-            season: SEASON,
+      const [allLeaguesData, picksBySeason, membersByLeague] = await Promise.all([
+        db.leagues.findMany({
+          orderBy: {
+            season: 'desc',
           }
         }),
-        db.leaguemembers.count({
-          where: {
-            leagues: {
-              season: SEASON,
-            }
+        db.picks.groupBy({
+          by: ['season'],
+          _count: true,
+          orderBy: {
+            season: 'desc'
           }
         }),
-        db.picks.count({
-          where: {
-            season: SEASON,
+        db.leaguemembers.groupBy({
+          by: ['league_id'],
+          _count: true,
+          orderBy: {
+            league_id: 'desc'
           }
         }),
       ]);
 
+      const allLeagues = allLeaguesData.map((league) => {
+        return {
+          ...league,
+          members: membersByLeague.find((m) => m.league_id === league.league_id)?._count ?? 0,
+          picks: picksBySeason.find((p) => p.season === league.season)?._count ?? 0,
+        }
+      })
+
       return {
-        leaguesForSeason,
-        membersForSeason,
-        picksForSeason,
+        allLeagues,
+        picksBySeason,
+        membersByLeague,
       }
     }),
 });
