@@ -171,6 +171,48 @@ export const leagueAdminRouter = createTRPCRouter({
 
     return { members };
   }),
+  setMembersPaid: leagueAdminProcedure
+    .input(
+      z.object({
+        memberIds: z.array(z.number().int()),
+        paid: z.boolean(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { db } = ctx;
+      const { memberIds, paid, leagueId } = input;
+
+      // Validate that all memberIds belong to the specified league
+      const validMembers = await db.leaguemembers.findMany({
+        where: {
+          membership_id: { in: memberIds },
+          league_id: leagueId,
+        },
+        select: { membership_id: true },
+      });
+
+      const validMemberIds = validMembers.map((m) => m.membership_id);
+
+      // Ensure that the validMemberIds are exactly the same as the input memberIds
+      if (!validMemberIds.every((id) => memberIds.includes(id)) ||
+        !memberIds.every((id) => validMemberIds.includes(id))) {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'One or more member IDs are not valid for this league',
+        });
+      }
+
+      // Update the paid status for valid members
+      await db.leaguemembers.updateMany({
+        where: {
+          membership_id: { in: validMemberIds },
+          league_id: leagueId,
+        },
+        data: { paid },
+      });
+
+      return { success: true, updatedCount: validMemberIds.length };
+    }),
   memberEmails: leagueAdminProcedure.input(z.object({ memberId: z.number().int() })).query(async ({ ctx, input }) => {
 
     const { db } = ctx;

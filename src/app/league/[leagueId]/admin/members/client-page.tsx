@@ -14,7 +14,6 @@ import {
 } from "~/components/ui/table";
 import Link from "next/link";
 import { Button } from "~/components/ui/button";
-import { DotsHorizontalIcon } from "@radix-ui/react-icons";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -23,7 +22,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
-import { ExternalLink, Pencil } from "lucide-react";
+import { Ellipsis, ExternalLink, InfoIcon, Pencil } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -50,6 +49,13 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormControl, FormField, FormItem } from "~/components/ui/form";
 import { MemberEmailLogs } from "./MemberEmailLogs";
+import {
+  Tooltip,
+  TooltipProvider,
+  TooltipContent,
+  TooltipTrigger,
+} from "~/components/ui/tooltip";
+import { Switch } from "~/components/ui/switch";
 
 type Props = {
   leagueId: number;
@@ -71,6 +77,14 @@ export function LeagueAdminMembersClientPage({
     { initialData: membersProp },
   );
 
+  const utils = clientApi.useUtils();
+  const { mutateAsync: setMembersPaid } =
+    clientApi.league.admin.setMembersPaid.useMutation({
+      onSettled: async () => {
+        await utils.league.admin.members.invalidate();
+      },
+    });
+
   const members = orderBy(membersData, (m) =>
     m.people.username.toLocaleLowerCase(),
   );
@@ -90,6 +104,20 @@ export function LeagueAdminMembersClientPage({
               <TableHead>Wins</TableHead>
               <TableHead>Missed Picks</TableHead>
               <TableHead>Email Logs</TableHead>
+              <TableHead className="flex items-center gap-1">
+                Donated?
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <InfoIcon className="ml-1 h-4 w-4 text-muted-foreground" />
+                    </TooltipTrigger>
+                    <TooltipContent className="max-w-[200px]">
+                      If you are seeking donations for the league, you can keep
+                      track of who has donated with this toggle.
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </TableHead>
               <TableHead />
             </TableRow>
           </TableHeader>
@@ -141,6 +169,20 @@ export function LeagueAdminMembersClientPage({
                       </DialogContent>
                     </Dialog>
                   </TableCell>
+                  <TableCell className="pl-6">
+                    <Switch
+                      defaultChecked={member.paid ?? false}
+                      onCheckedChange={async (checked) => {
+                        setMembersPaid({
+                          memberIds: [member.membership_id],
+                          paid: checked,
+                          leagueId: member.league_id,
+                        }).catch(() => {
+                          toast.error("Failed to update donation status");
+                        });
+                      }}
+                    />
+                  </TableCell>
                   <TableCell className="sticky right-0 flex items-center justify-end">
                     <div className="border-x border-border bg-card px-2 transition-colors group-hover:bg-transparent md:border-none">
                       <MemberActions member={member} league={league} />
@@ -174,7 +216,7 @@ function MemberActions({ member, league }: MemberProps) {
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button size="icon" variant="ghost">
-            <DotsHorizontalIcon className="h-4 w-4" />
+            <Ellipsis className="h-4 w-4" />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent>
