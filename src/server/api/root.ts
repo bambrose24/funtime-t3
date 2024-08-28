@@ -12,6 +12,7 @@ import { picksRouter } from "./routers/picks";
 import { authRouter } from "./routers/auth";
 import { messagesRouter } from "./routers/messages";
 import { memberRouter } from "./routers/member";
+import { generalAdminRouter } from "./routers/generalAdmin";
 
 /**
  * This is the primary router for your server.
@@ -32,6 +33,7 @@ export const appRouter = createTRPCRouter({
   playerProfile: playerProfileRouter,
   messages: messagesRouter,
   member: memberRouter,
+  generalAdmin: generalAdminRouter,
 });
 
 // export type definition of API
