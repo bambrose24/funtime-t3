@@ -17,7 +17,7 @@ export default async function AdminDashboard() {
     console.error(`Viewer unable to access admin dashboard: ${e}`);
     notFound();
   });
-  const { allLeagues, membersByLeague, picksBySeason } = data;
+  const { allLeagues, picksBySeason } = data;
 
   const thisSeasonLeagues = allLeagues.filter(
     (l) => l.season === DEFAULT_SEASON,
