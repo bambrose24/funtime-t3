@@ -1,9 +1,13 @@
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Activity, Users, Trophy } from "lucide-react";
 import { serverApi } from "~/trpc/server";
+import { notFound } from "next/navigation";
 
 export default async function AdminDashboard() {
-  const data = await serverApi.generalAdmin.getAdminData();
+  const data = await serverApi.generalAdmin.getAdminData().catch((e) => {
+    console.error(`Viewer unable to access admin dashboard: ${e}`);
+    notFound();
+  });
   const { leaguesForSeason, membersForSeason, picksForSeason } = data;
   const stats = [
     { title: "Total Picks", value: picksForSeason, icon: Activity },
