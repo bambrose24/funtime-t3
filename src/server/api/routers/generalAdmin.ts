@@ -1,10 +1,12 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-import { createTRPCRouter, authorizedProcedure } from "../trpc";
+import { createTRPCRouter, authorizedProcedure, publicProcedure } from "../trpc";
 import { DEFAULT_SEASON } from "~/utils/const";
 
+const SUPER_ADMIN_EMAILS = ["bambrose24@gmail.com"];
+
 const adminOnlyProcedure = authorizedProcedure.use(async ({ ctx, next }) => {
-  if (ctx?.dbUser?.email !== "bambrose24@gmail.com") {
+  if (!SUPER_ADMIN_EMAILS.includes(ctx?.dbUser?.email ?? "")) {
     throw new TRPCError({
       code: "UNAUTHORIZED",
       message: "Only the admin can access this data",
@@ -14,6 +16,9 @@ const adminOnlyProcedure = authorizedProcedure.use(async ({ ctx, next }) => {
 });
 
 export const generalAdminRouter = createTRPCRouter({
+  isSuperAdmin: publicProcedure.query(async ({ ctx }) => {
+    return SUPER_ADMIN_EMAILS.includes(ctx.dbUser?.email ?? "");
+  }),
   getAdminData: adminOnlyProcedure
     .query(async ({ ctx }) => {
       const db = ctx.db;

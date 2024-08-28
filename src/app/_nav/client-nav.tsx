@@ -34,6 +34,7 @@ import {
   PenIcon,
   PlusIcon,
   SettingsIcon,
+  ShieldCheck,
   TrophyIcon,
 } from "lucide-react";
 import { Avatar } from "~/components/ui/avatar";
@@ -58,6 +59,8 @@ export function ClientNav({ data: initialData, canCreateLeague }: NavData) {
   const { data } = clientApi.home.nav.useQuery(undefined, {
     initialData,
   });
+
+  const { data: isSuperAdmin } = clientApi.generalAdmin.isSuperAdmin.useQuery();
 
   const user = data?.dbUser;
   const leagues = data?.leagues;
@@ -178,7 +181,7 @@ export function ClientNav({ data: initialData, canCreateLeague }: NavData) {
                     <DropdownMenuItem>
                       <MenuRow>
                         Settings
-                        <GearIcon />
+                        <GearIcon className="h-4 w-4" />
                       </MenuRow>
                     </DropdownMenuItem>
                   </Link>
@@ -191,15 +194,25 @@ export function ClientNav({ data: initialData, canCreateLeague }: NavData) {
 
                   <DropdownMenuSeparator />
 
+                  {isSuperAdmin && (
+                    <Link href="/admin" prefetch>
+                      <DropdownMenuItem>
+                        <MenuRow>
+                          Super admin
+                          <ShieldCheck className="h-4 w-4" />
+                        </MenuRow>
+                      </DropdownMenuItem>
+                    </Link>
+                  )}
+
                   <DropdownMenuItem
-                    className="cursor-pointer"
                     onClick={async () => {
                       await logout();
                     }}
                   >
                     <MenuRow>
-                      Log Out
-                      <ExitIcon />
+                      Log out
+                      <ExitIcon className="h-4 w-4" />
                     </MenuRow>
                   </DropdownMenuItem>
                 </DropdownMenuContent>

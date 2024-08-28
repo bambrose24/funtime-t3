@@ -78,6 +78,7 @@ function UsernameForm({ data }: Props) {
           </Text.Small>
         )}
         <Button
+          variant="secondary"
           loading={isSubmitting}
           disabled={isSubmitting || Boolean(errors.username) || !isDirty}
         >
