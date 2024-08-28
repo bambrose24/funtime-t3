@@ -82,7 +82,7 @@ export function MemberEmailLogs({ memberId, leagueId }: Props) {
                         <DialogHeader>
                           <DialogTitle>Email Preview</DialogTitle>
                         </DialogHeader>
-                        <div className="bg-white text-black">
+                        <div className="bg-white p-2 text-black">
                           <div
                             dangerouslySetInnerHTML={{
                               __html: selectedEmail ?? "",
