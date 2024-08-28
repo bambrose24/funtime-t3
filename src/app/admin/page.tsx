@@ -68,7 +68,7 @@ export default async function AdminDashboard() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Season</TableHead>
+                    <TableHead>Season x</TableHead>
                     <TableHead>Picks for Season</TableHead>
                   </TableRow>
                 </TableHeader>
