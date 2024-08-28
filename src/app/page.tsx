@@ -11,7 +11,10 @@ import { FuntimeLanding } from "./_components/FuntimeLanding";
 export const dynamic: AppConfigDynamic = "force-dynamic";
 
 export default async function Home() {
-  const [session] = await Promise.all([serverApi.session.current()]);
+  const [session, data] = await Promise.all([
+    serverApi.session.current(),
+    serverApi.home.summary(),
+  ]);
 
   if (!session.dbUser) {
     return (
@@ -32,8 +35,6 @@ export default async function Home() {
       redirect(`/league/${activeLeague.league_id}`);
     }
   }
-
-  const data = await serverApi.home.summary();
 
   const thisSeasonLeagues = data?.filter((l) => l.season === DEFAULT_SEASON);
   const priorLeagues = data?.filter((l) => l.season !== DEFAULT_SEASON);
