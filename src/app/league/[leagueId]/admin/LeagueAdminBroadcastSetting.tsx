@@ -32,6 +32,7 @@ import {
   PopoverTrigger,
 } from "~/components/ui/popover";
 import { format } from "date-fns";
+import { Text } from "~/components/ui/text";
 
 interface LeagueAdminBroadcastSettingProps {
   leagueId: number;
@@ -71,9 +72,7 @@ export function LeagueAdminBroadcastSetting({
   return (
     <div className="flex w-full flex-col gap-4">
       <div className="flex flex-col gap-1">
-        <h3 className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-          Broadcast a Message
-        </h3>
+        <Text.H4>Broadcast a Message</Text.H4>
         <span className="text-sm text-muted-foreground">
           Send an email to all league members. Limited to twice per week for
           important announcements or reminders.
