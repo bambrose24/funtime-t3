@@ -247,6 +247,15 @@ export const leagueRouter = createTRPCRouter({
         where: {
           league_id: leagueId,
         },
+        include: {
+          WeekWinners: {
+            select: {
+              correct_count: true,
+              week: true,
+              membership_id: true,
+            },
+          },
+        },
       });
     }),
   members: authorizedProcedure
@@ -362,10 +371,10 @@ export const leagueRouter = createTRPCRouter({
       }
       const weekWhere = week
         ? {
-            where: {
-              week,
-            },
-          }
+          where: {
+            week,
+          },
+        }
         : {};
 
       const { season } = await db.leagues.findFirstOrThrow({

@@ -9,15 +9,27 @@ import Link from "next/link";
 import type { RouterOutputs } from "~/trpc/types";
 import { clientApi } from "~/trpc/react";
 import { Skeleton } from "~/components/ui/skeleton";
+import { useUserEnforced } from "~/utils/hooks/useUserEnforced";
 
 type LeagueCardData = NonNullable<RouterOutputs["home"]["summary"]>[number];
 
 export function HomeLeagueCard({ data }: { data: LeagueCardData }) {
-  const weekWins = useMemo(() => {
-    return data.WeekWinners.map((w) => {
-      return { week: w.week, league_id: data.league_id };
+  const { data: leagueData, isPending: leagueDataPending } =
+    clientApi.league.get.useQuery({
+      leagueId: data.league_id,
     });
-  }, [data]);
+
+  const user = useUserEnforced();
+  const userMemberIds = user.dbUser.leaguemembers.map((m) => m.membership_id);
+  const weekWins = useMemo(() => {
+    return (
+      leagueData?.WeekWinners?.filter((w) =>
+        userMemberIds.includes(w.membership_id),
+      ).map((w) => {
+        return { week: w.week, league_id: data.league_id };
+      }) ?? []
+    );
+  }, [leagueData?.WeekWinners, userMemberIds, data.league_id]);
 
   return (
     <Link href={`/league/${data.league_id}`} passHref>
@@ -35,7 +47,10 @@ export function HomeLeagueCard({ data }: { data: LeagueCardData }) {
             <div className="flex w-full flex-row items-center justify-between">
               <Text.Small>Week Wins</Text.Small>
               <div className="flex max-w-[160px] flex-row flex-wrap justify-end gap-1">
-                {weekWins.length === 0
+                {leagueDataPending && (
+                  <Skeleton className="h-[18px] w-[60px]" />
+                )}
+                {!leagueDataPending && weekWins.length === 0
                   ? "None"
                   : weekWins.map((w) => {
                       return (

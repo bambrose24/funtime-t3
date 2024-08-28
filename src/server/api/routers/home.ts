@@ -44,32 +44,18 @@ export const homeRouter = createTRPCRouter({
 
     return await getLeagues();
   }),
-  summary: publicProcedure.query(async ({ input: _input, ctx }) => {
+  summary: publicProcedure.query(async ({ ctx }) => {
     const { db, supabaseUser, dbUser } = ctx;
     if (!supabaseUser || !dbUser) {
       return null;
     }
 
     const leagueIds = dbUser.leaguemembers.map((m) => m.league_id).sort();
-    const memberIds = dbUser.leaguemembers.map((m) => m.membership_id).sort();
 
     const leagues = await db.leagues.findMany({
       where: {
         league_id: {
           in: leagueIds,
-        },
-      },
-      include: {
-        WeekWinners: {
-          where: {
-            membership_id: {
-              in: memberIds,
-            },
-          },
-          select: {
-            correct_count: true,
-            week: true,
-          },
         },
       },
     });
