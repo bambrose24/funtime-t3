@@ -21,7 +21,7 @@ export const generalAdminRouter = createTRPCRouter({
     .query(async ({ ctx }) => {
       const db = ctx.db;
 
-      const [allLeaguesData, picksBySeason, membersByLeague] = await Promise.all([
+      const [allLeaguesData, picksBySeason, membersByLeague, emailsSent, messagesSent] = await Promise.all([
         db.leagues.findMany({
           orderBy: {
             season: 'desc',
@@ -41,6 +41,20 @@ export const generalAdminRouter = createTRPCRouter({
             league_id: 'desc'
           }
         }),
+        db.emailLogs.groupBy({
+          by: ['league_id'],
+          _count: true,
+          orderBy: {
+            league_id: 'desc'
+          }
+        }),
+        db.leaguemessages.groupBy({
+          by: ['league_id'],
+          _count: true,
+          orderBy: {
+            league_id: 'desc'
+          }
+        })
       ]);
 
       const allLeagues = allLeaguesData.map((league) => {
@@ -55,6 +69,8 @@ export const generalAdminRouter = createTRPCRouter({
         allLeagues,
         picksBySeason,
         membersByLeague,
+        emailsSent,
+        messagesSent,
       }
     }),
 });

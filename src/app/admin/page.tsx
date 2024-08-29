@@ -7,7 +7,7 @@ import {
   TableHeader,
   TableRow,
 } from "~/components/ui/table";
-import { Users, Trophy, Activity } from "lucide-react";
+import { Users, Trophy, Activity, MessageSquare, Mail } from "lucide-react";
 import { serverApi } from "~/trpc/server";
 import { notFound } from "next/navigation";
 import { DEFAULT_SEASON } from "~/utils/const";
@@ -17,7 +17,7 @@ export default async function AdminDashboard() {
     console.error(`Viewer unable to access admin dashboard: ${e}`);
     notFound();
   });
-  const { allLeagues, picksBySeason } = data;
+  const { allLeagues, picksBySeason, messagesSent, emailsSent } = data;
 
   const thisSeasonLeagues = allLeagues.filter(
     (l) => l.season === DEFAULT_SEASON,
@@ -37,6 +37,16 @@ export default async function AdminDashboard() {
       title: "This Season Total Players",
       value: thisSeasonLeagues.reduce((prev, curr) => prev + curr.members, 0),
       icon: Users,
+    },
+    {
+      title: "Messages Sent",
+      value: messagesSent.reduce((prev, curr) => prev + curr._count, 0),
+      icon: MessageSquare,
+    },
+    {
+      title: "Emails Sent",
+      value: emailsSent.reduce((prev, curr) => prev + curr._count, 0),
+      icon: Mail,
     },
   ];
   return (
