@@ -48,26 +48,28 @@ model WeekWinners {
 }
 
 model games {
-  gid                     Int      @id(map: "idx_18403_primary") @default(autoincrement())
-  season                  Int
-  week                    Int
-  ts                      DateTime @db.Timestamptz(6)
-  home                    Int
-  away                    Int
-  homescore               Int?     @default(0)
-  awayscore               Int?     @default(0)
-  done                    Boolean? @default(false)
-  winner                  Int?     @default(0)
-  international           Boolean? @default(false)
-  seconds                 Int?
-  current_record          String?  @default("0-0,0-0") @db.VarChar(50)
-  is_tiebreaker           Boolean?
-  homerecord              String?  @db.VarChar(10)
-  awayrecord              String?  @db.VarChar(10)
-  msf_id                  Int?
-  teams_games_homeToteams teams    @relation("games_homeToteams", fields: [home], references: [teamid], onUpdate: Restrict, map: "games_ibfk_1")
-  teams_games_awayToteams teams    @relation("games_awayToteams", fields: [away], references: [teamid], onUpdate: Restrict, map: "games_ibfk_2")
-  picks                   picks[]
+  gid                               Int      @id(map: "idx_18403_primary") @default(autoincrement())
+  season                            Int
+  week                              Int
+  ts                                DateTime @db.Timestamptz(6)
+  home                              Int
+  away                              Int
+  homescore                         Int?     @default(0)
+  awayscore                         Int?     @default(0)
+  done                              Boolean? @default(false)
+  winner                            Int?     @default(0)
+  international                     Boolean? @default(false)
+  seconds                           Int?
+  current_record                    String?  @default("0-0,0-0") @db.VarChar(50)
+  is_tiebreaker                     Boolean?
+  homerecord                        String?  @db.VarChar(10)
+  awayrecord                        String?  @db.VarChar(10)
+  current_quarter_seconds_remaining Int?
+  current_quarter                   Int?
+  msf_id                            Int?
+  teams_games_homeToteams           teams    @relation("games_homeToteams", fields: [home], references: [teamid], onUpdate: Restrict, map: "games_ibfk_1")
+  teams_games_awayToteams           teams    @relation("games_awayToteams", fields: [away], references: [teamid], onUpdate: Restrict, map: "games_ibfk_2")
+  picks                             picks[]
 
   @@index([away], map: "idx_18403_away")
   @@index([home], map: "idx_18403_home")

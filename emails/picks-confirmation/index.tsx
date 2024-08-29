@@ -5,7 +5,6 @@ import { EmailButton } from "../../emails/components/email-button";
 import { chunk, orderBy } from "lodash";
 import { cn } from "~/lib/utils";
 import { format } from "date-fns-tz";
-import { EASTERN_TIMEZONE } from "emails/util";
 
 type League = {
   name: string;

@@ -160,6 +160,8 @@ exports.Prisma.GamesScalarFieldEnum = {
   is_tiebreaker: 'is_tiebreaker',
   homerecord: 'homerecord',
   awayrecord: 'awayrecord',
+  current_quarter_seconds_remaining: 'current_quarter_seconds_remaining',
+  current_quarter: 'current_quarter',
   msf_id: 'msf_id'
 };
 

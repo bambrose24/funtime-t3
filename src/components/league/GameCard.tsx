@@ -2,13 +2,13 @@
 
 import { Card } from "../ui/card";
 import { TeamLogo } from "../shared/TeamLogo";
-import dayjs from "dayjs";
-import localizedFormat from "dayjs/plugin/localizedFormat";
 import { Separator } from "../ui/separator";
 import { Button } from "../ui/button";
 import { cn } from "~/lib/utils";
 import { type RouterOutputs } from "~/trpc/types";
-dayjs.extend(localizedFormat);
+import { format } from "date-fns-tz";
+import { EASTERN_TIMEZONE } from "~/utils/const";
+import { isBefore } from "date-fns";
 
 type Props = {
   game: RouterOutputs["games"]["getGames"][number];
@@ -30,31 +30,58 @@ export function GameCard({
   const isSimulated = simulatedWinner && simulatedWinner !== game.winner;
   const winner = simulatedWinner ?? game.winner;
 
-  const status: "simulated" | "empty-state" | "correct" | "wrong" = isSimulated
-    ? "simulated"
-    : !winner || !myChosenTeam
-      ? "empty-state"
-      : myChosenTeam === winner
-        ? "correct"
-        : "wrong";
+  const gameStarted = isBefore(new Date(game.ts), new Date());
+  const gameEnded = game.done ?? false;
+  const gameOngoing = !gameEnded && gameStarted;
+
+  const status: "simulated" | "ongoing" | "correct" | "wrong" | "empty-state" =
+    isSimulated
+      ? "simulated"
+      : gameOngoing
+        ? "ongoing"
+        : !gameStarted
+          ? "empty-state"
+          : myChosenTeam === winner
+            ? "correct"
+            : "wrong";
+
+  const formatGameTime = (
+    quarter: number | undefined | null,
+    seconds: number | undefined | null,
+  ) => {
+    if (
+      quarter === undefined ||
+      quarter === null ||
+      seconds === undefined ||
+      seconds === null
+    )
+      return "In Progress";
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${quarter}Q ${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
+  };
+
+  const subtitle = gameEnded
+    ? "Final"
+    : gameStarted
+      ? formatGameTime(
+          game.current_quarter,
+          game.current_quarter_seconds_remaining,
+        )
+      : format(game.ts, "EEE, MMM d, h:mm aa", {
+          timeZone: EASTERN_TIMEZONE,
+        });
 
   return (
     <Card
       className={cn(
-        "max-h-[130px] min-h-[130px] min-w-[130px] max-w-[130px] shrink-0 p-1",
-        status === "simulated" && "border-2 border-warning",
-        status === "empty-state" && "border-pending border-2",
-        status === "correct" && "border-2 border-correct",
-        status === "wrong" && "border-2 border-wrong",
-        // Boolean(isSimulated)
-        //   ? "border-2 border-warning"
-        //   : game.done
-        //     ? !myChosenTeam
-        //       ? "border-2 border-blue-500 dark:border-blue-700"
-        //       : myChosenTeam === game.winner
-        //         ? "border-2 border-correct"
-        //         : "border-2 border-wrong"
-        //     : "",
+        "max-h-[130px] min-h-[130px] min-w-[130px] max-w-[130px] shrink-0 border-2 border-border p-1 transition-colors",
+        {
+          "border-warning": status === "simulated",
+          "border-pending": status === "ongoing",
+          "border-correct": status === "correct",
+          "border-wrong": status === "wrong",
+        },
       )}
     >
       <div className="grid grid-cols-3 gap-y-1">
@@ -103,9 +130,7 @@ export function GameCard({
           {game.homescore}
         </div>
         <Separator className="col-span-3" />
-        <div className="col-span-3 text-wrap text-xs">
-          {dayjs(game.ts).format("llll")}
-        </div>
+        <div className="col-span-3 text-wrap px-1 text-xs">{subtitle}</div>
       </div>
     </Card>
   );

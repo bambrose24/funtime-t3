@@ -40,6 +40,7 @@ import { Checkbox } from "~/components/ui/checkbox";
 import { orderBy } from "lodash";
 import { useRouter } from "next/navigation";
 import confetti from "canvas-confetti";
+import { EASTERN_TIMEZONE } from "~/utils/const";
 
 type Props = {
   league: RouterOutputs["league"]["get"];
@@ -47,8 +48,6 @@ type Props = {
   teams: RouterOutputs["teams"]["getTeams"];
   existingPicks: RouterOutputs["member"]["picksForWeek"];
 };
-
-const EASTERN_TIMEZONE = "America/New_York";
 
 const picksSchema = z.object({
   applyToAllSeasonLeagues: z.boolean().default(false),

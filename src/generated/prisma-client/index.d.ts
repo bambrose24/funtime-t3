@@ -4146,6 +4146,8 @@ export namespace Prisma {
     awayscore: number | null
     winner: number | null
     seconds: number | null
+    current_quarter_seconds_remaining: number | null
+    current_quarter: number | null
     msf_id: number | null
   }
 
@@ -4159,6 +4161,8 @@ export namespace Prisma {
     awayscore: number | null
     winner: number | null
     seconds: number | null
+    current_quarter_seconds_remaining: number | null
+    current_quarter: number | null
     msf_id: number | null
   }
 
@@ -4179,6 +4183,8 @@ export namespace Prisma {
     is_tiebreaker: boolean | null
     homerecord: string | null
     awayrecord: string | null
+    current_quarter_seconds_remaining: number | null
+    current_quarter: number | null
     msf_id: number | null
   }
 
@@ -4199,6 +4205,8 @@ export namespace Prisma {
     is_tiebreaker: boolean | null
     homerecord: string | null
     awayrecord: string | null
+    current_quarter_seconds_remaining: number | null
+    current_quarter: number | null
     msf_id: number | null
   }
 
@@ -4219,6 +4227,8 @@ export namespace Prisma {
     is_tiebreaker: number
     homerecord: number
     awayrecord: number
+    current_quarter_seconds_remaining: number
+    current_quarter: number
     msf_id: number
     _all: number
   }
@@ -4234,6 +4244,8 @@ export namespace Prisma {
     awayscore?: true
     winner?: true
     seconds?: true
+    current_quarter_seconds_remaining?: true
+    current_quarter?: true
     msf_id?: true
   }
 
@@ -4247,6 +4259,8 @@ export namespace Prisma {
     awayscore?: true
     winner?: true
     seconds?: true
+    current_quarter_seconds_remaining?: true
+    current_quarter?: true
     msf_id?: true
   }
 
@@ -4267,6 +4281,8 @@ export namespace Prisma {
     is_tiebreaker?: true
     homerecord?: true
     awayrecord?: true
+    current_quarter_seconds_remaining?: true
+    current_quarter?: true
     msf_id?: true
   }
 
@@ -4287,6 +4303,8 @@ export namespace Prisma {
     is_tiebreaker?: true
     homerecord?: true
     awayrecord?: true
+    current_quarter_seconds_remaining?: true
+    current_quarter?: true
     msf_id?: true
   }
 
@@ -4307,6 +4325,8 @@ export namespace Prisma {
     is_tiebreaker?: true
     homerecord?: true
     awayrecord?: true
+    current_quarter_seconds_remaining?: true
+    current_quarter?: true
     msf_id?: true
     _all?: true
   }
@@ -4414,6 +4434,8 @@ export namespace Prisma {
     is_tiebreaker: boolean | null
     homerecord: string | null
     awayrecord: string | null
+    current_quarter_seconds_remaining: number | null
+    current_quarter: number | null
     msf_id: number | null
     _count: GamesCountAggregateOutputType | null
     _avg: GamesAvgAggregateOutputType | null
@@ -4453,6 +4475,8 @@ export namespace Prisma {
     is_tiebreaker?: boolean
     homerecord?: boolean
     awayrecord?: boolean
+    current_quarter_seconds_remaining?: boolean
+    current_quarter?: boolean
     msf_id?: boolean
     teams_games_homeToteams?: boolean | teamsDefaultArgs<ExtArgs>
     teams_games_awayToteams?: boolean | teamsDefaultArgs<ExtArgs>
@@ -4477,6 +4501,8 @@ export namespace Prisma {
     is_tiebreaker?: boolean
     homerecord?: boolean
     awayrecord?: boolean
+    current_quarter_seconds_remaining?: boolean
+    current_quarter?: boolean
     msf_id?: boolean
     teams_games_homeToteams?: boolean | teamsDefaultArgs<ExtArgs>
     teams_games_awayToteams?: boolean | teamsDefaultArgs<ExtArgs>
@@ -4499,6 +4525,8 @@ export namespace Prisma {
     is_tiebreaker?: boolean
     homerecord?: boolean
     awayrecord?: boolean
+    current_quarter_seconds_remaining?: boolean
+    current_quarter?: boolean
     msf_id?: boolean
   }
 
@@ -4537,6 +4565,8 @@ export namespace Prisma {
       is_tiebreaker: boolean | null
       homerecord: string | null
       awayrecord: string | null
+      current_quarter_seconds_remaining: number | null
+      current_quarter: number | null
       msf_id: number | null
     }, ExtArgs["result"]["games"]>
     composites: {}
@@ -4950,6 +4980,8 @@ export namespace Prisma {
     readonly is_tiebreaker: FieldRef<"games", 'Boolean'>
     readonly homerecord: FieldRef<"games", 'String'>
     readonly awayrecord: FieldRef<"games", 'String'>
+    readonly current_quarter_seconds_remaining: FieldRef<"games", 'Int'>
+    readonly current_quarter: FieldRef<"games", 'Int'>
     readonly msf_id: FieldRef<"games", 'Int'>
   }
     
@@ -14175,6 +14207,8 @@ export namespace Prisma {
     is_tiebreaker: 'is_tiebreaker',
     homerecord: 'homerecord',
     awayrecord: 'awayrecord',
+    current_quarter_seconds_remaining: 'current_quarter_seconds_remaining',
+    current_quarter: 'current_quarter',
     msf_id: 'msf_id'
   };
 
@@ -14679,6 +14713,8 @@ export namespace Prisma {
     is_tiebreaker?: BoolNullableFilter<"games"> | boolean | null
     homerecord?: StringNullableFilter<"games"> | string | null
     awayrecord?: StringNullableFilter<"games"> | string | null
+    current_quarter_seconds_remaining?: IntNullableFilter<"games"> | number | null
+    current_quarter?: IntNullableFilter<"games"> | number | null
     msf_id?: IntNullableFilter<"games"> | number | null
     teams_games_homeToteams?: XOR<TeamsRelationFilter, teamsWhereInput>
     teams_games_awayToteams?: XOR<TeamsRelationFilter, teamsWhereInput>
@@ -14702,6 +14738,8 @@ export namespace Prisma {
     is_tiebreaker?: SortOrderInput | SortOrder
     homerecord?: SortOrderInput | SortOrder
     awayrecord?: SortOrderInput | SortOrder
+    current_quarter_seconds_remaining?: SortOrderInput | SortOrder
+    current_quarter?: SortOrderInput | SortOrder
     msf_id?: SortOrderInput | SortOrder
     teams_games_homeToteams?: teamsOrderByWithRelationInput
     teams_games_awayToteams?: teamsOrderByWithRelationInput
@@ -14728,6 +14766,8 @@ export namespace Prisma {
     is_tiebreaker?: BoolNullableFilter<"games"> | boolean | null
     homerecord?: StringNullableFilter<"games"> | string | null
     awayrecord?: StringNullableFilter<"games"> | string | null
+    current_quarter_seconds_remaining?: IntNullableFilter<"games"> | number | null
+    current_quarter?: IntNullableFilter<"games"> | number | null
     msf_id?: IntNullableFilter<"games"> | number | null
     teams_games_homeToteams?: XOR<TeamsRelationFilter, teamsWhereInput>
     teams_games_awayToteams?: XOR<TeamsRelationFilter, teamsWhereInput>
@@ -14751,6 +14791,8 @@ export namespace Prisma {
     is_tiebreaker?: SortOrderInput | SortOrder
     homerecord?: SortOrderInput | SortOrder
     awayrecord?: SortOrderInput | SortOrder
+    current_quarter_seconds_remaining?: SortOrderInput | SortOrder
+    current_quarter?: SortOrderInput | SortOrder
     msf_id?: SortOrderInput | SortOrder
     _count?: gamesCountOrderByAggregateInput
     _avg?: gamesAvgOrderByAggregateInput
@@ -14779,6 +14821,8 @@ export namespace Prisma {
     is_tiebreaker?: BoolNullableWithAggregatesFilter<"games"> | boolean | null
     homerecord?: StringNullableWithAggregatesFilter<"games"> | string | null
     awayrecord?: StringNullableWithAggregatesFilter<"games"> | string | null
+    current_quarter_seconds_remaining?: IntNullableWithAggregatesFilter<"games"> | number | null
+    current_quarter?: IntNullableWithAggregatesFilter<"games"> | number | null
     msf_id?: IntNullableWithAggregatesFilter<"games"> | number | null
   }
 
@@ -15617,6 +15661,8 @@ export namespace Prisma {
     is_tiebreaker?: boolean | null
     homerecord?: string | null
     awayrecord?: string | null
+    current_quarter_seconds_remaining?: number | null
+    current_quarter?: number | null
     msf_id?: number | null
     teams_games_homeToteams: teamsCreateNestedOneWithoutGames_games_homeToteamsInput
     teams_games_awayToteams: teamsCreateNestedOneWithoutGames_games_awayToteamsInput
@@ -15640,6 +15686,8 @@ export namespace Prisma {
     is_tiebreaker?: boolean | null
     homerecord?: string | null
     awayrecord?: string | null
+    current_quarter_seconds_remaining?: number | null
+    current_quarter?: number | null
     msf_id?: number | null
     picks?: picksUncheckedCreateNestedManyWithoutGamesInput
   }
@@ -15658,6 +15706,8 @@ export namespace Prisma {
     is_tiebreaker?: NullableBoolFieldUpdateOperationsInput | boolean | null
     homerecord?: NullableStringFieldUpdateOperationsInput | string | null
     awayrecord?: NullableStringFieldUpdateOperationsInput | string | null
+    current_quarter_seconds_remaining?: NullableIntFieldUpdateOperationsInput | number | null
+    current_quarter?: NullableIntFieldUpdateOperationsInput | number | null
     msf_id?: NullableIntFieldUpdateOperationsInput | number | null
     teams_games_homeToteams?: teamsUpdateOneRequiredWithoutGames_games_homeToteamsNestedInput
     teams_games_awayToteams?: teamsUpdateOneRequiredWithoutGames_games_awayToteamsNestedInput
@@ -15681,6 +15731,8 @@ export namespace Prisma {
     is_tiebreaker?: NullableBoolFieldUpdateOperationsInput | boolean | null
     homerecord?: NullableStringFieldUpdateOperationsInput | string | null
     awayrecord?: NullableStringFieldUpdateOperationsInput | string | null
+    current_quarter_seconds_remaining?: NullableIntFieldUpdateOperationsInput | number | null
+    current_quarter?: NullableIntFieldUpdateOperationsInput | number | null
     msf_id?: NullableIntFieldUpdateOperationsInput | number | null
     picks?: picksUncheckedUpdateManyWithoutGamesNestedInput
   }
@@ -15702,6 +15754,8 @@ export namespace Prisma {
     is_tiebreaker?: boolean | null
     homerecord?: string | null
     awayrecord?: string | null
+    current_quarter_seconds_remaining?: number | null
+    current_quarter?: number | null
     msf_id?: number | null
   }
 
@@ -15719,6 +15773,8 @@ export namespace Prisma {
     is_tiebreaker?: NullableBoolFieldUpdateOperationsInput | boolean | null
     homerecord?: NullableStringFieldUpdateOperationsInput | string | null
     awayrecord?: NullableStringFieldUpdateOperationsInput | string | null
+    current_quarter_seconds_remaining?: NullableIntFieldUpdateOperationsInput | number | null
+    current_quarter?: NullableIntFieldUpdateOperationsInput | number | null
     msf_id?: NullableIntFieldUpdateOperationsInput | number | null
   }
 
@@ -15739,6 +15795,8 @@ export namespace Prisma {
     is_tiebreaker?: NullableBoolFieldUpdateOperationsInput | boolean | null
     homerecord?: NullableStringFieldUpdateOperationsInput | string | null
     awayrecord?: NullableStringFieldUpdateOperationsInput | string | null
+    current_quarter_seconds_remaining?: NullableIntFieldUpdateOperationsInput | number | null
+    current_quarter?: NullableIntFieldUpdateOperationsInput | number | null
     msf_id?: NullableIntFieldUpdateOperationsInput | number | null
   }
 
@@ -16749,6 +16807,8 @@ export namespace Prisma {
     is_tiebreaker?: SortOrder
     homerecord?: SortOrder
     awayrecord?: SortOrder
+    current_quarter_seconds_remaining?: SortOrder
+    current_quarter?: SortOrder
     msf_id?: SortOrder
   }
 
@@ -16762,6 +16822,8 @@ export namespace Prisma {
     awayscore?: SortOrder
     winner?: SortOrder
     seconds?: SortOrder
+    current_quarter_seconds_remaining?: SortOrder
+    current_quarter?: SortOrder
     msf_id?: SortOrder
   }
 
@@ -16782,6 +16844,8 @@ export namespace Prisma {
     is_tiebreaker?: SortOrder
     homerecord?: SortOrder
     awayrecord?: SortOrder
+    current_quarter_seconds_remaining?: SortOrder
+    current_quarter?: SortOrder
     msf_id?: SortOrder
   }
 
@@ -16802,6 +16866,8 @@ export namespace Prisma {
     is_tiebreaker?: SortOrder
     homerecord?: SortOrder
     awayrecord?: SortOrder
+    current_quarter_seconds_remaining?: SortOrder
+    current_quarter?: SortOrder
     msf_id?: SortOrder
   }
 
@@ -16815,6 +16881,8 @@ export namespace Prisma {
     awayscore?: SortOrder
     winner?: SortOrder
     seconds?: SortOrder
+    current_quarter_seconds_remaining?: SortOrder
+    current_quarter?: SortOrder
     msf_id?: SortOrder
   }
 
@@ -20835,6 +20903,8 @@ export namespace Prisma {
     is_tiebreaker?: boolean | null
     homerecord?: string | null
     awayrecord?: string | null
+    current_quarter_seconds_remaining?: number | null
+    current_quarter?: number | null
     msf_id?: number | null
     teams_games_homeToteams: teamsCreateNestedOneWithoutGames_games_homeToteamsInput
     teams_games_awayToteams: teamsCreateNestedOneWithoutGames_games_awayToteamsInput
@@ -20857,6 +20927,8 @@ export namespace Prisma {
     is_tiebreaker?: boolean | null
     homerecord?: string | null
     awayrecord?: string | null
+    current_quarter_seconds_remaining?: number | null
+    current_quarter?: number | null
     msf_id?: number | null
   }
 
@@ -20990,6 +21062,8 @@ export namespace Prisma {
     is_tiebreaker?: NullableBoolFieldUpdateOperationsInput | boolean | null
     homerecord?: NullableStringFieldUpdateOperationsInput | string | null
     awayrecord?: NullableStringFieldUpdateOperationsInput | string | null
+    current_quarter_seconds_remaining?: NullableIntFieldUpdateOperationsInput | number | null
+    current_quarter?: NullableIntFieldUpdateOperationsInput | number | null
     msf_id?: NullableIntFieldUpdateOperationsInput | number | null
     teams_games_homeToteams?: teamsUpdateOneRequiredWithoutGames_games_homeToteamsNestedInput
     teams_games_awayToteams?: teamsUpdateOneRequiredWithoutGames_games_awayToteamsNestedInput
@@ -21012,6 +21086,8 @@ export namespace Prisma {
     is_tiebreaker?: NullableBoolFieldUpdateOperationsInput | boolean | null
     homerecord?: NullableStringFieldUpdateOperationsInput | string | null
     awayrecord?: NullableStringFieldUpdateOperationsInput | string | null
+    current_quarter_seconds_remaining?: NullableIntFieldUpdateOperationsInput | number | null
+    current_quarter?: NullableIntFieldUpdateOperationsInput | number | null
     msf_id?: NullableIntFieldUpdateOperationsInput | number | null
   }
 
@@ -21361,6 +21437,8 @@ export namespace Prisma {
     is_tiebreaker?: boolean | null
     homerecord?: string | null
     awayrecord?: string | null
+    current_quarter_seconds_remaining?: number | null
+    current_quarter?: number | null
     msf_id?: number | null
     teams_games_awayToteams: teamsCreateNestedOneWithoutGames_games_awayToteamsInput
     picks?: picksCreateNestedManyWithoutGamesInput
@@ -21382,6 +21460,8 @@ export namespace Prisma {
     is_tiebreaker?: boolean | null
     homerecord?: string | null
     awayrecord?: string | null
+    current_quarter_seconds_remaining?: number | null
+    current_quarter?: number | null
     msf_id?: number | null
     picks?: picksUncheckedCreateNestedManyWithoutGamesInput
   }
@@ -21410,6 +21490,8 @@ export namespace Prisma {
     is_tiebreaker?: boolean | null
     homerecord?: string | null
     awayrecord?: string | null
+    current_quarter_seconds_remaining?: number | null
+    current_quarter?: number | null
     msf_id?: number | null
     teams_games_homeToteams: teamsCreateNestedOneWithoutGames_games_homeToteamsInput
     picks?: picksCreateNestedManyWithoutGamesInput
@@ -21431,6 +21513,8 @@ export namespace Prisma {
     is_tiebreaker?: boolean | null
     homerecord?: string | null
     awayrecord?: string | null
+    current_quarter_seconds_remaining?: number | null
+    current_quarter?: number | null
     msf_id?: number | null
     picks?: picksUncheckedCreateNestedManyWithoutGamesInput
   }
@@ -21578,6 +21662,8 @@ export namespace Prisma {
     is_tiebreaker?: BoolNullableFilter<"games"> | boolean | null
     homerecord?: StringNullableFilter<"games"> | string | null
     awayrecord?: StringNullableFilter<"games"> | string | null
+    current_quarter_seconds_remaining?: IntNullableFilter<"games"> | number | null
+    current_quarter?: IntNullableFilter<"games"> | number | null
     msf_id?: IntNullableFilter<"games"> | number | null
   }
 
@@ -22311,6 +22397,8 @@ export namespace Prisma {
     is_tiebreaker?: boolean | null
     homerecord?: string | null
     awayrecord?: string | null
+    current_quarter_seconds_remaining?: number | null
+    current_quarter?: number | null
     msf_id?: number | null
   }
 
@@ -22330,6 +22418,8 @@ export namespace Prisma {
     is_tiebreaker?: boolean | null
     homerecord?: string | null
     awayrecord?: string | null
+    current_quarter_seconds_remaining?: number | null
+    current_quarter?: number | null
     msf_id?: number | null
   }
 
@@ -22382,6 +22472,8 @@ export namespace Prisma {
     is_tiebreaker?: NullableBoolFieldUpdateOperationsInput | boolean | null
     homerecord?: NullableStringFieldUpdateOperationsInput | string | null
     awayrecord?: NullableStringFieldUpdateOperationsInput | string | null
+    current_quarter_seconds_remaining?: NullableIntFieldUpdateOperationsInput | number | null
+    current_quarter?: NullableIntFieldUpdateOperationsInput | number | null
     msf_id?: NullableIntFieldUpdateOperationsInput | number | null
     teams_games_awayToteams?: teamsUpdateOneRequiredWithoutGames_games_awayToteamsNestedInput
     picks?: picksUpdateManyWithoutGamesNestedInput
@@ -22403,6 +22495,8 @@ export namespace Prisma {
     is_tiebreaker?: NullableBoolFieldUpdateOperationsInput | boolean | null
     homerecord?: NullableStringFieldUpdateOperationsInput | string | null
     awayrecord?: NullableStringFieldUpdateOperationsInput | string | null
+    current_quarter_seconds_remaining?: NullableIntFieldUpdateOperationsInput | number | null
+    current_quarter?: NullableIntFieldUpdateOperationsInput | number | null
     msf_id?: NullableIntFieldUpdateOperationsInput | number | null
     picks?: picksUncheckedUpdateManyWithoutGamesNestedInput
   }
@@ -22423,6 +22517,8 @@ export namespace Prisma {
     is_tiebreaker?: NullableBoolFieldUpdateOperationsInput | boolean | null
     homerecord?: NullableStringFieldUpdateOperationsInput | string | null
     awayrecord?: NullableStringFieldUpdateOperationsInput | string | null
+    current_quarter_seconds_remaining?: NullableIntFieldUpdateOperationsInput | number | null
+    current_quarter?: NullableIntFieldUpdateOperationsInput | number | null
     msf_id?: NullableIntFieldUpdateOperationsInput | number | null
   }
 
@@ -22440,6 +22536,8 @@ export namespace Prisma {
     is_tiebreaker?: NullableBoolFieldUpdateOperationsInput | boolean | null
     homerecord?: NullableStringFieldUpdateOperationsInput | string | null
     awayrecord?: NullableStringFieldUpdateOperationsInput | string | null
+    current_quarter_seconds_remaining?: NullableIntFieldUpdateOperationsInput | number | null
+    current_quarter?: NullableIntFieldUpdateOperationsInput | number | null
     msf_id?: NullableIntFieldUpdateOperationsInput | number | null
     teams_games_homeToteams?: teamsUpdateOneRequiredWithoutGames_games_homeToteamsNestedInput
     picks?: picksUpdateManyWithoutGamesNestedInput
@@ -22461,6 +22559,8 @@ export namespace Prisma {
     is_tiebreaker?: NullableBoolFieldUpdateOperationsInput | boolean | null
     homerecord?: NullableStringFieldUpdateOperationsInput | string | null
     awayrecord?: NullableStringFieldUpdateOperationsInput | string | null
+    current_quarter_seconds_remaining?: NullableIntFieldUpdateOperationsInput | number | null
+    current_quarter?: NullableIntFieldUpdateOperationsInput | number | null
     msf_id?: NullableIntFieldUpdateOperationsInput | number | null
     picks?: picksUncheckedUpdateManyWithoutGamesNestedInput
   }
@@ -22481,6 +22581,8 @@ export namespace Prisma {
     is_tiebreaker?: NullableBoolFieldUpdateOperationsInput | boolean | null
     homerecord?: NullableStringFieldUpdateOperationsInput | string | null
     awayrecord?: NullableStringFieldUpdateOperationsInput | string | null
+    current_quarter_seconds_remaining?: NullableIntFieldUpdateOperationsInput | number | null
+    current_quarter?: NullableIntFieldUpdateOperationsInput | number | null
     msf_id?: NullableIntFieldUpdateOperationsInput | number | null
   }
 

@@ -59,6 +59,8 @@ export async function run() {
           homescore: msfGame.score.homeScoreTotal ?? 0,
           done,
           winner,
+          current_quarter: msfGame.score.currentQuarter,
+          current_quarter_seconds_remaining: msfGame.score.currentQuarterSecondsRemaining,
         } satisfies Parameters<typeof db.games.update>[0]["data"];
 
         console.log(
