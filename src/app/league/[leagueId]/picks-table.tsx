@@ -119,7 +119,7 @@ function PicksTableImpl({ picksSummary, games, teams }: Props) {
   });
 
   return (
-    <div className="rounded-lg border p-[2px]">
+    <div className="rounded-lg border bg-card p-1">
       <Table>
         <TableHeader className="rounded-t-lg">
           {table.getHeaderGroups().map((headerGroup) => (
