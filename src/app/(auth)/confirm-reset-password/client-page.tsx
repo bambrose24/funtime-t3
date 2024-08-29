@@ -3,7 +3,12 @@
 import { type SubmitHandler, useForm } from "react-hook-form";
 import { type confirmResetPasswordSchema } from "~/lib/schemas/auth";
 import { type z } from "zod";
-import { Card, CardContent, CardHeader } from "~/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+} from "~/components/ui/card";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Input } from "~/components/ui/input";
 
@@ -13,6 +18,7 @@ import { toast } from "sonner";
 import { clientApi } from "~/trpc/react";
 import { revalidatePathServerAction } from "../actions";
 import * as Yup from "yup";
+import { Separator } from "~/components/ui/separator";
 
 type ForgotPasswordFormType = z.infer<typeof confirmResetPasswordSchema>;
 
@@ -67,10 +73,11 @@ export function ConfirmResetPasswordClient() {
     <div className="col-span-12 flex flex-col items-center p-2 pt-8 md:col-span-6 md:col-start-4 lg:col-span-4 lg:col-start-5 2xl:col-span-2 2xl:col-start-6">
       <Card className="w-full">
         <CardHeader>Confirm Password Reset</CardHeader>
+        <CardDescription>Please enter your new password.</CardDescription>
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="flex flex-col gap-4">
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-4">
                 <Input
                   placeholder="New Password"
                   type="password"
@@ -85,6 +92,7 @@ export function ConfirmResetPasswordClient() {
                   <span>{errors.password2.message}</span>
                 )}
               </div>
+              <Separator />
               <div className="flex flex-col gap-2">
                 <Button
                   className="w-full"
