@@ -39,6 +39,7 @@ import {
 import { Checkbox } from "~/components/ui/checkbox";
 import { orderBy } from "lodash";
 import { useRouter } from "next/navigation";
+import confetti from "canvas-confetti";
 
 type Props = {
   league: RouterOutputs["league"]["get"];
@@ -161,6 +162,13 @@ export function ClientPickPage({
         }),
         leagueIds,
         overrideMemberId: undefined,
+      });
+
+      // Trigger confetti
+      void confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 },
       });
 
       setPicksDialogOpen(true);
