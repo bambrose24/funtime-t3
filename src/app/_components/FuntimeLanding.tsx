@@ -53,7 +53,7 @@ export function FuntimeLanding() {
           </div>
         </div>
       </section>
-      <section className="w-full bg-secondary py-8 md:py-16 lg:py-24">
+      <section className="w-full rounded-lg bg-secondary py-8 md:py-16 lg:py-24">
         <div className="container px-4 md:px-6">
           <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-3">
             <div className="flex flex-col items-center space-y-2 rounded-lg border-gray-800 p-4">
