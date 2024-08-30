@@ -1,18 +1,19 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useCallback } from "react";
+import { clientApi } from "~/trpc/react";
 import { createSupabaseBrowser } from "~/utils/supabase/client";
 
 export function useLogout() {
-  const router = useRouter();
+  const utils = clientApi.useUtils();
 
   return useCallback(async () => {
     const clientSupabase = createSupabaseBrowser();
     const { error } = await clientSupabase.auth.signOut();
+    void utils.invalidate();
     if (error) {
       throw error;
     }
-    router.push("/login");
-  }, [router]);
+    window.location.href = '/';
+  }, [utils]);
 }
