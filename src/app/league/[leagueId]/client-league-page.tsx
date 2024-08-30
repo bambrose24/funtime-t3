@@ -240,9 +240,9 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
               <SheetTrigger asChild>
                 <Button
                   variant="secondary"
-                  className="flex items-center gap-2 text-muted-foreground"
+                  className="flex items-center gap-2 "
                 >
-                  <MessagesSquare className="h-4 w-4 text-muted-foreground" />
+                  <MessagesSquare className="h-4 w-4 " />
                   Chat
                 </Button>
               </SheetTrigger>
@@ -306,9 +306,9 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
                   <SheetTrigger asChild>
                     <Button
                       variant="secondary"
-                      className="flex w-full items-center gap-2 text-muted-foreground"
+                      className="flex w-full items-center gap-2"
                     >
-                      <MessagesSquare className="h-4 w-4 text-muted-foreground" />
+                      <MessagesSquare className="h-4 w-4" />
                       Chat
                     </Button>
                   </SheetTrigger>

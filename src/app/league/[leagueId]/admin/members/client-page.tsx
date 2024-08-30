@@ -56,6 +56,7 @@ import {
   TooltipTrigger,
 } from "~/components/ui/tooltip";
 import { Switch } from "~/components/ui/switch";
+import { saveAs } from "file-saver";
 
 type Props = {
   leagueId: number;
@@ -92,7 +93,21 @@ export function LeagueAdminMembersClientPage({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Members</CardTitle>
+        <CardTitle className="flex items-center justify-between">
+          <>Members</>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline">Actions</Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem
+                onClick={() => downloadPlayersCSV(members, league.name)}
+              >
+                Download Players
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </CardTitle>
       </CardHeader>
       <CardContent>
         <Table>
@@ -389,4 +404,35 @@ function RoleChangeRow({ member, league }: MemberProps) {
       </Form>
     </form>
   );
+}
+
+function downloadPlayersCSV(
+  members: RouterOutputs["league"]["admin"]["members"]["members"],
+  leagueName: string,
+) {
+  const headers = [
+    "Username",
+    "Email",
+    "Role",
+    "Wins",
+    "Missed Picks",
+    "Donated",
+  ];
+  const csvContent = members.map((member) => [
+    member.people.username,
+    member.people.email,
+    capitalize(member.role ?? "player"),
+    member.WeekWinners.length.toString(),
+    member.misssedPicks.toString(),
+    member.paid ? "Yes" : "No",
+  ]);
+
+  const csvArray = [
+    headers.join(","),
+    ...csvContent.map((row) => row.join(",")),
+  ].join("\n");
+
+  const b = new Blob([csvArray], { type: "text/csv;charset=utf-8;" });
+  const fileName = `${leagueName.replace(/[^a-z0-9]/gi, "_").toLowerCase()}_members.csv`;
+  saveAs(b, fileName);
 }
