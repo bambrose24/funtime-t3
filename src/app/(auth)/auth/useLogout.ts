@@ -14,6 +14,6 @@ export function useLogout() {
     if (error) {
       throw error;
     }
-    window.location.href = '/';
+    window.location.href = '/login';
   }, [utils]);
 }
