@@ -40,15 +40,16 @@ const validationSchema = Yup.object({
 });
 
 export function ConfirmResetPasswordClient() {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isLoading, isSubmitting },
-    control,
-  } = useForm<ForgotPasswordFormType>({
+  const form = useForm<ForgotPasswordFormType>({
     resolver: yupResolver(validationSchema),
     mode: "onBlur",
   });
+
+  const {
+    handleSubmit,
+    formState: { isLoading, isSubmitting },
+    control,
+  } = form;
 
   // eslint-disable-next-line @typescript-eslint/unbound-method
   const { invalidate } = clientApi.useUtils();
