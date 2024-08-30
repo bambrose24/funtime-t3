@@ -49,7 +49,8 @@ export default async function Home() {
       <div className="col-span-12 flex w-full flex-row flex-wrap justify-center gap-4 py-4">
         {!thisSeasonLeagues || thisSeasonLeagues.length === 0 ? (
           <Text.Body>
-            No active leagues for the {DEFAULT_SEASON} season.
+            No active leagues for the {DEFAULT_SEASON} season. Create one or
+            join from a friend&apos;s share link.
           </Text.Body>
         ) : null}
         {thisSeasonLeagues?.map((d) => {

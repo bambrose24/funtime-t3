@@ -8,6 +8,7 @@ import {
   CardContent,
   CardDescription,
   CardHeader,
+  CardTitle,
 } from "~/components/ui/card";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Input } from "~/components/ui/input";
@@ -19,6 +20,13 @@ import { clientApi } from "~/trpc/react";
 import { revalidatePathServerAction } from "../actions";
 import * as Yup from "yup";
 import { Separator } from "~/components/ui/separator";
+import {
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "~/components/ui/form";
 
 type ForgotPasswordFormType = z.infer<typeof confirmResetPasswordSchema>;
 
@@ -36,6 +44,7 @@ export function ConfirmResetPasswordClient() {
     register,
     handleSubmit,
     formState: { errors, isLoading, isSubmitting },
+    control,
   } = useForm<ForgotPasswordFormType>({
     resolver: yupResolver(validationSchema),
     mode: "onBlur",
@@ -72,35 +81,52 @@ export function ConfirmResetPasswordClient() {
   return (
     <div className="col-span-12 flex flex-col items-center p-2 pt-8 md:col-span-6 md:col-start-4 lg:col-span-4 lg:col-start-5 2xl:col-span-2 2xl:col-start-6">
       <Card className="w-full">
-        <CardHeader>Confirm Password Reset</CardHeader>
-        <CardDescription>Please enter your new password.</CardDescription>
+        <CardHeader>
+          <CardTitle>Confirm Password Reset</CardTitle>
+          <CardDescription>Please enter your new password.</CardDescription>
+        </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="flex flex-col gap-4">
-              <div className="flex flex-col gap-4">
-                <Input
-                  placeholder="New Password"
-                  type="password"
-                  {...register("password1")}
-                />
-                <Input
-                  placeholder="Confirm Password"
-                  type="password"
-                  {...register("password2")}
-                />
-                {errors.password2?.message && (
-                  <span>{errors.password2.message}</span>
+              <FormField
+                control={control}
+                name="password1"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>New Password</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="password"
+                        placeholder="New Password"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
                 )}
-              </div>
+              />
+              <FormField
+                control={control}
+                name="password2"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Confirm Password</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="password"
+                        placeholder="Confirm Password"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               <Separator />
               <div className="flex flex-col gap-2">
                 <Button
                   className="w-full"
-                  disabled={
-                    Boolean(errors.password2?.message) ||
-                    isLoading ||
-                    isSubmitting
-                  }
+                  disabled={isLoading || isSubmitting}
                   loading={isLoading || isSubmitting}
                 >
                   Confirm Reset
