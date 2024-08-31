@@ -36,6 +36,7 @@ export function UserProviderClient({ children, data: initialData }: Props) {
       posthog.identify(user.dbUser.email, {
         userId: user.dbUser.uid,
         username: user.dbUser.username,
+        email: user.dbUser.email,
       });
     }
   });
