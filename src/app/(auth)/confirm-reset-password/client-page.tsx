@@ -21,6 +21,7 @@ import { revalidatePathServerAction } from "../actions";
 import * as Yup from "yup";
 import { Separator } from "~/components/ui/separator";
 import {
+  Form,
   FormControl,
   FormField,
   FormItem,
@@ -88,52 +89,54 @@ export function ConfirmResetPasswordClient() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)}>
-            <div className="flex flex-col gap-4">
-              <FormField
-                control={control}
-                name="password1"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>New Password</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="password"
-                        placeholder="New Password"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={control}
-                name="password2"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Confirm Password</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="password"
-                        placeholder="Confirm Password"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Separator />
-              <div className="flex flex-col gap-2">
-                <Button
-                  className="w-full"
-                  disabled={isLoading || isSubmitting}
-                  loading={isLoading || isSubmitting}
-                >
-                  Confirm Reset
-                </Button>
+            <Form {...form}>
+              <div className="flex flex-col gap-4">
+                <FormField
+                  control={control}
+                  name="password1"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>New Password</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="password"
+                          placeholder="New Password"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={control}
+                  name="password2"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Confirm Password</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="password"
+                          placeholder="Confirm Password"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <Separator />
+                <div className="flex flex-col gap-2">
+                  <Button
+                    className="w-full"
+                    disabled={isLoading || isSubmitting}
+                    loading={isLoading || isSubmitting}
+                  >
+                    Confirm Reset
+                  </Button>
+                </div>
               </div>
-            </div>
+            </Form>
           </form>
         </CardContent>
       </Card>
