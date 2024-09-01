@@ -55,6 +55,7 @@ export function LoginClientPage() {
 
     if (authResponse.error) {
       toast.error(`Error signing in - ${authResponse.error.message}`);
+      console.error("Error signing in...", authResponse);
       throw authResponse.error;
     }
 
