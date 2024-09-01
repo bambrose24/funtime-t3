@@ -111,6 +111,12 @@ export function JoinLeagueClientPage({ data, session, teams }: Props) {
   const afcTeam = teams.find((t) => t.teamid.toString() === afcTeamId);
   const nfcTeam = teams.find((t) => t.teamid.toString() === nfcTeamId);
 
+  const registerButtonText = form.formState.isValid
+    ? "Register"
+    : data.superbowl_competition
+      ? "Finish Super Bowl pick"
+      : "Fix your registration";
+
   return (
     <Form {...form}>
       <form
@@ -338,7 +344,7 @@ export function JoinLeagueClientPage({ data, session, teams }: Props) {
               loading={form.formState.isSubmitting}
               type="submit"
             >
-              Register
+              {registerButtonText}
             </Button>
           </CardFooter>
         </Card>
