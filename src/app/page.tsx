@@ -16,6 +16,10 @@ export default async function Home() {
     serverApi.home.summary(),
   ]);
 
+  if (!session.dbUser && session.supabaseUser) {
+    redirect("/confirm-signup");
+  }
+
   if (!session.dbUser) {
     return (
       <div className="col-span-12 flex justify-center">
