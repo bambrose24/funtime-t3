@@ -16,6 +16,8 @@ export async function run() {
   const season = DEFAULT_SEASON;
 
   const msfGames = await msf.getGamesBySeason({ season });
+
+  console.log(`${LOG_PREFIX} msf games ${JSON.stringify(msfGames)}`)
   let games = await db.games.findMany({
     where: {
       season,
