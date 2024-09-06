@@ -58,7 +58,7 @@ export function GameCard({
       return "In Progress";
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
-    return `${quarter}Q ${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
+    return `Q${quarter} - ${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
   };
 
   const subtitle = gameEnded
