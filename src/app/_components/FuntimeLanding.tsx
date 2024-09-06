@@ -16,23 +16,42 @@ export function FuntimeLanding() {
                 season-long league and test your prediction skills!
               </p>
             </div>
-            <div className="flex items-center justify-center space-x-2 text-primary">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="h-6 w-6"
-              >
-                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-                <polyline points="22 4 12 14.01 9 11.01" />
-              </svg>
-              <span className="font-semibold">Completely Free</span>
+            <div className="flex flex-wrap items-center justify-center gap-4 text-primary">
+              <div className="flex items-center space-x-2">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="h-6 w-6"
+                >
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                  <polyline points="22 4 12 14.01 9 11.01" />
+                </svg>
+                <span className="font-semibold">Completely Free</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="h-6 w-6"
+                >
+                  <path d="M12 20v-6M6 20V10M18 20V4" />
+                </svg>
+                <span className="font-semibold">100,000+ Picks Made</span>
+              </div>
             </div>
             <div className="flex w-full max-w-sm flex-col gap-4">
               <Link href="/signup" className="w-full">
@@ -95,15 +114,12 @@ export function FuntimeLanding() {
                 strokeLinejoin="round"
                 className="mb-2 h-10 w-10"
               >
-                <rect width="18" height="18" x="3" y="4" rx="2" ry="2" />
-                <line x1="16" x2="16" y1="2" y2="6" />
-                <line x1="8" x2="8" y1="2" y2="6" />
-                <line x1="3" x2="21" y1="10" y2="10" />
+                <path d="M12 20v-6M6 20V10M18 20V4" />
               </svg>
-              <h2 className="text-xl font-bold">Weekly Picks</h2>
+              <h2 className="text-xl font-bold">100,000+ Picks Made</h2>
               <p className="text-center text-sm text-gray-500">
-                Make your predictions each week and track your progress
-                throughout the season.
+                Join our thriving community of NFL enthusiasts that have made
+                over 100,000 NFL game predictions.
               </p>
             </div>
             <div className="flex flex-col items-center space-y-2 rounded-lg border-gray-800 p-4">
