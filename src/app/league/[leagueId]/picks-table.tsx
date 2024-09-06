@@ -46,7 +46,7 @@ function PicksTableSkeleton() {
 }
 
 // TODO use simulatedGames
-function PicksTableImpl({ picksSummary, games, teams }: Props) {
+function PicksTableImpl({ picksSummary, games, teams, simulatedGames }: Props) {
   const teamIdToTeam = useDictify(teams, (t) => t.teamid);
   const gameIdToGame = useDictify(games, (g) => g.gid);
 
@@ -165,12 +165,19 @@ function PicksTableImpl({ picksSummary, games, teams }: Props) {
                   let bgColor: "yellow" | "green" | "red" | undefined =
                     undefined;
 
-                  if (game?.done) {
+                  const simulatedWinner = simulatedGames[gid];
+                  if (game?.done === true || simulatedWinner) {
                     if (!pick) {
                       bgColor = "yellow";
-                    } else if (pick?.correct) {
+                    } else if (
+                      pick?.correct === 1 ||
+                      (pick.winner && pick.winner === simulatedWinner)
+                    ) {
                       bgColor = "green";
-                    } else if (pick?.correct !== null) {
+                    } else if (
+                      pick?.correct !== null ||
+                      (simulatedWinner && pick.winner !== simulatedWinner)
+                    ) {
                       bgColor = "red";
                     }
                   } else if (!game && cell.column.getIndex() > 1) {
