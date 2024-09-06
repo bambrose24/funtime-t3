@@ -12,6 +12,7 @@ import { UnauthorizedError } from "~/server/util/errors/unauthorized";
 import {
   LatePolicy,
   PickPolicy,
+  type PrismaClient,
   ReminderPolicy,
   ScoringType,
 } from "~/generated/prisma-client";
@@ -141,6 +142,14 @@ export const leagueRouter = createTRPCRouter({
         });
       }
 
+      const hasStarted = await hasLeagueStarted({ leagueId: league.league_id, db: ctx.db });
+      if (hasStarted) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: `Cannot join league ${league.league_id} as it has already started`,
+        });
+      }
+
       const leagueMember = await ctx.db.leaguemembers.create({
         data: {
           league_id: league.league_id,
@@ -187,6 +196,26 @@ export const leagueRouter = createTRPCRouter({
       if (!dbUser) {
         throw new TRPCError({ code: "UNAUTHORIZED" });
       }
+
+      const existingLeague = await ctx.db.leagues.findFirst({
+        where: {
+          season: DEFAULT_SEASON,
+        },
+      });
+
+      if (existingLeague) {
+        const leagueStarted = await hasLeagueStarted({
+          leagueId: existingLeague.league_id,
+          db: ctx.db,
+        });
+
+        if (leagueStarted) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Cannot create a new league as the current season has already started.",
+          });
+        }
+      }
       const response = await ctx.db.leagues.create({
         data: {
           name: input.name,
@@ -217,20 +246,7 @@ export const leagueRouter = createTRPCRouter({
       if (!viewerInLeague.includes(leagueId)) {
         throw UnauthorizedError;
       }
-      const league = await ctx.db.leagues.findFirstOrThrow({
-        where: {
-          league_id: leagueId,
-        },
-      });
-      const firstGame = await ctx.db.games.findFirst({
-        where: {
-          season: league.season,
-        },
-        orderBy: {
-          ts: "asc",
-        },
-      });
-      return firstGame && firstGame.ts < new Date();
+      return await hasLeagueStarted({ leagueId, db: ctx.db });
     }),
   get: authorizedProcedure
     .input(leagueIdSchema)
@@ -495,3 +511,20 @@ export const leagueRouter = createTRPCRouter({
       return { leagueId, correct, wrong, total: correct + wrong };
     }),
 });
+
+async function hasLeagueStarted({ leagueId, db }: { leagueId: number; db: PrismaClient }): Promise<boolean> {
+  const league = await db.leagues.findFirstOrThrow({
+    where: {
+      league_id: leagueId,
+    },
+  });
+  const firstGame = await db.games.findFirst({
+    where: {
+      season: league.season,
+    },
+    orderBy: {
+      ts: "asc",
+    },
+  });
+  return firstGame !== null && firstGame.ts < new Date();
+}
