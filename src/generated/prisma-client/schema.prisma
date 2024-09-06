@@ -39,8 +39,8 @@ model WeekWinners {
   week          Int
   correct_count Int
   score_diff    Int
-  leagues       leagues       @relation(fields: [league_id], references: [league_id])
-  leaguemembers leaguemembers @relation(fields: [membership_id], references: [membership_id])
+  leagues       leagues       @relation(fields: [league_id], references: [league_id], onDelete: Cascade)
+  leaguemembers leaguemembers @relation(fields: [membership_id], references: [membership_id], onDelete: Cascade)
 
   @@index([league_id, membership_id], map: "idx_184XX_league_and_membership")
   @@index([league_id], map: "idx_184XX_league_id")
@@ -110,8 +110,8 @@ model leaguemessages {
   message_type  MessageType
   createdAt     DateTime      @default(now())
   status        MessageStatus @default(PUBLISHED)
-  leagues       leagues       @relation(fields: [league_id], references: [league_id])
-  leaguemembers leaguemembers @relation(fields: [member_id], references: [membership_id])
+  leagues       leagues       @relation(fields: [league_id], references: [league_id], onDelete: Cascade)
+  leaguemembers leaguemembers @relation(fields: [member_id], references: [membership_id], onDelete: Cascade)
 
   @@index([createdAt])
   @@index([league_id])
