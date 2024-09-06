@@ -58,6 +58,9 @@ type JoinLeagueData = z.infer<typeof joinLeagueSchema>;
 function JoinLeagueCard() {
   const { register, handleSubmit, watch } = useForm<JoinLeagueData>({
     resolver: zodResolver(joinLeagueSchema),
+    defaultValues: {
+      leagueCode: "",
+    },
   });
 
   const leagueCodeValue = watch("leagueCode");
