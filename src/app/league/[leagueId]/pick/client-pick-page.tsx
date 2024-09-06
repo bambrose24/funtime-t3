@@ -41,6 +41,12 @@ import { orderBy } from "lodash";
 import { useRouter } from "next/navigation";
 import confetti from "canvas-confetti";
 import { EASTERN_TIMEZONE } from "~/utils/const";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "~/components/ui/tooltip";
 
 type Props = {
   league: RouterOutputs["league"]["get"];
@@ -188,6 +194,11 @@ export function ClientPickPage({
     idx: number;
     winner: number;
   }) => {
+    const game = games.find((g) => g.gid === gid);
+    if (!game || game.ts < new Date()) {
+      console.log(`not allowing picking of game because it has started ${gid}`);
+      return;
+    }
     console.log(`going to update idx ${idx} gid ${gid} winner ${winner}`);
     picksField.update(idx, {
       gid,
@@ -306,6 +317,8 @@ export function ClientPickPage({
               if (!game) {
                 return null;
               }
+              const started = game.ts < new Date();
+              const disabled = started;
               const home = teamById.get(game.home);
               const away = teamById.get(game.away);
               if (!home || !away) {
@@ -325,7 +338,7 @@ export function ClientPickPage({
               return (
                 <Card
                   key={`${idx}_${winner}`}
-                  className={cn("w-full", winnerTeam && "border-transparent")}
+                  className={cn("w-full", { "border-transparent": winnerTeam })}
                 >
                   <div
                     style={{
@@ -333,151 +346,201 @@ export function ClientPickPage({
                     }}
                     className="w-full rounded-lg p-1 transition-all lg:p-1.5"
                   >
-                    <CardContent className="flex flex-col gap-2 rounded-sm bg-card py-2">
-                      <RadioGroup value={winner?.toString()}>
-                        <div className="grid w-full grid-cols-5 gap-2">
-                          <div
-                            className="col-span-1 flex cursor-pointer items-center justify-center"
-                            onClick={() => {
-                              onTeamPick({
-                                idx,
-                                gid: game.gid,
-                                winner: away.teamid,
-                              });
-                            }}
-                          >
-                            <TeamLogo
-                              abbrev={away.abbrev ?? ""}
-                              width={40}
-                              height={40}
-                            />
-                          </div>
-                          <div
-                            className="col-span-1 flex cursor-pointer items-center justify-start md:pl-2"
-                            onClick={() => {
-                              onTeamPick({
-                                idx,
-                                gid: game.gid,
-                                winner: away.teamid,
-                              });
-                            }}
-                          >
-                            <div className="flex items-center gap-2">
-                              <RadioGroupItem
-                                value={away.teamid.toString()}
-                                id={`pick_option_${away.teamid.toString()}`}
-                                onClick={() => {
-                                  onTeamPick({
-                                    idx,
-                                    gid: game.gid,
-                                    winner: away.teamid,
-                                  });
-                                }}
-                              />
-                              <Text.Small>{away.abbrev}</Text.Small>
-                            </div>
-                          </div>
-                          <div className="col-span-1 flex items-center justify-center pb-0.5">
-                            @
-                          </div>
-                          <div
-                            className="col-span-1 flex cursor-pointer items-center justify-end md:pr-2"
-                            onClick={() => {
-                              onTeamPick({
-                                idx,
-                                gid: game.gid,
-                                winner: home.teamid,
-                              });
-                            }}
-                          >
-                            <div className="flex items-center gap-2">
-                              <Text.Small>{home.abbrev}</Text.Small>
-                              <div className="flex items-center justify-center">
-                                <RadioGroupItem
-                                  value={home.teamid.toString()}
-                                  id={`pick_option_${home.teamid.toString()}`}
-                                  onClick={() => {
-                                    onTeamPick({
-                                      idx,
-                                      gid: game.gid,
-                                      winner: home.teamid,
-                                    });
-                                  }}
-                                />
-                              </div>
-                            </div>
-                          </div>
-
-                          <div
-                            className="col-span-1 flex cursor-pointer items-center justify-center"
-                            onClick={() => {
-                              onTeamPick({
-                                idx,
-                                gid: game.gid,
-                                winner: home.teamid,
-                              });
-                            }}
-                          >
-                            <TeamLogo
-                              abbrev={home.abbrev ?? ""}
-                              width={40}
-                              height={40}
-                            />
-                          </div>
-                          <div className="col-span-1 flex justify-center">
-                            <Text.Small className="text-xs text-muted-foreground">
-                              {game.awayrecord}
-                            </Text.Small>
-                          </div>
-                          <div className="col-span-3 flex justify-center">
-                            <Text.Small className="text-xs text-muted-foreground">
-                              {format(game.ts, "EEE MMM d yyyy, h:mm a zzz", {
-                                timeZone: EASTERN_TIMEZONE,
+                    <CardContent
+                      className={cn(
+                        "flex flex-col gap-2 rounded-sm bg-card py-2",
+                      )}
+                    >
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <div
+                              className={cn({
+                                "cursor-not-allowed opacity-50": disabled,
                               })}
-                            </Text.Small>
-                          </div>
-                          <div className="col-span-1 flex justify-center">
-                            <Text.Small className="text-xs text-muted-foreground">
-                              {game.homerecord}
-                            </Text.Small>
-                          </div>
-                          {game.is_tiebreaker === true && (
-                            <div className="col-span-5 mt-2 flex w-full flex-col items-center gap-2 text-center">
-                              <Separator />
-                              <div className="w-full">
-                                <FormField
-                                  control={form.control}
-                                  name="tiebreakerScore.score"
-                                  render={({ field, fieldState }) => {
-                                    return (
-                                      <FormItem>
-                                        <FormLabel>Tiebreaker Score</FormLabel>
-                                        <FormControl>
-                                          <Input
-                                            {...field}
-                                            type="number"
-                                            step="1"
-                                            className={cn(
-                                              "w-full focus-visible:ring-2",
-                                              fieldState.invalid
-                                                ? "ring-2 ring-wrong"
-                                                : "ring-2 ring-correct",
-                                            )}
-                                          />
-                                        </FormControl>
-                                        <Text.Small className="mt-2 text-xs text-muted-foreground">
-                                          You must enter a score between 1 and
-                                          200
-                                        </Text.Small>
-                                      </FormItem>
-                                    );
-                                  }}
-                                />
-                              </div>
+                            >
+                              <RadioGroup
+                                value={winner?.toString()}
+                                disabled={started}
+                              >
+                                <div className="grid w-full grid-cols-5 gap-2">
+                                  <div
+                                    className={cn(
+                                      "col-span-1 flex cursor-pointer items-center justify-center",
+                                      {
+                                        "cursor-not-allowed": disabled,
+                                      },
+                                    )}
+                                    onClick={() => {
+                                      onTeamPick({
+                                        idx,
+                                        gid: game.gid,
+                                        winner: away.teamid,
+                                      });
+                                    }}
+                                  >
+                                    <TeamLogo
+                                      abbrev={away.abbrev ?? ""}
+                                      width={40}
+                                      height={40}
+                                    />
+                                  </div>
+                                  <div
+                                    className={cn(
+                                      "col-span-1 flex cursor-pointer items-center justify-start md:pl-2",
+                                      {
+                                        "cursor-not-allowed": disabled,
+                                      },
+                                    )}
+                                    onClick={() => {
+                                      onTeamPick({
+                                        idx,
+                                        gid: game.gid,
+                                        winner: away.teamid,
+                                      });
+                                    }}
+                                  >
+                                    <div className="flex items-center gap-2">
+                                      <RadioGroupItem
+                                        value={away.teamid.toString()}
+                                        id={`pick_option_${away.teamid.toString()}`}
+                                        onClick={() => {
+                                          onTeamPick({
+                                            idx,
+                                            gid: game.gid,
+                                            winner: away.teamid,
+                                          });
+                                        }}
+                                      />
+                                      <Text.Small>{away.abbrev}</Text.Small>
+                                    </div>
+                                  </div>
+                                  <div className="col-span-1 flex items-center justify-center pb-0.5">
+                                    @
+                                  </div>
+                                  <div
+                                    className={cn(
+                                      "col-span-1 flex cursor-pointer items-center justify-end md:pr-2",
+                                      {
+                                        "cursor-not-allowed": disabled,
+                                      },
+                                    )}
+                                    onClick={() => {
+                                      onTeamPick({
+                                        idx,
+                                        gid: game.gid,
+                                        winner: home.teamid,
+                                      });
+                                    }}
+                                  >
+                                    <div className="flex items-center gap-2">
+                                      <Text.Small>{home.abbrev}</Text.Small>
+                                      <div className="flex items-center justify-center">
+                                        <RadioGroupItem
+                                          value={home.teamid.toString()}
+                                          id={`pick_option_${home.teamid.toString()}`}
+                                          onClick={() => {
+                                            onTeamPick({
+                                              idx,
+                                              gid: game.gid,
+                                              winner: home.teamid,
+                                            });
+                                          }}
+                                        />
+                                      </div>
+                                    </div>
+                                  </div>
+
+                                  <div
+                                    className={cn(
+                                      "col-span-1 flex cursor-pointer items-center justify-center",
+                                      {
+                                        "cursor-not-allowed": disabled,
+                                      },
+                                    )}
+                                    onClick={() => {
+                                      onTeamPick({
+                                        idx,
+                                        gid: game.gid,
+                                        winner: home.teamid,
+                                      });
+                                    }}
+                                  >
+                                    <TeamLogo
+                                      abbrev={home.abbrev ?? ""}
+                                      width={40}
+                                      height={40}
+                                    />
+                                  </div>
+                                  <div className="col-span-1 flex justify-center">
+                                    <Text.Small className="text-xs text-muted-foreground">
+                                      {game.awayrecord}
+                                    </Text.Small>
+                                  </div>
+                                  <div className="col-span-3 flex justify-center">
+                                    <Text.Small className="text-xs text-muted-foreground">
+                                      {format(
+                                        game.ts,
+                                        "EEE MMM d yyyy, h:mm a zzz",
+                                        {
+                                          timeZone: EASTERN_TIMEZONE,
+                                        },
+                                      )}
+                                    </Text.Small>
+                                  </div>
+                                  <div className="col-span-1 flex justify-center">
+                                    <Text.Small className="text-xs text-muted-foreground">
+                                      {game.homerecord}
+                                    </Text.Small>
+                                  </div>
+                                  {game.is_tiebreaker === true && (
+                                    <div className="col-span-5 mt-2 flex w-full flex-col items-center gap-2 text-center">
+                                      <Separator />
+                                      <div className="w-full">
+                                        <FormField
+                                          control={form.control}
+                                          name="tiebreakerScore.score"
+                                          render={({ field, fieldState }) => {
+                                            return (
+                                              <FormItem>
+                                                <FormLabel>
+                                                  Tiebreaker Score
+                                                </FormLabel>
+                                                <FormControl>
+                                                  <Input
+                                                    {...field}
+                                                    type="number"
+                                                    step="1"
+                                                    className={cn(
+                                                      "w-full focus-visible:ring-2",
+                                                      fieldState.invalid
+                                                        ? "ring-2 ring-wrong"
+                                                        : "ring-2 ring-correct",
+                                                    )}
+                                                  />
+                                                </FormControl>
+                                                <Text.Small className="mt-2 text-xs text-muted-foreground">
+                                                  You must enter a score between
+                                                  1 and 200
+                                                </Text.Small>
+                                              </FormItem>
+                                            );
+                                          }}
+                                        />
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
+                              </RadioGroup>
                             </div>
+                          </TooltipTrigger>
+                          {disabled && (
+                            <TooltipContent>
+                              <p>This game has already started</p>
+                            </TooltipContent>
                           )}
-                        </div>
-                      </RadioGroup>
+                        </Tooltip>
+                      </TooltipProvider>
                     </CardContent>
                   </div>
                 </Card>

@@ -98,6 +98,7 @@ export function LoginClientPage() {
                         <FormLabel>Email</FormLabel>
                         <FormControl>
                           <Input
+                            autoFocus
                             {...field}
                             type="email"
                             required
