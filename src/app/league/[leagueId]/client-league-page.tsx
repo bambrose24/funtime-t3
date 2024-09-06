@@ -409,10 +409,12 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
                 <DrawerContent>
                   <div className="mx-auto w-full max-w-sm">
                     <DrawerHeader>
-                      <DrawerTitle>
+                      <DrawerTitle className="text-center">
                         Your Week {firstGame.week}, {firstGame.season} Picks
                       </DrawerTitle>
-                      <DrawerDescription>{league.name}</DrawerDescription>
+                      <DrawerDescription className="text-center">
+                        {league.name}
+                      </DrawerDescription>
                     </DrawerHeader>
                     <div className="overflow-scroll">
                       <CompactYourPicksList
