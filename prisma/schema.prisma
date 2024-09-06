@@ -19,7 +19,7 @@ model EmailLogs {
   ts            DateTime      @default(now()) @db.Timestamptz(6)
   week          Int?
   resend_id     String
-  leagues       leagues       @relation(fields: [league_id], references: [league_id], onUpdate: Restrict)
+  leagues       leagues       @relation(fields: [league_id], references: [league_id], onUpdate: Restrict, onDelete: Cascade)
   leaguemembers leaguemembers @relation(fields: [member_id], references: [membership_id], onDelete: Cascade)
 
   @@index([league_id], map: "idx_emaillogs_league_id")
