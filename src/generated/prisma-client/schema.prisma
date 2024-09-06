@@ -89,7 +89,7 @@ model leaguemembers {
   EmailLogs      EmailLogs[]
   WeekWinners    WeekWinners[]
   people         people           @relation(fields: [user_id], references: [uid], onDelete: Cascade, onUpdate: Restrict, map: "leaguemembers_ibfk_1")
-  leagues        leagues          @relation(fields: [league_id], references: [league_id], onUpdate: Restrict, map: "leaguemembers_ibfk_2")
+  leagues        leagues          @relation(fields: [league_id], references: [league_id], onUpdate: Restrict, onDelete: Cascade, map: "leaguemembers_ibfk_2")
   leaguemessages leaguemessages[]
   picks          picks[]
   superbowl      superbowl[]
