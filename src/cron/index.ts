@@ -66,7 +66,7 @@ export async function run() {
         } satisfies Parameters<typeof db.games.update>[0]["data"];
 
         console.log(
-          `${LOG_PREFIX} going to update game ${game.gid} with data ${JSON.stringify(data)}`,
+          `${LOG_PREFIX} going to update game ${game.gid} with data ${JSON.stringify(data)}, got msf data ${JSON.stringify(msfGame)}`,
         );
 
         return db.games.update({
