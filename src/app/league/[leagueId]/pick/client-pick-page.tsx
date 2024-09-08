@@ -58,11 +58,19 @@ type Props = {
 const picksSchema = z.object({
   applyToAllSeasonLeagues: z.boolean().default(false),
   picks: z.array(
-    z.object({
-      gid: z.number().int(),
-      winner: z.number().int().nullable(),
-      isRandom: z.boolean().default(false),
-    }),
+    z.union([
+      z.object({
+        type: z.literal("toPick"),
+        gid: z.number().int(),
+        winner: z.number().int().nullable(),
+        isRandom: z.boolean().default(false),
+      }),
+      z.object({
+        type: z.literal("alreadyStarted"),
+        gid: z.number().int(),
+        cannotPick: z.literal(true),
+      }),
+    ]),
   ),
   tiebreakerScore: z.object({
     gid: z.number().int(),
@@ -114,7 +122,14 @@ export function ClientPickPage({
       applyToAllSeasonLeagues: false,
       picks: games.map((g) => {
         const p = existingPicks.find((p) => p.gid === g.gid);
+        if (g.ts < new Date()) {
+          return {
+            gid: g.gid,
+            type: "alreadyStarted",
+          };
+        }
         return {
+          type: "toPick",
           gid: g.gid,
           winner: p?.winner ?? undefined,
           isRandom: p?.is_random ?? undefined,
@@ -153,18 +168,20 @@ export function ClientPickPage({
         `going to submit picks for league(s): ${leagueIds.join(",")}`,
       );
       await submitPicks({
-        picks: data.picks.map((p) => {
-          const score =
-            data.tiebreakerScore.gid === p.gid &&
-            Number.isInteger(Number(data.tiebreakerScore.score))
-              ? Number(data.tiebreakerScore.score)
-              : undefined;
-          return {
-            ...p,
-            winner: p.winner!,
-            ...(score !== undefined ? { score } : {}),
-          };
-        }),
+        picks: data.picks
+          .filter((p) => p.type === "toPick")
+          .map((p) => {
+            const score =
+              data.tiebreakerScore.gid === p.gid &&
+              Number.isInteger(Number(data.tiebreakerScore.score))
+                ? Number(data.tiebreakerScore.score)
+                : undefined;
+            return {
+              ...p,
+              winner: p.winner!,
+              ...(score !== undefined ? { score } : {}),
+            };
+          }),
         leagueIds,
         overrideMemberId: undefined,
       });
@@ -201,6 +218,7 @@ export function ClientPickPage({
     }
     console.log(`going to update idx ${idx} gid ${gid} winner ${winner}`);
     picksField.update(idx, {
+      type: "toPick",
       gid,
       winner,
       isRandom: false,
@@ -210,11 +228,12 @@ export function ClientPickPage({
   const randomizePicks = () => {
     picksField.fields.forEach((f, idx) => {
       const game = gameById.get(f.gid);
-      if (!game) {
+      if (!game || game.ts < new Date()) {
         return;
       }
       const winner = Math.random() < 0.5 ? game.away : game?.home;
       picksField.update(idx, {
+        type: "toPick",
         gid: f.gid,
         winner,
         isRandom: true,
@@ -312,13 +331,15 @@ export function ClientPickPage({
             >
               Randomize Picks
             </Button>
-            {picksField.fields.map(({ gid, winner }, idx) => {
+            {picksField.fields.map((f, idx) => {
+              const { gid } = f;
+              const winner = f.type === "toPick" ? f.winner : null;
               const game = gameById.get(gid);
               if (!game) {
                 return null;
               }
               const started = game.ts < new Date();
-              const disabled = started;
+              const disabled = started || f.type === "alreadyStarted";
               const home = teamById.get(game.home);
               const away = teamById.get(game.away);
               if (!home || !away) {

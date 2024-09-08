@@ -28,7 +28,7 @@ export const MSFGameScheduleSchema = z.object({
 export const MSFGameScoreSchema = z.object({
   currentQuarter: z.number().nullable(),
   currentQuarterSecondsRemaining: z.number().nullable(),
-  currentIntermission: z.string().nullable(),
+  currentIntermission: z.union([z.string(), z.number()]).nullable(),
   awayScoreTotal: z.number().nullable(),
   homeScoreTotal: z.number().nullable(),
 });
