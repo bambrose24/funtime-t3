@@ -40,7 +40,7 @@ export async function run() {
         if (!awayTeam || !homeTeam || !game || game.done) {
           return null;
         }
-        const done = msfGame.schedule.playedStatus === "COMPLETED";
+        const done = msfGame.schedule.playedStatus === "COMPLETED" || msfGame.schedule.playedStatus === 'COMPLETED_PENDING_REVIEW';
 
         let winner: number | null = null;
         if (
