@@ -92,6 +92,6 @@
     },
     "./*": "./*"
   },
-  "version": "5.19.0",
+  "version": "5.19.1",
   "sideEffects": false
 }
