@@ -1,3 +1,4 @@
+import { env } from "~/env";
 import { PrismaClient } from "~/generated/prisma-client";
 import { config } from "~/utils/config";
 
