@@ -36,5 +36,5 @@ const configMap: Record<Env, Config> = {
   },
 };
 
-export const env = (process.env.NEXT_PUBLIC_VERCEL_ENV ?? "development") as Env;
+export const env = (process.env.NEXT_PUBLIC_VERCEL_ENV ?? process.env.NEXT_PUBLIC_FUNTIME_ENV ?? "development") as Env;
 export const config = configMap[env];
