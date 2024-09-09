@@ -128,7 +128,7 @@ export const leagueAdminRouter = createTRPCRouter({
     ]);
     const memberIds = dbMembers.map((m) => m.membership_id);
 
-    const [picks, doneGames] = await Promise.all([
+    const [picks, allGames] = await Promise.all([
       db.picks.groupBy({
         by: ["member_id", "correct"],
         where: {
@@ -139,19 +139,41 @@ export const leagueAdminRouter = createTRPCRouter({
         },
         _count: true,
       }),
-      await db.games.count({
+      await db.games.findMany({
         where: {
           season: league.season,
-          done: true,
         },
       }),
     ]);
 
+    const doneGames = allGames.filter(g => g.done === true).length;
+    const now = new Date();
+    const startedGames = allGames.filter(g => g.ts < now);
+    const startedGameIds = new Set(startedGames.map(g => g.gid));
+
     const donePicksByMemberId = groupBy(picks, (p) => p.member_id);
+
+    const picksMadeForStartedGames = await db.picks.groupBy({
+      by: ['member_id'],
+      where: {
+        gid: {
+          in: Array.from(startedGameIds),
+        }
+      },
+      _count: true,
+    });
+
+    const picksMadeForStartedGamesByMemberId = groupBy(picksMadeForStartedGames, p => p.member_id);
 
     const members = orderBy(
       dbMembers.map((member) => {
         const picksCounts = donePicksByMemberId[member.membership_id] ?? [];
+
+        const picksMadeList = picksMadeForStartedGamesByMemberId[member.membership_id] ?? [];
+        const picksMadeForStartedGamesForMember = picksMadeList.reduce((prev, curr) => {
+          return prev + curr._count;
+        }, 0)
+
         const correctPicks = picksCounts
           .filter((p) => p.correct === 1)
           .reduce((prev, curr) => prev + curr._count, 0);
@@ -163,7 +185,7 @@ export const leagueAdminRouter = createTRPCRouter({
           ...member,
           correctPicks,
           wrongPicks,
-          misssedPicks: doneGames - (correctPicks + wrongPicks),
+          misssedPicks: startedGames.length - picksMadeForStartedGamesForMember,
         };
       }),
       (m) => m.people.username.toLowerCase(),
