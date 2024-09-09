@@ -1,6 +1,7 @@
 import { PrismaClient } from "~/generated/prisma-client";
+import { config } from "~/utils/config";
 
-import { env } from "~/env";
+
 import { getLogger } from "~/utils/logging";
 
 const LOG_PREFIX = `[prisma client]`;
@@ -15,7 +16,7 @@ const createPrismaClient = () => {
     ],
   });
 
-  if (env.VERCEL_ENV === "production") {
+  if (config.logging.level !== "error") {
     prisma.$on("query", (e) => {
       getLogger().info(`${LOG_PREFIX} Query executed`, {
         prismaQueryDurationMs: e.duration,

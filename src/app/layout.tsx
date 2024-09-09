@@ -1,7 +1,6 @@
 import "~/styles/globals.css";
 
 import { Inter } from "next/font/google";
-import { SpeedInsights } from "@vercel/speed-insights/next";
 import { TRPCReactProvider } from "~/trpc/react";
 import type { Metadata, Viewport } from "next";
 import { ThemeProvider } from "../components/theme-provider";
@@ -55,7 +54,6 @@ export default function RootLayout({
               <div className="grid grid-cols-12 gap-4 p-2">{children}</div>
               <Toaster position="bottom-right" richColors duration={5000} />
               <AxiomWebVitals />
-              <SpeedInsights />
             </ThemeProvider>
           </UserProviderServer>
         </TRPCReactProvider>
