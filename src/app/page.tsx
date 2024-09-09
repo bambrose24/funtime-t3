@@ -17,6 +17,7 @@ export default async function Home() {
   ]);
 
   if (!session.dbUser && session.supabaseUser) {
+    // they didn't finish signing up, make them do it
     redirect("/confirm-signup");
   }
 
