@@ -418,6 +418,7 @@ export const leagueRouter = createTRPCRouter({
         prev.set(curr.gid, idx);
         return prev;
       }, new Map<number, number>());
+      const tiebreakerGameId = games.find(g => g.is_tiebreaker)?.gid;
 
       const mps = memberPicks.map((mp) => {
         mp.picks = orderBy(
@@ -439,6 +440,7 @@ export const leagueRouter = createTRPCRouter({
           correctPicks: mp.picks.reduce((prev, curr) => {
             return prev + (curr.correct ? 1 : 0);
           }, 0),
+          tiebreakerScore: tiebreakerGameId ? mp.picks.find(p => p.gid === tiebreakerGameId)?.score ?? 0 : 0,
           gameIdToPick: mp.picks.reduce((prev, curr) => {
             prev.set(curr.gid, curr);
             return prev;

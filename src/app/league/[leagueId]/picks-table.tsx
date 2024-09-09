@@ -21,6 +21,15 @@ import { Skeleton } from "~/components/ui/skeleton";
 import { useDictify } from "~/utils/hooks/useIdToValMemo";
 import Link from "next/link";
 import { type RouterOutputs } from "~/trpc/types";
+import { clientApi } from "~/trpc/react";
+import { Badge } from "~/components/ui/badge";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "~/components/ui/tooltip";
+import { Info } from "lucide-react";
 
 type Props = {
   picksSummary: RouterOutputs["league"]["picksSummary"];
@@ -48,6 +57,7 @@ function PicksTableSkeleton() {
 // TODO use simulatedGames
 function PicksTableImpl({ picksSummary, games, teams, simulatedGames }: Props) {
   const teamIdToTeam = useDictify(teams, (t) => t.teamid);
+  const user = clientApi.session.current.useQuery();
   const gameIdToGame = useDictify(games, (g) => g.gid);
 
   const sortedData = useMemo(() => {
@@ -55,7 +65,6 @@ function PicksTableImpl({ picksSummary, games, teams, simulatedGames }: Props) {
       return -p.correctPicks;
     });
   }, [picksSummary]);
-
   const columns: ColumnDef<Pick>[] = [
     {
       maxSize: 30,
@@ -64,6 +73,19 @@ function PicksTableImpl({ picksSummary, games, teams, simulatedGames }: Props) {
       },
       cell: (c) => {
         const value = c.cell.getValue() as Pick;
+        const isViewer = user.data?.dbUser?.leaguemembers.some(
+          (m) => m.membership_id === value.membership_id,
+        );
+
+        if (isViewer) {
+          return (
+            <Link
+              href={`/league/${value.league_id}/player/${value.membership_id}`}
+            >
+              <Badge variant="default">{value.people.username}</Badge>
+            </Link>
+          );
+        }
         return (
           <Link
             href={`/league/${value.league_id}/player/${value.membership_id}`}
@@ -80,6 +102,31 @@ function PicksTableImpl({ picksSummary, games, teams, simulatedGames }: Props) {
       accessorKey: "correctPicks",
       header: "Correct",
       id: "correct",
+    },
+    {
+      accessorKey: "tiebreakerScore",
+      // header: "Tiebreaker Score",
+      header: (_data) => {
+        return (
+          <div className="flex items-center gap-1">
+            Score
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Info className="h-4 w-4 cursor-help" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  The tiebreaker score is the total score of the last game in
+                  the week. If there are multiple players with the same total
+                  picks correct, the player with the closest total score wins.
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
+        );
+      },
+      id: "tiebreakerScore",
+      maxSize: 10,
     },
     ...games.map((g): ColumnDef<Pick> => {
       return {
