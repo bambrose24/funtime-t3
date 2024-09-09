@@ -146,7 +146,6 @@ export const leagueAdminRouter = createTRPCRouter({
       }),
     ]);
 
-    const doneGames = allGames.filter(g => g.done === true).length;
     const now = new Date();
     const startedGames = allGames.filter(g => g.ts < now);
     const startedGameIds = new Set(startedGames.map(g => g.gid));
