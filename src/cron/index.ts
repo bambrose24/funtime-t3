@@ -128,9 +128,104 @@ export async function run() {
     });
   }
 
-  // update game records
   games = orderBy(games, ["week", "ts"], ["asc", "asc"]);
 
+  // update WeekWinners
+  // Get all leagues
+  const [leagues, existingWinners] = await Promise.all([
+    db.leagues.findMany({
+      where: { season },
+    }),
+    db.weekWinners.findMany({
+      where: {
+        leagues: {
+          season
+        }
+      }
+    })
+  ]);
+
+  // Process each league
+  for (const league of leagues) {
+    // Get all done weeks
+    const doneWeeks = games
+      .filter(game => game.done)
+      .map(game => game.week);
+    const uniqueDoneWeeks = [...new Set(doneWeeks)];
+
+    // Process each done week
+    for (const week of uniqueDoneWeeks) {
+      // Check if all games for this week are done
+      const allGamesDone = games
+        .filter(game => game.week === week)
+        .every(game => game.done);
+
+      if (!allGamesDone) continue;
+
+      const hasExistingWinner = existingWinners.some(w => w.league_id === league.league_id && w.week === week);
+
+      if (hasExistingWinner) {
+        continue;
+      }
+
+      // Get all picks for this league and week
+      const picks = await db.picks.findMany({
+        where: {
+          leaguemembers: {
+            league_id: league.league_id,
+          },
+          week,
+        },
+        include: {
+          people: true,
+        },
+      });
+
+      // Group picks by person
+      const picksByMember = groupBy(picks, pick => pick.member_id);
+
+      // Calculate scores for each person
+      const scores = Object.entries(picksByMember).map(([memberId, personPicks]) => {
+        const correctPicks = personPicks.filter(pick => pick.correct === 1).length;
+        const tiebreakerGame = games.find(game => game.week === week && game.is_tiebreaker);
+        const tiebreakerPick = personPicks.find(pick => pick.gid === tiebreakerGame?.gid);
+        const tiebreakerDiff = tiebreakerPick && tiebreakerPick.score !== null && tiebreakerGame
+          ? Math.abs(tiebreakerPick.score - ((tiebreakerGame.homescore ?? 0) + (tiebreakerGame.awayscore ?? 0)))
+          : Infinity;
+
+        return {
+          memberId: parseInt(memberId),
+          correctPicks,
+          tiebreakerDiff,
+        };
+      });
+
+      // Sort scores
+      const sortedScores = orderBy(scores, ['correctPicks', 'tiebreakerDiff'], ['desc', 'asc']);
+
+      if (!sortedScores.length) continue;
+
+      // Determine winner(s)
+      const winners = sortedScores.filter(score => score.correctPicks === sortedScores[0]?.correctPicks && score.tiebreakerDiff === sortedScores[0]?.tiebreakerDiff);
+
+      // Update or create WeekWinners
+      for (const winner of winners) {
+        await db.weekWinners.create({
+          data: {
+            league_id: league.league_id,
+            week,
+            membership_id: winner.memberId,
+            correct_count: winner.correctPicks,
+            score_diff: winner.tiebreakerDiff
+          },
+        });
+      }
+
+      console.log(`${LOG_PREFIX} Updated WeekWinners for league ${league.league_id}, week ${week} to be ${JSON.stringify(winners)}`);
+    }
+  }
+
+  // update game records
   const gamesByTeamId = games.reduce((acc, curr) => {
     if (!acc.has(curr.away)) {
       acc.set(curr.away, []);
