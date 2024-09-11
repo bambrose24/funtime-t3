@@ -286,8 +286,8 @@ export async function run() {
         return prev + (curr.done && !curr.winner ? 1 : 0);
       }, 0);
 
-      const awayrecord = `${awayWins}-${awayLosses}-${awayTies}`;
-      const homerecord = `${homeWins}-${homeLosses}-${homeTies}`;
+      const awayrecord = awayTies > 0 ? `${awayWins}-${awayLosses}-${awayTies}` : `${awayWins}-${awayLosses}`;
+      const homerecord = homeTies > 0 ? `${homeWins}-${homeLosses}-${homeTies}` : `${homeWins}-${homeLosses}`;
 
       console.log(
         `${LOG_PREFIX} going to update game ${game.gid} with awayrecord ${awayrecord} homerecord ${homerecord}`,
