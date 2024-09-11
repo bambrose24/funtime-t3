@@ -269,10 +269,25 @@ export async function run() {
         0,
       );
 
-      const awayLosses = awayDonePriorGames.length - awayWins;
-      const homeLosses = homeDonePriorGames.length - homeWins;
-      const awayrecord = `${awayWins}-${awayLosses}`;
-      const homerecord = `${homeWins}-${homeLosses}`;
+      const homeLosses = homeDonePriorGames.reduce(
+        (prev, curr) => prev + (curr.winner === game.away ? 1 : 0),
+        0,
+      );
+      const awayLosses = awayDonePriorGames.reduce(
+        (prev, curr) => prev + (curr.winner === game.home ? 1 : 0),
+        0,
+      );
+
+      const homeTies = homeDonePriorGames.reduce((prev, curr) => {
+        return prev + (curr.done && !curr.winner ? 1 : 0);
+      }, 0);
+
+      const awayTies = awayDonePriorGames.reduce((prev, curr) => {
+        return prev + (curr.done && !curr.winner ? 1 : 0);
+      }, 0);
+
+      const awayrecord = `${awayWins}-${awayLosses}-${awayTies}`;
+      const homerecord = `${homeWins}-${homeLosses}-${homeTies}`;
 
       console.log(
         `${LOG_PREFIX} going to update game ${game.gid} with awayrecord ${awayrecord} homerecord ${homerecord}`,
