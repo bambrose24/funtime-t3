@@ -261,11 +261,11 @@ export async function run() {
       const awayDonePriorGames = awayPriorGames.filter((g) => g.done);
 
       const homeWins = homeDonePriorGames.reduce(
-        (prev, curr) => prev + (curr.winner === curr.home ? 1 : 0),
+        (prev, curr) => prev + (curr.winner === game.home ? 1 : 0),
         0,
       );
       const awayWins = awayDonePriorGames.reduce(
-        (prev, curr) => prev + (curr.winner === curr.away ? 1 : 0),
+        (prev, curr) => prev + (curr.winner === game.away ? 1 : 0),
         0,
       );
 

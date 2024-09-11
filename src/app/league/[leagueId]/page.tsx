@@ -55,11 +55,12 @@ export default async function LeaguePage({
     (m) => m.league_id === leagueId,
   );
 
-  const [data, games, teams, weekWinners] = await Promise.all([
+  const [data, games, teams, weekWinners, weeksWithPicks] = await Promise.all([
     serverApi.league.picksSummary({ leagueId, week }),
     serverApi.games.getGames({ week, season }),
     serverApi.teams.getTeams(),
     serverApi.league.weekWinners({ week, leagueId }),
+    serverApi.picks.weeksWithPicks({ leagueId }),
   ]);
 
   const viewerHasPicks =
@@ -80,6 +81,7 @@ export default async function LeaguePage({
       currentGame={activeGame}
       viewerHasPicks={viewerHasPicks}
       weekWinners={weekWinners}
+      weeksWithPicks={weeksWithPicks}
     />
   );
 }

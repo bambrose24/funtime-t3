@@ -47,13 +47,14 @@ type ClientLeaguePageProps = {
   session: RouterOutputs["session"]["current"];
   currentGame: RouterOutputs["time"]["activeWeekByLeague"];
   weekWinners: RouterOutputs["league"]["weekWinners"];
+  weeksWithPicks: RouterOutputs["picks"]["weeksWithPicks"];
   viewerHasPicks: boolean;
 };
 
 const REFETCH_INTERVAL_MS = 1000 * 60 * 2;
 
 export function ClientLeaguePage(props: ClientLeaguePageProps) {
-  const { teams, league, session, currentGame } = props;
+  const { teams, league, session, currentGame, weeksWithPicks } = props;
 
   const { data: games } = clientApi.games.getGames.useQuery(
     {
@@ -80,6 +81,10 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
     { week: props.week, leagueId: props.leagueId },
     { initialData: props.weekWinners, refetchInterval: REFETCH_INTERVAL_MS },
   );
+
+  const weeksOptions = useMemo(() => {
+    return weeksWithPicks.weeks.reverse();
+  }, [weeksWithPicks.weeks]);
 
   const [chatSheetOpen, setChatSheetOpen] = useState(false);
 
@@ -218,16 +223,13 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
                 <SelectValue placeholder={`Week ${firstGame.week}`} />
               </SelectTrigger>
               <SelectContent>
-                {[...Array(currentGame.week).keys()]
-                  .reverse()
-                  .map((weekMinusOne) => {
-                    const realWeek = weekMinusOne + 1;
-                    return (
-                      <SelectItem key={realWeek} value={realWeek.toString()}>
-                        Week {realWeek}
-                      </SelectItem>
-                    );
-                  })}
+                {weeksOptions.reverse().map((weekOption) => {
+                  return (
+                    <SelectItem key={weekOption} value={weekOption.toString()}>
+                      Week {weekOption}
+                    </SelectItem>
+                  );
+                })}
               </SelectContent>
             </Select>
           )}

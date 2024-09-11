@@ -20,6 +20,32 @@ const submitPicksSchema = z.object({
 });
 
 export const picksRouter = createTRPCRouter({
+  weeksWithPicks: authorizedProcedure.input(z.object({
+    leagueId: z.number(),
+  })).query(async ({ ctx, input }) => {
+    const member = ctx.dbUser?.leaguemembers.find(m => m.league_id === input.leagueId);
+
+    if (!member) {
+      throw new TRPCError({
+        code: "UNAUTHORIZED",
+        message: "You are not a member of this league",
+      });
+    }
+
+    const picks = await ctx.db.picks.findMany({
+      where: {
+        member_id: member.membership_id,
+      },
+      select: {
+        week: true,
+      },
+      distinct: ['week'],
+    });
+
+    const weeks = Array.from(new Set(picks.map(p => p.week))).sort();
+
+    return { weeks }
+  }),
   submitPicks: authorizedProcedure
     .input(submitPicksSchema)
     .mutation(async ({ ctx, input }) => {
