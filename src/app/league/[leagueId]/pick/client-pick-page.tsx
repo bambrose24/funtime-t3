@@ -69,6 +69,7 @@ const picksSchema = z.object({
         type: z.literal("alreadyStarted"),
         gid: z.number().int(),
         cannotPick: z.literal(true),
+        alreadyPickedWinner: z.number().int().nullable(),
       }),
     ]),
   ),
@@ -126,6 +127,8 @@ export function ClientPickPage({
           return {
             gid: g.gid,
             type: "alreadyStarted",
+            alreadyPickedWinner: p?.winner ?? undefined,
+            cannotPick: true,
           };
         }
         return {
@@ -333,7 +336,8 @@ export function ClientPickPage({
             </Button>
             {picksField.fields.map((f, idx) => {
               const { gid } = f;
-              const winner = f.type === "toPick" ? f.winner : null;
+              const winner =
+                f.type === "toPick" ? f.winner : f.alreadyPickedWinner;
               const game = gameById.get(gid);
               if (!game) {
                 return null;
