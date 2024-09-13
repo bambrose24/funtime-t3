@@ -43,7 +43,7 @@ async function run() {
         return result;
       })
       if (espnGame && Number(espnGame.id)) {
-        const espnGameId = Number(espnGame.id);
+        // const espnGameId = Number(espnGame.id);
         console.log(`found espnGame with id ${espnGame.id} for dbGame ${dbGame.gid}`);
         // await db.games.update({
         //   where: {

@@ -1,6 +1,5 @@
 import { chunk, groupBy, orderBy } from "lodash";
 import { db } from "~/server/db";
-import { msf } from "~/server/services/mysportsfeeds";
 import { DEFAULT_SEASON } from "~/utils/const";
 import { Defined } from "~/utils/defined";
 import { addHours } from 'date-fns';
@@ -45,7 +44,7 @@ export async function run() {
         const awayTeam =
           teamByAbbrev[awayCompetitor?.team?.abbreviation ?? '']?.at(0);
 
-        if (!awayTeam || !homeTeam || !game || game.done || !espnCompetition) {
+        if (!awayTeam || !homeTeam || !game || !espnCompetition || game.done) {
           return null;
         }
         const done = espnCompetition?.status.type.name === 'STATUS_FINAL';
@@ -76,7 +75,7 @@ export async function run() {
         } satisfies Parameters<typeof db.games.update>[0]["data"];
 
         console.log(
-          `${LOG_PREFIX} going to update game ${game.gid} with data ${JSON.stringify(data)}, got msf data ${JSON.stringify(msfGame)}`,
+          `${LOG_PREFIX} going to update game ${game.gid} with data ${JSON.stringify(data)}, got msf data ${JSON.stringify(espnGame)}`,
         );
 
         return db.games.update({
