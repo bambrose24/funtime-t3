@@ -43,7 +43,7 @@ export const messagesRouter = createTRPCRouter({
       z.object({
         week: z.number().int(),
         leagueId: z.number().int(),
-        content: z.string().min(1).max(300),
+        content: z.string().min(1).max(500),
       }),
     )
     .mutation(async ({ ctx, input }) => {

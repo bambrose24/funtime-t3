@@ -111,6 +111,12 @@ export default function PicksConfirmationEmail({
                           >
                             {pick.homeTeam}
                           </span>
+                          <span>
+                            {" - "}
+                            {pick.chosen === "away"
+                              ? pick.awayTeam
+                              : pick.homeTeam}
+                          </span>
                         </Row>
                         {/* <Row className="flex justify-center font-mono text-xs">
                           {format(pick.time, "M/d/yy h:mm a", {
