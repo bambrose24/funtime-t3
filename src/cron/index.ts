@@ -36,7 +36,7 @@ export async function run() {
         const espnGameId = Number(espnGame.id);
         const game = gamesByEspnId[espnGameId]?.at(0);
         const espnCompetition = espnGame.competitions.at(0);
-        const homeCompetitor = espnCompetition?.competitors.find(t => t.homeAway === 'away');
+        const homeCompetitor = espnCompetition?.competitors.find(t => t.homeAway === 'home');
         const awayCompetitor = espnCompetition?.competitors.find(t => t.homeAway === 'away');
 
         const homeTeam =
