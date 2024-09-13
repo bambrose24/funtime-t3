@@ -279,11 +279,11 @@ export async function run() {
       );
 
       const homeLosses = homeDonePriorGames.reduce(
-        (prev, curr) => prev + (curr.winner === game.away ? 1 : 0),
+        (prev, curr) => prev + (curr.winner && curr.winner !== game.home ? 1 : 0),
         0,
       );
       const awayLosses = awayDonePriorGames.reduce(
-        (prev, curr) => prev + (curr.winner === game.home ? 1 : 0),
+        (prev, curr) => prev + (curr.winner && curr.winner !== game.away ? 1 : 0),
         0,
       );
 
