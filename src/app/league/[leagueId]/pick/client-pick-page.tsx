@@ -47,6 +47,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "~/components/ui/tooltip";
+import { Defined } from "~/utils/defined";
 
 type Props = {
   league: RouterOutputs["league"]["get"];
@@ -179,11 +180,10 @@ export function ClientPickPage({
       );
       await submitPicks({
         picks: data.picks
-          .filter(
-            (p): p is Extract<typeof p, { type: "toPick" }> =>
-              p.type === "toPick" && p.winner !== null,
-          )
           .map((p) => {
+            if (p.type !== "toPick" || !p.winner) {
+              return null;
+            }
             const score =
               data.tiebreakerScore.gid === p.gid &&
               Number.isInteger(Number(data.tiebreakerScore.score))
@@ -194,7 +194,8 @@ export function ClientPickPage({
               winner: p.winner,
               ...(score !== undefined ? { score } : {}),
             };
-          }),
+          })
+          .filter(Defined),
         leagueIds,
         overrideMemberId: undefined,
       });
