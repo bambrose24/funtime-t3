@@ -162,7 +162,8 @@ exports.Prisma.GamesScalarFieldEnum = {
   awayrecord: 'awayrecord',
   current_quarter_seconds_remaining: 'current_quarter_seconds_remaining',
   current_quarter: 'current_quarter',
-  msf_id: 'msf_id'
+  msf_id: 'msf_id',
+  espn_id: 'espn_id'
 };
 
 exports.Prisma.LeaguemembersScalarFieldEnum = {

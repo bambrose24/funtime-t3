@@ -4149,6 +4149,7 @@ export namespace Prisma {
     current_quarter_seconds_remaining: number | null
     current_quarter: number | null
     msf_id: number | null
+    espn_id: number | null
   }
 
   export type GamesSumAggregateOutputType = {
@@ -4164,6 +4165,7 @@ export namespace Prisma {
     current_quarter_seconds_remaining: number | null
     current_quarter: number | null
     msf_id: number | null
+    espn_id: number | null
   }
 
   export type GamesMinAggregateOutputType = {
@@ -4186,6 +4188,7 @@ export namespace Prisma {
     current_quarter_seconds_remaining: number | null
     current_quarter: number | null
     msf_id: number | null
+    espn_id: number | null
   }
 
   export type GamesMaxAggregateOutputType = {
@@ -4208,6 +4211,7 @@ export namespace Prisma {
     current_quarter_seconds_remaining: number | null
     current_quarter: number | null
     msf_id: number | null
+    espn_id: number | null
   }
 
   export type GamesCountAggregateOutputType = {
@@ -4230,6 +4234,7 @@ export namespace Prisma {
     current_quarter_seconds_remaining: number
     current_quarter: number
     msf_id: number
+    espn_id: number
     _all: number
   }
 
@@ -4247,6 +4252,7 @@ export namespace Prisma {
     current_quarter_seconds_remaining?: true
     current_quarter?: true
     msf_id?: true
+    espn_id?: true
   }
 
   export type GamesSumAggregateInputType = {
@@ -4262,6 +4268,7 @@ export namespace Prisma {
     current_quarter_seconds_remaining?: true
     current_quarter?: true
     msf_id?: true
+    espn_id?: true
   }
 
   export type GamesMinAggregateInputType = {
@@ -4284,6 +4291,7 @@ export namespace Prisma {
     current_quarter_seconds_remaining?: true
     current_quarter?: true
     msf_id?: true
+    espn_id?: true
   }
 
   export type GamesMaxAggregateInputType = {
@@ -4306,6 +4314,7 @@ export namespace Prisma {
     current_quarter_seconds_remaining?: true
     current_quarter?: true
     msf_id?: true
+    espn_id?: true
   }
 
   export type GamesCountAggregateInputType = {
@@ -4328,6 +4337,7 @@ export namespace Prisma {
     current_quarter_seconds_remaining?: true
     current_quarter?: true
     msf_id?: true
+    espn_id?: true
     _all?: true
   }
 
@@ -4437,6 +4447,7 @@ export namespace Prisma {
     current_quarter_seconds_remaining: number | null
     current_quarter: number | null
     msf_id: number | null
+    espn_id: number | null
     _count: GamesCountAggregateOutputType | null
     _avg: GamesAvgAggregateOutputType | null
     _sum: GamesSumAggregateOutputType | null
@@ -4478,6 +4489,7 @@ export namespace Prisma {
     current_quarter_seconds_remaining?: boolean
     current_quarter?: boolean
     msf_id?: boolean
+    espn_id?: boolean
     teams_games_homeToteams?: boolean | teamsDefaultArgs<ExtArgs>
     teams_games_awayToteams?: boolean | teamsDefaultArgs<ExtArgs>
     picks?: boolean | games$picksArgs<ExtArgs>
@@ -4504,6 +4516,7 @@ export namespace Prisma {
     current_quarter_seconds_remaining?: boolean
     current_quarter?: boolean
     msf_id?: boolean
+    espn_id?: boolean
     teams_games_homeToteams?: boolean | teamsDefaultArgs<ExtArgs>
     teams_games_awayToteams?: boolean | teamsDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["games"]>
@@ -4528,6 +4541,7 @@ export namespace Prisma {
     current_quarter_seconds_remaining?: boolean
     current_quarter?: boolean
     msf_id?: boolean
+    espn_id?: boolean
   }
 
   export type gamesInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -4568,6 +4582,7 @@ export namespace Prisma {
       current_quarter_seconds_remaining: number | null
       current_quarter: number | null
       msf_id: number | null
+      espn_id: number | null
     }, ExtArgs["result"]["games"]>
     composites: {}
   }
@@ -4983,6 +4998,7 @@ export namespace Prisma {
     readonly current_quarter_seconds_remaining: FieldRef<"games", 'Int'>
     readonly current_quarter: FieldRef<"games", 'Int'>
     readonly msf_id: FieldRef<"games", 'Int'>
+    readonly espn_id: FieldRef<"games", 'Int'>
   }
     
 
@@ -14209,7 +14225,8 @@ export namespace Prisma {
     awayrecord: 'awayrecord',
     current_quarter_seconds_remaining: 'current_quarter_seconds_remaining',
     current_quarter: 'current_quarter',
-    msf_id: 'msf_id'
+    msf_id: 'msf_id',
+    espn_id: 'espn_id'
   };
 
   export type GamesScalarFieldEnum = (typeof GamesScalarFieldEnum)[keyof typeof GamesScalarFieldEnum]
@@ -14716,6 +14733,7 @@ export namespace Prisma {
     current_quarter_seconds_remaining?: IntNullableFilter<"games"> | number | null
     current_quarter?: IntNullableFilter<"games"> | number | null
     msf_id?: IntNullableFilter<"games"> | number | null
+    espn_id?: IntNullableFilter<"games"> | number | null
     teams_games_homeToteams?: XOR<TeamsRelationFilter, teamsWhereInput>
     teams_games_awayToteams?: XOR<TeamsRelationFilter, teamsWhereInput>
     picks?: PicksListRelationFilter
@@ -14741,6 +14759,7 @@ export namespace Prisma {
     current_quarter_seconds_remaining?: SortOrderInput | SortOrder
     current_quarter?: SortOrderInput | SortOrder
     msf_id?: SortOrderInput | SortOrder
+    espn_id?: SortOrderInput | SortOrder
     teams_games_homeToteams?: teamsOrderByWithRelationInput
     teams_games_awayToteams?: teamsOrderByWithRelationInput
     picks?: picksOrderByRelationAggregateInput
@@ -14769,6 +14788,7 @@ export namespace Prisma {
     current_quarter_seconds_remaining?: IntNullableFilter<"games"> | number | null
     current_quarter?: IntNullableFilter<"games"> | number | null
     msf_id?: IntNullableFilter<"games"> | number | null
+    espn_id?: IntNullableFilter<"games"> | number | null
     teams_games_homeToteams?: XOR<TeamsRelationFilter, teamsWhereInput>
     teams_games_awayToteams?: XOR<TeamsRelationFilter, teamsWhereInput>
     picks?: PicksListRelationFilter
@@ -14794,6 +14814,7 @@ export namespace Prisma {
     current_quarter_seconds_remaining?: SortOrderInput | SortOrder
     current_quarter?: SortOrderInput | SortOrder
     msf_id?: SortOrderInput | SortOrder
+    espn_id?: SortOrderInput | SortOrder
     _count?: gamesCountOrderByAggregateInput
     _avg?: gamesAvgOrderByAggregateInput
     _max?: gamesMaxOrderByAggregateInput
@@ -14824,6 +14845,7 @@ export namespace Prisma {
     current_quarter_seconds_remaining?: IntNullableWithAggregatesFilter<"games"> | number | null
     current_quarter?: IntNullableWithAggregatesFilter<"games"> | number | null
     msf_id?: IntNullableWithAggregatesFilter<"games"> | number | null
+    espn_id?: IntNullableWithAggregatesFilter<"games"> | number | null
   }
 
   export type leaguemembersWhereInput = {
@@ -15664,6 +15686,7 @@ export namespace Prisma {
     current_quarter_seconds_remaining?: number | null
     current_quarter?: number | null
     msf_id?: number | null
+    espn_id?: number | null
     teams_games_homeToteams: teamsCreateNestedOneWithoutGames_games_homeToteamsInput
     teams_games_awayToteams: teamsCreateNestedOneWithoutGames_games_awayToteamsInput
     picks?: picksCreateNestedManyWithoutGamesInput
@@ -15689,6 +15712,7 @@ export namespace Prisma {
     current_quarter_seconds_remaining?: number | null
     current_quarter?: number | null
     msf_id?: number | null
+    espn_id?: number | null
     picks?: picksUncheckedCreateNestedManyWithoutGamesInput
   }
 
@@ -15709,6 +15733,7 @@ export namespace Prisma {
     current_quarter_seconds_remaining?: NullableIntFieldUpdateOperationsInput | number | null
     current_quarter?: NullableIntFieldUpdateOperationsInput | number | null
     msf_id?: NullableIntFieldUpdateOperationsInput | number | null
+    espn_id?: NullableIntFieldUpdateOperationsInput | number | null
     teams_games_homeToteams?: teamsUpdateOneRequiredWithoutGames_games_homeToteamsNestedInput
     teams_games_awayToteams?: teamsUpdateOneRequiredWithoutGames_games_awayToteamsNestedInput
     picks?: picksUpdateManyWithoutGamesNestedInput
@@ -15734,6 +15759,7 @@ export namespace Prisma {
     current_quarter_seconds_remaining?: NullableIntFieldUpdateOperationsInput | number | null
     current_quarter?: NullableIntFieldUpdateOperationsInput | number | null
     msf_id?: NullableIntFieldUpdateOperationsInput | number | null
+    espn_id?: NullableIntFieldUpdateOperationsInput | number | null
     picks?: picksUncheckedUpdateManyWithoutGamesNestedInput
   }
 
@@ -15757,6 +15783,7 @@ export namespace Prisma {
     current_quarter_seconds_remaining?: number | null
     current_quarter?: number | null
     msf_id?: number | null
+    espn_id?: number | null
   }
 
   export type gamesUpdateManyMutationInput = {
@@ -15776,6 +15803,7 @@ export namespace Prisma {
     current_quarter_seconds_remaining?: NullableIntFieldUpdateOperationsInput | number | null
     current_quarter?: NullableIntFieldUpdateOperationsInput | number | null
     msf_id?: NullableIntFieldUpdateOperationsInput | number | null
+    espn_id?: NullableIntFieldUpdateOperationsInput | number | null
   }
 
   export type gamesUncheckedUpdateManyInput = {
@@ -15798,6 +15826,7 @@ export namespace Prisma {
     current_quarter_seconds_remaining?: NullableIntFieldUpdateOperationsInput | number | null
     current_quarter?: NullableIntFieldUpdateOperationsInput | number | null
     msf_id?: NullableIntFieldUpdateOperationsInput | number | null
+    espn_id?: NullableIntFieldUpdateOperationsInput | number | null
   }
 
   export type leaguemembersCreateInput = {
@@ -16810,6 +16839,7 @@ export namespace Prisma {
     current_quarter_seconds_remaining?: SortOrder
     current_quarter?: SortOrder
     msf_id?: SortOrder
+    espn_id?: SortOrder
   }
 
   export type gamesAvgOrderByAggregateInput = {
@@ -16825,6 +16855,7 @@ export namespace Prisma {
     current_quarter_seconds_remaining?: SortOrder
     current_quarter?: SortOrder
     msf_id?: SortOrder
+    espn_id?: SortOrder
   }
 
   export type gamesMaxOrderByAggregateInput = {
@@ -16847,6 +16878,7 @@ export namespace Prisma {
     current_quarter_seconds_remaining?: SortOrder
     current_quarter?: SortOrder
     msf_id?: SortOrder
+    espn_id?: SortOrder
   }
 
   export type gamesMinOrderByAggregateInput = {
@@ -16869,6 +16901,7 @@ export namespace Prisma {
     current_quarter_seconds_remaining?: SortOrder
     current_quarter?: SortOrder
     msf_id?: SortOrder
+    espn_id?: SortOrder
   }
 
   export type gamesSumOrderByAggregateInput = {
@@ -16884,6 +16917,7 @@ export namespace Prisma {
     current_quarter_seconds_remaining?: SortOrder
     current_quarter?: SortOrder
     msf_id?: SortOrder
+    espn_id?: SortOrder
   }
 
   export type BoolNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -20906,6 +20940,7 @@ export namespace Prisma {
     current_quarter_seconds_remaining?: number | null
     current_quarter?: number | null
     msf_id?: number | null
+    espn_id?: number | null
     teams_games_homeToteams: teamsCreateNestedOneWithoutGames_games_homeToteamsInput
     teams_games_awayToteams: teamsCreateNestedOneWithoutGames_games_awayToteamsInput
   }
@@ -20930,6 +20965,7 @@ export namespace Prisma {
     current_quarter_seconds_remaining?: number | null
     current_quarter?: number | null
     msf_id?: number | null
+    espn_id?: number | null
   }
 
   export type gamesCreateOrConnectWithoutPicksInput = {
@@ -21065,6 +21101,7 @@ export namespace Prisma {
     current_quarter_seconds_remaining?: NullableIntFieldUpdateOperationsInput | number | null
     current_quarter?: NullableIntFieldUpdateOperationsInput | number | null
     msf_id?: NullableIntFieldUpdateOperationsInput | number | null
+    espn_id?: NullableIntFieldUpdateOperationsInput | number | null
     teams_games_homeToteams?: teamsUpdateOneRequiredWithoutGames_games_homeToteamsNestedInput
     teams_games_awayToteams?: teamsUpdateOneRequiredWithoutGames_games_awayToteamsNestedInput
   }
@@ -21089,6 +21126,7 @@ export namespace Prisma {
     current_quarter_seconds_remaining?: NullableIntFieldUpdateOperationsInput | number | null
     current_quarter?: NullableIntFieldUpdateOperationsInput | number | null
     msf_id?: NullableIntFieldUpdateOperationsInput | number | null
+    espn_id?: NullableIntFieldUpdateOperationsInput | number | null
   }
 
   export type peopleUpsertWithoutPicksInput = {
@@ -21440,6 +21478,7 @@ export namespace Prisma {
     current_quarter_seconds_remaining?: number | null
     current_quarter?: number | null
     msf_id?: number | null
+    espn_id?: number | null
     teams_games_awayToteams: teamsCreateNestedOneWithoutGames_games_awayToteamsInput
     picks?: picksCreateNestedManyWithoutGamesInput
   }
@@ -21463,6 +21502,7 @@ export namespace Prisma {
     current_quarter_seconds_remaining?: number | null
     current_quarter?: number | null
     msf_id?: number | null
+    espn_id?: number | null
     picks?: picksUncheckedCreateNestedManyWithoutGamesInput
   }
 
@@ -21493,6 +21533,7 @@ export namespace Prisma {
     current_quarter_seconds_remaining?: number | null
     current_quarter?: number | null
     msf_id?: number | null
+    espn_id?: number | null
     teams_games_homeToteams: teamsCreateNestedOneWithoutGames_games_homeToteamsInput
     picks?: picksCreateNestedManyWithoutGamesInput
   }
@@ -21516,6 +21557,7 @@ export namespace Prisma {
     current_quarter_seconds_remaining?: number | null
     current_quarter?: number | null
     msf_id?: number | null
+    espn_id?: number | null
     picks?: picksUncheckedCreateNestedManyWithoutGamesInput
   }
 
@@ -21665,6 +21707,7 @@ export namespace Prisma {
     current_quarter_seconds_remaining?: IntNullableFilter<"games"> | number | null
     current_quarter?: IntNullableFilter<"games"> | number | null
     msf_id?: IntNullableFilter<"games"> | number | null
+    espn_id?: IntNullableFilter<"games"> | number | null
   }
 
   export type gamesUpsertWithWhereUniqueWithoutTeams_games_awayToteamsInput = {
@@ -22400,6 +22443,7 @@ export namespace Prisma {
     current_quarter_seconds_remaining?: number | null
     current_quarter?: number | null
     msf_id?: number | null
+    espn_id?: number | null
   }
 
   export type gamesCreateManyTeams_games_awayToteamsInput = {
@@ -22421,6 +22465,7 @@ export namespace Prisma {
     current_quarter_seconds_remaining?: number | null
     current_quarter?: number | null
     msf_id?: number | null
+    espn_id?: number | null
   }
 
   export type picksCreateManyTeamsInput = {
@@ -22475,6 +22520,7 @@ export namespace Prisma {
     current_quarter_seconds_remaining?: NullableIntFieldUpdateOperationsInput | number | null
     current_quarter?: NullableIntFieldUpdateOperationsInput | number | null
     msf_id?: NullableIntFieldUpdateOperationsInput | number | null
+    espn_id?: NullableIntFieldUpdateOperationsInput | number | null
     teams_games_awayToteams?: teamsUpdateOneRequiredWithoutGames_games_awayToteamsNestedInput
     picks?: picksUpdateManyWithoutGamesNestedInput
   }
@@ -22498,6 +22544,7 @@ export namespace Prisma {
     current_quarter_seconds_remaining?: NullableIntFieldUpdateOperationsInput | number | null
     current_quarter?: NullableIntFieldUpdateOperationsInput | number | null
     msf_id?: NullableIntFieldUpdateOperationsInput | number | null
+    espn_id?: NullableIntFieldUpdateOperationsInput | number | null
     picks?: picksUncheckedUpdateManyWithoutGamesNestedInput
   }
 
@@ -22520,6 +22567,7 @@ export namespace Prisma {
     current_quarter_seconds_remaining?: NullableIntFieldUpdateOperationsInput | number | null
     current_quarter?: NullableIntFieldUpdateOperationsInput | number | null
     msf_id?: NullableIntFieldUpdateOperationsInput | number | null
+    espn_id?: NullableIntFieldUpdateOperationsInput | number | null
   }
 
   export type gamesUpdateWithoutTeams_games_awayToteamsInput = {
@@ -22539,6 +22587,7 @@ export namespace Prisma {
     current_quarter_seconds_remaining?: NullableIntFieldUpdateOperationsInput | number | null
     current_quarter?: NullableIntFieldUpdateOperationsInput | number | null
     msf_id?: NullableIntFieldUpdateOperationsInput | number | null
+    espn_id?: NullableIntFieldUpdateOperationsInput | number | null
     teams_games_homeToteams?: teamsUpdateOneRequiredWithoutGames_games_homeToteamsNestedInput
     picks?: picksUpdateManyWithoutGamesNestedInput
   }
@@ -22562,6 +22611,7 @@ export namespace Prisma {
     current_quarter_seconds_remaining?: NullableIntFieldUpdateOperationsInput | number | null
     current_quarter?: NullableIntFieldUpdateOperationsInput | number | null
     msf_id?: NullableIntFieldUpdateOperationsInput | number | null
+    espn_id?: NullableIntFieldUpdateOperationsInput | number | null
     picks?: picksUncheckedUpdateManyWithoutGamesNestedInput
   }
 
@@ -22584,6 +22634,7 @@ export namespace Prisma {
     current_quarter_seconds_remaining?: NullableIntFieldUpdateOperationsInput | number | null
     current_quarter?: NullableIntFieldUpdateOperationsInput | number | null
     msf_id?: NullableIntFieldUpdateOperationsInput | number | null
+    espn_id?: NullableIntFieldUpdateOperationsInput | number | null
   }
 
   export type picksUpdateWithoutTeamsInput = {

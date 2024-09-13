@@ -5,6 +5,7 @@ import { DEFAULT_SEASON } from "~/utils/const";
 import { Defined } from "~/utils/defined";
 import { addHours } from 'date-fns';
 import { resendApi } from "~/server/services/resend";
+import { espn } from "~/server/services/espn";
 
 const LOG_PREFIX = "[cron]";
 
@@ -15,9 +16,10 @@ export async function run() {
 
   const season = DEFAULT_SEASON;
 
-  const msfGames = await msf.getGamesBySeason({ season });
+  // const msfGames = await msf.getGamesBySeason({ season });
+  const espnGames = await espn.getGamesBySeason({ season });
 
-  console.log(`${LOG_PREFIX} msf games ${JSON.stringify(msfGames)}`)
+  console.log(`${LOG_PREFIX} msf games ${JSON.stringify(espnGames)}`)
   let games = await db.games.findMany({
     where: {
       season,
@@ -26,43 +28,51 @@ export async function run() {
   const teams = await db.teams.findMany();
   const teamByAbbrev = groupBy(teams, (t) => t.abbrev);
 
-  const gamesByMsfId = groupBy(games, (g) => g.msf_id);
-  const msfGamesById = groupBy(msfGames, (g) => g.schedule.id);
+  const gamesByEspnId = groupBy(games, (g) => g.espn_id);
+  const espnGamesById = groupBy(espnGames, g => Number(g.id))
 
   await db.$transaction(
-    msfGames
-      .map((msfGame) => {
-        const game = gamesByMsfId[msfGame.schedule.id]?.at(0);
-        const awayTeam =
-          teamByAbbrev[msfGame.schedule.awayTeam.abbreviation]?.at(0);
+    espnGames
+      .map((espnGame) => {
+        const espnGameId = Number(espnGame.id);
+        const game = gamesByEspnId[espnGameId]?.at(0);
+        const espnCompetition = espnGame.competitions.at(0);
+        const homeCompetitor = espnCompetition?.competitors.find(t => t.homeAway === 'away');
+        const awayCompetitor = espnCompetition?.competitors.find(t => t.homeAway === 'away');
+
         const homeTeam =
-          teamByAbbrev[msfGame.schedule.homeTeam.abbreviation]?.at(0);
-        if (!awayTeam || !homeTeam || !game || game.done) {
+          teamByAbbrev[homeCompetitor?.team?.abbreviation ?? '']?.at(0);
+        const awayTeam =
+          teamByAbbrev[awayCompetitor?.team?.abbreviation ?? '']?.at(0);
+
+        if (!awayTeam || !homeTeam || !game || game.done || !espnCompetition) {
           return null;
         }
-        const done = msfGame.schedule.playedStatus === "COMPLETED" || msfGame.schedule.playedStatus === 'COMPLETED_PENDING_REVIEW';
+        const done = espnCompetition?.status.type.name === 'STATUS_FINAL';
+        const homeScore = homeCompetitor?.score ? Number(homeCompetitor.score) : null;
+        const awayScore = awayCompetitor?.score ? Number(awayCompetitor.score) : null;
 
         let winner: number | null = null;
         if (
           done &&
-          msfGame.score.homeScoreTotal !== null &&
-          msfGame.score.awayScoreTotal !== null
+          homeScore !== null &&
+          awayScore !== null
         ) {
-          if (msfGame.score.homeScoreTotal > msfGame.score.awayScoreTotal) {
+          if (homeScore > awayScore) {
             winner = game.home;
           } else if (
-            msfGame.score.awayScoreTotal > msfGame.score.homeScoreTotal
+            awayScore > homeScore
           ) {
             winner = game.away;
           }
         }
         const data = {
-          awayscore: msfGame.score.awayScoreTotal ?? 0,
-          homescore: msfGame.score.homeScoreTotal ?? 0,
+          awayscore: awayScore ?? 0,
+          homescore: homeScore ?? 0,
           done,
           winner,
-          current_quarter: msfGame.score.currentQuarter,
-          current_quarter_seconds_remaining: msfGame.score.currentQuarterSecondsRemaining,
+          current_quarter: espnCompetition.status.period ?? 0,
+          current_quarter_seconds_remaining: espnCompetition.status.clock,
         } satisfies Parameters<typeof db.games.update>[0]["data"];
 
         console.log(
@@ -323,21 +333,22 @@ export async function run() {
   const firstUnstartedGameWeek = firstUnstartedGame?.week;
 
   for (const game of games) {
-    const msfGame = game.msf_id ? msfGamesById[game.msf_id]?.at(0) : undefined;
+    const espnGame = game.espn_id ? espnGamesById[game.espn_id]?.at(0) : undefined;
+    const espnGameDateSeconds = espnGame ? new Date(espnGame.date).getTime() : undefined;
     if (
       firstUnstartedGameWeek &&
-      msfGame &&
-      msfGame.schedule.week > firstUnstartedGameWeek
+      espnGame && espnGameDateSeconds &&
+      espnGame.week.number > firstUnstartedGameWeek
     ) {
       console.log(
-        `${LOG_PREFIX} going to update time for game ${game.gid} to ${msfGame.schedule.startTime}`,
+        `${LOG_PREFIX} going to update time for game ${game.gid} to ${espnGameDateSeconds}`,
       );
       await db.games.update({
         where: {
           gid: game.gid,
         },
         data: {
-          ts: new Date(msfGame.schedule.startTime),
+          ts: new Date(espnGame.date),
         },
       });
     }

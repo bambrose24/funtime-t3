@@ -67,6 +67,7 @@ model games {
   current_quarter_seconds_remaining Int?
   current_quarter                   Int?
   msf_id                            Int?
+  espn_id                           Int?
   teams_games_homeToteams           teams    @relation("games_homeToteams", fields: [home], references: [teamid], onUpdate: Restrict, map: "games_ibfk_1")
   teams_games_awayToteams           teams    @relation("games_awayToteams", fields: [away], references: [teamid], onUpdate: Restrict, map: "games_ibfk_2")
   picks                             picks[]
@@ -74,6 +75,7 @@ model games {
   @@index([away], map: "idx_18403_away")
   @@index([home], map: "idx_18403_home")
   @@index([msf_id], map: "idx_18403_msf_id")
+  @@index([espn_id])
   @@index([season], map: "idx_18403_season")
   @@index([ts], map: "idx_18403_ts")
   @@index([week], map: "idx_18403_week")
