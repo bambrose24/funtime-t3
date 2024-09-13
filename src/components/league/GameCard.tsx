@@ -83,6 +83,7 @@ export function GameCard({
           "border-wrong": status === "wrong",
         },
       )}
+      data-gameid={game.gid}
     >
       <div className="grid grid-cols-3 gap-y-1">
         <div className="flex flex-row items-center justify-center">
