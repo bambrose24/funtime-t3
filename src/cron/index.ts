@@ -44,7 +44,7 @@ export async function run() {
         const awayTeam =
           teamByAbbrev[awayCompetitor?.team?.abbreviation ?? '']?.at(0);
 
-        if (!awayTeam || !homeTeam || !game || !espnCompetition) {
+        if (!awayTeam || !homeTeam || !game || !espnCompetition || game.done) {
           return null;
         }
         const done = espnCompetition?.status.type.name === 'STATUS_FINAL';
