@@ -95,10 +95,17 @@ export function ClientPickPage({
   weekToPick,
   teams,
   league,
+  // existingPicks: existingPicksProp,
   existingPicks,
 }: Props) {
   const { week, season, games } = weekToPick;
   const { league_id: leagueId } = league;
+
+  // do this to test out missing the first game
+  // const firstGameId = games.at(0)?.gid;
+  // const existingPicks = firstGameId
+  //   ? existingPicksProp.filter((p) => p.gid !== firstGameId)
+  //   : existingPicksProp;
 
   const router = useRouter();
   const { dbUser } = useUserEnforced();
@@ -127,15 +134,15 @@ export function ClientPickPage({
           return {
             gid: g.gid,
             type: "alreadyStarted",
-            alreadyPickedWinner: p?.winner ?? undefined,
+            alreadyPickedWinner: p?.winner ?? null,
             cannotPick: true,
           };
         }
         return {
           type: "toPick",
           gid: g.gid,
-          winner: p?.winner ?? undefined,
-          isRandom: p?.is_random ?? undefined,
+          winner: p?.winner ? p.winner : null,
+          isRandom: p?.is_random ?? false,
         };
       }),
       tiebreakerScore: {
@@ -172,7 +179,10 @@ export function ClientPickPage({
       );
       await submitPicks({
         picks: data.picks
-          .filter((p) => p.type === "toPick")
+          .filter(
+            (p): p is Extract<typeof p, { type: "toPick" }> =>
+              p.type === "toPick" && p.winner !== null,
+          )
           .map((p) => {
             const score =
               data.tiebreakerScore.gid === p.gid &&
@@ -181,7 +191,7 @@ export function ClientPickPage({
                 : undefined;
             return {
               ...p,
-              winner: p.winner!,
+              winner: p.winner,
               ...(score !== undefined ? { score } : {}),
             };
           }),
