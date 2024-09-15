@@ -308,28 +308,33 @@ export const leagueRouter = createTRPCRouter({
 
       const { season } = data;
 
-      const mostRecentUnstartedGame = await ctx.db.games.findFirst({
+      const mostRecentStartedGame = await ctx.db.games.findFirst({
         where: {
           season,
           ts: {
-            gte: new Date(),
+            lte: new Date(),
           },
         },
         orderBy: {
-          ts: "asc",
+          ts: "desc",
         },
       });
 
-      if (!mostRecentUnstartedGame) {
+      if (!mostRecentStartedGame) {
         return { week: null, season: null, games: [] };
       }
 
-      const { week } = mostRecentUnstartedGame;
+      const { week } = mostRecentStartedGame;
 
       const gamesResp = await ctx.db.games.findMany({
         where: {
           season,
-          week,
+          OR: [
+            {
+              week,
+            },
+            { week: week + 1 }
+          ]
         },
       });
 
@@ -339,7 +344,10 @@ export const leagueRouter = createTRPCRouter({
         ["asc", "asc", "asc"],
       );
 
-      const memberPicks = await ctx.db.picks.findMany({
+      const mostRecentStartedWeekGames = games.filter(g => g.week === week);
+      const nextWeekGames = games.filter(g => g.week === (week + 1));
+
+      const multipleWeekMemberPicks = await ctx.db.picks.findMany({
         where: {
           gid: {
             in: games.map((g) => g.gid),
@@ -348,11 +356,23 @@ export const leagueRouter = createTRPCRouter({
         },
       });
 
+      const mostRecentStartedWeekPicks = multipleWeekMemberPicks.filter(pick =>
+        mostRecentStartedWeekGames.some(game => game.gid === pick.gid)
+      );
+      const nextWeekPicks = multipleWeekMemberPicks.filter(pick =>
+        nextWeekGames.some(game => game.gid === pick.gid)
+      );
+
+      const weekToReturn = mostRecentStartedWeekPicks.length > 0 ? week + 1 : week;
+      const picksToReturn = weekToReturn === week ? mostRecentStartedWeekPicks : nextWeekPicks;
+      const gamesToReturn = weekToReturn === week ? mostRecentStartedWeekGames : nextWeekGames;
+
+
       return {
         season,
-        week,
-        games,
-        picks: memberPicks,
+        week: weekToReturn,
+        games: gamesToReturn,
+        picks: picksToReturn,
       };
     }),
   picksSummary: publicProcedure
