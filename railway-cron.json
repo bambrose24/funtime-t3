@@ -6,7 +6,6 @@
   },
   "deploy": {
     "startCommand": "bun run cron",
-    "restartPolicyType": "NEVER",
-    "cronSchedule": "*/10 * * * *"
+    "restartPolicyType": "NEVER"
   }
 }
