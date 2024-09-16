@@ -51,9 +51,9 @@ export async function run() {
         );
 
         const homeTeam =
-          teamByAbbrev[homeCompetitor?.team?.abbreviation ?? ""]?.at(0);
+          teamByAbbrev[espn.translateAbbreviation(homeCompetitor?.team?.abbreviation ?? "")]?.at(0);
         const awayTeam =
-          teamByAbbrev[awayCompetitor?.team?.abbreviation ?? ""]?.at(0);
+          teamByAbbrev[espn.translateAbbreviation(awayCompetitor?.team?.abbreviation ?? "")]?.at(0);
 
         if (!awayTeam || !homeTeam || !game || !espnCompetition || game.done) {
           if (espnGame.week.number === 2) {
