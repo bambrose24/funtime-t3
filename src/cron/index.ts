@@ -17,6 +17,13 @@ export async function run() {
 
   // const msfGames = await msf.getGamesBySeason({ season });
   const espnGames = await espn.getGamesBySeason({ season });
+  console.log(
+    `${LOG_PREFIX} Full espnGames response as second parameter`,
+    espnGames,
+  );
+  console.log(
+    `${LOG_PREFIX} Full espnGames response as stringified: ${JSON.stringify(espnGames)}`,
+  );
 
   console.log(`${LOG_PREFIX} espn games ${JSON.stringify(espnGames)}`);
   let games = await db.games.findMany({
@@ -49,7 +56,9 @@ export async function run() {
           teamByAbbrev[awayCompetitor?.team?.abbreviation ?? ""]?.at(0);
 
         if (!awayTeam || !homeTeam || !game || !espnCompetition || game.done) {
-          console.log(`${LOG_PREFIX} Could not find game or teams for ESPN game ${JSON.stringify(espnGame)}`)
+          console.log(
+            `${LOG_PREFIX} Could not find game or teams for ESPN game ${JSON.stringify(espnGame)}`,
+          );
           return null;
         }
         const done = espnCompetition?.status.type.name === "STATUS_FINAL";
