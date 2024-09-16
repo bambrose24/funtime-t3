@@ -50,16 +50,26 @@ export const homeRouter = createTRPCRouter({
       return null;
     }
 
-    const leagueIds = dbUser.leaguemembers.map((m) => m.league_id).sort();
+    const cachedFn = cache(
+      async () => {
+        const leagueIds = dbUser.leaguemembers.map((m) => m.league_id).sort();
 
-    const leagues = await db.leagues.findMany({
-      where: {
-        league_id: {
-          in: leagueIds,
-        },
+        const leagues = await db.leagues.findMany({
+          where: {
+            league_id: {
+              in: leagueIds,
+            },
+          },
+        });
+
+        return orderBy(leagues, (l) => l.season, "desc");
       },
-    });
+      [`user_home_${dbUser.uid}`],
+      {
+        revalidate: 60 * 60, // hour
+      },
+    );
 
-    return orderBy(leagues, (l) => l.season, "desc");
+    return cachedFn();
   }),
 });

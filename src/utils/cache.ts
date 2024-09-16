@@ -4,7 +4,7 @@ import { parse, stringify } from "superjson";
 export const cache = <T, P extends unknown[]>(
   fn: (...params: P) => Promise<T>,
   keys: Parameters<typeof unstable_cache>[1],
-  opts: Parameters<typeof unstable_cache>[2],
+  opts?: Parameters<typeof unstable_cache>[2],
 ) => {
   const wrap = async (params: unknown[]): Promise<string> => {
     const result = await fn(...(params as P));
