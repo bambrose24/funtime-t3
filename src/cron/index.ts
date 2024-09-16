@@ -56,9 +56,11 @@ export async function run() {
           teamByAbbrev[awayCompetitor?.team?.abbreviation ?? ""]?.at(0);
 
         if (!awayTeam || !homeTeam || !game || !espnCompetition || game.done) {
-          console.log(
-            `${LOG_PREFIX} Could not find game or teams for ESPN game ${JSON.stringify(espnGame)}`,
-          );
+          if (espnGame.week === 1) {
+            console.log(
+              `${LOG_PREFIX} Could not find game or teams for ESPN game ${JSON.stringify(espnGame)}`,
+            );
+          }
           return null;
         }
         const done = espnCompetition?.status.type.name === "STATUS_FINAL";
