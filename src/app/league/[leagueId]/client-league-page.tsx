@@ -54,7 +54,14 @@ type ClientLeaguePageProps = {
 const REFETCH_INTERVAL_MS = 1000 * 60 * 2;
 
 export function ClientLeaguePage(props: ClientLeaguePageProps) {
-  const { teams, league, session, currentGame, weeksWithPicks } = props;
+  const { teams, league, session, currentGame } = props;
+
+  const { data: weeksWithPicks } = clientApi.picks.weeksWithPicks.useQuery(
+    {
+      leagueId: props.leagueId,
+    },
+    { initialData: props.weeksWithPicks, refetchInterval: REFETCH_INTERVAL_MS },
+  );
 
   const { data: games } = clientApi.games.getGames.useQuery(
     {
