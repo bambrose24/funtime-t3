@@ -18,8 +18,8 @@ export const playerProfileRouter = createTRPCRouter({
       if (!dbUser) {
         throw UnauthorizedError;
       }
-      const viewerLeagues = ctx.dbUser?.leaguemembers.map((m) => m.league_id);
-      if (!viewerLeagues?.includes(leagueId)) {
+      const viewerMember = ctx.dbUser?.leaguemembers.find((m) => m.league_id);
+      if (!viewerMember) {
         throw UnauthorizedError;
       }
 
@@ -36,11 +36,25 @@ export const playerProfileRouter = createTRPCRouter({
         throw UnauthorizedError;
       }
 
+      const doneGidsForTheYear = await db.games.findMany({
+        where: {
+          season: viewerMember.leagues.season,
+          done: true,
+        },
+        select: {
+          gid: true,
+        }
+      })
+
+      const doneGids = doneGidsForTheYear.map(g => g.gid);
+
       const picksGrouped = await db.picks.groupBy({
         by: "correct",
         where: {
           member_id: memberId,
-          done: 1,
+          gid: {
+            in: doneGids,
+          }
         },
         _count: true,
       });
