@@ -30,42 +30,34 @@ export const playerProfileRouter = createTRPCRouter({
           superbowl: true,
           WeekWinners: true,
           leaguemessages: true,
+          leagues: true,
         },
       });
       if (member.league_id !== leagueId) {
         throw UnauthorizedError;
       }
 
-      const doneGidsForTheYear = await db.games.findMany({
+      const doneGames = await db.games.findMany({
         where: {
-          season: viewerMember.leagues.season,
+          season: member.leagues.season,
           done: true,
         },
-        select: {
-          gid: true,
-        }
-      })
+      });
 
-      const doneGids = doneGidsForTheYear.map(g => g.gid);
+      const doneGids = doneGames.map((g) => g.gid);
 
-      const picksGrouped = await db.picks.groupBy({
-        by: "correct",
+      const picks = await db.picks.findMany({
         where: {
           member_id: memberId,
           gid: {
             in: doneGids,
-          }
+          },
         },
-        _count: true,
       });
 
-      const correctPicks = picksGrouped
-        .filter((p) => p.correct === 1)
-        .reduce((prev, curr) => prev + curr._count, 0);
-      const wrongPicks = picksGrouped
-        .filter((p) => p.correct !== 1)
-        .reduce((prev, curr) => prev + curr._count, 0);
+      const correctPicks = picks.filter((p) => p.correct === 1).length;
+      const wrongPicks = picks.filter((p) => p.correct !== 1).length;
 
-      return { member, correctPicks: correctPicks, wrongPicks };
+      return { member, correctPicks, wrongPicks };
     }),
 });

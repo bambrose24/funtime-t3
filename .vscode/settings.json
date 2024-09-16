@@ -1,5 +1,6 @@
 {
   "files.exclude": {
     "src/generated/**": true
-  }
+  },
+  "editor.defaultFormatter": "esbenp.prettier-vscode"
 }

@@ -97,6 +97,7 @@ export function ClientMemberPage({
   const superbowlWinner = teams.find((t) => t.teamid === superbowl?.winner);
   const superbowlLoser = teams.find((t) => t.teamid === superbowl?.loser);
 
+  console.log("playerProfile", playerProfile);
   const correct = playerProfile.correctPicks;
   const wrong = playerProfile.wrongPicks;
   const total = correct + wrong;
