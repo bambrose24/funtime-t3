@@ -308,7 +308,7 @@ export const leagueRouter = createTRPCRouter({
 
       const { season } = data;
 
-      const mostRecentStartedGame = await ctx.db.games.findFirst({
+      const [mostRecentStartedGame, nextGameToStart] = await Promise.all([ctx.db.games.findFirst({
         where: {
           season,
           ts: {
@@ -318,7 +318,19 @@ export const leagueRouter = createTRPCRouter({
         orderBy: {
           ts: "desc",
         },
-      });
+      }),
+      ctx.db.games.findFirst({
+        where: {
+          season,
+          ts: {
+            gte: new Date(),
+          },
+        },
+        orderBy: {
+          ts: 'asc',
+        }
+      })
+      ]);
 
       if (!mostRecentStartedGame) {
         return { week: null, season: null, games: [] };
@@ -363,7 +375,7 @@ export const leagueRouter = createTRPCRouter({
         nextWeekGames.some(game => game.gid === pick.gid)
       );
 
-      const weekToReturn = mostRecentStartedWeekPicks.length > 0 ? week + 1 : week;
+      const weekToReturn = mostRecentStartedWeekPicks.length > 0 || (nextGameToStart && nextGameToStart.week === week + 1) ? week + 1 : week;
       const picksToReturn = weekToReturn === week ? mostRecentStartedWeekPicks : nextWeekPicks;
       const gamesToReturn = weekToReturn === week ? mostRecentStartedWeekGames : nextWeekGames;
 
