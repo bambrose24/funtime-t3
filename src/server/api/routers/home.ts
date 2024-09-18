@@ -1,6 +1,7 @@
 import { orderBy } from "lodash";
 
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
+import { SECONDS_IN_DAY, SECONDS_IN_HOUR } from "~/server/const";
 import { cache, getCoreUserTag } from "~/utils/cache";
 
 // const HOME_REVALIDATE_SECONDS = 60 * 3; // 3 minutes should be good
@@ -66,7 +67,7 @@ export const homeRouter = createTRPCRouter({
       },
       [`user_home_${dbUser.uid}`],
       {
-        revalidate: 60 * 60, // hour
+        revalidate: SECONDS_IN_DAY,
       },
     );
 
