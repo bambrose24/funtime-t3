@@ -58,22 +58,35 @@ type Props = {
 
 const picksSchema = z.object({
   applyToAllSeasonLeagues: z.boolean().default(false),
-  picks: z.array(
-    z.union([
-      z.object({
-        type: z.literal("toPick"),
-        gid: z.number().int(),
-        winner: z.number().int().nullable(),
-        isRandom: z.boolean().default(false),
-      }),
-      z.object({
-        type: z.literal("alreadyStarted"),
-        gid: z.number().int(),
-        cannotPick: z.literal(true),
-        alreadyPickedWinner: z.number().int().nullable(),
-      }),
-    ]),
-  ),
+  picks: z
+    .array(
+      z.union([
+        z.object({
+          type: z.literal("toPick"),
+          gid: z.number().int(),
+          winner: z.number().int().nullable(),
+          isRandom: z.boolean().default(false),
+        }),
+        z.object({
+          type: z.literal("alreadyStarted"),
+          gid: z.number().int(),
+          cannotPick: z.literal(true),
+          alreadyPickedWinner: z.number().int().nullable(),
+        }),
+      ]),
+    )
+    .refine(
+      (picks) =>
+        picks.every(
+          (pick) =>
+            pick.type === "alreadyStarted" ||
+            (pick.type === "toPick" && pick.winner !== null),
+        ),
+      {
+        message: "All games must be picked",
+        path: ["picks"],
+      },
+    ),
   tiebreakerScore: z.object({
     gid: z.number().int(),
     score: z
@@ -156,6 +169,7 @@ export function ClientPickPage({
     },
     reValidateMode: "onChange",
     criteriaMode: "all",
+    mode: "onChange",
   });
 
   const applyToAllSeasonLeagues = form.watch("applyToAllSeasonLeagues");
