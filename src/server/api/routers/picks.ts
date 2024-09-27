@@ -220,7 +220,7 @@ export const picksRouter = createTRPCRouter({
               }));
             }
           }
-          return Promise.all(promises);
+          return await Promise.all(promises);
         });
       }
 
