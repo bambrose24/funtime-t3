@@ -11,7 +11,6 @@ import superjson from "superjson";
 import { ZodError } from "zod";
 
 import { db } from "~/server/db";
-import { cache, getCoreUserTag } from "~/utils/cache";
 import { createLogger, getLogger } from "~/utils/logging";
 import { RequestContext } from "~/utils/requestContext";
 import { supabaseServer } from "~/utils/supabase/server";
@@ -36,36 +35,26 @@ export const createTRPCContext = async (opts: { headers: Headers }) => {
 
   let dbUser = null;
   if (supabaseUser?.email) {
-    const getDbUser = cache(
-      async () => {
-        return await db.people.findFirst({
-          where: {
-            email: supabaseUser.email,
-          },
-          include: {
-            leaguemembers: {
+    dbUser = await db.people.findFirst({
+      where: {
+        email: supabaseUser.email,
+      },
+      include: {
+        leaguemembers: {
+          select: {
+            league_id: true,
+            membership_id: true,
+            role: true,
+            leagues: {
               select: {
-                league_id: true,
-                membership_id: true,
-                role: true,
-                leagues: {
-                  select: {
-                    season: true,
-                    name: true,
-                  },
-                },
+                season: true,
+                name: true,
               },
             },
           },
-        });
+        },
       },
-      ["getUserByEmail", supabaseUser.email],
-      {
-        revalidate: 10, // 10 seconds but revalidate via tag below
-        tags: [getCoreUserTag(supabaseUser.email)],
-      },
-    );
-    dbUser = await getDbUser();
+    });
   }
 
   const context = {
@@ -155,10 +144,10 @@ const procedure = t.procedure.use(async ({ path, type, next }) => {
     ok: result.ok,
     ...(result.ok === false
       ? {
-          trpcError: result.error.message,
-          trpcErrorCode: result.error.code,
-          ...(result.error.stack ? { trpcErrorStack: result.error.stack } : {}),
-        }
+        trpcError: result.error.message,
+        trpcErrorCode: result.error.code,
+        ...(result.error.stack ? { trpcErrorStack: result.error.stack } : {}),
+      }
       : {}),
   });
   return result;
