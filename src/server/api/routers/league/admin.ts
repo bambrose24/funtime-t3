@@ -3,7 +3,7 @@ import { authorizedProcedure, createTRPCRouter } from "../../trpc";
 import { MemberRole, type PrismaClient } from "~/generated/prisma-client";
 import { TRPCError } from "@trpc/server";
 import { groupBy, orderBy } from "lodash";
-import { addDays, subDays } from 'date-fns';
+import { addDays, subDays } from "date-fns";
 import { resendApi } from "~/server/services/resend";
 import { Defined } from "~/utils/defined";
 
@@ -31,17 +31,17 @@ const canSendBroadcastThisWeek = async (db: PrismaClient, leagueId: number) => {
       league_id: leagueId,
       email_type: "league_broadcast",
       ts: {
-        gte: sevenDaysAgo
-      }
+        gte: sevenDaysAgo,
+      },
     },
     orderBy: {
-      ts: 'desc'
+      ts: "desc",
     },
-    distinct: ['resend_id'], // since we log the same email for all the members we send to, we count distinct email instances instead of number of rows here
+    distinct: ["resend_id"], // since we log the same email for all the members we send to, we count distinct email instances instead of number of rows here
     take: 2,
     select: {
-      ts: true
-    }
+      ts: true,
+    },
   });
 
   if (recentBroadcasts.length < 2) {
@@ -147,31 +147,38 @@ export const leagueAdminRouter = createTRPCRouter({
     ]);
 
     const now = new Date();
-    const startedGames = allGames.filter(g => g.ts < now);
-    const startedGameIds = new Set(startedGames.map(g => g.gid));
+    const startedGames = allGames.filter((g) => g.ts < now);
+    const startedGameIds = new Set(startedGames.map((g) => g.gid));
 
     const donePicksByMemberId = groupBy(picks, (p) => p.member_id);
 
     const picksMadeForStartedGames = await db.picks.groupBy({
-      by: ['member_id'],
+      by: ["member_id"],
       where: {
         gid: {
           in: Array.from(startedGameIds),
-        }
+        },
       },
       _count: true,
     });
 
-    const picksMadeForStartedGamesByMemberId = groupBy(picksMadeForStartedGames, p => p.member_id);
+    const picksMadeForStartedGamesByMemberId = groupBy(
+      picksMadeForStartedGames,
+      (p) => p.member_id,
+    );
 
     const members = orderBy(
       dbMembers.map((member) => {
         const picksCounts = donePicksByMemberId[member.membership_id] ?? [];
 
-        const picksMadeList = picksMadeForStartedGamesByMemberId[member.membership_id] ?? [];
-        const picksMadeForStartedGamesForMember = picksMadeList.reduce((prev, curr) => {
-          return prev + curr._count;
-        }, 0)
+        const picksMadeList =
+          picksMadeForStartedGamesByMemberId[member.membership_id] ?? [];
+        const picksMadeForStartedGamesForMember = picksMadeList.reduce(
+          (prev, curr) => {
+            return prev + curr._count;
+          },
+          0,
+        );
 
         const correctPicks = picksCounts
           .filter((p) => p.correct === 1)
@@ -197,7 +204,7 @@ export const leagueAdminRouter = createTRPCRouter({
       z.object({
         memberIds: z.array(z.number().int()),
         paid: z.boolean(),
-      })
+      }),
     )
     .mutation(async ({ ctx, input }) => {
       const { db } = ctx;
@@ -215,11 +222,13 @@ export const leagueAdminRouter = createTRPCRouter({
       const validMemberIds = validMembers.map((m) => m.membership_id);
 
       // Ensure that the validMemberIds are exactly the same as the input memberIds
-      if (!validMemberIds.every((id) => memberIds.includes(id)) ||
-        !memberIds.every((id) => validMemberIds.includes(id))) {
+      if (
+        !validMemberIds.every((id) => memberIds.includes(id)) ||
+        !memberIds.every((id) => validMemberIds.includes(id))
+      ) {
         throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'One or more member IDs are not valid for this league',
+          code: "BAD_REQUEST",
+          message: "One or more member IDs are not valid for this league",
         });
       }
 
@@ -234,58 +243,159 @@ export const leagueAdminRouter = createTRPCRouter({
 
       return { success: true, updatedCount: validMemberIds.length };
     }),
-  memberEmails: leagueAdminProcedure.input(z.object({ memberId: z.number().int() })).query(async ({ ctx, input }) => {
+  memberPicks: leagueAdminProcedure
+    .input(
+      z.object({
+        memberId: z.number().int(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const { leagueId, memberId } = input;
 
-    const { db } = ctx;
-    const { memberId, leagueId } = input;
-
-    // Ensure the member is in the league
-    const memberInLeague = await db.leaguemembers.findFirst({
-      where: {
-        membership_id: memberId,
-        league_id: leagueId,
-      },
-    });
-
-    if (!memberInLeague) {
-      throw new TRPCError({
-        code: 'NOT_FOUND',
-        message: 'Member not found in this league',
+      const member = await ctx.db.leaguemembers.findFirstOrThrow({
+        where: {
+          league_id: leagueId,
+          membership_id: memberId,
+        },
       });
-    }
 
-    // Fetch email logs for the member
-    const emailLogs = await db.emailLogs.findMany({
-      where: {
-        member_id: memberId,
-        league_id: leagueId,
-      },
-      orderBy: {
-        ts: 'desc',
-      },
-    });
+      return await ctx.db.picks.findMany({
+        where: {
+          member_id: member.membership_id,
+        },
+      });
+    }),
+  setPick: leagueAdminProcedure
+    .input(
+      z.object({
+        memberId: z.number().int().min(1),
+        gameId: z.number().int().min(1),
+        winner: z.number().int().min(1),
+        score: z.number().int().optional(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { gameId, memberId, leagueId, winner, score } = input;
+      const [game, member, league] = await Promise.all([
+        ctx.db.games.findFirstOrThrow({
+          where: {
+            gid: gameId,
+          },
+        }),
+        ctx.db.leaguemembers.findFirstOrThrow({
+          where: {
+            league_id: leagueId,
+            membership_id: memberId,
+          },
+        }),
+        ctx.db.leagues.findFirstOrThrow({
+          where: {
+            league_id: leagueId,
+          },
+        }),
+      ]);
 
-    // Fetch email contents from Resend API
-    const emailsResponse = await Promise.all(
-      emailLogs.map(async (log) => {
-        try {
-          const emailContent = await resendApi.get(log.resend_id);
-          const data = emailContent?.data;
-          return {
-            id: log.email_log_id,
-            resend_id: log.resend_id,
-            resend_data: data,
-          };
-        } catch (error) {
-          console.error(`Failed to fetch email content for ID ${log.resend_id}:`, error);
-          return null;
-        }
-      })
-    );
+      if (!member || !game) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Game or member not found",
+        });
+      }
 
-    return { emails: emailsResponse.filter(Defined) }
+      if (![game.away, game.home].includes(winner)) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: `Could not find team ${winner} for game ${game.gid}`,
+        });
+      }
 
-  }),
+      const existingPick = await ctx.db.picks.findFirst({
+        where: {
+          gid: gameId,
+          member_id: memberId,
+        },
+      });
+
+      if (existingPick) {
+        await ctx.db.picks.update({
+          where: {
+            pickid: existingPick.pickid,
+          },
+          data: {
+            winner,
+            correct: null,
+            done: null,
+          },
+        });
+      } else {
+        await ctx.db.picks.create({
+          data: {
+            member_id: memberId,
+            uid: member.user_id,
+            season: league.season,
+            week: game.week,
+            gid: gameId,
+            winner,
+            score: Boolean(score) ? score : null,
+          },
+        });
+      }
+    }),
+  memberEmails: leagueAdminProcedure
+    .input(z.object({ memberId: z.number().int() }))
+    .query(async ({ ctx, input }) => {
+      const { db } = ctx;
+      const { memberId, leagueId } = input;
+
+      // Ensure the member is in the league
+      const memberInLeague = await db.leaguemembers.findFirst({
+        where: {
+          membership_id: memberId,
+          league_id: leagueId,
+        },
+      });
+
+      if (!memberInLeague) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Member not found in this league",
+        });
+      }
+
+      // Fetch email logs for the member
+      const emailLogs = await db.emailLogs.findMany({
+        where: {
+          member_id: memberId,
+          league_id: leagueId,
+        },
+        orderBy: {
+          ts: "desc",
+        },
+      });
+
+      // Fetch email contents from Resend API
+      const emailsResponse = await Promise.all(
+        emailLogs.map(async (log) => {
+          try {
+            const emailContent = await resendApi.get(log.resend_id);
+            const data = emailContent?.data;
+            return {
+              id: log.email_log_id,
+              resend_id: log.resend_id,
+              resend_data: data,
+            };
+          } catch (error) {
+            console.error(
+              `Failed to fetch email content for ID ${log.resend_id}:`,
+              error,
+            );
+            return null;
+          }
+        }),
+      );
+
+      return { emails: emailsResponse.filter(Defined) };
+    }),
   changeName: leagueAdminProcedure
     .input(
       z.object({
@@ -305,22 +415,23 @@ export const leagueAdminRouter = createTRPCRouter({
       });
       return updatedLeague;
     }),
-  canSendLeagueBroadcast: leagueAdminProcedure
-    .query(async ({ ctx, input }) => {
-      const { db, dbUser } = ctx;
-      const { leagueId } = input;
+  canSendLeagueBroadcast: leagueAdminProcedure.query(async ({ ctx, input }) => {
+    const { db, dbUser } = ctx;
+    const { leagueId } = input;
 
-      // Check if the user is an admin of the league
-      const adminMembership = dbUser?.leaguemembers.find(m => m.role === MemberRole.admin && m.league_id === leagueId);
-      if (!adminMembership || !dbUser) {
-        throw new TRPCError({
-          code: "FORBIDDEN",
-          message: "You are not an admin of this league",
-        });
-      }
+    // Check if the user is an admin of the league
+    const adminMembership = dbUser?.leaguemembers.find(
+      (m) => m.role === MemberRole.admin && m.league_id === leagueId,
+    );
+    if (!adminMembership || !dbUser) {
+      throw new TRPCError({
+        code: "FORBIDDEN",
+        message: "You are not an admin of this league",
+      });
+    }
 
-      return await canSendBroadcastThisWeek(db, leagueId);
-    }),
+    return await canSendBroadcastThisWeek(db, leagueId);
+  }),
   sendBroadcast: leagueAdminProcedure
     .input(
       z.object({
@@ -330,7 +441,9 @@ export const leagueAdminRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const { db, dbUser } = ctx;
       const { leagueId, markdownString } = input;
-      const adminMembership = dbUser?.leaguemembers.find(m => m.role === 'admin' && m.league_id === leagueId);
+      const adminMembership = dbUser?.leaguemembers.find(
+        (m) => m.role === "admin" && m.league_id === leagueId,
+      );
       if (!adminMembership || !dbUser) {
         throw new TRPCError({
           code: "FORBIDDEN",
@@ -348,7 +461,7 @@ export const leagueAdminRouter = createTRPCRouter({
       if (!canSendBroadcast.canSend) {
         throw new TRPCError({
           code: "TOO_MANY_REQUESTS",
-          message: `You can only send two broadcasts per week. ${canSendBroadcast.nextAvailableTime ? `Please try again after ${canSendBroadcast.nextAvailableTime.toISOString()}.` : ''}`,
+          message: `You can only send two broadcasts per week. ${canSendBroadcast.nextAvailableTime ? `Please try again after ${canSendBroadcast.nextAvailableTime.toISOString()}.` : ""}`,
         });
       }
 
@@ -359,7 +472,13 @@ export const leagueAdminRouter = createTRPCRouter({
       });
 
       const to = members
-        .map((m) => { return { email: m.people.email, memberId: m.membership_id } }).filter(t => t.email !== null) as { email: string; memberId: number }[];
+        .map((m) => {
+          return { email: m.people.email, memberId: m.membership_id };
+        })
+        .filter((t) => t.email !== null) as {
+          email: string;
+          memberId: number;
+        }[];
 
       // Send the broadcast email
       try {

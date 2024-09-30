@@ -57,6 +57,7 @@ import {
 } from "~/components/ui/tooltip";
 import { Switch } from "~/components/ui/switch";
 import { saveAs } from "file-saver";
+import { MemberPicksEdit } from "./MemberPicksEdit";
 
 type Props = {
   leagueId: number;
@@ -77,6 +78,15 @@ export function LeagueAdminMembersClientPage({
     },
     { initialData: membersProp },
   );
+
+  // prefetch some data
+  clientApi.games.getGames.useQuery({
+    season: league.season,
+  });
+  clientApi.league.weekToPick.useQuery({
+    leagueId,
+  });
+  clientApi.teams.getTeams.useQuery();
 
   const utils = clientApi.useUtils();
   const { mutateAsync: setMembersPaid } =
@@ -118,6 +128,7 @@ export function LeagueAdminMembersClientPage({
               <TableHead>Role</TableHead>
               <TableHead>Wins</TableHead>
               <TableHead>Missed Picks</TableHead>
+              <TableHead>Edit Picks</TableHead>
               <TableHead>Email Logs</TableHead>
               <TableHead className="flex items-center gap-1">
                 Donated?
@@ -164,6 +175,26 @@ export function LeagueAdminMembersClientPage({
                         ))}
                   </TableCell>
                   <TableCell>{member.misssedPicks}</TableCell>
+                  <TableCell>
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button variant="outline" size="sm">
+                          Edit Picks
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="max-h-[90vh] overflow-y-auto">
+                        <DialogHeader>
+                          <DialogTitle>
+                            Edit picks for {member.people.username}
+                          </DialogTitle>
+                        </DialogHeader>
+                        <MemberPicksEdit
+                          memberId={member.membership_id}
+                          league={league}
+                        />
+                      </DialogContent>
+                    </Dialog>
+                  </TableCell>
                   <TableCell>
                     <Dialog>
                       <DialogTrigger asChild>
