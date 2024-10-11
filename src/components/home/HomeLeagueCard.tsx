@@ -44,7 +44,7 @@ export function HomeLeagueCard({ data }: { data: LeagueCardData }) {
               </Text.Small>
             </div>
             <Separator />
-            <div className="flex w-full flex-row items-center justify-between">
+            <div className="flex w-full flex-row items-center justify-between gap-1">
               <Text.Small>Week Wins</Text.Small>
               <div className="flex max-w-[160px] flex-row flex-wrap justify-end gap-1">
                 {leagueDataPending && (
