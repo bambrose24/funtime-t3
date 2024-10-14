@@ -32,7 +32,7 @@ export function HomeLeagueCard({ data }: { data: LeagueCardData }) {
   }, [leagueData?.WeekWinners, userMemberIds, data.league_id]);
 
   return (
-    <Link href={`/league/${data.league_id}`} passHref>
+    <Link href={`/league/${data.league_id}`} passHref className="max-w-[240px]">
       <Card className="min-w-[240px] transition-colors hover:border-primary">
         <CardHeader className="text-center font-bold">{data.name}</CardHeader>
         <CardContent>
