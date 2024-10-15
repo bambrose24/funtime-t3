@@ -19,7 +19,9 @@ import {
   TableBody,
   TableHeader,
 } from "~/components/ui/table";
+import { clientApi } from "~/trpc/react";
 import { type serverApi } from "~/trpc/server";
+import { Badge } from "~/components/ui/badge";
 
 type TableProps = {
   leaderboard: Awaited<ReturnType<typeof serverApi.leaderboard.league>>;
@@ -33,79 +35,67 @@ type Column = NonNullable<
   Awaited<ReturnType<typeof serverApi.leaderboard.league>>
 >["correctCountsSorted"][number];
 
-export const columns: ColumnDef<Column>[] = [
-  {
-    id: "select",
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select Person"
-      />
-    ),
-  },
-  {
-    id: "rank",
-    accessorFn: (row) => {
-      return row.rank;
-    },
-    header: "Rank",
-    cell: ({ row }) => {
-      return <div>{row.getValue("rank")}</div>;
-    },
-  },
-  {
-    id: "username",
-    accessorFn: (d) => {
-      return d;
-    },
-    filterFn: (row, column, filterValue) => {
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
-      const val = row.getValue(column) as Column;
-      return val.member.people.username
-        .toLowerCase()
-        .includes((filterValue as string).toLowerCase());
-    },
-    header: "Player",
-    cell: ({ getValue }) => {
-      const c = getValue() as Column;
-
-      return (
-        <Link
-          href={`/league/${c.member.league_id}/player/${c.member.membership_id}`}
-          className="hover:underline"
-        >
-          {c.member.people.username}
-        </Link>
-      );
-    },
-  },
-  {
-    id: "correct",
-    accessorFn: (d) => d.correct,
-    header: "Correct",
-    cell: ({ row }) => {
-      return <div>{row.getValue("correct")}</div>;
-    },
-  },
-];
-
 export function LeaderboardTable(props: TableProps) {
+  const { data: session } = clientApi.session.current.useQuery();
+
+  const columns: ColumnDef<Column>[] = [
+    {
+      id: "select",
+      header: ({ table }) => (
+        <Checkbox
+          checked={
+            table.getIsAllPageRowsSelected() ||
+            (table.getIsSomePageRowsSelected() && "indeterminate")
+          }
+          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+          aria-label="Select all"
+        />
+      ),
+      cell: ({ row }) => (
+        <Checkbox
+          checked={row.getIsSelected()}
+          onCheckedChange={(value) => row.toggleSelected(!!value)}
+          aria-label="Select Person"
+        />
+      ),
+    },
+    {
+      id: "rank",
+      header: "Rank",
+      cell: ({ row }) => row.original.rank,
+    },
+    {
+      id: "username",
+      header: "Player",
+      cell: ({ row }) => {
+        const isMe = session?.dbUser?.uid === row.original.member.user_id;
+        return (
+          <Link
+            href={`/league/${row.original.member.league_id}/player/${row.original.member.membership_id}`}
+            className="hover:underline"
+          >
+            {isMe ? (
+              <Badge variant="default">
+                {row.original.member.people.username}
+              </Badge>
+            ) : (
+              row.original.member.people.username
+            )}
+          </Link>
+        );
+      },
+    },
+    {
+      id: "correct",
+      header: "Correct",
+      cell: ({ row }) => row.original.correct,
+    },
+  ];
+
   const table = useReactTable({
     data: props.leaderboard?.correctCountsSorted ?? [],
     columns,
     getCoreRowModel: getCoreRowModel(),
-    // getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     onRowSelectionChange: props.setRowSelection,
