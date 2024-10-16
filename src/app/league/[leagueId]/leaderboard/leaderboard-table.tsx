@@ -1,4 +1,3 @@
-// LeaderboardTable.tsx
 import {
   type ColumnDef,
   useReactTable,
