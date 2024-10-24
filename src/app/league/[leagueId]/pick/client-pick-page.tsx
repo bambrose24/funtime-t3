@@ -561,6 +561,7 @@ export function ClientPickPage({
                                                     {...field}
                                                     type="number"
                                                     step="1"
+                                                    min={1}
                                                     className={cn(
                                                       "w-full focus-visible:ring-2",
                                                       fieldState.invalid
