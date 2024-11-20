@@ -20,33 +20,40 @@ const submitPicksSchema = z.object({
 });
 
 export const picksRouter = createTRPCRouter({
-  weeksWithPicks: authorizedProcedure.input(z.object({
-    leagueId: z.number(),
-  })).query(async ({ ctx, input }) => {
-    const member = ctx.dbUser?.leaguemembers.find(m => m.league_id === input.leagueId);
+  weeksWithPicks: authorizedProcedure
+    .input(
+      z.object({
+        leagueId: z.number(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const member = ctx.dbUser?.leaguemembers.find(
+        (m) => m.league_id === input.leagueId,
+      );
 
-    if (!member) {
-      throw new TRPCError({
-        code: "UNAUTHORIZED",
-        message: "You are not a member of this league",
+      if (!member) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "You are not a member of this league",
+        });
+      }
+
+      const picks = await ctx.db.picks.findMany({
+        where: {
+          member_id: member.membership_id,
+        },
+        select: {
+          week: true,
+        },
+        distinct: ["week"],
       });
-    }
 
-    const picks = await ctx.db.picks.findMany({
-      where: {
-        member_id: member.membership_id,
-      },
-      select: {
-        week: true,
-      },
-      distinct: ['week'],
-    });
+      const weeks = Array.from(new Set(picks.map((p) => p.week))).sort(
+        (a, b) => a - b,
+      );
 
-    const weeks = Array.from(new Set(picks.map(p => p.week))).sort((a, b) => a - b);
-    console.log('weeksWithPicks', weeks)
-
-    return { weeks }
-  }),
+      return { weeks };
+    }),
   submitPicks: authorizedProcedure
     .input(submitPicksSchema)
     .mutation(async ({ ctx, input }) => {
@@ -193,32 +200,36 @@ export const picksRouter = createTRPCRouter({
               existingPicksByGid[`${member.membership_id}_${game.gid}`]?.at(0);
 
             if (existingPick) {
-              promises.push(tx.picks.update({
-                data: {
-                  winner: pick.winner,
-                  score: pick.score,
-                  gid: pick.gid,
-                  is_random: pick.isRandom,
-                },
-                where: {
-                  pickid: existingPick.pickid,
-                },
-              }));
+              promises.push(
+                tx.picks.update({
+                  data: {
+                    winner: pick.winner,
+                    score: pick.score,
+                    gid: pick.gid,
+                    is_random: pick.isRandom,
+                  },
+                  where: {
+                    pickid: existingPick.pickid,
+                  },
+                }),
+              );
             } else {
-              promises.push(tx.picks.create({
-                data: {
-                  winner: pick.winner,
-                  gid: pick.gid,
-                  score: pick.score,
-                  member_id: member.membership_id,
-                  season: member.leagues.season,
-                  uid: member.user_id,
-                  is_random: pick.isRandom,
-                  week: game.week,
-                  ts: new Date(),
-                  loser: game.away + game.home - pick.winner,
-                },
-              }));
+              promises.push(
+                tx.picks.create({
+                  data: {
+                    winner: pick.winner,
+                    gid: pick.gid,
+                    score: pick.score,
+                    member_id: member.membership_id,
+                    season: member.leagues.season,
+                    uid: member.user_id,
+                    is_random: pick.isRandom,
+                    week: game.week,
+                    ts: new Date(),
+                    loser: game.away + game.home - pick.winner,
+                  },
+                }),
+              );
             }
           }
           return await Promise.all(promises);
