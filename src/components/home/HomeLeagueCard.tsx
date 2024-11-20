@@ -13,6 +13,7 @@ import { useUserEnforced } from "~/utils/hooks/useUserEnforced";
 
 type LeagueCardData = NonNullable<RouterOutputs["home"]["summary"]>[number];
 
+// card that independently fetches data relevant for that person's membership in the league
 export function HomeLeagueCard({ data }: { data: LeagueCardData }) {
   const { data: leagueData, isPending: leagueDataPending } =
     clientApi.league.get.useQuery({
