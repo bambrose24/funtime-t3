@@ -42,7 +42,8 @@ export const picksRouter = createTRPCRouter({
       distinct: ['week'],
     });
 
-    const weeks = Array.from(new Set(picks.map(p => p.week))).sort();
+    const weeks = Array.from(new Set(picks.map(p => p.week))).sort((a, b) => a - b);
+    console.log('weeksWithPicks', weeks)
 
     return { weeks }
   }),
