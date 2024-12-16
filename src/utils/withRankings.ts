@@ -3,12 +3,14 @@ export function withRankings<T>(
   valFn: (x: T) => number,
 ): Array<T & { rank: number }> {
   let runningRank = 1;
-  let prevScore: number | undefined = undefined;
+  const first = sortedVals.at(0);
+  if (!first) {
+    return [];
+  }
+  let prevScore = valFn(first);
+
   return sortedVals.map((v, idx) => {
-    if (idx === 0) {
-      return { ...v, rank: runningRank };
-    }
-    const currScore = valFn(sortedVals[idx]!);
+    const currScore = valFn(v);
 
     if (currScore !== prevScore) {
       runningRank = idx + 1;
