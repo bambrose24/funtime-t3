@@ -67,7 +67,7 @@ model games {
   current_quarter_seconds_remaining Int?
   current_quarter                   Int?
   msf_id                            Int?
-  espn_id                           Int?
+  espn_id                           Int?     @unique
   teams_games_homeToteams           teams    @relation("games_homeToteams", fields: [home], references: [teamid], onUpdate: Restrict, map: "games_ibfk_1")
   teams_games_awayToteams           teams    @relation("games_awayToteams", fields: [away], references: [teamid], onUpdate: Restrict, map: "games_ibfk_2")
   picks                             picks[]

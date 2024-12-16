@@ -14769,6 +14769,7 @@ export namespace Prisma {
 
   export type gamesWhereUniqueInput = Prisma.AtLeast<{
     gid?: number
+    espn_id?: number
     AND?: gamesWhereInput | gamesWhereInput[]
     OR?: gamesWhereInput[]
     NOT?: gamesWhereInput | gamesWhereInput[]
@@ -14790,11 +14791,10 @@ export namespace Prisma {
     current_quarter_seconds_remaining?: IntNullableFilter<"games"> | number | null
     current_quarter?: IntNullableFilter<"games"> | number | null
     msf_id?: IntNullableFilter<"games"> | number | null
-    espn_id?: IntNullableFilter<"games"> | number | null
     teams_games_homeToteams?: XOR<TeamsRelationFilter, teamsWhereInput>
     teams_games_awayToteams?: XOR<TeamsRelationFilter, teamsWhereInput>
     picks?: PicksListRelationFilter
-  }, "gid">
+  }, "gid" | "espn_id">
 
   export type gamesOrderByWithAggregationInput = {
     gid?: SortOrder
