@@ -136,7 +136,7 @@ export function MemberPicksEdit({ league, memberId }: Props) {
                   {game.is_tiebreaker && (
                     <Input
                       type="number"
-                      value={pick?.score?.toString() ?? ""}
+                      defaultValue={pick?.score?.toString() ?? ""}
                       onBlur={(e) =>
                         handleScoreChange(
                           game.gid,
