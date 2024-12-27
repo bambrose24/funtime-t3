@@ -137,7 +137,7 @@ export function MemberPicksEdit({ league, memberId }: Props) {
                     <Input
                       type="number"
                       value={pick?.score?.toString() ?? ""}
-                      onChange={(e) =>
+                      onBlur={(e) =>
                         handleScoreChange(
                           game.gid,
                           Number(pick?.winner ?? 0),
