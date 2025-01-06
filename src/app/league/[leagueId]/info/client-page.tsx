@@ -95,7 +95,7 @@ export function ClientLeagueInfoPage({
                   <div>
                     This competition runs the duration of the season. It is
                     similar to Weekly Picks in that you aim to have the highest
-                    total correct picks. The top 3 players will be winners.
+                    total correct picks. The top 5 players will be winners.
                     There is no tiebreaker for point differences over the course
                     of the season.
                   </div>
