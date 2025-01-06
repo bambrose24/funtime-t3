@@ -528,4 +528,36 @@ export const leagueRouter = createTRPCRouter({
 
       return { leagueId, correct, wrong, total: correct + wrong };
     }),
+  superbowlPicks: authorizedProcedure
+    .input(leagueIdSchema)
+    .query(async ({ ctx, input }) => {
+      const { dbUser } = ctx;
+      const { leagueId } = input;
+      const member = dbUser?.leaguemembers.find(
+        (m) => m.league_id === leagueId,
+      );
+      if (!member) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: `User ${dbUser?.uid} is not in league ${leagueId}`,
+        });
+      }
+      const superbowlPicks = await ctx.db.superbowl.findMany({
+        where: {
+          leaguemembers: {
+            league_id: leagueId,
+          },
+        },
+        include: {
+          leaguemembers: {
+            include: {
+              people: true,
+            },
+          },
+        },
+      });
+
+
+      return { superbowlPicks: orderBy(superbowlPicks, (s) => s.leaguemembers?.people.username?.toLocaleLowerCase(), "asc") };
+    }),
 });

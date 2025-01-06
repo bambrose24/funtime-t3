@@ -31,6 +31,7 @@ import {
   CircleUser,
   HomeIcon,
   InfoIcon,
+  MedalIcon,
   PenIcon,
   PlusIcon,
   SettingsIcon,
@@ -383,6 +384,7 @@ function LeagueDropdownMenu({ chosenLeague }: { chosenLeague: ChosenLeague }) {
   const adminHref = `/league/${chosenLeague.league_id}/admin`;
   const myProfileHref = `/league/${chosenLeague.league_id}/my-profile`;
   const infoHref = `/league/${chosenLeague.league_id}/info`;
+  const superbowlHref = `/league/${chosenLeague.league_id}/superbowl`;
 
   const { data: session } = clientApi.session.current.useQuery();
   const isAdmin =
@@ -423,8 +425,16 @@ function LeagueDropdownMenu({ chosenLeague }: { chosenLeague: ChosenLeague }) {
           <Link href={leaderboardHref} prefetch>
             <DropdownMenuItem>
               <div className="flex flex-row items-center gap-3">
-                <TrophyIcon className="h-4 w-4" />
+                <MedalIcon className="h-4 w-4" />
                 <>Leaderboard</>
+              </div>
+            </DropdownMenuItem>
+          </Link>
+          <Link href={superbowlHref} prefetch>
+            <DropdownMenuItem>
+              <div className="flex flex-row items-center gap-3">
+                <TrophyIcon className="h-4 w-4" />
+                <>Superbowl Picks</>
               </div>
             </DropdownMenuItem>
           </Link>
