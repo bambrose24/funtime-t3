@@ -5,7 +5,7 @@
     "dockerfilePath": "Dockerfile.cron"
   },
   "deploy": {
-    "startCommand": "bun run cron",
+    "startCommand": "cd apps/web && bun run cron",
     "restartPolicyType": "NEVER"
   }
 }
