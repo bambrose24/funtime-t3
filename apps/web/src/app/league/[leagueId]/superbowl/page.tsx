@@ -1,6 +1,5 @@
 import { notFound } from "next/navigation";
 import { serverApi } from "~/trpc/server";
-import { ClientMemberPage } from "../player/[memberId]/client-page";
 import { ClientSuperbowlPicksPage } from "./client-page";
 
 type Props = {

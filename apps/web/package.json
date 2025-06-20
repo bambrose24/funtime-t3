@@ -14,10 +14,11 @@
     "clean": "rm -rf .next"
   },
   "dependencies": {
-    "@funtime/api": "*",
     "@axiomhq/winston": "^1.0.0",
+    "@funtime/api": "*",
     "@hookform/resolvers": "^3.6.0",
     "@nivo/line": "^0.85.1",
+    "@prisma/nextjs-monorepo-workaround-plugin": "^6.10.1",
     "@radix-ui/react-alert-dialog": "^1.0.5",
     "@radix-ui/react-aspect-ratio": "^1.0.3",
     "@radix-ui/react-avatar": "^1.0.4",

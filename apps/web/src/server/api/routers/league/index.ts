@@ -10,13 +10,6 @@ import { TRPCError } from "@trpc/server";
 import { Defined } from "~/utils/defined";
 import { UnauthorizedError } from "~/server/util/errors/unauthorized";
 import {
-  type leagues,
-  type leaguemembers,
-  type people,
-  type picks,
-  type games,
-  type WeekWinners,
-  MemberRole,
   ScoringType,
   PickPolicy,
   LatePolicy,

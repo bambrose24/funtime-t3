@@ -1,6 +1,5 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { clientApi } from "~/trpc/react";
 import { RouterOutputs } from "~/trpc/types";
 import { Button } from "~/components/ui/button";

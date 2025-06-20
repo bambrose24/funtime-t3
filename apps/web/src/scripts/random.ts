@@ -2,7 +2,7 @@ import { db } from "~/server/db";
 import { espn } from "~/server/services/espn";
 async function run() {
   const week = 17;
-  const season = 2024;
+  const season = 2025;
   const espnGamesSeason = await espn.getGamesBySeason({ season });
 
   const dbGames = await db.games.findMany({
@@ -20,8 +20,6 @@ async function run() {
   console.log('espnWeekGamesWithNoDbGames...', espnWeekGamesWithNoDbGames.length);
 
   for (const toCreateEspnGame of espnWeekGamesWithNoDbGames) {
-    const week = toCreateEspnGame.week.number;
-    const season = toCreateEspnGame.season.year;
 
     const homeTeamAbbrev = toCreateEspnGame.competitions[0]?.competitors.find(c => c.homeAway === 'home')?.team.abbreviation;
     const homeTeamId = teams.find(t => t.abbrev === homeTeamAbbrev)?.teamid;
