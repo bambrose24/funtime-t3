@@ -2469,7 +2469,7 @@ export namespace Prisma {
   type EmailLogsGetPayload<S extends boolean | null | undefined | EmailLogsDefaultArgs> = $Result.GetResult<Prisma.$EmailLogsPayload, S>
 
   type EmailLogsCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
-    Omit<EmailLogsFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
+    Omit<EmailLogsFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
       select?: EmailLogsCountAggregateInputType | true
     }
 
@@ -2918,7 +2918,6 @@ export namespace Prisma {
      * Filter, which EmailLogs to fetch.
      */
     where: EmailLogsWhereUniqueInput
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -2941,7 +2940,6 @@ export namespace Prisma {
      * Filter, which EmailLogs to fetch.
      */
     where: EmailLogsWhereUniqueInput
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -2994,7 +2992,6 @@ export namespace Prisma {
      * Filter by unique combinations of EmailLogs.
      */
     distinct?: EmailLogsScalarFieldEnum | EmailLogsScalarFieldEnum[]
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -3047,7 +3044,6 @@ export namespace Prisma {
      * Filter by unique combinations of EmailLogs.
      */
     distinct?: EmailLogsScalarFieldEnum | EmailLogsScalarFieldEnum[]
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -3095,7 +3091,6 @@ export namespace Prisma {
      */
     skip?: number
     distinct?: EmailLogsScalarFieldEnum | EmailLogsScalarFieldEnum[]
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -3118,7 +3113,6 @@ export namespace Prisma {
      * The data needed to create a EmailLogs.
      */
     data: XOR<EmailLogsCreateInput, EmailLogsUncheckedCreateInput>
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -3179,7 +3173,6 @@ export namespace Prisma {
      * Choose, which EmailLogs to update.
      */
     where: EmailLogsWhereUniqueInput
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -3258,7 +3251,6 @@ export namespace Prisma {
      * In case the EmailLogs was found with the provided `where` argument, update it with this data.
      */
     update: XOR<EmailLogsUpdateInput, EmailLogsUncheckedUpdateInput>
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -3281,7 +3273,6 @@ export namespace Prisma {
      * Filter which EmailLogs to delete.
      */
     where: EmailLogsWhereUniqueInput
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -3612,7 +3603,7 @@ export namespace Prisma {
   type WeekWinnersGetPayload<S extends boolean | null | undefined | WeekWinnersDefaultArgs> = $Result.GetResult<Prisma.$WeekWinnersPayload, S>
 
   type WeekWinnersCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
-    Omit<WeekWinnersFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
+    Omit<WeekWinnersFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
       select?: WeekWinnersCountAggregateInputType | true
     }
 
@@ -4060,7 +4051,6 @@ export namespace Prisma {
      * Filter, which WeekWinners to fetch.
      */
     where: WeekWinnersWhereUniqueInput
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -4083,7 +4073,6 @@ export namespace Prisma {
      * Filter, which WeekWinners to fetch.
      */
     where: WeekWinnersWhereUniqueInput
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -4136,7 +4125,6 @@ export namespace Prisma {
      * Filter by unique combinations of WeekWinners.
      */
     distinct?: WeekWinnersScalarFieldEnum | WeekWinnersScalarFieldEnum[]
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -4189,7 +4177,6 @@ export namespace Prisma {
      * Filter by unique combinations of WeekWinners.
      */
     distinct?: WeekWinnersScalarFieldEnum | WeekWinnersScalarFieldEnum[]
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -4237,7 +4224,6 @@ export namespace Prisma {
      */
     skip?: number
     distinct?: WeekWinnersScalarFieldEnum | WeekWinnersScalarFieldEnum[]
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -4260,7 +4246,6 @@ export namespace Prisma {
      * The data needed to create a WeekWinners.
      */
     data: XOR<WeekWinnersCreateInput, WeekWinnersUncheckedCreateInput>
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -4321,7 +4306,6 @@ export namespace Prisma {
      * Choose, which WeekWinners to update.
      */
     where: WeekWinnersWhereUniqueInput
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -4400,7 +4384,6 @@ export namespace Prisma {
      * In case the WeekWinners was found with the provided `where` argument, update it with this data.
      */
     update: XOR<WeekWinnersUpdateInput, WeekWinnersUncheckedUpdateInput>
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -4423,7 +4406,6 @@ export namespace Prisma {
      * Filter which WeekWinners to delete.
      */
     where: WeekWinnersWhereUniqueInput
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -4955,7 +4937,7 @@ export namespace Prisma {
   type gamesGetPayload<S extends boolean | null | undefined | gamesDefaultArgs> = $Result.GetResult<Prisma.$gamesPayload, S>
 
   type gamesCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
-    Omit<gamesFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
+    Omit<gamesFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
       select?: GamesCountAggregateInputType | true
     }
 
@@ -5418,7 +5400,6 @@ export namespace Prisma {
      * Filter, which games to fetch.
      */
     where: gamesWhereUniqueInput
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -5441,7 +5422,6 @@ export namespace Prisma {
      * Filter, which games to fetch.
      */
     where: gamesWhereUniqueInput
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -5494,7 +5474,6 @@ export namespace Prisma {
      * Filter by unique combinations of games.
      */
     distinct?: GamesScalarFieldEnum | GamesScalarFieldEnum[]
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -5547,7 +5526,6 @@ export namespace Prisma {
      * Filter by unique combinations of games.
      */
     distinct?: GamesScalarFieldEnum | GamesScalarFieldEnum[]
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -5595,7 +5573,6 @@ export namespace Prisma {
      */
     skip?: number
     distinct?: GamesScalarFieldEnum | GamesScalarFieldEnum[]
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -5618,7 +5595,6 @@ export namespace Prisma {
      * The data needed to create a games.
      */
     data: XOR<gamesCreateInput, gamesUncheckedCreateInput>
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -5679,7 +5655,6 @@ export namespace Prisma {
      * Choose, which games to update.
      */
     where: gamesWhereUniqueInput
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -5758,7 +5733,6 @@ export namespace Prisma {
      * In case the games was found with the provided `where` argument, update it with this data.
      */
     update: XOR<gamesUpdateInput, gamesUncheckedUpdateInput>
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -5781,7 +5755,6 @@ export namespace Prisma {
      * Filter which games to delete.
      */
     where: gamesWhereUniqueInput
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -6141,7 +6114,7 @@ export namespace Prisma {
   type leaguemembersGetPayload<S extends boolean | null | undefined | leaguemembersDefaultArgs> = $Result.GetResult<Prisma.$leaguemembersPayload, S>
 
   type leaguemembersCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
-    Omit<leaguemembersFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
+    Omit<leaguemembersFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
       select?: LeaguemembersCountAggregateInputType | true
     }
 
@@ -6594,7 +6567,6 @@ export namespace Prisma {
      * Filter, which leaguemembers to fetch.
      */
     where: leaguemembersWhereUniqueInput
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -6617,7 +6589,6 @@ export namespace Prisma {
      * Filter, which leaguemembers to fetch.
      */
     where: leaguemembersWhereUniqueInput
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -6670,7 +6641,6 @@ export namespace Prisma {
      * Filter by unique combinations of leaguemembers.
      */
     distinct?: LeaguemembersScalarFieldEnum | LeaguemembersScalarFieldEnum[]
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -6723,7 +6693,6 @@ export namespace Prisma {
      * Filter by unique combinations of leaguemembers.
      */
     distinct?: LeaguemembersScalarFieldEnum | LeaguemembersScalarFieldEnum[]
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -6771,7 +6740,6 @@ export namespace Prisma {
      */
     skip?: number
     distinct?: LeaguemembersScalarFieldEnum | LeaguemembersScalarFieldEnum[]
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -6794,7 +6762,6 @@ export namespace Prisma {
      * The data needed to create a leaguemembers.
      */
     data: XOR<leaguemembersCreateInput, leaguemembersUncheckedCreateInput>
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -6855,7 +6822,6 @@ export namespace Prisma {
      * Choose, which leaguemembers to update.
      */
     where: leaguemembersWhereUniqueInput
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -6934,7 +6900,6 @@ export namespace Prisma {
      * In case the leaguemembers was found with the provided `where` argument, update it with this data.
      */
     update: XOR<leaguemembersUpdateInput, leaguemembersUncheckedUpdateInput>
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -6957,7 +6922,6 @@ export namespace Prisma {
      * Filter which leaguemembers to delete.
      */
     where: leaguemembersWhereUniqueInput
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -7420,7 +7384,7 @@ export namespace Prisma {
   type leaguemessagesGetPayload<S extends boolean | null | undefined | leaguemessagesDefaultArgs> = $Result.GetResult<Prisma.$leaguemessagesPayload, S>
 
   type leaguemessagesCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
-    Omit<leaguemessagesFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
+    Omit<leaguemessagesFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
       select?: LeaguemessagesCountAggregateInputType | true
     }
 
@@ -7870,7 +7834,6 @@ export namespace Prisma {
      * Filter, which leaguemessages to fetch.
      */
     where: leaguemessagesWhereUniqueInput
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -7893,7 +7856,6 @@ export namespace Prisma {
      * Filter, which leaguemessages to fetch.
      */
     where: leaguemessagesWhereUniqueInput
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -7946,7 +7908,6 @@ export namespace Prisma {
      * Filter by unique combinations of leaguemessages.
      */
     distinct?: LeaguemessagesScalarFieldEnum | LeaguemessagesScalarFieldEnum[]
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -7999,7 +7960,6 @@ export namespace Prisma {
      * Filter by unique combinations of leaguemessages.
      */
     distinct?: LeaguemessagesScalarFieldEnum | LeaguemessagesScalarFieldEnum[]
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -8047,7 +8007,6 @@ export namespace Prisma {
      */
     skip?: number
     distinct?: LeaguemessagesScalarFieldEnum | LeaguemessagesScalarFieldEnum[]
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -8070,7 +8029,6 @@ export namespace Prisma {
      * The data needed to create a leaguemessages.
      */
     data: XOR<leaguemessagesCreateInput, leaguemessagesUncheckedCreateInput>
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -8131,7 +8089,6 @@ export namespace Prisma {
      * Choose, which leaguemessages to update.
      */
     where: leaguemessagesWhereUniqueInput
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -8210,7 +8167,6 @@ export namespace Prisma {
      * In case the leaguemessages was found with the provided `where` argument, update it with this data.
      */
     update: XOR<leaguemessagesUpdateInput, leaguemessagesUncheckedUpdateInput>
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -8233,7 +8189,6 @@ export namespace Prisma {
      * Filter which leaguemessages to delete.
      */
     where: leaguemessagesWhereUniqueInput
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -8657,7 +8612,7 @@ export namespace Prisma {
   type leaguesGetPayload<S extends boolean | null | undefined | leaguesDefaultArgs> = $Result.GetResult<Prisma.$leaguesPayload, S>
 
   type leaguesCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
-    Omit<leaguesFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
+    Omit<leaguesFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
       select?: LeaguesCountAggregateInputType | true
     }
 
@@ -9117,7 +9072,6 @@ export namespace Prisma {
      * Filter, which leagues to fetch.
      */
     where: leaguesWhereUniqueInput
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -9140,7 +9094,6 @@ export namespace Prisma {
      * Filter, which leagues to fetch.
      */
     where: leaguesWhereUniqueInput
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -9193,7 +9146,6 @@ export namespace Prisma {
      * Filter by unique combinations of leagues.
      */
     distinct?: LeaguesScalarFieldEnum | LeaguesScalarFieldEnum[]
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -9246,7 +9198,6 @@ export namespace Prisma {
      * Filter by unique combinations of leagues.
      */
     distinct?: LeaguesScalarFieldEnum | LeaguesScalarFieldEnum[]
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -9294,7 +9245,6 @@ export namespace Prisma {
      */
     skip?: number
     distinct?: LeaguesScalarFieldEnum | LeaguesScalarFieldEnum[]
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -9317,7 +9267,6 @@ export namespace Prisma {
      * The data needed to create a leagues.
      */
     data: XOR<leaguesCreateInput, leaguesUncheckedCreateInput>
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -9378,7 +9327,6 @@ export namespace Prisma {
      * Choose, which leagues to update.
      */
     where: leaguesWhereUniqueInput
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -9457,7 +9405,6 @@ export namespace Prisma {
      * In case the leagues was found with the provided `where` argument, update it with this data.
      */
     update: XOR<leaguesUpdateInput, leaguesUncheckedUpdateInput>
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -9480,7 +9427,6 @@ export namespace Prisma {
      * Filter which leagues to delete.
      */
     where: leaguesWhereUniqueInput
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -9989,7 +9935,7 @@ export namespace Prisma {
   type peopleGetPayload<S extends boolean | null | undefined | peopleDefaultArgs> = $Result.GetResult<Prisma.$peoplePayload, S>
 
   type peopleCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
-    Omit<peopleFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
+    Omit<peopleFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
       select?: PeopleCountAggregateInputType | true
     }
 
@@ -10443,7 +10389,6 @@ export namespace Prisma {
      * Filter, which people to fetch.
      */
     where: peopleWhereUniqueInput
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -10466,7 +10411,6 @@ export namespace Prisma {
      * Filter, which people to fetch.
      */
     where: peopleWhereUniqueInput
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -10519,7 +10463,6 @@ export namespace Prisma {
      * Filter by unique combinations of people.
      */
     distinct?: PeopleScalarFieldEnum | PeopleScalarFieldEnum[]
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -10572,7 +10515,6 @@ export namespace Prisma {
      * Filter by unique combinations of people.
      */
     distinct?: PeopleScalarFieldEnum | PeopleScalarFieldEnum[]
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -10620,7 +10562,6 @@ export namespace Prisma {
      */
     skip?: number
     distinct?: PeopleScalarFieldEnum | PeopleScalarFieldEnum[]
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -10643,7 +10584,6 @@ export namespace Prisma {
      * The data needed to create a people.
      */
     data: XOR<peopleCreateInput, peopleUncheckedCreateInput>
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -10700,7 +10640,6 @@ export namespace Prisma {
      * Choose, which people to update.
      */
     where: peopleWhereUniqueInput
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -10775,7 +10714,6 @@ export namespace Prisma {
      * In case the people was found with the provided `where` argument, update it with this data.
      */
     update: XOR<peopleUpdateInput, peopleUncheckedUpdateInput>
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -10798,7 +10736,6 @@ export namespace Prisma {
      * Filter which people to delete.
      */
     where: peopleWhereUniqueInput
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -11319,7 +11256,7 @@ export namespace Prisma {
   type picksGetPayload<S extends boolean | null | undefined | picksDefaultArgs> = $Result.GetResult<Prisma.$picksPayload, S>
 
   type picksCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
-    Omit<picksFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
+    Omit<picksFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
       select?: PicksCountAggregateInputType | true
     }
 
@@ -11776,7 +11713,6 @@ export namespace Prisma {
      * Filter, which picks to fetch.
      */
     where: picksWhereUniqueInput
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -11799,7 +11735,6 @@ export namespace Prisma {
      * Filter, which picks to fetch.
      */
     where: picksWhereUniqueInput
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -11852,7 +11787,6 @@ export namespace Prisma {
      * Filter by unique combinations of picks.
      */
     distinct?: PicksScalarFieldEnum | PicksScalarFieldEnum[]
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -11905,7 +11839,6 @@ export namespace Prisma {
      * Filter by unique combinations of picks.
      */
     distinct?: PicksScalarFieldEnum | PicksScalarFieldEnum[]
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -11953,7 +11886,6 @@ export namespace Prisma {
      */
     skip?: number
     distinct?: PicksScalarFieldEnum | PicksScalarFieldEnum[]
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -11976,7 +11908,6 @@ export namespace Prisma {
      * The data needed to create a picks.
      */
     data: XOR<picksCreateInput, picksUncheckedCreateInput>
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -12037,7 +11968,6 @@ export namespace Prisma {
      * Choose, which picks to update.
      */
     where: picksWhereUniqueInput
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -12116,7 +12046,6 @@ export namespace Prisma {
      * In case the picks was found with the provided `where` argument, update it with this data.
      */
     update: XOR<picksUpdateInput, picksUncheckedUpdateInput>
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -12139,7 +12068,6 @@ export namespace Prisma {
      * Filter which picks to delete.
      */
     where: picksWhereUniqueInput
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -12543,7 +12471,7 @@ export namespace Prisma {
   type superbowlGetPayload<S extends boolean | null | undefined | superbowlDefaultArgs> = $Result.GetResult<Prisma.$superbowlPayload, S>
 
   type superbowlCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
-    Omit<superbowlFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
+    Omit<superbowlFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
       select?: SuperbowlCountAggregateInputType | true
     }
 
@@ -12994,7 +12922,6 @@ export namespace Prisma {
      * Filter, which superbowl to fetch.
      */
     where: superbowlWhereUniqueInput
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -13017,7 +12944,6 @@ export namespace Prisma {
      * Filter, which superbowl to fetch.
      */
     where: superbowlWhereUniqueInput
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -13070,7 +12996,6 @@ export namespace Prisma {
      * Filter by unique combinations of superbowls.
      */
     distinct?: SuperbowlScalarFieldEnum | SuperbowlScalarFieldEnum[]
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -13123,7 +13048,6 @@ export namespace Prisma {
      * Filter by unique combinations of superbowls.
      */
     distinct?: SuperbowlScalarFieldEnum | SuperbowlScalarFieldEnum[]
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -13171,7 +13095,6 @@ export namespace Prisma {
      */
     skip?: number
     distinct?: SuperbowlScalarFieldEnum | SuperbowlScalarFieldEnum[]
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -13194,7 +13117,6 @@ export namespace Prisma {
      * The data needed to create a superbowl.
      */
     data: XOR<superbowlCreateInput, superbowlUncheckedCreateInput>
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -13255,7 +13177,6 @@ export namespace Prisma {
      * Choose, which superbowl to update.
      */
     where: superbowlWhereUniqueInput
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -13334,7 +13255,6 @@ export namespace Prisma {
      * In case the superbowl was found with the provided `where` argument, update it with this data.
      */
     update: XOR<superbowlUpdateInput, superbowlUncheckedUpdateInput>
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -13357,7 +13277,6 @@ export namespace Prisma {
      * Filter which superbowl to delete.
      */
     where: superbowlWhereUniqueInput
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -13694,7 +13613,7 @@ export namespace Prisma {
   type superbowlsquaresGetPayload<S extends boolean | null | undefined | superbowlsquaresDefaultArgs> = $Result.GetResult<Prisma.$superbowlsquaresPayload, S>
 
   type superbowlsquaresCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
-    Omit<superbowlsquaresFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
+    Omit<superbowlsquaresFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
       select?: SuperbowlsquaresCountAggregateInputType | true
     }
 
@@ -14137,7 +14056,6 @@ export namespace Prisma {
      * Filter, which superbowlsquares to fetch.
      */
     where: superbowlsquaresWhereUniqueInput
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -14156,7 +14074,6 @@ export namespace Prisma {
      * Filter, which superbowlsquares to fetch.
      */
     where: superbowlsquaresWhereUniqueInput
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -14205,7 +14122,6 @@ export namespace Prisma {
      * Filter by unique combinations of superbowlsquares.
      */
     distinct?: SuperbowlsquaresScalarFieldEnum | SuperbowlsquaresScalarFieldEnum[]
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -14254,7 +14170,6 @@ export namespace Prisma {
      * Filter by unique combinations of superbowlsquares.
      */
     distinct?: SuperbowlsquaresScalarFieldEnum | SuperbowlsquaresScalarFieldEnum[]
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -14298,7 +14213,6 @@ export namespace Prisma {
      */
     skip?: number
     distinct?: SuperbowlsquaresScalarFieldEnum | SuperbowlsquaresScalarFieldEnum[]
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -14317,7 +14231,6 @@ export namespace Prisma {
      * The data needed to create a superbowlsquares.
      */
     data: XOR<superbowlsquaresCreateInput, superbowlsquaresUncheckedCreateInput>
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -14370,7 +14283,6 @@ export namespace Prisma {
      * Choose, which superbowlsquares to update.
      */
     where: superbowlsquaresWhereUniqueInput
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -14441,7 +14353,6 @@ export namespace Prisma {
      * In case the superbowlsquares was found with the provided `where` argument, update it with this data.
      */
     update: XOR<superbowlsquaresUpdateInput, superbowlsquaresUncheckedUpdateInput>
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -14460,7 +14371,6 @@ export namespace Prisma {
      * Filter which superbowlsquares to delete.
      */
     where: superbowlsquaresWhereUniqueInput
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -14792,7 +14702,7 @@ export namespace Prisma {
   type teamsGetPayload<S extends boolean | null | undefined | teamsDefaultArgs> = $Result.GetResult<Prisma.$teamsPayload, S>
 
   type teamsCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
-    Omit<teamsFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
+    Omit<teamsFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
       select?: TeamsCountAggregateInputType | true
     }
 
@@ -15245,7 +15155,6 @@ export namespace Prisma {
      * Filter, which teams to fetch.
      */
     where: teamsWhereUniqueInput
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -15268,7 +15177,6 @@ export namespace Prisma {
      * Filter, which teams to fetch.
      */
     where: teamsWhereUniqueInput
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -15321,7 +15229,6 @@ export namespace Prisma {
      * Filter by unique combinations of teams.
      */
     distinct?: TeamsScalarFieldEnum | TeamsScalarFieldEnum[]
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -15374,7 +15281,6 @@ export namespace Prisma {
      * Filter by unique combinations of teams.
      */
     distinct?: TeamsScalarFieldEnum | TeamsScalarFieldEnum[]
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -15422,7 +15328,6 @@ export namespace Prisma {
      */
     skip?: number
     distinct?: TeamsScalarFieldEnum | TeamsScalarFieldEnum[]
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -15445,7 +15350,6 @@ export namespace Prisma {
      * The data needed to create a teams.
      */
     data: XOR<teamsCreateInput, teamsUncheckedCreateInput>
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -15502,7 +15406,6 @@ export namespace Prisma {
      * Choose, which teams to update.
      */
     where: teamsWhereUniqueInput
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -15577,7 +15480,6 @@ export namespace Prisma {
      * In case the teams was found with the provided `where` argument, update it with this data.
      */
     update: XOR<teamsUpdateInput, teamsUncheckedUpdateInput>
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -15600,7 +15502,6 @@ export namespace Prisma {
      * Filter which teams to delete.
      */
     where: teamsWhereUniqueInput
-    relationLoadStrategy?: RelationLoadStrategy
   }
 
   /**
@@ -15781,14 +15682,6 @@ export namespace Prisma {
   };
 
   export type EmailLogsScalarFieldEnum = (typeof EmailLogsScalarFieldEnum)[keyof typeof EmailLogsScalarFieldEnum]
-
-
-  export const RelationLoadStrategy: {
-    query: 'query',
-    join: 'join'
-  };
-
-  export type RelationLoadStrategy = (typeof RelationLoadStrategy)[keyof typeof RelationLoadStrategy]
 
 
   export const WeekWinnersScalarFieldEnum: {
