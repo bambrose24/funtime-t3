@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { authorizedProcedure, createTRPCRouter } from "../../trpc";
-import { MemberRole, type PrismaClient } from "~/generated/prisma-client";
+import { type MemberRole, type PrismaClient } from "@funtime/api/types";
 import { TRPCError } from "@trpc/server";
 import { groupBy, orderBy } from "lodash";
 import { addDays, subDays } from "date-fns";
@@ -13,7 +13,7 @@ const leagueAdminProcedure = authorizedProcedure
     const member = ctx.dbUser?.leaguemembers.find(
       (m) => m.league_id === input.leagueId,
     );
-    if (member?.role !== MemberRole.admin) {
+    if (member?.role !== "admin") {
       throw new TRPCError({
         code: "UNAUTHORIZED",
         message: `You are not an admin of the league ${input.leagueId}. Path ${path}`,
@@ -59,7 +59,7 @@ const canSendBroadcastThisWeek = async (db: PrismaClient, leagueId: number) => {
 export const leagueAdminRouter = createTRPCRouter({
   changeMemberRole: leagueAdminProcedure
     .input(
-      z.object({ memberId: z.number().int(), role: z.nativeEnum(MemberRole) }),
+      z.object({ memberId: z.number().int(), role: z.enum(["admin", "member"]) }),
     )
     .mutation(async ({ ctx, input }) => {
       const { db } = ctx;
@@ -421,7 +421,7 @@ export const leagueAdminRouter = createTRPCRouter({
 
     // Check if the user is an admin of the league
     const adminMembership = dbUser?.leaguemembers.find(
-      (m) => m.role === MemberRole.admin && m.league_id === leagueId,
+      (m) => m.role === "admin" && m.league_id === leagueId,
     );
     if (!adminMembership || !dbUser) {
       throw new TRPCError({

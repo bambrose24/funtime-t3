@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { MemberRole } from "~/generated/prisma-client";
+import { type MemberRole } from "@funtime/api/types";
 import { serverApi } from "~/trpc/server";
 import { Text } from "~/components/ui/text";
 import { MobileAdminNav } from "./mobile-admin-nav";
@@ -25,7 +25,7 @@ export default async function LeagueAdminPage({
     !session.dbUser ||
     !league ||
     session.dbUser.leaguemembers.find((m) => m.league_id === league.league_id)
-      ?.role !== MemberRole.admin
+      ?.role !== "admin"
   ) {
     notFound();
   }

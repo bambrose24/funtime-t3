@@ -32,7 +32,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "~/components/ui/select";
-import { ReminderPolicy } from "~/generated/prisma-client";
+import { type ReminderPolicy } from "@funtime/api/types";
 import { Button } from "~/components/ui/button";
 import { clientApi } from "~/trpc/react";
 import { DEFAULT_SEASON } from "~/utils/const";
@@ -260,9 +260,7 @@ export function CreateLeagueClientPage({
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem
-                              value={ReminderPolicy.three_hours_before}
-                            >
+                            <SelectItem value="three_hours_before">
                               Yes
                             </SelectItem>
                             <SelectItem value="none">No</SelectItem>

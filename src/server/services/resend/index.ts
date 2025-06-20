@@ -3,7 +3,7 @@ import PicksConfirmationEmail from "emails/picks-confirmation";
 import PickReminderEmail from "emails/picks-reminder";
 import LeagueBroadcastEmail from "emails/league-broadcast";
 import { Resend } from "resend";
-import type { leaguemembers, leagues, people } from "~/generated/prisma-client";
+import type { leaguemembers, leagues, people } from "@funtime/api/types";
 import { db } from "~/server/db";
 import { getLogger } from "~/utils/logging";
 import { Defined } from "~/utils/defined";

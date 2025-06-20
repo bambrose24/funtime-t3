@@ -84,20 +84,21 @@ export namespace $Enums {
 export type EmailType = (typeof EmailType)[keyof typeof EmailType]
 
 
+export const LatePolicy: {
+  allow_late_whole_week: 'allow_late_whole_week',
+  close_at_first_game_start: 'close_at_first_game_start',
+  allow_late_and_lock_after_start: 'allow_late_and_lock_after_start'
+};
+
+export type LatePolicy = (typeof LatePolicy)[keyof typeof LatePolicy]
+
+
 export const MemberRole: {
   player: 'player',
   admin: 'admin'
 };
 
 export type MemberRole = (typeof MemberRole)[keyof typeof MemberRole]
-
-
-export const MessageType: {
-  WEEK_COMMENT: 'WEEK_COMMENT',
-  LEAGUE_MESSAGE: 'LEAGUE_MESSAGE'
-};
-
-export type MessageType = (typeof MessageType)[keyof typeof MessageType]
 
 
 export const MessageStatus: {
@@ -108,13 +109,12 @@ export const MessageStatus: {
 export type MessageStatus = (typeof MessageStatus)[keyof typeof MessageStatus]
 
 
-export const LatePolicy: {
-  allow_late_whole_week: 'allow_late_whole_week',
-  close_at_first_game_start: 'close_at_first_game_start',
-  allow_late_and_lock_after_start: 'allow_late_and_lock_after_start'
+export const MessageType: {
+  WEEK_COMMENT: 'WEEK_COMMENT',
+  LEAGUE_MESSAGE: 'LEAGUE_MESSAGE'
 };
 
-export type LatePolicy = (typeof LatePolicy)[keyof typeof LatePolicy]
+export type MessageType = (typeof MessageType)[keyof typeof MessageType]
 
 
 export const PickPolicy: {
@@ -131,13 +131,6 @@ export const ReminderPolicy: {
 export type ReminderPolicy = (typeof ReminderPolicy)[keyof typeof ReminderPolicy]
 
 
-export const ScoringType: {
-  game_winner: 'game_winner'
-};
-
-export type ScoringType = (typeof ScoringType)[keyof typeof ScoringType]
-
-
 export const LeagueStatus: {
   not_started: 'not_started',
   in_progress: 'in_progress',
@@ -146,27 +139,34 @@ export const LeagueStatus: {
 
 export type LeagueStatus = (typeof LeagueStatus)[keyof typeof LeagueStatus]
 
+
+export const ScoringType: {
+  game_winner: 'game_winner'
+};
+
+export type ScoringType = (typeof ScoringType)[keyof typeof ScoringType]
+
 }
 
 export type EmailType = $Enums.EmailType
 
 export const EmailType: typeof $Enums.EmailType
 
+export type LatePolicy = $Enums.LatePolicy
+
+export const LatePolicy: typeof $Enums.LatePolicy
+
 export type MemberRole = $Enums.MemberRole
 
 export const MemberRole: typeof $Enums.MemberRole
-
-export type MessageType = $Enums.MessageType
-
-export const MessageType: typeof $Enums.MessageType
 
 export type MessageStatus = $Enums.MessageStatus
 
 export const MessageStatus: typeof $Enums.MessageStatus
 
-export type LatePolicy = $Enums.LatePolicy
+export type MessageType = $Enums.MessageType
 
-export const LatePolicy: typeof $Enums.LatePolicy
+export const MessageType: typeof $Enums.MessageType
 
 export type PickPolicy = $Enums.PickPolicy
 
@@ -176,17 +176,17 @@ export type ReminderPolicy = $Enums.ReminderPolicy
 
 export const ReminderPolicy: typeof $Enums.ReminderPolicy
 
-export type ScoringType = $Enums.ScoringType
-
-export const ScoringType: typeof $Enums.ScoringType
-
 export type LeagueStatus = $Enums.LeagueStatus
 
 export const LeagueStatus: typeof $Enums.LeagueStatus
 
+export type ScoringType = $Enums.ScoringType
+
+export const ScoringType: typeof $Enums.ScoringType
+
 /**
  * ##  Prisma Client ʲˢ
- * 
+ *
  * Type-safe database client for TypeScript & Node.js
  * @example
  * ```
@@ -195,7 +195,7 @@ export const LeagueStatus: typeof $Enums.LeagueStatus
  * const emailLogs = await prisma.emailLogs.findMany()
  * ```
  *
- * 
+ *
  * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client).
  */
 export class PrismaClient<
@@ -207,7 +207,7 @@ export class PrismaClient<
 
     /**
    * ##  Prisma Client ʲˢ
-   * 
+   *
    * Type-safe database client for TypeScript & Node.js
    * @example
    * ```
@@ -216,12 +216,12 @@ export class PrismaClient<
    * const emailLogs = await prisma.emailLogs.findMany()
    * ```
    *
-   * 
+   *
    * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client).
    */
 
   constructor(optionsArg ?: Prisma.Subset<ClientOptions, Prisma.PrismaClientOptions>);
-  $on<V extends U>(eventType: V, callback: (event: V extends 'query' ? Prisma.QueryEvent : Prisma.LogEvent) => void): void;
+  $on<V extends U>(eventType: V, callback: (event: V extends 'query' ? Prisma.QueryEvent : Prisma.LogEvent) => void): PrismaClient;
 
   /**
    * Connect with the database
@@ -246,7 +246,7 @@ export class PrismaClient<
    * ```
    * const result = await prisma.$executeRaw`UPDATE User SET cool = ${true} WHERE email = ${'user@email.com'};`
    * ```
-   * 
+   *
    * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client/raw-database-access).
    */
   $executeRaw<T = unknown>(query: TemplateStringsArray | Prisma.Sql, ...values: any[]): Prisma.PrismaPromise<number>;
@@ -258,7 +258,7 @@ export class PrismaClient<
    * ```
    * const result = await prisma.$executeRawUnsafe('UPDATE User SET cool = $1 WHERE email = $2 ;', true, 'user@email.com')
    * ```
-   * 
+   *
    * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client/raw-database-access).
    */
   $executeRawUnsafe<T = unknown>(query: string, ...values: any[]): Prisma.PrismaPromise<number>;
@@ -269,7 +269,7 @@ export class PrismaClient<
    * ```
    * const result = await prisma.$queryRaw`SELECT * FROM User WHERE id = ${1} OR email = ${'user@email.com'};`
    * ```
-   * 
+   *
    * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client/raw-database-access).
    */
   $queryRaw<T = unknown>(query: TemplateStringsArray | Prisma.Sql, ...values: any[]): Prisma.PrismaPromise<T>;
@@ -281,7 +281,7 @@ export class PrismaClient<
    * ```
    * const result = await prisma.$queryRawUnsafe('SELECT * FROM User WHERE id = $1 OR email = $2;', 1, 'user@email.com')
    * ```
-   * 
+   *
    * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client/raw-database-access).
    */
   $queryRawUnsafe<T = unknown>(query: string, ...values: any[]): Prisma.PrismaPromise<T>;
@@ -305,7 +305,9 @@ export class PrismaClient<
   $transaction<R>(fn: (prisma: Omit<PrismaClient, runtime.ITXClientDenyList>) => $Utils.JsPromise<R>, options?: { maxWait?: number, timeout?: number, isolationLevel?: Prisma.TransactionIsolationLevel }): $Utils.JsPromise<R>
 
 
-  $extends: $Extensions.ExtendsHook<"extends", Prisma.TypeMapCb, ExtArgs>
+  $extends: $Extensions.ExtendsHook<"extends", Prisma.TypeMapCb<ClientOptions>, ExtArgs, $Utils.Call<Prisma.TypeMapCb<ClientOptions>, {
+    extArgs: ExtArgs
+  }>>
 
       /**
    * `prisma.emailLogs`: Exposes CRUD operations for the **EmailLogs** model.
@@ -315,7 +317,7 @@ export class PrismaClient<
     * const emailLogs = await prisma.emailLogs.findMany()
     * ```
     */
-  get emailLogs(): Prisma.EmailLogsDelegate<ExtArgs>;
+  get emailLogs(): Prisma.EmailLogsDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.weekWinners`: Exposes CRUD operations for the **WeekWinners** model.
@@ -325,7 +327,7 @@ export class PrismaClient<
     * const weekWinners = await prisma.weekWinners.findMany()
     * ```
     */
-  get weekWinners(): Prisma.WeekWinnersDelegate<ExtArgs>;
+  get weekWinners(): Prisma.WeekWinnersDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.games`: Exposes CRUD operations for the **games** model.
@@ -335,7 +337,7 @@ export class PrismaClient<
     * const games = await prisma.games.findMany()
     * ```
     */
-  get games(): Prisma.gamesDelegate<ExtArgs>;
+  get games(): Prisma.gamesDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.leaguemembers`: Exposes CRUD operations for the **leaguemembers** model.
@@ -345,7 +347,7 @@ export class PrismaClient<
     * const leaguemembers = await prisma.leaguemembers.findMany()
     * ```
     */
-  get leaguemembers(): Prisma.leaguemembersDelegate<ExtArgs>;
+  get leaguemembers(): Prisma.leaguemembersDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.leaguemessages`: Exposes CRUD operations for the **leaguemessages** model.
@@ -355,7 +357,7 @@ export class PrismaClient<
     * const leaguemessages = await prisma.leaguemessages.findMany()
     * ```
     */
-  get leaguemessages(): Prisma.leaguemessagesDelegate<ExtArgs>;
+  get leaguemessages(): Prisma.leaguemessagesDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.leagues`: Exposes CRUD operations for the **leagues** model.
@@ -365,7 +367,7 @@ export class PrismaClient<
     * const leagues = await prisma.leagues.findMany()
     * ```
     */
-  get leagues(): Prisma.leaguesDelegate<ExtArgs>;
+  get leagues(): Prisma.leaguesDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.people`: Exposes CRUD operations for the **people** model.
@@ -375,7 +377,7 @@ export class PrismaClient<
     * const people = await prisma.people.findMany()
     * ```
     */
-  get people(): Prisma.peopleDelegate<ExtArgs>;
+  get people(): Prisma.peopleDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.picks`: Exposes CRUD operations for the **picks** model.
@@ -385,7 +387,7 @@ export class PrismaClient<
     * const picks = await prisma.picks.findMany()
     * ```
     */
-  get picks(): Prisma.picksDelegate<ExtArgs>;
+  get picks(): Prisma.picksDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.superbowl`: Exposes CRUD operations for the **superbowl** model.
@@ -395,7 +397,7 @@ export class PrismaClient<
     * const superbowls = await prisma.superbowl.findMany()
     * ```
     */
-  get superbowl(): Prisma.superbowlDelegate<ExtArgs>;
+  get superbowl(): Prisma.superbowlDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.superbowlsquares`: Exposes CRUD operations for the **superbowlsquares** model.
@@ -405,7 +407,7 @@ export class PrismaClient<
     * const superbowlsquares = await prisma.superbowlsquares.findMany()
     * ```
     */
-  get superbowlsquares(): Prisma.superbowlsquaresDelegate<ExtArgs>;
+  get superbowlsquares(): Prisma.superbowlsquaresDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.teams`: Exposes CRUD operations for the **teams** model.
@@ -415,7 +417,7 @@ export class PrismaClient<
     * const teams = await prisma.teams.findMany()
     * ```
     */
-  get teams(): Prisma.teamsDelegate<ExtArgs>;
+  get teams(): Prisma.teamsDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -436,7 +438,6 @@ export namespace Prisma {
   export import PrismaClientRustPanicError = runtime.PrismaClientRustPanicError
   export import PrismaClientInitializationError = runtime.PrismaClientInitializationError
   export import PrismaClientValidationError = runtime.PrismaClientValidationError
-  export import NotFoundError = runtime.NotFoundError
 
   /**
    * Re-export of sql-template-tag
@@ -457,7 +458,7 @@ export namespace Prisma {
   export type DecimalJsLike = runtime.DecimalJsLike
 
   /**
-   * Metrics 
+   * Metrics
    */
   export type Metrics = runtime.Metrics
   export type Metric<T> = runtime.Metric<T>
@@ -475,14 +476,14 @@ export namespace Prisma {
   export import Exact = $Public.Exact
 
   /**
-   * Prisma Client JS version: 5.21.0
-   * Query Engine version: 08713a93b99d58f31485621c634b04983ae01d95
+   * Prisma Client JS version: 6.10.1
+   * Query Engine version: 9b628578b3b7cae625e8c927178f15a170e74a9c
    */
   export type PrismaVersion = {
     client: string
   }
 
-  export const prismaVersion: PrismaVersion 
+  export const prismaVersion: PrismaVersion
 
   /**
    * Utility Types
@@ -498,15 +499,15 @@ export namespace Prisma {
 
   /**
    * Types of the values used to represent different kinds of `null` values when working with JSON fields.
-   * 
+   *
    * @see https://www.prisma.io/docs/concepts/components/prisma-client/working-with-fields/working-with-json-fields#filtering-on-a-json-field
    */
   namespace NullTypes {
     /**
     * Type of `Prisma.DbNull`.
-    * 
+    *
     * You cannot use other instances of this class. Please use the `Prisma.DbNull` value.
-    * 
+    *
     * @see https://www.prisma.io/docs/concepts/components/prisma-client/working-with-fields/working-with-json-fields#filtering-on-a-json-field
     */
     class DbNull {
@@ -516,9 +517,9 @@ export namespace Prisma {
 
     /**
     * Type of `Prisma.JsonNull`.
-    * 
+    *
     * You cannot use other instances of this class. Please use the `Prisma.JsonNull` value.
-    * 
+    *
     * @see https://www.prisma.io/docs/concepts/components/prisma-client/working-with-fields/working-with-json-fields#filtering-on-a-json-field
     */
     class JsonNull {
@@ -528,9 +529,9 @@ export namespace Prisma {
 
     /**
     * Type of `Prisma.AnyNull`.
-    * 
+    *
     * You cannot use other instances of this class. Please use the `Prisma.AnyNull` value.
-    * 
+    *
     * @see https://www.prisma.io/docs/concepts/components/prisma-client/working-with-fields/working-with-json-fields#filtering-on-a-json-field
     */
     class AnyNull {
@@ -541,21 +542,21 @@ export namespace Prisma {
 
   /**
    * Helper for filtering JSON entries that have `null` on the database (empty on the db)
-   * 
+   *
    * @see https://www.prisma.io/docs/concepts/components/prisma-client/working-with-fields/working-with-json-fields#filtering-on-a-json-field
    */
   export const DbNull: NullTypes.DbNull
 
   /**
    * Helper for filtering JSON entries that have JSON `null` values (not empty on the db)
-   * 
+   *
    * @see https://www.prisma.io/docs/concepts/components/prisma-client/working-with-fields/working-with-json-fields#filtering-on-a-json-field
    */
   export const JsonNull: NullTypes.JsonNull
 
   /**
    * Helper for filtering JSON entries that are `Prisma.DbNull` or `Prisma.JsonNull`
-   * 
+   *
    * @see https://www.prisma.io/docs/concepts/components/prisma-client/working-with-fields/working-with-json-fields#filtering-on-a-json-field
    */
   export const AnyNull: NullTypes.AnyNull
@@ -743,7 +744,7 @@ export namespace Prisma {
   type AtLeast<O extends object, K extends string> = NoExpand<
     O extends unknown
     ? | (K extends keyof O ? { [P in K]: O[P] } & O : O)
-      | {[P in keyof O as P extends K ? K : never]-?: O[P]} & O
+      | {[P in keyof O as P extends K ? P : never]-?: O[P]} & O
     : never>;
 
   type _Strict<U, _U = U> = U extends unknown ? U & OptionalFlat<_Record<Exclude<Keys<_U>, keyof U>, never>> : never;
@@ -877,11 +878,14 @@ export namespace Prisma {
     db?: Datasource
   }
 
-  interface TypeMapCb extends $Utils.Fn<{extArgs: $Extensions.InternalArgs, clientOptions: PrismaClientOptions }, $Utils.Record<string, any>> {
-    returns: Prisma.TypeMap<this['params']['extArgs'], this['params']['clientOptions']>
+  interface TypeMapCb<ClientOptions = {}> extends $Utils.Fn<{extArgs: $Extensions.InternalArgs }, $Utils.Record<string, any>> {
+    returns: Prisma.TypeMap<this['params']['extArgs'], ClientOptions extends { omit: infer OmitOptions } ? OmitOptions : {}>
   }
 
-  export type TypeMap<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, ClientOptions = {}> = {
+  export type TypeMap<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> = {
+    globalOmitOptions: {
+      omit: GlobalOmitOptions
+    }
     meta: {
       modelProps: "emailLogs" | "weekWinners" | "games" | "leaguemembers" | "leaguemessages" | "leagues" | "people" | "picks" | "superbowl" | "superbowlsquares" | "teams"
       txIsolationLevel: Prisma.TransactionIsolationLevel
@@ -938,6 +942,10 @@ export namespace Prisma {
           updateMany: {
             args: Prisma.EmailLogsUpdateManyArgs<ExtArgs>
             result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.EmailLogsUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EmailLogsPayload>[]
           }
           upsert: {
             args: Prisma.EmailLogsUpsertArgs<ExtArgs>
@@ -1009,6 +1017,10 @@ export namespace Prisma {
             args: Prisma.WeekWinnersUpdateManyArgs<ExtArgs>
             result: BatchPayload
           }
+          updateManyAndReturn: {
+            args: Prisma.WeekWinnersUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$WeekWinnersPayload>[]
+          }
           upsert: {
             args: Prisma.WeekWinnersUpsertArgs<ExtArgs>
             result: $Utils.PayloadToResult<Prisma.$WeekWinnersPayload>
@@ -1078,6 +1090,10 @@ export namespace Prisma {
           updateMany: {
             args: Prisma.gamesUpdateManyArgs<ExtArgs>
             result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.gamesUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$gamesPayload>[]
           }
           upsert: {
             args: Prisma.gamesUpsertArgs<ExtArgs>
@@ -1149,6 +1165,10 @@ export namespace Prisma {
             args: Prisma.leaguemembersUpdateManyArgs<ExtArgs>
             result: BatchPayload
           }
+          updateManyAndReturn: {
+            args: Prisma.leaguemembersUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$leaguemembersPayload>[]
+          }
           upsert: {
             args: Prisma.leaguemembersUpsertArgs<ExtArgs>
             result: $Utils.PayloadToResult<Prisma.$leaguemembersPayload>
@@ -1218,6 +1238,10 @@ export namespace Prisma {
           updateMany: {
             args: Prisma.leaguemessagesUpdateManyArgs<ExtArgs>
             result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.leaguemessagesUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$leaguemessagesPayload>[]
           }
           upsert: {
             args: Prisma.leaguemessagesUpsertArgs<ExtArgs>
@@ -1289,6 +1313,10 @@ export namespace Prisma {
             args: Prisma.leaguesUpdateManyArgs<ExtArgs>
             result: BatchPayload
           }
+          updateManyAndReturn: {
+            args: Prisma.leaguesUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$leaguesPayload>[]
+          }
           upsert: {
             args: Prisma.leaguesUpsertArgs<ExtArgs>
             result: $Utils.PayloadToResult<Prisma.$leaguesPayload>
@@ -1358,6 +1386,10 @@ export namespace Prisma {
           updateMany: {
             args: Prisma.peopleUpdateManyArgs<ExtArgs>
             result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.peopleUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$peoplePayload>[]
           }
           upsert: {
             args: Prisma.peopleUpsertArgs<ExtArgs>
@@ -1429,6 +1461,10 @@ export namespace Prisma {
             args: Prisma.picksUpdateManyArgs<ExtArgs>
             result: BatchPayload
           }
+          updateManyAndReturn: {
+            args: Prisma.picksUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$picksPayload>[]
+          }
           upsert: {
             args: Prisma.picksUpsertArgs<ExtArgs>
             result: $Utils.PayloadToResult<Prisma.$picksPayload>
@@ -1498,6 +1534,10 @@ export namespace Prisma {
           updateMany: {
             args: Prisma.superbowlUpdateManyArgs<ExtArgs>
             result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.superbowlUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$superbowlPayload>[]
           }
           upsert: {
             args: Prisma.superbowlUpsertArgs<ExtArgs>
@@ -1569,6 +1609,10 @@ export namespace Prisma {
             args: Prisma.superbowlsquaresUpdateManyArgs<ExtArgs>
             result: BatchPayload
           }
+          updateManyAndReturn: {
+            args: Prisma.superbowlsquaresUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$superbowlsquaresPayload>[]
+          }
           upsert: {
             args: Prisma.superbowlsquaresUpsertArgs<ExtArgs>
             result: $Utils.PayloadToResult<Prisma.$superbowlsquaresPayload>
@@ -1638,6 +1682,10 @@ export namespace Prisma {
           updateMany: {
             args: Prisma.teamsUpdateManyArgs<ExtArgs>
             result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.teamsUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$teamsPayload>[]
           }
           upsert: {
             args: Prisma.teamsUpsertArgs<ExtArgs>
@@ -1724,8 +1772,35 @@ export namespace Prisma {
       timeout?: number
       isolationLevel?: Prisma.TransactionIsolationLevel
     }
+    /**
+     * Global configuration for omitting model fields by default.
+     * 
+     * @example
+     * ```
+     * const prisma = new PrismaClient({
+     *   omit: {
+     *     user: {
+     *       password: true
+     *     }
+     *   }
+     * })
+     * ```
+     */
+    omit?: Prisma.GlobalOmitConfig
   }
-
+  export type GlobalOmitConfig = {
+    emailLogs?: EmailLogsOmit
+    weekWinners?: WeekWinnersOmit
+    games?: gamesOmit
+    leaguemembers?: leaguemembersOmit
+    leaguemessages?: leaguemessagesOmit
+    leagues?: leaguesOmit
+    people?: peopleOmit
+    picks?: picksOmit
+    superbowl?: superbowlOmit
+    superbowlsquares?: superbowlsquaresOmit
+    teams?: teamsOmit
+  }
 
   /* Types for Logging */
   export type LogLevel = 'info' | 'query' | 'warn' | 'error'
@@ -1766,6 +1841,7 @@ export namespace Prisma {
     | 'createManyAndReturn'
     | 'update'
     | 'updateMany'
+    | 'updateManyAndReturn'
     | 'upsert'
     | 'delete'
     | 'deleteMany'
@@ -2336,6 +2412,18 @@ export namespace Prisma {
     leaguemembers?: boolean | leaguemembersDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["emailLogs"]>
 
+  export type EmailLogsSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    email_log_id?: boolean
+    league_id?: boolean
+    member_id?: boolean
+    email_type?: boolean
+    ts?: boolean
+    week?: boolean
+    resend_id?: boolean
+    leagues?: boolean | leaguesDefaultArgs<ExtArgs>
+    leaguemembers?: boolean | leaguemembersDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["emailLogs"]>
+
   export type EmailLogsSelectScalar = {
     email_log_id?: boolean
     league_id?: boolean
@@ -2346,11 +2434,16 @@ export namespace Prisma {
     resend_id?: boolean
   }
 
+  export type EmailLogsOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"email_log_id" | "league_id" | "member_id" | "email_type" | "ts" | "week" | "resend_id", ExtArgs["result"]["emailLogs"]>
   export type EmailLogsInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     leagues?: boolean | leaguesDefaultArgs<ExtArgs>
     leaguemembers?: boolean | leaguemembersDefaultArgs<ExtArgs>
   }
   export type EmailLogsIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    leagues?: boolean | leaguesDefaultArgs<ExtArgs>
+    leaguemembers?: boolean | leaguemembersDefaultArgs<ExtArgs>
+  }
+  export type EmailLogsIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     leagues?: boolean | leaguesDefaultArgs<ExtArgs>
     leaguemembers?: boolean | leaguemembersDefaultArgs<ExtArgs>
   }
@@ -2375,12 +2468,12 @@ export namespace Prisma {
 
   type EmailLogsGetPayload<S extends boolean | null | undefined | EmailLogsDefaultArgs> = $Result.GetResult<Prisma.$EmailLogsPayload, S>
 
-  type EmailLogsCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = 
-    Omit<EmailLogsFindManyArgs, 'select' | 'include' | 'distinct' | 'relationLoadStrategy'> & {
+  type EmailLogsCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<EmailLogsFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
       select?: EmailLogsCountAggregateInputType | true
     }
 
-  export interface EmailLogsDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> {
+  export interface EmailLogsDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
     [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['EmailLogs'], meta: { name: 'EmailLogs' } }
     /**
      * Find zero or one EmailLogs that matches the filter.
@@ -2393,10 +2486,10 @@ export namespace Prisma {
      *   }
      * })
      */
-    findUnique<T extends EmailLogsFindUniqueArgs>(args: SelectSubset<T, EmailLogsFindUniqueArgs<ExtArgs>>): Prisma__EmailLogsClient<$Result.GetResult<Prisma.$EmailLogsPayload<ExtArgs>, T, "findUnique"> | null, null, ExtArgs>
+    findUnique<T extends EmailLogsFindUniqueArgs>(args: SelectSubset<T, EmailLogsFindUniqueArgs<ExtArgs>>): Prisma__EmailLogsClient<$Result.GetResult<Prisma.$EmailLogsPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
 
     /**
-     * Find one EmailLogs that matches the filter or throw an error with `error.code='P2025'` 
+     * Find one EmailLogs that matches the filter or throw an error with `error.code='P2025'`
      * if no matches were found.
      * @param {EmailLogsFindUniqueOrThrowArgs} args - Arguments to find a EmailLogs
      * @example
@@ -2407,7 +2500,7 @@ export namespace Prisma {
      *   }
      * })
      */
-    findUniqueOrThrow<T extends EmailLogsFindUniqueOrThrowArgs>(args: SelectSubset<T, EmailLogsFindUniqueOrThrowArgs<ExtArgs>>): Prisma__EmailLogsClient<$Result.GetResult<Prisma.$EmailLogsPayload<ExtArgs>, T, "findUniqueOrThrow">, never, ExtArgs>
+    findUniqueOrThrow<T extends EmailLogsFindUniqueOrThrowArgs>(args: SelectSubset<T, EmailLogsFindUniqueOrThrowArgs<ExtArgs>>): Prisma__EmailLogsClient<$Result.GetResult<Prisma.$EmailLogsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
      * Find the first EmailLogs that matches the filter.
@@ -2422,7 +2515,7 @@ export namespace Prisma {
      *   }
      * })
      */
-    findFirst<T extends EmailLogsFindFirstArgs>(args?: SelectSubset<T, EmailLogsFindFirstArgs<ExtArgs>>): Prisma__EmailLogsClient<$Result.GetResult<Prisma.$EmailLogsPayload<ExtArgs>, T, "findFirst"> | null, null, ExtArgs>
+    findFirst<T extends EmailLogsFindFirstArgs>(args?: SelectSubset<T, EmailLogsFindFirstArgs<ExtArgs>>): Prisma__EmailLogsClient<$Result.GetResult<Prisma.$EmailLogsPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
 
     /**
      * Find the first EmailLogs that matches the filter or
@@ -2438,7 +2531,7 @@ export namespace Prisma {
      *   }
      * })
      */
-    findFirstOrThrow<T extends EmailLogsFindFirstOrThrowArgs>(args?: SelectSubset<T, EmailLogsFindFirstOrThrowArgs<ExtArgs>>): Prisma__EmailLogsClient<$Result.GetResult<Prisma.$EmailLogsPayload<ExtArgs>, T, "findFirstOrThrow">, never, ExtArgs>
+    findFirstOrThrow<T extends EmailLogsFindFirstOrThrowArgs>(args?: SelectSubset<T, EmailLogsFindFirstOrThrowArgs<ExtArgs>>): Prisma__EmailLogsClient<$Result.GetResult<Prisma.$EmailLogsPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
      * Find zero or more EmailLogs that matches the filter.
@@ -2456,7 +2549,7 @@ export namespace Prisma {
      * const emailLogsWithEmail_log_idOnly = await prisma.emailLogs.findMany({ select: { email_log_id: true } })
      * 
      */
-    findMany<T extends EmailLogsFindManyArgs>(args?: SelectSubset<T, EmailLogsFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EmailLogsPayload<ExtArgs>, T, "findMany">>
+    findMany<T extends EmailLogsFindManyArgs>(args?: SelectSubset<T, EmailLogsFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EmailLogsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
 
     /**
      * Create a EmailLogs.
@@ -2470,7 +2563,7 @@ export namespace Prisma {
      * })
      * 
      */
-    create<T extends EmailLogsCreateArgs>(args: SelectSubset<T, EmailLogsCreateArgs<ExtArgs>>): Prisma__EmailLogsClient<$Result.GetResult<Prisma.$EmailLogsPayload<ExtArgs>, T, "create">, never, ExtArgs>
+    create<T extends EmailLogsCreateArgs>(args: SelectSubset<T, EmailLogsCreateArgs<ExtArgs>>): Prisma__EmailLogsClient<$Result.GetResult<Prisma.$EmailLogsPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
      * Create many EmailLogs.
@@ -2498,7 +2591,7 @@ export namespace Prisma {
      * })
      * 
      * // Create many EmailLogs and only return the `email_log_id`
-     * const emailLogsWithEmail_log_idOnly = await prisma.emailLogs.createManyAndReturn({ 
+     * const emailLogsWithEmail_log_idOnly = await prisma.emailLogs.createManyAndReturn({
      *   select: { email_log_id: true },
      *   data: [
      *     // ... provide data here
@@ -2508,7 +2601,7 @@ export namespace Prisma {
      * Read more here: https://pris.ly/d/null-undefined
      * 
      */
-    createManyAndReturn<T extends EmailLogsCreateManyAndReturnArgs>(args?: SelectSubset<T, EmailLogsCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EmailLogsPayload<ExtArgs>, T, "createManyAndReturn">>
+    createManyAndReturn<T extends EmailLogsCreateManyAndReturnArgs>(args?: SelectSubset<T, EmailLogsCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EmailLogsPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
 
     /**
      * Delete a EmailLogs.
@@ -2522,7 +2615,7 @@ export namespace Prisma {
      * })
      * 
      */
-    delete<T extends EmailLogsDeleteArgs>(args: SelectSubset<T, EmailLogsDeleteArgs<ExtArgs>>): Prisma__EmailLogsClient<$Result.GetResult<Prisma.$EmailLogsPayload<ExtArgs>, T, "delete">, never, ExtArgs>
+    delete<T extends EmailLogsDeleteArgs>(args: SelectSubset<T, EmailLogsDeleteArgs<ExtArgs>>): Prisma__EmailLogsClient<$Result.GetResult<Prisma.$EmailLogsPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
      * Update one EmailLogs.
@@ -2539,7 +2632,7 @@ export namespace Prisma {
      * })
      * 
      */
-    update<T extends EmailLogsUpdateArgs>(args: SelectSubset<T, EmailLogsUpdateArgs<ExtArgs>>): Prisma__EmailLogsClient<$Result.GetResult<Prisma.$EmailLogsPayload<ExtArgs>, T, "update">, never, ExtArgs>
+    update<T extends EmailLogsUpdateArgs>(args: SelectSubset<T, EmailLogsUpdateArgs<ExtArgs>>): Prisma__EmailLogsClient<$Result.GetResult<Prisma.$EmailLogsPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
      * Delete zero or more EmailLogs.
@@ -2575,6 +2668,36 @@ export namespace Prisma {
     updateMany<T extends EmailLogsUpdateManyArgs>(args: SelectSubset<T, EmailLogsUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
     /**
+     * Update zero or more EmailLogs and returns the data updated in the database.
+     * @param {EmailLogsUpdateManyAndReturnArgs} args - Arguments to update many EmailLogs.
+     * @example
+     * // Update many EmailLogs
+     * const emailLogs = await prisma.emailLogs.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more EmailLogs and only return the `email_log_id`
+     * const emailLogsWithEmail_log_idOnly = await prisma.emailLogs.updateManyAndReturn({
+     *   select: { email_log_id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends EmailLogsUpdateManyAndReturnArgs>(args: SelectSubset<T, EmailLogsUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EmailLogsPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
      * Create or update one EmailLogs.
      * @param {EmailLogsUpsertArgs} args - Arguments to update or create a EmailLogs.
      * @example
@@ -2591,7 +2714,7 @@ export namespace Prisma {
      *   }
      * })
      */
-    upsert<T extends EmailLogsUpsertArgs>(args: SelectSubset<T, EmailLogsUpsertArgs<ExtArgs>>): Prisma__EmailLogsClient<$Result.GetResult<Prisma.$EmailLogsPayload<ExtArgs>, T, "upsert">, never, ExtArgs>
+    upsert<T extends EmailLogsUpsertArgs>(args: SelectSubset<T, EmailLogsUpsertArgs<ExtArgs>>): Prisma__EmailLogsClient<$Result.GetResult<Prisma.$EmailLogsPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
 
     /**
@@ -2731,10 +2854,10 @@ export namespace Prisma {
    * Because we want to prevent naming conflicts as mentioned in
    * https://github.com/prisma/prisma-client-js/issues/707
    */
-  export interface Prisma__EmailLogsClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
+  export interface Prisma__EmailLogsClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
-    leagues<T extends leaguesDefaultArgs<ExtArgs> = {}>(args?: Subset<T, leaguesDefaultArgs<ExtArgs>>): Prisma__leaguesClient<$Result.GetResult<Prisma.$leaguesPayload<ExtArgs>, T, "findUniqueOrThrow"> | Null, Null, ExtArgs>
-    leaguemembers<T extends leaguemembersDefaultArgs<ExtArgs> = {}>(args?: Subset<T, leaguemembersDefaultArgs<ExtArgs>>): Prisma__leaguemembersClient<$Result.GetResult<Prisma.$leaguemembersPayload<ExtArgs>, T, "findUniqueOrThrow"> | Null, Null, ExtArgs>
+    leagues<T extends leaguesDefaultArgs<ExtArgs> = {}>(args?: Subset<T, leaguesDefaultArgs<ExtArgs>>): Prisma__leaguesClient<$Result.GetResult<Prisma.$leaguesPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    leaguemembers<T extends leaguemembersDefaultArgs<ExtArgs> = {}>(args?: Subset<T, leaguemembersDefaultArgs<ExtArgs>>): Prisma__leaguemembersClient<$Result.GetResult<Prisma.$leaguemembersPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2762,7 +2885,7 @@ export namespace Prisma {
 
   /**
    * Fields of the EmailLogs model
-   */ 
+   */
   interface EmailLogsFieldRefs {
     readonly email_log_id: FieldRef<"EmailLogs", 'String'>
     readonly league_id: FieldRef<"EmailLogs", 'Int'>
@@ -2784,6 +2907,10 @@ export namespace Prisma {
      */
     select?: EmailLogsSelect<ExtArgs> | null
     /**
+     * Omit specific fields from the EmailLogs
+     */
+    omit?: EmailLogsOmit<ExtArgs> | null
+    /**
      * Choose, which related nodes to fetch as well
      */
     include?: EmailLogsInclude<ExtArgs> | null
@@ -2803,6 +2930,10 @@ export namespace Prisma {
      */
     select?: EmailLogsSelect<ExtArgs> | null
     /**
+     * Omit specific fields from the EmailLogs
+     */
+    omit?: EmailLogsOmit<ExtArgs> | null
+    /**
      * Choose, which related nodes to fetch as well
      */
     include?: EmailLogsInclude<ExtArgs> | null
@@ -2821,6 +2952,10 @@ export namespace Prisma {
      * Select specific fields to fetch from the EmailLogs
      */
     select?: EmailLogsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EmailLogs
+     */
+    omit?: EmailLogsOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
@@ -2871,6 +3006,10 @@ export namespace Prisma {
      */
     select?: EmailLogsSelect<ExtArgs> | null
     /**
+     * Omit specific fields from the EmailLogs
+     */
+    omit?: EmailLogsOmit<ExtArgs> | null
+    /**
      * Choose, which related nodes to fetch as well
      */
     include?: EmailLogsInclude<ExtArgs> | null
@@ -2920,6 +3059,10 @@ export namespace Prisma {
      */
     select?: EmailLogsSelect<ExtArgs> | null
     /**
+     * Omit specific fields from the EmailLogs
+     */
+    omit?: EmailLogsOmit<ExtArgs> | null
+    /**
      * Choose, which related nodes to fetch as well
      */
     include?: EmailLogsInclude<ExtArgs> | null
@@ -2964,6 +3107,10 @@ export namespace Prisma {
      */
     select?: EmailLogsSelect<ExtArgs> | null
     /**
+     * Omit specific fields from the EmailLogs
+     */
+    omit?: EmailLogsOmit<ExtArgs> | null
+    /**
      * Choose, which related nodes to fetch as well
      */
     include?: EmailLogsInclude<ExtArgs> | null
@@ -2994,6 +3141,10 @@ export namespace Prisma {
      */
     select?: EmailLogsSelectCreateManyAndReturn<ExtArgs> | null
     /**
+     * Omit specific fields from the EmailLogs
+     */
+    omit?: EmailLogsOmit<ExtArgs> | null
+    /**
      * The data used to create many EmailLogs.
      */
     data: EmailLogsCreateManyInput | EmailLogsCreateManyInput[]
@@ -3012,6 +3163,10 @@ export namespace Prisma {
      * Select specific fields to fetch from the EmailLogs
      */
     select?: EmailLogsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EmailLogs
+     */
+    omit?: EmailLogsOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
@@ -3039,6 +3194,40 @@ export namespace Prisma {
      * Filter which EmailLogs to update
      */
     where?: EmailLogsWhereInput
+    /**
+     * Limit how many EmailLogs to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * EmailLogs updateManyAndReturn
+   */
+  export type EmailLogsUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EmailLogs
+     */
+    select?: EmailLogsSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the EmailLogs
+     */
+    omit?: EmailLogsOmit<ExtArgs> | null
+    /**
+     * The data used to update EmailLogs.
+     */
+    data: XOR<EmailLogsUpdateManyMutationInput, EmailLogsUncheckedUpdateManyInput>
+    /**
+     * Filter which EmailLogs to update
+     */
+    where?: EmailLogsWhereInput
+    /**
+     * Limit how many EmailLogs to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EmailLogsIncludeUpdateManyAndReturn<ExtArgs> | null
   }
 
   /**
@@ -3049,6 +3238,10 @@ export namespace Prisma {
      * Select specific fields to fetch from the EmailLogs
      */
     select?: EmailLogsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EmailLogs
+     */
+    omit?: EmailLogsOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
@@ -3077,6 +3270,10 @@ export namespace Prisma {
      */
     select?: EmailLogsSelect<ExtArgs> | null
     /**
+     * Omit specific fields from the EmailLogs
+     */
+    omit?: EmailLogsOmit<ExtArgs> | null
+    /**
      * Choose, which related nodes to fetch as well
      */
     include?: EmailLogsInclude<ExtArgs> | null
@@ -3095,6 +3292,10 @@ export namespace Prisma {
      * Filter which EmailLogs to delete
      */
     where?: EmailLogsWhereInput
+    /**
+     * Limit how many EmailLogs to delete.
+     */
+    limit?: number
   }
 
   /**
@@ -3105,6 +3306,10 @@ export namespace Prisma {
      * Select specific fields to fetch from the EmailLogs
      */
     select?: EmailLogsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EmailLogs
+     */
+    omit?: EmailLogsOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
@@ -3353,6 +3558,17 @@ export namespace Prisma {
     leaguemembers?: boolean | leaguemembersDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["weekWinners"]>
 
+  export type WeekWinnersSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    league_id?: boolean
+    membership_id?: boolean
+    week?: boolean
+    correct_count?: boolean
+    score_diff?: boolean
+    leagues?: boolean | leaguesDefaultArgs<ExtArgs>
+    leaguemembers?: boolean | leaguemembersDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["weekWinners"]>
+
   export type WeekWinnersSelectScalar = {
     id?: boolean
     league_id?: boolean
@@ -3362,11 +3578,16 @@ export namespace Prisma {
     score_diff?: boolean
   }
 
+  export type WeekWinnersOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "league_id" | "membership_id" | "week" | "correct_count" | "score_diff", ExtArgs["result"]["weekWinners"]>
   export type WeekWinnersInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     leagues?: boolean | leaguesDefaultArgs<ExtArgs>
     leaguemembers?: boolean | leaguemembersDefaultArgs<ExtArgs>
   }
   export type WeekWinnersIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    leagues?: boolean | leaguesDefaultArgs<ExtArgs>
+    leaguemembers?: boolean | leaguemembersDefaultArgs<ExtArgs>
+  }
+  export type WeekWinnersIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     leagues?: boolean | leaguesDefaultArgs<ExtArgs>
     leaguemembers?: boolean | leaguemembersDefaultArgs<ExtArgs>
   }
@@ -3390,12 +3611,12 @@ export namespace Prisma {
 
   type WeekWinnersGetPayload<S extends boolean | null | undefined | WeekWinnersDefaultArgs> = $Result.GetResult<Prisma.$WeekWinnersPayload, S>
 
-  type WeekWinnersCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = 
-    Omit<WeekWinnersFindManyArgs, 'select' | 'include' | 'distinct' | 'relationLoadStrategy'> & {
+  type WeekWinnersCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<WeekWinnersFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
       select?: WeekWinnersCountAggregateInputType | true
     }
 
-  export interface WeekWinnersDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> {
+  export interface WeekWinnersDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
     [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['WeekWinners'], meta: { name: 'WeekWinners' } }
     /**
      * Find zero or one WeekWinners that matches the filter.
@@ -3408,10 +3629,10 @@ export namespace Prisma {
      *   }
      * })
      */
-    findUnique<T extends WeekWinnersFindUniqueArgs>(args: SelectSubset<T, WeekWinnersFindUniqueArgs<ExtArgs>>): Prisma__WeekWinnersClient<$Result.GetResult<Prisma.$WeekWinnersPayload<ExtArgs>, T, "findUnique"> | null, null, ExtArgs>
+    findUnique<T extends WeekWinnersFindUniqueArgs>(args: SelectSubset<T, WeekWinnersFindUniqueArgs<ExtArgs>>): Prisma__WeekWinnersClient<$Result.GetResult<Prisma.$WeekWinnersPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
 
     /**
-     * Find one WeekWinners that matches the filter or throw an error with `error.code='P2025'` 
+     * Find one WeekWinners that matches the filter or throw an error with `error.code='P2025'`
      * if no matches were found.
      * @param {WeekWinnersFindUniqueOrThrowArgs} args - Arguments to find a WeekWinners
      * @example
@@ -3422,7 +3643,7 @@ export namespace Prisma {
      *   }
      * })
      */
-    findUniqueOrThrow<T extends WeekWinnersFindUniqueOrThrowArgs>(args: SelectSubset<T, WeekWinnersFindUniqueOrThrowArgs<ExtArgs>>): Prisma__WeekWinnersClient<$Result.GetResult<Prisma.$WeekWinnersPayload<ExtArgs>, T, "findUniqueOrThrow">, never, ExtArgs>
+    findUniqueOrThrow<T extends WeekWinnersFindUniqueOrThrowArgs>(args: SelectSubset<T, WeekWinnersFindUniqueOrThrowArgs<ExtArgs>>): Prisma__WeekWinnersClient<$Result.GetResult<Prisma.$WeekWinnersPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
      * Find the first WeekWinners that matches the filter.
@@ -3437,7 +3658,7 @@ export namespace Prisma {
      *   }
      * })
      */
-    findFirst<T extends WeekWinnersFindFirstArgs>(args?: SelectSubset<T, WeekWinnersFindFirstArgs<ExtArgs>>): Prisma__WeekWinnersClient<$Result.GetResult<Prisma.$WeekWinnersPayload<ExtArgs>, T, "findFirst"> | null, null, ExtArgs>
+    findFirst<T extends WeekWinnersFindFirstArgs>(args?: SelectSubset<T, WeekWinnersFindFirstArgs<ExtArgs>>): Prisma__WeekWinnersClient<$Result.GetResult<Prisma.$WeekWinnersPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
 
     /**
      * Find the first WeekWinners that matches the filter or
@@ -3453,7 +3674,7 @@ export namespace Prisma {
      *   }
      * })
      */
-    findFirstOrThrow<T extends WeekWinnersFindFirstOrThrowArgs>(args?: SelectSubset<T, WeekWinnersFindFirstOrThrowArgs<ExtArgs>>): Prisma__WeekWinnersClient<$Result.GetResult<Prisma.$WeekWinnersPayload<ExtArgs>, T, "findFirstOrThrow">, never, ExtArgs>
+    findFirstOrThrow<T extends WeekWinnersFindFirstOrThrowArgs>(args?: SelectSubset<T, WeekWinnersFindFirstOrThrowArgs<ExtArgs>>): Prisma__WeekWinnersClient<$Result.GetResult<Prisma.$WeekWinnersPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
      * Find zero or more WeekWinners that matches the filter.
@@ -3471,7 +3692,7 @@ export namespace Prisma {
      * const weekWinnersWithIdOnly = await prisma.weekWinners.findMany({ select: { id: true } })
      * 
      */
-    findMany<T extends WeekWinnersFindManyArgs>(args?: SelectSubset<T, WeekWinnersFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$WeekWinnersPayload<ExtArgs>, T, "findMany">>
+    findMany<T extends WeekWinnersFindManyArgs>(args?: SelectSubset<T, WeekWinnersFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$WeekWinnersPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
 
     /**
      * Create a WeekWinners.
@@ -3485,7 +3706,7 @@ export namespace Prisma {
      * })
      * 
      */
-    create<T extends WeekWinnersCreateArgs>(args: SelectSubset<T, WeekWinnersCreateArgs<ExtArgs>>): Prisma__WeekWinnersClient<$Result.GetResult<Prisma.$WeekWinnersPayload<ExtArgs>, T, "create">, never, ExtArgs>
+    create<T extends WeekWinnersCreateArgs>(args: SelectSubset<T, WeekWinnersCreateArgs<ExtArgs>>): Prisma__WeekWinnersClient<$Result.GetResult<Prisma.$WeekWinnersPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
      * Create many WeekWinners.
@@ -3513,7 +3734,7 @@ export namespace Prisma {
      * })
      * 
      * // Create many WeekWinners and only return the `id`
-     * const weekWinnersWithIdOnly = await prisma.weekWinners.createManyAndReturn({ 
+     * const weekWinnersWithIdOnly = await prisma.weekWinners.createManyAndReturn({
      *   select: { id: true },
      *   data: [
      *     // ... provide data here
@@ -3523,7 +3744,7 @@ export namespace Prisma {
      * Read more here: https://pris.ly/d/null-undefined
      * 
      */
-    createManyAndReturn<T extends WeekWinnersCreateManyAndReturnArgs>(args?: SelectSubset<T, WeekWinnersCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$WeekWinnersPayload<ExtArgs>, T, "createManyAndReturn">>
+    createManyAndReturn<T extends WeekWinnersCreateManyAndReturnArgs>(args?: SelectSubset<T, WeekWinnersCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$WeekWinnersPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
 
     /**
      * Delete a WeekWinners.
@@ -3537,7 +3758,7 @@ export namespace Prisma {
      * })
      * 
      */
-    delete<T extends WeekWinnersDeleteArgs>(args: SelectSubset<T, WeekWinnersDeleteArgs<ExtArgs>>): Prisma__WeekWinnersClient<$Result.GetResult<Prisma.$WeekWinnersPayload<ExtArgs>, T, "delete">, never, ExtArgs>
+    delete<T extends WeekWinnersDeleteArgs>(args: SelectSubset<T, WeekWinnersDeleteArgs<ExtArgs>>): Prisma__WeekWinnersClient<$Result.GetResult<Prisma.$WeekWinnersPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
      * Update one WeekWinners.
@@ -3554,7 +3775,7 @@ export namespace Prisma {
      * })
      * 
      */
-    update<T extends WeekWinnersUpdateArgs>(args: SelectSubset<T, WeekWinnersUpdateArgs<ExtArgs>>): Prisma__WeekWinnersClient<$Result.GetResult<Prisma.$WeekWinnersPayload<ExtArgs>, T, "update">, never, ExtArgs>
+    update<T extends WeekWinnersUpdateArgs>(args: SelectSubset<T, WeekWinnersUpdateArgs<ExtArgs>>): Prisma__WeekWinnersClient<$Result.GetResult<Prisma.$WeekWinnersPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
      * Delete zero or more WeekWinners.
@@ -3590,6 +3811,36 @@ export namespace Prisma {
     updateMany<T extends WeekWinnersUpdateManyArgs>(args: SelectSubset<T, WeekWinnersUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
     /**
+     * Update zero or more WeekWinners and returns the data updated in the database.
+     * @param {WeekWinnersUpdateManyAndReturnArgs} args - Arguments to update many WeekWinners.
+     * @example
+     * // Update many WeekWinners
+     * const weekWinners = await prisma.weekWinners.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more WeekWinners and only return the `id`
+     * const weekWinnersWithIdOnly = await prisma.weekWinners.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends WeekWinnersUpdateManyAndReturnArgs>(args: SelectSubset<T, WeekWinnersUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$WeekWinnersPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
      * Create or update one WeekWinners.
      * @param {WeekWinnersUpsertArgs} args - Arguments to update or create a WeekWinners.
      * @example
@@ -3606,7 +3857,7 @@ export namespace Prisma {
      *   }
      * })
      */
-    upsert<T extends WeekWinnersUpsertArgs>(args: SelectSubset<T, WeekWinnersUpsertArgs<ExtArgs>>): Prisma__WeekWinnersClient<$Result.GetResult<Prisma.$WeekWinnersPayload<ExtArgs>, T, "upsert">, never, ExtArgs>
+    upsert<T extends WeekWinnersUpsertArgs>(args: SelectSubset<T, WeekWinnersUpsertArgs<ExtArgs>>): Prisma__WeekWinnersClient<$Result.GetResult<Prisma.$WeekWinnersPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
 
     /**
@@ -3746,10 +3997,10 @@ export namespace Prisma {
    * Because we want to prevent naming conflicts as mentioned in
    * https://github.com/prisma/prisma-client-js/issues/707
    */
-  export interface Prisma__WeekWinnersClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
+  export interface Prisma__WeekWinnersClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
-    leagues<T extends leaguesDefaultArgs<ExtArgs> = {}>(args?: Subset<T, leaguesDefaultArgs<ExtArgs>>): Prisma__leaguesClient<$Result.GetResult<Prisma.$leaguesPayload<ExtArgs>, T, "findUniqueOrThrow"> | Null, Null, ExtArgs>
-    leaguemembers<T extends leaguemembersDefaultArgs<ExtArgs> = {}>(args?: Subset<T, leaguemembersDefaultArgs<ExtArgs>>): Prisma__leaguemembersClient<$Result.GetResult<Prisma.$leaguemembersPayload<ExtArgs>, T, "findUniqueOrThrow"> | Null, Null, ExtArgs>
+    leagues<T extends leaguesDefaultArgs<ExtArgs> = {}>(args?: Subset<T, leaguesDefaultArgs<ExtArgs>>): Prisma__leaguesClient<$Result.GetResult<Prisma.$leaguesPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    leaguemembers<T extends leaguemembersDefaultArgs<ExtArgs> = {}>(args?: Subset<T, leaguemembersDefaultArgs<ExtArgs>>): Prisma__leaguemembersClient<$Result.GetResult<Prisma.$leaguemembersPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -3777,7 +4028,7 @@ export namespace Prisma {
 
   /**
    * Fields of the WeekWinners model
-   */ 
+   */
   interface WeekWinnersFieldRefs {
     readonly id: FieldRef<"WeekWinners", 'Int'>
     readonly league_id: FieldRef<"WeekWinners", 'Int'>
@@ -3798,6 +4049,10 @@ export namespace Prisma {
      */
     select?: WeekWinnersSelect<ExtArgs> | null
     /**
+     * Omit specific fields from the WeekWinners
+     */
+    omit?: WeekWinnersOmit<ExtArgs> | null
+    /**
      * Choose, which related nodes to fetch as well
      */
     include?: WeekWinnersInclude<ExtArgs> | null
@@ -3817,6 +4072,10 @@ export namespace Prisma {
      */
     select?: WeekWinnersSelect<ExtArgs> | null
     /**
+     * Omit specific fields from the WeekWinners
+     */
+    omit?: WeekWinnersOmit<ExtArgs> | null
+    /**
      * Choose, which related nodes to fetch as well
      */
     include?: WeekWinnersInclude<ExtArgs> | null
@@ -3835,6 +4094,10 @@ export namespace Prisma {
      * Select specific fields to fetch from the WeekWinners
      */
     select?: WeekWinnersSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the WeekWinners
+     */
+    omit?: WeekWinnersOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
@@ -3885,6 +4148,10 @@ export namespace Prisma {
      */
     select?: WeekWinnersSelect<ExtArgs> | null
     /**
+     * Omit specific fields from the WeekWinners
+     */
+    omit?: WeekWinnersOmit<ExtArgs> | null
+    /**
      * Choose, which related nodes to fetch as well
      */
     include?: WeekWinnersInclude<ExtArgs> | null
@@ -3934,6 +4201,10 @@ export namespace Prisma {
      */
     select?: WeekWinnersSelect<ExtArgs> | null
     /**
+     * Omit specific fields from the WeekWinners
+     */
+    omit?: WeekWinnersOmit<ExtArgs> | null
+    /**
      * Choose, which related nodes to fetch as well
      */
     include?: WeekWinnersInclude<ExtArgs> | null
@@ -3978,6 +4249,10 @@ export namespace Prisma {
      */
     select?: WeekWinnersSelect<ExtArgs> | null
     /**
+     * Omit specific fields from the WeekWinners
+     */
+    omit?: WeekWinnersOmit<ExtArgs> | null
+    /**
      * Choose, which related nodes to fetch as well
      */
     include?: WeekWinnersInclude<ExtArgs> | null
@@ -4008,6 +4283,10 @@ export namespace Prisma {
      */
     select?: WeekWinnersSelectCreateManyAndReturn<ExtArgs> | null
     /**
+     * Omit specific fields from the WeekWinners
+     */
+    omit?: WeekWinnersOmit<ExtArgs> | null
+    /**
      * The data used to create many WeekWinners.
      */
     data: WeekWinnersCreateManyInput | WeekWinnersCreateManyInput[]
@@ -4026,6 +4305,10 @@ export namespace Prisma {
      * Select specific fields to fetch from the WeekWinners
      */
     select?: WeekWinnersSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the WeekWinners
+     */
+    omit?: WeekWinnersOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
@@ -4053,6 +4336,40 @@ export namespace Prisma {
      * Filter which WeekWinners to update
      */
     where?: WeekWinnersWhereInput
+    /**
+     * Limit how many WeekWinners to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * WeekWinners updateManyAndReturn
+   */
+  export type WeekWinnersUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the WeekWinners
+     */
+    select?: WeekWinnersSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the WeekWinners
+     */
+    omit?: WeekWinnersOmit<ExtArgs> | null
+    /**
+     * The data used to update WeekWinners.
+     */
+    data: XOR<WeekWinnersUpdateManyMutationInput, WeekWinnersUncheckedUpdateManyInput>
+    /**
+     * Filter which WeekWinners to update
+     */
+    where?: WeekWinnersWhereInput
+    /**
+     * Limit how many WeekWinners to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: WeekWinnersIncludeUpdateManyAndReturn<ExtArgs> | null
   }
 
   /**
@@ -4063,6 +4380,10 @@ export namespace Prisma {
      * Select specific fields to fetch from the WeekWinners
      */
     select?: WeekWinnersSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the WeekWinners
+     */
+    omit?: WeekWinnersOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
@@ -4091,6 +4412,10 @@ export namespace Prisma {
      */
     select?: WeekWinnersSelect<ExtArgs> | null
     /**
+     * Omit specific fields from the WeekWinners
+     */
+    omit?: WeekWinnersOmit<ExtArgs> | null
+    /**
      * Choose, which related nodes to fetch as well
      */
     include?: WeekWinnersInclude<ExtArgs> | null
@@ -4109,6 +4434,10 @@ export namespace Prisma {
      * Filter which WeekWinners to delete
      */
     where?: WeekWinnersWhereInput
+    /**
+     * Limit how many WeekWinners to delete.
+     */
+    limit?: number
   }
 
   /**
@@ -4119,6 +4448,10 @@ export namespace Prisma {
      * Select specific fields to fetch from the WeekWinners
      */
     select?: WeekWinnersSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the WeekWinners
+     */
+    omit?: WeekWinnersOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
@@ -4523,6 +4856,31 @@ export namespace Prisma {
     teams_games_awayToteams?: boolean | teamsDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["games"]>
 
+  export type gamesSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    gid?: boolean
+    season?: boolean
+    week?: boolean
+    ts?: boolean
+    home?: boolean
+    away?: boolean
+    homescore?: boolean
+    awayscore?: boolean
+    done?: boolean
+    winner?: boolean
+    international?: boolean
+    seconds?: boolean
+    current_record?: boolean
+    is_tiebreaker?: boolean
+    homerecord?: boolean
+    awayrecord?: boolean
+    current_quarter_seconds_remaining?: boolean
+    current_quarter?: boolean
+    msf_id?: boolean
+    espn_id?: boolean
+    teams_games_homeToteams?: boolean | teamsDefaultArgs<ExtArgs>
+    teams_games_awayToteams?: boolean | teamsDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["games"]>
+
   export type gamesSelectScalar = {
     gid?: boolean
     season?: boolean
@@ -4546,6 +4904,7 @@ export namespace Prisma {
     espn_id?: boolean
   }
 
+  export type gamesOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"gid" | "season" | "week" | "ts" | "home" | "away" | "homescore" | "awayscore" | "done" | "winner" | "international" | "seconds" | "current_record" | "is_tiebreaker" | "homerecord" | "awayrecord" | "current_quarter_seconds_remaining" | "current_quarter" | "msf_id" | "espn_id", ExtArgs["result"]["games"]>
   export type gamesInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     teams_games_homeToteams?: boolean | teamsDefaultArgs<ExtArgs>
     teams_games_awayToteams?: boolean | teamsDefaultArgs<ExtArgs>
@@ -4553,6 +4912,10 @@ export namespace Prisma {
     _count?: boolean | GamesCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type gamesIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    teams_games_homeToteams?: boolean | teamsDefaultArgs<ExtArgs>
+    teams_games_awayToteams?: boolean | teamsDefaultArgs<ExtArgs>
+  }
+  export type gamesIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     teams_games_homeToteams?: boolean | teamsDefaultArgs<ExtArgs>
     teams_games_awayToteams?: boolean | teamsDefaultArgs<ExtArgs>
   }
@@ -4591,12 +4954,12 @@ export namespace Prisma {
 
   type gamesGetPayload<S extends boolean | null | undefined | gamesDefaultArgs> = $Result.GetResult<Prisma.$gamesPayload, S>
 
-  type gamesCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = 
-    Omit<gamesFindManyArgs, 'select' | 'include' | 'distinct' | 'relationLoadStrategy'> & {
+  type gamesCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<gamesFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
       select?: GamesCountAggregateInputType | true
     }
 
-  export interface gamesDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> {
+  export interface gamesDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
     [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['games'], meta: { name: 'games' } }
     /**
      * Find zero or one Games that matches the filter.
@@ -4609,10 +4972,10 @@ export namespace Prisma {
      *   }
      * })
      */
-    findUnique<T extends gamesFindUniqueArgs>(args: SelectSubset<T, gamesFindUniqueArgs<ExtArgs>>): Prisma__gamesClient<$Result.GetResult<Prisma.$gamesPayload<ExtArgs>, T, "findUnique"> | null, null, ExtArgs>
+    findUnique<T extends gamesFindUniqueArgs>(args: SelectSubset<T, gamesFindUniqueArgs<ExtArgs>>): Prisma__gamesClient<$Result.GetResult<Prisma.$gamesPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
 
     /**
-     * Find one Games that matches the filter or throw an error with `error.code='P2025'` 
+     * Find one Games that matches the filter or throw an error with `error.code='P2025'`
      * if no matches were found.
      * @param {gamesFindUniqueOrThrowArgs} args - Arguments to find a Games
      * @example
@@ -4623,7 +4986,7 @@ export namespace Prisma {
      *   }
      * })
      */
-    findUniqueOrThrow<T extends gamesFindUniqueOrThrowArgs>(args: SelectSubset<T, gamesFindUniqueOrThrowArgs<ExtArgs>>): Prisma__gamesClient<$Result.GetResult<Prisma.$gamesPayload<ExtArgs>, T, "findUniqueOrThrow">, never, ExtArgs>
+    findUniqueOrThrow<T extends gamesFindUniqueOrThrowArgs>(args: SelectSubset<T, gamesFindUniqueOrThrowArgs<ExtArgs>>): Prisma__gamesClient<$Result.GetResult<Prisma.$gamesPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
      * Find the first Games that matches the filter.
@@ -4638,7 +5001,7 @@ export namespace Prisma {
      *   }
      * })
      */
-    findFirst<T extends gamesFindFirstArgs>(args?: SelectSubset<T, gamesFindFirstArgs<ExtArgs>>): Prisma__gamesClient<$Result.GetResult<Prisma.$gamesPayload<ExtArgs>, T, "findFirst"> | null, null, ExtArgs>
+    findFirst<T extends gamesFindFirstArgs>(args?: SelectSubset<T, gamesFindFirstArgs<ExtArgs>>): Prisma__gamesClient<$Result.GetResult<Prisma.$gamesPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
 
     /**
      * Find the first Games that matches the filter or
@@ -4654,7 +5017,7 @@ export namespace Prisma {
      *   }
      * })
      */
-    findFirstOrThrow<T extends gamesFindFirstOrThrowArgs>(args?: SelectSubset<T, gamesFindFirstOrThrowArgs<ExtArgs>>): Prisma__gamesClient<$Result.GetResult<Prisma.$gamesPayload<ExtArgs>, T, "findFirstOrThrow">, never, ExtArgs>
+    findFirstOrThrow<T extends gamesFindFirstOrThrowArgs>(args?: SelectSubset<T, gamesFindFirstOrThrowArgs<ExtArgs>>): Prisma__gamesClient<$Result.GetResult<Prisma.$gamesPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
      * Find zero or more Games that matches the filter.
@@ -4672,7 +5035,7 @@ export namespace Prisma {
      * const gamesWithGidOnly = await prisma.games.findMany({ select: { gid: true } })
      * 
      */
-    findMany<T extends gamesFindManyArgs>(args?: SelectSubset<T, gamesFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$gamesPayload<ExtArgs>, T, "findMany">>
+    findMany<T extends gamesFindManyArgs>(args?: SelectSubset<T, gamesFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$gamesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
 
     /**
      * Create a Games.
@@ -4686,7 +5049,7 @@ export namespace Prisma {
      * })
      * 
      */
-    create<T extends gamesCreateArgs>(args: SelectSubset<T, gamesCreateArgs<ExtArgs>>): Prisma__gamesClient<$Result.GetResult<Prisma.$gamesPayload<ExtArgs>, T, "create">, never, ExtArgs>
+    create<T extends gamesCreateArgs>(args: SelectSubset<T, gamesCreateArgs<ExtArgs>>): Prisma__gamesClient<$Result.GetResult<Prisma.$gamesPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
      * Create many Games.
@@ -4714,7 +5077,7 @@ export namespace Prisma {
      * })
      * 
      * // Create many Games and only return the `gid`
-     * const gamesWithGidOnly = await prisma.games.createManyAndReturn({ 
+     * const gamesWithGidOnly = await prisma.games.createManyAndReturn({
      *   select: { gid: true },
      *   data: [
      *     // ... provide data here
@@ -4724,7 +5087,7 @@ export namespace Prisma {
      * Read more here: https://pris.ly/d/null-undefined
      * 
      */
-    createManyAndReturn<T extends gamesCreateManyAndReturnArgs>(args?: SelectSubset<T, gamesCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$gamesPayload<ExtArgs>, T, "createManyAndReturn">>
+    createManyAndReturn<T extends gamesCreateManyAndReturnArgs>(args?: SelectSubset<T, gamesCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$gamesPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
 
     /**
      * Delete a Games.
@@ -4738,7 +5101,7 @@ export namespace Prisma {
      * })
      * 
      */
-    delete<T extends gamesDeleteArgs>(args: SelectSubset<T, gamesDeleteArgs<ExtArgs>>): Prisma__gamesClient<$Result.GetResult<Prisma.$gamesPayload<ExtArgs>, T, "delete">, never, ExtArgs>
+    delete<T extends gamesDeleteArgs>(args: SelectSubset<T, gamesDeleteArgs<ExtArgs>>): Prisma__gamesClient<$Result.GetResult<Prisma.$gamesPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
      * Update one Games.
@@ -4755,7 +5118,7 @@ export namespace Prisma {
      * })
      * 
      */
-    update<T extends gamesUpdateArgs>(args: SelectSubset<T, gamesUpdateArgs<ExtArgs>>): Prisma__gamesClient<$Result.GetResult<Prisma.$gamesPayload<ExtArgs>, T, "update">, never, ExtArgs>
+    update<T extends gamesUpdateArgs>(args: SelectSubset<T, gamesUpdateArgs<ExtArgs>>): Prisma__gamesClient<$Result.GetResult<Prisma.$gamesPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
      * Delete zero or more Games.
@@ -4791,6 +5154,36 @@ export namespace Prisma {
     updateMany<T extends gamesUpdateManyArgs>(args: SelectSubset<T, gamesUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
     /**
+     * Update zero or more Games and returns the data updated in the database.
+     * @param {gamesUpdateManyAndReturnArgs} args - Arguments to update many Games.
+     * @example
+     * // Update many Games
+     * const games = await prisma.games.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more Games and only return the `gid`
+     * const gamesWithGidOnly = await prisma.games.updateManyAndReturn({
+     *   select: { gid: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends gamesUpdateManyAndReturnArgs>(args: SelectSubset<T, gamesUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$gamesPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
      * Create or update one Games.
      * @param {gamesUpsertArgs} args - Arguments to update or create a Games.
      * @example
@@ -4807,7 +5200,7 @@ export namespace Prisma {
      *   }
      * })
      */
-    upsert<T extends gamesUpsertArgs>(args: SelectSubset<T, gamesUpsertArgs<ExtArgs>>): Prisma__gamesClient<$Result.GetResult<Prisma.$gamesPayload<ExtArgs>, T, "upsert">, never, ExtArgs>
+    upsert<T extends gamesUpsertArgs>(args: SelectSubset<T, gamesUpsertArgs<ExtArgs>>): Prisma__gamesClient<$Result.GetResult<Prisma.$gamesPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
 
     /**
@@ -4947,11 +5340,11 @@ export namespace Prisma {
    * Because we want to prevent naming conflicts as mentioned in
    * https://github.com/prisma/prisma-client-js/issues/707
    */
-  export interface Prisma__gamesClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
+  export interface Prisma__gamesClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
-    teams_games_homeToteams<T extends teamsDefaultArgs<ExtArgs> = {}>(args?: Subset<T, teamsDefaultArgs<ExtArgs>>): Prisma__teamsClient<$Result.GetResult<Prisma.$teamsPayload<ExtArgs>, T, "findUniqueOrThrow"> | Null, Null, ExtArgs>
-    teams_games_awayToteams<T extends teamsDefaultArgs<ExtArgs> = {}>(args?: Subset<T, teamsDefaultArgs<ExtArgs>>): Prisma__teamsClient<$Result.GetResult<Prisma.$teamsPayload<ExtArgs>, T, "findUniqueOrThrow"> | Null, Null, ExtArgs>
-    picks<T extends games$picksArgs<ExtArgs> = {}>(args?: Subset<T, games$picksArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$picksPayload<ExtArgs>, T, "findMany"> | Null>
+    teams_games_homeToteams<T extends teamsDefaultArgs<ExtArgs> = {}>(args?: Subset<T, teamsDefaultArgs<ExtArgs>>): Prisma__teamsClient<$Result.GetResult<Prisma.$teamsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    teams_games_awayToteams<T extends teamsDefaultArgs<ExtArgs> = {}>(args?: Subset<T, teamsDefaultArgs<ExtArgs>>): Prisma__teamsClient<$Result.GetResult<Prisma.$teamsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    picks<T extends games$picksArgs<ExtArgs> = {}>(args?: Subset<T, games$picksArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$picksPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -4979,7 +5372,7 @@ export namespace Prisma {
 
   /**
    * Fields of the games model
-   */ 
+   */
   interface gamesFieldRefs {
     readonly gid: FieldRef<"games", 'Int'>
     readonly season: FieldRef<"games", 'Int'>
@@ -5014,6 +5407,10 @@ export namespace Prisma {
      */
     select?: gamesSelect<ExtArgs> | null
     /**
+     * Omit specific fields from the games
+     */
+    omit?: gamesOmit<ExtArgs> | null
+    /**
      * Choose, which related nodes to fetch as well
      */
     include?: gamesInclude<ExtArgs> | null
@@ -5033,6 +5430,10 @@ export namespace Prisma {
      */
     select?: gamesSelect<ExtArgs> | null
     /**
+     * Omit specific fields from the games
+     */
+    omit?: gamesOmit<ExtArgs> | null
+    /**
      * Choose, which related nodes to fetch as well
      */
     include?: gamesInclude<ExtArgs> | null
@@ -5051,6 +5452,10 @@ export namespace Prisma {
      * Select specific fields to fetch from the games
      */
     select?: gamesSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the games
+     */
+    omit?: gamesOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
@@ -5101,6 +5506,10 @@ export namespace Prisma {
      */
     select?: gamesSelect<ExtArgs> | null
     /**
+     * Omit specific fields from the games
+     */
+    omit?: gamesOmit<ExtArgs> | null
+    /**
      * Choose, which related nodes to fetch as well
      */
     include?: gamesInclude<ExtArgs> | null
@@ -5150,6 +5559,10 @@ export namespace Prisma {
      */
     select?: gamesSelect<ExtArgs> | null
     /**
+     * Omit specific fields from the games
+     */
+    omit?: gamesOmit<ExtArgs> | null
+    /**
      * Choose, which related nodes to fetch as well
      */
     include?: gamesInclude<ExtArgs> | null
@@ -5194,6 +5607,10 @@ export namespace Prisma {
      */
     select?: gamesSelect<ExtArgs> | null
     /**
+     * Omit specific fields from the games
+     */
+    omit?: gamesOmit<ExtArgs> | null
+    /**
      * Choose, which related nodes to fetch as well
      */
     include?: gamesInclude<ExtArgs> | null
@@ -5224,6 +5641,10 @@ export namespace Prisma {
      */
     select?: gamesSelectCreateManyAndReturn<ExtArgs> | null
     /**
+     * Omit specific fields from the games
+     */
+    omit?: gamesOmit<ExtArgs> | null
+    /**
      * The data used to create many games.
      */
     data: gamesCreateManyInput | gamesCreateManyInput[]
@@ -5242,6 +5663,10 @@ export namespace Prisma {
      * Select specific fields to fetch from the games
      */
     select?: gamesSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the games
+     */
+    omit?: gamesOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
@@ -5269,6 +5694,40 @@ export namespace Prisma {
      * Filter which games to update
      */
     where?: gamesWhereInput
+    /**
+     * Limit how many games to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * games updateManyAndReturn
+   */
+  export type gamesUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the games
+     */
+    select?: gamesSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the games
+     */
+    omit?: gamesOmit<ExtArgs> | null
+    /**
+     * The data used to update games.
+     */
+    data: XOR<gamesUpdateManyMutationInput, gamesUncheckedUpdateManyInput>
+    /**
+     * Filter which games to update
+     */
+    where?: gamesWhereInput
+    /**
+     * Limit how many games to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: gamesIncludeUpdateManyAndReturn<ExtArgs> | null
   }
 
   /**
@@ -5279,6 +5738,10 @@ export namespace Prisma {
      * Select specific fields to fetch from the games
      */
     select?: gamesSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the games
+     */
+    omit?: gamesOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
@@ -5307,6 +5770,10 @@ export namespace Prisma {
      */
     select?: gamesSelect<ExtArgs> | null
     /**
+     * Omit specific fields from the games
+     */
+    omit?: gamesOmit<ExtArgs> | null
+    /**
      * Choose, which related nodes to fetch as well
      */
     include?: gamesInclude<ExtArgs> | null
@@ -5325,6 +5792,10 @@ export namespace Prisma {
      * Filter which games to delete
      */
     where?: gamesWhereInput
+    /**
+     * Limit how many games to delete.
+     */
+    limit?: number
   }
 
   /**
@@ -5335,6 +5806,10 @@ export namespace Prisma {
      * Select specific fields to fetch from the picks
      */
     select?: picksSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the picks
+     */
+    omit?: picksOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
@@ -5355,6 +5830,10 @@ export namespace Prisma {
      * Select specific fields to fetch from the games
      */
     select?: gamesSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the games
+     */
+    omit?: gamesOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
@@ -5597,6 +6076,17 @@ export namespace Prisma {
     leagues?: boolean | leaguesDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["leaguemembers"]>
 
+  export type leaguemembersSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    membership_id?: boolean
+    league_id?: boolean
+    user_id?: boolean
+    ts?: boolean
+    role?: boolean
+    paid?: boolean
+    people?: boolean | peopleDefaultArgs<ExtArgs>
+    leagues?: boolean | leaguesDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["leaguemembers"]>
+
   export type leaguemembersSelectScalar = {
     membership_id?: boolean
     league_id?: boolean
@@ -5606,6 +6096,7 @@ export namespace Prisma {
     paid?: boolean
   }
 
+  export type leaguemembersOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"membership_id" | "league_id" | "user_id" | "ts" | "role" | "paid", ExtArgs["result"]["leaguemembers"]>
   export type leaguemembersInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     EmailLogs?: boolean | leaguemembers$EmailLogsArgs<ExtArgs>
     WeekWinners?: boolean | leaguemembers$WeekWinnersArgs<ExtArgs>
@@ -5617,6 +6108,10 @@ export namespace Prisma {
     _count?: boolean | LeaguemembersCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type leaguemembersIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    people?: boolean | peopleDefaultArgs<ExtArgs>
+    leagues?: boolean | leaguesDefaultArgs<ExtArgs>
+  }
+  export type leaguemembersIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     people?: boolean | peopleDefaultArgs<ExtArgs>
     leagues?: boolean | leaguesDefaultArgs<ExtArgs>
   }
@@ -5645,12 +6140,12 @@ export namespace Prisma {
 
   type leaguemembersGetPayload<S extends boolean | null | undefined | leaguemembersDefaultArgs> = $Result.GetResult<Prisma.$leaguemembersPayload, S>
 
-  type leaguemembersCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = 
-    Omit<leaguemembersFindManyArgs, 'select' | 'include' | 'distinct' | 'relationLoadStrategy'> & {
+  type leaguemembersCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<leaguemembersFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
       select?: LeaguemembersCountAggregateInputType | true
     }
 
-  export interface leaguemembersDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> {
+  export interface leaguemembersDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
     [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['leaguemembers'], meta: { name: 'leaguemembers' } }
     /**
      * Find zero or one Leaguemembers that matches the filter.
@@ -5663,10 +6158,10 @@ export namespace Prisma {
      *   }
      * })
      */
-    findUnique<T extends leaguemembersFindUniqueArgs>(args: SelectSubset<T, leaguemembersFindUniqueArgs<ExtArgs>>): Prisma__leaguemembersClient<$Result.GetResult<Prisma.$leaguemembersPayload<ExtArgs>, T, "findUnique"> | null, null, ExtArgs>
+    findUnique<T extends leaguemembersFindUniqueArgs>(args: SelectSubset<T, leaguemembersFindUniqueArgs<ExtArgs>>): Prisma__leaguemembersClient<$Result.GetResult<Prisma.$leaguemembersPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
 
     /**
-     * Find one Leaguemembers that matches the filter or throw an error with `error.code='P2025'` 
+     * Find one Leaguemembers that matches the filter or throw an error with `error.code='P2025'`
      * if no matches were found.
      * @param {leaguemembersFindUniqueOrThrowArgs} args - Arguments to find a Leaguemembers
      * @example
@@ -5677,7 +6172,7 @@ export namespace Prisma {
      *   }
      * })
      */
-    findUniqueOrThrow<T extends leaguemembersFindUniqueOrThrowArgs>(args: SelectSubset<T, leaguemembersFindUniqueOrThrowArgs<ExtArgs>>): Prisma__leaguemembersClient<$Result.GetResult<Prisma.$leaguemembersPayload<ExtArgs>, T, "findUniqueOrThrow">, never, ExtArgs>
+    findUniqueOrThrow<T extends leaguemembersFindUniqueOrThrowArgs>(args: SelectSubset<T, leaguemembersFindUniqueOrThrowArgs<ExtArgs>>): Prisma__leaguemembersClient<$Result.GetResult<Prisma.$leaguemembersPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
      * Find the first Leaguemembers that matches the filter.
@@ -5692,7 +6187,7 @@ export namespace Prisma {
      *   }
      * })
      */
-    findFirst<T extends leaguemembersFindFirstArgs>(args?: SelectSubset<T, leaguemembersFindFirstArgs<ExtArgs>>): Prisma__leaguemembersClient<$Result.GetResult<Prisma.$leaguemembersPayload<ExtArgs>, T, "findFirst"> | null, null, ExtArgs>
+    findFirst<T extends leaguemembersFindFirstArgs>(args?: SelectSubset<T, leaguemembersFindFirstArgs<ExtArgs>>): Prisma__leaguemembersClient<$Result.GetResult<Prisma.$leaguemembersPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
 
     /**
      * Find the first Leaguemembers that matches the filter or
@@ -5708,7 +6203,7 @@ export namespace Prisma {
      *   }
      * })
      */
-    findFirstOrThrow<T extends leaguemembersFindFirstOrThrowArgs>(args?: SelectSubset<T, leaguemembersFindFirstOrThrowArgs<ExtArgs>>): Prisma__leaguemembersClient<$Result.GetResult<Prisma.$leaguemembersPayload<ExtArgs>, T, "findFirstOrThrow">, never, ExtArgs>
+    findFirstOrThrow<T extends leaguemembersFindFirstOrThrowArgs>(args?: SelectSubset<T, leaguemembersFindFirstOrThrowArgs<ExtArgs>>): Prisma__leaguemembersClient<$Result.GetResult<Prisma.$leaguemembersPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
      * Find zero or more Leaguemembers that matches the filter.
@@ -5726,7 +6221,7 @@ export namespace Prisma {
      * const leaguemembersWithMembership_idOnly = await prisma.leaguemembers.findMany({ select: { membership_id: true } })
      * 
      */
-    findMany<T extends leaguemembersFindManyArgs>(args?: SelectSubset<T, leaguemembersFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$leaguemembersPayload<ExtArgs>, T, "findMany">>
+    findMany<T extends leaguemembersFindManyArgs>(args?: SelectSubset<T, leaguemembersFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$leaguemembersPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
 
     /**
      * Create a Leaguemembers.
@@ -5740,7 +6235,7 @@ export namespace Prisma {
      * })
      * 
      */
-    create<T extends leaguemembersCreateArgs>(args: SelectSubset<T, leaguemembersCreateArgs<ExtArgs>>): Prisma__leaguemembersClient<$Result.GetResult<Prisma.$leaguemembersPayload<ExtArgs>, T, "create">, never, ExtArgs>
+    create<T extends leaguemembersCreateArgs>(args: SelectSubset<T, leaguemembersCreateArgs<ExtArgs>>): Prisma__leaguemembersClient<$Result.GetResult<Prisma.$leaguemembersPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
      * Create many Leaguemembers.
@@ -5768,7 +6263,7 @@ export namespace Prisma {
      * })
      * 
      * // Create many Leaguemembers and only return the `membership_id`
-     * const leaguemembersWithMembership_idOnly = await prisma.leaguemembers.createManyAndReturn({ 
+     * const leaguemembersWithMembership_idOnly = await prisma.leaguemembers.createManyAndReturn({
      *   select: { membership_id: true },
      *   data: [
      *     // ... provide data here
@@ -5778,7 +6273,7 @@ export namespace Prisma {
      * Read more here: https://pris.ly/d/null-undefined
      * 
      */
-    createManyAndReturn<T extends leaguemembersCreateManyAndReturnArgs>(args?: SelectSubset<T, leaguemembersCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$leaguemembersPayload<ExtArgs>, T, "createManyAndReturn">>
+    createManyAndReturn<T extends leaguemembersCreateManyAndReturnArgs>(args?: SelectSubset<T, leaguemembersCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$leaguemembersPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
 
     /**
      * Delete a Leaguemembers.
@@ -5792,7 +6287,7 @@ export namespace Prisma {
      * })
      * 
      */
-    delete<T extends leaguemembersDeleteArgs>(args: SelectSubset<T, leaguemembersDeleteArgs<ExtArgs>>): Prisma__leaguemembersClient<$Result.GetResult<Prisma.$leaguemembersPayload<ExtArgs>, T, "delete">, never, ExtArgs>
+    delete<T extends leaguemembersDeleteArgs>(args: SelectSubset<T, leaguemembersDeleteArgs<ExtArgs>>): Prisma__leaguemembersClient<$Result.GetResult<Prisma.$leaguemembersPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
      * Update one Leaguemembers.
@@ -5809,7 +6304,7 @@ export namespace Prisma {
      * })
      * 
      */
-    update<T extends leaguemembersUpdateArgs>(args: SelectSubset<T, leaguemembersUpdateArgs<ExtArgs>>): Prisma__leaguemembersClient<$Result.GetResult<Prisma.$leaguemembersPayload<ExtArgs>, T, "update">, never, ExtArgs>
+    update<T extends leaguemembersUpdateArgs>(args: SelectSubset<T, leaguemembersUpdateArgs<ExtArgs>>): Prisma__leaguemembersClient<$Result.GetResult<Prisma.$leaguemembersPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
      * Delete zero or more Leaguemembers.
@@ -5845,6 +6340,36 @@ export namespace Prisma {
     updateMany<T extends leaguemembersUpdateManyArgs>(args: SelectSubset<T, leaguemembersUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
     /**
+     * Update zero or more Leaguemembers and returns the data updated in the database.
+     * @param {leaguemembersUpdateManyAndReturnArgs} args - Arguments to update many Leaguemembers.
+     * @example
+     * // Update many Leaguemembers
+     * const leaguemembers = await prisma.leaguemembers.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more Leaguemembers and only return the `membership_id`
+     * const leaguemembersWithMembership_idOnly = await prisma.leaguemembers.updateManyAndReturn({
+     *   select: { membership_id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends leaguemembersUpdateManyAndReturnArgs>(args: SelectSubset<T, leaguemembersUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$leaguemembersPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
      * Create or update one Leaguemembers.
      * @param {leaguemembersUpsertArgs} args - Arguments to update or create a Leaguemembers.
      * @example
@@ -5861,7 +6386,7 @@ export namespace Prisma {
      *   }
      * })
      */
-    upsert<T extends leaguemembersUpsertArgs>(args: SelectSubset<T, leaguemembersUpsertArgs<ExtArgs>>): Prisma__leaguemembersClient<$Result.GetResult<Prisma.$leaguemembersPayload<ExtArgs>, T, "upsert">, never, ExtArgs>
+    upsert<T extends leaguemembersUpsertArgs>(args: SelectSubset<T, leaguemembersUpsertArgs<ExtArgs>>): Prisma__leaguemembersClient<$Result.GetResult<Prisma.$leaguemembersPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
 
     /**
@@ -6001,15 +6526,15 @@ export namespace Prisma {
    * Because we want to prevent naming conflicts as mentioned in
    * https://github.com/prisma/prisma-client-js/issues/707
    */
-  export interface Prisma__leaguemembersClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
+  export interface Prisma__leaguemembersClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
-    EmailLogs<T extends leaguemembers$EmailLogsArgs<ExtArgs> = {}>(args?: Subset<T, leaguemembers$EmailLogsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EmailLogsPayload<ExtArgs>, T, "findMany"> | Null>
-    WeekWinners<T extends leaguemembers$WeekWinnersArgs<ExtArgs> = {}>(args?: Subset<T, leaguemembers$WeekWinnersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$WeekWinnersPayload<ExtArgs>, T, "findMany"> | Null>
-    people<T extends peopleDefaultArgs<ExtArgs> = {}>(args?: Subset<T, peopleDefaultArgs<ExtArgs>>): Prisma__peopleClient<$Result.GetResult<Prisma.$peoplePayload<ExtArgs>, T, "findUniqueOrThrow"> | Null, Null, ExtArgs>
-    leagues<T extends leaguesDefaultArgs<ExtArgs> = {}>(args?: Subset<T, leaguesDefaultArgs<ExtArgs>>): Prisma__leaguesClient<$Result.GetResult<Prisma.$leaguesPayload<ExtArgs>, T, "findUniqueOrThrow"> | Null, Null, ExtArgs>
-    leaguemessages<T extends leaguemembers$leaguemessagesArgs<ExtArgs> = {}>(args?: Subset<T, leaguemembers$leaguemessagesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$leaguemessagesPayload<ExtArgs>, T, "findMany"> | Null>
-    picks<T extends leaguemembers$picksArgs<ExtArgs> = {}>(args?: Subset<T, leaguemembers$picksArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$picksPayload<ExtArgs>, T, "findMany"> | Null>
-    superbowl<T extends leaguemembers$superbowlArgs<ExtArgs> = {}>(args?: Subset<T, leaguemembers$superbowlArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$superbowlPayload<ExtArgs>, T, "findMany"> | Null>
+    EmailLogs<T extends leaguemembers$EmailLogsArgs<ExtArgs> = {}>(args?: Subset<T, leaguemembers$EmailLogsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EmailLogsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    WeekWinners<T extends leaguemembers$WeekWinnersArgs<ExtArgs> = {}>(args?: Subset<T, leaguemembers$WeekWinnersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$WeekWinnersPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    people<T extends peopleDefaultArgs<ExtArgs> = {}>(args?: Subset<T, peopleDefaultArgs<ExtArgs>>): Prisma__peopleClient<$Result.GetResult<Prisma.$peoplePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    leagues<T extends leaguesDefaultArgs<ExtArgs> = {}>(args?: Subset<T, leaguesDefaultArgs<ExtArgs>>): Prisma__leaguesClient<$Result.GetResult<Prisma.$leaguesPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    leaguemessages<T extends leaguemembers$leaguemessagesArgs<ExtArgs> = {}>(args?: Subset<T, leaguemembers$leaguemessagesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$leaguemessagesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    picks<T extends leaguemembers$picksArgs<ExtArgs> = {}>(args?: Subset<T, leaguemembers$picksArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$picksPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    superbowl<T extends leaguemembers$superbowlArgs<ExtArgs> = {}>(args?: Subset<T, leaguemembers$superbowlArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$superbowlPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -6037,7 +6562,7 @@ export namespace Prisma {
 
   /**
    * Fields of the leaguemembers model
-   */ 
+   */
   interface leaguemembersFieldRefs {
     readonly membership_id: FieldRef<"leaguemembers", 'Int'>
     readonly league_id: FieldRef<"leaguemembers", 'Int'>
@@ -6058,6 +6583,10 @@ export namespace Prisma {
      */
     select?: leaguemembersSelect<ExtArgs> | null
     /**
+     * Omit specific fields from the leaguemembers
+     */
+    omit?: leaguemembersOmit<ExtArgs> | null
+    /**
      * Choose, which related nodes to fetch as well
      */
     include?: leaguemembersInclude<ExtArgs> | null
@@ -6077,6 +6606,10 @@ export namespace Prisma {
      */
     select?: leaguemembersSelect<ExtArgs> | null
     /**
+     * Omit specific fields from the leaguemembers
+     */
+    omit?: leaguemembersOmit<ExtArgs> | null
+    /**
      * Choose, which related nodes to fetch as well
      */
     include?: leaguemembersInclude<ExtArgs> | null
@@ -6095,6 +6628,10 @@ export namespace Prisma {
      * Select specific fields to fetch from the leaguemembers
      */
     select?: leaguemembersSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the leaguemembers
+     */
+    omit?: leaguemembersOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
@@ -6145,6 +6682,10 @@ export namespace Prisma {
      */
     select?: leaguemembersSelect<ExtArgs> | null
     /**
+     * Omit specific fields from the leaguemembers
+     */
+    omit?: leaguemembersOmit<ExtArgs> | null
+    /**
      * Choose, which related nodes to fetch as well
      */
     include?: leaguemembersInclude<ExtArgs> | null
@@ -6194,6 +6735,10 @@ export namespace Prisma {
      */
     select?: leaguemembersSelect<ExtArgs> | null
     /**
+     * Omit specific fields from the leaguemembers
+     */
+    omit?: leaguemembersOmit<ExtArgs> | null
+    /**
      * Choose, which related nodes to fetch as well
      */
     include?: leaguemembersInclude<ExtArgs> | null
@@ -6238,6 +6783,10 @@ export namespace Prisma {
      */
     select?: leaguemembersSelect<ExtArgs> | null
     /**
+     * Omit specific fields from the leaguemembers
+     */
+    omit?: leaguemembersOmit<ExtArgs> | null
+    /**
      * Choose, which related nodes to fetch as well
      */
     include?: leaguemembersInclude<ExtArgs> | null
@@ -6268,6 +6817,10 @@ export namespace Prisma {
      */
     select?: leaguemembersSelectCreateManyAndReturn<ExtArgs> | null
     /**
+     * Omit specific fields from the leaguemembers
+     */
+    omit?: leaguemembersOmit<ExtArgs> | null
+    /**
      * The data used to create many leaguemembers.
      */
     data: leaguemembersCreateManyInput | leaguemembersCreateManyInput[]
@@ -6286,6 +6839,10 @@ export namespace Prisma {
      * Select specific fields to fetch from the leaguemembers
      */
     select?: leaguemembersSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the leaguemembers
+     */
+    omit?: leaguemembersOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
@@ -6313,6 +6870,40 @@ export namespace Prisma {
      * Filter which leaguemembers to update
      */
     where?: leaguemembersWhereInput
+    /**
+     * Limit how many leaguemembers to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * leaguemembers updateManyAndReturn
+   */
+  export type leaguemembersUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the leaguemembers
+     */
+    select?: leaguemembersSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the leaguemembers
+     */
+    omit?: leaguemembersOmit<ExtArgs> | null
+    /**
+     * The data used to update leaguemembers.
+     */
+    data: XOR<leaguemembersUpdateManyMutationInput, leaguemembersUncheckedUpdateManyInput>
+    /**
+     * Filter which leaguemembers to update
+     */
+    where?: leaguemembersWhereInput
+    /**
+     * Limit how many leaguemembers to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: leaguemembersIncludeUpdateManyAndReturn<ExtArgs> | null
   }
 
   /**
@@ -6323,6 +6914,10 @@ export namespace Prisma {
      * Select specific fields to fetch from the leaguemembers
      */
     select?: leaguemembersSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the leaguemembers
+     */
+    omit?: leaguemembersOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
@@ -6351,6 +6946,10 @@ export namespace Prisma {
      */
     select?: leaguemembersSelect<ExtArgs> | null
     /**
+     * Omit specific fields from the leaguemembers
+     */
+    omit?: leaguemembersOmit<ExtArgs> | null
+    /**
      * Choose, which related nodes to fetch as well
      */
     include?: leaguemembersInclude<ExtArgs> | null
@@ -6369,6 +6968,10 @@ export namespace Prisma {
      * Filter which leaguemembers to delete
      */
     where?: leaguemembersWhereInput
+    /**
+     * Limit how many leaguemembers to delete.
+     */
+    limit?: number
   }
 
   /**
@@ -6379,6 +6982,10 @@ export namespace Prisma {
      * Select specific fields to fetch from the EmailLogs
      */
     select?: EmailLogsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EmailLogs
+     */
+    omit?: EmailLogsOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
@@ -6400,6 +7007,10 @@ export namespace Prisma {
      */
     select?: WeekWinnersSelect<ExtArgs> | null
     /**
+     * Omit specific fields from the WeekWinners
+     */
+    omit?: WeekWinnersOmit<ExtArgs> | null
+    /**
      * Choose, which related nodes to fetch as well
      */
     include?: WeekWinnersInclude<ExtArgs> | null
@@ -6419,6 +7030,10 @@ export namespace Prisma {
      * Select specific fields to fetch from the leaguemessages
      */
     select?: leaguemessagesSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the leaguemessages
+     */
+    omit?: leaguemessagesOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
@@ -6440,6 +7055,10 @@ export namespace Prisma {
      */
     select?: picksSelect<ExtArgs> | null
     /**
+     * Omit specific fields from the picks
+     */
+    omit?: picksOmit<ExtArgs> | null
+    /**
      * Choose, which related nodes to fetch as well
      */
     include?: picksInclude<ExtArgs> | null
@@ -6460,6 +7079,10 @@ export namespace Prisma {
      */
     select?: superbowlSelect<ExtArgs> | null
     /**
+     * Omit specific fields from the superbowl
+     */
+    omit?: superbowlOmit<ExtArgs> | null
+    /**
      * Choose, which related nodes to fetch as well
      */
     include?: superbowlInclude<ExtArgs> | null
@@ -6479,6 +7102,10 @@ export namespace Prisma {
      * Select specific fields to fetch from the leaguemembers
      */
     select?: leaguemembersSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the leaguemembers
+     */
+    omit?: leaguemembersOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
@@ -6733,6 +7360,19 @@ export namespace Prisma {
     leaguemembers?: boolean | leaguemembersDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["leaguemessages"]>
 
+  export type leaguemessagesSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    message_id?: boolean
+    content?: boolean
+    member_id?: boolean
+    league_id?: boolean
+    week?: boolean
+    message_type?: boolean
+    createdAt?: boolean
+    status?: boolean
+    leagues?: boolean | leaguesDefaultArgs<ExtArgs>
+    leaguemembers?: boolean | leaguemembersDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["leaguemessages"]>
+
   export type leaguemessagesSelectScalar = {
     message_id?: boolean
     content?: boolean
@@ -6744,11 +7384,16 @@ export namespace Prisma {
     status?: boolean
   }
 
+  export type leaguemessagesOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"message_id" | "content" | "member_id" | "league_id" | "week" | "message_type" | "createdAt" | "status", ExtArgs["result"]["leaguemessages"]>
   export type leaguemessagesInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     leagues?: boolean | leaguesDefaultArgs<ExtArgs>
     leaguemembers?: boolean | leaguemembersDefaultArgs<ExtArgs>
   }
   export type leaguemessagesIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    leagues?: boolean | leaguesDefaultArgs<ExtArgs>
+    leaguemembers?: boolean | leaguemembersDefaultArgs<ExtArgs>
+  }
+  export type leaguemessagesIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     leagues?: boolean | leaguesDefaultArgs<ExtArgs>
     leaguemembers?: boolean | leaguemembersDefaultArgs<ExtArgs>
   }
@@ -6774,12 +7419,12 @@ export namespace Prisma {
 
   type leaguemessagesGetPayload<S extends boolean | null | undefined | leaguemessagesDefaultArgs> = $Result.GetResult<Prisma.$leaguemessagesPayload, S>
 
-  type leaguemessagesCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = 
-    Omit<leaguemessagesFindManyArgs, 'select' | 'include' | 'distinct' | 'relationLoadStrategy'> & {
+  type leaguemessagesCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<leaguemessagesFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
       select?: LeaguemessagesCountAggregateInputType | true
     }
 
-  export interface leaguemessagesDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> {
+  export interface leaguemessagesDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
     [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['leaguemessages'], meta: { name: 'leaguemessages' } }
     /**
      * Find zero or one Leaguemessages that matches the filter.
@@ -6792,10 +7437,10 @@ export namespace Prisma {
      *   }
      * })
      */
-    findUnique<T extends leaguemessagesFindUniqueArgs>(args: SelectSubset<T, leaguemessagesFindUniqueArgs<ExtArgs>>): Prisma__leaguemessagesClient<$Result.GetResult<Prisma.$leaguemessagesPayload<ExtArgs>, T, "findUnique"> | null, null, ExtArgs>
+    findUnique<T extends leaguemessagesFindUniqueArgs>(args: SelectSubset<T, leaguemessagesFindUniqueArgs<ExtArgs>>): Prisma__leaguemessagesClient<$Result.GetResult<Prisma.$leaguemessagesPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
 
     /**
-     * Find one Leaguemessages that matches the filter or throw an error with `error.code='P2025'` 
+     * Find one Leaguemessages that matches the filter or throw an error with `error.code='P2025'`
      * if no matches were found.
      * @param {leaguemessagesFindUniqueOrThrowArgs} args - Arguments to find a Leaguemessages
      * @example
@@ -6806,7 +7451,7 @@ export namespace Prisma {
      *   }
      * })
      */
-    findUniqueOrThrow<T extends leaguemessagesFindUniqueOrThrowArgs>(args: SelectSubset<T, leaguemessagesFindUniqueOrThrowArgs<ExtArgs>>): Prisma__leaguemessagesClient<$Result.GetResult<Prisma.$leaguemessagesPayload<ExtArgs>, T, "findUniqueOrThrow">, never, ExtArgs>
+    findUniqueOrThrow<T extends leaguemessagesFindUniqueOrThrowArgs>(args: SelectSubset<T, leaguemessagesFindUniqueOrThrowArgs<ExtArgs>>): Prisma__leaguemessagesClient<$Result.GetResult<Prisma.$leaguemessagesPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
      * Find the first Leaguemessages that matches the filter.
@@ -6821,7 +7466,7 @@ export namespace Prisma {
      *   }
      * })
      */
-    findFirst<T extends leaguemessagesFindFirstArgs>(args?: SelectSubset<T, leaguemessagesFindFirstArgs<ExtArgs>>): Prisma__leaguemessagesClient<$Result.GetResult<Prisma.$leaguemessagesPayload<ExtArgs>, T, "findFirst"> | null, null, ExtArgs>
+    findFirst<T extends leaguemessagesFindFirstArgs>(args?: SelectSubset<T, leaguemessagesFindFirstArgs<ExtArgs>>): Prisma__leaguemessagesClient<$Result.GetResult<Prisma.$leaguemessagesPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
 
     /**
      * Find the first Leaguemessages that matches the filter or
@@ -6837,7 +7482,7 @@ export namespace Prisma {
      *   }
      * })
      */
-    findFirstOrThrow<T extends leaguemessagesFindFirstOrThrowArgs>(args?: SelectSubset<T, leaguemessagesFindFirstOrThrowArgs<ExtArgs>>): Prisma__leaguemessagesClient<$Result.GetResult<Prisma.$leaguemessagesPayload<ExtArgs>, T, "findFirstOrThrow">, never, ExtArgs>
+    findFirstOrThrow<T extends leaguemessagesFindFirstOrThrowArgs>(args?: SelectSubset<T, leaguemessagesFindFirstOrThrowArgs<ExtArgs>>): Prisma__leaguemessagesClient<$Result.GetResult<Prisma.$leaguemessagesPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
      * Find zero or more Leaguemessages that matches the filter.
@@ -6855,7 +7500,7 @@ export namespace Prisma {
      * const leaguemessagesWithMessage_idOnly = await prisma.leaguemessages.findMany({ select: { message_id: true } })
      * 
      */
-    findMany<T extends leaguemessagesFindManyArgs>(args?: SelectSubset<T, leaguemessagesFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$leaguemessagesPayload<ExtArgs>, T, "findMany">>
+    findMany<T extends leaguemessagesFindManyArgs>(args?: SelectSubset<T, leaguemessagesFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$leaguemessagesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
 
     /**
      * Create a Leaguemessages.
@@ -6869,7 +7514,7 @@ export namespace Prisma {
      * })
      * 
      */
-    create<T extends leaguemessagesCreateArgs>(args: SelectSubset<T, leaguemessagesCreateArgs<ExtArgs>>): Prisma__leaguemessagesClient<$Result.GetResult<Prisma.$leaguemessagesPayload<ExtArgs>, T, "create">, never, ExtArgs>
+    create<T extends leaguemessagesCreateArgs>(args: SelectSubset<T, leaguemessagesCreateArgs<ExtArgs>>): Prisma__leaguemessagesClient<$Result.GetResult<Prisma.$leaguemessagesPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
      * Create many Leaguemessages.
@@ -6897,7 +7542,7 @@ export namespace Prisma {
      * })
      * 
      * // Create many Leaguemessages and only return the `message_id`
-     * const leaguemessagesWithMessage_idOnly = await prisma.leaguemessages.createManyAndReturn({ 
+     * const leaguemessagesWithMessage_idOnly = await prisma.leaguemessages.createManyAndReturn({
      *   select: { message_id: true },
      *   data: [
      *     // ... provide data here
@@ -6907,7 +7552,7 @@ export namespace Prisma {
      * Read more here: https://pris.ly/d/null-undefined
      * 
      */
-    createManyAndReturn<T extends leaguemessagesCreateManyAndReturnArgs>(args?: SelectSubset<T, leaguemessagesCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$leaguemessagesPayload<ExtArgs>, T, "createManyAndReturn">>
+    createManyAndReturn<T extends leaguemessagesCreateManyAndReturnArgs>(args?: SelectSubset<T, leaguemessagesCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$leaguemessagesPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
 
     /**
      * Delete a Leaguemessages.
@@ -6921,7 +7566,7 @@ export namespace Prisma {
      * })
      * 
      */
-    delete<T extends leaguemessagesDeleteArgs>(args: SelectSubset<T, leaguemessagesDeleteArgs<ExtArgs>>): Prisma__leaguemessagesClient<$Result.GetResult<Prisma.$leaguemessagesPayload<ExtArgs>, T, "delete">, never, ExtArgs>
+    delete<T extends leaguemessagesDeleteArgs>(args: SelectSubset<T, leaguemessagesDeleteArgs<ExtArgs>>): Prisma__leaguemessagesClient<$Result.GetResult<Prisma.$leaguemessagesPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
      * Update one Leaguemessages.
@@ -6938,7 +7583,7 @@ export namespace Prisma {
      * })
      * 
      */
-    update<T extends leaguemessagesUpdateArgs>(args: SelectSubset<T, leaguemessagesUpdateArgs<ExtArgs>>): Prisma__leaguemessagesClient<$Result.GetResult<Prisma.$leaguemessagesPayload<ExtArgs>, T, "update">, never, ExtArgs>
+    update<T extends leaguemessagesUpdateArgs>(args: SelectSubset<T, leaguemessagesUpdateArgs<ExtArgs>>): Prisma__leaguemessagesClient<$Result.GetResult<Prisma.$leaguemessagesPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
      * Delete zero or more Leaguemessages.
@@ -6974,6 +7619,36 @@ export namespace Prisma {
     updateMany<T extends leaguemessagesUpdateManyArgs>(args: SelectSubset<T, leaguemessagesUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
     /**
+     * Update zero or more Leaguemessages and returns the data updated in the database.
+     * @param {leaguemessagesUpdateManyAndReturnArgs} args - Arguments to update many Leaguemessages.
+     * @example
+     * // Update many Leaguemessages
+     * const leaguemessages = await prisma.leaguemessages.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more Leaguemessages and only return the `message_id`
+     * const leaguemessagesWithMessage_idOnly = await prisma.leaguemessages.updateManyAndReturn({
+     *   select: { message_id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends leaguemessagesUpdateManyAndReturnArgs>(args: SelectSubset<T, leaguemessagesUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$leaguemessagesPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
      * Create or update one Leaguemessages.
      * @param {leaguemessagesUpsertArgs} args - Arguments to update or create a Leaguemessages.
      * @example
@@ -6990,7 +7665,7 @@ export namespace Prisma {
      *   }
      * })
      */
-    upsert<T extends leaguemessagesUpsertArgs>(args: SelectSubset<T, leaguemessagesUpsertArgs<ExtArgs>>): Prisma__leaguemessagesClient<$Result.GetResult<Prisma.$leaguemessagesPayload<ExtArgs>, T, "upsert">, never, ExtArgs>
+    upsert<T extends leaguemessagesUpsertArgs>(args: SelectSubset<T, leaguemessagesUpsertArgs<ExtArgs>>): Prisma__leaguemessagesClient<$Result.GetResult<Prisma.$leaguemessagesPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
 
     /**
@@ -7130,10 +7805,10 @@ export namespace Prisma {
    * Because we want to prevent naming conflicts as mentioned in
    * https://github.com/prisma/prisma-client-js/issues/707
    */
-  export interface Prisma__leaguemessagesClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
+  export interface Prisma__leaguemessagesClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
-    leagues<T extends leaguesDefaultArgs<ExtArgs> = {}>(args?: Subset<T, leaguesDefaultArgs<ExtArgs>>): Prisma__leaguesClient<$Result.GetResult<Prisma.$leaguesPayload<ExtArgs>, T, "findUniqueOrThrow"> | Null, Null, ExtArgs>
-    leaguemembers<T extends leaguemembersDefaultArgs<ExtArgs> = {}>(args?: Subset<T, leaguemembersDefaultArgs<ExtArgs>>): Prisma__leaguemembersClient<$Result.GetResult<Prisma.$leaguemembersPayload<ExtArgs>, T, "findUniqueOrThrow"> | Null, Null, ExtArgs>
+    leagues<T extends leaguesDefaultArgs<ExtArgs> = {}>(args?: Subset<T, leaguesDefaultArgs<ExtArgs>>): Prisma__leaguesClient<$Result.GetResult<Prisma.$leaguesPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    leaguemembers<T extends leaguemembersDefaultArgs<ExtArgs> = {}>(args?: Subset<T, leaguemembersDefaultArgs<ExtArgs>>): Prisma__leaguemembersClient<$Result.GetResult<Prisma.$leaguemembersPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -7161,7 +7836,7 @@ export namespace Prisma {
 
   /**
    * Fields of the leaguemessages model
-   */ 
+   */
   interface leaguemessagesFieldRefs {
     readonly message_id: FieldRef<"leaguemessages", 'String'>
     readonly content: FieldRef<"leaguemessages", 'String'>
@@ -7184,6 +7859,10 @@ export namespace Prisma {
      */
     select?: leaguemessagesSelect<ExtArgs> | null
     /**
+     * Omit specific fields from the leaguemessages
+     */
+    omit?: leaguemessagesOmit<ExtArgs> | null
+    /**
      * Choose, which related nodes to fetch as well
      */
     include?: leaguemessagesInclude<ExtArgs> | null
@@ -7203,6 +7882,10 @@ export namespace Prisma {
      */
     select?: leaguemessagesSelect<ExtArgs> | null
     /**
+     * Omit specific fields from the leaguemessages
+     */
+    omit?: leaguemessagesOmit<ExtArgs> | null
+    /**
      * Choose, which related nodes to fetch as well
      */
     include?: leaguemessagesInclude<ExtArgs> | null
@@ -7221,6 +7904,10 @@ export namespace Prisma {
      * Select specific fields to fetch from the leaguemessages
      */
     select?: leaguemessagesSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the leaguemessages
+     */
+    omit?: leaguemessagesOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
@@ -7271,6 +7958,10 @@ export namespace Prisma {
      */
     select?: leaguemessagesSelect<ExtArgs> | null
     /**
+     * Omit specific fields from the leaguemessages
+     */
+    omit?: leaguemessagesOmit<ExtArgs> | null
+    /**
      * Choose, which related nodes to fetch as well
      */
     include?: leaguemessagesInclude<ExtArgs> | null
@@ -7320,6 +8011,10 @@ export namespace Prisma {
      */
     select?: leaguemessagesSelect<ExtArgs> | null
     /**
+     * Omit specific fields from the leaguemessages
+     */
+    omit?: leaguemessagesOmit<ExtArgs> | null
+    /**
      * Choose, which related nodes to fetch as well
      */
     include?: leaguemessagesInclude<ExtArgs> | null
@@ -7364,6 +8059,10 @@ export namespace Prisma {
      */
     select?: leaguemessagesSelect<ExtArgs> | null
     /**
+     * Omit specific fields from the leaguemessages
+     */
+    omit?: leaguemessagesOmit<ExtArgs> | null
+    /**
      * Choose, which related nodes to fetch as well
      */
     include?: leaguemessagesInclude<ExtArgs> | null
@@ -7394,6 +8093,10 @@ export namespace Prisma {
      */
     select?: leaguemessagesSelectCreateManyAndReturn<ExtArgs> | null
     /**
+     * Omit specific fields from the leaguemessages
+     */
+    omit?: leaguemessagesOmit<ExtArgs> | null
+    /**
      * The data used to create many leaguemessages.
      */
     data: leaguemessagesCreateManyInput | leaguemessagesCreateManyInput[]
@@ -7412,6 +8115,10 @@ export namespace Prisma {
      * Select specific fields to fetch from the leaguemessages
      */
     select?: leaguemessagesSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the leaguemessages
+     */
+    omit?: leaguemessagesOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
@@ -7439,6 +8146,40 @@ export namespace Prisma {
      * Filter which leaguemessages to update
      */
     where?: leaguemessagesWhereInput
+    /**
+     * Limit how many leaguemessages to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * leaguemessages updateManyAndReturn
+   */
+  export type leaguemessagesUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the leaguemessages
+     */
+    select?: leaguemessagesSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the leaguemessages
+     */
+    omit?: leaguemessagesOmit<ExtArgs> | null
+    /**
+     * The data used to update leaguemessages.
+     */
+    data: XOR<leaguemessagesUpdateManyMutationInput, leaguemessagesUncheckedUpdateManyInput>
+    /**
+     * Filter which leaguemessages to update
+     */
+    where?: leaguemessagesWhereInput
+    /**
+     * Limit how many leaguemessages to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: leaguemessagesIncludeUpdateManyAndReturn<ExtArgs> | null
   }
 
   /**
@@ -7449,6 +8190,10 @@ export namespace Prisma {
      * Select specific fields to fetch from the leaguemessages
      */
     select?: leaguemessagesSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the leaguemessages
+     */
+    omit?: leaguemessagesOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
@@ -7477,6 +8222,10 @@ export namespace Prisma {
      */
     select?: leaguemessagesSelect<ExtArgs> | null
     /**
+     * Omit specific fields from the leaguemessages
+     */
+    omit?: leaguemessagesOmit<ExtArgs> | null
+    /**
      * Choose, which related nodes to fetch as well
      */
     include?: leaguemessagesInclude<ExtArgs> | null
@@ -7495,6 +8244,10 @@ export namespace Prisma {
      * Filter which leaguemessages to delete
      */
     where?: leaguemessagesWhereInput
+    /**
+     * Limit how many leaguemessages to delete.
+     */
+    limit?: number
   }
 
   /**
@@ -7505,6 +8258,10 @@ export namespace Prisma {
      * Select specific fields to fetch from the leaguemessages
      */
     select?: leaguemessagesSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the leaguemessages
+     */
+    omit?: leaguemessagesOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
@@ -7814,6 +8571,24 @@ export namespace Prisma {
     prior_league?: boolean | leagues$prior_leagueArgs<ExtArgs>
   }, ExtArgs["result"]["leagues"]>
 
+  export type leaguesSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    league_id?: boolean
+    created_by_user_id?: boolean
+    name?: boolean
+    created_time?: boolean
+    season?: boolean
+    late_policy?: boolean
+    pick_policy?: boolean
+    reminder_policy?: boolean
+    scoring_type?: boolean
+    share_code?: boolean
+    superbowl_competition?: boolean
+    prior_league_id?: boolean
+    status?: boolean
+    people?: boolean | peopleDefaultArgs<ExtArgs>
+    prior_league?: boolean | leagues$prior_leagueArgs<ExtArgs>
+  }, ExtArgs["result"]["leagues"]>
+
   export type leaguesSelectScalar = {
     league_id?: boolean
     created_by_user_id?: boolean
@@ -7830,6 +8605,7 @@ export namespace Prisma {
     status?: boolean
   }
 
+  export type leaguesOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"league_id" | "created_by_user_id" | "name" | "created_time" | "season" | "late_policy" | "pick_policy" | "reminder_policy" | "scoring_type" | "share_code" | "superbowl_competition" | "prior_league_id" | "status", ExtArgs["result"]["leagues"]>
   export type leaguesInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     EmailLogs?: boolean | leagues$EmailLogsArgs<ExtArgs>
     WeekWinners?: boolean | leagues$WeekWinnersArgs<ExtArgs>
@@ -7841,6 +8617,10 @@ export namespace Prisma {
     _count?: boolean | LeaguesCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type leaguesIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    people?: boolean | peopleDefaultArgs<ExtArgs>
+    prior_league?: boolean | leagues$prior_leagueArgs<ExtArgs>
+  }
+  export type leaguesIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     people?: boolean | peopleDefaultArgs<ExtArgs>
     prior_league?: boolean | leagues$prior_leagueArgs<ExtArgs>
   }
@@ -7876,12 +8656,12 @@ export namespace Prisma {
 
   type leaguesGetPayload<S extends boolean | null | undefined | leaguesDefaultArgs> = $Result.GetResult<Prisma.$leaguesPayload, S>
 
-  type leaguesCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = 
-    Omit<leaguesFindManyArgs, 'select' | 'include' | 'distinct' | 'relationLoadStrategy'> & {
+  type leaguesCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<leaguesFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
       select?: LeaguesCountAggregateInputType | true
     }
 
-  export interface leaguesDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> {
+  export interface leaguesDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
     [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['leagues'], meta: { name: 'leagues' } }
     /**
      * Find zero or one Leagues that matches the filter.
@@ -7894,10 +8674,10 @@ export namespace Prisma {
      *   }
      * })
      */
-    findUnique<T extends leaguesFindUniqueArgs>(args: SelectSubset<T, leaguesFindUniqueArgs<ExtArgs>>): Prisma__leaguesClient<$Result.GetResult<Prisma.$leaguesPayload<ExtArgs>, T, "findUnique"> | null, null, ExtArgs>
+    findUnique<T extends leaguesFindUniqueArgs>(args: SelectSubset<T, leaguesFindUniqueArgs<ExtArgs>>): Prisma__leaguesClient<$Result.GetResult<Prisma.$leaguesPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
 
     /**
-     * Find one Leagues that matches the filter or throw an error with `error.code='P2025'` 
+     * Find one Leagues that matches the filter or throw an error with `error.code='P2025'`
      * if no matches were found.
      * @param {leaguesFindUniqueOrThrowArgs} args - Arguments to find a Leagues
      * @example
@@ -7908,7 +8688,7 @@ export namespace Prisma {
      *   }
      * })
      */
-    findUniqueOrThrow<T extends leaguesFindUniqueOrThrowArgs>(args: SelectSubset<T, leaguesFindUniqueOrThrowArgs<ExtArgs>>): Prisma__leaguesClient<$Result.GetResult<Prisma.$leaguesPayload<ExtArgs>, T, "findUniqueOrThrow">, never, ExtArgs>
+    findUniqueOrThrow<T extends leaguesFindUniqueOrThrowArgs>(args: SelectSubset<T, leaguesFindUniqueOrThrowArgs<ExtArgs>>): Prisma__leaguesClient<$Result.GetResult<Prisma.$leaguesPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
      * Find the first Leagues that matches the filter.
@@ -7923,7 +8703,7 @@ export namespace Prisma {
      *   }
      * })
      */
-    findFirst<T extends leaguesFindFirstArgs>(args?: SelectSubset<T, leaguesFindFirstArgs<ExtArgs>>): Prisma__leaguesClient<$Result.GetResult<Prisma.$leaguesPayload<ExtArgs>, T, "findFirst"> | null, null, ExtArgs>
+    findFirst<T extends leaguesFindFirstArgs>(args?: SelectSubset<T, leaguesFindFirstArgs<ExtArgs>>): Prisma__leaguesClient<$Result.GetResult<Prisma.$leaguesPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
 
     /**
      * Find the first Leagues that matches the filter or
@@ -7939,7 +8719,7 @@ export namespace Prisma {
      *   }
      * })
      */
-    findFirstOrThrow<T extends leaguesFindFirstOrThrowArgs>(args?: SelectSubset<T, leaguesFindFirstOrThrowArgs<ExtArgs>>): Prisma__leaguesClient<$Result.GetResult<Prisma.$leaguesPayload<ExtArgs>, T, "findFirstOrThrow">, never, ExtArgs>
+    findFirstOrThrow<T extends leaguesFindFirstOrThrowArgs>(args?: SelectSubset<T, leaguesFindFirstOrThrowArgs<ExtArgs>>): Prisma__leaguesClient<$Result.GetResult<Prisma.$leaguesPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
      * Find zero or more Leagues that matches the filter.
@@ -7957,7 +8737,7 @@ export namespace Prisma {
      * const leaguesWithLeague_idOnly = await prisma.leagues.findMany({ select: { league_id: true } })
      * 
      */
-    findMany<T extends leaguesFindManyArgs>(args?: SelectSubset<T, leaguesFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$leaguesPayload<ExtArgs>, T, "findMany">>
+    findMany<T extends leaguesFindManyArgs>(args?: SelectSubset<T, leaguesFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$leaguesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
 
     /**
      * Create a Leagues.
@@ -7971,7 +8751,7 @@ export namespace Prisma {
      * })
      * 
      */
-    create<T extends leaguesCreateArgs>(args: SelectSubset<T, leaguesCreateArgs<ExtArgs>>): Prisma__leaguesClient<$Result.GetResult<Prisma.$leaguesPayload<ExtArgs>, T, "create">, never, ExtArgs>
+    create<T extends leaguesCreateArgs>(args: SelectSubset<T, leaguesCreateArgs<ExtArgs>>): Prisma__leaguesClient<$Result.GetResult<Prisma.$leaguesPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
      * Create many Leagues.
@@ -7999,7 +8779,7 @@ export namespace Prisma {
      * })
      * 
      * // Create many Leagues and only return the `league_id`
-     * const leaguesWithLeague_idOnly = await prisma.leagues.createManyAndReturn({ 
+     * const leaguesWithLeague_idOnly = await prisma.leagues.createManyAndReturn({
      *   select: { league_id: true },
      *   data: [
      *     // ... provide data here
@@ -8009,7 +8789,7 @@ export namespace Prisma {
      * Read more here: https://pris.ly/d/null-undefined
      * 
      */
-    createManyAndReturn<T extends leaguesCreateManyAndReturnArgs>(args?: SelectSubset<T, leaguesCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$leaguesPayload<ExtArgs>, T, "createManyAndReturn">>
+    createManyAndReturn<T extends leaguesCreateManyAndReturnArgs>(args?: SelectSubset<T, leaguesCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$leaguesPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
 
     /**
      * Delete a Leagues.
@@ -8023,7 +8803,7 @@ export namespace Prisma {
      * })
      * 
      */
-    delete<T extends leaguesDeleteArgs>(args: SelectSubset<T, leaguesDeleteArgs<ExtArgs>>): Prisma__leaguesClient<$Result.GetResult<Prisma.$leaguesPayload<ExtArgs>, T, "delete">, never, ExtArgs>
+    delete<T extends leaguesDeleteArgs>(args: SelectSubset<T, leaguesDeleteArgs<ExtArgs>>): Prisma__leaguesClient<$Result.GetResult<Prisma.$leaguesPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
      * Update one Leagues.
@@ -8040,7 +8820,7 @@ export namespace Prisma {
      * })
      * 
      */
-    update<T extends leaguesUpdateArgs>(args: SelectSubset<T, leaguesUpdateArgs<ExtArgs>>): Prisma__leaguesClient<$Result.GetResult<Prisma.$leaguesPayload<ExtArgs>, T, "update">, never, ExtArgs>
+    update<T extends leaguesUpdateArgs>(args: SelectSubset<T, leaguesUpdateArgs<ExtArgs>>): Prisma__leaguesClient<$Result.GetResult<Prisma.$leaguesPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
      * Delete zero or more Leagues.
@@ -8076,6 +8856,36 @@ export namespace Prisma {
     updateMany<T extends leaguesUpdateManyArgs>(args: SelectSubset<T, leaguesUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
     /**
+     * Update zero or more Leagues and returns the data updated in the database.
+     * @param {leaguesUpdateManyAndReturnArgs} args - Arguments to update many Leagues.
+     * @example
+     * // Update many Leagues
+     * const leagues = await prisma.leagues.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more Leagues and only return the `league_id`
+     * const leaguesWithLeague_idOnly = await prisma.leagues.updateManyAndReturn({
+     *   select: { league_id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends leaguesUpdateManyAndReturnArgs>(args: SelectSubset<T, leaguesUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$leaguesPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
      * Create or update one Leagues.
      * @param {leaguesUpsertArgs} args - Arguments to update or create a Leagues.
      * @example
@@ -8092,7 +8902,7 @@ export namespace Prisma {
      *   }
      * })
      */
-    upsert<T extends leaguesUpsertArgs>(args: SelectSubset<T, leaguesUpsertArgs<ExtArgs>>): Prisma__leaguesClient<$Result.GetResult<Prisma.$leaguesPayload<ExtArgs>, T, "upsert">, never, ExtArgs>
+    upsert<T extends leaguesUpsertArgs>(args: SelectSubset<T, leaguesUpsertArgs<ExtArgs>>): Prisma__leaguesClient<$Result.GetResult<Prisma.$leaguesPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
 
     /**
@@ -8232,15 +9042,15 @@ export namespace Prisma {
    * Because we want to prevent naming conflicts as mentioned in
    * https://github.com/prisma/prisma-client-js/issues/707
    */
-  export interface Prisma__leaguesClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
+  export interface Prisma__leaguesClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
-    EmailLogs<T extends leagues$EmailLogsArgs<ExtArgs> = {}>(args?: Subset<T, leagues$EmailLogsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EmailLogsPayload<ExtArgs>, T, "findMany"> | Null>
-    WeekWinners<T extends leagues$WeekWinnersArgs<ExtArgs> = {}>(args?: Subset<T, leagues$WeekWinnersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$WeekWinnersPayload<ExtArgs>, T, "findMany"> | Null>
-    leaguemembers<T extends leagues$leaguemembersArgs<ExtArgs> = {}>(args?: Subset<T, leagues$leaguemembersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$leaguemembersPayload<ExtArgs>, T, "findMany"> | Null>
-    leaguemessages<T extends leagues$leaguemessagesArgs<ExtArgs> = {}>(args?: Subset<T, leagues$leaguemessagesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$leaguemessagesPayload<ExtArgs>, T, "findMany"> | Null>
-    people<T extends peopleDefaultArgs<ExtArgs> = {}>(args?: Subset<T, peopleDefaultArgs<ExtArgs>>): Prisma__peopleClient<$Result.GetResult<Prisma.$peoplePayload<ExtArgs>, T, "findUniqueOrThrow"> | Null, Null, ExtArgs>
-    prior_league<T extends leagues$prior_leagueArgs<ExtArgs> = {}>(args?: Subset<T, leagues$prior_leagueArgs<ExtArgs>>): Prisma__leaguesClient<$Result.GetResult<Prisma.$leaguesPayload<ExtArgs>, T, "findUniqueOrThrow"> | null, null, ExtArgs>
-    future_leagues<T extends leagues$future_leaguesArgs<ExtArgs> = {}>(args?: Subset<T, leagues$future_leaguesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$leaguesPayload<ExtArgs>, T, "findMany"> | Null>
+    EmailLogs<T extends leagues$EmailLogsArgs<ExtArgs> = {}>(args?: Subset<T, leagues$EmailLogsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EmailLogsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    WeekWinners<T extends leagues$WeekWinnersArgs<ExtArgs> = {}>(args?: Subset<T, leagues$WeekWinnersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$WeekWinnersPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    leaguemembers<T extends leagues$leaguemembersArgs<ExtArgs> = {}>(args?: Subset<T, leagues$leaguemembersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$leaguemembersPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    leaguemessages<T extends leagues$leaguemessagesArgs<ExtArgs> = {}>(args?: Subset<T, leagues$leaguemessagesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$leaguemessagesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    people<T extends peopleDefaultArgs<ExtArgs> = {}>(args?: Subset<T, peopleDefaultArgs<ExtArgs>>): Prisma__peopleClient<$Result.GetResult<Prisma.$peoplePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    prior_league<T extends leagues$prior_leagueArgs<ExtArgs> = {}>(args?: Subset<T, leagues$prior_leagueArgs<ExtArgs>>): Prisma__leaguesClient<$Result.GetResult<Prisma.$leaguesPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    future_leagues<T extends leagues$future_leaguesArgs<ExtArgs> = {}>(args?: Subset<T, leagues$future_leaguesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$leaguesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -8268,7 +9078,7 @@ export namespace Prisma {
 
   /**
    * Fields of the leagues model
-   */ 
+   */
   interface leaguesFieldRefs {
     readonly league_id: FieldRef<"leagues", 'Int'>
     readonly created_by_user_id: FieldRef<"leagues", 'Int'>
@@ -8296,6 +9106,10 @@ export namespace Prisma {
      */
     select?: leaguesSelect<ExtArgs> | null
     /**
+     * Omit specific fields from the leagues
+     */
+    omit?: leaguesOmit<ExtArgs> | null
+    /**
      * Choose, which related nodes to fetch as well
      */
     include?: leaguesInclude<ExtArgs> | null
@@ -8315,6 +9129,10 @@ export namespace Prisma {
      */
     select?: leaguesSelect<ExtArgs> | null
     /**
+     * Omit specific fields from the leagues
+     */
+    omit?: leaguesOmit<ExtArgs> | null
+    /**
      * Choose, which related nodes to fetch as well
      */
     include?: leaguesInclude<ExtArgs> | null
@@ -8333,6 +9151,10 @@ export namespace Prisma {
      * Select specific fields to fetch from the leagues
      */
     select?: leaguesSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the leagues
+     */
+    omit?: leaguesOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
@@ -8383,6 +9205,10 @@ export namespace Prisma {
      */
     select?: leaguesSelect<ExtArgs> | null
     /**
+     * Omit specific fields from the leagues
+     */
+    omit?: leaguesOmit<ExtArgs> | null
+    /**
      * Choose, which related nodes to fetch as well
      */
     include?: leaguesInclude<ExtArgs> | null
@@ -8432,6 +9258,10 @@ export namespace Prisma {
      */
     select?: leaguesSelect<ExtArgs> | null
     /**
+     * Omit specific fields from the leagues
+     */
+    omit?: leaguesOmit<ExtArgs> | null
+    /**
      * Choose, which related nodes to fetch as well
      */
     include?: leaguesInclude<ExtArgs> | null
@@ -8476,6 +9306,10 @@ export namespace Prisma {
      */
     select?: leaguesSelect<ExtArgs> | null
     /**
+     * Omit specific fields from the leagues
+     */
+    omit?: leaguesOmit<ExtArgs> | null
+    /**
      * Choose, which related nodes to fetch as well
      */
     include?: leaguesInclude<ExtArgs> | null
@@ -8506,6 +9340,10 @@ export namespace Prisma {
      */
     select?: leaguesSelectCreateManyAndReturn<ExtArgs> | null
     /**
+     * Omit specific fields from the leagues
+     */
+    omit?: leaguesOmit<ExtArgs> | null
+    /**
      * The data used to create many leagues.
      */
     data: leaguesCreateManyInput | leaguesCreateManyInput[]
@@ -8524,6 +9362,10 @@ export namespace Prisma {
      * Select specific fields to fetch from the leagues
      */
     select?: leaguesSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the leagues
+     */
+    omit?: leaguesOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
@@ -8551,6 +9393,40 @@ export namespace Prisma {
      * Filter which leagues to update
      */
     where?: leaguesWhereInput
+    /**
+     * Limit how many leagues to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * leagues updateManyAndReturn
+   */
+  export type leaguesUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the leagues
+     */
+    select?: leaguesSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the leagues
+     */
+    omit?: leaguesOmit<ExtArgs> | null
+    /**
+     * The data used to update leagues.
+     */
+    data: XOR<leaguesUpdateManyMutationInput, leaguesUncheckedUpdateManyInput>
+    /**
+     * Filter which leagues to update
+     */
+    where?: leaguesWhereInput
+    /**
+     * Limit how many leagues to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: leaguesIncludeUpdateManyAndReturn<ExtArgs> | null
   }
 
   /**
@@ -8561,6 +9437,10 @@ export namespace Prisma {
      * Select specific fields to fetch from the leagues
      */
     select?: leaguesSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the leagues
+     */
+    omit?: leaguesOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
@@ -8589,6 +9469,10 @@ export namespace Prisma {
      */
     select?: leaguesSelect<ExtArgs> | null
     /**
+     * Omit specific fields from the leagues
+     */
+    omit?: leaguesOmit<ExtArgs> | null
+    /**
      * Choose, which related nodes to fetch as well
      */
     include?: leaguesInclude<ExtArgs> | null
@@ -8607,6 +9491,10 @@ export namespace Prisma {
      * Filter which leagues to delete
      */
     where?: leaguesWhereInput
+    /**
+     * Limit how many leagues to delete.
+     */
+    limit?: number
   }
 
   /**
@@ -8617,6 +9505,10 @@ export namespace Prisma {
      * Select specific fields to fetch from the EmailLogs
      */
     select?: EmailLogsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EmailLogs
+     */
+    omit?: EmailLogsOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
@@ -8638,6 +9530,10 @@ export namespace Prisma {
      */
     select?: WeekWinnersSelect<ExtArgs> | null
     /**
+     * Omit specific fields from the WeekWinners
+     */
+    omit?: WeekWinnersOmit<ExtArgs> | null
+    /**
      * Choose, which related nodes to fetch as well
      */
     include?: WeekWinnersInclude<ExtArgs> | null
@@ -8657,6 +9553,10 @@ export namespace Prisma {
      * Select specific fields to fetch from the leaguemembers
      */
     select?: leaguemembersSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the leaguemembers
+     */
+    omit?: leaguemembersOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
@@ -8678,6 +9578,10 @@ export namespace Prisma {
      */
     select?: leaguemessagesSelect<ExtArgs> | null
     /**
+     * Omit specific fields from the leaguemessages
+     */
+    omit?: leaguemessagesOmit<ExtArgs> | null
+    /**
      * Choose, which related nodes to fetch as well
      */
     include?: leaguemessagesInclude<ExtArgs> | null
@@ -8698,6 +9602,10 @@ export namespace Prisma {
      */
     select?: leaguesSelect<ExtArgs> | null
     /**
+     * Omit specific fields from the leagues
+     */
+    omit?: leaguesOmit<ExtArgs> | null
+    /**
      * Choose, which related nodes to fetch as well
      */
     include?: leaguesInclude<ExtArgs> | null
@@ -8712,6 +9620,10 @@ export namespace Prisma {
      * Select specific fields to fetch from the leagues
      */
     select?: leaguesSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the leagues
+     */
+    omit?: leaguesOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
@@ -8732,6 +9644,10 @@ export namespace Prisma {
      * Select specific fields to fetch from the leagues
      */
     select?: leaguesSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the leagues
+     */
+    omit?: leaguesOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
@@ -9009,6 +9925,20 @@ export namespace Prisma {
     supabase_id?: boolean
   }, ExtArgs["result"]["people"]>
 
+  export type peopleSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    uid?: boolean
+    username?: boolean
+    fname?: boolean
+    lname?: boolean
+    email?: boolean
+    season?: boolean
+    email2?: boolean
+    google_photo_url?: boolean
+    google_email?: boolean
+    google_userid?: boolean
+    supabase_id?: boolean
+  }, ExtArgs["result"]["people"]>
+
   export type peopleSelectScalar = {
     uid?: boolean
     username?: boolean
@@ -9023,6 +9953,7 @@ export namespace Prisma {
     supabase_id?: boolean
   }
 
+  export type peopleOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"uid" | "username" | "fname" | "lname" | "email" | "season" | "email2" | "google_photo_url" | "google_email" | "google_userid" | "supabase_id", ExtArgs["result"]["people"]>
   export type peopleInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     leaguemembers?: boolean | people$leaguemembersArgs<ExtArgs>
     leagues?: boolean | people$leaguesArgs<ExtArgs>
@@ -9030,6 +9961,7 @@ export namespace Prisma {
     _count?: boolean | PeopleCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type peopleIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
+  export type peopleIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
 
   export type $peoplePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "people"
@@ -9056,12 +9988,12 @@ export namespace Prisma {
 
   type peopleGetPayload<S extends boolean | null | undefined | peopleDefaultArgs> = $Result.GetResult<Prisma.$peoplePayload, S>
 
-  type peopleCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = 
-    Omit<peopleFindManyArgs, 'select' | 'include' | 'distinct' | 'relationLoadStrategy'> & {
+  type peopleCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<peopleFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
       select?: PeopleCountAggregateInputType | true
     }
 
-  export interface peopleDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> {
+  export interface peopleDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
     [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['people'], meta: { name: 'people' } }
     /**
      * Find zero or one People that matches the filter.
@@ -9074,10 +10006,10 @@ export namespace Prisma {
      *   }
      * })
      */
-    findUnique<T extends peopleFindUniqueArgs>(args: SelectSubset<T, peopleFindUniqueArgs<ExtArgs>>): Prisma__peopleClient<$Result.GetResult<Prisma.$peoplePayload<ExtArgs>, T, "findUnique"> | null, null, ExtArgs>
+    findUnique<T extends peopleFindUniqueArgs>(args: SelectSubset<T, peopleFindUniqueArgs<ExtArgs>>): Prisma__peopleClient<$Result.GetResult<Prisma.$peoplePayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
 
     /**
-     * Find one People that matches the filter or throw an error with `error.code='P2025'` 
+     * Find one People that matches the filter or throw an error with `error.code='P2025'`
      * if no matches were found.
      * @param {peopleFindUniqueOrThrowArgs} args - Arguments to find a People
      * @example
@@ -9088,7 +10020,7 @@ export namespace Prisma {
      *   }
      * })
      */
-    findUniqueOrThrow<T extends peopleFindUniqueOrThrowArgs>(args: SelectSubset<T, peopleFindUniqueOrThrowArgs<ExtArgs>>): Prisma__peopleClient<$Result.GetResult<Prisma.$peoplePayload<ExtArgs>, T, "findUniqueOrThrow">, never, ExtArgs>
+    findUniqueOrThrow<T extends peopleFindUniqueOrThrowArgs>(args: SelectSubset<T, peopleFindUniqueOrThrowArgs<ExtArgs>>): Prisma__peopleClient<$Result.GetResult<Prisma.$peoplePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
      * Find the first People that matches the filter.
@@ -9103,7 +10035,7 @@ export namespace Prisma {
      *   }
      * })
      */
-    findFirst<T extends peopleFindFirstArgs>(args?: SelectSubset<T, peopleFindFirstArgs<ExtArgs>>): Prisma__peopleClient<$Result.GetResult<Prisma.$peoplePayload<ExtArgs>, T, "findFirst"> | null, null, ExtArgs>
+    findFirst<T extends peopleFindFirstArgs>(args?: SelectSubset<T, peopleFindFirstArgs<ExtArgs>>): Prisma__peopleClient<$Result.GetResult<Prisma.$peoplePayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
 
     /**
      * Find the first People that matches the filter or
@@ -9119,7 +10051,7 @@ export namespace Prisma {
      *   }
      * })
      */
-    findFirstOrThrow<T extends peopleFindFirstOrThrowArgs>(args?: SelectSubset<T, peopleFindFirstOrThrowArgs<ExtArgs>>): Prisma__peopleClient<$Result.GetResult<Prisma.$peoplePayload<ExtArgs>, T, "findFirstOrThrow">, never, ExtArgs>
+    findFirstOrThrow<T extends peopleFindFirstOrThrowArgs>(args?: SelectSubset<T, peopleFindFirstOrThrowArgs<ExtArgs>>): Prisma__peopleClient<$Result.GetResult<Prisma.$peoplePayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
      * Find zero or more People that matches the filter.
@@ -9137,7 +10069,7 @@ export namespace Prisma {
      * const peopleWithUidOnly = await prisma.people.findMany({ select: { uid: true } })
      * 
      */
-    findMany<T extends peopleFindManyArgs>(args?: SelectSubset<T, peopleFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$peoplePayload<ExtArgs>, T, "findMany">>
+    findMany<T extends peopleFindManyArgs>(args?: SelectSubset<T, peopleFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$peoplePayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
 
     /**
      * Create a People.
@@ -9151,7 +10083,7 @@ export namespace Prisma {
      * })
      * 
      */
-    create<T extends peopleCreateArgs>(args: SelectSubset<T, peopleCreateArgs<ExtArgs>>): Prisma__peopleClient<$Result.GetResult<Prisma.$peoplePayload<ExtArgs>, T, "create">, never, ExtArgs>
+    create<T extends peopleCreateArgs>(args: SelectSubset<T, peopleCreateArgs<ExtArgs>>): Prisma__peopleClient<$Result.GetResult<Prisma.$peoplePayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
      * Create many People.
@@ -9179,7 +10111,7 @@ export namespace Prisma {
      * })
      * 
      * // Create many People and only return the `uid`
-     * const peopleWithUidOnly = await prisma.people.createManyAndReturn({ 
+     * const peopleWithUidOnly = await prisma.people.createManyAndReturn({
      *   select: { uid: true },
      *   data: [
      *     // ... provide data here
@@ -9189,7 +10121,7 @@ export namespace Prisma {
      * Read more here: https://pris.ly/d/null-undefined
      * 
      */
-    createManyAndReturn<T extends peopleCreateManyAndReturnArgs>(args?: SelectSubset<T, peopleCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$peoplePayload<ExtArgs>, T, "createManyAndReturn">>
+    createManyAndReturn<T extends peopleCreateManyAndReturnArgs>(args?: SelectSubset<T, peopleCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$peoplePayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
 
     /**
      * Delete a People.
@@ -9203,7 +10135,7 @@ export namespace Prisma {
      * })
      * 
      */
-    delete<T extends peopleDeleteArgs>(args: SelectSubset<T, peopleDeleteArgs<ExtArgs>>): Prisma__peopleClient<$Result.GetResult<Prisma.$peoplePayload<ExtArgs>, T, "delete">, never, ExtArgs>
+    delete<T extends peopleDeleteArgs>(args: SelectSubset<T, peopleDeleteArgs<ExtArgs>>): Prisma__peopleClient<$Result.GetResult<Prisma.$peoplePayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
      * Update one People.
@@ -9220,7 +10152,7 @@ export namespace Prisma {
      * })
      * 
      */
-    update<T extends peopleUpdateArgs>(args: SelectSubset<T, peopleUpdateArgs<ExtArgs>>): Prisma__peopleClient<$Result.GetResult<Prisma.$peoplePayload<ExtArgs>, T, "update">, never, ExtArgs>
+    update<T extends peopleUpdateArgs>(args: SelectSubset<T, peopleUpdateArgs<ExtArgs>>): Prisma__peopleClient<$Result.GetResult<Prisma.$peoplePayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
      * Delete zero or more People.
@@ -9256,6 +10188,36 @@ export namespace Prisma {
     updateMany<T extends peopleUpdateManyArgs>(args: SelectSubset<T, peopleUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
     /**
+     * Update zero or more People and returns the data updated in the database.
+     * @param {peopleUpdateManyAndReturnArgs} args - Arguments to update many People.
+     * @example
+     * // Update many People
+     * const people = await prisma.people.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more People and only return the `uid`
+     * const peopleWithUidOnly = await prisma.people.updateManyAndReturn({
+     *   select: { uid: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends peopleUpdateManyAndReturnArgs>(args: SelectSubset<T, peopleUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$peoplePayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
      * Create or update one People.
      * @param {peopleUpsertArgs} args - Arguments to update or create a People.
      * @example
@@ -9272,7 +10234,7 @@ export namespace Prisma {
      *   }
      * })
      */
-    upsert<T extends peopleUpsertArgs>(args: SelectSubset<T, peopleUpsertArgs<ExtArgs>>): Prisma__peopleClient<$Result.GetResult<Prisma.$peoplePayload<ExtArgs>, T, "upsert">, never, ExtArgs>
+    upsert<T extends peopleUpsertArgs>(args: SelectSubset<T, peopleUpsertArgs<ExtArgs>>): Prisma__peopleClient<$Result.GetResult<Prisma.$peoplePayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
 
     /**
@@ -9412,11 +10374,11 @@ export namespace Prisma {
    * Because we want to prevent naming conflicts as mentioned in
    * https://github.com/prisma/prisma-client-js/issues/707
    */
-  export interface Prisma__peopleClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
+  export interface Prisma__peopleClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
-    leaguemembers<T extends people$leaguemembersArgs<ExtArgs> = {}>(args?: Subset<T, people$leaguemembersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$leaguemembersPayload<ExtArgs>, T, "findMany"> | Null>
-    leagues<T extends people$leaguesArgs<ExtArgs> = {}>(args?: Subset<T, people$leaguesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$leaguesPayload<ExtArgs>, T, "findMany"> | Null>
-    picks<T extends people$picksArgs<ExtArgs> = {}>(args?: Subset<T, people$picksArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$picksPayload<ExtArgs>, T, "findMany"> | Null>
+    leaguemembers<T extends people$leaguemembersArgs<ExtArgs> = {}>(args?: Subset<T, people$leaguemembersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$leaguemembersPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    leagues<T extends people$leaguesArgs<ExtArgs> = {}>(args?: Subset<T, people$leaguesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$leaguesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    picks<T extends people$picksArgs<ExtArgs> = {}>(args?: Subset<T, people$picksArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$picksPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -9444,7 +10406,7 @@ export namespace Prisma {
 
   /**
    * Fields of the people model
-   */ 
+   */
   interface peopleFieldRefs {
     readonly uid: FieldRef<"people", 'Int'>
     readonly username: FieldRef<"people", 'String'>
@@ -9470,6 +10432,10 @@ export namespace Prisma {
      */
     select?: peopleSelect<ExtArgs> | null
     /**
+     * Omit specific fields from the people
+     */
+    omit?: peopleOmit<ExtArgs> | null
+    /**
      * Choose, which related nodes to fetch as well
      */
     include?: peopleInclude<ExtArgs> | null
@@ -9489,6 +10455,10 @@ export namespace Prisma {
      */
     select?: peopleSelect<ExtArgs> | null
     /**
+     * Omit specific fields from the people
+     */
+    omit?: peopleOmit<ExtArgs> | null
+    /**
      * Choose, which related nodes to fetch as well
      */
     include?: peopleInclude<ExtArgs> | null
@@ -9507,6 +10477,10 @@ export namespace Prisma {
      * Select specific fields to fetch from the people
      */
     select?: peopleSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the people
+     */
+    omit?: peopleOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
@@ -9557,6 +10531,10 @@ export namespace Prisma {
      */
     select?: peopleSelect<ExtArgs> | null
     /**
+     * Omit specific fields from the people
+     */
+    omit?: peopleOmit<ExtArgs> | null
+    /**
      * Choose, which related nodes to fetch as well
      */
     include?: peopleInclude<ExtArgs> | null
@@ -9606,6 +10584,10 @@ export namespace Prisma {
      */
     select?: peopleSelect<ExtArgs> | null
     /**
+     * Omit specific fields from the people
+     */
+    omit?: peopleOmit<ExtArgs> | null
+    /**
      * Choose, which related nodes to fetch as well
      */
     include?: peopleInclude<ExtArgs> | null
@@ -9650,6 +10632,10 @@ export namespace Prisma {
      */
     select?: peopleSelect<ExtArgs> | null
     /**
+     * Omit specific fields from the people
+     */
+    omit?: peopleOmit<ExtArgs> | null
+    /**
      * Choose, which related nodes to fetch as well
      */
     include?: peopleInclude<ExtArgs> | null
@@ -9680,6 +10666,10 @@ export namespace Prisma {
      */
     select?: peopleSelectCreateManyAndReturn<ExtArgs> | null
     /**
+     * Omit specific fields from the people
+     */
+    omit?: peopleOmit<ExtArgs> | null
+    /**
      * The data used to create many people.
      */
     data: peopleCreateManyInput | peopleCreateManyInput[]
@@ -9694,6 +10684,10 @@ export namespace Prisma {
      * Select specific fields to fetch from the people
      */
     select?: peopleSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the people
+     */
+    omit?: peopleOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
@@ -9721,6 +10715,36 @@ export namespace Prisma {
      * Filter which people to update
      */
     where?: peopleWhereInput
+    /**
+     * Limit how many people to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * people updateManyAndReturn
+   */
+  export type peopleUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the people
+     */
+    select?: peopleSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the people
+     */
+    omit?: peopleOmit<ExtArgs> | null
+    /**
+     * The data used to update people.
+     */
+    data: XOR<peopleUpdateManyMutationInput, peopleUncheckedUpdateManyInput>
+    /**
+     * Filter which people to update
+     */
+    where?: peopleWhereInput
+    /**
+     * Limit how many people to update.
+     */
+    limit?: number
   }
 
   /**
@@ -9731,6 +10755,10 @@ export namespace Prisma {
      * Select specific fields to fetch from the people
      */
     select?: peopleSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the people
+     */
+    omit?: peopleOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
@@ -9759,6 +10787,10 @@ export namespace Prisma {
      */
     select?: peopleSelect<ExtArgs> | null
     /**
+     * Omit specific fields from the people
+     */
+    omit?: peopleOmit<ExtArgs> | null
+    /**
      * Choose, which related nodes to fetch as well
      */
     include?: peopleInclude<ExtArgs> | null
@@ -9777,6 +10809,10 @@ export namespace Prisma {
      * Filter which people to delete
      */
     where?: peopleWhereInput
+    /**
+     * Limit how many people to delete.
+     */
+    limit?: number
   }
 
   /**
@@ -9787,6 +10823,10 @@ export namespace Prisma {
      * Select specific fields to fetch from the leaguemembers
      */
     select?: leaguemembersSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the leaguemembers
+     */
+    omit?: leaguemembersOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
@@ -9808,6 +10848,10 @@ export namespace Prisma {
      */
     select?: leaguesSelect<ExtArgs> | null
     /**
+     * Omit specific fields from the leagues
+     */
+    omit?: leaguesOmit<ExtArgs> | null
+    /**
      * Choose, which related nodes to fetch as well
      */
     include?: leaguesInclude<ExtArgs> | null
@@ -9828,6 +10872,10 @@ export namespace Prisma {
      */
     select?: picksSelect<ExtArgs> | null
     /**
+     * Omit specific fields from the picks
+     */
+    omit?: picksOmit<ExtArgs> | null
+    /**
      * Choose, which related nodes to fetch as well
      */
     include?: picksInclude<ExtArgs> | null
@@ -9847,6 +10895,10 @@ export namespace Prisma {
      * Select specific fields to fetch from the people
      */
     select?: peopleSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the people
+     */
+    omit?: peopleOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
@@ -10182,6 +11234,26 @@ export namespace Prisma {
     teams?: boolean | picks$teamsArgs<ExtArgs>
   }, ExtArgs["result"]["picks"]>
 
+  export type picksSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    pickid?: boolean
+    uid?: boolean
+    season?: boolean
+    week?: boolean
+    gid?: boolean
+    winner?: boolean
+    loser?: boolean
+    score?: boolean
+    ts?: boolean
+    correct?: boolean
+    done?: boolean
+    is_random?: boolean
+    member_id?: boolean
+    games?: boolean | gamesDefaultArgs<ExtArgs>
+    people?: boolean | peopleDefaultArgs<ExtArgs>
+    leaguemembers?: boolean | picks$leaguemembersArgs<ExtArgs>
+    teams?: boolean | picks$teamsArgs<ExtArgs>
+  }, ExtArgs["result"]["picks"]>
+
   export type picksSelectScalar = {
     pickid?: boolean
     uid?: boolean
@@ -10198,6 +11270,7 @@ export namespace Prisma {
     member_id?: boolean
   }
 
+  export type picksOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"pickid" | "uid" | "season" | "week" | "gid" | "winner" | "loser" | "score" | "ts" | "correct" | "done" | "is_random" | "member_id", ExtArgs["result"]["picks"]>
   export type picksInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     games?: boolean | gamesDefaultArgs<ExtArgs>
     people?: boolean | peopleDefaultArgs<ExtArgs>
@@ -10205,6 +11278,12 @@ export namespace Prisma {
     teams?: boolean | picks$teamsArgs<ExtArgs>
   }
   export type picksIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    games?: boolean | gamesDefaultArgs<ExtArgs>
+    people?: boolean | peopleDefaultArgs<ExtArgs>
+    leaguemembers?: boolean | picks$leaguemembersArgs<ExtArgs>
+    teams?: boolean | picks$teamsArgs<ExtArgs>
+  }
+  export type picksIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     games?: boolean | gamesDefaultArgs<ExtArgs>
     people?: boolean | peopleDefaultArgs<ExtArgs>
     leaguemembers?: boolean | picks$leaguemembersArgs<ExtArgs>
@@ -10239,12 +11318,12 @@ export namespace Prisma {
 
   type picksGetPayload<S extends boolean | null | undefined | picksDefaultArgs> = $Result.GetResult<Prisma.$picksPayload, S>
 
-  type picksCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = 
-    Omit<picksFindManyArgs, 'select' | 'include' | 'distinct' | 'relationLoadStrategy'> & {
+  type picksCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<picksFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
       select?: PicksCountAggregateInputType | true
     }
 
-  export interface picksDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> {
+  export interface picksDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
     [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['picks'], meta: { name: 'picks' } }
     /**
      * Find zero or one Picks that matches the filter.
@@ -10257,10 +11336,10 @@ export namespace Prisma {
      *   }
      * })
      */
-    findUnique<T extends picksFindUniqueArgs>(args: SelectSubset<T, picksFindUniqueArgs<ExtArgs>>): Prisma__picksClient<$Result.GetResult<Prisma.$picksPayload<ExtArgs>, T, "findUnique"> | null, null, ExtArgs>
+    findUnique<T extends picksFindUniqueArgs>(args: SelectSubset<T, picksFindUniqueArgs<ExtArgs>>): Prisma__picksClient<$Result.GetResult<Prisma.$picksPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
 
     /**
-     * Find one Picks that matches the filter or throw an error with `error.code='P2025'` 
+     * Find one Picks that matches the filter or throw an error with `error.code='P2025'`
      * if no matches were found.
      * @param {picksFindUniqueOrThrowArgs} args - Arguments to find a Picks
      * @example
@@ -10271,7 +11350,7 @@ export namespace Prisma {
      *   }
      * })
      */
-    findUniqueOrThrow<T extends picksFindUniqueOrThrowArgs>(args: SelectSubset<T, picksFindUniqueOrThrowArgs<ExtArgs>>): Prisma__picksClient<$Result.GetResult<Prisma.$picksPayload<ExtArgs>, T, "findUniqueOrThrow">, never, ExtArgs>
+    findUniqueOrThrow<T extends picksFindUniqueOrThrowArgs>(args: SelectSubset<T, picksFindUniqueOrThrowArgs<ExtArgs>>): Prisma__picksClient<$Result.GetResult<Prisma.$picksPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
      * Find the first Picks that matches the filter.
@@ -10286,7 +11365,7 @@ export namespace Prisma {
      *   }
      * })
      */
-    findFirst<T extends picksFindFirstArgs>(args?: SelectSubset<T, picksFindFirstArgs<ExtArgs>>): Prisma__picksClient<$Result.GetResult<Prisma.$picksPayload<ExtArgs>, T, "findFirst"> | null, null, ExtArgs>
+    findFirst<T extends picksFindFirstArgs>(args?: SelectSubset<T, picksFindFirstArgs<ExtArgs>>): Prisma__picksClient<$Result.GetResult<Prisma.$picksPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
 
     /**
      * Find the first Picks that matches the filter or
@@ -10302,7 +11381,7 @@ export namespace Prisma {
      *   }
      * })
      */
-    findFirstOrThrow<T extends picksFindFirstOrThrowArgs>(args?: SelectSubset<T, picksFindFirstOrThrowArgs<ExtArgs>>): Prisma__picksClient<$Result.GetResult<Prisma.$picksPayload<ExtArgs>, T, "findFirstOrThrow">, never, ExtArgs>
+    findFirstOrThrow<T extends picksFindFirstOrThrowArgs>(args?: SelectSubset<T, picksFindFirstOrThrowArgs<ExtArgs>>): Prisma__picksClient<$Result.GetResult<Prisma.$picksPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
      * Find zero or more Picks that matches the filter.
@@ -10320,7 +11399,7 @@ export namespace Prisma {
      * const picksWithPickidOnly = await prisma.picks.findMany({ select: { pickid: true } })
      * 
      */
-    findMany<T extends picksFindManyArgs>(args?: SelectSubset<T, picksFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$picksPayload<ExtArgs>, T, "findMany">>
+    findMany<T extends picksFindManyArgs>(args?: SelectSubset<T, picksFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$picksPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
 
     /**
      * Create a Picks.
@@ -10334,7 +11413,7 @@ export namespace Prisma {
      * })
      * 
      */
-    create<T extends picksCreateArgs>(args: SelectSubset<T, picksCreateArgs<ExtArgs>>): Prisma__picksClient<$Result.GetResult<Prisma.$picksPayload<ExtArgs>, T, "create">, never, ExtArgs>
+    create<T extends picksCreateArgs>(args: SelectSubset<T, picksCreateArgs<ExtArgs>>): Prisma__picksClient<$Result.GetResult<Prisma.$picksPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
      * Create many Picks.
@@ -10362,7 +11441,7 @@ export namespace Prisma {
      * })
      * 
      * // Create many Picks and only return the `pickid`
-     * const picksWithPickidOnly = await prisma.picks.createManyAndReturn({ 
+     * const picksWithPickidOnly = await prisma.picks.createManyAndReturn({
      *   select: { pickid: true },
      *   data: [
      *     // ... provide data here
@@ -10372,7 +11451,7 @@ export namespace Prisma {
      * Read more here: https://pris.ly/d/null-undefined
      * 
      */
-    createManyAndReturn<T extends picksCreateManyAndReturnArgs>(args?: SelectSubset<T, picksCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$picksPayload<ExtArgs>, T, "createManyAndReturn">>
+    createManyAndReturn<T extends picksCreateManyAndReturnArgs>(args?: SelectSubset<T, picksCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$picksPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
 
     /**
      * Delete a Picks.
@@ -10386,7 +11465,7 @@ export namespace Prisma {
      * })
      * 
      */
-    delete<T extends picksDeleteArgs>(args: SelectSubset<T, picksDeleteArgs<ExtArgs>>): Prisma__picksClient<$Result.GetResult<Prisma.$picksPayload<ExtArgs>, T, "delete">, never, ExtArgs>
+    delete<T extends picksDeleteArgs>(args: SelectSubset<T, picksDeleteArgs<ExtArgs>>): Prisma__picksClient<$Result.GetResult<Prisma.$picksPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
      * Update one Picks.
@@ -10403,7 +11482,7 @@ export namespace Prisma {
      * })
      * 
      */
-    update<T extends picksUpdateArgs>(args: SelectSubset<T, picksUpdateArgs<ExtArgs>>): Prisma__picksClient<$Result.GetResult<Prisma.$picksPayload<ExtArgs>, T, "update">, never, ExtArgs>
+    update<T extends picksUpdateArgs>(args: SelectSubset<T, picksUpdateArgs<ExtArgs>>): Prisma__picksClient<$Result.GetResult<Prisma.$picksPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
      * Delete zero or more Picks.
@@ -10439,6 +11518,36 @@ export namespace Prisma {
     updateMany<T extends picksUpdateManyArgs>(args: SelectSubset<T, picksUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
     /**
+     * Update zero or more Picks and returns the data updated in the database.
+     * @param {picksUpdateManyAndReturnArgs} args - Arguments to update many Picks.
+     * @example
+     * // Update many Picks
+     * const picks = await prisma.picks.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more Picks and only return the `pickid`
+     * const picksWithPickidOnly = await prisma.picks.updateManyAndReturn({
+     *   select: { pickid: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends picksUpdateManyAndReturnArgs>(args: SelectSubset<T, picksUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$picksPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
      * Create or update one Picks.
      * @param {picksUpsertArgs} args - Arguments to update or create a Picks.
      * @example
@@ -10455,7 +11564,7 @@ export namespace Prisma {
      *   }
      * })
      */
-    upsert<T extends picksUpsertArgs>(args: SelectSubset<T, picksUpsertArgs<ExtArgs>>): Prisma__picksClient<$Result.GetResult<Prisma.$picksPayload<ExtArgs>, T, "upsert">, never, ExtArgs>
+    upsert<T extends picksUpsertArgs>(args: SelectSubset<T, picksUpsertArgs<ExtArgs>>): Prisma__picksClient<$Result.GetResult<Prisma.$picksPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
 
     /**
@@ -10595,12 +11704,12 @@ export namespace Prisma {
    * Because we want to prevent naming conflicts as mentioned in
    * https://github.com/prisma/prisma-client-js/issues/707
    */
-  export interface Prisma__picksClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
+  export interface Prisma__picksClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
-    games<T extends gamesDefaultArgs<ExtArgs> = {}>(args?: Subset<T, gamesDefaultArgs<ExtArgs>>): Prisma__gamesClient<$Result.GetResult<Prisma.$gamesPayload<ExtArgs>, T, "findUniqueOrThrow"> | Null, Null, ExtArgs>
-    people<T extends peopleDefaultArgs<ExtArgs> = {}>(args?: Subset<T, peopleDefaultArgs<ExtArgs>>): Prisma__peopleClient<$Result.GetResult<Prisma.$peoplePayload<ExtArgs>, T, "findUniqueOrThrow"> | Null, Null, ExtArgs>
-    leaguemembers<T extends picks$leaguemembersArgs<ExtArgs> = {}>(args?: Subset<T, picks$leaguemembersArgs<ExtArgs>>): Prisma__leaguemembersClient<$Result.GetResult<Prisma.$leaguemembersPayload<ExtArgs>, T, "findUniqueOrThrow"> | null, null, ExtArgs>
-    teams<T extends picks$teamsArgs<ExtArgs> = {}>(args?: Subset<T, picks$teamsArgs<ExtArgs>>): Prisma__teamsClient<$Result.GetResult<Prisma.$teamsPayload<ExtArgs>, T, "findUniqueOrThrow"> | null, null, ExtArgs>
+    games<T extends gamesDefaultArgs<ExtArgs> = {}>(args?: Subset<T, gamesDefaultArgs<ExtArgs>>): Prisma__gamesClient<$Result.GetResult<Prisma.$gamesPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    people<T extends peopleDefaultArgs<ExtArgs> = {}>(args?: Subset<T, peopleDefaultArgs<ExtArgs>>): Prisma__peopleClient<$Result.GetResult<Prisma.$peoplePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    leaguemembers<T extends picks$leaguemembersArgs<ExtArgs> = {}>(args?: Subset<T, picks$leaguemembersArgs<ExtArgs>>): Prisma__leaguemembersClient<$Result.GetResult<Prisma.$leaguemembersPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    teams<T extends picks$teamsArgs<ExtArgs> = {}>(args?: Subset<T, picks$teamsArgs<ExtArgs>>): Prisma__teamsClient<$Result.GetResult<Prisma.$teamsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -10628,7 +11737,7 @@ export namespace Prisma {
 
   /**
    * Fields of the picks model
-   */ 
+   */
   interface picksFieldRefs {
     readonly pickid: FieldRef<"picks", 'Int'>
     readonly uid: FieldRef<"picks", 'Int'>
@@ -10656,6 +11765,10 @@ export namespace Prisma {
      */
     select?: picksSelect<ExtArgs> | null
     /**
+     * Omit specific fields from the picks
+     */
+    omit?: picksOmit<ExtArgs> | null
+    /**
      * Choose, which related nodes to fetch as well
      */
     include?: picksInclude<ExtArgs> | null
@@ -10675,6 +11788,10 @@ export namespace Prisma {
      */
     select?: picksSelect<ExtArgs> | null
     /**
+     * Omit specific fields from the picks
+     */
+    omit?: picksOmit<ExtArgs> | null
+    /**
      * Choose, which related nodes to fetch as well
      */
     include?: picksInclude<ExtArgs> | null
@@ -10693,6 +11810,10 @@ export namespace Prisma {
      * Select specific fields to fetch from the picks
      */
     select?: picksSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the picks
+     */
+    omit?: picksOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
@@ -10743,6 +11864,10 @@ export namespace Prisma {
      */
     select?: picksSelect<ExtArgs> | null
     /**
+     * Omit specific fields from the picks
+     */
+    omit?: picksOmit<ExtArgs> | null
+    /**
      * Choose, which related nodes to fetch as well
      */
     include?: picksInclude<ExtArgs> | null
@@ -10792,6 +11917,10 @@ export namespace Prisma {
      */
     select?: picksSelect<ExtArgs> | null
     /**
+     * Omit specific fields from the picks
+     */
+    omit?: picksOmit<ExtArgs> | null
+    /**
      * Choose, which related nodes to fetch as well
      */
     include?: picksInclude<ExtArgs> | null
@@ -10836,6 +11965,10 @@ export namespace Prisma {
      */
     select?: picksSelect<ExtArgs> | null
     /**
+     * Omit specific fields from the picks
+     */
+    omit?: picksOmit<ExtArgs> | null
+    /**
      * Choose, which related nodes to fetch as well
      */
     include?: picksInclude<ExtArgs> | null
@@ -10866,6 +11999,10 @@ export namespace Prisma {
      */
     select?: picksSelectCreateManyAndReturn<ExtArgs> | null
     /**
+     * Omit specific fields from the picks
+     */
+    omit?: picksOmit<ExtArgs> | null
+    /**
      * The data used to create many picks.
      */
     data: picksCreateManyInput | picksCreateManyInput[]
@@ -10884,6 +12021,10 @@ export namespace Prisma {
      * Select specific fields to fetch from the picks
      */
     select?: picksSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the picks
+     */
+    omit?: picksOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
@@ -10911,6 +12052,40 @@ export namespace Prisma {
      * Filter which picks to update
      */
     where?: picksWhereInput
+    /**
+     * Limit how many picks to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * picks updateManyAndReturn
+   */
+  export type picksUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the picks
+     */
+    select?: picksSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the picks
+     */
+    omit?: picksOmit<ExtArgs> | null
+    /**
+     * The data used to update picks.
+     */
+    data: XOR<picksUpdateManyMutationInput, picksUncheckedUpdateManyInput>
+    /**
+     * Filter which picks to update
+     */
+    where?: picksWhereInput
+    /**
+     * Limit how many picks to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: picksIncludeUpdateManyAndReturn<ExtArgs> | null
   }
 
   /**
@@ -10921,6 +12096,10 @@ export namespace Prisma {
      * Select specific fields to fetch from the picks
      */
     select?: picksSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the picks
+     */
+    omit?: picksOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
@@ -10949,6 +12128,10 @@ export namespace Prisma {
      */
     select?: picksSelect<ExtArgs> | null
     /**
+     * Omit specific fields from the picks
+     */
+    omit?: picksOmit<ExtArgs> | null
+    /**
      * Choose, which related nodes to fetch as well
      */
     include?: picksInclude<ExtArgs> | null
@@ -10967,6 +12150,10 @@ export namespace Prisma {
      * Filter which picks to delete
      */
     where?: picksWhereInput
+    /**
+     * Limit how many picks to delete.
+     */
+    limit?: number
   }
 
   /**
@@ -10977,6 +12164,10 @@ export namespace Prisma {
      * Select specific fields to fetch from the leaguemembers
      */
     select?: leaguemembersSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the leaguemembers
+     */
+    omit?: leaguemembersOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
@@ -10993,6 +12184,10 @@ export namespace Prisma {
      */
     select?: teamsSelect<ExtArgs> | null
     /**
+     * Omit specific fields from the teams
+     */
+    omit?: teamsOmit<ExtArgs> | null
+    /**
      * Choose, which related nodes to fetch as well
      */
     include?: teamsInclude<ExtArgs> | null
@@ -11007,6 +12202,10 @@ export namespace Prisma {
      * Select specific fields to fetch from the picks
      */
     select?: picksSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the picks
+     */
+    omit?: picksOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
@@ -11279,6 +12478,20 @@ export namespace Prisma {
     teams_superbowl_winnerToteams?: boolean | teamsDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["superbowl"]>
 
+  export type superbowlSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    pickid?: boolean
+    uid?: boolean
+    winner?: boolean
+    loser?: boolean
+    score?: boolean
+    ts?: boolean
+    season?: boolean
+    member_id?: boolean
+    teams_superbowl_loserToteams?: boolean | teamsDefaultArgs<ExtArgs>
+    leaguemembers?: boolean | superbowl$leaguemembersArgs<ExtArgs>
+    teams_superbowl_winnerToteams?: boolean | teamsDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["superbowl"]>
+
   export type superbowlSelectScalar = {
     pickid?: boolean
     uid?: boolean
@@ -11290,12 +12503,18 @@ export namespace Prisma {
     member_id?: boolean
   }
 
+  export type superbowlOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"pickid" | "uid" | "winner" | "loser" | "score" | "ts" | "season" | "member_id", ExtArgs["result"]["superbowl"]>
   export type superbowlInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     teams_superbowl_loserToteams?: boolean | teamsDefaultArgs<ExtArgs>
     leaguemembers?: boolean | superbowl$leaguemembersArgs<ExtArgs>
     teams_superbowl_winnerToteams?: boolean | teamsDefaultArgs<ExtArgs>
   }
   export type superbowlIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    teams_superbowl_loserToteams?: boolean | teamsDefaultArgs<ExtArgs>
+    leaguemembers?: boolean | superbowl$leaguemembersArgs<ExtArgs>
+    teams_superbowl_winnerToteams?: boolean | teamsDefaultArgs<ExtArgs>
+  }
+  export type superbowlIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     teams_superbowl_loserToteams?: boolean | teamsDefaultArgs<ExtArgs>
     leaguemembers?: boolean | superbowl$leaguemembersArgs<ExtArgs>
     teams_superbowl_winnerToteams?: boolean | teamsDefaultArgs<ExtArgs>
@@ -11323,12 +12542,12 @@ export namespace Prisma {
 
   type superbowlGetPayload<S extends boolean | null | undefined | superbowlDefaultArgs> = $Result.GetResult<Prisma.$superbowlPayload, S>
 
-  type superbowlCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = 
-    Omit<superbowlFindManyArgs, 'select' | 'include' | 'distinct' | 'relationLoadStrategy'> & {
+  type superbowlCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<superbowlFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
       select?: SuperbowlCountAggregateInputType | true
     }
 
-  export interface superbowlDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> {
+  export interface superbowlDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
     [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['superbowl'], meta: { name: 'superbowl' } }
     /**
      * Find zero or one Superbowl that matches the filter.
@@ -11341,10 +12560,10 @@ export namespace Prisma {
      *   }
      * })
      */
-    findUnique<T extends superbowlFindUniqueArgs>(args: SelectSubset<T, superbowlFindUniqueArgs<ExtArgs>>): Prisma__superbowlClient<$Result.GetResult<Prisma.$superbowlPayload<ExtArgs>, T, "findUnique"> | null, null, ExtArgs>
+    findUnique<T extends superbowlFindUniqueArgs>(args: SelectSubset<T, superbowlFindUniqueArgs<ExtArgs>>): Prisma__superbowlClient<$Result.GetResult<Prisma.$superbowlPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
 
     /**
-     * Find one Superbowl that matches the filter or throw an error with `error.code='P2025'` 
+     * Find one Superbowl that matches the filter or throw an error with `error.code='P2025'`
      * if no matches were found.
      * @param {superbowlFindUniqueOrThrowArgs} args - Arguments to find a Superbowl
      * @example
@@ -11355,7 +12574,7 @@ export namespace Prisma {
      *   }
      * })
      */
-    findUniqueOrThrow<T extends superbowlFindUniqueOrThrowArgs>(args: SelectSubset<T, superbowlFindUniqueOrThrowArgs<ExtArgs>>): Prisma__superbowlClient<$Result.GetResult<Prisma.$superbowlPayload<ExtArgs>, T, "findUniqueOrThrow">, never, ExtArgs>
+    findUniqueOrThrow<T extends superbowlFindUniqueOrThrowArgs>(args: SelectSubset<T, superbowlFindUniqueOrThrowArgs<ExtArgs>>): Prisma__superbowlClient<$Result.GetResult<Prisma.$superbowlPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
      * Find the first Superbowl that matches the filter.
@@ -11370,7 +12589,7 @@ export namespace Prisma {
      *   }
      * })
      */
-    findFirst<T extends superbowlFindFirstArgs>(args?: SelectSubset<T, superbowlFindFirstArgs<ExtArgs>>): Prisma__superbowlClient<$Result.GetResult<Prisma.$superbowlPayload<ExtArgs>, T, "findFirst"> | null, null, ExtArgs>
+    findFirst<T extends superbowlFindFirstArgs>(args?: SelectSubset<T, superbowlFindFirstArgs<ExtArgs>>): Prisma__superbowlClient<$Result.GetResult<Prisma.$superbowlPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
 
     /**
      * Find the first Superbowl that matches the filter or
@@ -11386,7 +12605,7 @@ export namespace Prisma {
      *   }
      * })
      */
-    findFirstOrThrow<T extends superbowlFindFirstOrThrowArgs>(args?: SelectSubset<T, superbowlFindFirstOrThrowArgs<ExtArgs>>): Prisma__superbowlClient<$Result.GetResult<Prisma.$superbowlPayload<ExtArgs>, T, "findFirstOrThrow">, never, ExtArgs>
+    findFirstOrThrow<T extends superbowlFindFirstOrThrowArgs>(args?: SelectSubset<T, superbowlFindFirstOrThrowArgs<ExtArgs>>): Prisma__superbowlClient<$Result.GetResult<Prisma.$superbowlPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
      * Find zero or more Superbowls that matches the filter.
@@ -11404,7 +12623,7 @@ export namespace Prisma {
      * const superbowlWithPickidOnly = await prisma.superbowl.findMany({ select: { pickid: true } })
      * 
      */
-    findMany<T extends superbowlFindManyArgs>(args?: SelectSubset<T, superbowlFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$superbowlPayload<ExtArgs>, T, "findMany">>
+    findMany<T extends superbowlFindManyArgs>(args?: SelectSubset<T, superbowlFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$superbowlPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
 
     /**
      * Create a Superbowl.
@@ -11418,7 +12637,7 @@ export namespace Prisma {
      * })
      * 
      */
-    create<T extends superbowlCreateArgs>(args: SelectSubset<T, superbowlCreateArgs<ExtArgs>>): Prisma__superbowlClient<$Result.GetResult<Prisma.$superbowlPayload<ExtArgs>, T, "create">, never, ExtArgs>
+    create<T extends superbowlCreateArgs>(args: SelectSubset<T, superbowlCreateArgs<ExtArgs>>): Prisma__superbowlClient<$Result.GetResult<Prisma.$superbowlPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
      * Create many Superbowls.
@@ -11446,7 +12665,7 @@ export namespace Prisma {
      * })
      * 
      * // Create many Superbowls and only return the `pickid`
-     * const superbowlWithPickidOnly = await prisma.superbowl.createManyAndReturn({ 
+     * const superbowlWithPickidOnly = await prisma.superbowl.createManyAndReturn({
      *   select: { pickid: true },
      *   data: [
      *     // ... provide data here
@@ -11456,7 +12675,7 @@ export namespace Prisma {
      * Read more here: https://pris.ly/d/null-undefined
      * 
      */
-    createManyAndReturn<T extends superbowlCreateManyAndReturnArgs>(args?: SelectSubset<T, superbowlCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$superbowlPayload<ExtArgs>, T, "createManyAndReturn">>
+    createManyAndReturn<T extends superbowlCreateManyAndReturnArgs>(args?: SelectSubset<T, superbowlCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$superbowlPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
 
     /**
      * Delete a Superbowl.
@@ -11470,7 +12689,7 @@ export namespace Prisma {
      * })
      * 
      */
-    delete<T extends superbowlDeleteArgs>(args: SelectSubset<T, superbowlDeleteArgs<ExtArgs>>): Prisma__superbowlClient<$Result.GetResult<Prisma.$superbowlPayload<ExtArgs>, T, "delete">, never, ExtArgs>
+    delete<T extends superbowlDeleteArgs>(args: SelectSubset<T, superbowlDeleteArgs<ExtArgs>>): Prisma__superbowlClient<$Result.GetResult<Prisma.$superbowlPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
      * Update one Superbowl.
@@ -11487,7 +12706,7 @@ export namespace Prisma {
      * })
      * 
      */
-    update<T extends superbowlUpdateArgs>(args: SelectSubset<T, superbowlUpdateArgs<ExtArgs>>): Prisma__superbowlClient<$Result.GetResult<Prisma.$superbowlPayload<ExtArgs>, T, "update">, never, ExtArgs>
+    update<T extends superbowlUpdateArgs>(args: SelectSubset<T, superbowlUpdateArgs<ExtArgs>>): Prisma__superbowlClient<$Result.GetResult<Prisma.$superbowlPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
      * Delete zero or more Superbowls.
@@ -11523,6 +12742,36 @@ export namespace Prisma {
     updateMany<T extends superbowlUpdateManyArgs>(args: SelectSubset<T, superbowlUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
     /**
+     * Update zero or more Superbowls and returns the data updated in the database.
+     * @param {superbowlUpdateManyAndReturnArgs} args - Arguments to update many Superbowls.
+     * @example
+     * // Update many Superbowls
+     * const superbowl = await prisma.superbowl.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more Superbowls and only return the `pickid`
+     * const superbowlWithPickidOnly = await prisma.superbowl.updateManyAndReturn({
+     *   select: { pickid: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends superbowlUpdateManyAndReturnArgs>(args: SelectSubset<T, superbowlUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$superbowlPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
      * Create or update one Superbowl.
      * @param {superbowlUpsertArgs} args - Arguments to update or create a Superbowl.
      * @example
@@ -11539,7 +12788,7 @@ export namespace Prisma {
      *   }
      * })
      */
-    upsert<T extends superbowlUpsertArgs>(args: SelectSubset<T, superbowlUpsertArgs<ExtArgs>>): Prisma__superbowlClient<$Result.GetResult<Prisma.$superbowlPayload<ExtArgs>, T, "upsert">, never, ExtArgs>
+    upsert<T extends superbowlUpsertArgs>(args: SelectSubset<T, superbowlUpsertArgs<ExtArgs>>): Prisma__superbowlClient<$Result.GetResult<Prisma.$superbowlPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
 
     /**
@@ -11679,11 +12928,11 @@ export namespace Prisma {
    * Because we want to prevent naming conflicts as mentioned in
    * https://github.com/prisma/prisma-client-js/issues/707
    */
-  export interface Prisma__superbowlClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
+  export interface Prisma__superbowlClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
-    teams_superbowl_loserToteams<T extends teamsDefaultArgs<ExtArgs> = {}>(args?: Subset<T, teamsDefaultArgs<ExtArgs>>): Prisma__teamsClient<$Result.GetResult<Prisma.$teamsPayload<ExtArgs>, T, "findUniqueOrThrow"> | Null, Null, ExtArgs>
-    leaguemembers<T extends superbowl$leaguemembersArgs<ExtArgs> = {}>(args?: Subset<T, superbowl$leaguemembersArgs<ExtArgs>>): Prisma__leaguemembersClient<$Result.GetResult<Prisma.$leaguemembersPayload<ExtArgs>, T, "findUniqueOrThrow"> | null, null, ExtArgs>
-    teams_superbowl_winnerToteams<T extends teamsDefaultArgs<ExtArgs> = {}>(args?: Subset<T, teamsDefaultArgs<ExtArgs>>): Prisma__teamsClient<$Result.GetResult<Prisma.$teamsPayload<ExtArgs>, T, "findUniqueOrThrow"> | Null, Null, ExtArgs>
+    teams_superbowl_loserToteams<T extends teamsDefaultArgs<ExtArgs> = {}>(args?: Subset<T, teamsDefaultArgs<ExtArgs>>): Prisma__teamsClient<$Result.GetResult<Prisma.$teamsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    leaguemembers<T extends superbowl$leaguemembersArgs<ExtArgs> = {}>(args?: Subset<T, superbowl$leaguemembersArgs<ExtArgs>>): Prisma__leaguemembersClient<$Result.GetResult<Prisma.$leaguemembersPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    teams_superbowl_winnerToteams<T extends teamsDefaultArgs<ExtArgs> = {}>(args?: Subset<T, teamsDefaultArgs<ExtArgs>>): Prisma__teamsClient<$Result.GetResult<Prisma.$teamsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -11711,7 +12960,7 @@ export namespace Prisma {
 
   /**
    * Fields of the superbowl model
-   */ 
+   */
   interface superbowlFieldRefs {
     readonly pickid: FieldRef<"superbowl", 'Int'>
     readonly uid: FieldRef<"superbowl", 'Int'>
@@ -11734,6 +12983,10 @@ export namespace Prisma {
      */
     select?: superbowlSelect<ExtArgs> | null
     /**
+     * Omit specific fields from the superbowl
+     */
+    omit?: superbowlOmit<ExtArgs> | null
+    /**
      * Choose, which related nodes to fetch as well
      */
     include?: superbowlInclude<ExtArgs> | null
@@ -11753,6 +13006,10 @@ export namespace Prisma {
      */
     select?: superbowlSelect<ExtArgs> | null
     /**
+     * Omit specific fields from the superbowl
+     */
+    omit?: superbowlOmit<ExtArgs> | null
+    /**
      * Choose, which related nodes to fetch as well
      */
     include?: superbowlInclude<ExtArgs> | null
@@ -11771,6 +13028,10 @@ export namespace Prisma {
      * Select specific fields to fetch from the superbowl
      */
     select?: superbowlSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the superbowl
+     */
+    omit?: superbowlOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
@@ -11821,6 +13082,10 @@ export namespace Prisma {
      */
     select?: superbowlSelect<ExtArgs> | null
     /**
+     * Omit specific fields from the superbowl
+     */
+    omit?: superbowlOmit<ExtArgs> | null
+    /**
      * Choose, which related nodes to fetch as well
      */
     include?: superbowlInclude<ExtArgs> | null
@@ -11870,6 +13135,10 @@ export namespace Prisma {
      */
     select?: superbowlSelect<ExtArgs> | null
     /**
+     * Omit specific fields from the superbowl
+     */
+    omit?: superbowlOmit<ExtArgs> | null
+    /**
      * Choose, which related nodes to fetch as well
      */
     include?: superbowlInclude<ExtArgs> | null
@@ -11914,6 +13183,10 @@ export namespace Prisma {
      */
     select?: superbowlSelect<ExtArgs> | null
     /**
+     * Omit specific fields from the superbowl
+     */
+    omit?: superbowlOmit<ExtArgs> | null
+    /**
      * Choose, which related nodes to fetch as well
      */
     include?: superbowlInclude<ExtArgs> | null
@@ -11944,6 +13217,10 @@ export namespace Prisma {
      */
     select?: superbowlSelectCreateManyAndReturn<ExtArgs> | null
     /**
+     * Omit specific fields from the superbowl
+     */
+    omit?: superbowlOmit<ExtArgs> | null
+    /**
      * The data used to create many superbowls.
      */
     data: superbowlCreateManyInput | superbowlCreateManyInput[]
@@ -11962,6 +13239,10 @@ export namespace Prisma {
      * Select specific fields to fetch from the superbowl
      */
     select?: superbowlSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the superbowl
+     */
+    omit?: superbowlOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
@@ -11989,6 +13270,40 @@ export namespace Prisma {
      * Filter which superbowls to update
      */
     where?: superbowlWhereInput
+    /**
+     * Limit how many superbowls to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * superbowl updateManyAndReturn
+   */
+  export type superbowlUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the superbowl
+     */
+    select?: superbowlSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the superbowl
+     */
+    omit?: superbowlOmit<ExtArgs> | null
+    /**
+     * The data used to update superbowls.
+     */
+    data: XOR<superbowlUpdateManyMutationInput, superbowlUncheckedUpdateManyInput>
+    /**
+     * Filter which superbowls to update
+     */
+    where?: superbowlWhereInput
+    /**
+     * Limit how many superbowls to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: superbowlIncludeUpdateManyAndReturn<ExtArgs> | null
   }
 
   /**
@@ -11999,6 +13314,10 @@ export namespace Prisma {
      * Select specific fields to fetch from the superbowl
      */
     select?: superbowlSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the superbowl
+     */
+    omit?: superbowlOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
@@ -12027,6 +13346,10 @@ export namespace Prisma {
      */
     select?: superbowlSelect<ExtArgs> | null
     /**
+     * Omit specific fields from the superbowl
+     */
+    omit?: superbowlOmit<ExtArgs> | null
+    /**
      * Choose, which related nodes to fetch as well
      */
     include?: superbowlInclude<ExtArgs> | null
@@ -12045,6 +13368,10 @@ export namespace Prisma {
      * Filter which superbowls to delete
      */
     where?: superbowlWhereInput
+    /**
+     * Limit how many superbowls to delete.
+     */
+    limit?: number
   }
 
   /**
@@ -12055,6 +13382,10 @@ export namespace Prisma {
      * Select specific fields to fetch from the leaguemembers
      */
     select?: leaguemembersSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the leaguemembers
+     */
+    omit?: leaguemembersOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
@@ -12070,6 +13401,10 @@ export namespace Prisma {
      * Select specific fields to fetch from the superbowl
      */
     select?: superbowlSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the superbowl
+     */
+    omit?: superbowlOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
@@ -12319,6 +13654,16 @@ export namespace Prisma {
     ts?: boolean
   }, ExtArgs["result"]["superbowlsquares"]>
 
+  export type superbowlsquaresSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    square_id?: boolean
+    uid?: boolean
+    league_id?: boolean
+    afc_score_index?: boolean
+    nfc_score_index?: boolean
+    correct?: boolean
+    ts?: boolean
+  }, ExtArgs["result"]["superbowlsquares"]>
+
   export type superbowlsquaresSelectScalar = {
     square_id?: boolean
     uid?: boolean
@@ -12329,6 +13674,7 @@ export namespace Prisma {
     ts?: boolean
   }
 
+  export type superbowlsquaresOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"square_id" | "uid" | "league_id" | "afc_score_index" | "nfc_score_index" | "correct" | "ts", ExtArgs["result"]["superbowlsquares"]>
 
   export type $superbowlsquaresPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "superbowlsquares"
@@ -12347,12 +13693,12 @@ export namespace Prisma {
 
   type superbowlsquaresGetPayload<S extends boolean | null | undefined | superbowlsquaresDefaultArgs> = $Result.GetResult<Prisma.$superbowlsquaresPayload, S>
 
-  type superbowlsquaresCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = 
-    Omit<superbowlsquaresFindManyArgs, 'select' | 'include' | 'distinct' | 'relationLoadStrategy'> & {
+  type superbowlsquaresCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<superbowlsquaresFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
       select?: SuperbowlsquaresCountAggregateInputType | true
     }
 
-  export interface superbowlsquaresDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> {
+  export interface superbowlsquaresDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
     [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['superbowlsquares'], meta: { name: 'superbowlsquares' } }
     /**
      * Find zero or one Superbowlsquares that matches the filter.
@@ -12365,10 +13711,10 @@ export namespace Prisma {
      *   }
      * })
      */
-    findUnique<T extends superbowlsquaresFindUniqueArgs>(args: SelectSubset<T, superbowlsquaresFindUniqueArgs<ExtArgs>>): Prisma__superbowlsquaresClient<$Result.GetResult<Prisma.$superbowlsquaresPayload<ExtArgs>, T, "findUnique"> | null, null, ExtArgs>
+    findUnique<T extends superbowlsquaresFindUniqueArgs>(args: SelectSubset<T, superbowlsquaresFindUniqueArgs<ExtArgs>>): Prisma__superbowlsquaresClient<$Result.GetResult<Prisma.$superbowlsquaresPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
 
     /**
-     * Find one Superbowlsquares that matches the filter or throw an error with `error.code='P2025'` 
+     * Find one Superbowlsquares that matches the filter or throw an error with `error.code='P2025'`
      * if no matches were found.
      * @param {superbowlsquaresFindUniqueOrThrowArgs} args - Arguments to find a Superbowlsquares
      * @example
@@ -12379,7 +13725,7 @@ export namespace Prisma {
      *   }
      * })
      */
-    findUniqueOrThrow<T extends superbowlsquaresFindUniqueOrThrowArgs>(args: SelectSubset<T, superbowlsquaresFindUniqueOrThrowArgs<ExtArgs>>): Prisma__superbowlsquaresClient<$Result.GetResult<Prisma.$superbowlsquaresPayload<ExtArgs>, T, "findUniqueOrThrow">, never, ExtArgs>
+    findUniqueOrThrow<T extends superbowlsquaresFindUniqueOrThrowArgs>(args: SelectSubset<T, superbowlsquaresFindUniqueOrThrowArgs<ExtArgs>>): Prisma__superbowlsquaresClient<$Result.GetResult<Prisma.$superbowlsquaresPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
      * Find the first Superbowlsquares that matches the filter.
@@ -12394,7 +13740,7 @@ export namespace Prisma {
      *   }
      * })
      */
-    findFirst<T extends superbowlsquaresFindFirstArgs>(args?: SelectSubset<T, superbowlsquaresFindFirstArgs<ExtArgs>>): Prisma__superbowlsquaresClient<$Result.GetResult<Prisma.$superbowlsquaresPayload<ExtArgs>, T, "findFirst"> | null, null, ExtArgs>
+    findFirst<T extends superbowlsquaresFindFirstArgs>(args?: SelectSubset<T, superbowlsquaresFindFirstArgs<ExtArgs>>): Prisma__superbowlsquaresClient<$Result.GetResult<Prisma.$superbowlsquaresPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
 
     /**
      * Find the first Superbowlsquares that matches the filter or
@@ -12410,7 +13756,7 @@ export namespace Prisma {
      *   }
      * })
      */
-    findFirstOrThrow<T extends superbowlsquaresFindFirstOrThrowArgs>(args?: SelectSubset<T, superbowlsquaresFindFirstOrThrowArgs<ExtArgs>>): Prisma__superbowlsquaresClient<$Result.GetResult<Prisma.$superbowlsquaresPayload<ExtArgs>, T, "findFirstOrThrow">, never, ExtArgs>
+    findFirstOrThrow<T extends superbowlsquaresFindFirstOrThrowArgs>(args?: SelectSubset<T, superbowlsquaresFindFirstOrThrowArgs<ExtArgs>>): Prisma__superbowlsquaresClient<$Result.GetResult<Prisma.$superbowlsquaresPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
      * Find zero or more Superbowlsquares that matches the filter.
@@ -12428,7 +13774,7 @@ export namespace Prisma {
      * const superbowlsquaresWithSquare_idOnly = await prisma.superbowlsquares.findMany({ select: { square_id: true } })
      * 
      */
-    findMany<T extends superbowlsquaresFindManyArgs>(args?: SelectSubset<T, superbowlsquaresFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$superbowlsquaresPayload<ExtArgs>, T, "findMany">>
+    findMany<T extends superbowlsquaresFindManyArgs>(args?: SelectSubset<T, superbowlsquaresFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$superbowlsquaresPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
 
     /**
      * Create a Superbowlsquares.
@@ -12442,7 +13788,7 @@ export namespace Prisma {
      * })
      * 
      */
-    create<T extends superbowlsquaresCreateArgs>(args: SelectSubset<T, superbowlsquaresCreateArgs<ExtArgs>>): Prisma__superbowlsquaresClient<$Result.GetResult<Prisma.$superbowlsquaresPayload<ExtArgs>, T, "create">, never, ExtArgs>
+    create<T extends superbowlsquaresCreateArgs>(args: SelectSubset<T, superbowlsquaresCreateArgs<ExtArgs>>): Prisma__superbowlsquaresClient<$Result.GetResult<Prisma.$superbowlsquaresPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
      * Create many Superbowlsquares.
@@ -12470,7 +13816,7 @@ export namespace Prisma {
      * })
      * 
      * // Create many Superbowlsquares and only return the `square_id`
-     * const superbowlsquaresWithSquare_idOnly = await prisma.superbowlsquares.createManyAndReturn({ 
+     * const superbowlsquaresWithSquare_idOnly = await prisma.superbowlsquares.createManyAndReturn({
      *   select: { square_id: true },
      *   data: [
      *     // ... provide data here
@@ -12480,7 +13826,7 @@ export namespace Prisma {
      * Read more here: https://pris.ly/d/null-undefined
      * 
      */
-    createManyAndReturn<T extends superbowlsquaresCreateManyAndReturnArgs>(args?: SelectSubset<T, superbowlsquaresCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$superbowlsquaresPayload<ExtArgs>, T, "createManyAndReturn">>
+    createManyAndReturn<T extends superbowlsquaresCreateManyAndReturnArgs>(args?: SelectSubset<T, superbowlsquaresCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$superbowlsquaresPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
 
     /**
      * Delete a Superbowlsquares.
@@ -12494,7 +13840,7 @@ export namespace Prisma {
      * })
      * 
      */
-    delete<T extends superbowlsquaresDeleteArgs>(args: SelectSubset<T, superbowlsquaresDeleteArgs<ExtArgs>>): Prisma__superbowlsquaresClient<$Result.GetResult<Prisma.$superbowlsquaresPayload<ExtArgs>, T, "delete">, never, ExtArgs>
+    delete<T extends superbowlsquaresDeleteArgs>(args: SelectSubset<T, superbowlsquaresDeleteArgs<ExtArgs>>): Prisma__superbowlsquaresClient<$Result.GetResult<Prisma.$superbowlsquaresPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
      * Update one Superbowlsquares.
@@ -12511,7 +13857,7 @@ export namespace Prisma {
      * })
      * 
      */
-    update<T extends superbowlsquaresUpdateArgs>(args: SelectSubset<T, superbowlsquaresUpdateArgs<ExtArgs>>): Prisma__superbowlsquaresClient<$Result.GetResult<Prisma.$superbowlsquaresPayload<ExtArgs>, T, "update">, never, ExtArgs>
+    update<T extends superbowlsquaresUpdateArgs>(args: SelectSubset<T, superbowlsquaresUpdateArgs<ExtArgs>>): Prisma__superbowlsquaresClient<$Result.GetResult<Prisma.$superbowlsquaresPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
      * Delete zero or more Superbowlsquares.
@@ -12547,6 +13893,36 @@ export namespace Prisma {
     updateMany<T extends superbowlsquaresUpdateManyArgs>(args: SelectSubset<T, superbowlsquaresUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
     /**
+     * Update zero or more Superbowlsquares and returns the data updated in the database.
+     * @param {superbowlsquaresUpdateManyAndReturnArgs} args - Arguments to update many Superbowlsquares.
+     * @example
+     * // Update many Superbowlsquares
+     * const superbowlsquares = await prisma.superbowlsquares.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more Superbowlsquares and only return the `square_id`
+     * const superbowlsquaresWithSquare_idOnly = await prisma.superbowlsquares.updateManyAndReturn({
+     *   select: { square_id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends superbowlsquaresUpdateManyAndReturnArgs>(args: SelectSubset<T, superbowlsquaresUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$superbowlsquaresPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
      * Create or update one Superbowlsquares.
      * @param {superbowlsquaresUpsertArgs} args - Arguments to update or create a Superbowlsquares.
      * @example
@@ -12563,7 +13939,7 @@ export namespace Prisma {
      *   }
      * })
      */
-    upsert<T extends superbowlsquaresUpsertArgs>(args: SelectSubset<T, superbowlsquaresUpsertArgs<ExtArgs>>): Prisma__superbowlsquaresClient<$Result.GetResult<Prisma.$superbowlsquaresPayload<ExtArgs>, T, "upsert">, never, ExtArgs>
+    upsert<T extends superbowlsquaresUpsertArgs>(args: SelectSubset<T, superbowlsquaresUpsertArgs<ExtArgs>>): Prisma__superbowlsquaresClient<$Result.GetResult<Prisma.$superbowlsquaresPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
 
     /**
@@ -12703,7 +14079,7 @@ export namespace Prisma {
    * Because we want to prevent naming conflicts as mentioned in
    * https://github.com/prisma/prisma-client-js/issues/707
    */
-  export interface Prisma__superbowlsquaresClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
+  export interface Prisma__superbowlsquaresClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -12732,7 +14108,7 @@ export namespace Prisma {
 
   /**
    * Fields of the superbowlsquares model
-   */ 
+   */
   interface superbowlsquaresFieldRefs {
     readonly square_id: FieldRef<"superbowlsquares", 'Int'>
     readonly uid: FieldRef<"superbowlsquares", 'Int'>
@@ -12754,6 +14130,10 @@ export namespace Prisma {
      */
     select?: superbowlsquaresSelect<ExtArgs> | null
     /**
+     * Omit specific fields from the superbowlsquares
+     */
+    omit?: superbowlsquaresOmit<ExtArgs> | null
+    /**
      * Filter, which superbowlsquares to fetch.
      */
     where: superbowlsquaresWhereUniqueInput
@@ -12769,6 +14149,10 @@ export namespace Prisma {
      */
     select?: superbowlsquaresSelect<ExtArgs> | null
     /**
+     * Omit specific fields from the superbowlsquares
+     */
+    omit?: superbowlsquaresOmit<ExtArgs> | null
+    /**
      * Filter, which superbowlsquares to fetch.
      */
     where: superbowlsquaresWhereUniqueInput
@@ -12783,6 +14167,10 @@ export namespace Prisma {
      * Select specific fields to fetch from the superbowlsquares
      */
     select?: superbowlsquaresSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the superbowlsquares
+     */
+    omit?: superbowlsquaresOmit<ExtArgs> | null
     /**
      * Filter, which superbowlsquares to fetch.
      */
@@ -12829,6 +14217,10 @@ export namespace Prisma {
      */
     select?: superbowlsquaresSelect<ExtArgs> | null
     /**
+     * Omit specific fields from the superbowlsquares
+     */
+    omit?: superbowlsquaresOmit<ExtArgs> | null
+    /**
      * Filter, which superbowlsquares to fetch.
      */
     where?: superbowlsquaresWhereInput
@@ -12874,6 +14266,10 @@ export namespace Prisma {
      */
     select?: superbowlsquaresSelect<ExtArgs> | null
     /**
+     * Omit specific fields from the superbowlsquares
+     */
+    omit?: superbowlsquaresOmit<ExtArgs> | null
+    /**
      * Filter, which superbowlsquares to fetch.
      */
     where?: superbowlsquaresWhereInput
@@ -12914,6 +14310,10 @@ export namespace Prisma {
      */
     select?: superbowlsquaresSelect<ExtArgs> | null
     /**
+     * Omit specific fields from the superbowlsquares
+     */
+    omit?: superbowlsquaresOmit<ExtArgs> | null
+    /**
      * The data needed to create a superbowlsquares.
      */
     data: XOR<superbowlsquaresCreateInput, superbowlsquaresUncheckedCreateInput>
@@ -12940,6 +14340,10 @@ export namespace Prisma {
      */
     select?: superbowlsquaresSelectCreateManyAndReturn<ExtArgs> | null
     /**
+     * Omit specific fields from the superbowlsquares
+     */
+    omit?: superbowlsquaresOmit<ExtArgs> | null
+    /**
      * The data used to create many superbowlsquares.
      */
     data: superbowlsquaresCreateManyInput | superbowlsquaresCreateManyInput[]
@@ -12954,6 +14358,10 @@ export namespace Prisma {
      * Select specific fields to fetch from the superbowlsquares
      */
     select?: superbowlsquaresSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the superbowlsquares
+     */
+    omit?: superbowlsquaresOmit<ExtArgs> | null
     /**
      * The data needed to update a superbowlsquares.
      */
@@ -12977,6 +14385,36 @@ export namespace Prisma {
      * Filter which superbowlsquares to update
      */
     where?: superbowlsquaresWhereInput
+    /**
+     * Limit how many superbowlsquares to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * superbowlsquares updateManyAndReturn
+   */
+  export type superbowlsquaresUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the superbowlsquares
+     */
+    select?: superbowlsquaresSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the superbowlsquares
+     */
+    omit?: superbowlsquaresOmit<ExtArgs> | null
+    /**
+     * The data used to update superbowlsquares.
+     */
+    data: XOR<superbowlsquaresUpdateManyMutationInput, superbowlsquaresUncheckedUpdateManyInput>
+    /**
+     * Filter which superbowlsquares to update
+     */
+    where?: superbowlsquaresWhereInput
+    /**
+     * Limit how many superbowlsquares to update.
+     */
+    limit?: number
   }
 
   /**
@@ -12987,6 +14425,10 @@ export namespace Prisma {
      * Select specific fields to fetch from the superbowlsquares
      */
     select?: superbowlsquaresSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the superbowlsquares
+     */
+    omit?: superbowlsquaresOmit<ExtArgs> | null
     /**
      * The filter to search for the superbowlsquares to update in case it exists.
      */
@@ -13011,6 +14453,10 @@ export namespace Prisma {
      */
     select?: superbowlsquaresSelect<ExtArgs> | null
     /**
+     * Omit specific fields from the superbowlsquares
+     */
+    omit?: superbowlsquaresOmit<ExtArgs> | null
+    /**
      * Filter which superbowlsquares to delete.
      */
     where: superbowlsquaresWhereUniqueInput
@@ -13025,6 +14471,10 @@ export namespace Prisma {
      * Filter which superbowlsquares to delete
      */
     where?: superbowlsquaresWhereInput
+    /**
+     * Limit how many superbowlsquares to delete.
+     */
+    limit?: number
   }
 
   /**
@@ -13035,6 +14485,10 @@ export namespace Prisma {
      * Select specific fields to fetch from the superbowlsquares
      */
     select?: superbowlsquaresSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the superbowlsquares
+     */
+    omit?: superbowlsquaresOmit<ExtArgs> | null
   }
 
 
@@ -13279,6 +14733,17 @@ export namespace Prisma {
     tertiary_color?: boolean
   }, ExtArgs["result"]["teams"]>
 
+  export type teamsSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    teamid?: boolean
+    abbrev?: boolean
+    loc?: boolean
+    name?: boolean
+    conference?: boolean
+    primary_color?: boolean
+    secondary_color?: boolean
+    tertiary_color?: boolean
+  }, ExtArgs["result"]["teams"]>
+
   export type teamsSelectScalar = {
     teamid?: boolean
     abbrev?: boolean
@@ -13290,6 +14755,7 @@ export namespace Prisma {
     tertiary_color?: boolean
   }
 
+  export type teamsOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"teamid" | "abbrev" | "loc" | "name" | "conference" | "primary_color" | "secondary_color" | "tertiary_color", ExtArgs["result"]["teams"]>
   export type teamsInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     games_games_homeToteams?: boolean | teams$games_games_homeToteamsArgs<ExtArgs>
     games_games_awayToteams?: boolean | teams$games_games_awayToteamsArgs<ExtArgs>
@@ -13299,6 +14765,7 @@ export namespace Prisma {
     _count?: boolean | TeamsCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type teamsIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
+  export type teamsIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
 
   export type $teamsPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "teams"
@@ -13324,12 +14791,12 @@ export namespace Prisma {
 
   type teamsGetPayload<S extends boolean | null | undefined | teamsDefaultArgs> = $Result.GetResult<Prisma.$teamsPayload, S>
 
-  type teamsCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = 
-    Omit<teamsFindManyArgs, 'select' | 'include' | 'distinct' | 'relationLoadStrategy'> & {
+  type teamsCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<teamsFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
       select?: TeamsCountAggregateInputType | true
     }
 
-  export interface teamsDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> {
+  export interface teamsDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
     [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['teams'], meta: { name: 'teams' } }
     /**
      * Find zero or one Teams that matches the filter.
@@ -13342,10 +14809,10 @@ export namespace Prisma {
      *   }
      * })
      */
-    findUnique<T extends teamsFindUniqueArgs>(args: SelectSubset<T, teamsFindUniqueArgs<ExtArgs>>): Prisma__teamsClient<$Result.GetResult<Prisma.$teamsPayload<ExtArgs>, T, "findUnique"> | null, null, ExtArgs>
+    findUnique<T extends teamsFindUniqueArgs>(args: SelectSubset<T, teamsFindUniqueArgs<ExtArgs>>): Prisma__teamsClient<$Result.GetResult<Prisma.$teamsPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
 
     /**
-     * Find one Teams that matches the filter or throw an error with `error.code='P2025'` 
+     * Find one Teams that matches the filter or throw an error with `error.code='P2025'`
      * if no matches were found.
      * @param {teamsFindUniqueOrThrowArgs} args - Arguments to find a Teams
      * @example
@@ -13356,7 +14823,7 @@ export namespace Prisma {
      *   }
      * })
      */
-    findUniqueOrThrow<T extends teamsFindUniqueOrThrowArgs>(args: SelectSubset<T, teamsFindUniqueOrThrowArgs<ExtArgs>>): Prisma__teamsClient<$Result.GetResult<Prisma.$teamsPayload<ExtArgs>, T, "findUniqueOrThrow">, never, ExtArgs>
+    findUniqueOrThrow<T extends teamsFindUniqueOrThrowArgs>(args: SelectSubset<T, teamsFindUniqueOrThrowArgs<ExtArgs>>): Prisma__teamsClient<$Result.GetResult<Prisma.$teamsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
      * Find the first Teams that matches the filter.
@@ -13371,7 +14838,7 @@ export namespace Prisma {
      *   }
      * })
      */
-    findFirst<T extends teamsFindFirstArgs>(args?: SelectSubset<T, teamsFindFirstArgs<ExtArgs>>): Prisma__teamsClient<$Result.GetResult<Prisma.$teamsPayload<ExtArgs>, T, "findFirst"> | null, null, ExtArgs>
+    findFirst<T extends teamsFindFirstArgs>(args?: SelectSubset<T, teamsFindFirstArgs<ExtArgs>>): Prisma__teamsClient<$Result.GetResult<Prisma.$teamsPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
 
     /**
      * Find the first Teams that matches the filter or
@@ -13387,7 +14854,7 @@ export namespace Prisma {
      *   }
      * })
      */
-    findFirstOrThrow<T extends teamsFindFirstOrThrowArgs>(args?: SelectSubset<T, teamsFindFirstOrThrowArgs<ExtArgs>>): Prisma__teamsClient<$Result.GetResult<Prisma.$teamsPayload<ExtArgs>, T, "findFirstOrThrow">, never, ExtArgs>
+    findFirstOrThrow<T extends teamsFindFirstOrThrowArgs>(args?: SelectSubset<T, teamsFindFirstOrThrowArgs<ExtArgs>>): Prisma__teamsClient<$Result.GetResult<Prisma.$teamsPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
      * Find zero or more Teams that matches the filter.
@@ -13405,7 +14872,7 @@ export namespace Prisma {
      * const teamsWithTeamidOnly = await prisma.teams.findMany({ select: { teamid: true } })
      * 
      */
-    findMany<T extends teamsFindManyArgs>(args?: SelectSubset<T, teamsFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$teamsPayload<ExtArgs>, T, "findMany">>
+    findMany<T extends teamsFindManyArgs>(args?: SelectSubset<T, teamsFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$teamsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
 
     /**
      * Create a Teams.
@@ -13419,7 +14886,7 @@ export namespace Prisma {
      * })
      * 
      */
-    create<T extends teamsCreateArgs>(args: SelectSubset<T, teamsCreateArgs<ExtArgs>>): Prisma__teamsClient<$Result.GetResult<Prisma.$teamsPayload<ExtArgs>, T, "create">, never, ExtArgs>
+    create<T extends teamsCreateArgs>(args: SelectSubset<T, teamsCreateArgs<ExtArgs>>): Prisma__teamsClient<$Result.GetResult<Prisma.$teamsPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
      * Create many Teams.
@@ -13447,7 +14914,7 @@ export namespace Prisma {
      * })
      * 
      * // Create many Teams and only return the `teamid`
-     * const teamsWithTeamidOnly = await prisma.teams.createManyAndReturn({ 
+     * const teamsWithTeamidOnly = await prisma.teams.createManyAndReturn({
      *   select: { teamid: true },
      *   data: [
      *     // ... provide data here
@@ -13457,7 +14924,7 @@ export namespace Prisma {
      * Read more here: https://pris.ly/d/null-undefined
      * 
      */
-    createManyAndReturn<T extends teamsCreateManyAndReturnArgs>(args?: SelectSubset<T, teamsCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$teamsPayload<ExtArgs>, T, "createManyAndReturn">>
+    createManyAndReturn<T extends teamsCreateManyAndReturnArgs>(args?: SelectSubset<T, teamsCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$teamsPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
 
     /**
      * Delete a Teams.
@@ -13471,7 +14938,7 @@ export namespace Prisma {
      * })
      * 
      */
-    delete<T extends teamsDeleteArgs>(args: SelectSubset<T, teamsDeleteArgs<ExtArgs>>): Prisma__teamsClient<$Result.GetResult<Prisma.$teamsPayload<ExtArgs>, T, "delete">, never, ExtArgs>
+    delete<T extends teamsDeleteArgs>(args: SelectSubset<T, teamsDeleteArgs<ExtArgs>>): Prisma__teamsClient<$Result.GetResult<Prisma.$teamsPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
      * Update one Teams.
@@ -13488,7 +14955,7 @@ export namespace Prisma {
      * })
      * 
      */
-    update<T extends teamsUpdateArgs>(args: SelectSubset<T, teamsUpdateArgs<ExtArgs>>): Prisma__teamsClient<$Result.GetResult<Prisma.$teamsPayload<ExtArgs>, T, "update">, never, ExtArgs>
+    update<T extends teamsUpdateArgs>(args: SelectSubset<T, teamsUpdateArgs<ExtArgs>>): Prisma__teamsClient<$Result.GetResult<Prisma.$teamsPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
      * Delete zero or more Teams.
@@ -13524,6 +14991,36 @@ export namespace Prisma {
     updateMany<T extends teamsUpdateManyArgs>(args: SelectSubset<T, teamsUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
     /**
+     * Update zero or more Teams and returns the data updated in the database.
+     * @param {teamsUpdateManyAndReturnArgs} args - Arguments to update many Teams.
+     * @example
+     * // Update many Teams
+     * const teams = await prisma.teams.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more Teams and only return the `teamid`
+     * const teamsWithTeamidOnly = await prisma.teams.updateManyAndReturn({
+     *   select: { teamid: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends teamsUpdateManyAndReturnArgs>(args: SelectSubset<T, teamsUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$teamsPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
      * Create or update one Teams.
      * @param {teamsUpsertArgs} args - Arguments to update or create a Teams.
      * @example
@@ -13540,7 +15037,7 @@ export namespace Prisma {
      *   }
      * })
      */
-    upsert<T extends teamsUpsertArgs>(args: SelectSubset<T, teamsUpsertArgs<ExtArgs>>): Prisma__teamsClient<$Result.GetResult<Prisma.$teamsPayload<ExtArgs>, T, "upsert">, never, ExtArgs>
+    upsert<T extends teamsUpsertArgs>(args: SelectSubset<T, teamsUpsertArgs<ExtArgs>>): Prisma__teamsClient<$Result.GetResult<Prisma.$teamsPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
 
     /**
@@ -13680,13 +15177,13 @@ export namespace Prisma {
    * Because we want to prevent naming conflicts as mentioned in
    * https://github.com/prisma/prisma-client-js/issues/707
    */
-  export interface Prisma__teamsClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
+  export interface Prisma__teamsClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
-    games_games_homeToteams<T extends teams$games_games_homeToteamsArgs<ExtArgs> = {}>(args?: Subset<T, teams$games_games_homeToteamsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$gamesPayload<ExtArgs>, T, "findMany"> | Null>
-    games_games_awayToteams<T extends teams$games_games_awayToteamsArgs<ExtArgs> = {}>(args?: Subset<T, teams$games_games_awayToteamsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$gamesPayload<ExtArgs>, T, "findMany"> | Null>
-    picks<T extends teams$picksArgs<ExtArgs> = {}>(args?: Subset<T, teams$picksArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$picksPayload<ExtArgs>, T, "findMany"> | Null>
-    superbowl_superbowl_loserToteams<T extends teams$superbowl_superbowl_loserToteamsArgs<ExtArgs> = {}>(args?: Subset<T, teams$superbowl_superbowl_loserToteamsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$superbowlPayload<ExtArgs>, T, "findMany"> | Null>
-    superbowl_superbowl_winnerToteams<T extends teams$superbowl_superbowl_winnerToteamsArgs<ExtArgs> = {}>(args?: Subset<T, teams$superbowl_superbowl_winnerToteamsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$superbowlPayload<ExtArgs>, T, "findMany"> | Null>
+    games_games_homeToteams<T extends teams$games_games_homeToteamsArgs<ExtArgs> = {}>(args?: Subset<T, teams$games_games_homeToteamsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$gamesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    games_games_awayToteams<T extends teams$games_games_awayToteamsArgs<ExtArgs> = {}>(args?: Subset<T, teams$games_games_awayToteamsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$gamesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    picks<T extends teams$picksArgs<ExtArgs> = {}>(args?: Subset<T, teams$picksArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$picksPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    superbowl_superbowl_loserToteams<T extends teams$superbowl_superbowl_loserToteamsArgs<ExtArgs> = {}>(args?: Subset<T, teams$superbowl_superbowl_loserToteamsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$superbowlPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    superbowl_superbowl_winnerToteams<T extends teams$superbowl_superbowl_winnerToteamsArgs<ExtArgs> = {}>(args?: Subset<T, teams$superbowl_superbowl_winnerToteamsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$superbowlPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -13714,7 +15211,7 @@ export namespace Prisma {
 
   /**
    * Fields of the teams model
-   */ 
+   */
   interface teamsFieldRefs {
     readonly teamid: FieldRef<"teams", 'Int'>
     readonly abbrev: FieldRef<"teams", 'String'>
@@ -13737,6 +15234,10 @@ export namespace Prisma {
      */
     select?: teamsSelect<ExtArgs> | null
     /**
+     * Omit specific fields from the teams
+     */
+    omit?: teamsOmit<ExtArgs> | null
+    /**
      * Choose, which related nodes to fetch as well
      */
     include?: teamsInclude<ExtArgs> | null
@@ -13756,6 +15257,10 @@ export namespace Prisma {
      */
     select?: teamsSelect<ExtArgs> | null
     /**
+     * Omit specific fields from the teams
+     */
+    omit?: teamsOmit<ExtArgs> | null
+    /**
      * Choose, which related nodes to fetch as well
      */
     include?: teamsInclude<ExtArgs> | null
@@ -13774,6 +15279,10 @@ export namespace Prisma {
      * Select specific fields to fetch from the teams
      */
     select?: teamsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the teams
+     */
+    omit?: teamsOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
@@ -13824,6 +15333,10 @@ export namespace Prisma {
      */
     select?: teamsSelect<ExtArgs> | null
     /**
+     * Omit specific fields from the teams
+     */
+    omit?: teamsOmit<ExtArgs> | null
+    /**
      * Choose, which related nodes to fetch as well
      */
     include?: teamsInclude<ExtArgs> | null
@@ -13873,6 +15386,10 @@ export namespace Prisma {
      */
     select?: teamsSelect<ExtArgs> | null
     /**
+     * Omit specific fields from the teams
+     */
+    omit?: teamsOmit<ExtArgs> | null
+    /**
      * Choose, which related nodes to fetch as well
      */
     include?: teamsInclude<ExtArgs> | null
@@ -13917,6 +15434,10 @@ export namespace Prisma {
      */
     select?: teamsSelect<ExtArgs> | null
     /**
+     * Omit specific fields from the teams
+     */
+    omit?: teamsOmit<ExtArgs> | null
+    /**
      * Choose, which related nodes to fetch as well
      */
     include?: teamsInclude<ExtArgs> | null
@@ -13947,6 +15468,10 @@ export namespace Prisma {
      */
     select?: teamsSelectCreateManyAndReturn<ExtArgs> | null
     /**
+     * Omit specific fields from the teams
+     */
+    omit?: teamsOmit<ExtArgs> | null
+    /**
      * The data used to create many teams.
      */
     data: teamsCreateManyInput | teamsCreateManyInput[]
@@ -13961,6 +15486,10 @@ export namespace Prisma {
      * Select specific fields to fetch from the teams
      */
     select?: teamsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the teams
+     */
+    omit?: teamsOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
@@ -13988,6 +15517,36 @@ export namespace Prisma {
      * Filter which teams to update
      */
     where?: teamsWhereInput
+    /**
+     * Limit how many teams to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * teams updateManyAndReturn
+   */
+  export type teamsUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the teams
+     */
+    select?: teamsSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the teams
+     */
+    omit?: teamsOmit<ExtArgs> | null
+    /**
+     * The data used to update teams.
+     */
+    data: XOR<teamsUpdateManyMutationInput, teamsUncheckedUpdateManyInput>
+    /**
+     * Filter which teams to update
+     */
+    where?: teamsWhereInput
+    /**
+     * Limit how many teams to update.
+     */
+    limit?: number
   }
 
   /**
@@ -13998,6 +15557,10 @@ export namespace Prisma {
      * Select specific fields to fetch from the teams
      */
     select?: teamsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the teams
+     */
+    omit?: teamsOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
@@ -14026,6 +15589,10 @@ export namespace Prisma {
      */
     select?: teamsSelect<ExtArgs> | null
     /**
+     * Omit specific fields from the teams
+     */
+    omit?: teamsOmit<ExtArgs> | null
+    /**
      * Choose, which related nodes to fetch as well
      */
     include?: teamsInclude<ExtArgs> | null
@@ -14044,6 +15611,10 @@ export namespace Prisma {
      * Filter which teams to delete
      */
     where?: teamsWhereInput
+    /**
+     * Limit how many teams to delete.
+     */
+    limit?: number
   }
 
   /**
@@ -14054,6 +15625,10 @@ export namespace Prisma {
      * Select specific fields to fetch from the games
      */
     select?: gamesSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the games
+     */
+    omit?: gamesOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
@@ -14075,6 +15650,10 @@ export namespace Prisma {
      */
     select?: gamesSelect<ExtArgs> | null
     /**
+     * Omit specific fields from the games
+     */
+    omit?: gamesOmit<ExtArgs> | null
+    /**
      * Choose, which related nodes to fetch as well
      */
     include?: gamesInclude<ExtArgs> | null
@@ -14094,6 +15673,10 @@ export namespace Prisma {
      * Select specific fields to fetch from the picks
      */
     select?: picksSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the picks
+     */
+    omit?: picksOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
@@ -14115,6 +15698,10 @@ export namespace Prisma {
      */
     select?: superbowlSelect<ExtArgs> | null
     /**
+     * Omit specific fields from the superbowl
+     */
+    omit?: superbowlOmit<ExtArgs> | null
+    /**
      * Choose, which related nodes to fetch as well
      */
     include?: superbowlInclude<ExtArgs> | null
@@ -14135,6 +15722,10 @@ export namespace Prisma {
      */
     select?: superbowlSelect<ExtArgs> | null
     /**
+     * Omit specific fields from the superbowl
+     */
+    omit?: superbowlOmit<ExtArgs> | null
+    /**
      * Choose, which related nodes to fetch as well
      */
     include?: superbowlInclude<ExtArgs> | null
@@ -14154,6 +15745,10 @@ export namespace Prisma {
      * Select specific fields to fetch from the teams
      */
     select?: teamsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the teams
+     */
+    omit?: teamsOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
@@ -14381,7 +15976,7 @@ export namespace Prisma {
 
 
   /**
-   * Field references 
+   * Field references
    */
 
 
@@ -14588,8 +16183,8 @@ export namespace Prisma {
     ts?: DateTimeFilter<"EmailLogs"> | Date | string
     week?: IntNullableFilter<"EmailLogs"> | number | null
     resend_id?: StringFilter<"EmailLogs"> | string
-    leagues?: XOR<LeaguesRelationFilter, leaguesWhereInput>
-    leaguemembers?: XOR<LeaguemembersRelationFilter, leaguemembersWhereInput>
+    leagues?: XOR<LeaguesScalarRelationFilter, leaguesWhereInput>
+    leaguemembers?: XOR<LeaguemembersScalarRelationFilter, leaguemembersWhereInput>
   }
 
   export type EmailLogsOrderByWithRelationInput = {
@@ -14615,8 +16210,8 @@ export namespace Prisma {
     ts?: DateTimeFilter<"EmailLogs"> | Date | string
     week?: IntNullableFilter<"EmailLogs"> | number | null
     resend_id?: StringFilter<"EmailLogs"> | string
-    leagues?: XOR<LeaguesRelationFilter, leaguesWhereInput>
-    leaguemembers?: XOR<LeaguemembersRelationFilter, leaguemembersWhereInput>
+    leagues?: XOR<LeaguesScalarRelationFilter, leaguesWhereInput>
+    leaguemembers?: XOR<LeaguemembersScalarRelationFilter, leaguemembersWhereInput>
   }, "email_log_id">
 
   export type EmailLogsOrderByWithAggregationInput = {
@@ -14657,8 +16252,8 @@ export namespace Prisma {
     week?: IntFilter<"WeekWinners"> | number
     correct_count?: IntFilter<"WeekWinners"> | number
     score_diff?: IntFilter<"WeekWinners"> | number
-    leagues?: XOR<LeaguesRelationFilter, leaguesWhereInput>
-    leaguemembers?: XOR<LeaguemembersRelationFilter, leaguemembersWhereInput>
+    leagues?: XOR<LeaguesScalarRelationFilter, leaguesWhereInput>
+    leaguemembers?: XOR<LeaguemembersScalarRelationFilter, leaguemembersWhereInput>
   }
 
   export type WeekWinnersOrderByWithRelationInput = {
@@ -14682,8 +16277,8 @@ export namespace Prisma {
     week?: IntFilter<"WeekWinners"> | number
     correct_count?: IntFilter<"WeekWinners"> | number
     score_diff?: IntFilter<"WeekWinners"> | number
-    leagues?: XOR<LeaguesRelationFilter, leaguesWhereInput>
-    leaguemembers?: XOR<LeaguemembersRelationFilter, leaguemembersWhereInput>
+    leagues?: XOR<LeaguesScalarRelationFilter, leaguesWhereInput>
+    leaguemembers?: XOR<LeaguemembersScalarRelationFilter, leaguemembersWhereInput>
   }, "id">
 
   export type WeekWinnersOrderByWithAggregationInput = {
@@ -14736,8 +16331,8 @@ export namespace Prisma {
     current_quarter?: IntNullableFilter<"games"> | number | null
     msf_id?: IntNullableFilter<"games"> | number | null
     espn_id?: IntNullableFilter<"games"> | number | null
-    teams_games_homeToteams?: XOR<TeamsRelationFilter, teamsWhereInput>
-    teams_games_awayToteams?: XOR<TeamsRelationFilter, teamsWhereInput>
+    teams_games_homeToteams?: XOR<TeamsScalarRelationFilter, teamsWhereInput>
+    teams_games_awayToteams?: XOR<TeamsScalarRelationFilter, teamsWhereInput>
     picks?: PicksListRelationFilter
   }
 
@@ -14791,8 +16386,8 @@ export namespace Prisma {
     current_quarter_seconds_remaining?: IntNullableFilter<"games"> | number | null
     current_quarter?: IntNullableFilter<"games"> | number | null
     msf_id?: IntNullableFilter<"games"> | number | null
-    teams_games_homeToteams?: XOR<TeamsRelationFilter, teamsWhereInput>
-    teams_games_awayToteams?: XOR<TeamsRelationFilter, teamsWhereInput>
+    teams_games_homeToteams?: XOR<TeamsScalarRelationFilter, teamsWhereInput>
+    teams_games_awayToteams?: XOR<TeamsScalarRelationFilter, teamsWhereInput>
     picks?: PicksListRelationFilter
   }, "gid" | "espn_id">
 
@@ -14862,8 +16457,8 @@ export namespace Prisma {
     paid?: BoolNullableFilter<"leaguemembers"> | boolean | null
     EmailLogs?: EmailLogsListRelationFilter
     WeekWinners?: WeekWinnersListRelationFilter
-    people?: XOR<PeopleRelationFilter, peopleWhereInput>
-    leagues?: XOR<LeaguesRelationFilter, leaguesWhereInput>
+    people?: XOR<PeopleScalarRelationFilter, peopleWhereInput>
+    leagues?: XOR<LeaguesScalarRelationFilter, leaguesWhereInput>
     leaguemessages?: LeaguemessagesListRelationFilter
     picks?: PicksListRelationFilter
     superbowl?: SuperbowlListRelationFilter
@@ -14897,8 +16492,8 @@ export namespace Prisma {
     paid?: BoolNullableFilter<"leaguemembers"> | boolean | null
     EmailLogs?: EmailLogsListRelationFilter
     WeekWinners?: WeekWinnersListRelationFilter
-    people?: XOR<PeopleRelationFilter, peopleWhereInput>
-    leagues?: XOR<LeaguesRelationFilter, leaguesWhereInput>
+    people?: XOR<PeopleScalarRelationFilter, peopleWhereInput>
+    leagues?: XOR<LeaguesScalarRelationFilter, leaguesWhereInput>
     leaguemessages?: LeaguemessagesListRelationFilter
     picks?: PicksListRelationFilter
     superbowl?: SuperbowlListRelationFilter
@@ -14942,8 +16537,8 @@ export namespace Prisma {
     message_type?: EnumMessageTypeFilter<"leaguemessages"> | $Enums.MessageType
     createdAt?: DateTimeFilter<"leaguemessages"> | Date | string
     status?: EnumMessageStatusFilter<"leaguemessages"> | $Enums.MessageStatus
-    leagues?: XOR<LeaguesRelationFilter, leaguesWhereInput>
-    leaguemembers?: XOR<LeaguemembersRelationFilter, leaguemembersWhereInput>
+    leagues?: XOR<LeaguesScalarRelationFilter, leaguesWhereInput>
+    leaguemembers?: XOR<LeaguemembersScalarRelationFilter, leaguemembersWhereInput>
   }
 
   export type leaguemessagesOrderByWithRelationInput = {
@@ -14971,8 +16566,8 @@ export namespace Prisma {
     message_type?: EnumMessageTypeFilter<"leaguemessages"> | $Enums.MessageType
     createdAt?: DateTimeFilter<"leaguemessages"> | Date | string
     status?: EnumMessageStatusFilter<"leaguemessages"> | $Enums.MessageStatus
-    leagues?: XOR<LeaguesRelationFilter, leaguesWhereInput>
-    leaguemembers?: XOR<LeaguemembersRelationFilter, leaguemembersWhereInput>
+    leagues?: XOR<LeaguesScalarRelationFilter, leaguesWhereInput>
+    leaguemembers?: XOR<LeaguemembersScalarRelationFilter, leaguemembersWhereInput>
   }, "message_id">
 
   export type leaguemessagesOrderByWithAggregationInput = {
@@ -15026,8 +16621,8 @@ export namespace Prisma {
     WeekWinners?: WeekWinnersListRelationFilter
     leaguemembers?: LeaguemembersListRelationFilter
     leaguemessages?: LeaguemessagesListRelationFilter
-    people?: XOR<PeopleRelationFilter, peopleWhereInput>
-    prior_league?: XOR<LeaguesNullableRelationFilter, leaguesWhereInput> | null
+    people?: XOR<PeopleScalarRelationFilter, peopleWhereInput>
+    prior_league?: XOR<LeaguesNullableScalarRelationFilter, leaguesWhereInput> | null
     future_leagues?: LeaguesListRelationFilter
   }
 
@@ -15075,8 +16670,8 @@ export namespace Prisma {
     WeekWinners?: WeekWinnersListRelationFilter
     leaguemembers?: LeaguemembersListRelationFilter
     leaguemessages?: LeaguemessagesListRelationFilter
-    people?: XOR<PeopleRelationFilter, peopleWhereInput>
-    prior_league?: XOR<LeaguesNullableRelationFilter, leaguesWhereInput> | null
+    people?: XOR<PeopleScalarRelationFilter, peopleWhereInput>
+    prior_league?: XOR<LeaguesNullableScalarRelationFilter, leaguesWhereInput> | null
     future_leagues?: LeaguesListRelationFilter
   }, "league_id" | "share_code">
 
@@ -15230,10 +16825,10 @@ export namespace Prisma {
     done?: IntNullableFilter<"picks"> | number | null
     is_random?: BoolNullableFilter<"picks"> | boolean | null
     member_id?: IntNullableFilter<"picks"> | number | null
-    games?: XOR<GamesRelationFilter, gamesWhereInput>
-    people?: XOR<PeopleRelationFilter, peopleWhereInput>
-    leaguemembers?: XOR<LeaguemembersNullableRelationFilter, leaguemembersWhereInput> | null
-    teams?: XOR<TeamsNullableRelationFilter, teamsWhereInput> | null
+    games?: XOR<GamesScalarRelationFilter, gamesWhereInput>
+    people?: XOR<PeopleScalarRelationFilter, peopleWhereInput>
+    leaguemembers?: XOR<LeaguemembersNullableScalarRelationFilter, leaguemembersWhereInput> | null
+    teams?: XOR<TeamsNullableScalarRelationFilter, teamsWhereInput> | null
   }
 
   export type picksOrderByWithRelationInput = {
@@ -15273,10 +16868,10 @@ export namespace Prisma {
     done?: IntNullableFilter<"picks"> | number | null
     is_random?: BoolNullableFilter<"picks"> | boolean | null
     member_id?: IntNullableFilter<"picks"> | number | null
-    games?: XOR<GamesRelationFilter, gamesWhereInput>
-    people?: XOR<PeopleRelationFilter, peopleWhereInput>
-    leaguemembers?: XOR<LeaguemembersNullableRelationFilter, leaguemembersWhereInput> | null
-    teams?: XOR<TeamsNullableRelationFilter, teamsWhereInput> | null
+    games?: XOR<GamesScalarRelationFilter, gamesWhereInput>
+    people?: XOR<PeopleScalarRelationFilter, peopleWhereInput>
+    leaguemembers?: XOR<LeaguemembersNullableScalarRelationFilter, leaguemembersWhereInput> | null
+    teams?: XOR<TeamsNullableScalarRelationFilter, teamsWhereInput> | null
   }, "pickid">
 
   export type picksOrderByWithAggregationInput = {
@@ -15331,9 +16926,9 @@ export namespace Prisma {
     ts?: DateTimeNullableFilter<"superbowl"> | Date | string | null
     season?: IntNullableFilter<"superbowl"> | number | null
     member_id?: IntNullableFilter<"superbowl"> | number | null
-    teams_superbowl_loserToteams?: XOR<TeamsRelationFilter, teamsWhereInput>
-    leaguemembers?: XOR<LeaguemembersNullableRelationFilter, leaguemembersWhereInput> | null
-    teams_superbowl_winnerToteams?: XOR<TeamsRelationFilter, teamsWhereInput>
+    teams_superbowl_loserToteams?: XOR<TeamsScalarRelationFilter, teamsWhereInput>
+    leaguemembers?: XOR<LeaguemembersNullableScalarRelationFilter, leaguemembersWhereInput> | null
+    teams_superbowl_winnerToteams?: XOR<TeamsScalarRelationFilter, teamsWhereInput>
   }
 
   export type superbowlOrderByWithRelationInput = {
@@ -15362,9 +16957,9 @@ export namespace Prisma {
     ts?: DateTimeNullableFilter<"superbowl"> | Date | string | null
     season?: IntNullableFilter<"superbowl"> | number | null
     member_id?: IntNullableFilter<"superbowl"> | number | null
-    teams_superbowl_loserToteams?: XOR<TeamsRelationFilter, teamsWhereInput>
-    leaguemembers?: XOR<LeaguemembersNullableRelationFilter, leaguemembersWhereInput> | null
-    teams_superbowl_winnerToteams?: XOR<TeamsRelationFilter, teamsWhereInput>
+    teams_superbowl_loserToteams?: XOR<TeamsScalarRelationFilter, teamsWhereInput>
+    leaguemembers?: XOR<LeaguemembersNullableScalarRelationFilter, leaguemembersWhereInput> | null
+    teams_superbowl_winnerToteams?: XOR<TeamsScalarRelationFilter, teamsWhereInput>
   }, "pickid">
 
   export type superbowlOrderByWithAggregationInput = {
@@ -16610,12 +18205,12 @@ export namespace Prisma {
     not?: NestedIntNullableFilter<$PrismaModel> | number | null
   }
 
-  export type LeaguesRelationFilter = {
+  export type LeaguesScalarRelationFilter = {
     is?: leaguesWhereInput
     isNot?: leaguesWhereInput
   }
 
-  export type LeaguemembersRelationFilter = {
+  export type LeaguemembersScalarRelationFilter = {
     is?: leaguemembersWhereInput
     isNot?: leaguemembersWhereInput
   }
@@ -16806,7 +18401,7 @@ export namespace Prisma {
     not?: NestedStringNullableFilter<$PrismaModel> | string | null
   }
 
-  export type TeamsRelationFilter = {
+  export type TeamsScalarRelationFilter = {
     is?: teamsWhereInput
     isNot?: teamsWhereInput
   }
@@ -16967,7 +18562,7 @@ export namespace Prisma {
     none?: WeekWinnersWhereInput
   }
 
-  export type PeopleRelationFilter = {
+  export type PeopleScalarRelationFilter = {
     is?: peopleWhereInput
     isNot?: peopleWhereInput
   }
@@ -17169,7 +18764,7 @@ export namespace Prisma {
     none?: leaguemembersWhereInput
   }
 
-  export type LeaguesNullableRelationFilter = {
+  export type LeaguesNullableScalarRelationFilter = {
     is?: leaguesWhereInput | null
     isNot?: leaguesWhereInput | null
   }
@@ -17352,17 +18947,17 @@ export namespace Prisma {
     season?: SortOrder
   }
 
-  export type GamesRelationFilter = {
+  export type GamesScalarRelationFilter = {
     is?: gamesWhereInput
     isNot?: gamesWhereInput
   }
 
-  export type LeaguemembersNullableRelationFilter = {
+  export type LeaguemembersNullableScalarRelationFilter = {
     is?: leaguemembersWhereInput | null
     isNot?: leaguemembersWhereInput | null
   }
 
-  export type TeamsNullableRelationFilter = {
+  export type TeamsNullableScalarRelationFilter = {
     is?: teamsWhereInput | null
     isNot?: teamsWhereInput | null
   }
@@ -22742,74 +24337,6 @@ export namespace Prisma {
   }
 
 
-
-  /**
-   * Aliases for legacy arg types
-   */
-    /**
-     * @deprecated Use GamesCountOutputTypeDefaultArgs instead
-     */
-    export type GamesCountOutputTypeArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = GamesCountOutputTypeDefaultArgs<ExtArgs>
-    /**
-     * @deprecated Use LeaguemembersCountOutputTypeDefaultArgs instead
-     */
-    export type LeaguemembersCountOutputTypeArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = LeaguemembersCountOutputTypeDefaultArgs<ExtArgs>
-    /**
-     * @deprecated Use LeaguesCountOutputTypeDefaultArgs instead
-     */
-    export type LeaguesCountOutputTypeArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = LeaguesCountOutputTypeDefaultArgs<ExtArgs>
-    /**
-     * @deprecated Use PeopleCountOutputTypeDefaultArgs instead
-     */
-    export type PeopleCountOutputTypeArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = PeopleCountOutputTypeDefaultArgs<ExtArgs>
-    /**
-     * @deprecated Use TeamsCountOutputTypeDefaultArgs instead
-     */
-    export type TeamsCountOutputTypeArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = TeamsCountOutputTypeDefaultArgs<ExtArgs>
-    /**
-     * @deprecated Use EmailLogsDefaultArgs instead
-     */
-    export type EmailLogsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = EmailLogsDefaultArgs<ExtArgs>
-    /**
-     * @deprecated Use WeekWinnersDefaultArgs instead
-     */
-    export type WeekWinnersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = WeekWinnersDefaultArgs<ExtArgs>
-    /**
-     * @deprecated Use gamesDefaultArgs instead
-     */
-    export type gamesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = gamesDefaultArgs<ExtArgs>
-    /**
-     * @deprecated Use leaguemembersDefaultArgs instead
-     */
-    export type leaguemembersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = leaguemembersDefaultArgs<ExtArgs>
-    /**
-     * @deprecated Use leaguemessagesDefaultArgs instead
-     */
-    export type leaguemessagesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = leaguemessagesDefaultArgs<ExtArgs>
-    /**
-     * @deprecated Use leaguesDefaultArgs instead
-     */
-    export type leaguesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = leaguesDefaultArgs<ExtArgs>
-    /**
-     * @deprecated Use peopleDefaultArgs instead
-     */
-    export type peopleArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = peopleDefaultArgs<ExtArgs>
-    /**
-     * @deprecated Use picksDefaultArgs instead
-     */
-    export type picksArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = picksDefaultArgs<ExtArgs>
-    /**
-     * @deprecated Use superbowlDefaultArgs instead
-     */
-    export type superbowlArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = superbowlDefaultArgs<ExtArgs>
-    /**
-     * @deprecated Use superbowlsquaresDefaultArgs instead
-     */
-    export type superbowlsquaresArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = superbowlsquaresDefaultArgs<ExtArgs>
-    /**
-     * @deprecated Use teamsDefaultArgs instead
-     */
-    export type teamsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = teamsDefaultArgs<ExtArgs>
 
   /**
    * Batch Payload for updateMany & deleteMany & createMany

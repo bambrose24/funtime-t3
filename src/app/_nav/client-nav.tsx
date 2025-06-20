@@ -43,7 +43,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { FuntimeAvatarFallback } from "./AvatarFallback";
 import { type RouterOutputs } from "~/trpc/types";
 import { clientApi } from "~/trpc/react";
-import { MemberRole } from "~/generated/prisma-client";
+import { type MemberRole } from "@funtime/api/types";
 import { useEffect } from "react";
 import { PrefetchKind } from "next/dist/client/components/router-reducer/router-reducer-types";
 
@@ -390,7 +390,7 @@ function LeagueDropdownMenu({ chosenLeague }: { chosenLeague: ChosenLeague }) {
   const isAdmin =
     session?.dbUser?.leaguemembers?.find(
       (m) => m.league_id === chosenLeague.league_id,
-    )?.role === MemberRole.admin;
+    )?.role === "admin";
 
   return (
     <>
