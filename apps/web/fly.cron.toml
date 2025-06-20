@@ -1,0 +1,9 @@
+app = "funtime-cron"
+primary_region = "bos"
+
+[build]
+  dockerfile = "Dockerfile"
+
+
+[experimental]
+  allowed_runtime = "bun"

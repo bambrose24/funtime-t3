@@ -7,21 +7,23 @@ ARG DIRECT_URL
 ENV DATABASE_URL=${DATABASE_URL}
 ENV DIRECT_URL=${DIRECT_URL}
 
-# Copy the Prisma schema file
-COPY prisma ./prisma
+# Copy the Prisma schema file from the API package
+COPY packages/api/prisma ./packages/api/prisma
 
 # Install dependencies
 COPY package.json bun.lockb ./
+COPY apps/web/package.json ./apps/web/
+COPY packages/api/package.json ./packages/api/
 RUN bun install --frozen-lockfile
 
 # Copy the rest of the application code
 COPY . .
 
 # Validate Prisma schema
-RUN bunx prisma validate
+RUN bunx prisma validate --schema=packages/api/prisma/schema.prisma
 
 # Generate Prisma client
-RUN bunx prisma generate
+RUN bunx prisma generate --schema=packages/api/prisma/schema.prisma
 
 # Verify Prisma client generation
 RUN ls -la node_modules/.prisma && ls -la node_modules/@prisma/client
@@ -32,4 +34,4 @@ RUN chown -R bun:bun /usr/src/app
 # Run the application
 USER bun
 EXPOSE 3000/tcp
-ENTRYPOINT [ "sh", "-c", "bun run src/cron/index.ts" ]
+ENTRYPOINT [ "sh", "-c", "cd apps/web && bun run src/cron/index.ts" ]

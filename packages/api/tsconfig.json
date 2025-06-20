@@ -1,0 +1,40 @@
+{
+  "compilerOptions": {
+    "target": "es2022",
+    "lib": ["es2022", "dom"],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "allowJs": true,
+    "strict": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "isolatedModules": true,
+    "resolveJsonModule": true,
+    "declaration": true,
+    "declarationMap": true,
+    "outDir": "./dist",
+    "baseUrl": ".",
+    "paths": {
+      "~/*": ["./src/*", "./server/*", "./utils/*", "./lib/*", "./trpc/*"],
+      "~/server/*": ["./server/*"],
+      "~/utils/*": ["./utils/*"],
+      "~/lib/*": ["./lib/*"],
+      "~/trpc/*": ["./trpc/*"],
+      "~/env": ["./env.js"],
+      "emails/*": ["./emails/*"]
+    },
+    "jsx": "react-jsx"
+  },
+  "include": [
+    "src/**/*",
+    "server/**/*",
+    "utils/**/*",
+    "lib/**/*",
+    "trpc/**/*",
+    "emails/**/*",
+    "env.js"
+  ],
+  "exclude": ["node_modules", "dist", "src/generated"]
+}

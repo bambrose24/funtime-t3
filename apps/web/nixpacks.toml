@@ -1,0 +1,8 @@
+[phases.setup]
+cmds = ["bun install"]
+
+[phases.build]
+cmds = ["bunx prisma generate"]
+
+[phases.start]
+cmd = "bun run cron"
