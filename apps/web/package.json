@@ -11,11 +11,7 @@
     "start": "next start",
     "cron": "bun run src/cron/index.ts",
     "typecheck": "tsc --noEmit",
-    "clean": "rm -rf .next",
-    "postinstall": "prisma generate"
-  },
-  "prisma": {
-    "schema": "../../packages/api/prisma/schema.prisma"
+    "clean": "rm -rf .next"
   },
   "dependencies": {
     "@funtime/api": "*",

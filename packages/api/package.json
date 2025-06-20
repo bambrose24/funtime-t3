@@ -30,6 +30,7 @@
     "schema": "./prisma/schema.prisma"
   },
   "dependencies": {
+    "@prisma/client": "^6.10.1",
     "@supabase/ssr": "^0.4.0",
     "@supabase/supabase-js": "^2.43.5",
     "@t3-oss/env-nextjs": "^0.9.2",
