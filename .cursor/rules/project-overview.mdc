@@ -1,0 +1,30 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+This project is a monorepo setup using Turbo Repo.
+
+This project aims to hold 3 core tenants:
+- A "backend" package that is a set of tRPC endpoints
+- A web app built in Next.js, that hoists that tRPC api to a route
+- An Expo React Native app that uses the same backend as the web app, aiming at the deployed Next.js app to get its endpoints
+
+The goal with this setup is to keep everything type-safe end to end. I want to be very sure that code lives in the right place, so if you're ever not sure what platform we're building in, I want you to confirm before going ahead and making changes. For example I don't want to have web react code slip into the react native codebase.
+
+For the web app, these are the core things I'm trying to do
+- Use Next.js server components to fetch tRPC data and make business logic decisions where possible
+- Client components are totally fine and I use the data from the server to hydrate the React Query client so it magically has all of the data on first render
+- We use shadcn/ui as the component library and I want to follow their paradigms wherever possible.
+
+For the react native app, I'm still working on it, but the hope is to use Expo and Native Wind as much as possible to lean into tailwind. I don't know what UI library I want to be using yet but I'm hoping to keep the feel and style as close to the same across both.
+
+Things that are allowed
+- Referencing the implementation of a feature that exists on web/native that is being built on the other platform - it can be good to reference it for inspiration about form states, etc - and any bugs that we want to fix in one platform can be fixed in the other
+- Follow best practices for the platform at hand - for example, in react native, use native gestures and focus management as expected. Another example, manage the keyboard visibility to make the app accessible and not have key buttons hide behind the keyboard.
+
+
+Things that you should not do
+- Overly rely on the other app's implementation. Native and web are structurally different UX's and we don't need it to be 100% the same.
+- Make huge sweeping changes in agent mode without consulting me - meaning, we shouldn't alter big config files or core UI files without confirming that that's what I want to be doing
+- Use any React no-no's like overly relying on useEffect and other confusing things
