@@ -5,16 +5,16 @@ import { NotStartedLeaguePage } from "./not-started/NotStartedLeaguePage";
 
 // dynamic route params come in as `params` arg
 type Props = {
-  params: {
+  params: Promise<{
     leagueId: string;
-  };
-  searchParams?: Record<string, string | string[] | undefined>;
+  }>;
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
 };
 
-export default async function LeaguePage({
-  params: { leagueId: leagueIdParam },
-  searchParams,
-}: Props) {
+export default async function LeaguePage(props: Props) {
+  const params = await props.params;
+  const searchParams = await props.searchParams;
+  const { leagueId: leagueIdParam } = params;
   const leagueId = Number(leagueIdParam);
   const weekParam = searchParams?.week;
 

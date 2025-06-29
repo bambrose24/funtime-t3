@@ -4,16 +4,15 @@ import { Text } from "~/components/ui/text";
 import { MobileAdminNav } from "./mobile-admin-nav";
 
 type Props = {
-  params: {
+  params: Promise<{
     leagueId: string;
-  };
+  }>;
   children: React.ReactNode;
 };
 
-export default async function LeagueAdminPage({
-  params: { leagueId: leagueIdParam },
-  children,
-}: Props) {
+export default async function LeagueAdminPage(props: Props) {
+  const params = await props.params;
+  const { leagueId: leagueIdParam } = params;
   const leagueId = Number(leagueIdParam);
   const [session, league] = await Promise.all([
     serverApi.session.current(),
@@ -37,7 +36,7 @@ export default async function LeagueAdminPage({
       <div>
         <MobileAdminNav leagueId={league.league_id} />
       </div>
-      {children}
+      {props.children}
     </div>
   );
 }

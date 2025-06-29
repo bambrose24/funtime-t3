@@ -3,7 +3,6 @@
  * for Docker builds.
  */
 await import("./src/env.js");
-import { withAxiom } from "next-axiom";
 import { PrismaPlugin } from "@prisma/nextjs-monorepo-workaround-plugin";
 
 /** @type {import("next").NextConfig} */
@@ -42,4 +41,4 @@ const config = {
   skipTrailingSlashRedirect: true,
 };
 
-export default withAxiom(config);
+export default config;

@@ -1,8 +1,7 @@
 "use client";
 
 import { clientApi } from "~/trpc/react";
-import { RouterOutputs } from "~/trpc/types";
-import { Button } from "~/components/ui/button";
+import type { RouterOutputs } from "~/trpc/types";
 import {
   Select,
   SelectContent,

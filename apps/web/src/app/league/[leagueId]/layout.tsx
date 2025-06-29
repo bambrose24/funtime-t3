@@ -3,13 +3,15 @@ import { serverApi } from "~/trpc/server";
 
 export default async function LeagueAuthLayout({
   children,
-  params: { leagueId },
+  params,
 }: {
   children: React.ReactNode;
-  params: {
+  params: Promise<{
     leagueId: string;
-  };
+  }>;
 }) {
+  const resolvedParams = await params;
+  const { leagueId } = resolvedParams;
   try {
     const league = await serverApi.league.get({ leagueId: Number(leagueId) });
     if (!league) {
