@@ -4,13 +4,14 @@ import { JoinLeagueClientPage } from "./client-page";
 import { notFound, redirect } from "next/navigation";
 
 type Props = {
-  params: {
+  params: Promise<{
     code: string;
-  };
+  }>;
 };
 
 export default async function JoinLeaguePage(props: Props) {
-  const { code } = props.params;
+  const params = await props.params;
+  const { code } = params;
 
   const [league, session] = await Promise.all([
     serverApi.league.fromJoinCode({ code }),

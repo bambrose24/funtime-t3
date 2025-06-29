@@ -14,12 +14,12 @@ export async function GET(request: NextRequest) {
 
   const redirectTo = searchParams.get("redirectTo");
   const next =
-    searchParams.get("next") ?? type === "signup"
+    (searchParams.get("next") ?? type === "signup")
       ? `/confirm-signup?${redirectTo ? `redirectTo=${redirectTo}` : ``}`
-      : redirectTo ?? "/";
+      : (redirectTo ?? "/");
 
   if (token_hash && type) {
-    const supabase = supabaseServer();
+    const supabase = await supabaseServer();
 
     const { error } = await supabase.auth.verifyOtp({
       type,

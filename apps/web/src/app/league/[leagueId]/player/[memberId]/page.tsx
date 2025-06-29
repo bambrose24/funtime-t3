@@ -4,16 +4,16 @@ import { ClientMemberPage } from "./client-page";
 
 // dynamic route params come in as `params` arg
 type Props = {
-  params: {
+  params: Promise<{
     leagueId: string;
     memberId: string;
-  };
-  searchParams?: Record<string, string | string[] | undefined>;
+  }>;
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
 };
 
-export default async function MemberPage({
-  params: { leagueId: leagueIdParam, memberId: memberIdParam },
-}: Props) {
+export default async function MemberPage(props: Props) {
+  const params = await props.params;
+  const { leagueId: leagueIdParam, memberId: memberIdParam } = params;
   const leagueId = Number(leagueIdParam);
   const memberId = Number(memberIdParam);
 

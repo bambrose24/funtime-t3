@@ -1,4 +1,3 @@
-import { type AppConfigDynamic } from "next/dist/build/utils";
 import { HomeLeagueCard } from "~/components/home/HomeLeagueCard";
 import { serverApi } from "~/trpc/server";
 import { JoinOrCreateALeague } from "./JoinOrCreateALeague";
@@ -8,7 +7,7 @@ import { Text } from "~/components/ui/text";
 import { FuntimeLanding } from "./_components/FuntimeLanding";
 
 // Almost all of the Funtime pages will need this
-export const dynamic: AppConfigDynamic = "force-dynamic";
+export const dynamic = "force-dynamic";
 
 export default async function Home() {
   const [session, data] = await Promise.all([

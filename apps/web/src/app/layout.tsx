@@ -7,7 +7,7 @@ import { ThemeProvider } from "../components/theme-provider";
 import { cn } from "~/lib/utils";
 import { Toaster } from "~/components/ui/sonner";
 import { Nav } from "./_nav/nav";
-import { AxiomWebVitals } from "next-axiom";
+import { WebVitals } from "~/lib/axiom/client";
 import { UserProviderServer } from "./(auth)/provider/UserProviderServer";
 
 const inter = Inter({
@@ -53,7 +53,7 @@ export default function RootLayout({
               <Nav />
               <div className="grid grid-cols-12 gap-4 p-2">{children}</div>
               <Toaster position="bottom-right" richColors duration={5000} />
-              <AxiomWebVitals />
+              <WebVitals />
             </ThemeProvider>
           </UserProviderServer>
         </TRPCReactProvider>

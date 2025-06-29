@@ -3,15 +3,15 @@ import { serverApi } from "~/trpc/server";
 import { ClientLeagueInfoPage } from "./client-page";
 
 type Props = {
-  params: {
+  params: Promise<{
     leagueId: string;
-  };
-  searchParams?: Record<string, string | string[] | undefined>;
+  }>;
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
 };
 
-export default async function MyProfilePage({
-  params: { leagueId: leagueIdParam },
-}: Props) {
+export default async function MyProfilePage(props: Props) {
+  const params = await props.params;
+  const { leagueId: leagueIdParam } = params;
   const leagueId = Number(leagueIdParam);
   if (!leagueId) {
     notFound();

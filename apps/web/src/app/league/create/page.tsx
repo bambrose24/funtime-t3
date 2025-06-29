@@ -10,8 +10,9 @@ const paramsSchema = z.object({
 export default async function CreateLeaguePage({
   searchParams,
 }: {
-  searchParams?: Record<string, string>;
+  searchParams?: Promise<Record<string, string>>;
 }) {
+  const resolvedSearchParams = await searchParams;
   const [session, nav] = await Promise.all([
     serverApi.session.current(),
     serverApi.home.nav(),
@@ -28,7 +29,7 @@ export default async function CreateLeaguePage({
   if (!canCreate) {
     redirect("/league");
   }
-  const params = paramsSchema.safeParse(searchParams);
+  const params = paramsSchema.safeParse(resolvedSearchParams);
   const priorLeagueId = params.data?.priorLeagueId;
 
   const priorLeague = priorLeagueId

@@ -1,9 +1,10 @@
 import { fetchRequestHandler } from "@trpc/server/adapters/fetch";
-import { type AxiomRequest, withAxiom } from "next-axiom";
+import type { NextRequest } from "next/server";
 
 import { env } from "~/env";
 import { appRouter } from "~/server/api/root";
 import { createTRPCContext } from "~/server/api/trpc";
+import { withAxiom } from "~/lib/axiom/route-handler";
 
 export const dynamic = "force-dynamic";
 
@@ -11,19 +12,15 @@ export const dynamic = "force-dynamic";
  * This wraps the `createTRPCContext` helper and provides the required context for the tRPC API when
  * handling a HTTP request (e.g. when you make requests from Client Components).
  */
-const createContext = async (req: AxiomRequest) => {
+const createContext = async (req: NextRequest) => {
   const context = await createTRPCContext({
     headers: req.headers,
-  });
-  req.log.with({
-    userId: context.dbUser?.uid,
-    email: context.supabaseUser?.email,
   });
   return context;
 };
 
-const handler = withAxiom((req: AxiomRequest) =>
-  fetchRequestHandler({
+const handler = withAxiom(async (req: NextRequest) => {
+  return fetchRequestHandler({
     endpoint: "/api/trpc",
     req,
     router: appRouter,
@@ -36,7 +33,7 @@ const handler = withAxiom((req: AxiomRequest) =>
             );
           }
         : undefined,
-  }),
-);
+  });
+});
 
 export { handler as GET, handler as POST };

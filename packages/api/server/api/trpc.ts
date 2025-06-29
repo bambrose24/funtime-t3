@@ -28,7 +28,7 @@ import { supabaseServer } from "~/utils/supabase/server";
  * @see https://trpc.io/docs/server/context
  */
 export const createTRPCContext = async (opts: { headers: Headers }) => {
-  const supabase = supabaseServer();
+  const supabase = await supabaseServer();
   const {
     data: { user: supabaseUser },
   } = await supabase.auth.getUser();
@@ -144,10 +144,10 @@ const procedure = t.procedure.use(async ({ path, type, next }) => {
     ok: result.ok,
     ...(result.ok === false
       ? {
-        trpcError: result.error.message,
-        trpcErrorCode: result.error.code,
-        ...(result.error.stack ? { trpcErrorStack: result.error.stack } : {}),
-      }
+          trpcError: result.error.message,
+          trpcErrorCode: result.error.code,
+          ...(result.error.stack ? { trpcErrorStack: result.error.stack } : {}),
+        }
       : {}),
   });
   return result;
