@@ -1,8 +1,8 @@
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
-import { db } from "~/server/db";
 import { cache } from "~/utils/cache";
 import { DEFAULT_SEASON } from "~/utils/const";
+import { PrismaClient } from "@funtime/api/generated/prisma-client";
 
 const getGamesSchema = z.object({
   season: z.number().int(),
@@ -26,31 +26,35 @@ export const gamesRouter = createTRPCRouter({
       },
     });
   }),
-  getGames: publicProcedure.input(getGamesSchema).query(async ({ input }) => {
-    const { skipCache, season, week } = input;
-    if (skipCache) {
-      return await getGamesImpl({ season, week });
-    }
+  getGames: publicProcedure
+    .input(getGamesSchema)
+    .query(async ({ input, ctx }) => {
+      const { skipCache, season, week } = input;
+      if (skipCache) {
+        return await getGamesImpl({ season, week, db: ctx.db });
+      }
 
-    const getGames = cache(
-      async () => {
-        return await getGamesImpl({ season, week });
-      },
-      ["getGamesBySeason", season.toString(), week?.toString() ?? ""],
-      {
-        revalidate: 60 * 2,
-      },
-    );
-    return await getGames();
-  }),
+      const getGames = cache(
+        async () => {
+          return await getGamesImpl({ season, week, db: ctx.db });
+        },
+        ["getGamesBySeason", season.toString(), week?.toString() ?? ""],
+        {
+          revalidate: 60 * 2,
+        },
+      );
+      return await getGames();
+    }),
 });
 
 async function getGamesImpl({
   season,
   week,
+  db,
 }: {
   season: number;
   week?: number;
+  db: PrismaClient;
 }) {
   return await db.games.findMany({
     where: { season, ...(week ? { week } : {}) },

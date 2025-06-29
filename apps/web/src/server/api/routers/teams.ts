@@ -1,12 +1,11 @@
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
-import { db } from "~/server/db";
 import { cache } from "~/utils/cache";
 
 export const teamsRouter = createTRPCRouter({
-  getTeams: publicProcedure.query(async () => {
+  getTeams: publicProcedure.query(async ({ ctx }) => {
     const getTeamsImpl = cache(
       async () => {
-        return await db.teams.findMany();
+        return await ctx.db.teams.findMany();
       },
       ["getTeams"],
       {

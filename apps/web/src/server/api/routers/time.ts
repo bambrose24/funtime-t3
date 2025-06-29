@@ -1,6 +1,5 @@
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
-import { db } from "~/server/db";
 
 const currentWeekSeasonInputSchema = z.object({
   leagueId: z.number().int(),
@@ -12,7 +11,7 @@ export const timeRouter = createTRPCRouter({
     .query(async ({ input, ctx }) => {
       const { leagueId } = input;
 
-      const league = await db.leagues.findFirstOrThrow({
+      const league = await ctx.db.leagues.findFirstOrThrow({
         where: { league_id: leagueId },
       });
 

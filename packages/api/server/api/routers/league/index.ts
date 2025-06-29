@@ -315,28 +315,29 @@ export const leagueRouter = createTRPCRouter({
 
       const { season } = data;
 
-      const [mostRecentStartedGame, nextGameToStart] = await Promise.all([ctx.db.games.findFirst({
-        where: {
-          season,
-          ts: {
-            lte: new Date(),
+      const [mostRecentStartedGame, nextGameToStart] = await Promise.all([
+        ctx.db.games.findFirst({
+          where: {
+            season,
+            ts: {
+              lte: new Date(),
+            },
           },
-        },
-        orderBy: {
-          ts: "desc",
-        },
-      }),
-      ctx.db.games.findFirst({
-        where: {
-          season,
-          ts: {
-            gte: new Date(),
+          orderBy: {
+            ts: "desc",
           },
-        },
-        orderBy: {
-          ts: 'asc',
-        }
-      })
+        }),
+        ctx.db.games.findFirst({
+          where: {
+            season,
+            ts: {
+              gte: new Date(),
+            },
+          },
+          orderBy: {
+            ts: "asc",
+          },
+        }),
       ]);
 
       if (!mostRecentStartedGame) {
@@ -352,8 +353,8 @@ export const leagueRouter = createTRPCRouter({
             {
               week,
             },
-            { week: week + 1 }
-          ]
+            { week: week + 1 },
+          ],
         },
       });
 
@@ -363,8 +364,8 @@ export const leagueRouter = createTRPCRouter({
         ["asc", "asc", "asc"],
       );
 
-      const mostRecentStartedWeekGames = games.filter(g => g.week === week);
-      const nextWeekGames = games.filter(g => g.week === (week + 1));
+      const mostRecentStartedWeekGames = games.filter((g) => g.week === week);
+      const nextWeekGames = games.filter((g) => g.week === week + 1);
 
       const multipleWeekMemberPicks = await ctx.db.picks.findMany({
         where: {
@@ -375,17 +376,23 @@ export const leagueRouter = createTRPCRouter({
         },
       });
 
-      const mostRecentStartedWeekPicks = multipleWeekMemberPicks.filter(pick =>
-        mostRecentStartedWeekGames.some(game => game.gid === pick.gid)
+      const mostRecentStartedWeekPicks = multipleWeekMemberPicks.filter(
+        (pick) =>
+          mostRecentStartedWeekGames.some((game) => game.gid === pick.gid),
       );
-      const nextWeekPicks = multipleWeekMemberPicks.filter(pick =>
-        nextWeekGames.some(game => game.gid === pick.gid)
+      const nextWeekPicks = multipleWeekMemberPicks.filter((pick) =>
+        nextWeekGames.some((game) => game.gid === pick.gid),
       );
 
-      const weekToReturn = mostRecentStartedWeekPicks.length > 0 || (nextGameToStart && nextGameToStart.week === week + 1) ? week + 1 : week;
-      const picksToReturn = weekToReturn === week ? mostRecentStartedWeekPicks : nextWeekPicks;
-      const gamesToReturn = weekToReturn === week ? mostRecentStartedWeekGames : nextWeekGames;
-
+      const weekToReturn =
+        mostRecentStartedWeekPicks.length > 0 ||
+        (nextGameToStart && nextGameToStart.week === week + 1)
+          ? week + 1
+          : week;
+      const picksToReturn =
+        weekToReturn === week ? mostRecentStartedWeekPicks : nextWeekPicks;
+      const gamesToReturn =
+        weekToReturn === week ? mostRecentStartedWeekGames : nextWeekGames;
 
       return {
         season,
@@ -410,10 +417,10 @@ export const leagueRouter = createTRPCRouter({
       }
       const weekWhere = week
         ? {
-          where: {
-            week,
-          },
-        }
+            where: {
+              week,
+            },
+          }
         : {};
 
       const { season } = await db.leagues.findFirstOrThrow({
@@ -443,7 +450,7 @@ export const leagueRouter = createTRPCRouter({
             },
           },
         }),
-        getGames({ season, week }),
+        getGames({ season, week, db }),
       ]);
 
       const viewerMemberPicks = memberPicks.find(
@@ -457,7 +464,7 @@ export const leagueRouter = createTRPCRouter({
         prev.set(curr.gid, idx);
         return prev;
       }, new Map<number, number>());
-      const tiebreakerGameId = games.find(g => g.is_tiebreaker)?.gid;
+      const tiebreakerGameId = games.find((g) => g.is_tiebreaker)?.gid;
 
       const mps = memberPicks.map((mp) => {
         mp.picks = orderBy(
@@ -479,7 +486,9 @@ export const leagueRouter = createTRPCRouter({
           correctPicks: mp.picks.reduce((prev, curr) => {
             return prev + (curr.correct ? 1 : 0);
           }, 0),
-          tiebreakerScore: tiebreakerGameId ? mp.picks.find(p => p.gid === tiebreakerGameId)?.score ?? 0 : 0,
+          tiebreakerScore: tiebreakerGameId
+            ? (mp.picks.find((p) => p.gid === tiebreakerGameId)?.score ?? 0)
+            : 0,
           gameIdToPick: mp.picks.reduce((prev, curr) => {
             prev.set(curr.gid, curr);
             return prev;
@@ -564,7 +573,12 @@ export const leagueRouter = createTRPCRouter({
         },
       });
 
-
-      return { superbowlPicks: orderBy(superbowlPicks, (s) => s.leaguemembers?.people.username?.toLocaleLowerCase(), "asc") };
+      return {
+        superbowlPicks: orderBy(
+          superbowlPicks,
+          (s) => s.leaguemembers?.people.username?.toLocaleLowerCase(),
+          "asc",
+        ),
+      };
     }),
 });
