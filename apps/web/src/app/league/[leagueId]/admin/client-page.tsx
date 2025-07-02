@@ -13,7 +13,7 @@ import { LeagueAdminBroadcastSetting } from "./LeagueAdminBroadcastSetting";
 import { clientApi } from "~/trpc/react";
 
 type Props = {
-  league: RouterOutputs["league"]["get"];
+  league: NonNullable<RouterOutputs["league"]["get"]>;
   members: RouterOutputs["league"]["members"];
 };
 
@@ -40,7 +40,7 @@ export function LeagueAdminClientPage({
           <CardTitle className="py-2 text-2xl">
             General Admin Settings
           </CardTitle>
-          <LeagueAdminChangeNameSetting league={league} />
+          {league && <LeagueAdminChangeNameSetting league={league} />}
           <Separator />
           <div className="flex w-full flex-col gap-4">
             <div className="flex flex-col gap-1">
@@ -73,7 +73,6 @@ export function LeagueAdminClientPage({
           </div>
           <Separator />
           <LeagueAdminBroadcastSetting
-            // league={league}
             leagueId={league.league_id}
             numMembersInLeague={members.length}
           />

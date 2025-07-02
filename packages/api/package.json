@@ -22,14 +22,15 @@
     "clean": "rm -rf dist",
     "postinstall": "prisma generate",
     "db:generate": "prisma generate",
-    "db:push": "prisma db push",
-    "db:pull": "prisma db pull",
-    "db:studio": "prisma studio"
+    "db:push": "DOTENV_CONFIG_PATH=../../.env.local prisma db push",
+    "db:pull": "DOTENV_CONFIG_PATH=../../.env.local prisma db pull",
+    "db:studio": "DOTENV_CONFIG_PATH=../../.env.local prisma studio"
   },
   "prisma": {
     "schema": "./prisma/schema.prisma"
   },
   "dependencies": {
+    "@prisma/adapter-pg": "^6.11.0",
     "@prisma/client": "^6.10.1",
     "@prisma/nextjs-monorepo-workaround-plugin": "^6.10.1",
     "@supabase/ssr": "^0.4.0",

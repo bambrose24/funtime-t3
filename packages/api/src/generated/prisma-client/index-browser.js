@@ -130,6 +130,11 @@ exports.Prisma.EmailLogsScalarFieldEnum = {
   resend_id: 'resend_id'
 };
 
+exports.Prisma.RelationLoadStrategy = {
+  query: 'query',
+  join: 'join'
+};
+
 exports.Prisma.WeekWinnersScalarFieldEnum = {
   id: 'id',
   league_id: 'league_id',
