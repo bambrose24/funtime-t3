@@ -15,7 +15,7 @@ import {
   TableRow,
 } from "~/components/ui/table";
 import { Suspense, useMemo } from "react";
-import _ from "lodash";
+import sortBy from "lodash/sortBy";
 import { cn } from "~/lib/utils";
 import { Skeleton } from "~/components/ui/skeleton";
 import { useDictify } from "~/utils/hooks/useIdToValMemo";
@@ -61,7 +61,7 @@ function PicksTableImpl({ picksSummary, games, teams, simulatedGames }: Props) {
   const gameIdToGame = useDictify(games, (g) => g.gid);
 
   const sortedData = useMemo(() => {
-    return _.sortBy(picksSummary, (p) => {
+    return sortBy(picksSummary, (p) => {
       return -p.correctPicks;
     });
   }, [picksSummary]);

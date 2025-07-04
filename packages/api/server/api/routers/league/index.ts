@@ -434,7 +434,11 @@ export const leagueRouter = createTRPCRouter({
           },
           include: {
             people: {
-              select: { username: true, email: true, uid: true },
+              select: {
+                username: true,
+                email: true,
+                uid: true,
+              },
             },
             picks: {
               select: {
@@ -442,9 +446,7 @@ export const leagueRouter = createTRPCRouter({
                 winner: true,
                 gid: true,
                 done: true,
-                pickid: true,
                 score: true,
-                is_random: true,
               },
               ...weekWhere,
             },
@@ -481,7 +483,9 @@ export const leagueRouter = createTRPCRouter({
           }
           return p;
         });
+        // const { picks: _picks, ...mpRest } = mp;
         return {
+          // ...mpRest,
           ...mp,
           correctPicks: mp.picks.reduce((prev, curr) => {
             return prev + (curr.correct ? 1 : 0);

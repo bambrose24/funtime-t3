@@ -55,6 +55,8 @@ export default async function LeaguePage(props: Props) {
     (m) => m.league_id === leagueId,
   );
 
+  console.log("going to do big fetch for league page..");
+
   const [data, games, teams, weekWinners, weeksWithPicks] = await Promise.all([
     serverApi.league.picksSummary({ leagueId, week }),
     serverApi.games.getGames({ week, season }),
@@ -62,6 +64,33 @@ export default async function LeaguePage(props: Props) {
     serverApi.league.weekWinners({ week, leagueId }),
     serverApi.picks.weeksWithPicks({ leagueId }),
   ]);
+
+  // Log data sizes to debug serialization issues
+  console.log("Data sizes:", {
+    picksSummary: new Blob([JSON.stringify(data)]).size,
+    games: new Blob([JSON.stringify(games)]).size,
+    teams: new Blob([JSON.stringify(teams)]).size,
+    weekWinners: new Blob([JSON.stringify(weekWinners)]).size,
+    weeksWithPicks: new Blob([JSON.stringify(weeksWithPicks)]).size,
+  });
+
+  // Debug picksSummary structure
+  console.log("PicksSummary debug:", {
+    length: data.length,
+    firstItemKeys: data[0] ? Object.keys(data[0]) : null,
+    picksCount: data[0]?.picks?.length ?? 0,
+    peopleKeys: data[0]?.people ? Object.keys(data[0].people) : null,
+  });
+
+  // Test if data serializes properly
+  try {
+    JSON.stringify({ data, games, teams, weekWinners, weeksWithPicks });
+    console.log("✅ Data serializes successfully");
+  } catch (error) {
+    console.error("❌ Serialization error:", error);
+  }
+
+  console.log("done with big fetch for league page..");
 
   const viewerHasPicks =
     Boolean(viewerMember) &&

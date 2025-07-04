@@ -13,7 +13,9 @@
     "./trpc": "./trpc/server.ts",
     "./trpc/react": "./trpc/react.tsx",
     "./server/api/trpc": "./server/api/trpc.ts",
-    "./server/api/root": "./server/api/root.ts"
+    "./server/api/root": "./server/api/root.ts",
+    "./utils/config": "./utils/config.ts",
+    "./utils/logging": "./utils/logging.ts"
   },
   "scripts": {
     "build": "tsc",

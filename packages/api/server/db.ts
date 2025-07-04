@@ -14,6 +14,11 @@ const createPrismaClient = () => {
         level: "query",
       },
     ],
+    datasources: {
+      db: {
+        url: env.DATABASE_URL,
+      },
+    },
   });
 
   if (config.logging.level !== "error") {

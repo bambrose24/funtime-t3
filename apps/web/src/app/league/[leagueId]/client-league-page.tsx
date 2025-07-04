@@ -25,7 +25,7 @@ import {
   SelectValue,
 } from "~/components/ui/select";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { cloneDeep } from "lodash";
+// import cloneDeep from "lodash/cloneDeep";
 import { Alert, AlertTitle } from "~/components/ui/alert";
 import { AlertCircleIcon, MessagesSquare, Trophy } from "lucide-react";
 import { useDictify } from "~/utils/hooks/useIdToValMemo";
@@ -53,9 +53,20 @@ type ClientLeaguePageProps = {
 
 const REFETCH_INTERVAL_MS = 1000 * 60 * 2;
 
-export function ClientLeaguePage(props: ClientLeaguePageProps) {
-  const { teams, league, session, currentGame } = props;
+// NEXT: try plucking away props one by one and see if it renders...
 
+export function ClientLeaguePage(props: ClientLeaguePageProps) {
+  console.log("[debug] ClientLeaguePage start");
+
+  // Temporarily return a simple div to test if component renders at all
+  // return (
+  //   <div>
+  //     <h1>ClientLeaguePage is rendering!</h1>
+  //     <p>Props have {JSON.stringify(props).length} chars</p>
+  //   </div>
+  // );
+
+  const { teams, league, session, currentGame } = props;
   const { data: weeksWithPicks } = clientApi.picks.weeksWithPicks.useQuery(
     {
       leagueId: props.leagueId,
@@ -73,6 +84,7 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
       refetchInterval: REFETCH_INTERVAL_MS,
     },
   );
+
   const { data: picksSummaryData } = clientApi.league.picksSummary.useQuery(
     {
       leagueId: props.leagueId,
@@ -113,7 +125,7 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
   const gameToGid = useDictify(games, (g) => g.gid);
 
   const picksSummary = useMemo(() => {
-    const picksSummaryCloned = cloneDeep(picksSummaryData);
+    const picksSummaryCloned = structuredClone(picksSummaryData);
     picksSummaryCloned.forEach((p) => {
       p.picks = p.picks.map((p) => {
         const gid = p.gid;
@@ -162,6 +174,8 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
       : !props.viewerHasPicks && !searchParams.get("week")
         ? "make-picks"
         : null;
+
+  console.log("[debug] going to return the jsx");
 
   return (
     <>

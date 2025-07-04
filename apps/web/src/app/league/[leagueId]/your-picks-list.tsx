@@ -53,7 +53,7 @@ export function YourPicksList(props: Props) {
         }
         return (
           <div
-            key={p.pickid}
+            key={p.gid}
             className={cn(
               "flex w-full flex-col rounded-xl border-2 border-transparent p-1",
               status === "simulated" && "border-simulated",
@@ -180,7 +180,7 @@ export function CompactYourPicksList(props: Props) {
         }
         return (
           <div
-            key={p.pickid}
+            key={p.gid}
             className={cn(
               "col-span-1 flex w-full flex-row items-center",
               idx % 2 === 0 ? "justify-end" : "justify-start",

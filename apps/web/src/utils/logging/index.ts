@@ -1,5 +1,5 @@
 import * as winston from "winston";
-import { config, env } from "../config";
+import { config, env } from "@funtime/api/utils/config";
 import { RequestContext } from "../requestContext";
 import { WinstonTransport as AxiomTransport } from "@axiomhq/winston";
 
