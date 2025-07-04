@@ -483,9 +483,7 @@ export const leagueRouter = createTRPCRouter({
           }
           return p;
         });
-        // const { picks: _picks, ...mpRest } = mp;
         return {
-          // ...mpRest,
           ...mp,
           correctPicks: mp.picks.reduce((prev, curr) => {
             return prev + (curr.correct ? 1 : 0);
@@ -493,10 +491,6 @@ export const leagueRouter = createTRPCRouter({
           tiebreakerScore: tiebreakerGameId
             ? (mp.picks.find((p) => p.gid === tiebreakerGameId)?.score ?? 0)
             : 0,
-          gameIdToPick: mp.picks.reduce((prev, curr) => {
-            prev.set(curr.gid, curr);
-            return prev;
-          }, new Map<number, (typeof mp.picks)[number]>()),
         };
       });
       return mps;

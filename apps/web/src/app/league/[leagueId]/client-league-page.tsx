@@ -382,11 +382,12 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
               {games.map((g) => {
                 const homeTeam = teams.find((t) => t.teamid === g.home)!;
                 const awayTeam = teams.find((t) => t.teamid === g.away)!;
+                const myPick = myPicks?.picks.find((p) => p.gid === g.gid);
                 return (
                   <GameCard
                     key={g.gid}
                     game={g}
-                    myChosenTeam={myPicks?.gameIdToPick.get(g.gid)?.winner}
+                    myChosenTeam={myPick?.winner}
                     awayTeam={awayTeam}
                     homeTeam={homeTeam}
                     simulatedWinner={overrideGidToWinner[g.gid]}

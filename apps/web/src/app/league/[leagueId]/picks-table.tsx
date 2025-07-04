@@ -132,11 +132,7 @@ function PicksTableImpl({ picksSummary, games, teams, simulatedGames }: Props) {
       return {
         id: g.gid?.toString(),
         accessorFn: (data) => {
-          // eslint-disable-next-line @typescript-eslint/prefer-optional-chain
-          if (!data?.gameIdToPick || !data?.gameIdToPick?.get) {
-            return "--";
-          }
-          const winner = data?.gameIdToPick?.get(g.gid)?.winner;
+          const winner = data?.picks.find((p) => p.gid === g.gid)?.winner;
 
           if (!winner) {
             return "--";
@@ -202,12 +198,10 @@ function PicksTableImpl({ picksSummary, games, teams, simulatedGames }: Props) {
               >
                 {row.getVisibleCells().map((cell, index) => {
                   const gid = Number(cell.column.id);
-                  let pick;
-                  let game;
-                  if (cell?.row?.original?.gameIdToPick?.get?.(gid)) {
-                    pick = cell.row.original?.gameIdToPick?.get(gid);
-                    game = gameIdToGame.get(gid);
-                  }
+                  let pick = cell.row.original?.picks.find(
+                    (p) => p.gid === gid,
+                  );
+                  let game = gameIdToGame.get(gid);
 
                   let bgColor: "yellow" | "green" | "red" | undefined =
                     undefined;
