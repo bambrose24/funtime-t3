@@ -28,7 +28,7 @@ import { resendApi } from "~/server/services/resend";
 
 const picksSummarySchema = z.object({
   leagueId: z.number().int(),
-  week: z.number().int().optional(),
+  week: z.number().int(), // only allowed for specific week because otherwise the response is too big and hangs forever
 });
 
 const leagueIdSchema = z.object({
@@ -474,6 +474,7 @@ export const leagueRouter = createTRPCRouter({
           [(p) => gidToIndex.get(p.gid), (p) => p.gid],
           ["asc", "asc"],
         );
+
         mp.picks = mp.picks.map((p) => {
           if (
             (!viewerHasPicks || !weekStarted) &&
@@ -483,14 +484,26 @@ export const leagueRouter = createTRPCRouter({
           }
           return p;
         });
+
+        const correctPicks = mp.picks.reduce((prev, curr) => {
+          return prev + (curr.correct ? 1 : 0);
+        }, 0);
+        const tiebreakerScore = tiebreakerGameId
+          ? (mp.picks.find((p) => p.gid === tiebreakerGameId)?.score ?? 0)
+          : 0;
+
         return {
           ...mp,
-          correctPicks: mp.picks.reduce((prev, curr) => {
-            return prev + (curr.correct ? 1 : 0);
-          }, 0),
-          tiebreakerScore: tiebreakerGameId
-            ? (mp.picks.find((p) => p.gid === tiebreakerGameId)?.score ?? 0)
-            : 0,
+          picks: mp.picks.map((p) => {
+            return {
+              correct: p.correct,
+              done: p.done,
+              gid: p.gid,
+              winner: p.winner,
+            };
+          }),
+          correctPicks,
+          tiebreakerScore,
         };
       });
       return mps;

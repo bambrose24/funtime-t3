@@ -164,7 +164,7 @@ export function CompactYourPicksList(props: Props) {
         const gameWinner = simulatedWinner ?? game.winner;
 
         const gameIsTiebreaker = game.is_tiebreaker;
-        const pickScore = p.score;
+        const pickScore = myPicks.tiebreakerScore;
 
         const status: "simulated" | "empty-state" | "correct" | "wrong" =
           isSimulated

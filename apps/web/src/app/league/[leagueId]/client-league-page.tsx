@@ -296,11 +296,7 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
                   <div className="flex w-full flex-row items-center justify-between gap-2">
                     <Text.Muted>Tiebreaker Score:</Text.Muted>
                     <Text.Small className="font-semibold text-card-foreground">
-                      {
-                        myPicks.picks.find(
-                          (p) => p.score !== null && p.score > 0,
-                        )?.score
-                      }
+                      {myPicks.tiebreakerScore}
                     </Text.Small>
                   </div>
                 </div>
