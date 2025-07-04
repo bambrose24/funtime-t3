@@ -37,7 +37,7 @@ const leagueIdSchema = z.object({
 
 export const leagueRouter = createTRPCRouter({
   admin: leagueAdminRouter,
-  canCreate: publicProcedure.query(async ({ ctx }) => {
+  canCreate: authorizedProcedure.query(async ({ ctx }) => {
     const lastStarted = await ctx.db.games.findFirst({
       where: {
         ts: {
