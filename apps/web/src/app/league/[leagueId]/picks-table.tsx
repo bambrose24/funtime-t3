@@ -198,10 +198,10 @@ function PicksTableImpl({ picksSummary, games, teams, simulatedGames }: Props) {
               >
                 {row.getVisibleCells().map((cell, index) => {
                   const gid = Number(cell.column.id);
-                  let pick = cell.row.original?.picks.find(
+                  const pick = cell.row.original?.picks.find(
                     (p) => p.gid === gid,
                   );
-                  let game = gameIdToGame.get(gid);
+                  const game = gameIdToGame.get(gid);
 
                   let bgColor: "yellow" | "green" | "red" | undefined =
                     undefined;
