@@ -1,6 +1,5 @@
 "use client";
 import { usePathname } from "next/navigation";
-import { type ReactNode } from "react";
 import { type SettingsTabId, settingsTabIds, settingsTabs } from "./types";
 import { Button } from "~/components/ui/button";
 import Link from "next/link";
@@ -12,7 +11,11 @@ function useActiveSettingsTabId(): SettingsTabId | undefined {
   return settingsTabIds.filter((id) => id === lastPath)?.at(0);
 }
 
-export default function SettingsLayout({ children }: { children: ReactNode }) {
+export default function SettingsLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const tab = useActiveSettingsTabId();
   return (
     <div className="col-span-12 flex w-full flex-row justify-center py-4 md:col-span-8 md:col-start-3">
