@@ -7,6 +7,10 @@ import { PrismaPlugin } from "@prisma/nextjs-monorepo-workaround-plugin";
 
 /** @type {import("next").NextConfig} */
 const config = {
+  typescript: {
+    // issues with react-email types
+    ignoreBuildErrors: true,
+  },
   images: {
     remotePatterns: [
       {

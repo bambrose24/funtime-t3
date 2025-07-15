@@ -1,6 +1,6 @@
 import "server-only";
 import { cache } from "~/utils/cache";
-import { PrismaClient } from "@funtime/api/generated/prisma-client";
+import { type PrismaClient } from "@funtime/api/generated/prisma-client";
 
 export async function getGames({
   season,
