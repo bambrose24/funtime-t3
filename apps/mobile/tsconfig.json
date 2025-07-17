@@ -2,16 +2,25 @@
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
     "strict": true,
+    "moduleResolution": "Bundler",
+    "baseUrl": "./",
     "paths": {
-      "@/*": [
-        "./*"
-      ]
+      "@/*": ["./*"],
+      "~/*": [
+        "../../packages/api/src/*",
+        "../../packages/api/server/*",
+        "../../packages/api/utils/*",
+        "../../packages/api/lib/*",
+        "../../packages/api/trpc/*"
+      ],
+      "~/server/*": ["../../packages/api/server/*"],
+      "~/utils/*": ["../../packages/api/utils/*"],
+      "~/lib/*": ["../../packages/api/lib/*"],
+      "~/trpc/*": ["../../packages/api/trpc/*"],
+      "~/env": ["../../packages/api/env.js"],
+      "emails/*": ["../../packages/api/emails/*"]
     }
   },
-  "include": [
-    "**/*.ts",
-    "**/*.tsx",
-    ".expo/types/**/*.ts",
-    "expo-env.d.ts"
-  ]
+  "include": ["**/*.ts", "**/*.tsx", ".expo/types/**/*.ts", "expo-env.d.ts"],
+  "exclude": ["node_modules", "../../packages/api/**/*"]
 }
