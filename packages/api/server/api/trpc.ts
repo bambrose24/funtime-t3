@@ -9,6 +9,7 @@
 import { TRPCError, initTRPC } from "@trpc/server";
 import superjson from "superjson";
 import { ZodError } from "zod";
+import { createServerClient } from "@supabase/ssr";
 
 import { db } from "~/server/db";
 import { createLogger, getLogger } from "~/utils/logging";
@@ -28,7 +29,35 @@ import { supabaseServer } from "~/utils/supabase/server";
  * @see https://trpc.io/docs/server/context
  */
 export const createTRPCContext = async (opts: { headers: Headers }) => {
-  const supabase = await supabaseServer();
+  console.log("🔍 Creating TRPC context in api package");
+  // Check if this is a React Native request with Authorization header
+  const authHeader = opts.headers.get("authorization");
+  let supabase;
+
+  if (authHeader?.startsWith("Bearer ")) {
+    // React Native request - create Supabase client with the token
+    supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll: () => [],
+          setAll: () => {
+            // React Native doesn't use cookies for auth
+          },
+        },
+        global: {
+          headers: {
+            Authorization: authHeader,
+          },
+        },
+      },
+    );
+  } else {
+    // Web request - use cookie-based client
+    supabase = await supabaseServer();
+  }
+
   const {
     data: { user: supabaseUser },
   } = await supabase.auth.getUser();

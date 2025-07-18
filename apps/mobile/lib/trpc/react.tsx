@@ -11,6 +11,7 @@ import SuperJSON from "superjson";
 import { type AppRouter } from "@funtime/api";
 
 import { getBaseUrl } from "@/utils/getBaseUrl";
+import { supabase } from "@/lib/supabase/client";
 
 const createQueryClient = () => {
   const queryClient = new QueryClient({
@@ -55,12 +56,13 @@ export function TRPCReactProvider(props: { children: React.ReactNode }) {
             const headers = new Headers();
             headers.set("x-trpc-source", "react-native");
 
-            // TODO: Add authentication headers from AsyncStorage
-            // const token = await AsyncStorage.getItem('supabase-auth-token');
-            // if (token) {
-            //   headers.set('Authorization', `Bearer ${token}`);
-            // }
-
+            // Add Supabase session token for authentication
+            const {
+              data: { session },
+            } = await supabase.auth.getSession();
+            if (session?.access_token) {
+              headers.set("Authorization", `Bearer ${session.access_token}`);
+            }
             return headers;
           },
         }),
