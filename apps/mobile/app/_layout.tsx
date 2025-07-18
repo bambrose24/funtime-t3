@@ -1,3 +1,11 @@
+// Hermes doesn't support structuredClone, so we need to polyfill it for supabase to work
+// Attach the polyfill as a Global function
+import structuredClone from "@ungap/structured-clone";
+if (!("structuredClone" in globalThis)) {
+  // @ts-ignore this is a global polyfill on purpose
+  globalThis.structuredClone = structuredClone;
+}
+
 import {
   DarkTheme,
   DefaultTheme,
@@ -6,10 +14,15 @@ import {
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
+import { useState, useEffect } from "react";
+import { type Session } from "@supabase/supabase-js";
 import "react-native-reanimated";
 
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { TRPCReactProvider } from "@/lib/trpc/react";
+import { supabase } from "@/lib/supabase/client";
+import LoadingScreen from "@/components/LoadingScreen";
+import AuthScreen from "./auth";
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
@@ -17,11 +30,62 @@ export default function RootLayout() {
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
   });
 
+  // Authentication state
+  const [session, setSession] = useState<Session | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setIsLoading(false);
+    });
+
+    // Listen for auth changes
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+      setIsLoading(false);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  // Show loading screen while fonts load
   if (!loaded) {
-    // Async font loading only occurs in development.
     return null;
   }
 
+  // Show loading screen while checking authentication
+  if (isLoading) {
+    return (
+      <TRPCReactProvider>
+        <ThemeProvider
+          value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
+        >
+          <LoadingScreen />
+          <StatusBar style="auto" />
+        </ThemeProvider>
+      </TRPCReactProvider>
+    );
+  }
+
+  // Show auth screen if not logged in
+  if (!session) {
+    return (
+      <TRPCReactProvider>
+        <ThemeProvider
+          value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
+        >
+          <AuthScreen />
+          <StatusBar style="auto" />
+        </ThemeProvider>
+      </TRPCReactProvider>
+    );
+  }
+
+  // Show tabs if logged in
   return (
     <TRPCReactProvider>
       <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>

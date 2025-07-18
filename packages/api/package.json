@@ -53,6 +53,6 @@
     "@types/lodash": "^4.17.0",
     "@types/node": "^20.11.20",
     "prisma": "^6.10.1",
-    "typescript": "^5.4.2"
+    "typescript": "~5.8.3"
   }
 }

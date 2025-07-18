@@ -28,6 +28,7 @@ import { supabaseServer } from "~/utils/supabase/server";
  * @see https://trpc.io/docs/server/context
  */
 export const createTRPCContext = async (opts: { headers: Headers }) => {
+  console.log("🔍 Creating TRPC context in web app not api package");
   const supabase = await supabaseServer();
   const {
     data: { user: supabaseUser },
