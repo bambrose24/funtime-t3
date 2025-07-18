@@ -41,24 +41,28 @@ export const leagueRouter = createTRPCRouter({
     if (!ctx.dbUser) {
       return false;
     }
-    const lastStarted = await ctx.db.games.findFirst({
-      where: {
-        ts: {
-          lte: new Date(),
-        },
-        season: {
-          gte: DEFAULT_SEASON - 1,
-        },
-      },
-      orderBy: {
-        ts: "desc",
-      },
-    });
 
-    if (!lastStarted || lastStarted.season >= DEFAULT_SEASON) {
-      return false;
-    }
     return true;
+
+    // TODO: can this be faster?
+    // const lastStarted = await ctx.db.games.findFirst({
+    //   where: {
+    //     ts: {
+    //       lte: new Date(),
+    //     },
+    //     season: {
+    //       gte: DEFAULT_SEASON - 1,
+    //     },
+    //   },
+    //   orderBy: {
+    //     ts: "desc",
+    //   },
+    // });
+
+    // if (!lastStarted || lastStarted.season >= DEFAULT_SEASON) {
+    //   return false;
+    // }
+    // return true;
   }),
   fromJoinCode: publicProcedure
     .input(
