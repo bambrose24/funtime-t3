@@ -8,16 +8,15 @@ import {
   ScrollView,
   SafeAreaView,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { supabase } from "@/lib/supabase/client";
 import { clientApi } from "@/lib/trpc/react";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
-import { useColorScheme } from "@/hooks/useColorScheme";
-import { Colors } from "@/constants/Colors";
 
 export default function AccountScreen() {
   const [loading, setLoading] = useState(false);
-  const colorScheme = useColorScheme();
+  const insets = useSafeAreaInsets();
 
   // Get user data from tRPC - will only be called if user is authenticated
   const { data: userData, isLoading: userLoading } =
@@ -34,79 +33,76 @@ export default function AccountScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView>
-        <ThemedView style={styles.content}>
-          <ThemedText type="title" style={styles.title}>
-            Account
-          </ThemedText>
+      <ThemedView style={styles.header}>
+        <ThemedText type="title" style={styles.headerTitle}>
+          Account
+        </ThemedText>
+      </ThemedView>
 
+      <ScrollView
+        style={styles.scrollContainer}
+        showsVerticalScrollIndicator={false}
+      >
+        <ThemedView style={styles.content}>
           {userLoading ? (
-            <ThemedText>Loading user data...</ThemedText>
+            <View style={styles.loadingContainer}>
+              <ThemedText style={styles.loadingText}>
+                Loading your profile...
+              </ThemedText>
+            </View>
           ) : userData?.dbUser ? (
-            <View>
-              <View style={styles.userInfo}>
-                <ThemedText type="subtitle">Profile Information</ThemedText>
-                <Text
-                  style={[
-                    styles.userDetail,
-                    { color: Colors[colorScheme ?? "light"].text },
-                  ]}
-                >
-                  Name: {userData.dbUser.fname} {userData.dbUser.lname}
-                </Text>
-                <Text
-                  style={[
-                    styles.userDetail,
-                    { color: Colors[colorScheme ?? "light"].text },
-                  ]}
-                >
-                  Username: {userData.dbUser.username}
-                </Text>
-                <Text
-                  style={[
-                    styles.userDetail,
-                    { color: Colors[colorScheme ?? "light"].text },
-                  ]}
-                >
-                  Email: {userData.dbUser.email}
-                </Text>
+            <View style={styles.profileSection}>
+              <View style={styles.profileField}>
+                <ThemedText style={styles.fieldLabel}>First Name</ThemedText>
+                <ThemedText style={styles.fieldValue}>
+                  {userData.dbUser.fname}
+                </ThemedText>
               </View>
 
-              {userData.dbUser.leaguemembers &&
-                userData.dbUser.leaguemembers.length > 0 && (
-                  <View style={styles.leaguesInfo}>
-                    <ThemedText type="subtitle">Your Leagues</ThemedText>
-                    {userData.dbUser.leaguemembers.map((member, index) => (
-                      <Text
-                        key={index}
-                        style={[
-                          styles.leagueItem,
-                          { color: Colors[colorScheme ?? "light"].text },
-                        ]}
-                      >
-                        • {member.leagues.name} ({member.leagues.season})
-                      </Text>
-                    ))}
-                  </View>
-                )}
+              <View style={styles.profileField}>
+                <ThemedText style={styles.fieldLabel}>Last Name</ThemedText>
+                <ThemedText style={styles.fieldValue}>
+                  {userData.dbUser.lname}
+                </ThemedText>
+              </View>
+
+              <View style={styles.profileField}>
+                <ThemedText style={styles.fieldLabel}>Username</ThemedText>
+                <ThemedText style={styles.fieldValue}>
+                  @{userData.dbUser.username}
+                </ThemedText>
+              </View>
+
+              <View style={styles.profileField}>
+                <ThemedText style={styles.fieldLabel}>Email</ThemedText>
+                <ThemedText style={styles.fieldValue}>
+                  {userData.dbUser.email}
+                </ThemedText>
+              </View>
             </View>
           ) : (
-            <ThemedText>
-              No user data found. You may need to complete your profile setup.
-            </ThemedText>
+            <View style={styles.errorContainer}>
+              <ThemedText style={styles.errorText}>
+                Unable to load profile data. Please try signing in again.
+              </ThemedText>
+            </View>
           )}
-
-          <TouchableOpacity
-            style={[styles.button, styles.signOutButton]}
-            onPress={signOut}
-            disabled={loading}
-          >
-            <Text style={styles.buttonText}>
-              {loading ? "Signing out..." : "Sign Out"}
-            </Text>
-          </TouchableOpacity>
         </ThemedView>
       </ScrollView>
+
+      <ThemedView
+        style={[styles.footer, { paddingBottom: insets.bottom || 20 }]}
+      >
+        <TouchableOpacity
+          style={[styles.signOutButton, { opacity: loading ? 0.6 : 1 }]}
+          onPress={signOut}
+          disabled={loading}
+        >
+          <Text style={styles.signOutButtonText}>
+            {loading ? "Signing out..." : "Sign Out"}
+          </Text>
+        </TouchableOpacity>
+      </ThemedView>
     </SafeAreaView>
   );
 }
@@ -115,55 +111,76 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  content: {
+  header: {
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: "rgba(0,0,0,0.1)",
+  },
+  headerTitle: {
+    fontSize: 28,
+    fontWeight: "700",
+  },
+  scrollContainer: {
     flex: 1,
-    padding: 20,
   },
-  title: {
-    textAlign: "center",
-    marginBottom: 10,
+  content: {
+    padding: 24,
   },
-  subtitle: {
-    textAlign: "center",
-    marginBottom: 30,
-    opacity: 0.8,
-  },
-
-  button: {
-    borderRadius: 8,
-    padding: 16,
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
     alignItems: "center",
-    marginTop: 20,
+    paddingVertical: 40,
+  },
+  loadingText: {
+    fontSize: 16,
+    opacity: 0.7,
+  },
+  profileSection: {
+    gap: 24,
+  },
+  profileField: {
+    gap: 8,
+  },
+  fieldLabel: {
+    fontSize: 14,
+    fontWeight: "600",
+    opacity: 0.6,
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
+  },
+  fieldValue: {
+    fontSize: 18,
+    fontWeight: "500",
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingVertical: 40,
+  },
+  errorText: {
+    fontSize: 16,
+    textAlign: "center",
+    opacity: 0.7,
+    lineHeight: 22,
+  },
+  footer: {
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    borderTopWidth: 1,
+    borderTopColor: "rgba(0,0,0,0.1)",
   },
   signOutButton: {
     backgroundColor: "#dc3545",
-    marginTop: 30,
+    borderRadius: 12,
+    padding: 16,
+    alignItems: "center",
   },
-  buttonText: {
+  signOutButtonText: {
     color: "white",
     fontSize: 16,
     fontWeight: "600",
-  },
-  helpText: {
-    textAlign: "center",
-    marginTop: 20,
-    opacity: 0.7,
-    fontSize: 14,
-  },
-  userInfo: {
-    marginBottom: 30,
-  },
-  userDetail: {
-    fontSize: 16,
-    marginBottom: 8,
-    paddingVertical: 4,
-  },
-  leaguesInfo: {
-    marginBottom: 20,
-  },
-  leagueItem: {
-    fontSize: 14,
-    marginBottom: 4,
-    paddingLeft: 10,
   },
 });

@@ -26,6 +26,7 @@ const handler = withAxiom(async (req: NextRequest) => {
     router: appRouter,
     createContext: () => createContext(req),
     onError:
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       env.NODE_ENV === "development"
         ? ({ path, error }) => {
             console.error(
