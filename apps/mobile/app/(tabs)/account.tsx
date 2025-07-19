@@ -3,7 +3,6 @@ import {
   View,
   Text,
   TouchableOpacity,
-  StyleSheet,
   Alert,
   ScrollView,
   SafeAreaView,
@@ -11,8 +10,6 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { supabase } from "@/lib/supabase/client";
 import { clientApi } from "@/lib/trpc/react";
-import { ThemedText } from "@/components/ThemedText";
-import { ThemedView } from "@/components/ThemedView";
 
 export default function AccountScreen() {
   const [loading, setLoading] = useState(false);
@@ -32,155 +29,84 @@ export default function AccountScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <ThemedView style={styles.header}>
-        <ThemedText type="title" style={styles.headerTitle}>
+    <SafeAreaView className="bg-app-bg-light dark:bg-app-bg-dark flex-1">
+      <View className="border-b border-gray-200 px-5 py-4 dark:border-zinc-800">
+        <Text className="text-app-fg-light dark:text-app-fg-dark text-3xl font-bold">
           Account
-        </ThemedText>
-      </ThemedView>
+        </Text>
+      </View>
 
-      <ScrollView
-        style={styles.scrollContainer}
-        showsVerticalScrollIndicator={false}
-      >
-        <ThemedView style={styles.content}>
+      <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
+        <View className="p-6">
           {userLoading ? (
-            <View style={styles.loadingContainer}>
-              <ThemedText style={styles.loadingText}>
+            <View className="flex-1 items-center justify-center py-10">
+              <Text className="text-base text-gray-500 dark:text-gray-400">
                 Loading your profile...
-              </ThemedText>
+              </Text>
             </View>
           ) : userData?.dbUser ? (
-            <View style={styles.profileSection}>
-              <View style={styles.profileField}>
-                <ThemedText style={styles.fieldLabel}>First Name</ThemedText>
-                <ThemedText style={styles.fieldValue}>
+            <View className="gap-6">
+              <View className="gap-2">
+                <Text className="text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                  First Name
+                </Text>
+                <Text className="text-app-fg-light dark:text-app-fg-dark text-lg font-medium">
                   {userData.dbUser.fname}
-                </ThemedText>
+                </Text>
               </View>
 
-              <View style={styles.profileField}>
-                <ThemedText style={styles.fieldLabel}>Last Name</ThemedText>
-                <ThemedText style={styles.fieldValue}>
+              <View className="gap-2">
+                <Text className="text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                  Last Name
+                </Text>
+                <Text className="text-app-fg-light dark:text-app-fg-dark text-lg font-medium">
                   {userData.dbUser.lname}
-                </ThemedText>
+                </Text>
               </View>
 
-              <View style={styles.profileField}>
-                <ThemedText style={styles.fieldLabel}>Username</ThemedText>
-                <ThemedText style={styles.fieldValue}>
+              <View className="gap-2">
+                <Text className="text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                  Username
+                </Text>
+                <Text className="text-app-fg-light dark:text-app-fg-dark text-lg font-medium">
                   @{userData.dbUser.username}
-                </ThemedText>
+                </Text>
               </View>
 
-              <View style={styles.profileField}>
-                <ThemedText style={styles.fieldLabel}>Email</ThemedText>
-                <ThemedText style={styles.fieldValue}>
+              <View className="gap-2">
+                <Text className="text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                  Email
+                </Text>
+                <Text className="text-app-fg-light dark:text-app-fg-dark text-lg font-medium">
                   {userData.dbUser.email}
-                </ThemedText>
+                </Text>
               </View>
             </View>
           ) : (
-            <View style={styles.errorContainer}>
-              <ThemedText style={styles.errorText}>
+            <View className="flex-1 items-center justify-center py-10">
+              <Text className="text-center text-base leading-6 text-gray-500 dark:text-gray-400">
                 Unable to load profile data. Please try signing in again.
-              </ThemedText>
+              </Text>
             </View>
           )}
-        </ThemedView>
+        </View>
       </ScrollView>
 
-      <ThemedView
-        style={[styles.footer, { paddingBottom: insets.bottom || 20 }]}
+      <View
+        className="border-t border-gray-200 px-5 pt-5 dark:border-zinc-800"
+        style={{ paddingBottom: insets.bottom || 20 }}
       >
         <TouchableOpacity
-          style={[styles.signOutButton, { opacity: loading ? 0.6 : 1 }]}
+          className="items-center rounded-xl bg-red-500 p-4 dark:bg-red-600"
+          style={{ opacity: loading ? 0.6 : 1 }}
           onPress={signOut}
           disabled={loading}
         >
-          <Text style={styles.signOutButtonText}>
+          <Text className="text-base font-semibold text-white">
             {loading ? "Signing out..." : "Sign Out"}
           </Text>
         </TouchableOpacity>
-      </ThemedView>
+      </View>
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  header: {
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: "rgba(0,0,0,0.1)",
-  },
-  headerTitle: {
-    fontSize: 28,
-    fontWeight: "700",
-  },
-  scrollContainer: {
-    flex: 1,
-  },
-  content: {
-    padding: 24,
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    paddingVertical: 40,
-  },
-  loadingText: {
-    fontSize: 16,
-    opacity: 0.7,
-  },
-  profileSection: {
-    gap: 24,
-  },
-  profileField: {
-    gap: 8,
-  },
-  fieldLabel: {
-    fontSize: 14,
-    fontWeight: "600",
-    opacity: 0.6,
-    textTransform: "uppercase",
-    letterSpacing: 0.5,
-  },
-  fieldValue: {
-    fontSize: 18,
-    fontWeight: "500",
-  },
-  errorContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    paddingVertical: 40,
-  },
-  errorText: {
-    fontSize: 16,
-    textAlign: "center",
-    opacity: 0.7,
-    lineHeight: 22,
-  },
-  footer: {
-    paddingHorizontal: 20,
-    paddingTop: 20,
-    borderTopWidth: 1,
-    borderTopColor: "rgba(0,0,0,0.1)",
-  },
-  signOutButton: {
-    backgroundColor: "#dc3545",
-    borderRadius: 12,
-    padding: 16,
-    alignItems: "center",
-  },
-  signOutButtonText: {
-    color: "white",
-    fontSize: 16,
-    fontWeight: "600",
-  },
-});
