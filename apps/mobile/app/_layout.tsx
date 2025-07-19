@@ -1,3 +1,6 @@
+// NativeWind CSS
+import "../global.css";
+
 // Hermes doesn't support structuredClone, so we need to polyfill it for supabase to work
 // Attach the polyfill as a Global function
 import structuredClone from "@ungap/structured-clone";
@@ -12,6 +15,12 @@ import {
   ThemeProvider,
 } from "@react-navigation/native";
 import { useFonts } from "expo-font";
+import {
+  Inter_400Regular,
+  Inter_500Medium,
+  Inter_600SemiBold,
+  Inter_700Bold,
+} from "@expo-google-fonts/inter";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useState, useEffect } from "react";
@@ -27,7 +36,10 @@ import AuthScreen from "./auth";
 export default function RootLayout() {
   const colorScheme = useColorScheme();
   const [loaded] = useFonts({
-    SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
+    Inter_400Regular,
+    Inter_500Medium,
+    Inter_600SemiBold,
+    Inter_700Bold,
   });
 
   // Authentication state
