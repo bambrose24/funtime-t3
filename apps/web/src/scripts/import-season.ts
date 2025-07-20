@@ -1,9 +1,9 @@
 import { groupBy, orderBy } from "lodash";
 import { db } from "~/server/db";
-import { msf } from "~/server/services/mysportsfeeds";
+import { espn } from "~/server/services/espn";
 
 async function run() {
-  const season = 2024;
+  const season = 2025;
   const existingGames = await db.games.findMany({
     where: {
       season,
@@ -17,20 +17,26 @@ async function run() {
 
   console.log("can make games!");
 
-  const msfGamesResponse = await msf.getGamesBySeason({ season });
+  // Get games from ESPN instead of MySportsFeeds
+  const espnGamesResponse = await espn.getGamesBySeason({ season });
+  console.log(
+    `Found ${espnGamesResponse.length} games from ESPN for season ${season}`,
+  );
 
-  const groupedByWeek = groupBy(msfGamesResponse, (g) => g.schedule.week);
+  // Group games by week to determine tiebreaker games
+  const groupedByWeek = groupBy(espnGamesResponse, (g) => g.week.number);
 
-  const msfTiebreakerIds = new Set<number>();
+  // Determine tiebreaker games (last game of each week)
+  const espnTiebreakerIds = new Set<string>();
   for (const groupedGames of Object.values(groupedByWeek)) {
     const sortedGames = orderBy(
       groupedGames,
-      [(g) => new Date(g.schedule.startTime), (g) => g.schedule.id],
+      [(g) => new Date(g.date), (g) => g.id],
       ["asc", "asc"],
     );
     const lastGame = sortedGames.at(-1);
     if (lastGame) {
-      msfTiebreakerIds.add(lastGame.schedule.id);
+      espnTiebreakerIds.add(lastGame.id);
     }
   }
 
@@ -38,29 +44,38 @@ async function run() {
   const teamByAbbrev = groupBy(teams, (t) => t.abbrev);
 
   const creates: Array<Parameters<typeof db.games.create>[0]> = [];
-  for (const msfGame of msfGamesResponse) {
-    const homeTeam =
-      teamByAbbrev[msfGame.schedule.homeTeam.abbreviation]?.at(0);
-    const awayTeam =
-      teamByAbbrev[msfGame.schedule.awayTeam.abbreviation]?.at(0);
+  for (const espnGame of espnGamesResponse) {
+    // Extract team info from ESPN game data
+    const homeTeamAbbrev = espnGame.competitions[0]?.competitors.find(
+      (c) => c.homeAway === "home",
+    )?.team.abbreviation;
+    const awayTeamAbbrev = espnGame.competitions[0]?.competitors.find(
+      (c) => c.homeAway === "away",
+    )?.team.abbreviation;
+
+    const homeTeam = teamByAbbrev[homeTeamAbbrev ?? ""]?.at(0);
+    const awayTeam = teamByAbbrev[awayTeamAbbrev ?? ""]?.at(0);
 
     if (!homeTeam || !awayTeam) {
-      throw new Error("Could not find home team");
+      console.warn(
+        `Could not find teams for game ${espnGame.id}: ${awayTeamAbbrev} @ ${homeTeamAbbrev}`,
+      );
+      continue;
     }
 
     creates.push({
       data: {
         season,
-        week: msfGame.schedule.week,
-        ts: new Date(msfGame.schedule.startTime),
-        msf_id: msfGame.schedule.id,
+        week: espnGame.week.number,
+        ts: new Date(espnGame.date),
+        espn_id: Number(espnGame.id),
         done: false,
-        seconds: Math.round(
-          new Date(msfGame.schedule.startTime).getTime() / 1000,
-        ),
-        is_tiebreaker: msfTiebreakerIds.has(msfGame.schedule.id),
+        seconds: Math.round(new Date(espnGame.date).getTime() / 1000),
+        is_tiebreaker: espnTiebreakerIds.has(espnGame.id),
         away: awayTeam.teamid,
         home: homeTeam.teamid,
+        homescore: 0,
+        awayscore: 0,
       },
     });
   }
@@ -68,7 +83,9 @@ async function run() {
   console.log(`going to create ${creates.length} games...`);
   let i = 1;
   for (const create of creates) {
-    console.log(`  creating game ${i} of ${creates.length}`);
+    console.log(
+      `  creating game ${i} of ${creates.length} - Week ${create.data.week}`,
+    );
     await db.games.create(create);
     i++;
   }

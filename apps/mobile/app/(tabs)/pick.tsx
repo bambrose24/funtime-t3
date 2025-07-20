@@ -2,6 +2,7 @@ import React from "react";
 import { SafeAreaView, ScrollView, View, Text } from "react-native";
 import { clientApi } from "@/lib/trpc/react";
 import { ClientPickPage } from "@/components/picks/ClientPickPage";
+import { DEFAULT_SEASON } from "@/constants";
 
 export default function PickScreen() {
   // Get session first to ensure user is authenticated
@@ -9,7 +10,9 @@ export default function PickScreen() {
     clientApi.session.current.useQuery();
 
   // Only fetch other data if user is authenticated and has leagues
-  const firstLeagueId = session?.dbUser?.leaguemembers?.[0]?.league_id;
+  const firstLeagueId = session?.dbUser?.leaguemembers?.find(
+    (m) => m.leagues.season === DEFAULT_SEASON,
+  )?.league_id;
 
   const { data: weekToPick, isLoading: weekLoading } =
     clientApi.league.weekToPick.useQuery(
@@ -75,6 +78,8 @@ export default function PickScreen() {
       </SafeAreaView>
     );
   }
+
+  console.log("[debug] firstLeagueId and league", firstLeagueId, league);
 
   // Show no leagues message
   if (!firstLeagueId || !league) {

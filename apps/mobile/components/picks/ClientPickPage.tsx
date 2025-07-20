@@ -234,18 +234,10 @@ export function ClientPickPage({
           </Text>
         </View>
 
-        {/* User info alert */}
-        <View className="mb-4 rounded-xl border border-blue-200 bg-blue-50 p-4 dark:border-blue-700 dark:bg-blue-900">
-          <Text className="text-center text-sm text-blue-800 dark:text-blue-200">
-            You are picking as{" "}
-            <Text className="font-bold">{/* TODO: Add username */}player</Text>
-          </Text>
-        </View>
-
         {/* Randomize button */}
         <TouchableOpacity
           onPress={randomizePicks}
-          className="mb-6 rounded-xl bg-gray-100 p-4 dark:bg-gray-800"
+          className="mb-6 rounded-xl bg-gray-100 p-3 dark:bg-gray-800"
         >
           <Text className="text-app-fg-light dark:text-app-fg-dark text-center font-medium">
             Randomize Picks
@@ -280,13 +272,13 @@ export function ClientPickPage({
                 disabled={field.type === "alreadyStarted"}
                 tiebreakerScore={
                   game.is_tiebreaker ? (
-                    <View className="mt-4 border-t border-gray-200 pt-4 dark:border-gray-700">
+                    <View className="mt-3 border-t border-gray-200 pt-3 dark:border-gray-700">
                       <Text className="text-app-fg-light dark:text-app-fg-dark mb-2 text-sm font-medium">
                         Tiebreaker Score
                       </Text>
                       <TextInput
-                        className="text-app-fg-light dark:text-app-fg-dark rounded-lg border border-gray-300 bg-white p-3 dark:border-gray-600 dark:bg-gray-800"
-                        placeholder="Enter total score (1-200)"
+                        className="text-app-fg-light dark:text-app-fg-dark rounded-lg border border-gray-300 bg-white p-2 text-sm dark:border-gray-600 dark:bg-gray-800"
+                        placeholder="Total score (1-200)"
                         placeholderTextColor="#9CA3AF"
                         keyboardType="numeric"
                         value={form.watch("tiebreakerScore.score")}
@@ -296,9 +288,6 @@ export function ClientPickPage({
                           })
                         }
                       />
-                      <Text className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                        You must enter a score between 1 and 200
-                      </Text>
                     </View>
                   ) : null
                 }

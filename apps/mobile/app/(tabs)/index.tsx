@@ -2,8 +2,7 @@ import React from "react";
 import { ScrollView, View, Text, SafeAreaView } from "react-native";
 import { clientApi } from "@/lib/trpc/react";
 import { HomeLeagueCard } from "@/components/home/HomeLeagueCard";
-
-const DEFAULT_SEASON = 2025;
+import { DEFAULT_SEASON } from "@/constants";
 
 export default function HomeScreen() {
   // Fetch session and home summary data

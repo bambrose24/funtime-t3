@@ -295,6 +295,7 @@ export const leagueRouter = createTRPCRouter({
   weekToPick: authorizedProcedure
     .input(leagueIdSchema)
     .query(async ({ input, ctx }) => {
+      console.log("[debug] weekToPick leagueId ", input.leagueId);
       const { leagueId } = input;
       const member = ctx.dbUser?.leaguemembers.find(
         (m) => m.league_id === leagueId,
@@ -321,6 +322,7 @@ export const leagueRouter = createTRPCRouter({
       }
 
       const { season } = data;
+      console.log("[debug] season ", season);
 
       const [mostRecentStartedGame, nextGameToStart] = await Promise.all([
         ctx.db.games.findFirst({
@@ -347,11 +349,7 @@ export const leagueRouter = createTRPCRouter({
         }),
       ]);
 
-      if (!mostRecentStartedGame) {
-        return { week: null, season: null, games: [] };
-      }
-
-      const { week } = mostRecentStartedGame;
+      const { week } = mostRecentStartedGame ?? nextGameToStart ?? { week: 1 };
 
       const gamesResp = await ctx.db.games.findMany({
         where: {
