@@ -1,9 +1,64 @@
-import { Image } from "expo-image";
-import { Platform, ScrollView, View, Text, SafeAreaView } from "react-native";
+import React from "react";
+import { ScrollView, View, Text, SafeAreaView } from "react-native";
+import { clientApi } from "@/lib/trpc/react";
+import { HomeLeagueCard } from "@/components/home/HomeLeagueCard";
 
-import { HelloWave } from "@/components/HelloWave";
+const DEFAULT_SEASON = 2025;
 
 export default function HomeScreen() {
+  // Fetch session and home summary data
+  const { data: session, isLoading: sessionLoading } =
+    clientApi.session.current.useQuery();
+  const { data: homeData, isLoading: homeLoading } =
+    clientApi.home.summary.useQuery(
+      undefined,
+      { enabled: !!session?.dbUser }, // Only fetch if user is authenticated
+    );
+
+  // Show loading while fetching session
+  if (sessionLoading) {
+    return (
+      <SafeAreaView className="bg-app-bg-light dark:bg-app-bg-dark flex-1">
+        <View className="flex-1 items-center justify-center">
+          <Text className="text-base text-gray-500 dark:text-gray-400">
+            Loading...
+          </Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  // Show welcome/landing screen if not authenticated
+  if (!session?.dbUser) {
+    return (
+      <SafeAreaView className="bg-app-bg-light dark:bg-app-bg-dark flex-1">
+        <ScrollView
+          className="flex-1"
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ padding: 24 }}
+        >
+          <View className="items-center justify-center py-16">
+            <Text className="text-app-fg-light dark:text-app-fg-dark mb-4 text-center text-3xl font-bold">
+              Welcome to Funtime
+            </Text>
+            <Text className="text-center text-lg text-gray-700 dark:text-gray-300">
+              Free NFL Pick 'em Platform
+            </Text>
+            <Text className="mt-4 text-center text-base text-gray-600 dark:text-gray-400">
+              Sign in to view your leagues and make picks!
+            </Text>
+          </View>
+        </ScrollView>
+      </SafeAreaView>
+    );
+  }
+
+  // Filter leagues by season
+  const activeLeagues =
+    homeData?.filter((l) => l.season === DEFAULT_SEASON) ?? [];
+  const priorLeagues =
+    homeData?.filter((l) => l.season !== DEFAULT_SEASON) ?? [];
+
   return (
     <SafeAreaView className="bg-app-bg-light dark:bg-app-bg-dark flex-1">
       <ScrollView
@@ -11,89 +66,54 @@ export default function HomeScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 32 }}
       >
-        {/* Header with logo - simplified without blue background */}
-        <View className="relative mb-8 h-64 items-center justify-center bg-gray-50 dark:bg-zinc-900">
-          <Image
-            source={require("@/assets/images/partial-react-logo.png")}
-            style={{
-              height: 178,
-              width: 290,
-              position: "absolute",
-              bottom: 0,
-              left: 0,
-            }}
-          />
+        {/* Active Leagues Section */}
+        <View className="px-6 pb-4 pt-6">
+          <Text className="text-app-fg-light dark:text-app-fg-dark text-center text-2xl font-bold">
+            Active Leagues
+          </Text>
         </View>
 
-        {/* Content */}
-        <View className="px-6">
-          {/* Title */}
-          <View className="mb-8 flex-row items-center gap-2">
-            <Text className="text-app-fg-light dark:text-app-fg-dark text-3xl font-bold">
-              Welcome!
-            </Text>
-            <HelloWave />
-          </View>
-
-          {/* Step 1 */}
-          <View className="mb-6 gap-2">
-            <Text className="text-app-fg-light dark:text-app-fg-dark mb-2 text-xl font-bold">
-              Step 1: Try it
-            </Text>
-            <Text className="text-base leading-6 text-gray-700 dark:text-gray-300">
-              Edit{" "}
-              <Text className="text-app-fg-light dark:text-app-fg-dark font-semibold">
-                app/(tabs)/index.tsx
-              </Text>{" "}
-              to see changes. Press{" "}
-              <Text className="text-app-fg-light dark:text-app-fg-dark font-semibold">
-                {Platform.select({
-                  ios: "cmd + d",
-                  android: "cmd + m",
-                  web: "F12",
-                })}
-              </Text>{" "}
-              to open developer tools.
-            </Text>
-          </View>
-
-          {/* Step 2 */}
-          <View className="mb-6 gap-2">
-            <Text className="text-app-fg-light dark:text-app-fg-dark mb-2 text-xl font-bold">
-              Step 2: Explore
-            </Text>
-            <Text className="text-base leading-6 text-gray-700 dark:text-gray-300">
-              Tap the Explore tab to learn more about what's included in this
-              starter app.
-            </Text>
-          </View>
-
-          {/* Step 3 */}
-          <View className="mb-6 gap-2">
-            <Text className="text-app-fg-light dark:text-app-fg-dark mb-2 text-xl font-bold">
-              Step 3: Get a fresh start
-            </Text>
-            <Text className="text-base leading-6 text-gray-700 dark:text-gray-300">
-              When you're ready, run{" "}
-              <Text className="text-app-fg-light dark:text-app-fg-dark font-semibold">
-                npm run reset-project
-              </Text>{" "}
-              to get a fresh{" "}
-              <Text className="text-app-fg-light dark:text-app-fg-dark font-semibold">
-                app
-              </Text>{" "}
-              directory. This will move the current{" "}
-              <Text className="text-app-fg-light dark:text-app-fg-dark font-semibold">
-                app
-              </Text>{" "}
-              to{" "}
-              <Text className="text-app-fg-light dark:text-app-fg-dark font-semibold">
-                app-example
+        <View className="px-4">
+          {homeLoading ? (
+            <View className="flex-1 items-center justify-center py-10">
+              <Text className="text-base text-gray-500 dark:text-gray-400">
+                Loading your leagues...
               </Text>
-              .
-            </Text>
-          </View>
+            </View>
+          ) : activeLeagues.length === 0 ? (
+            <View className="px-4 py-8">
+              <Text className="text-center text-base text-gray-600 dark:text-gray-400">
+                No active leagues for the {DEFAULT_SEASON} season.{"\n"}
+                Create one or join from a friend's share link.
+              </Text>
+            </View>
+          ) : (
+            <View className="gap-4">
+              {activeLeagues.map((league) => (
+                <HomeLeagueCard key={league.league_id} data={league} />
+              ))}
+            </View>
+          )}
         </View>
+
+        {/* Prior Leagues Section */}
+        {priorLeagues.length > 0 && (
+          <>
+            <View className="px-6 pb-4 pt-8">
+              <Text className="text-app-fg-light dark:text-app-fg-dark text-center text-2xl font-bold">
+                Prior Leagues
+              </Text>
+            </View>
+
+            <View className="px-4">
+              <View className="gap-4">
+                {priorLeagues.map((league) => (
+                  <HomeLeagueCard key={league.league_id} data={league} />
+                ))}
+              </View>
+            </View>
+          </>
+        )}
       </ScrollView>
     </SafeAreaView>
   );
