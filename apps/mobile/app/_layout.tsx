@@ -13,6 +13,7 @@ import {
   DarkTheme,
   DefaultTheme,
   ThemeProvider,
+  type Theme,
 } from "@react-navigation/native";
 import { useFonts } from "expo-font";
 import {
@@ -23,18 +24,36 @@ import {
 } from "@expo-google-fonts/inter";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { type Session } from "@supabase/supabase-js";
+import { Platform } from "react-native";
 import "react-native-reanimated";
 
-import { useColorScheme } from "@/hooks/useColorScheme";
+import { useColorScheme } from "../lib/useColorScheme";
+import { NAV_THEME } from "../lib/constants";
 import { TRPCReactProvider } from "@/lib/trpc/react";
 import { supabase } from "@/lib/supabase/client";
 import LoadingScreen from "@/components/LoadingScreen";
 import AuthScreen from "./auth";
 
+const LIGHT_THEME: Theme = {
+  ...DefaultTheme,
+  colors: NAV_THEME.light,
+};
+const DARK_THEME: Theme = {
+  ...DarkTheme,
+  colors: NAV_THEME.dark,
+};
+
+const useIsomorphicLayoutEffect =
+  Platform.OS === "web" && typeof window === "undefined"
+    ? useEffect
+    : useEffect;
+
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
+  const hasMounted = useRef(false);
+  const { colorScheme, isDarkColorScheme } = useColorScheme();
+  const [isColorSchemeLoaded, setIsColorSchemeLoaded] = useState(false);
   const [loaded] = useFonts({
     Inter_400Regular,
     Inter_500Medium,
@@ -45,6 +64,19 @@ export default function RootLayout() {
   // Authentication state
   const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+
+  useIsomorphicLayoutEffect(() => {
+    if (hasMounted.current) {
+      return;
+    }
+
+    if (Platform.OS === "web") {
+      // Adds the background color to the html element to prevent white background on overscroll.
+      document.documentElement.classList.add("bg-background");
+    }
+    setIsColorSchemeLoaded(true);
+    hasMounted.current = true;
+  }, []);
 
   useEffect(() => {
     // Get initial session
@@ -64,8 +96,8 @@ export default function RootLayout() {
     return () => subscription.unsubscribe();
   }, []);
 
-  // Show loading screen while fonts load
-  if (!loaded) {
+  // Show loading screen while fonts or color scheme load
+  if (!loaded || !isColorSchemeLoaded) {
     return null;
   }
 
@@ -73,11 +105,9 @@ export default function RootLayout() {
   if (isLoading) {
     return (
       <TRPCReactProvider>
-        <ThemeProvider
-          value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
-        >
+        <ThemeProvider value={isDarkColorScheme ? DARK_THEME : LIGHT_THEME}>
           <LoadingScreen />
-          <StatusBar style="auto" />
+          <StatusBar style={isDarkColorScheme ? "light" : "dark"} />
         </ThemeProvider>
       </TRPCReactProvider>
     );
@@ -87,11 +117,9 @@ export default function RootLayout() {
   if (!session) {
     return (
       <TRPCReactProvider>
-        <ThemeProvider
-          value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
-        >
+        <ThemeProvider value={isDarkColorScheme ? DARK_THEME : LIGHT_THEME}>
           <AuthScreen />
-          <StatusBar style="auto" />
+          <StatusBar style={isDarkColorScheme ? "light" : "dark"} />
         </ThemeProvider>
       </TRPCReactProvider>
     );
@@ -100,12 +128,12 @@ export default function RootLayout() {
   // Show tabs if logged in
   return (
     <TRPCReactProvider>
-      <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
+      <ThemeProvider value={isDarkColorScheme ? DARK_THEME : LIGHT_THEME}>
         <Stack>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen name="+not-found" />
         </Stack>
-        <StatusBar style="auto" />
+        <StatusBar style={isDarkColorScheme ? "light" : "dark"} />
       </ThemeProvider>
     </TRPCReactProvider>
   );

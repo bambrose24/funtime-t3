@@ -295,7 +295,6 @@ export const leagueRouter = createTRPCRouter({
   weekToPick: authorizedProcedure
     .input(leagueIdSchema)
     .query(async ({ input, ctx }) => {
-      console.log("[debug] weekToPick leagueId ", input.leagueId);
       const { leagueId } = input;
       const member = ctx.dbUser?.leaguemembers.find(
         (m) => m.league_id === leagueId,
@@ -322,7 +321,6 @@ export const leagueRouter = createTRPCRouter({
       }
 
       const { season } = data;
-      console.log("[debug] season ", season);
 
       const [mostRecentStartedGame, nextGameToStart] = await Promise.all([
         ctx.db.games.findFirst({
@@ -349,6 +347,9 @@ export const leagueRouter = createTRPCRouter({
         }),
       ]);
 
+      console.log("[debug] mostRecentStartedGame ", mostRecentStartedGame);
+      console.log("[debug] nextGameToStart ", nextGameToStart);
+
       const { week } = mostRecentStartedGame ?? nextGameToStart ?? { week: 1 };
 
       const gamesResp = await ctx.db.games.findMany({
@@ -358,7 +359,8 @@ export const leagueRouter = createTRPCRouter({
             {
               week,
             },
-            { week: week + 1 },
+            // A fix to not look ahead if week 1 hasn't started yet
+            { week: week === 1 ? week : week + 1 },
           ],
         },
       });
@@ -390,10 +392,20 @@ export const leagueRouter = createTRPCRouter({
       );
 
       const weekToReturn =
-        mostRecentStartedWeekPicks.length > 0 ||
-        (nextGameToStart && nextGameToStart.week === week + 1)
-          ? week + 1
-          : week;
+        week === 1
+          ? week
+          : mostRecentStartedWeekPicks.length > 0 ||
+              (nextGameToStart && nextGameToStart.week === week + 1)
+            ? week + 1
+            : week;
+      console.log(
+        "[debug] weekToReturn ",
+        week,
+        weekToReturn,
+        mostRecentStartedWeekPicks.length,
+        Boolean(nextGameToStart),
+        nextGameToStart?.week,
+      );
       const picksToReturn =
         weekToReturn === week ? mostRecentStartedWeekPicks : nextWeekPicks;
       const gamesToReturn =

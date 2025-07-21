@@ -1,19 +1,14 @@
 import React, { useState } from "react";
-import {
-  View,
-  Text,
-  ScrollView,
-  TouchableOpacity,
-  TextInput,
-  Alert,
-} from "react-native";
+import { View, ScrollView, Alert } from "react-native";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { format } from "date-fns";
 import { clientApi } from "@/lib/trpc/react";
 import { type RouterOutputs } from "~/trpc/types";
-import { GameCard } from "./GameCard";
+import { PickGameCard } from "./PickGameCard";
+import { Button } from "../ui/button";
+import { Text } from "../ui/text";
+import { Input } from "../ui/input";
 
 type Props = {
   league: RouterOutputs["league"]["get"];
@@ -30,7 +25,7 @@ const picksSchema = z.object({
           type: z.literal("toPick"),
           gid: z.number().int(),
           winner: z.number().int().nullable(),
-          isRandom: z.boolean().default(false),
+          isRandom: z.boolean(),
         }),
         z.object({
           type: z.literal("alreadyStarted"),
@@ -70,7 +65,7 @@ const picksSchema = z.object({
   }),
 });
 
-type FormData = z.infer<typeof picksSchema>;
+type PicksFormData = z.infer<typeof picksSchema>;
 
 export function ClientPickPage({
   weekToPick,
@@ -92,7 +87,7 @@ export function ClientPickPage({
   // Check if user has already submitted picks
   const hasSubmittedAlready = existingPicks.length > 0;
 
-  const form = useForm<FormData>({
+  const form = useForm<PicksFormData>({
     resolver: zodResolver(picksSchema),
     defaultValues: {
       picks: games.map((g) => {
@@ -131,7 +126,7 @@ export function ClientPickPage({
   const { mutateAsync: submitPicks } =
     clientApi.picks.submitPicks.useMutation();
 
-  const onSubmit = async (data: FormData) => {
+  const onSubmit = async (data: PicksFormData) => {
     try {
       setSubmitting(true);
 
@@ -234,17 +229,10 @@ export function ClientPickPage({
           </Text>
         </View>
 
-        {/* Randomize button */}
-        <TouchableOpacity
-          onPress={randomizePicks}
-          className="mb-6 rounded-xl bg-gray-100 p-3 dark:bg-gray-800"
-        >
-          <Text className="text-app-fg-light dark:text-app-fg-dark text-center font-medium">
-            Randomize Picks
-          </Text>
-        </TouchableOpacity>
+        <Button onPress={randomizePicks} variant="secondary" className="mb-6">
+          Randomize Picks
+        </Button>
 
-        {/* Game Cards */}
         <View className="mb-6 gap-4">
           {picksField.fields.map((field, idx) => {
             const game = games.find((g) => g.gid === field.gid);
@@ -260,7 +248,7 @@ export function ClientPickPage({
             if (!homeTeam || !awayTeam) return null;
 
             return (
-              <GameCard
+              <PickGameCard
                 key={field.gid}
                 game={game}
                 homeTeam={homeTeam}
@@ -272,22 +260,23 @@ export function ClientPickPage({
                 disabled={field.type === "alreadyStarted"}
                 tiebreakerScore={
                   game.is_tiebreaker ? (
-                    <View className="mt-3 border-t border-gray-200 pt-3 dark:border-gray-700">
-                      <Text className="text-app-fg-light dark:text-app-fg-dark mb-2 text-sm font-medium">
+                    <View className="mt-3 border-t-2 border-primary/20 pt-3">
+                      <Text className="mb-2 text-sm font-medium text-foreground">
                         Tiebreaker Score
                       </Text>
-                      <TextInput
-                        className="text-app-fg-light dark:text-app-fg-dark rounded-lg border border-gray-300 bg-white p-2 text-sm dark:border-gray-600 dark:bg-gray-800"
-                        placeholder="Total score (1-200)"
-                        placeholderTextColor="#9CA3AF"
+                      <Input
+                        placeholder="Total score"
                         keyboardType="numeric"
                         value={form.watch("tiebreakerScore.score")}
-                        onChangeText={(text) =>
+                        onChangeText={(text: string) =>
                           form.setValue("tiebreakerScore.score", text, {
                             shouldValidate: true,
                           })
                         }
                       />
+                      <Text className="mt-2 text-xs text-muted-foreground">
+                        You must enter a score between 1 and 200
+                      </Text>
                     </View>
                   ) : null
                 }
@@ -297,23 +286,18 @@ export function ClientPickPage({
         </View>
 
         {/* Submit Button */}
-        <TouchableOpacity
+        <Button
           onPress={form.handleSubmit(onSubmit)}
           disabled={submitting || !isFormValid || !isFormDirty}
-          className={`rounded-xl p-4 ${
-            submitting || !isFormValid || !isFormDirty
-              ? "bg-gray-300 dark:bg-gray-700"
-              : "bg-green-600 dark:bg-green-500"
-          }`}
+          variant="default"
+          size="lg"
         >
-          <Text className="text-center font-semibold text-white">
-            {submitting
-              ? "Submitting..."
-              : hasSubmittedAlready
-                ? "Update Picks"
-                : "Submit Picks"}
-          </Text>
-        </TouchableOpacity>
+          {submitting
+            ? "Submitting..."
+            : hasSubmittedAlready
+              ? "Update Picks"
+              : "Submit Picks"}
+        </Button>
 
         {/* Form validation errors */}
         {form.formState.errors.picks && (

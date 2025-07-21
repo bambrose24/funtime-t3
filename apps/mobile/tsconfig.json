@@ -9,6 +9,7 @@
         "./*"
       ],
       "~/*": [
+        "./*",
         "../../packages/api/src/*",
         "../../packages/api/server/*",
         "../../packages/api/utils/*",
