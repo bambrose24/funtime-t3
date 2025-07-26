@@ -11,10 +11,7 @@ import { Text } from "../ui/text";
 import { Input } from "../ui/input";
 
 type Props = {
-  league: RouterOutputs["league"]["get"];
-  weekToPick: RouterOutputs["league"]["weekToPick"];
-  teams: RouterOutputs["teams"]["getTeams"];
-  existingPicks: RouterOutputs["member"]["picksForWeek"];
+  leagueId: string;
 };
 
 const picksSchema = z.object({
@@ -43,7 +40,7 @@ const picksSchema = z.object({
             (pick.type === "toPick" && pick.winner !== null),
         ),
       {
-        message: "All games must be picked",
+        message: "All available games must be picked",
         path: ["picks"],
       },
     ),
@@ -67,15 +64,16 @@ const picksSchema = z.object({
 
 type PicksFormData = z.infer<typeof picksSchema>;
 
-export function ClientPickPage({
-  weekToPick,
-  teams,
-  league,
-  existingPicks,
-}: Props) {
-  const { week, season, games } = weekToPick;
-  const { league_id: leagueId } = league;
+type PickFormProps = {
+  league: RouterOutputs["league"]["get"];
+  weekToPick: RouterOutputs["league"]["weekToPick"];
+  teams: RouterOutputs["teams"]["getTeams"];
+  existingPicks: RouterOutputs["member"]["picksForWeek"];
+  leagueIdNumber: number;
+};
 
+function PickForm({ league, weekToPick, teams, existingPicks, leagueIdNumber }: PickFormProps) {
+  const { week, season, games } = weekToPick;
   const [submitting, setSubmitting] = useState(false);
 
   // Create team lookup
@@ -123,8 +121,7 @@ export function ClientPickPage({
     name: "picks",
   });
 
-  const { mutateAsync: submitPicks } =
-    clientApi.picks.submitPicks.useMutation();
+  const { mutateAsync: submitPicks } = clientApi.picks.submitPicks.useMutation();
 
   const onSubmit = async (data: PicksFormData) => {
     try {
@@ -150,7 +147,7 @@ export function ClientPickPage({
 
       await submitPicks({
         picks: picksToSubmit,
-        leagueIds: [leagueId],
+        leagueIds: [leagueIdNumber],
         overrideMemberId: undefined,
       });
 
@@ -312,5 +309,69 @@ export function ClientPickPage({
         )}
       </View>
     </ScrollView>
+  );
+}
+
+export function ClientPickPage({ leagueId }: Props) {
+  const leagueIdNumber = parseInt(leagueId, 10);
+  
+  // Fetch all required data (should be prefetched and cached)
+  const { data: league, isLoading: leagueLoading } = clientApi.league.get.useQuery({
+    leagueId: leagueIdNumber,
+  }, {
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    refetchOnWindowFocus: true,
+  });
+
+  const { data: weekToPick, isLoading: weekLoading } = clientApi.league.weekToPick.useQuery({
+    leagueId: leagueIdNumber,
+  }, {
+    staleTime: 2 * 60 * 1000, // 2 minutes
+    refetchOnWindowFocus: true,
+  });
+
+  const { data: teams, isLoading: teamsLoading } = clientApi.teams.getTeams.useQuery(undefined, {
+    staleTime: 30 * 60 * 1000, // 30 minutes
+  });
+
+  const { data: existingPicks, isLoading: picksLoading } = clientApi.member.picksForWeek.useQuery({
+    leagueId: leagueIdNumber,
+    week: weekToPick?.week ?? 0,
+  }, {
+    enabled: !!weekToPick?.week,
+    staleTime: 1 * 60 * 1000, // 1 minute
+    refetchOnWindowFocus: true,
+  });
+
+  // Show loading state
+  if (leagueLoading || weekLoading || teamsLoading || picksLoading) {
+    return (
+      <View className="flex-1 items-center justify-center">
+        <Text className="text-base text-gray-500 dark:text-gray-400">
+          Loading picks...
+        </Text>
+      </View>
+    );
+  }
+
+  // Show error if data is missing
+  if (!league || !weekToPick || !teams || !existingPicks) {
+    return (
+      <View className="flex-1 items-center justify-center px-4">
+        <Text className="text-center text-base text-gray-500 dark:text-gray-400">
+          Unable to load picks data. Please try again.
+        </Text>
+      </View>
+    );
+  }
+
+  return (
+    <PickForm
+      league={league}
+      weekToPick={weekToPick}
+      teams={teams}
+      existingPicks={existingPicks}
+      leagueIdNumber={leagueIdNumber}
+    />
   );
 }

@@ -79,8 +79,6 @@ export default function PickScreen() {
     );
   }
 
-  console.log("[debug] firstLeagueId and league", firstLeagueId, league);
-
   // Show no leagues message
   if (!firstLeagueId || !league) {
     return (
@@ -127,12 +125,7 @@ export default function PickScreen() {
 
   return (
     <SafeAreaView className="bg-app-bg-light dark:bg-app-bg-dark flex-1">
-      <ClientPickPage
-        league={league}
-        weekToPick={weekToPick}
-        teams={teams ?? []}
-        existingPicks={existingPicks ?? []}
-      />
+      <ClientPickPage leagueId={firstLeagueId.toString()} />
     </SafeAreaView>
   );
 }

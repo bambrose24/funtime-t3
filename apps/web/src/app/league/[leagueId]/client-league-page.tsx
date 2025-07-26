@@ -53,19 +53,7 @@ type ClientLeaguePageProps = {
 
 const REFETCH_INTERVAL_MS = 1000 * 60 * 2;
 
-// NEXT: try plucking away props one by one and see if it renders...
-
 export function ClientLeaguePage(props: ClientLeaguePageProps) {
-  console.log("[debug] ClientLeaguePage start");
-
-  // Temporarily return a simple div to test if component renders at all
-  // return (
-  //   <div>
-  //     <h1>ClientLeaguePage is rendering!</h1>
-  //     <p>Props have {JSON.stringify(props).length} chars</p>
-  //   </div>
-  // );
-
   const { teams, league, session, currentGame } = props;
   const { data: weeksWithPicks } = clientApi.picks.weeksWithPicks.useQuery(
     {
@@ -174,8 +162,6 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
       : !props.viewerHasPicks && !searchParams.get("week")
         ? "make-picks"
         : null;
-
-  console.log("[debug] going to return the jsx");
 
   return (
     <>

@@ -1,5 +1,6 @@
 import React, { useMemo } from "react";
-import { View, Text } from "react-native";
+import { View, Text, Pressable, TouchableOpacity } from "react-native";
+import { router } from "expo-router";
 import { clientApi } from "@/lib/trpc/react";
 import { type RouterOutputs } from "~/trpc/types";
 
@@ -34,7 +35,17 @@ export function HomeLeagueCard({ data }: { data: LeagueCardData }) {
   }, [leagueData?.WeekWinners, userMemberIds, data.league_id]);
 
   return (
-    <View className="mx-2 rounded-xl border border-gray-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-800">
+    <TouchableOpacity
+      onPress={() => {
+        console.log('Card pressed!'); // Debug log
+        router.push({
+          pathname: "/league/[id]" as any,
+          params: { id: data.league_id.toString() },
+        });
+      }}
+      activeOpacity={0.7}
+    >
+      <View className="mx-2 rounded-xl border border-gray-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-800">
       {/* League Name Header */}
       <View className="mb-4">
         <Text className="text-app-fg-light dark:text-app-fg-dark text-center text-lg font-bold">
@@ -94,6 +105,7 @@ export function HomeLeagueCard({ data }: { data: LeagueCardData }) {
           </View>
         </View>
       </View>
-    </View>
+      </View>
+    </TouchableOpacity>
   );
 }

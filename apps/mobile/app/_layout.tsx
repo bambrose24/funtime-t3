@@ -25,16 +25,16 @@ import {
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useState, useEffect, useRef } from "react";
-import { type Session } from "@supabase/supabase-js";
 import { Platform } from "react-native";
 import "react-native-reanimated";
 
 import { useColorScheme } from "../lib/useColorScheme";
 import { NAV_THEME } from "../lib/constants";
 import { TRPCReactProvider } from "@/lib/trpc/react";
-import { supabase } from "@/lib/supabase/client";
 import LoadingScreen from "@/components/LoadingScreen";
-import AuthScreen from "./auth";
+import { useColdStartPrefetch } from "@/hooks/useColdStartPrefetch";
+import { useCacheDebugger } from "@/hooks/useCacheDebugger";
+import { useAuthHandler } from "@/hooks/useAuthHandler";
 
 const LIGHT_THEME: Theme = {
   ...DefaultTheme,
@@ -50,9 +50,51 @@ const useIsomorphicLayoutEffect =
     ? useEffect
     : useEffect;
 
+function AppContent() {
+  const { isDarkColorScheme } = useColorScheme();
+  
+  // Handle all auth logic (session, deep links, navigation)
+  const { session, isLoading } = useAuthHandler();
+  
+  // Prefetch essential data on cold start
+  useColdStartPrefetch(session, isLoading);
+  
+  // Debug cache hydration (remove in production)
+  if (__DEV__) {
+    useCacheDebugger();
+  }
+
+  // Show loading screen while checking authentication
+  if (isLoading) {
+    return (
+      <ThemeProvider value={isDarkColorScheme ? DARK_THEME : LIGHT_THEME}>
+        <LoadingScreen />
+        <StatusBar style={isDarkColorScheme ? "light" : "dark"} />
+      </ThemeProvider>
+    );
+  }
+
+  // Show router with all screens available
+  return (
+    <ThemeProvider value={isDarkColorScheme ? DARK_THEME : LIGHT_THEME}>
+      <Stack>
+        <Stack.Screen name="auth" options={{ headerShown: false }} />
+        <Stack.Screen name="signup" options={{ headerShown: false }} />
+        <Stack.Screen name="auth/callback" options={{ headerShown: false }} />
+        <Stack.Screen name="confirm-signup" options={{ headerShown: false }} />
+        <Stack.Screen name="index" options={{ headerShown: false }} />
+        <Stack.Screen name="league/[id]/index" options={{ headerShown: false }} />
+        <Stack.Screen name="account" options={{ headerShown: false }} />
+        <Stack.Screen name="+not-found" />
+      </Stack>
+      <StatusBar style={isDarkColorScheme ? "light" : "dark"} />
+    </ThemeProvider>
+  );
+}
+
 export default function RootLayout() {
   const hasMounted = useRef(false);
-  const { colorScheme, isDarkColorScheme } = useColorScheme();
+  const { isDarkColorScheme } = useColorScheme();
   const [isColorSchemeLoaded, setIsColorSchemeLoaded] = useState(false);
   const [loaded] = useFonts({
     Inter_400Regular,
@@ -60,10 +102,6 @@ export default function RootLayout() {
     Inter_600SemiBold,
     Inter_700Bold,
   });
-
-  // Authentication state
-  const [session, setSession] = useState<Session | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
 
   useIsomorphicLayoutEffect(() => {
     if (hasMounted.current) {
@@ -78,63 +116,14 @@ export default function RootLayout() {
     hasMounted.current = true;
   }, []);
 
-  useEffect(() => {
-    // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setIsLoading(false);
-    });
-
-    // Listen for auth changes
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-      setIsLoading(false);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
-
   // Show loading screen while fonts or color scheme load
   if (!loaded || !isColorSchemeLoaded) {
     return null;
   }
 
-  // Show loading screen while checking authentication
-  if (isLoading) {
-    return (
-      <TRPCReactProvider>
-        <ThemeProvider value={isDarkColorScheme ? DARK_THEME : LIGHT_THEME}>
-          <LoadingScreen />
-          <StatusBar style={isDarkColorScheme ? "light" : "dark"} />
-        </ThemeProvider>
-      </TRPCReactProvider>
-    );
-  }
-
-  // Show auth screen if not logged in
-  if (!session) {
-    return (
-      <TRPCReactProvider>
-        <ThemeProvider value={isDarkColorScheme ? DARK_THEME : LIGHT_THEME}>
-          <AuthScreen />
-          <StatusBar style={isDarkColorScheme ? "light" : "dark"} />
-        </ThemeProvider>
-      </TRPCReactProvider>
-    );
-  }
-
-  // Show tabs if logged in
   return (
     <TRPCReactProvider>
-      <ThemeProvider value={isDarkColorScheme ? DARK_THEME : LIGHT_THEME}>
-        <Stack>
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen name="+not-found" />
-        </Stack>
-        <StatusBar style={isDarkColorScheme ? "light" : "dark"} />
-      </ThemeProvider>
+      <AppContent />
     </TRPCReactProvider>
   );
 }

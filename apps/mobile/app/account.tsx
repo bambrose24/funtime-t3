@@ -6,14 +6,19 @@ import {
   Alert,
   ScrollView,
   SafeAreaView,
+  Pressable,
 } from "react-native";
+import { router } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { Ionicons } from "@expo/vector-icons";
+import { useColorScheme } from "@/lib/useColorScheme";
 import { supabase } from "@/lib/supabase/client";
 import { clientApi } from "@/lib/trpc/react";
 
 export default function AccountScreen() {
   const [loading, setLoading] = useState(false);
   const insets = useSafeAreaInsets();
+  const { isDarkColorScheme } = useColorScheme();
 
   // Get user data from tRPC - will only be called if user is authenticated
   const { data: userData, isLoading: userLoading } =
@@ -30,10 +35,21 @@ export default function AccountScreen() {
 
   return (
     <SafeAreaView className="bg-app-bg-light dark:bg-app-bg-dark flex-1">
-      <View className="border-b border-gray-200 px-5 py-4 dark:border-zinc-800">
+      <View className="border-b border-gray-200 px-5 py-4 dark:border-zinc-800 flex-row justify-between items-center">
+        <Pressable
+          onPress={() => router.back()}
+          className="bg-app-card-light dark:bg-app-card-dark rounded-lg p-2"
+        >
+          <Ionicons
+            name="chevron-back"
+            size={24}
+            color={isDarkColorScheme ? "#e5e7eb" : "#374151"}
+          />
+        </Pressable>
         <Text className="text-app-fg-light dark:text-app-fg-dark text-3xl font-bold">
           Account
         </Text>
+        <View className="w-16" />
       </View>
 
       <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
@@ -46,24 +62,6 @@ export default function AccountScreen() {
             </View>
           ) : userData?.dbUser ? (
             <View className="gap-6">
-              <View className="gap-2">
-                <Text className="text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
-                  First Name
-                </Text>
-                <Text className="text-app-fg-light dark:text-app-fg-dark text-lg font-medium">
-                  {userData.dbUser.fname}
-                </Text>
-              </View>
-
-              <View className="gap-2">
-                <Text className="text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
-                  Last Name
-                </Text>
-                <Text className="text-app-fg-light dark:text-app-fg-dark text-lg font-medium">
-                  {userData.dbUser.lname}
-                </Text>
-              </View>
-
               <View className="gap-2">
                 <Text className="text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
                   Username

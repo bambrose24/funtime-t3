@@ -48,6 +48,13 @@ export const homeRouter = createTRPCRouter({
           in: leagueIds,
         },
       },
+      include: {
+        _count: {
+          select: {
+            leaguemembers: true,
+          },
+        },
+      },
     });
 
     return orderBy(leagues, (l) => l.season, "desc");

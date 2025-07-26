@@ -347,9 +347,6 @@ export const leagueRouter = createTRPCRouter({
         }),
       ]);
 
-      console.log("[debug] mostRecentStartedGame ", mostRecentStartedGame);
-      console.log("[debug] nextGameToStart ", nextGameToStart);
-
       const { week } = mostRecentStartedGame ?? nextGameToStart ?? { week: 1 };
 
       const gamesResp = await ctx.db.games.findMany({
@@ -398,14 +395,7 @@ export const leagueRouter = createTRPCRouter({
               (nextGameToStart && nextGameToStart.week === week + 1)
             ? week + 1
             : week;
-      console.log(
-        "[debug] weekToReturn ",
-        week,
-        weekToReturn,
-        mostRecentStartedWeekPicks.length,
-        Boolean(nextGameToStart),
-        nextGameToStart?.week,
-      );
+
       const picksToReturn =
         weekToReturn === week ? mostRecentStartedWeekPicks : nextWeekPicks;
       const gamesToReturn =
