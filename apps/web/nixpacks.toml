@@ -1,8 +1,9 @@
 [phases.setup]
+nixPkgs = ["nodejs_20", "npm-10_x"]
 cmds = ["npm install --legacy-peer-deps"]
 
 [phases.build]
-cmds = ["npx prisma generate"]
+cmds = ["npx prisma generate", "npm run build"]
 
-[phases.start]
-cmd = "bun run cron"
+[start]
+cmd = "npm run start"
