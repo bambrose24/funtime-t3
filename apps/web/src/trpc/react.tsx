@@ -12,17 +12,7 @@ import SuperJSON from "superjson";
 
 import { type AppRouter } from "@funtime/api";
 import { getBaseUrl } from "~/utils/getBaseUrl";
-
-const createQueryClient = () => {
-  const queryClient = new QueryClient({
-    mutationCache: new MutationCache({
-      onSettled: () => {
-        void queryClient.invalidateQueries();
-      },
-    }),
-  });
-  return queryClient;
-};
+import { createQueryClient } from "./create-query-client";
 
 let clientQueryClientSingleton: QueryClient | undefined = undefined;
 const getQueryClient = () => {
