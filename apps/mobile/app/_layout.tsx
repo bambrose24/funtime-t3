@@ -35,6 +35,7 @@ import LoadingScreen from "@/components/LoadingScreen";
 import { useColdStartPrefetch } from "@/hooks/useColdStartPrefetch";
 import { useCacheDebugger } from "@/hooks/useCacheDebugger";
 import { useAuthHandler } from "@/hooks/useAuthHandler";
+import { PostHogProvider } from "@/providers/PostHogProvider";
 
 const LIGHT_THEME: Theme = {
   ...DefaultTheme,
@@ -122,8 +123,10 @@ export default function RootLayout() {
   }
 
   return (
-    <TRPCReactProvider>
-      <AppContent />
-    </TRPCReactProvider>
+    <PostHogProvider>
+      <TRPCReactProvider>
+        <AppContent />
+      </TRPCReactProvider>
+    </PostHogProvider>
   );
 }

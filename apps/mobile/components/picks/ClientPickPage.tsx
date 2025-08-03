@@ -8,6 +8,7 @@ import { type RouterOutputs } from "~/trpc/types";
 import { PickGameCard } from "./PickGameCard";
 import { Button } from "../ui/button";
 import { Text } from "../ui/text";
+import { createComponentLogger } from "@/lib/logging";
 import { Input } from "../ui/input";
 
 type Props = {
@@ -75,6 +76,7 @@ type PickFormProps = {
 function PickForm({ league, weekToPick, teams, existingPicks, leagueIdNumber }: PickFormProps) {
   const { week, season, games } = weekToPick;
   const [submitting, setSubmitting] = useState(false);
+  const logger = createComponentLogger('PickForm', { leagueId: leagueIdNumber });
 
   // Create team lookup
   const teamById = new Map(teams.map((t) => [t.teamid, t]));
@@ -157,7 +159,11 @@ function PickForm({ league, weekToPick, teams, existingPicks, leagueIdNumber }: 
         [{ text: "OK" }],
       );
     } catch (error) {
-      console.error("Error submitting picks:", error);
+      logger.error("Error submitting picks", { 
+        error: error instanceof Error ? error.message : String(error),
+        leagueId: leagueIdNumber,
+        week 
+      });
       Alert.alert(
         "Error",
         "There was an error submitting your picks. Please try again or contact support.",

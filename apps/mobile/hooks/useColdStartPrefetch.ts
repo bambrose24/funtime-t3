@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { clientApi } from "@/lib/trpc/react";
 import { type Session } from "@supabase/supabase-js";
+import { createComponentLogger } from "@/lib/logging";
 
 /**
  * Hook to prefetch essential data on cold start
@@ -9,13 +10,14 @@ import { type Session } from "@supabase/supabase-js";
 export function useColdStartPrefetch(session: Session | null, isLoading: boolean) {
   const utils = clientApi.useUtils();
   const hasPrefetched = useRef(false);
+  const logger = createComponentLogger('ColdStartPrefetch');
 
   useEffect(() => {
     if (isLoading || !session || hasPrefetched.current) return;
 
     const prefetchEssentialData = async () => {
       try {
-        console.log('🚀 Starting cold start prefetch...');
+        logger.info('Starting cold start prefetch');
 
         // Step 1: Prefetch user session/profile data (needed everywhere)
         const sessionPromise = utils.session.current.prefetch();
@@ -33,7 +35,7 @@ export function useColdStartPrefetch(session: Session | null, isLoading: boolean
         // Step 4: Get the home data to determine which leagues to prefetch
         const homeData = utils.home.summary.getData();
         if (!homeData || homeData.length === 0) {
-          console.log('✅ Cold start prefetch complete (no leagues)');
+          logger.info('Cold start prefetch complete (no leagues)');
           return;
         }
 
@@ -43,14 +45,17 @@ export function useColdStartPrefetch(session: Session | null, isLoading: boolean
           .filter(league => league.season === 2025) // Current season
           .slice(0, 3); // Top 3 leagues only
 
-        console.log(`📋 Prefetching ${priorityLeagues.length} priority leagues...`);
+        logger.info('Prefetching priority leagues', { 
+          priorityLeaguesCount: priorityLeagues.length,
+          totalLeagues: homeData.length 
+        });
 
         // Step 6: Prefetch league data in parallel (but don't await - let it happen in background)
         const leaguePromises = priorityLeagues.map(async (league) => {
           try {
             // Core league data
             await utils.league.get.prefetch({ leagueId: league.league_id });
-            const activeWeek = await utils.time.activeWeekByLeague.prefetch({ 
+            await utils.time.activeWeekByLeague.prefetch({ 
               leagueId: league.league_id 
             });
             
@@ -72,19 +77,24 @@ export function useColdStartPrefetch(session: Session | null, isLoading: boolean
               });
             }
           } catch (error) {
-            console.warn(`Failed to prefetch league ${league.league_id}:`, error);
+            logger.warn('Failed to prefetch league', { 
+              leagueId: league.league_id, 
+              error: error instanceof Error ? error.message : String(error) 
+            });
           }
         });
 
         // Don't await league prefetches - let them happen in background
         Promise.all(leaguePromises).then(() => {
-          console.log('🎯 Priority league prefetch complete');
+          logger.info('Priority league prefetch complete');
         });
 
-        console.log('✅ Cold start prefetch complete (essential data loaded)');
+        logger.info('Cold start prefetch complete (essential data loaded)');
 
       } catch (error) {
-        console.warn('❌ Cold start prefetch failed:', error);
+        logger.error('Cold start prefetch failed', { 
+          error: error instanceof Error ? error.message : String(error) 
+        });
       }
     };
 
@@ -94,7 +104,7 @@ export function useColdStartPrefetch(session: Session | null, isLoading: boolean
     // Start prefetching (don't await - let app continue loading)
     prefetchEssentialData();
 
-  }, [session, isLoading, utils]);
+  }, [session, isLoading, utils, logger]);
 
   return {
     hasPrefetched: hasPrefetched.current,

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Suspense } from "react";
+import React, { useState, useEffect, Suspense, useMemo } from "react";
 import {
   View,
   Text,
@@ -20,6 +20,7 @@ import { TeamLogo } from "@/components/shared/TeamLogo";
 import { usePrefetchForLeague } from "@/hooks/usePrefetchForLeague";
 import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
+import { createComponentLogger } from "@/lib/logging";
 
 type TabType = "overview" | "picks" | "leaderboard";
 
@@ -236,14 +237,45 @@ function useLeagueOverviewData(leagueId: string) {
     gcTime: 60 * 60 * 1000, // 1 hour
   });
 
-  // Dependent queries that wait for activeWeek
+  // Get user's existing picks to determine the correct week to show
+  const allUserPicksQuery = clientApi.member.picksForWeek.useQuery(
+    {
+      leagueId: leagueIdNumber,
+      week: activeWeekQuery.data?.week ?? 1, // Use week 1 as fallback
+    },
+    {
+      enabled: !!leagueIdNumber,
+      staleTime: 1 * 60 * 1000, // 1 minute
+      refetchOnWindowFocus: true,
+    },
+  );
+
+  // Determine the correct week to display (following web app logic)
+  const displayWeek = useMemo(() => {
+    const activeWeek = activeWeekQuery.data?.week;
+    const userPicks = allUserPicksQuery.data || [];
+
+    if (activeWeek) {
+      return activeWeek;
+    }
+
+    // If no active week but user has picks, use their most recent pick week
+    if (userPicks.length > 0) {
+      return userPicks[0]?.week ?? 1;
+    }
+
+    // Default to week 1
+    return 1;
+  }, [activeWeekQuery.data?.week, allUserPicksQuery.data]);
+
+  // Dependent queries that wait for displayWeek
   const gamesQuery = clientApi.games.getGames.useQuery(
     {
-      week: activeWeekQuery.data?.week ?? 0,
+      week: displayWeek,
       season: leagueQuery.data?.season ?? 0,
     },
     {
-      enabled: !!activeWeekQuery.data?.week && !!leagueQuery.data?.season,
+      enabled: !!displayWeek && !!leagueQuery.data?.season,
       staleTime: 2 * 60 * 1000, // 2 minutes
       refetchOnWindowFocus: true,
     },
@@ -252,10 +284,10 @@ function useLeagueOverviewData(leagueId: string) {
   const picksSummaryQuery = clientApi.league.picksSummary.useQuery(
     {
       leagueId: leagueIdNumber,
-      week: activeWeekQuery.data?.week ?? 0,
+      week: displayWeek,
     },
     {
-      enabled: !!activeWeekQuery.data?.week,
+      enabled: !!displayWeek,
       staleTime: 1 * 60 * 1000, // 1 minute (picks change frequently)
       refetchOnWindowFocus: true,
     },
@@ -264,41 +296,37 @@ function useLeagueOverviewData(leagueId: string) {
   const userPicksQuery = clientApi.member.picksForWeek.useQuery(
     {
       leagueId: leagueIdNumber,
-      week: activeWeekQuery.data?.week ?? 0,
+      week: displayWeek,
     },
     {
-      enabled: !!activeWeekQuery.data?.week,
+      enabled: !!leagueIdNumber && !!displayWeek,
       staleTime: 1 * 60 * 1000, // 1 minute
       refetchOnWindowFocus: true,
     },
   );
 
-  // Prefetch dependent data when we have activeWeek
+  // Prefetch dependent data when we have displayWeek
   useEffect(() => {
-    if (activeWeekQuery.data?.week && leagueQuery.data?.season) {
+    if (displayWeek && leagueQuery.data?.season) {
       utils.games.getGames.prefetch({
-        week: activeWeekQuery.data.week,
+        week: displayWeek,
         season: leagueQuery.data.season,
       });
       utils.league.picksSummary.prefetch({
         leagueId: leagueIdNumber,
-        week: activeWeekQuery.data.week,
+        week: displayWeek,
       });
       utils.member.picksForWeek.prefetch({
         leagueId: leagueIdNumber,
-        week: activeWeekQuery.data.week,
+        week: displayWeek,
       });
     }
-  }, [
-    activeWeekQuery.data?.week,
-    leagueQuery.data?.season,
-    leagueIdNumber,
-    utils,
-  ]);
+  }, [displayWeek, leagueQuery.data?.season, leagueIdNumber, utils]);
 
   return {
     leagueData: leagueQuery.data,
     activeWeek: activeWeekQuery.data,
+    displayWeek,
     games: gamesQuery.data,
     teams: teamsQuery.data,
     picksSummary: picksSummaryQuery.data,
@@ -329,6 +357,7 @@ function LeagueOverview({
   const {
     leagueData,
     activeWeek,
+    displayWeek,
     games,
     teams,
     picksSummary,
@@ -354,6 +383,15 @@ function LeagueOverview({
   // Create team lookup map
   const teamById = teams ? new Map(teams.map((t) => [t.teamid, t])) : new Map();
 
+  const logger = createComponentLogger("LeagueOverview");
+  logger.debug("Picks summary data", {
+    picksSummaryLength: picksSummary?.length || 0,
+    gamesLength: games?.length || 0,
+    teamsLength: teams?.length || 0,
+    activeWeek,
+    displayWeek,
+  });
+
   return (
     <ScrollView
       className="flex-1"
@@ -366,9 +404,9 @@ function LeagueOverview({
           {isLoading ? (
             <Skeleton className="mx-auto h-6 w-32 rounded" />
           ) : (
-            activeWeek && (
+            displayWeek && (
               <Text className="text-app-fg-light dark:text-app-fg-dark text-center text-lg font-semibold">
-                Week {activeWeek.week}, {leagueData?.season}
+                Week {displayWeek}, {leagueData?.season}
               </Text>
             )
           )}
@@ -428,7 +466,7 @@ function LeagueOverview({
         )}
 
         {/* Your Picks - Only show after loading is complete */}
-        {!isLoading && !isUserPicksLoading && activeWeek && (
+        {!isLoading && !isUserPicksLoading && displayWeek && (
           <View className="mx-4 mb-6">
             {userPicks && userPicks.length > 0 ? (
               <Pressable
@@ -519,7 +557,7 @@ function LeagueOverview({
               {/* Modal Header */}
               <View className="flex-row items-center justify-between border-b border-gray-200 px-4 py-3 dark:border-zinc-700">
                 <Text className="text-app-fg-light dark:text-app-fg-dark text-lg font-semibold">
-                  Your Week {activeWeek?.week}, {leagueData?.season} Picks
+                  Your Week {displayWeek}, {leagueData?.season} Picks
                 </Text>
                 <Pressable
                   onPress={() => setIsPicksModalVisible(false)}
@@ -770,7 +808,7 @@ function MobilePicksTable({
   games: RouterOutputs["games"]["getGames"];
   teams: Map<number, RouterOutputs["teams"]["getTeams"][number]>;
 }) {
-  // Get current user to highlight their row  
+  // Get current user to highlight their row
   const { user } = useUser();
   const currentUserId = user?.uid;
   // Find tiebreaker game and its actual total score
