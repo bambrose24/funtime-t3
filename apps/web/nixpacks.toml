@@ -1,5 +1,5 @@
 [phases.setup]
-cmds = ["npm install"]
+cmds = ["npm install --legacy-peer-deps"]
 
 [phases.build]
 cmds = ["npx prisma generate"]
