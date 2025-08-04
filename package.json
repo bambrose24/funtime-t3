@@ -9,8 +9,8 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "turbo run build",
-    "build-web": "turbo run build --filter=@funtime/web",
+    "build": "turbo run db:generate && turbo run build",
+    "build-web": "turbo run db:generate && turbo run build --filter=@funtime/web",
     "lint": "turbo run lint",
     "typecheck": "turbo run typecheck",
     "test": "turbo run test",
