@@ -10,10 +10,12 @@
   ],
   "scripts": {
     "build": "turbo run build",
+    "build-web": "turbo run build --filter=@funtime/web",
     "lint": "turbo run lint",
     "typecheck": "turbo run typecheck",
     "test": "turbo run test",
     "dev": "turbo run dev",
+    "start-web": "cd apps/web && npm run start",
     "clean": "turbo run clean",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "db:generate": "turbo run db:generate",
