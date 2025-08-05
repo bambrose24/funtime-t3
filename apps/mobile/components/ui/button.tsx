@@ -61,9 +61,10 @@ type ButtonProps = React.ComponentPropsWithoutRef<typeof Pressable> &
   VariantProps<typeof buttonVariants> & {
     children?: React.ReactNode;
     "data-active"?: boolean;
+    disablePressEffect?: boolean;
   };
 
-function Button({ className, variant, size, children, ...props }: ButtonProps) {
+function Button({ className, variant, size, children, disablePressEffect = false, ...props }: ButtonProps) {
   return (
     <TextClassContext.Provider
       value={cn(
@@ -77,6 +78,9 @@ function Button({ className, variant, size, children, ...props }: ButtonProps) {
           buttonVariants({ variant, size, className }),
         )}
         role="button"
+        style={({ pressed }) => [
+          !disablePressEffect && pressed && { transform: [{ scale: 0.95 }] },
+        ]}
         {...props}
       >
         {typeof children === "string" ? <Text>{children}</Text> : children}
