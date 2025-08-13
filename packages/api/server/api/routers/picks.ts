@@ -93,12 +93,12 @@ export const picksRouter = createTRPCRouter({
       const [overrideMember, fullViewerMembers] = await Promise.all([
         input.overrideMemberId
           ? db.leaguemembers.findFirstOrThrow({
-            where: {
-              membership_id: input.overrideMemberId,
-              league_id: leagueIds.at(0),
-            },
-            include: memberInclude,
-          })
+              where: {
+                membership_id: input.overrideMemberId,
+                league_id: leagueIds.at(0),
+              },
+              include: memberInclude,
+            })
           : null,
         db.leaguemembers.findMany({
           where: {
@@ -159,24 +159,24 @@ export const picksRouter = createTRPCRouter({
       const finalPicks = input.overrideMemberId
         ? input.picks
         : input.picks.filter((p) => {
-          const game = gamesById[p.gid]?.at(0);
-          if (!game || game.ts < now) {
-            return false;
-          }
-          return true;
-        });
+            const game = gamesById[p.gid]?.at(0);
+            if (!game || game.ts < now) {
+              return false;
+            }
+            return true;
+          });
 
       const weeks = Array.from(new Set(pickedGames.map((g) => g.week)));
 
       const picksSearch: NonNullable<Parameters<typeof db.picks.findMany>[0]> =
-      {
-        where: {
-          member_id: { in: members.map((m) => m.membership_id) },
-          week: {
-            in: weeks,
+        {
+          where: {
+            member_id: { in: members.map((m) => m.membership_id) },
+            week: {
+              in: weeks,
+            },
           },
-        },
-      };
+        };
 
       const existingPicks = await db.picks.findMany(picksSearch);
       const existingPicksByGid = groupBy(

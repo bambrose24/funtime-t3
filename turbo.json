@@ -2,15 +2,16 @@
   "$schema": "https://turbo.build/schema.json",
   "globalDependencies": ["**/.env.*local"],
   "globalEnv": [
+    "CRON_SECRET",
     "DATABASE_URL",
     "DIRECT_URL",
-    "CRON_SECRET",
-    "NEXT_PUBLIC_SUPABASE_URL",
+    "MYSPORTSFEEDS_API_KEY",
     "NEXT_PUBLIC_SUPABASE_ANON_KEY",
-    "SUPABASE_URL",
-    "SUPABASE_ANON_KEY",
+    "NEXT_PUBLIC_SUPABASE_URL",
+    "REDIS_URL",
     "RESEND_API_KEY",
-    "MYSPORTSFEEDS_API_KEY"
+    "SUPABASE_ANON_KEY",
+    "SUPABASE_URL"
   ],
   "tasks": {
     "build": {

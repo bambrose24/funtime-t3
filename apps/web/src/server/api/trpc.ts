@@ -6,82 +6,11 @@
  * TL;DR - This is where all the tRPC server stuff is created and plugged in. The pieces you will
  * need to use are documented accordingly near the end.
  */
+import type { TRPCContext } from "@funtime/api/server/api/trpc";
 import { TRPCError, initTRPC } from "@trpc/server";
 import superjson from "superjson";
 import { ZodError } from "zod";
-
-import { db } from "~/server/db";
-import { createLogger, getLogger } from "~/utils/logging";
-import { RequestContext } from "~/utils/requestContext";
-import { supabaseServer } from "~/utils/supabase/server";
-
-/**
- * 1. CONTEXT
- *
- * This section defines the "contexts" that are available in the backend API.
- *
- * These allow you to access things when processing a request, like the database, the session, etc.
- *
- * This helper generates the "internals" for a tRPC context. The API handler and RSC clients each
- * wrap this and provides the required context.
- *
- * @see https://trpc.io/docs/server/context
- */
-export const createTRPCContext = async (opts: { headers: Headers }) => {
-  console.log("🔍 Creating TRPC context in web app not api package");
-  const supabase = await supabaseServer();
-  const {
-    data: { user: supabaseUser },
-  } = await supabase.auth.getUser();
-
-  let dbUser = null;
-  if (supabaseUser?.email) {
-    dbUser = await db.people.findFirst({
-      where: {
-        email: supabaseUser.email,
-      },
-      include: {
-        leaguemembers: {
-          select: {
-            league_id: true,
-            membership_id: true,
-            role: true,
-            leagues: {
-              select: {
-                season: true,
-                name: true,
-              },
-            },
-          },
-        },
-      },
-    });
-  }
-
-  const context = {
-    db,
-    supabaseUser,
-    dbUser,
-    ...opts,
-  };
-
-  await setupRequestContext(context);
-
-  return context;
-};
-
-async function setupRequestContext(
-  context: Awaited<ReturnType<typeof createTRPCContext>>,
-) {
-  const userId = context.dbUser?.uid ?? "";
-  RequestContext.set("userId", userId.toString());
-
-  const logger = createLogger({
-    userId,
-  });
-
-  RequestContext.set("logger", logger);
-}
+import { getLogger } from "~/utils/logging";
 
 /**
  * 2. INITIALIZATION
@@ -90,7 +19,7 @@ async function setupRequestContext(
  * ZodErrors so that you get typesafety on the frontend if your procedure fails due to validation
  * errors on the backend.
  */
-const t = initTRPC.context<typeof createTRPCContext>().create({
+const t = initTRPC.context<TRPCContext>().create({
   transformer: superjson,
   errorFormatter({ shape, error }) {
     return {

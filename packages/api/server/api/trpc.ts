@@ -29,7 +29,6 @@ import { supabaseServer } from "~/utils/supabase/server";
  * @see https://trpc.io/docs/server/context
  */
 export const createTRPCContext = async (opts: { headers: Headers }) => {
-  console.log("🔍 Creating TRPC context in api package");
   // Check if this is a React Native request with Authorization header
   const authHeader = opts.headers.get("authorization");
   let supabase;
@@ -98,9 +97,9 @@ export const createTRPCContext = async (opts: { headers: Headers }) => {
   return context;
 };
 
-async function setupRequestContext(
-  context: Awaited<ReturnType<typeof createTRPCContext>>,
-) {
+export type TRPCContext = Awaited<ReturnType<typeof createTRPCContext>>;
+
+async function setupRequestContext(context: TRPCContext) {
   const userId = context.dbUser?.uid ?? "";
   RequestContext.set("userId", userId.toString());
 
