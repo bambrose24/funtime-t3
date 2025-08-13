@@ -65,14 +65,14 @@ export const createCacheMiddleware: (options: CacheOptions) => MiddlewareFn = (
       // Try to get from cache first
       const cachedResult = await redis.get(cacheKey);
       if (cachedResult) {
-        getLogger().log(
+        getLogger().info(
           `${CACHE_LOG_PREFIX}[hit] Cache HIT for ${path} (${cacheKey})`,
           { path, cacheKey },
         );
         return superjson.parse(cachedResult);
       }
 
-      getLogger().log(
+      getLogger().info(
         `${CACHE_LOG_PREFIX}[miss] Cache MISS for ${path} (${cacheKey})`,
         { path, cacheKey },
       );
@@ -84,7 +84,7 @@ export const createCacheMiddleware: (options: CacheOptions) => MiddlewareFn = (
       if (result.ok) {
         const serializedData = superjson.stringify(result.data);
         await redis.setex(cacheKey, options.cacheTimeSeconds, serializedData);
-        getLogger().log(
+        getLogger().ingo(
           `${CACHE_LOG_PREFIX}[set] Cached result for ${path} (${cacheKey}) for ${options.cacheTimeSeconds}s`,
           { path, cacheKey, cacheTimeSeconds: options.cacheTimeSeconds },
         );
