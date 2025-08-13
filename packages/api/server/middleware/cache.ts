@@ -84,7 +84,7 @@ export const createCacheMiddleware: (options: CacheOptions) => MiddlewareFn = (
       if (result.ok) {
         const serializedData = superjson.stringify(result.data);
         await redis.setex(cacheKey, options.cacheTimeSeconds, serializedData);
-        getLogger().ingo(
+        getLogger().info(
           `${CACHE_LOG_PREFIX}[set] Cached result for ${path} (${cacheKey}) for ${options.cacheTimeSeconds}s`,
           { path, cacheKey, cacheTimeSeconds: options.cacheTimeSeconds },
         );

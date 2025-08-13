@@ -63,11 +63,6 @@ export default async function LeaguePage(props: Props) {
     serverApi.picks.weeksWithPicks({ leagueId }),
   ]);
 
-  // Log data sizes to debug serialization issues
-  console.log("Data sizes:", {
-    picksSummary: new Blob([JSON.stringify(data)]).size,
-  });
-
   const viewerHasPicks =
     Boolean(viewerMember) &&
     (data.find((p1) => p1.membership_id === viewerMember?.membership_id)?.picks
