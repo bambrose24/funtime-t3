@@ -3,7 +3,7 @@ import { env } from "~/env";
 import { getLogger } from "~/utils/logging";
 
 const url = env.REDIS_URL
-  ? `${env.REDIS_URL}?family=1`
+  ? `${env.REDIS_URL}?family=0`
   : "redis://localhost:6379";
 
 export const redis = new Redis(url, {
