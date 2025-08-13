@@ -46,6 +46,10 @@ function generateCacheKey(
 
 type MiddlewareFn = Parameters<(typeof authorizedProcedure)["use"]>[0];
 
+const middlewareMarker = "middlewareMarker" as "middlewareMarker" & {
+  __brand: "middlewareMarker";
+};
+
 const CACHE_LOG_PREFIX = "[trpc cache]";
 
 export const createCacheMiddleware: (options: CacheOptions) => MiddlewareFn = (
@@ -69,7 +73,11 @@ export const createCacheMiddleware: (options: CacheOptions) => MiddlewareFn = (
           `${CACHE_LOG_PREFIX}[hit] Cache HIT for ${path} (${cacheKey})`,
           { path, cacheKey },
         );
-        return superjson.parse(cachedResult);
+        return {
+          ok: true,
+          data: superjson.parse(cachedResult),
+          marker: middlewareMarker,
+        };
       }
 
       getLogger().info(
