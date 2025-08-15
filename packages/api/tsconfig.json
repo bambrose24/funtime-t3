@@ -19,6 +19,7 @@
     "paths": {
       "~/*": ["./src/*", "./server/*", "./utils/*", "./lib/*", "./trpc/*"],
       "~/server/*": ["./server/*"],
+      "~/server/cache": ["./server/cache.ts"],
       "~/utils/*": ["./utils/*"],
       "~/lib/*": ["./lib/*"],
       "~/trpc/*": ["./trpc/*"],

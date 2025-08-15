@@ -9,6 +9,7 @@
     "./generated/prisma-client": "./src/generated/prisma-client/index.js",
     "./types": "./src/types.ts",
     "./db": "./server/db.ts",
+    "./cache": "./server/cache.ts",
     "./env": "./env.js",
     "./trpc": "./trpc/server.ts",
     "./trpc/react": "./trpc/react.tsx",

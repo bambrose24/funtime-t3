@@ -1,30 +1,24 @@
+import { TRPCError } from "@trpc/server";
+import { orderBy } from "lodash";
 import { z } from "zod";
+import { resendApi } from "~/server/services/resend";
+import { UnauthorizedError } from "~/server/util/errors/unauthorized";
+import { getGames } from "~/server/util/getGames";
+import { DEFAULT_SEASON } from "~/utils/const";
+import { Defined } from "~/utils/defined";
+import {
+  LatePolicy,
+  PickPolicy,
+  ReminderPolicy,
+  ScoringType,
+} from "../../../../src/generated/prisma-client";
+import { authorizedCacheMiddleware } from "../../../cache";
 import {
   authorizedProcedure,
   createTRPCRouter,
   publicProcedure,
 } from "../../trpc";
-import { orderBy } from "lodash";
-import { getGames } from "~/server/util/getGames";
-import { TRPCError } from "@trpc/server";
-import { Defined } from "~/utils/defined";
-import { UnauthorizedError } from "~/server/util/errors/unauthorized";
-import {
-  type leagues,
-  type leaguemembers,
-  type people,
-  type picks,
-  type games,
-  type WeekWinners,
-  MemberRole,
-  ScoringType,
-  PickPolicy,
-  LatePolicy,
-  ReminderPolicy,
-} from "../../../../src/generated/prisma-client";
 import { leagueAdminRouter } from "./admin";
-import { DEFAULT_SEASON } from "~/utils/const";
-import { resendApi } from "~/server/services/resend";
 
 const picksSummarySchema = z.object({
   leagueId: z.number().int(),
@@ -248,6 +242,13 @@ export const leagueRouter = createTRPCRouter({
     }),
   get: authorizedProcedure
     .input(leagueIdSchema)
+    .use(async (opts) => {
+      return authorizedCacheMiddleware({
+        by: "params",
+        cacheTimeSeconds: 60 * 60,
+        ...opts,
+      });
+    })
     .query(async ({ input, ctx }) => {
       const { leagueId } = input;
       const { db } = ctx;

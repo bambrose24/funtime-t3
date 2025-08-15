@@ -2,5 +2,11 @@
   "files.exclude": {
     "src/generated/**": true
   },
-  "editor.defaultFormatter": "esbenp.prettier-vscode"
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "typescript.preferences.importModuleSpecifier": "relative",
+  "typescript.suggest.autoImports": true,
+  "typescript.preferences.includePackageJsonAutoImports": "off",
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": "explicit"
+  }
 }
