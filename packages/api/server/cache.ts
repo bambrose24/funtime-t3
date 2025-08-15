@@ -65,8 +65,6 @@ const _dummyPublicMiddleware: PublicMiddlewareFn = async (opts) => {
 type AuthorizedMiddlewareFnParameters = Parameters<
   typeof _dummyAuthorizedMiddleware
 >[0];
-type AuthorizedMiddlewareFnParametersInput =
-  AuthorizedMiddlewareFnParameters["input"];
 type PublicMiddlewareFnParameters = Parameters<
   typeof _dummyPublicMiddleware
 >[0];
