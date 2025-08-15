@@ -72,8 +72,6 @@ type PublicMiddlewareFnParameters = Parameters<
 >[0];
 type AuthorizedCacheMiddlewareOptions = CacheOptions &
   Omit<AuthorizedMiddlewareFnParameters, "input"> & { input: unknown };
-type AuthorizedCacheMiddlewareOptionsInput =
-  AuthorizedCacheMiddlewareOptions["input"];
 type PublicCacheMiddlewareOptions = CacheOptions &
   Omit<PublicMiddlewareFnParameters, "input"> & { input: unknown };
 
