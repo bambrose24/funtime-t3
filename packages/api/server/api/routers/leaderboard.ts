@@ -1,10 +1,10 @@
 import { sortBy } from "lodash";
 import { z } from "zod";
 
-import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import { UnauthorizedError } from "~/server/util/errors/unauthorized";
 import { cache } from "~/utils/cache";
 import { withRankings } from "~/utils/withRankings";
+import { createTRPCRouter, publicProcedure } from "../trpc";
 
 export const leaderboardRouter = createTRPCRouter({
   league: publicProcedure

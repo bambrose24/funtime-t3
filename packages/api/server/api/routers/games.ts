@@ -1,9 +1,9 @@
 import { z } from "zod";
-import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import { db } from "~/server/db";
 import { cache } from "~/utils/cache";
 import { DEFAULT_SEASON } from "~/utils/const";
 import { publicCacheMiddleware } from "../../cache";
+import { createTRPCRouter, publicProcedure } from "../trpc";
 
 const getGamesSchema = z.object({
   season: z.number().int(),

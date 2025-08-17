@@ -1,4 +1,4 @@
-import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
+import { createTRPCRouter, publicProcedure } from "../trpc";
 
 export const sessionRouter = createTRPCRouter({
   current: publicProcedure.query(async ({ ctx }) => {

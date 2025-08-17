@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import { db } from "~/server/db";
+import { createTRPCRouter, publicProcedure } from "../trpc";
 
 const currentWeekSeasonInputSchema = z.object({
   leagueId: z.number().int(),

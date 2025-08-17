@@ -1,6 +1,6 @@
-import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import { db } from "~/server/db";
 import { publicCacheMiddleware } from "../../cache";
+import { createTRPCRouter, publicProcedure } from "../trpc";
 
 export const teamsRouter = createTRPCRouter({
   // Test the new cache system with params strategy

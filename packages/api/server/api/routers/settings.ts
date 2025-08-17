@@ -1,10 +1,10 @@
 import { TRPCError } from "@trpc/server";
 import { revalidateTag } from "next/cache";
-import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import { db } from "~/server/db";
 import { UnauthorizedError } from "~/server/util/errors/unauthorized";
 import { getCoreUserTag } from "~/utils/cache";
 import { updateUsernameSchema } from "~/utils/schemas/updateUsername";
+import { createTRPCRouter, publicProcedure } from "../trpc";
 
 export const settingsRouter = createTRPCRouter({
   get: publicProcedure.query(async ({ ctx }) => {

@@ -1,8 +1,8 @@
 import { z } from "zod";
 
-import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import { db } from "~/server/db";
 import { UnauthorizedError } from "~/server/util/errors/unauthorized";
+import { createTRPCRouter, publicProcedure } from "../trpc";
 
 const getPlayerProfileSchema = z.object({
   leagueId: z.number().int(),
