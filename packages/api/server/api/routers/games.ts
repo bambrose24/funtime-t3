@@ -3,6 +3,7 @@ import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import { db } from "~/server/db";
 import { cache } from "~/utils/cache";
 import { DEFAULT_SEASON } from "~/utils/const";
+import { publicCacheMiddleware } from "../../cache";
 
 const getGamesSchema = z.object({
   season: z.number().int(),
@@ -26,23 +27,32 @@ export const gamesRouter = createTRPCRouter({
       },
     });
   }),
-  getGames: publicProcedure.input(getGamesSchema).query(async ({ input }) => {
-    const { skipCache, season, week } = input;
-    if (skipCache) {
-      return await getGamesImpl({ season, week });
-    }
-
-    const getGames = cache(
-      async () => {
+  getGames: publicProcedure
+    .input(getGamesSchema)
+    .use(async (opts) => {
+      return publicCacheMiddleware({
+        by: "params",
+        cacheTimeSeconds: 60 * 2,
+        ...opts,
+      });
+    })
+    .query(async ({ input }) => {
+      const { skipCache, season, week } = input;
+      if (skipCache) {
         return await getGamesImpl({ season, week });
-      },
-      ["getGamesBySeason", season.toString(), week?.toString() ?? ""],
-      {
-        revalidate: 60 * 2,
-      },
-    );
-    return await getGames();
-  }),
+      }
+
+      const getGames = cache(
+        async () => {
+          return await getGamesImpl({ season, week });
+        },
+        ["getGamesBySeason", season.toString(), week?.toString() ?? ""],
+        {
+          revalidate: 60 * 2,
+        },
+      );
+      return await getGames();
+    }),
 });
 
 async function getGamesImpl({

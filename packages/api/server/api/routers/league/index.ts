@@ -12,7 +12,6 @@ import {
   ReminderPolicy,
   ScoringType,
 } from "../../../../src/generated/prisma-client";
-import { authorizedCacheMiddleware } from "../../../cache";
 import {
   authorizedProcedure,
   createTRPCRouter,
@@ -242,13 +241,6 @@ export const leagueRouter = createTRPCRouter({
     }),
   get: authorizedProcedure
     .input(leagueIdSchema)
-    .use(async (opts) => {
-      return authorizedCacheMiddleware({
-        by: "params",
-        cacheTimeSeconds: 60 * 60,
-        ...opts,
-      });
-    })
     .query(async ({ input, ctx }) => {
       const { leagueId } = input;
       const { db } = ctx;

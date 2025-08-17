@@ -1,5 +1,5 @@
 import { TRPCError } from "@trpc/server";
-import StableStringify from "json-stable-stringify";
+import stringify from "json-stable-stringify";
 import superjson from "superjson";
 import { getLogger } from "~/utils/logging";
 import type { authorizedProcedure, publicProcedure } from "./api/trpc";
@@ -28,10 +28,10 @@ function generateCacheKey(
           message: "User required for params_and_user cache strategy",
         });
       }
-      return `${prefix}:user:${userEmail}:params:${StableStringify(input)}`;
+      return `${prefix}:user:${userEmail}:params:${stringify(input)}`;
 
     case "params":
-      return `${prefix}:params:${StableStringify(input)}`;
+      return `${prefix}:params:${stringify(input)}`;
 
     case "user":
       if (!userEmail) {
