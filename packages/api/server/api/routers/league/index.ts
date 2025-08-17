@@ -1,17 +1,17 @@
 import { TRPCError } from "@trpc/server";
 import { orderBy } from "lodash";
 import { z } from "zod";
-import { resendApi } from "~/server/services/resend";
-import { UnauthorizedError } from "~/server/util/errors/unauthorized";
-import { getGames } from "~/server/util/getGames";
-import { DEFAULT_SEASON } from "~/utils/const";
-import { Defined } from "~/utils/defined";
 import {
   LatePolicy,
   PickPolicy,
   ReminderPolicy,
   ScoringType,
 } from "../../../../src/generated/prisma-client";
+import { DEFAULT_SEASON } from "../../../../utils/const";
+import { Defined } from "../../../../utils/defined";
+import { resendApi } from "../../../services/resend";
+import { UnauthorizedError } from "../../../util/errors/unauthorized";
+import { getGames } from "../../../util/getGames";
 import {
   authorizedProcedure,
   createTRPCRouter,

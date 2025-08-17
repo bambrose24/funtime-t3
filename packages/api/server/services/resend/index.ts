@@ -1,12 +1,16 @@
+import LeagueBroadcastEmail from "emails/league-broadcast";
 import LeagueWelcome from "emails/league-welcome";
 import PicksConfirmationEmail from "emails/picks-confirmation";
 import PickReminderEmail from "emails/picks-reminder";
-import LeagueBroadcastEmail from "emails/league-broadcast";
 import { Resend } from "resend";
-import type { leaguemembers, leagues, people } from "../../../src/generated/prisma-client";
-import { db } from "~/server/db";
-import { getLogger } from "~/utils/logging";
-import { Defined } from "~/utils/defined";
+import type {
+  leaguemembers,
+  leagues,
+  people,
+} from "../../../src/generated/prisma-client";
+import { Defined } from "../../../utils/defined";
+import { getLogger } from "../../../utils/logging";
+import { db } from "../../db";
 const resend = new Resend(process.env.RESEND_API_KEY ?? "");
 
 const FROM = "Funtime System <no-reply@play-funtime.com>";
@@ -15,21 +19,29 @@ const LOG_PREFIX = "[resend-api]";
 
 export const resendApi = {
   getMany: async (ids: string[]) => {
-    const emails = await Promise.all(ids.map(async (id) => {
-      try {
-        return await resend.emails.get(id);
-      } catch (error) {
-        getLogger().error(`${LOG_PREFIX} Failed to fetch email with ID ${id}:`, error);
-        return null;
-      }
-    }));
+    const emails = await Promise.all(
+      ids.map(async (id) => {
+        try {
+          return await resend.emails.get(id);
+        } catch (error) {
+          getLogger().error(
+            `${LOG_PREFIX} Failed to fetch email with ID ${id}:`,
+            error,
+          );
+          return null;
+        }
+      }),
+    );
     return emails.filter(Defined);
   },
   get: async (id: string) => {
     try {
       return await resend.emails.get(id);
     } catch (error) {
-      getLogger().error(`${LOG_PREFIX} Failed to fetch email with ID ${id}:`, error);
+      getLogger().error(
+        `${LOG_PREFIX} Failed to fetch email with ID ${id}:`,
+        error,
+      );
       return null;
     }
   },
@@ -167,7 +179,7 @@ export const resendApi = {
     const { data, error } = await resend.emails.send({
       from: FROM,
       to: [email],
-      subject: `Your ${leagues.length === 1 ? leagues.at(0)?.name ?? "" : "Funtime"} picks for Week ${week}!`,
+      subject: `Your ${leagues.length === 1 ? (leagues.at(0)?.name ?? "") : "Funtime"} picks for Week ${week}!`,
       react: PicksConfirmationEmail({
         leagues: leagues.map((l) => {
           return {
@@ -293,7 +305,7 @@ export const resendApi = {
     const { data, error } = await resend.emails.send({
       from: FROM,
       to: [FROM], // Send to the FROM address
-      bcc: to.map(t => t.email), // Put all recipients in BCC
+      bcc: to.map((t) => t.email), // Put all recipients in BCC
       subject: `Funtime - Message from ${leagueName} Admin`,
       react: LeagueBroadcastEmail({
         leagueName,
@@ -318,7 +330,7 @@ export const resendApi = {
       // Note: You might want to adjust this based on your actual data model
       // Since we don't have specific league or member IDs here, we're logging it differently
       await db.emailLogs.createMany({
-        data: to.map(t => ({
+        data: to.map((t) => ({
           email_type: "league_broadcast",
           resend_id: data.id,
           league_id: leagueId,

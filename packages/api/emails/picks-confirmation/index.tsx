@@ -1,10 +1,10 @@
 import { Column, Container, Html, Preview, Row } from "@react-email/components";
+import { format } from "date-fns-tz";
+import { chunk, orderBy } from "lodash";
+import { EmailButton } from "../../emails/components/email-button";
 import { EmailH1, EmailText } from "../../emails/components/email-text";
 import { Provider } from "../../emails/provider";
-import { EmailButton } from "../../emails/components/email-button";
-import { chunk, orderBy } from "lodash";
-import { cn } from "~/lib/utils";
-import { format } from "date-fns-tz";
+import { cn } from "../../lib/utils";
 
 type League = {
   name: string;

@@ -1,7 +1,7 @@
 import { TRPCError } from "@trpc/server";
 import stringify from "json-stable-stringify";
 import superjson from "superjson";
-import { getLogger } from "~/utils/logging";
+import { getLogger } from "../utils/logging";
 import type { authorizedProcedure, publicProcedure } from "./api/trpc";
 import { redis } from "./redis";
 

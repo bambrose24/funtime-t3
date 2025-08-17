@@ -1,6 +1,6 @@
 import { Button as ReactEmailButton } from "@react-email/components";
 import React from "react";
-import { cn } from "~/lib/utils";
+import { cn } from "../../lib/utils";
 
 interface EmailButtonProps {
   href?: string;

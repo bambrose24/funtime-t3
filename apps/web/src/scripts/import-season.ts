@@ -1,6 +1,5 @@
+import { prisma as db, espn } from "@funtime/api";
 import { groupBy, orderBy } from "lodash";
-import { db } from "~/server/db";
-import { espn } from "~/server/services/espn";
 
 async function run() {
   const season = 2025;

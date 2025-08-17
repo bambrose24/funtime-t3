@@ -1,9 +1,9 @@
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "../trpc";
 
-import { DEFAULT_SEASON } from "~/utils/const";
 import { TRPCError } from "@trpc/server";
 import { revalidatePath } from "next/cache";
+import { DEFAULT_SEASON } from "../../../utils/const";
 
 export const authRouter = createTRPCRouter({
   signup: publicProcedure // authorized below to require supabase user

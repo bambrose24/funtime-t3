@@ -1,11 +1,14 @@
-import { z } from "zod";
-import { authorizedProcedure, createTRPCRouter } from "../../trpc";
-import { MemberRole, type PrismaClient } from "../../../../src/generated/prisma-client";
 import { TRPCError } from "@trpc/server";
-import { groupBy, orderBy } from "lodash";
 import { addDays, subDays } from "date-fns";
-import { resendApi } from "~/server/services/resend";
-import { Defined } from "~/utils/defined";
+import { groupBy, orderBy } from "lodash";
+import { z } from "zod";
+import {
+  MemberRole,
+  type PrismaClient,
+} from "../../../../src/generated/prisma-client";
+import { Defined } from "../../../../utils/defined";
+import { resendApi } from "../../../services/resend";
+import { authorizedProcedure, createTRPCRouter } from "../../trpc";
 
 const leagueAdminProcedure = authorizedProcedure
   .input(z.object({ leagueId: z.number().int() }))
@@ -476,9 +479,9 @@ export const leagueAdminRouter = createTRPCRouter({
           return { email: m.people.email, memberId: m.membership_id };
         })
         .filter((t) => t.email !== null) as {
-          email: string;
-          memberId: number;
-        }[];
+        email: string;
+        memberId: number;
+      }[];
 
       // Send the broadcast email
       try {

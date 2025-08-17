@@ -1,9 +1,9 @@
 import { sortBy } from "lodash";
 import { z } from "zod";
 
-import { UnauthorizedError } from "~/server/util/errors/unauthorized";
-import { cache } from "~/utils/cache";
-import { withRankings } from "~/utils/withRankings";
+import { cache } from "../../../utils/cache";
+import { withRankings } from "../../../utils/withRankings";
+import { UnauthorizedError } from "../../util/errors/unauthorized";
 import { createTRPCRouter, publicProcedure } from "../trpc";
 
 export const leaderboardRouter = createTRPCRouter({

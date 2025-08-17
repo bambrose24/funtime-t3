@@ -14,6 +14,12 @@ export { PrismaClient } from "./generated/prisma-client";
 // Use the same Prisma client singleton from server/db.ts
 export { db as prisma } from "../server/db";
 
+export { espn } from "../server/services/espn";
+
+export { resendApi } from "../server/services/resend";
+
+export { msf } from "../server/services/mysportsfeeds";
+
 // Export cache middleware
 export {
   authorizedCacheMiddleware,

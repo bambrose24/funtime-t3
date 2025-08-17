@@ -2,7 +2,7 @@ import { env } from "../env.js";
 import { PrismaClient } from "../src/generated/prisma-client";
 import { config } from "../utils/config";
 
-import { getLogger } from "~/utils/logging";
+import { getLogger } from "../utils/logging";
 
 const LOG_PREFIX = `[prisma client]`;
 

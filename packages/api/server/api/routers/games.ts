@@ -1,8 +1,7 @@
 import { z } from "zod";
-import { db } from "~/server/db";
-import { cache } from "~/utils/cache";
-import { DEFAULT_SEASON } from "~/utils/const";
+import { DEFAULT_SEASON } from "../../../utils/const";
 import { publicCacheMiddleware } from "../../cache";
+import { db } from "../../db";
 import { createTRPCRouter, publicProcedure } from "../trpc";
 
 const getGamesSchema = z.object({
@@ -42,16 +41,7 @@ export const gamesRouter = createTRPCRouter({
         return await getGamesImpl({ season, week });
       }
 
-      const getGames = cache(
-        async () => {
-          return await getGamesImpl({ season, week });
-        },
-        ["getGamesBySeason", season.toString(), week?.toString() ?? ""],
-        {
-          revalidate: 60 * 2,
-        },
-      );
-      return await getGames();
+      return await getGamesImpl({ season, week });
     }),
 });
 

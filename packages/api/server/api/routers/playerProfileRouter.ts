@@ -1,7 +1,7 @@
 import { z } from "zod";
 
-import { db } from "~/server/db";
-import { UnauthorizedError } from "~/server/util/errors/unauthorized";
+import { db } from "../../db";
+import { UnauthorizedError } from "../../util/errors/unauthorized";
 import { createTRPCRouter, publicProcedure } from "../trpc";
 
 const getPlayerProfileSchema = z.object({

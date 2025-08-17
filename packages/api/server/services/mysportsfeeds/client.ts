@@ -1,6 +1,6 @@
-import { getLogger } from "~/utils/logging";
-import { MSFGameSchema } from "./types";
 import { z } from "zod";
+import { getLogger } from "../../../utils/logging";
+import { MSFGameSchema } from "./types";
 
 type MSFGame = z.infer<typeof MSFGameSchema>;
 

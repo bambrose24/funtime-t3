@@ -1,6 +1,6 @@
 import "server-only";
 import { db } from "../db";
-import { cache } from "~/utils/cache";
+import { cache } from "../../utils/cache";
 
 const REVALIDATE_SECONDS = 60 * 60; // 1 hour
 

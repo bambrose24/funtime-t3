@@ -1,5 +1,5 @@
-import { db } from "~/server/db";
-import { espn } from "~/server/services/espn";
+import { prisma as db, espn } from "@funtime/api";
+
 async function run() {
   const week = 17;
   const season = 2025;
@@ -13,21 +13,29 @@ async function run() {
   });
   const teams = await db.teams.findMany();
 
-  const espnWeekGames = espnGamesSeason.filter(g => g.week.number === week)
-  console.log('espnWeekGames...', espnWeekGames.length);
+  const espnWeekGames = espnGamesSeason.filter((g) => g.week.number === week);
+  console.log("espnWeekGames...", espnWeekGames.length);
 
-  const espnWeekGamesWithNoDbGames = espnWeekGames.filter(g => !dbGames.find(db => db.espn_id === Number(g.id)));
-  console.log('espnWeekGamesWithNoDbGames...', espnWeekGamesWithNoDbGames.length);
+  const espnWeekGamesWithNoDbGames = espnWeekGames.filter(
+    (g) => !dbGames.find((db) => db.espn_id === Number(g.id)),
+  );
+  console.log(
+    "espnWeekGamesWithNoDbGames...",
+    espnWeekGamesWithNoDbGames.length,
+  );
 
   for (const toCreateEspnGame of espnWeekGamesWithNoDbGames) {
-
-    const homeTeamAbbrev = toCreateEspnGame.competitions[0]?.competitors.find(c => c.homeAway === 'home')?.team.abbreviation;
-    const homeTeamId = teams.find(t => t.abbrev === homeTeamAbbrev)?.teamid;
-    const awayTeamAbbrev = toCreateEspnGame.competitions[0]?.competitors.find(c => c.homeAway === 'away')?.team.abbreviation;
-    const awayTeamId = teams.find(t => t.abbrev === awayTeamAbbrev)?.teamid;
+    const homeTeamAbbrev = toCreateEspnGame.competitions[0]?.competitors.find(
+      (c) => c.homeAway === "home",
+    )?.team.abbreviation;
+    const homeTeamId = teams.find((t) => t.abbrev === homeTeamAbbrev)?.teamid;
+    const awayTeamAbbrev = toCreateEspnGame.competitions[0]?.competitors.find(
+      (c) => c.homeAway === "away",
+    )?.team.abbreviation;
+    const awayTeamId = teams.find((t) => t.abbrev === awayTeamAbbrev)?.teamid;
 
     if (!homeTeamId || !awayTeamId) {
-      console.log('No home or away team found...', toCreateEspnGame)
+      console.log("No home or away team found...", toCreateEspnGame);
       continue;
     }
 
@@ -46,13 +54,15 @@ async function run() {
   }
 
   for (const dbGame of dbGames) {
-    const espnGame = espnGamesSeason.find(g => dbGame.espn_id && Number(g.id) === dbGame.espn_id)
+    const espnGame = espnGamesSeason.find(
+      (g) => dbGame.espn_id && Number(g.id) === dbGame.espn_id,
+    );
     if (!espnGame) {
       console.log(`No game found... ${JSON.stringify(espnGame)}`);
     }
 
     if (dbGame.gid === 4245) {
-      console.log('dbGame and espnGame...', dbGame, espnGame)
+      console.log("dbGame and espnGame...", dbGame, espnGame);
     }
   }
 }

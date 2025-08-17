@@ -2,8 +2,8 @@ import { TRPCError } from "@trpc/server";
 import { groupBy } from "lodash";
 import { z } from "zod";
 
-import { resendApi } from "~/server/services/resend";
-import { getLogger } from "~/utils/logging";
+import { getLogger } from "../../../utils/logging";
+import { resendApi } from "../../services/resend";
 import { authorizedProcedure, createTRPCRouter } from "../trpc";
 
 const pickSchema = z.object({

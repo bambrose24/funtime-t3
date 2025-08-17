@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { db } from "~/server/db";
+import { db } from "../../db";
 import { createTRPCRouter, publicProcedure } from "../trpc";
 
 const currentWeekSeasonInputSchema = z.object({

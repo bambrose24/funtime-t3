@@ -1,9 +1,9 @@
 import { TRPCError } from "@trpc/server";
 import { revalidateTag } from "next/cache";
-import { db } from "~/server/db";
-import { UnauthorizedError } from "~/server/util/errors/unauthorized";
-import { getCoreUserTag } from "~/utils/cache";
-import { updateUsernameSchema } from "~/utils/schemas/updateUsername";
+import { getCoreUserTag } from "../../../utils/cache";
+import { updateUsernameSchema } from "../../../utils/schemas/updateUsername";
+import { db } from "../../db";
+import { UnauthorizedError } from "../../util/errors/unauthorized";
 import { createTRPCRouter, publicProcedure } from "../trpc";
 
 export const settingsRouter = createTRPCRouter({

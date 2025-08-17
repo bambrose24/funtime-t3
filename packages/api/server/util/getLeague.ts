@@ -1,6 +1,6 @@
 import "server-only";
+import { cache } from "../../utils/cache";
 import { db } from "../db";
-import { cache } from "~/utils/cache";
 
 export async function getLeague({ leagueId }: { leagueId: number }) {
   const getLeagueImpl = cache(

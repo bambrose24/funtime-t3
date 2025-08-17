@@ -1,5 +1,5 @@
-import { db } from "~/server/db";
 import { publicCacheMiddleware } from "../../cache";
+import { db } from "../../db";
 import { createTRPCRouter, publicProcedure } from "../trpc";
 
 export const teamsRouter = createTRPCRouter({

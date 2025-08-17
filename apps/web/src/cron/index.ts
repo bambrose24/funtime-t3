@@ -1,10 +1,9 @@
-import { chunk, groupBy, orderBy } from "lodash";
-import { db } from "~/server/db";
-import { DEFAULT_SEASON } from "~/utils/const";
-import { Defined } from "~/utils/defined";
+import { prisma as db, espn, resendApi } from "@funtime/api";
 import { addHours } from "date-fns";
-import { resendApi } from "~/server/services/resend";
-import { espn } from "~/server/services/espn";
+import { chunk, groupBy, orderBy } from "lodash";
+
+import { DEFAULT_SEASON } from "../utils/const";
+import { Defined } from "../utils/defined";
 
 const LOG_PREFIX = "[cron]";
 
@@ -51,9 +50,13 @@ export async function run() {
         );
 
         const homeTeam =
-          teamByAbbrev[espn.translateAbbreviation(homeCompetitor?.team?.abbreviation ?? "")]?.at(0);
+          teamByAbbrev[
+            espn.translateAbbreviation(homeCompetitor?.team?.abbreviation ?? "")
+          ]?.at(0);
         const awayTeam =
-          teamByAbbrev[espn.translateAbbreviation(awayCompetitor?.team?.abbreviation ?? "")]?.at(0);
+          teamByAbbrev[
+            espn.translateAbbreviation(awayCompetitor?.team?.abbreviation ?? "")
+          ]?.at(0);
 
         if (!awayTeam || !homeTeam || !game || !espnCompetition || game.done) {
           if (espnGame.week.number === 2) {
@@ -224,10 +227,10 @@ export async function run() {
           const tiebreakerDiff =
             tiebreakerPick && tiebreakerPick.score !== null && tiebreakerGame
               ? Math.abs(
-                tiebreakerPick.score -
-                ((tiebreakerGame.homescore ?? 0) +
-                  (tiebreakerGame.awayscore ?? 0)),
-              )
+                  tiebreakerPick.score -
+                    ((tiebreakerGame.homescore ?? 0) +
+                      (tiebreakerGame.awayscore ?? 0)),
+                )
               : Infinity;
 
           return {

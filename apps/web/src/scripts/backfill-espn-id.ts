@@ -1,51 +1,67 @@
+import { espn, prisma } from "@funtime/api";
 import { groupBy } from "lodash";
 import orderBy from "lodash/orderBy";
-import { db } from "~/server/db";
-import { espn } from "~/server/services/espn";
 
 async function run() {
   const season = 2024;
   // const week = 2;
 
   try {
-    const espnGamesResponse = orderBy(await espn.getGamesBySeason({ season }), g => new Date(g.date), 'asc');
+    const espnGamesResponse = orderBy(
+      await espn.getGamesBySeason({ season }),
+      (g) => new Date(g.date),
+      "asc",
+    );
 
     console.log(`Retrieved ${espnGamesResponse.length} games:`);
 
-    const dbGames = await db.games.findMany({
+    const dbGames = await prisma.games.findMany({
       where: {
-        season
+        season,
       },
       orderBy: {
-        ts: 'asc',
-      }
+        ts: "asc",
+      },
     });
-    const teams = await db.teams.findMany();
+    const teams = await prisma.teams.findMany();
 
-    const teamByAbbrev = groupBy(teams, t => t.abbrev);
+    const teamByAbbrev = groupBy(teams, (t) => t.abbrev);
 
     const noMatchGids = [] as number[];
 
     for (const dbGame of dbGames) {
-      const espnGame = espnGamesResponse.find(g => {
+      const espnGame = espnGamesResponse.find((g) => {
         const competition = g.competitions.at(0);
         const espnGameWeek = g.week.number;
-        const homeTeam = competition?.competitors.find(c => c.homeAway === 'home');
-        const awayTeam = competition?.competitors.find(c => c.homeAway === 'away');
+        const homeTeam = competition?.competitors.find(
+          (c) => c.homeAway === "home",
+        );
+        const awayTeam = competition?.competitors.find(
+          (c) => c.homeAway === "away",
+        );
 
-        const homeAbbrev = homeTeam?.team.abbreviation ? espn.translateAbbreviation(homeTeam.team.abbreviation) : null;
-        const awayAbbrev = awayTeam?.team.abbreviation ? espn.translateAbbreviation(awayTeam.team.abbreviation) : null;
+        const homeAbbrev = homeTeam?.team.abbreviation
+          ? espn.translateAbbreviation(homeTeam.team.abbreviation)
+          : null;
+        const awayAbbrev = awayTeam?.team.abbreviation
+          ? espn.translateAbbreviation(awayTeam.team.abbreviation)
+          : null;
 
         const homeDbTeam = homeAbbrev ? teamByAbbrev[homeAbbrev]?.at(0) : null;
         const awayDbTeam = awayAbbrev ? teamByAbbrev[awayAbbrev]?.at(0) : null;
 
-        const result = homeDbTeam?.teamid === dbGame.home && awayDbTeam?.teamid === dbGame.away && dbGame.week === espnGameWeek;
+        const result =
+          homeDbTeam?.teamid === dbGame.home &&
+          awayDbTeam?.teamid === dbGame.away &&
+          dbGame.week === espnGameWeek;
         return result;
-      })
+      });
       if (espnGame && Number(espnGame.id)) {
         // const espnGameId = Number(espnGame.id);
-        console.log(`found espnGame with id ${espnGame.id} for dbGame ${dbGame.gid}`);
-        // await db.games.update({
+        console.log(
+          `found espnGame with id ${espnGame.id} for dbGame ${dbGame.gid}`,
+        );
+        // await prisma.games.update({
         //   where: {
         //     gid: dbGame.gid,
         //   },
@@ -59,7 +75,6 @@ async function run() {
       }
     }
     console.log(`Number of games without a match: ${noMatchGids.length}`);
-
 
     // console.log("\nAll ESPN Games:");
     // espnGamesResponse.forEach((game, index) => {
@@ -76,8 +91,6 @@ async function run() {
     //   console.log(`  Status: ${game.status.type.name}`);
     //   console.log('---');
     // });
-
-
   } catch (error) {
     console.error("Error fetching games:", error);
   }

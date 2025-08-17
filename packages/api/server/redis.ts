@@ -1,6 +1,6 @@
 import Redis from "ioredis";
-import { env } from "~/env";
-import { getLogger } from "~/utils/logging";
+import { env } from "../env";
+import { getLogger } from "../utils/logging";
 
 const url = env.REDIS_URL
   ? `${env.REDIS_URL}?family=0`
