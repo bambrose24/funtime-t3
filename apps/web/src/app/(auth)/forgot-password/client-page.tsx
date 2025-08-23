@@ -1,8 +1,10 @@
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
 import { type SubmitHandler, useForm } from "react-hook-form";
-import { forgotPasswordSchema } from "~/lib/schemas/auth";
+import { toast } from "sonner";
 import { type z } from "zod";
+import { Button } from "~/components/ui/button";
 import {
   Card,
   CardContent,
@@ -10,11 +12,9 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "~/components/ui/input";
-import { Button } from "~/components/ui/button";
+import { forgotPasswordSchema } from "~/lib/schemas/auth";
 import { createSupabaseBrowser } from "~/utils/supabase/client";
-import { toast } from "sonner";
 import { revalidatePathServerAction } from "../actions";
 
 type ForgotPasswordFormType = z.infer<typeof forgotPasswordSchema>;

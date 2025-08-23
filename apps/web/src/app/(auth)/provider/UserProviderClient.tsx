@@ -1,11 +1,11 @@
 "use client";
 
-import { clientApi } from "~/trpc/react";
-import { type RouterOutputs } from "~/trpc/types";
+import { usePathname, useSearchParams } from "next/navigation";
 import posthog from "posthog-js";
 import { PostHogProvider, usePostHog } from "posthog-js/react";
-import { usePathname, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
+import { clientApi } from "~/trpc/react";
+import { type RouterOutputs } from "~/trpc/types";
 
 if (typeof window !== "undefined") {
   posthog.init(process.env.NEXT_PUBLIC_POSTHOG_KEY ?? "", {
@@ -39,7 +39,7 @@ export function UserProviderClient({ children, data: initialData }: Props) {
         email: user.dbUser.email,
       });
     }
-  });
+  }, [user.dbUser]);
   return (
     <PostHogProvider client={posthog}>
       {children}

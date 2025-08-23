@@ -592,4 +592,24 @@ export const leagueRouter = createTRPCRouter({
         ),
       };
     }),
+  nextLeague: authorizedProcedure
+    .input(leagueIdSchema)
+    .query(async ({ ctx, input }) => {
+      const { leagueId } = input;
+      const { db } = ctx;
+      const usersLeagueIds = (
+        ctx.dbUser?.leaguemembers.map((m) => m.league_id) ?? []
+      ).filter(Defined);
+      if (!usersLeagueIds.includes(leagueId)) {
+        throw UnauthorizedError;
+      }
+
+      const nextLeague = await db.leagues.findFirst({
+        where: {
+          prior_league_id: leagueId,
+        },
+      });
+
+      return { nextLeague };
+    }),
 });
