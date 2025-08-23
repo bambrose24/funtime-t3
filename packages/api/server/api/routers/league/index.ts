@@ -9,6 +9,7 @@ import {
 } from "../../../../src/generated/prisma-client";
 import { DEFAULT_SEASON } from "../../../../utils/const";
 import { Defined } from "../../../../utils/defined";
+import { authorizedCacheMiddleware } from "../../../cache";
 import { resendApi } from "../../../services/resend";
 import { UnauthorizedError } from "../../../util/errors/unauthorized";
 import { getGames } from "../../../util/getGames";
@@ -594,6 +595,13 @@ export const leagueRouter = createTRPCRouter({
     }),
   nextLeague: authorizedProcedure
     .input(leagueIdSchema)
+    .use(async (opts) => {
+      return authorizedCacheMiddleware({
+        by: "params",
+        cacheTimeSeconds: 60 * 60 * 24,
+        ...opts,
+      });
+    })
     .query(async ({ ctx, input }) => {
       const { leagueId } = input;
       const { db } = ctx;
