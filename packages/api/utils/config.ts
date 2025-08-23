@@ -16,7 +16,7 @@ const configMap: Record<Env, Config> = {
     logging: {
       shouldLogToConsole: true,
       shouldLogToAxiom: false,
-      level: "error",
+      level: "info",
     },
   },
   preview: {
@@ -36,7 +36,7 @@ const configMap: Record<Env, Config> = {
   },
 };
 
-export const env = (process.env.NEXT_PUBLIC_VERCEL_ENV ??
-  process.env.NEXT_PUBLIC_FUNTIME_ENV ??
+export const env = (process.env.NEXT_PUBLIC_FUNTIME_ENV ??
+  process.env.NEXT_PUBLIC_VERCEL_ENVIRONMENT ??
   "development") as Env;
 export const config = configMap[env];
