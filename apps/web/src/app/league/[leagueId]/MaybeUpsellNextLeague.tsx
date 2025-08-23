@@ -1,4 +1,3 @@
-import { Trophy } from "lucide-react";
 import Link from "next/link";
 import { Suspense } from "react";
 import { Alert, AlertDescription } from "~/components/ui/alert";
@@ -42,7 +41,6 @@ async function MaybeUpsellNextLeagueContent({
         <Alert className="flex w-full items-center border-primary bg-primary/5">
           <AlertDescription>
             <div className="flex items-center justify-between gap-2">
-              <Trophy className="h-4 w-4" />
               <span>
                 Don&apos;t miss out on the next season! Join &ldquo;
                 {nextLeague.name}
