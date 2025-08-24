@@ -3,6 +3,7 @@ import { orderBy } from "lodash";
 import { z } from "zod";
 import {
   LatePolicy,
+  LeagueStatus,
   PickPolicy,
   ReminderPolicy,
   ScoringType,
@@ -570,6 +571,15 @@ export const leagueRouter = createTRPCRouter({
           message: `User ${dbUser?.uid} is not in league ${leagueId}`,
         });
       }
+
+      const league = await ctx.db.leagues.findFirstOrThrow({
+        where: {
+          league_id: leagueId,
+        },
+      });
+
+      const leagueNotStarted = league.status === LeagueStatus.not_started;
+
       const superbowlPicks = await ctx.db.superbowl.findMany({
         where: {
           leaguemembers: {
@@ -590,7 +600,17 @@ export const leagueRouter = createTRPCRouter({
           superbowlPicks,
           (s) => s.leaguemembers?.people.username?.toLocaleLowerCase(),
           "asc",
-        ),
+        ).map((p) => {
+          if (leagueNotStarted && p.member_id !== member.membership_id) {
+            return {
+              ...p,
+              winner: null,
+              loser: null,
+              score: null,
+            };
+          }
+          return p;
+        }),
       };
     }),
   nextLeague: authorizedProcedure
