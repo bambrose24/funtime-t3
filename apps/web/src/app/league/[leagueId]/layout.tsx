@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { serverApi } from "~/trpc/server";
 import { MaybeUpsellNextLeague } from "./MaybeUpsellNextLeague";
+import { MaybeShareLeagueLink } from "./MaybeShareLeagueLink";
 
 export default async function LeagueAuthLayout({
   children,
@@ -25,6 +26,7 @@ export default async function LeagueAuthLayout({
   }
   return (
     <>
+      <MaybeShareLeagueLink leagueId={leagueIdNumber} />
       <MaybeUpsellNextLeague leagueId={leagueIdNumber} />
       {children}
     </>

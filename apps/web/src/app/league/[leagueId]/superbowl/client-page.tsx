@@ -1,5 +1,8 @@
 "use client";
 
+import Link from "next/link";
+import { Badge } from "~/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import {
   Table,
   TableBody,
@@ -10,9 +13,6 @@ import {
 } from "~/components/ui/table";
 import { type RouterOutputs } from "~/trpc/types";
 import { useDictify } from "~/utils/hooks/useIdToValMemo";
-import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
-import { Badge } from "~/components/ui/badge";
-import Link from "next/link";
 
 type ClientSuperbowlPicksPageProps = {
   league: RouterOutputs["league"]["get"];
@@ -49,8 +49,8 @@ export function ClientSuperbowlPicksPage({
             </TableHeader>
             <TableBody>
               {superbowlPicks.superbowlPicks.map((pick) => {
-                const winnerTeam = teamIdToTeam.get(pick.winner);
-                const loserTeam = teamIdToTeam.get(pick.loser);
+                const winnerTeam = teamIdToTeam.get(pick.winner ?? 0) ?? null;
+                const loserTeam = teamIdToTeam.get(pick.loser ?? 0) ?? null;
                 const isViewer = session?.dbUser?.leaguemembers.some(
                   (m) => m.membership_id === pick.member_id,
                 );
