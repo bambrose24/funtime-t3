@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { serverApi } from "~/trpc/server";
-import { MaybeUpsellNextLeague } from "./MaybeUpsellNextLeague";
 import { MaybeShareLeagueLink } from "./MaybeShareLeagueLink";
+import { MaybeUpsellNextLeague } from "./MaybeUpsellNextLeague";
 
 export default async function LeagueAuthLayout({
   children,

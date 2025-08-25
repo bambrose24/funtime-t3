@@ -2,11 +2,7 @@ import { Suspense } from "react";
 import { serverApi } from "~/trpc/server";
 import { ShareLeagueLinkClient } from "./ShareLeagueLinkClient";
 
-export async function MaybeShareLeagueLink({
-  leagueId,
-}: {
-  leagueId: number;
-}) {
+export async function MaybeShareLeagueLink({ leagueId }: { leagueId: number }) {
   return (
     <Suspense fallback={null}>
       <MaybeShareLeagueLinkContent leagueId={leagueId} />
@@ -14,11 +10,7 @@ export async function MaybeShareLeagueLink({
   );
 }
 
-async function MaybeShareLeagueLinkContent({
-  leagueId,
-}: {
-  leagueId: number;
-}) {
+async function MaybeShareLeagueLinkContent({ leagueId }: { leagueId: number }) {
   const [session, league] = await Promise.all([
     serverApi.session.current(),
     serverApi.league.get({ leagueId }),
@@ -28,7 +20,7 @@ async function MaybeShareLeagueLinkContent({
   const member = session.dbUser?.leaguemembers.find(
     (m) => m.league_id === leagueId,
   );
-  
+
   if (!member || member.role !== "admin") {
     return null;
   }
