@@ -1,12 +1,11 @@
-import * as React from "react";
 import {
-  Html,
-  Head,
   Body,
   Container,
+  Head,
   Heading,
-  Section,
   Hr,
+  Html,
+  Section,
 } from "@react-email/components";
 import { Markdown } from "@react-email/markdown";
 import { Provider } from "../provider";
@@ -40,7 +39,7 @@ export default function LeagueBroadcastEmail({
           <Container className="mx-auto py-8">
             <Heading className="mb-4 text-lg">
               This is a message from{" "}
-              <span className="underline">{adminName}</span>, an admin of your
+              <span className="underline">{adminName}</span>, an admin of yourrr
               Funtime league <span className="underline">{leagueName}</span>:
             </Heading>
             <Hr className="m-[16px] border-t-2 border-slate-400" />

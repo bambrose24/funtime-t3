@@ -1,4 +1,4 @@
-import { prisma as db, espn } from "@funtime/api";
+import { db, espn } from "../server/db";
 
 async function run() {
   const week = 17;

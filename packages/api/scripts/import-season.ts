@@ -1,5 +1,7 @@
-import { prisma as db, espn } from "@funtime/api";
 import { groupBy, orderBy } from "lodash";
+import { db } from "../server/db";
+import { espn } from "../server/services/espn";
+import { Defined } from "../utils/defined";
 
 async function run() {
   const season = 2025;
@@ -8,10 +10,30 @@ async function run() {
       season,
     },
   });
+
   if (existingGames.length) {
-    throw new Error(
-      `Found ${existingGames.length} games for season ${season} already`,
-    );
+    // throw new Error(
+    //   `Found ${existingGames.length} games for season ${season} already`,
+    // );
+
+    console.log("Deleting picks for games that already existed...");
+    /**
+     * Delete picks that exist because the games got corrupted
+     */
+    await db.picks.deleteMany({
+      where: {
+        gid: {
+          in: existingGames.map((g) => g.gid),
+        },
+      },
+    });
+    await db.games.deleteMany({
+      where: {
+        gid: {
+          in: existingGames.map((g) => g.gid),
+        },
+      },
+    });
   }
 
   console.log("can make games!");
@@ -19,11 +41,21 @@ async function run() {
   // Get games from ESPN instead of MySportsFeeds
   const espnGamesResponse = await espn.getGamesBySeason({ season });
   console.log(
-    `Found ${espnGamesResponse.length} games from ESPN for season ${season}`,
+    `Found ${espnGamesResponse.length} total games from ESPN for season ${season}`,
+  );
+
+  // Filter out playoff games - only keep regular season games (weeks 1-18)
+  const regularSeasonGames = espnGamesResponse.filter((game) => {
+    const week = game.week?.number;
+    return week && week >= 1 && week <= 18 && game.season.type === 2;
+  });
+
+  console.log(
+    `Found ${regularSeasonGames.length} regular season games from ESPN for season ${season}`,
   );
 
   // Group games by week to determine tiebreaker games
-  const groupedByWeek = groupBy(espnGamesResponse, (g) => g.week.number);
+  const groupedByWeek = groupBy(regularSeasonGames, (g) => g.week.number);
 
   // Determine tiebreaker games (last game of each week)
   const espnTiebreakerIds = new Set<string>();
@@ -41,9 +73,13 @@ async function run() {
 
   const teams = await db.teams.findMany();
   const teamByAbbrev = groupBy(teams, (t) => t.abbrev);
+  const rams = teamByAbbrev["LA"]?.at(0);
+  const washington = teamByAbbrev["WAS"]?.at(0);
+  teamByAbbrev["WSH"] = [washington].filter(Defined);
+  teamByAbbrev["LAR"] = [rams].filter(Defined);
 
   const creates: Array<Parameters<typeof db.games.create>[0]> = [];
-  for (const espnGame of espnGamesResponse) {
+  for (const espnGame of regularSeasonGames) {
     // Extract team info from ESPN game data
     const homeTeamAbbrev = espnGame.competitions[0]?.competitors.find(
       (c) => c.homeAway === "home",
@@ -79,7 +115,7 @@ async function run() {
     });
   }
 
-  console.log(`going to create ${creates.length} games...`);
+  console.log(`going to create ${creates.length} regular season games...`);
   let i = 1;
   for (const create of creates) {
     console.log(
@@ -89,7 +125,9 @@ async function run() {
     i++;
   }
 
-  console.log(`finished creating games, season ${season} is imported!`);
+  console.log(
+    `finished creating regular season games, season ${season} is imported!`,
+  );
 }
 
 await run();

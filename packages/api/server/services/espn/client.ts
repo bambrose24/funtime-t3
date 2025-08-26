@@ -23,15 +23,15 @@ const LeagueSchema = z.object({
 });
 
 const StatusSchema = z.enum([
-  'STATUS_SCHEDULED',
-  'STATUS_IN_PROGRESS',
-  'STATUS_FINAL',
-  'STATUS_HALFTIME',
-  'STATUS_END_PERIOD',
-  'STATUS_POSTPONED',
-  'STATUS_CANCELED',
-  'STATUS_SUSPENDED',
-  'STATUS_DELAYED',
+  "STATUS_SCHEDULED",
+  "STATUS_IN_PROGRESS",
+  "STATUS_FINAL",
+  "STATUS_HALFTIME",
+  "STATUS_END_PERIOD",
+  "STATUS_POSTPONED",
+  "STATUS_CANCELED",
+  "STATUS_SUSPENDED",
+  "STATUS_DELAYED",
 ]);
 
 const TeamSchema = z.object({
@@ -72,14 +72,16 @@ const CompetitionSchema = z.object({
   conferenceCompetition: z.boolean(),
   playByPlayAvailable: z.boolean(),
   recent: z.boolean(),
-  venue: z.object({
-    id: z.string(),
-    fullName: z.string(),
-    address: z.object({
-      city: z.string(),
-      state: z.string().optional(),
-    }),
-  }).optional(),
+  venue: z
+    .object({
+      id: z.string(),
+      fullName: z.string(),
+      address: z.object({
+        city: z.string(),
+        state: z.string().optional(),
+      }),
+    })
+    .optional(),
   competitors: z.array(CompetitorSchema),
   status: z.object({
     clock: z.number(),
@@ -105,7 +107,7 @@ const EventSchema = z.object({
   shortName: z.string(),
   season: z.object({
     year: z.number(),
-    type: z.number(),
+    type: z.number(), // 1 = preseason, 2 = regular season, 3 = postseason
     slug: z.string(),
   }),
   week: z.object({
@@ -130,13 +132,17 @@ const EventSchema = z.object({
 
 const EventsResponseSchema = z.object({
   leagues: z.array(LeagueSchema).optional(),
-  season: z.object({
-    type: z.number(),
-    year: z.number(),
-  }).optional(),
-  week: z.object({
-    number: z.number(),
-  }).optional(),
+  season: z
+    .object({
+      type: z.number(),
+      year: z.number(),
+    })
+    .optional(),
+  week: z
+    .object({
+      number: z.number(),
+    })
+    .optional(),
   events: z.array(EventSchema),
 });
 
@@ -144,29 +150,35 @@ type ESPNEvent = z.infer<typeof EventSchema>;
 
 export class ESPNClient {
   async getGamesBySeason({ season }: { season: number }): Promise<ESPNEvent[]> {
-    const startDate = `${season}0901`;  // September 1st of the season year
-    const endDate = `${season + 1}0301`;  // March 1st of the following year
+    const startDate = `${season}0901`; // September 1st of the season year
+    const endDate = `${season + 1}0301`; // March 1st of the following year
     const url = `${BASE_URL}/scoreboard?limit=1000&dates=${startDate}-${endDate}&seasontype=2`;
     const response = await fetch(url);
-    const data = await response.json() as unknown;
+    const data = (await response.json()) as unknown;
     const parsedData = EventsResponseSchema.parse(data);
     return parsedData.events;
   }
 
-  async getGamesByWeek({ season, week }: { season: number, week: number }): Promise<ESPNEvent[]> {
+  async getGamesByWeek({
+    season,
+    week,
+  }: {
+    season: number;
+    week: number;
+  }): Promise<ESPNEvent[]> {
     const url = `${BASE_URL}/scoreboard?limit=100&seasontype=2&week=${week}&season=${season}`;
     const response = await fetch(url);
-    const data = await response.json() as unknown;
+    const data = (await response.json()) as unknown;
     const parsedData = EventsResponseSchema.parse(data);
     return parsedData.events;
   }
 
   translateAbbreviation(abbrev: string) {
     switch (abbrev) {
-      case 'LAR':
-        return 'LA';
-      case 'WSH':
-        return 'WAS';
+      case "LAR":
+        return "LA";
+      case "WSH":
+        return "WAS";
       default:
         return abbrev;
     }

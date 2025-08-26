@@ -1,4 +1,4 @@
-import { espn, prisma } from "@funtime/api";
+import { db, espn } from "../server/db";
 import { groupBy } from "lodash";
 import orderBy from "lodash/orderBy";
 
@@ -15,7 +15,7 @@ async function run() {
 
     console.log(`Retrieved ${espnGamesResponse.length} games:`);
 
-    const dbGames = await prisma.games.findMany({
+    const dbGames = await db.games.findMany({
       where: {
         season,
       },
@@ -23,7 +23,7 @@ async function run() {
         ts: "asc",
       },
     });
-    const teams = await prisma.teams.findMany();
+    const teams = await db.teams.findMany();
 
     const teamByAbbrev = groupBy(teams, (t) => t.abbrev);
 
@@ -61,7 +61,7 @@ async function run() {
         console.log(
           `found espnGame with id ${espnGame.id} for dbGame ${dbGame.gid}`,
         );
-        // await prisma.games.update({
+        // await db.games.update({
         //   where: {
         //     gid: dbGame.gid,
         //   },
