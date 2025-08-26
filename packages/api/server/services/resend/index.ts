@@ -1,4 +1,4 @@
-import LeagueBroadcastEmail from "emails/league-broadcast";
+import LeagueBroadcastEmail from "emails/league-broadcast"; // TODO this import is going to the web app, it shouldnt
 import LeagueWelcome from "emails/league-welcome";
 import PicksConfirmationEmail from "emails/picks-confirmation";
 import PickReminderEmail from "emails/picks-reminder";
@@ -309,6 +309,7 @@ export const resendApi = {
       subject: `Funtime - Message from ${leagueName} Admin`,
       react: LeagueBroadcastEmail({
         leagueName,
+        leagueId,
         adminName,
         markdownMessage,
       }),
