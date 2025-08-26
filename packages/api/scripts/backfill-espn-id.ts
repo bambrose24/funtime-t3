@@ -1,6 +1,7 @@
-import { db, espn } from "../server/db";
 import { groupBy } from "lodash";
 import orderBy from "lodash/orderBy";
+import { db } from "../server/db";
+import { espn } from "../server/services/espn";
 
 async function run() {
   const season = 2024;

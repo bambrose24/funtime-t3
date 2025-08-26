@@ -12,28 +12,30 @@ async function run() {
   });
 
   if (existingGames.length) {
-    // throw new Error(
-    //   `Found ${existingGames.length} games for season ${season} already`,
-    // );
+    throw new Error(
+      `Found ${existingGames.length} games for season ${season} already`,
+    );
 
-    console.log("Deleting picks for games that already existed...");
-    /**
-     * Delete picks that exist because the games got corrupted
-     */
-    await db.picks.deleteMany({
-      where: {
-        gid: {
-          in: existingGames.map((g) => g.gid),
-        },
-      },
-    });
-    await db.games.deleteMany({
-      where: {
-        gid: {
-          in: existingGames.map((g) => g.gid),
-        },
-      },
-    });
+    // Can uncomment to delete picks and games that already existed for a corrupted import
+
+    // console.log("Deleting picks for games that already existed...");
+    // /**
+    //  * Delete picks that exist because the games got corrupted
+    //  */
+    // await db.picks.deleteMany({
+    //   where: {
+    //     gid: {
+    //       in: existingGames.map((g) => g.gid),
+    //     },
+    //   },
+    // });
+    // await db.games.deleteMany({
+    //   where: {
+    //     gid: {
+    //       in: existingGames.map((g) => g.gid),
+    //     },
+    //   },
+    // });
   }
 
   console.log("can make games!");
