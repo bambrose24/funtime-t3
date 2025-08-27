@@ -1,8 +1,6 @@
-import "server-only";
-
+import { createTRPCOptionsProxy } from "@trpc/tanstack-react-query";
 import { headers } from "next/headers";
 import { cache } from "react";
-import { createTRPCOptionsProxy } from "@trpc/tanstack-react-query";
 
 import { appRouter, createCaller } from "@funtime/api";
 import { createTRPCContext } from "@funtime/api/server/api/trpc";

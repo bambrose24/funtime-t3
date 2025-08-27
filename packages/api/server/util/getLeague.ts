@@ -1,4 +1,3 @@
-import "server-only";
 import { cache } from "../../utils/cache";
 import { db } from "../db";
 

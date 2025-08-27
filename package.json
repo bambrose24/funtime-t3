@@ -11,7 +11,7 @@
   "scripts": {
     "build": "turbo run db:generate && turbo run build",
     "build-web": "turbo run db:generate && turbo run build --filter=@funtime/web",
-    "web-cron": "cd apps/web && bun run web-cron",
+    "web-cron": "cd apps/web && bun run cron",
     "lint": "turbo run lint",
     "typecheck": "turbo run typecheck",
     "test": "turbo run test",

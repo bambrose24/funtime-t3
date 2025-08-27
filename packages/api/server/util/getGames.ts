@@ -1,4 +1,3 @@
-import "server-only";
 import type { PrismaClient } from "../../src/generated/prisma-client";
 import { cache } from "../../utils/cache";
 

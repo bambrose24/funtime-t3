@@ -81,7 +81,6 @@
     "recharts": "^2.15.4",
     "remark-gfm": "^4.0.1",
     "resend": "^3.5.0",
-    "server-only": "^0.0.1",
     "sonner": "^1.7.4",
     "superjson": "^2.2.2",
     "tailwind-merge": "^2.6.0",
