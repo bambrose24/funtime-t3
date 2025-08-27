@@ -2,6 +2,7 @@ import LeagueBroadcastEmail from "emails/league-broadcast"; // TODO this import 
 import LeagueWelcome from "emails/league-welcome";
 import PicksConfirmationEmail from "emails/picks-confirmation";
 import PickReminderEmail from "emails/picks-reminder";
+import { chunk } from "lodash";
 import { Resend } from "resend";
 import type {
   leaguemembers,
@@ -302,42 +303,72 @@ export const resendApi = {
       `${LOG_PREFIX} Going to send league broadcast email for league ${leagueName}`,
     );
 
-    const { data, error } = await resend.emails.send({
-      from: FROM,
-      to: [FROM], // Send to the FROM address
-      bcc: to.map((t) => t.email), // Put all recipients in BCC
-      subject: `Funtime - Message from ${leagueName} Admin`,
-      react: LeagueBroadcastEmail({
-        leagueName,
-        leagueId,
-        adminName,
-        markdownMessage,
-      }),
-    });
-
-    if (error) {
-      getLogger().error(
-        `${LOG_PREFIX} Error sending league broadcast email for league ${leagueName}`,
-        { error },
+    // Have to chunk into <100 per batch here, so let's chunk into 90 per group and send batches that way to stay under the limit
+    const chunks = chunk(to, 90);
+    for (const emailChunk of chunks) {
+      const { data, error } = await resend.batch.send(
+        emailChunk.map((t) => {
+          return {
+            from: FROM,
+            to: t.email,
+            subject: `Funtime - Message from ${leagueName} Admin`,
+            react: LeagueBroadcastEmail({
+              leagueName,
+              leagueId,
+              adminName,
+              markdownMessage,
+            }),
+          };
+        }),
       );
-    } else {
-      getLogger().info(
-        `${LOG_PREFIX} Sent league broadcast email for league ${leagueName}`,
-        { data },
-      );
-    }
 
-    if (data?.id) {
-      // Note: You might want to adjust this based on your actual data model
-      // Since we don't have specific league or member IDs here, we're logging it differently
-      await db.emailLogs.createMany({
-        data: to.map((t) => ({
-          email_type: "league_broadcast",
-          resend_id: data.id,
-          league_id: leagueId,
-          member_id: t.memberId,
-        })),
-      });
+      if (error) {
+        getLogger().error(
+          `${LOG_PREFIX} Error sending league broadcast email for league ${leagueName}`,
+          { error },
+        );
+      } else {
+        getLogger().info(
+          `${LOG_PREFIX} Sent league broadcast email for league ${leagueName}`,
+          { data },
+        );
+      }
+
+      if (data?.data && data.data.length > 0) {
+        const resendEmails = await Promise.all(
+          data.data.map(async (d) => {
+            return await resend.emails.get(d.id);
+          }),
+        );
+
+        // Only create email logs if we are able to
+        const toCreate = data.data
+          .map((d) => {
+            const resendEmail = resendEmails.find((e) => e.data?.id === d.id);
+            const memberAndEmail = to.find((t) =>
+              resendEmail?.data?.to.includes(t.email),
+            );
+            const memberId = memberAndEmail?.memberId;
+            if (memberId) {
+              return {
+                resend_id: d.id,
+                email_type: "league_broadcast",
+                league_id: leagueId,
+                member_id: memberId,
+              } as const;
+            } else {
+              getLogger().error(
+                `${LOG_PREFIX} Unable to find member for resend email id ${d.id} for league broadcast email for league ${leagueId}`,
+              );
+            }
+            return null;
+          })
+          .filter(Defined);
+
+        await db.emailLogs.createMany({
+          data: toCreate,
+        });
+      }
     }
   },
 };
