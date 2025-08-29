@@ -1,7 +1,7 @@
 "use client";
 
+import { yupResolver } from "@hookform/resolvers/yup";
 import { type SubmitHandler, useForm } from "react-hook-form";
-import { type confirmResetPasswordSchema } from "~/lib/schemas/auth";
 import { type z } from "zod";
 import {
   Card,
@@ -10,16 +10,12 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
-import { yupResolver } from "@hookform/resolvers/yup";
 import { Input } from "~/components/ui/input";
+import { type confirmResetPasswordSchema } from "~/lib/schemas/auth";
 
-import { Button } from "~/components/ui/button";
-import { createSupabaseBrowser } from "~/utils/supabase/client";
 import { toast } from "sonner";
-import { clientApi } from "~/trpc/react";
-import { revalidatePathServerAction } from "../actions";
 import * as Yup from "yup";
-import { Separator } from "~/components/ui/separator";
+import { Button } from "~/components/ui/button";
 import {
   Form,
   FormControl,
@@ -28,6 +24,10 @@ import {
   FormLabel,
   FormMessage,
 } from "~/components/ui/form";
+import { Separator } from "~/components/ui/separator";
+import { clientApi } from "~/trpc/react";
+import { createSupabaseBrowser } from "~/utils/supabase/client";
+import { revalidatePathServerAction } from "../actions";
 
 type ForgotPasswordFormType = z.infer<typeof confirmResetPasswordSchema>;
 
@@ -53,7 +53,7 @@ export function ConfirmResetPasswordClient() {
   } = form;
 
   // eslint-disable-next-line @typescript-eslint/unbound-method
-  const { invalidate } = clientApi.useUtils();
+  const utils = clientApi.useUtils();
 
   const onSubmit: SubmitHandler<ForgotPasswordFormType> = async ({
     password1,
@@ -73,7 +73,7 @@ export function ConfirmResetPasswordClient() {
     }
 
     await revalidatePathServerAction("/", "layout");
-    await invalidate();
+    await utils.invalidate();
 
     toast.success("Successfully reset your password.");
 
