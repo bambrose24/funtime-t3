@@ -5,9 +5,9 @@ import {
   Heading,
   Hr,
   Html,
+  Markdown,
   Section,
 } from "@react-email/components";
-import { Markdown } from "@react-email/markdown";
 import { Provider } from "../provider";
 
 export default function LeagueBroadcastEmail({

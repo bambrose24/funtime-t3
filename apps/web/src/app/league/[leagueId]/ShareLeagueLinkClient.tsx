@@ -5,9 +5,10 @@ import { toast } from "sonner";
 import { Alert, AlertDescription } from "~/components/ui/alert";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
+import { getBaseUrl } from "~/utils/getBaseUrl";
 
 export function ShareLeagueLinkClient({ shareCode }: { shareCode: string }) {
-  const shareLink = `${window.location?.origin}/join-league/${shareCode}`;
+  const shareLink = `${getBaseUrl()}/join-league/${shareCode}`;
 
   return (
     <div className="col-span-12 flex justify-center">

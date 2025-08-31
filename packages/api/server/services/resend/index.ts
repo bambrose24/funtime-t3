@@ -1,9 +1,11 @@
-import LeagueBroadcastEmail from "emails/league-broadcast"; // TODO this import is going to the web app, it shouldnt
-import LeagueWelcome from "emails/league-welcome";
-import PicksConfirmationEmail from "emails/picks-confirmation";
-import PickReminderEmail from "emails/picks-reminder";
+import { render } from "@react-email/render";
 import { chunk } from "lodash";
 import { Resend } from "resend";
+import LeagueBroadcastEmail from "../../../emails/league-broadcast";
+import LeagueWelcome from "../../../emails/league-welcome";
+import PicksConfirmationEmail from "../../../emails/picks-confirmation";
+import PickReminderEmail from "../../../emails/picks-reminder";
+
 import type {
   leaguemembers,
   leagues,
@@ -175,59 +177,71 @@ export const resendApi = {
     const teamById = new Map(teams.map((t) => [t.teamid, t]));
 
     getLogger().info(
-      `${LOG_PREFIX} Going to send league registration email for leagues ${leagues.map((l) => l.league_id).join(",")} for members ${members.map((m) => m.membership_id).join(",")}`,
+      `${LOG_PREFIX} Going to send weekly picks email for leagues ${leagues.map((l) => l.league_id).join(",")} for members ${members.map((m) => m.membership_id).join(",")}`,
     );
-    const { data, error } = await resend.emails.send({
-      from: FROM,
-      to: [email],
-      subject: `Your ${leagues.length === 1 ? (leagues.at(0)?.name ?? "") : "Funtime"} picks for Week ${week}!`,
-      react: PicksConfirmationEmail({
-        leagues: leagues.map((l) => {
-          return {
-            leagueId: l.league_id,
-            name: l.name,
-          };
+    try {
+      const emailHtml = await render(
+        PicksConfirmationEmail({
+          leagues: leagues.map((l) => {
+            return {
+              leagueId: l.league_id,
+              name: l.name,
+            };
+          }),
+          username: user.username,
+          week,
+          picks: picks.map((p) => {
+            return {
+              awayTeam: teamById.get(p.games.away)?.abbrev ?? "",
+              homeTeam: teamById.get(p.games.home)?.abbrev ?? "",
+              chosen: p.winner === p.games.home ? "home" : "away",
+              score: p.score ?? undefined,
+              time: p.games.ts,
+            };
+          }),
         }),
-        username: user.username,
-        week,
-        picks: picks.map((p) => {
-          return {
-            awayTeam: teamById.get(p.games.away)?.abbrev ?? "",
-            homeTeam: teamById.get(p.games.home)?.abbrev ?? "",
-            chosen: p.winner === p.games.home ? "home" : "away",
-            score: p.score ?? undefined,
-            time: p.games.ts,
-          };
-        }),
-      }),
-    });
+      );
 
-    if (error) {
+      const { data, error } = await resend.emails.send({
+        from: FROM,
+        to: [email],
+        subject: `Your ${leagues.length === 1 ? (leagues.at(0)?.name ?? "") : "Funtime"} picks for Week ${week}!`,
+        html: emailHtml,
+      });
+
+      if (error) {
+        getLogger().error(
+          `${LOG_PREFIX} Error sending weekly picks email for leagues ${leagues.map((l) => l.league_id).join(",")} for members ${members.map((m) => m.membership_id).join(",")}`,
+          { error },
+        );
+      } else {
+        getLogger().info(
+          `${LOG_PREFIX} Sent weekly picks email for leagues ${leagues.map((l) => l.league_id).join(",")} for members ${members.map((m) => m.membership_id).join(",")}`,
+          { data },
+        );
+      }
+
+      if (data?.id) {
+        await Promise.all(
+          members.map(async (m) => {
+            await db.emailLogs.create({
+              data: {
+                email_type: "week_picks",
+                week,
+                resend_id: data.id,
+                league_id: m.league_id,
+                member_id: m.membership_id,
+              },
+            });
+          }),
+        );
+      }
+    } catch (err) {
       getLogger().error(
-        `${LOG_PREFIX} Error sending registration email for leagues ${leagues.map((l) => l.league_id).join(",")} for members ${members.map((m) => m.membership_id).join(",")}`,
-        { error },
+        `${LOG_PREFIX} Error thrown sending weekly picks email for leagues ${leagues.map((l) => l.league_id).join(",")} for members ${members.map((m) => m.membership_id).join(",")}`,
+        { error: err },
       );
-    } else {
-      getLogger().info(
-        `${LOG_PREFIX} Sent registration email for leagues ${leagues.map((l) => l.league_id).join(",")} for members ${members.map((m) => m.membership_id).join(",")}`,
-        { data },
-      );
-    }
-
-    if (data?.id) {
-      await Promise.all(
-        members.map(async (m) => {
-          await db.emailLogs.create({
-            data: {
-              email_type: "week_picks",
-              week,
-              resend_id: data.id,
-              league_id: m.league_id,
-              member_id: m.membership_id,
-            },
-          });
-        }),
-      );
+      throw err;
     }
   },
   sendPickReminderEmail: async ({

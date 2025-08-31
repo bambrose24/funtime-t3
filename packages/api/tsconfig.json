@@ -12,9 +12,6 @@
     "skipLibCheck": true,
     "isolatedModules": true,
     "resolveJsonModule": true,
-    "declaration": true,
-    "declarationMap": true,
-    "outDir": "./dist",
     "baseUrl": ".",
     "paths": {
       "emails/*": ["./emails/*"]

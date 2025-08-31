@@ -1,6 +1,5 @@
-import { type ReactNode } from "react";
 import { Heading, Text } from "@react-email/components";
-import { cn } from "../../src/lib/utils";
+import { cn } from "../../lib/utils";
 
 type TextProps = {
   children: React.ReactNode;
