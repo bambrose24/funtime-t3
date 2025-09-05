@@ -16,6 +16,8 @@ export { db as prisma } from "../server/db";
 
 export { espn } from "../server/services/espn";
 
+export * as config from "../utils/config";
+
 export { resendApi } from "../server/services/resend";
 
 export { msf } from "../server/services/mysportsfeeds";

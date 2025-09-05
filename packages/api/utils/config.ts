@@ -16,7 +16,7 @@ const configMap: Record<Env, Config> = {
     logging: {
       shouldLogToConsole: true,
       shouldLogToAxiom: false,
-      level: "debug",
+      level: "error",
     },
   },
   preview: {

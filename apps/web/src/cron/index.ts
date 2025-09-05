@@ -41,6 +41,9 @@ export async function run() {
       .map((espnGame) => {
         const espnGameId = Number(espnGame.id);
         const game = gamesByEspnId[espnGameId]?.at(0);
+        if (game.gid === 4969) {
+          console.log("dal @ phi... ", { espnGame, game });
+        }
         const espnCompetition = espnGame.competitions.at(0);
         const homeCompetitor = espnCompetition?.competitors.find(
           (t) => t.homeAway === "home",
@@ -92,7 +95,7 @@ export async function run() {
         } satisfies Parameters<typeof db.games.update>[0]["data"];
 
         console.log(
-          `${LOG_PREFIX} going to update game ${game.gid} with data ${JSON.stringify(data)}, got msf data ${JSON.stringify(espnGame)}`,
+          `${LOG_PREFIX} going to update game ${game.gid} with data ${JSON.stringify(data)}, got espn game data ${JSON.stringify(espnGame)}`,
         );
 
         return db.games.update({

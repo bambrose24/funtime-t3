@@ -328,6 +328,7 @@ export const leagueAdminRouter = createTRPCRouter({
             winner,
             correct: null,
             done: null,
+            score: Boolean(score) ? score : null,
           },
         });
       } else {

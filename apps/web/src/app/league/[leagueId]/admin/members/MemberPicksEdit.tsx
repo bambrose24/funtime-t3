@@ -1,7 +1,7 @@
 "use client";
 
-import { clientApi } from "~/trpc/react";
-import type { RouterOutputs } from "~/trpc/types";
+import { toast } from "sonner";
+import { Input } from "~/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -17,8 +17,8 @@ import {
   TableHeader,
   TableRow,
 } from "~/components/ui/table";
-import { Input } from "~/components/ui/input";
-import { toast } from "sonner";
+import { clientApi } from "~/trpc/react";
+import type { RouterOutputs } from "~/trpc/types";
 import { useDictify } from "~/utils/hooks/useIdToValMemo";
 
 type Props = {
@@ -71,10 +71,18 @@ export function MemberPicksEdit({ league, memberId }: Props) {
     winner: number,
     newScore: string,
   ) => {
+    const scoreNumber = Number(newScore);
+
+    // Validate score
+    if (isNaN(scoreNumber) || scoreNumber < 1 || scoreNumber > 200) {
+      toast.error("Score must be between 1 and 200");
+      return;
+    }
+
     updatePickMutation.mutate({
       gameId,
       winner,
-      score: Number(newScore),
+      score: scoreNumber,
       leagueId: league.league_id,
       memberId,
     });
@@ -134,14 +142,20 @@ export function MemberPicksEdit({ league, memberId }: Props) {
                   {game.is_tiebreaker && (
                     <Input
                       type="number"
+                      min="1"
+                      max="200"
+                      placeholder="Score"
                       defaultValue={pick?.score?.toString() ?? ""}
-                      onBlur={(e) =>
-                        handleScoreChange(
-                          game.gid,
-                          Number(pick?.winner ?? 0),
-                          e.target.value,
-                        )
-                      }
+                      onBlur={(e) => {
+                        const value = e.target.value.trim();
+                        if (value && pick?.winner) {
+                          handleScoreChange(
+                            game.gid,
+                            Number(pick.winner),
+                            value,
+                          );
+                        }
+                      }}
                       className="w-20"
                     />
                   )}
