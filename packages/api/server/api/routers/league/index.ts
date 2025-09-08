@@ -352,7 +352,7 @@ export const leagueRouter = createTRPCRouter({
               week,
             },
             // A fix to not look ahead if week 1 hasn't started yet
-            { week: week === 1 ? week : week + 1 },
+            { week: week + 1 },
           ],
         },
       });
@@ -384,12 +384,10 @@ export const leagueRouter = createTRPCRouter({
       );
 
       const weekToReturn =
-        week === 1
-          ? week
-          : mostRecentStartedWeekPicks.length > 0 ||
-              (nextGameToStart && nextGameToStart.week === week + 1)
-            ? week + 1
-            : week;
+        mostRecentStartedWeekPicks.length > 0 ||
+        (nextGameToStart && nextGameToStart.week === week + 1)
+          ? week + 1
+          : week;
 
       const picksToReturn =
         weekToReturn === week ? mostRecentStartedWeekPicks : nextWeekPicks;
