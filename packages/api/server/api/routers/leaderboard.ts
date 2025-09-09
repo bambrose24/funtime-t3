@@ -141,7 +141,7 @@ export const leaderboardRouter = createTRPCRouter({
         },
         ["leaderboard_league", leagueId.toString()],
         {
-          revalidate: 60 * 60, // 1 hour
+          revalidate: 60 * 5, // 5 minutes
         },
       );
 
