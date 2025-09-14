@@ -7,7 +7,6 @@ import { createTRPCRouter, publicProcedure } from "../trpc";
 const getGamesSchema = z.object({
   season: z.number().int(),
   week: z.number().int().optional(),
-  skipCache: z.boolean().optional().default(false),
 });
 
 export const gamesRouter = createTRPCRouter({
@@ -36,24 +35,10 @@ export const gamesRouter = createTRPCRouter({
       });
     })
     .query(async ({ input }) => {
-      const { skipCache, season, week } = input;
-      if (skipCache) {
-        return await getGamesImpl({ season, week });
-      }
-
-      return await getGamesImpl({ season, week });
+      const { season, week } = input;
+      return await db.games.findMany({
+        where: { season, ...(week ? { week } : {}) },
+        orderBy: [{ ts: "asc" }, { gid: "asc" }],
+      });
     }),
 });
-
-async function getGamesImpl({
-  season,
-  week,
-}: {
-  season: number;
-  week?: number;
-}) {
-  return await db.games.findMany({
-    where: { season, ...(week ? { week } : {}) },
-    orderBy: [{ ts: "asc" }, { gid: "asc" }],
-  });
-}
