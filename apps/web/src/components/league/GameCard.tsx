@@ -1,14 +1,14 @@
 "use client";
 
-import { Card } from "../ui/card";
-import { TeamLogo } from "../shared/TeamLogo";
-import { Separator } from "../ui/separator";
-import { Button } from "../ui/button";
+import { isBefore } from "date-fns";
+import { format } from "date-fns-tz";
 import { cn } from "~/lib/utils";
 import { type RouterOutputs } from "~/trpc/types";
-import { format } from "date-fns-tz";
 import { EASTERN_TIMEZONE } from "~/utils/const";
-import { isBefore } from "date-fns";
+import { TeamLogo } from "../shared/TeamLogo";
+import { Button } from "../ui/button";
+import { Card } from "../ui/card";
+import { Separator } from "../ui/separator";
 
 type Props = {
   game: RouterOutputs["games"]["getGames"][number];
@@ -58,7 +58,8 @@ export function GameCard({
       return "In Progress";
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
-    return `Q${quarter} - ${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
+    const prefix = quarter > 4 ? "OT" : `Q${quarter}`;
+    return `${prefix} - ${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
   };
 
   const subtitle = gameEnded
