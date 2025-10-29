@@ -17,10 +17,10 @@ RUN npm install -g bun
 COPY packages/api/prisma ./packages/api/prisma
 
 # Install dependencies
-COPY package.json bun.lockb ./
+COPY package.json package-lock.json* ./
 COPY apps/web/package.json ./apps/web/
 COPY packages/api/package.json ./packages/api/
-RUN bun install
+RUN npm ci --include=dev || npm install
 
 # Copy the rest of the application code
 COPY . .
