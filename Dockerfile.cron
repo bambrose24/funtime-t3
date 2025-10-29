@@ -7,6 +7,9 @@ ARG DIRECT_URL
 ENV DATABASE_URL=${DATABASE_URL}
 ENV DIRECT_URL=${DIRECT_URL}
 
+# Install OpenSSL (required by Prisma)
+RUN apt-get update -y && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
+
 # Copy the Prisma schema file from the API package
 COPY packages/api/prisma ./packages/api/prisma
 
@@ -19,11 +22,11 @@ RUN bun install
 # Copy the rest of the application code
 COPY . .
 
-# Validate Prisma schema
-RUN bunx prisma validate --schema=packages/api/prisma/schema.prisma
+# Validate Prisma schema (use npx instead of bunx for better Prisma compatibility)
+RUN npx prisma validate --schema=packages/api/prisma/schema.prisma
 
-# Generate Prisma client
-RUN bunx prisma generate --schema=packages/api/prisma/schema.prisma
+# Generate Prisma client (use npx instead of bunx for better Prisma compatibility)
+RUN npx prisma generate --schema=packages/api/prisma/schema.prisma
 
 # Verify Prisma client generation
 RUN ls -la node_modules/.prisma && ls -la node_modules/@prisma/client
