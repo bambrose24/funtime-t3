@@ -1,12 +1,9 @@
 "use client";
-import { GameCard } from "~/components/league/GameCard";
-import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
-import { Text } from "~/components/ui/text";
-import { PicksTable } from "./picks-table";
-import { YourPicksList, CompactYourPicksList } from "./your-picks-list";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Separator } from "~/components/ui/separator";
+import { GameCard } from "~/components/league/GameCard";
 import { Button } from "~/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import {
   Drawer,
   DrawerClose,
@@ -24,17 +21,21 @@ import {
   SelectTrigger,
   SelectValue,
 } from "~/components/ui/select";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { Separator } from "~/components/ui/separator";
+import { Text } from "~/components/ui/text";
+import { PicksTable } from "./picks-table";
+import { CompactYourPicksList, YourPicksList } from "./your-picks-list";
 // import cloneDeep from "lodash/cloneDeep";
-import { Alert, AlertTitle } from "~/components/ui/alert";
 import { AlertCircleIcon, MessagesSquare, Trophy } from "lucide-react";
-import { useDictify } from "~/utils/hooks/useIdToValMemo";
-import { ScrollArea, ScrollBar } from "~/components/ui/scroll-area";
-import { type RouterOutputs } from "~/trpc/types";
-import { clientApi } from "~/trpc/react";
-import { Sheet, SheetTrigger } from "~/components/ui/sheet";
-import { LeagueWeekMessageSheetContent } from "~/components/messages/LeagueWeekMessageSheetContent";
 import Link from "next/link";
+import { ScenariosButton } from "~/components/league/ScenariosButton";
+import { LeagueWeekMessageSheetContent } from "~/components/messages/LeagueWeekMessageSheetContent";
+import { Alert, AlertTitle } from "~/components/ui/alert";
+import { ScrollArea, ScrollBar } from "~/components/ui/scroll-area";
+import { Sheet, SheetTrigger } from "~/components/ui/sheet";
+import { clientApi } from "~/trpc/react";
+import { type RouterOutputs } from "~/trpc/types";
+import { useDictify } from "~/utils/hooks/useIdToValMemo";
 
 type ClientLeaguePageProps = {
   week: number;
@@ -199,10 +200,7 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
             </Alert>
           </div>
         </div>
-      ) : (
-        <></>
-      )}
-      {banner === "make-picks" ? (
+      ) : banner === "make-picks" ? (
         <Alert className="col-span-12 flex items-center">
           <AlertTitle>
             You need to make your picks for this week. Make them{" "}
@@ -215,9 +213,17 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
             .
           </AlertTitle>
         </Alert>
-      ) : (
-        <></>
-      )}
+      ) : simulatedGameCount === 0 ? (
+        <div className="col-span-12 flex justify-center">
+          <ScenariosButton
+            picksSummary={picksSummary}
+            games={games}
+            teams={teams}
+            league={league}
+            week={week ?? 0}
+          />
+        </div>
+      ) : null}
       <div className="hidden xl:col-span-2 xl:flex">
         <div className="flex w-full flex-col gap-4">
           {currentGame && firstGame && (
