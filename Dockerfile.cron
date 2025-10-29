@@ -1,5 +1,5 @@
-# Use the official Bun image
-FROM oven/bun:1 AS base
+# Use Node.js base image (Prisma works better with Node)
+FROM node:20-slim AS base
 WORKDIR /usr/src/app
 
 ARG DATABASE_URL
@@ -9,6 +9,9 @@ ENV DIRECT_URL=${DIRECT_URL}
 
 # Install OpenSSL (required by Prisma)
 RUN apt-get update -y && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
+
+# Install Bun (needed to run the cron script)
+RUN npm install -g bun
 
 # Copy the Prisma schema file from the API package
 COPY packages/api/prisma ./packages/api/prisma
@@ -31,10 +34,10 @@ RUN npx prisma generate --schema=packages/api/prisma/schema.prisma
 # Verify Prisma client generation
 RUN ls -la node_modules/.prisma && ls -la node_modules/@prisma/client
 
-# Ensure correct ownership for the bun user
-RUN chown -R bun:bun /usr/src/app
+# Set correct ownership for the node user
+RUN chown -R node:node /usr/src/app
 
-# Run the application
-USER bun
+# Run the application as non-root user
+USER node
 EXPOSE 3000/tcp
 ENTRYPOINT [ "sh", "-c", "cd apps/web && bun run src/cron/index.ts" ]
