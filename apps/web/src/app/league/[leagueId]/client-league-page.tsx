@@ -213,7 +213,8 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
             .
           </AlertTitle>
         </Alert>
-      ) : simulatedGameCount === 0 ? (
+      ) : simulatedGameCount === 0 &&
+        session.dbUser?.email === "bambrose24@gmail.com" ? (
         <div className="col-span-12 flex justify-center">
           <ScenariosButton
             picksSummary={picksSummary}
