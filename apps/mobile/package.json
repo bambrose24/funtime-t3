@@ -15,7 +15,7 @@
     "@expo-google-fonts/inter": "^0.4.1",
     "@expo/config-plugins": "^10.1.2",
     "@expo/vector-icons": "^14.1.0",
-    "@funtime/api": "*",
+    "@funtime/api": "workspace:*",
     "@hookform/resolvers": "^5.1.1",
     "@radix-ui/react-slot": "^1.2.3",
     "@react-native-async-storage/async-storage": "^2.1.2",
@@ -69,7 +69,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
-    "@types/react": "~19.0.10",
+    "@types/react": "^19.2.7",
     "eslint": "^9.25.0",
     "eslint-config-expo": "~9.2.0",
     "expo": "^53.0.20",

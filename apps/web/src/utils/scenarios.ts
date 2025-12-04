@@ -29,7 +29,7 @@ export function getInRunningPeople(
   const sortedByCorrect = [...picksSummary].sort(
     (a, b) => b.correctPicks - a.correctPicks,
   );
-  const leaderCorrectPicks = sortedByCorrect[0]?.correctPicks || 0;
+  const leaderCorrectPicks = sortedByCorrect[0]?.correctPicks ?? 0;
 
   // Someone is "in the running" if they can catch up to the leader
   // by getting all remaining games correct

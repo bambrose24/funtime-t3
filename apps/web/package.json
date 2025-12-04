@@ -22,7 +22,7 @@
     "@axiomhq/nextjs": "^0.1.4",
     "@axiomhq/react": "^0.1.4",
     "@axiomhq/winston": "^1.3.1",
-    "@funtime/api": "*",
+    "@funtime/api": "workspace:*",
     "@hookform/resolvers": "^3.10.0",
     "@nivo/line": "^0.85.1",
     "@prisma/nextjs-monorepo-workaround-plugin": "^6.14.0",

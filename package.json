@@ -3,11 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "packageManager": "npm@10.0.0",
-  "workspaces": [
-    "apps/*",
-    "packages/*"
-  ],
+  "packageManager": "pnpm@9.15.0",
   "scripts": {
     "build": "turbo run db:generate && turbo run build",
     "build-web": "turbo run db:generate && turbo run build --filter=@funtime/web",
@@ -16,7 +12,7 @@
     "typecheck": "turbo run typecheck",
     "test": "turbo run test",
     "dev": "turbo run dev",
-    "start-web": "cd apps/web && npm run start",
+    "start-web": "cd apps/web && pnpm run start",
     "clean": "turbo run clean",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "db:generate": "turbo run db:generate",
@@ -30,8 +26,6 @@
     "@types/ioredis": "^4.28.10",
     "@types/lodash": "^4.17.0",
     "@types/node": "^20.11.20",
-    "@types/react": "~19.0.10",
-    "@types/react-dom": "19.1.6",
     "@typescript-eslint/eslint-plugin": "^7.1.1",
     "@typescript-eslint/parser": "^7.1.1",
     "ajv": "^8.17.1",
@@ -47,17 +41,13 @@
   "ct3aMetadata": {
     "initVersion": "7.30.0"
   },
-  "overrides": {
-    "@types/react": "~19.0.10",
-    "@types/react-dom": "19.1.6",
-    "next": "15.5.7",
-    "typescript": "~5.8.3"
+  "pnpm": {
+    "overrides": {
+      "@types/react": "^19.2.7",
+      "@types/react-dom": "^19.2.3"
+    }
   },
   "dependencies": {
-    "@radix-ui/react-slot": "^1.2.3",
-    "ioredis": "^5.7.0",
-    "next": "15.5.7",
-    "react": "19.0.0",
-    "react-dom": "19.0.0"
+    "ioredis": "^5.7.0"
   }
 }
