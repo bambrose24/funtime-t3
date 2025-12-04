@@ -536,19 +536,35 @@ export const leagueRouter = createTRPCRouter({
         });
       }
 
+      // Get the league's season to filter games
+      const league = await ctx.db.leagues.findUniqueOrThrow({
+        where: { league_id: leagueId },
+      });
+
+      // Get all done games for this season
+      const doneGames = await ctx.db.games.findMany({
+        where: {
+          season: league.season,
+          done: true,
+        },
+        select: { gid: true },
+      });
+      const doneGids = doneGames.map((g) => g.gid);
+
+      // Count picks for done games
       const [correct, wrong] = await Promise.all([
         ctx.db.picks.count({
           where: {
             correct: 1,
-            done: 1,
             member_id: member.membership_id,
+            gid: { in: doneGids },
           },
         }),
         ctx.db.picks.count({
           where: {
             correct: 0,
-            done: 1,
             member_id: member.membership_id,
+            gid: { in: doneGids },
           },
         }),
       ]);
