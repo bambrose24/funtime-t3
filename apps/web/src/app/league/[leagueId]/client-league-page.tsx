@@ -31,11 +31,13 @@ import Link from "next/link";
 import { ScenariosButton } from "~/components/league/ScenariosButton";
 import { LeagueWeekMessageSheetContent } from "~/components/messages/LeagueWeekMessageSheetContent";
 import { Alert, AlertTitle } from "~/components/ui/alert";
+import { Badge } from "~/components/ui/badge";
 import { ScrollArea, ScrollBar } from "~/components/ui/scroll-area";
 import { Sheet, SheetTrigger } from "~/components/ui/sheet";
 import { clientApi } from "~/trpc/react";
 import { type RouterOutputs } from "~/trpc/types";
 import { useDictify } from "~/utils/hooks/useIdToValMemo";
+import { useUnreadMessages } from "~/utils/messageReadTracker";
 
 type ClientLeaguePageProps = {
   week: number;
@@ -90,14 +92,30 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
     { initialData: props.weekWinners, refetchInterval: REFETCH_INTERVAL_MS },
   );
 
+  // Sort weeks in descending order (highest first) without mutating the original array
   const weeksOptions = useMemo(() => {
-    return weeksWithPicks.weeks.reverse();
+    return [...weeksWithPicks.weeks].sort((a, b) => b - a);
   }, [weeksWithPicks.weeks]);
 
   const [chatSheetOpen, setChatSheetOpen] = useState(false);
 
   const firstGame = games.at(0);
   const week = firstGame?.week;
+
+  // Fetch messages for unread badge
+  const { data: messagesData } =
+    clientApi.messages.leagueWeekMessageBoard.useQuery(
+      { leagueId: props.leagueId, week: week ?? props.week },
+      { enabled: week !== undefined },
+    );
+
+  // Use the unread messages hook
+  const { unreadCount } = useUnreadMessages({
+    leagueId: props.leagueId,
+    week: week ?? props.week,
+    messages: messagesData ?? [],
+    isChatOpen: chatSheetOpen,
+  });
 
   const router = useRouter();
   const pathname = usePathname();
@@ -237,7 +255,7 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
                 <SelectValue placeholder={`Week ${firstGame.week}`} />
               </SelectTrigger>
               <SelectContent>
-                {weeksOptions.reverse().map((weekOption) => {
+                {weeksOptions.map((weekOption) => {
                   return (
                     <SelectItem key={weekOption} value={weekOption.toString()}>
                       Week {weekOption}
@@ -257,10 +275,18 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
               <SheetTrigger asChild>
                 <Button
                   variant="secondary"
-                  className="flex items-center gap-2 "
+                  className="relative flex items-center gap-2"
                 >
-                  <MessagesSquare className="h-4 w-4 " />
+                  <MessagesSquare className="h-4 w-4" />
                   Chat
+                  {unreadCount > 0 && (
+                    <Badge
+                      variant="destructive"
+                      className="absolute -right-2 -top-2 flex h-5 min-w-5 items-center justify-center rounded-full px-1 text-xs"
+                    >
+                      {unreadCount > 99 ? "99+" : unreadCount}
+                    </Badge>
+                  )}
                 </Button>
               </SheetTrigger>
               <LeagueWeekMessageSheetContent
@@ -319,10 +345,18 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
                   <SheetTrigger asChild>
                     <Button
                       variant="secondary"
-                      className="flex w-full items-center gap-2"
+                      className="relative flex w-full items-center justify-center gap-2"
                     >
                       <MessagesSquare className="h-4 w-4" />
                       Chat
+                      {unreadCount > 0 && (
+                        <Badge
+                          variant="destructive"
+                          className="absolute -right-2 -top-2 flex h-5 min-w-5 items-center justify-center rounded-full px-1 text-xs"
+                        >
+                          {unreadCount > 99 ? "99+" : unreadCount}
+                        </Badge>
+                      )}
                     </Button>
                   </SheetTrigger>
                   <LeagueWeekMessageSheetContent
@@ -340,27 +374,24 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
               <div className="w-full">
                 <Select
                   onValueChange={(value) => {
-                    const week = Number(value);
-                    router.push(`${pathname}?week=${week}`);
+                    const selectedWeek = Number(value);
+                    router.push(`${pathname}?week=${selectedWeek}`);
                   }}
                 >
                   <SelectTrigger className="w-full ring-2 ring-input focus:ring-2">
                     <SelectValue placeholder={`Week ${firstGame.week}`} />
                   </SelectTrigger>
                   <SelectContent>
-                    {[...Array(currentGame.week).keys()]
-                      .reverse()
-                      .map((weekMinusOne) => {
-                        const realWeek = weekMinusOne + 1;
-                        return (
-                          <SelectItem
-                            key={realWeek}
-                            value={realWeek.toString()}
-                          >
-                            Week {realWeek}
-                          </SelectItem>
-                        );
-                      })}
+                    {weeksOptions.map((weekOption) => {
+                      return (
+                        <SelectItem
+                          key={weekOption}
+                          value={weekOption.toString()}
+                        >
+                          Week {weekOption}
+                        </SelectItem>
+                      );
+                    })}
                   </SelectContent>
                 </Select>
               </div>

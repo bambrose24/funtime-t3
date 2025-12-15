@@ -1,6 +1,7 @@
 "use client";
 
-import { Loader2 } from "lucide-react";
+import { useState } from "react";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -36,6 +37,7 @@ type LoginFormType = z.infer<typeof loginSchema>;
 const loginUpsellSchema = z.enum(["registration"]);
 
 export function LoginClientPage() {
+  const [showPassword, setShowPassword] = useState(false);
   const form = useForm<LoginFormType>({
     resolver: zodResolver(loginSchema),
     reValidateMode: "onChange",
@@ -130,12 +132,30 @@ export function LoginClientPage() {
                           </div>
                         </FormLabel>
                         <FormControl>
-                          <Input
-                            {...field}
-                            type="password"
-                            required
-                            tabIndex={2}
-                          />
+                          <div className="relative">
+                            <Input
+                              {...field}
+                              type={showPassword ? "text" : "password"}
+                              required
+                              tabIndex={2}
+                              className="pr-10"
+                            />
+                            <button
+                              type="button"
+                              tabIndex={-1}
+                              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                              onClick={() => setShowPassword(!showPassword)}
+                              aria-label={
+                                showPassword ? "Hide password" : "Show password"
+                              }
+                            >
+                              {showPassword ? (
+                                <EyeOff className="h-4 w-4" />
+                              ) : (
+                                <Eye className="h-4 w-4" />
+                              )}
+                            </button>
+                          </div>
                         </FormControl>
                         <FormDescription />
                         <FormMessage />

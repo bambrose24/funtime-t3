@@ -1,8 +1,9 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2 } from "lucide-react";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -51,6 +52,8 @@ const signupFormSchema = z
   });
 
 export function SignupClientPage() {
+  const [showPassword1, setShowPassword1] = useState(false);
+  const [showPassword2, setShowPassword2] = useState(false);
   const searchParams = useSearchParams();
   const form = useForm<z.infer<typeof signupFormSchema>>({
     resolver: zodResolver(signupFormSchema),
@@ -194,7 +197,29 @@ export function SignupClientPage() {
                       <FormItem>
                         <FormLabel>Password</FormLabel>
                         <FormControl>
-                          <Input {...field} type="password" required />
+                          <div className="relative">
+                            <Input
+                              {...field}
+                              type={showPassword1 ? "text" : "password"}
+                              required
+                              className="pr-10"
+                            />
+                            <button
+                              type="button"
+                              tabIndex={-1}
+                              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                              onClick={() => setShowPassword1(!showPassword1)}
+                              aria-label={
+                                showPassword1 ? "Hide password" : "Show password"
+                              }
+                            >
+                              {showPassword1 ? (
+                                <EyeOff className="h-4 w-4" />
+                              ) : (
+                                <Eye className="h-4 w-4" />
+                              )}
+                            </button>
+                          </div>
                         </FormControl>
                         <FormDescription />
                         <FormMessage />
@@ -210,7 +235,31 @@ export function SignupClientPage() {
                       <FormItem>
                         <FormLabel>Confirm Password</FormLabel>
                         <FormControl>
-                          <Input {...field} type="password" required />
+                          <div className="relative">
+                            <Input
+                              {...field}
+                              type={showPassword2 ? "text" : "password"}
+                              required
+                              className="pr-10"
+                            />
+                            <button
+                              type="button"
+                              tabIndex={-1}
+                              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                              onClick={() => setShowPassword2(!showPassword2)}
+                              aria-label={
+                                showPassword2
+                                  ? "Hide password"
+                                  : "Show password"
+                              }
+                            >
+                              {showPassword2 ? (
+                                <EyeOff className="h-4 w-4" />
+                              ) : (
+                                <Eye className="h-4 w-4" />
+                              )}
+                            </button>
+                          </div>
                         </FormControl>
                         <FormDescription />
                         <FormMessage />
