@@ -25,11 +25,11 @@ RUN npm ci --include=dev || npm install
 # Copy the rest of the application code
 COPY . .
 
-# Validate Prisma schema (use npx instead of bunx for better Prisma compatibility)
-RUN npx prisma validate --schema=packages/api/prisma/schema.prisma
+# Validate Prisma schema (use local prisma to avoid downloading latest version)
+RUN ./node_modules/.bin/prisma validate --schema=packages/api/prisma/schema.prisma
 
-# Generate Prisma client (use npx instead of bunx for better Prisma compatibility)
-RUN npx prisma generate --schema=packages/api/prisma/schema.prisma
+# Generate Prisma client (use local prisma to avoid downloading latest version)
+RUN ./node_modules/.bin/prisma generate --schema=packages/api/prisma/schema.prisma
 
 # Verify Prisma client generation
 RUN ls -la node_modules/.prisma && ls -la node_modules/@prisma/client

@@ -69,7 +69,7 @@
     "file-saver": "^2.0.5",
     "lodash": "^4.17.21",
     "lucide-react": "^0.400.0",
-    "next": "15.5.7",
+    "next": "15.5.9",
     "next-themes": "^0.3.0",
     "posthog-js": "^1.260.2",
     "react": "^19.2.1",
