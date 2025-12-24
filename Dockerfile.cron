@@ -10,29 +10,29 @@ ENV DIRECT_URL=${DIRECT_URL}
 # Install OpenSSL (required by Prisma)
 RUN apt-get update -y && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
 
-# Install Bun (needed to run the cron script)
-RUN npm install -g bun
+# Install pnpm and Bun
+RUN npm install -g pnpm bun
 
 # Copy the Prisma schema file from the API package
 COPY packages/api/prisma ./packages/api/prisma
 
-# Install dependencies
-COPY package.json package-lock.json* ./
+# Install dependencies using pnpm
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY apps/web/package.json ./apps/web/
 COPY packages/api/package.json ./packages/api/
-RUN npm ci --include=dev || npm install
+RUN pnpm install --frozen-lockfile
 
 # Copy the rest of the application code
 COPY . .
 
-# Validate Prisma schema (use local prisma to avoid downloading latest version)
-RUN ./node_modules/.bin/prisma validate --schema=packages/api/prisma/schema.prisma
+# Validate Prisma schema
+RUN pnpm exec prisma validate --schema=packages/api/prisma/schema.prisma
 
-# Generate Prisma client (use local prisma to avoid downloading latest version)
-RUN ./node_modules/.bin/prisma generate --schema=packages/api/prisma/schema.prisma
+# Generate Prisma client
+RUN pnpm exec prisma generate --schema=packages/api/prisma/schema.prisma
 
 # Verify Prisma client generation
-RUN ls -la node_modules/.prisma && ls -la node_modules/@prisma/client
+RUN ls -la node_modules/.pnpm/@prisma+client* || ls -la node_modules/@prisma/client
 
 # Set correct ownership for the node user
 RUN chown -R node:node /usr/src/app
