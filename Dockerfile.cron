@@ -25,14 +25,14 @@ RUN pnpm install --frozen-lockfile
 # Copy the rest of the application code
 COPY . .
 
-# Validate Prisma schema
-RUN pnpm exec prisma validate --schema=packages/api/prisma/schema.prisma
+# Validate Prisma schema (prisma is in packages/api)
+RUN pnpm --filter @funtime/api exec prisma validate
 
 # Generate Prisma client
-RUN pnpm exec prisma generate --schema=packages/api/prisma/schema.prisma
+RUN pnpm --filter @funtime/api exec prisma generate
 
 # Verify Prisma client generation
-RUN ls -la node_modules/.pnpm/@prisma+client* || ls -la node_modules/@prisma/client
+RUN ls -la node_modules/.pnpm/@prisma+client* || ls -la packages/api/node_modules/.prisma/client
 
 # Set correct ownership for the node user
 RUN chown -R node:node /usr/src/app
