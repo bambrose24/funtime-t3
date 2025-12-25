@@ -2,8 +2,17 @@ import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "../trpc";
 
 import { TRPCError } from "@trpc/server";
-import { revalidatePath } from "next/cache";
 import { DEFAULT_SEASON } from "../../../utils/const";
+
+// Lazily import revalidatePath to avoid issues in non-Next.js environments (e.g., cron jobs)
+const revalidatePath = async (path: string, type?: "layout" | "page") => {
+  try {
+    const { revalidatePath: nextRevalidatePath } = await import("next/cache");
+    nextRevalidatePath(path, type);
+  } catch {
+    // Not in a Next.js environment, skip revalidation
+  }
+};
 
 export const authRouter = createTRPCRouter({
   signup: publicProcedure // authorized below to require supabase user
@@ -36,7 +45,7 @@ export const authRouter = createTRPCRouter({
         },
       });
 
-      revalidatePath("/", "layout");
+      await revalidatePath("/", "layout");
 
       return person;
     }),
