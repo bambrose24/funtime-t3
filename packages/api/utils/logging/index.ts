@@ -7,9 +7,6 @@ const baseLogger = winston.createLogger({
   level: config.logging.level,
   format: winston.format.json(),
   transports: [
-    // TODO add Axiom transport
-    // new winston.transports.File({ filename: 'error.log', level: 'error' }),
-    // new winston.transports.File({ filename: 'combined.log' }),
     ...(config.logging.shouldLogToConsole
       ? [new winston.transports.Console()]
       : []),
