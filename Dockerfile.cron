@@ -32,7 +32,7 @@ RUN pnpm --filter @funtime/api exec prisma validate
 RUN pnpm --filter @funtime/api exec prisma generate
 
 # Verify Prisma client generation
-RUN ls -la node_modules/.pnpm/@prisma+client* || ls -la packages/api/node_modules/.prisma/client
+RUN ls -la packages/api/src/generated/prisma-client/
 
 # Set correct ownership for the node user
 RUN chown -R node:node /usr/src/app
