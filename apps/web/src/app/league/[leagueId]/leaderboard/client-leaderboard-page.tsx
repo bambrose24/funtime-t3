@@ -13,6 +13,7 @@ import * as React from "react";
 
 import { LeaderboardTable } from "./leaderboard-table";
 import { LeaderboardChart2 } from "./leaderboard-chart-2";
+import { SeasonWinnersBanner } from "./season-winners-banner";
 import { Defined } from "~/utils/defined";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { ScrollArea } from "~/components/ui/scroll-area";
@@ -110,6 +111,7 @@ export function ClientLeaderboardPage(props: Props) {
 
   return (
     <>
+      {leaderboard && <SeasonWinnersBanner leaderboard={leaderboard} />}
       <div className="col-span-12 max-h-[1000px] md:col-span-4">
         <Card className="p-2">
           <ScrollArea>

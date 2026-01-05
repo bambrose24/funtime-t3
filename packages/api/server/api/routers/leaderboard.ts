@@ -1,4 +1,4 @@
-import { sortBy } from "lodash";
+import { groupBy, sortBy } from "lodash";
 import { z } from "zod";
 
 import { cache } from "../../../utils/cache";
@@ -34,6 +34,14 @@ export const leaderboardRouter = createTRPCRouter({
               },
             }),
           ]);
+
+          // Check if all games for this season are done
+          const seasonGames = await db.games.findMany({
+            where: { season: league.season },
+            select: { done: true },
+          });
+          const isSeasonOver =
+            seasonGames.length > 0 && seasonGames.every((g) => g.done === true);
 
           const memberIdToMember = leagueMembers.reduce((prev, curr) => {
             prev.set(curr.membership_id, curr);
@@ -132,11 +140,18 @@ export const leaderboardRouter = createTRPCRouter({
             (x) => x.correct,
           );
 
+          // Get top finishers (rank <= 4) for season winners announcement
+          // Group by rank to handle ties properly
+          const topFinishers = correctCountsSorted.filter((p) => p.rank <= 4);
+          const topFinishersByRank = groupBy(topFinishers, (p) => p.rank);
+
           return {
             league,
             weekTotals,
             chartableMembersData,
             correctCountsSorted,
+            isSeasonOver,
+            topFinishersByRank,
           };
         },
         ["leaderboard_league", leagueId.toString()],
