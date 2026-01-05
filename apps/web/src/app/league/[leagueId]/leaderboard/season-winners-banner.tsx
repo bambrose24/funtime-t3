@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import Link from "next/link";
 import { Trophy } from "lucide-react";
 import {
@@ -59,7 +60,7 @@ export function SeasonWinnersBanner({ leaderboard }: Props) {
           </div>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-col gap-2">
+          <div className="grid grid-cols-[2.5rem_3rem_1fr] gap-y-2 text-sm">
             {ranks.map((rank) => {
               const finishers = topFinishersByRank[rank] ?? [];
               if (finishers.length === 0) return null;
@@ -71,13 +72,11 @@ export function SeasonWinnersBanner({ leaderboard }: Props) {
               }));
 
               return (
-                <div key={rank} className="flex items-baseline gap-2 text-sm">
-                  <span className="w-8 font-medium text-muted-foreground">
+                <React.Fragment key={rank}>
+                  <span className="font-medium text-muted-foreground">
                     {getRankLabel(rank)}
                   </span>
-                  <span className="text-muted-foreground">
-                    {correctCount} —
-                  </span>
+                  <span className="text-muted-foreground">{correctCount}</span>
                   <span className="flex flex-wrap gap-x-1">
                     {names.map((name, idx) => (
                       <span key={name.membershipId}>
@@ -91,7 +90,7 @@ export function SeasonWinnersBanner({ leaderboard }: Props) {
                       </span>
                     ))}
                   </span>
-                </div>
+                </React.Fragment>
               );
             })}
           </div>
