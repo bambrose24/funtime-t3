@@ -160,7 +160,7 @@ export async function syncPostseason(
         conference = espn.getGameConference(
           homeTeam.conference,
           awayTeam.conference
-        ) as "AFC" | "NFC" | null;
+        );
       } else if (round !== "super_bowl") {
         // For TBD games, try to infer conference from the game name
         const gameName = espnGame.name?.toLowerCase() ?? "";
@@ -272,6 +272,6 @@ async function main() {
 
 // Only run main if this file is executed directly
 if (require.main === module) {
-  main();
+  void main();
 }
 

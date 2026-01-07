@@ -318,7 +318,10 @@ export function PlayoffBracket({
       actualGame?: PostseasonGame,
     ) => {
       // Prefer actual game ID if game has teams
-      if (actualGame && (actualGame.home_team || actualGame.away_team)) {
+      if (
+        actualGame &&
+        (actualGame.home_team != null || actualGame.away_team != null)
+      ) {
         return actualGame.game_id;
       }
       return `${round}-${conference}-${index}`;
@@ -725,7 +728,8 @@ export function PlayoffBracket({
       const nfcChamp = state.conference.NFC?.winnerId ?? null;
       const gameId = getGameId("sb", "SB", 0, actualSb);
       const hasConfSim =
-        state.conference.AFC?.isSimulated || state.conference.NFC?.isSimulated;
+        state.conference.AFC?.isSimulated === true ||
+        state.conference.NFC?.isSimulated === true;
 
       state.superBowl = {
         gameId,
@@ -740,14 +744,8 @@ export function PlayoffBracket({
     }
 
     return state;
-  }, [
-    bracket,
-    simulatedWinners,
-    getSeed,
-    getGameId,
-    getWinnerForGame,
-    isSimulated,
-  ]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [bracket, getSeed, getGameId, getWinnerForGame, isSimulated]);
 
   const clearSimulations = () => {
     setSimulatedWinners(new Map());
@@ -817,8 +815,9 @@ export function PlayoffBracket({
     for (const conf of ["AFC", "NFC"] as const) {
       bracketState.wildCard[conf].forEach(processGame);
       bracketState.divisional[conf].forEach(processGame);
-      if (bracketState.conference[conf]) {
-        processGame(bracketState.conference[conf]!);
+      const confGame = bracketState.conference[conf];
+      if (confGame) {
+        processGame(confGame);
       }
     }
     if (bracketState.superBowl) {
