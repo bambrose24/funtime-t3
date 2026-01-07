@@ -220,7 +220,7 @@ export function ClientSuperbowlPicksPage({
                           pick.score !== null && (
                             <span className="ml-1 text-xs text-muted-foreground">
                               {(() => {
-                                const diff = pick.score - bracketState.totalScore;
+                                const diff = pick.score - (bracketState?.totalScore ?? 0);
                                 return `(${diff > 0 ? "+" : ""}${diff})`;
                               })()}
                             </span>
