@@ -246,6 +246,14 @@ model teams {
   superbowl_superbowl_loserToteams  superbowl[] @relation("superbowl_loserToteams")
   superbowl_superbowl_winnerToteams superbowl[] @relation("superbowl_winnerToteams")
 
+  // Postseason game relations
+  postseason_home   postseason_games[] @relation("postseason_home")
+  postseason_away   postseason_games[] @relation("postseason_away")
+  postseason_winner postseason_games[] @relation("postseason_winner")
+
+  // Postseason seeding relation
+  postseason_seeds postseason_team_seeds[]
+
   @@index([abbrev], map: "idx_18460_abbrev")
   @@index([conference], map: "idx_18460_conference")
   @@index([loc], map: "idx_18460_loc")
@@ -296,4 +304,64 @@ enum LeagueStatus {
 
 enum ScoringType {
   game_winner
+}
+
+enum PostseasonRound {
+  wild_card
+  divisional
+  conference
+  super_bowl
+}
+
+enum Conference {
+  AFC
+  NFC
+}
+
+model postseason_games {
+  game_id    String          @id @default(cuid())
+  espn_id    Int             @unique
+  season     Int
+  round      PostseasonRound
+  conference Conference? // null for Super Bowl (AFC vs NFC)
+  ts         DateTime        @db.Timestamptz(6)
+  home_team  Int? // nullable for TBD games
+  away_team  Int? // nullable for TBD games
+  home_score Int?
+  away_score Int?
+  winner     Int?
+  done       Boolean         @default(false)
+
+  // Bracket structure
+  bracket_position    Int // Position within the round (1-6 for wild card, 1-4 for divisional, 1-2 for conference, 1 for super bowl)
+  advances_to_game_id String? // FK to next game in bracket (null for super bowl)
+
+  // Relations (all optional since teams can be TBD)
+  home_team_rel   teams?             @relation("postseason_home", fields: [home_team], references: [teamid], onUpdate: Restrict)
+  away_team_rel   teams?             @relation("postseason_away", fields: [away_team], references: [teamid], onUpdate: Restrict)
+  winner_team_rel teams?             @relation("postseason_winner", fields: [winner], references: [teamid], onUpdate: Restrict)
+  advances_to     postseason_games?  @relation("bracket_advancement", fields: [advances_to_game_id], references: [game_id])
+  advances_from   postseason_games[] @relation("bracket_advancement")
+
+  @@index([season])
+  @@index([season, round])
+  @@index([espn_id])
+  @@index([ts])
+}
+
+// Stores playoff seeding for each team per season
+// Used to calculate proper bracket matchups after reseeding
+model postseason_team_seeds {
+  id         String     @id @default(cuid())
+  season     Int
+  teamid     Int
+  conference Conference
+  seed       Int // 1-7 for NFL playoffs
+
+  // Relations
+  team teams @relation(fields: [teamid], references: [teamid], onUpdate: Restrict)
+
+  @@unique([season, teamid])
+  @@index([season])
+  @@index([season, conference])
 }

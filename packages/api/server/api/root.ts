@@ -8,6 +8,7 @@ import { memberRouter } from "./routers/member";
 import { messagesRouter } from "./routers/messages";
 import { picksRouter } from "./routers/picks";
 import { playerProfileRouter } from "./routers/playerProfileRouter";
+import { postseasonRouter } from "./routers/postseason";
 import { sessionRouter } from "./routers/session";
 import { settingsRouter } from "./routers/settings";
 import { teamsRouter } from "./routers/teams";
@@ -34,6 +35,7 @@ export const appRouter = createTRPCRouter({
   messages: messagesRouter,
   member: memberRouter,
   generalAdmin: generalAdminRouter,
+  postseason: postseasonRouter,
 });
 
 // export type definition of API

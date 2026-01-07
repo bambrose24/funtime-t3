@@ -266,6 +266,31 @@ exports.Prisma.TeamsScalarFieldEnum = {
   tertiary_color: 'tertiary_color'
 };
 
+exports.Prisma.Postseason_gamesScalarFieldEnum = {
+  game_id: 'game_id',
+  espn_id: 'espn_id',
+  season: 'season',
+  round: 'round',
+  conference: 'conference',
+  ts: 'ts',
+  home_team: 'home_team',
+  away_team: 'away_team',
+  home_score: 'home_score',
+  away_score: 'away_score',
+  winner: 'winner',
+  done: 'done',
+  bracket_position: 'bracket_position',
+  advances_to_game_id: 'advances_to_game_id'
+};
+
+exports.Prisma.Postseason_team_seedsScalarFieldEnum = {
+  id: 'id',
+  season: 'season',
+  teamid: 'teamid',
+  conference: 'conference',
+  seed: 'seed'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -327,6 +352,18 @@ exports.LeagueStatus = exports.$Enums.LeagueStatus = {
   completed: 'completed'
 };
 
+exports.PostseasonRound = exports.$Enums.PostseasonRound = {
+  wild_card: 'wild_card',
+  divisional: 'divisional',
+  conference: 'conference',
+  super_bowl: 'super_bowl'
+};
+
+exports.Conference = exports.$Enums.Conference = {
+  AFC: 'AFC',
+  NFC: 'NFC'
+};
+
 exports.Prisma.ModelName = {
   EmailLogs: 'EmailLogs',
   WeekWinners: 'WeekWinners',
@@ -338,7 +375,9 @@ exports.Prisma.ModelName = {
   picks: 'picks',
   superbowl: 'superbowl',
   superbowlsquares: 'superbowlsquares',
-  teams: 'teams'
+  teams: 'teams',
+  postseason_games: 'postseason_games',
+  postseason_team_seeds: 'postseason_team_seeds'
 };
 
 /**

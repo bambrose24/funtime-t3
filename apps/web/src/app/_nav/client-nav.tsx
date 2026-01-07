@@ -312,12 +312,16 @@ type TabOption =
   | "leaderboard"
   | "admin"
   | "my-profile"
-  | "league-info";
+  | "league-info"
+  | "superbowl";
 
 function useActiveLeagueSubPath(): TabOption {
   const pathname = usePathname();
   if (pathname.includes("/leaderboard")) {
     return "leaderboard";
+  }
+  if (pathname.includes("/superbowl")) {
+    return "superbowl";
   }
   if (pathname.includes("pick")) {
     return "make-picks";
@@ -372,6 +376,13 @@ function TabLabel() {
         <>
           <div className="hidden lg:block">League Info</div>
           <div className="lg:hidden">Info</div>
+        </>
+      );
+    case "superbowl":
+      return (
+        <>
+          <div className="hidden lg:block">Superbowl Picks</div>
+          <div className="lg:hidden">Superbowl</div>
         </>
       );
   }

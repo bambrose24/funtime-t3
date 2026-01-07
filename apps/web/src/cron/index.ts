@@ -4,6 +4,7 @@ import { chunk, groupBy, orderBy } from "lodash";
 
 import { DEFAULT_SEASON } from "../utils/const";
 import { Defined } from "../utils/defined";
+import { syncPostseason } from "./postseason";
 
 const LOG_PREFIX = "[cron]";
 
@@ -15,16 +16,12 @@ export async function run() {
   const season = DEFAULT_SEASON;
 
   // const msfGames = await msf.getGamesBySeason({ season });
-  const espnGames = await espn.getGamesBySeason({ season });
+  const allEspnGames = await espn.getGamesBySeason({ season });
+  // Filter to only regular season games (type 2) - ESPN sometimes returns postseason games too
+  const espnGames = allEspnGames.filter((g) => g.season.type === 2);
   console.log(
-    `${LOG_PREFIX} Full espnGames response as second parameter`,
-    espnGames,
+    `${LOG_PREFIX} Fetched ${allEspnGames.length} ESPN games, ${espnGames.length} are regular season`,
   );
-  console.log(
-    `${LOG_PREFIX} Full espnGames response as stringified: ${JSON.stringify(espnGames)}`,
-  );
-
-  console.log(`${LOG_PREFIX} espn games ${JSON.stringify(espnGames)}`);
   let games = await db.games.findMany({
     where: {
       season,
@@ -59,11 +56,7 @@ export async function run() {
           ]?.at(0);
 
         if (!awayTeam || !homeTeam || !game || !espnCompetition || game.done) {
-          if (espnGame.week.number === 2) {
-            console.log(
-              `${LOG_PREFIX} Could not find game or teams for ESPN game ${JSON.stringify(espnGame)}`,
-            );
-          }
+          // Skip silently - game may not be in DB yet or is already done
           return null;
         }
         const done = espnCompetition?.status.type.name === "STATUS_FINAL";
@@ -90,10 +83,6 @@ export async function run() {
           current_quarter: espnCompetition.status.period ?? 0,
           current_quarter_seconds_remaining: espnCompetition.status.clock,
         } satisfies Parameters<typeof db.games.update>[0]["data"];
-
-        console.log(
-          `${LOG_PREFIX} going to update game ${game.gid} with data ${JSON.stringify(data)}, got espn game data ${JSON.stringify(espnGame)}`,
-        );
 
         return db.games.update({
           where: {
@@ -450,6 +439,16 @@ export async function run() {
         },
       });
     }
+  }
+
+  // ========================================
+  // Sync postseason data (seeds + games)
+  // ========================================
+  try {
+    await syncPostseason(season);
+  } catch (error) {
+    console.error(`${LOG_PREFIX} Error in postseason sync:`, error);
+    // Don't throw - postseason sync failure shouldn't break the whole cron
   }
 
   // Remind members to make picks for the upcoming week

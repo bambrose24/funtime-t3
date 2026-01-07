@@ -68,6 +68,16 @@ export type superbowlsquares = $Result.DefaultSelection<Prisma.$superbowlsquares
  * 
  */
 export type teams = $Result.DefaultSelection<Prisma.$teamsPayload>
+/**
+ * Model postseason_games
+ * 
+ */
+export type postseason_games = $Result.DefaultSelection<Prisma.$postseason_gamesPayload>
+/**
+ * Model postseason_team_seeds
+ * 
+ */
+export type postseason_team_seeds = $Result.DefaultSelection<Prisma.$postseason_team_seedsPayload>
 
 /**
  * Enums
@@ -146,6 +156,24 @@ export const ScoringType: {
 
 export type ScoringType = (typeof ScoringType)[keyof typeof ScoringType]
 
+
+export const PostseasonRound: {
+  wild_card: 'wild_card',
+  divisional: 'divisional',
+  conference: 'conference',
+  super_bowl: 'super_bowl'
+};
+
+export type PostseasonRound = (typeof PostseasonRound)[keyof typeof PostseasonRound]
+
+
+export const Conference: {
+  AFC: 'AFC',
+  NFC: 'NFC'
+};
+
+export type Conference = (typeof Conference)[keyof typeof Conference]
+
 }
 
 export type EmailType = $Enums.EmailType
@@ -183,6 +211,14 @@ export const LeagueStatus: typeof $Enums.LeagueStatus
 export type ScoringType = $Enums.ScoringType
 
 export const ScoringType: typeof $Enums.ScoringType
+
+export type PostseasonRound = $Enums.PostseasonRound
+
+export const PostseasonRound: typeof $Enums.PostseasonRound
+
+export type Conference = $Enums.Conference
+
+export const Conference: typeof $Enums.Conference
 
 /**
  * ##  Prisma Client ʲˢ
@@ -411,6 +447,26 @@ export class PrismaClient<
     * ```
     */
   get teams(): Prisma.teamsDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.postseason_games`: Exposes CRUD operations for the **postseason_games** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Postseason_games
+    * const postseason_games = await prisma.postseason_games.findMany()
+    * ```
+    */
+  get postseason_games(): Prisma.postseason_gamesDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.postseason_team_seeds`: Exposes CRUD operations for the **postseason_team_seeds** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Postseason_team_seeds
+    * const postseason_team_seeds = await prisma.postseason_team_seeds.findMany()
+    * ```
+    */
+  get postseason_team_seeds(): Prisma.postseason_team_seedsDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -862,7 +918,9 @@ export namespace Prisma {
     picks: 'picks',
     superbowl: 'superbowl',
     superbowlsquares: 'superbowlsquares',
-    teams: 'teams'
+    teams: 'teams',
+    postseason_games: 'postseason_games',
+    postseason_team_seeds: 'postseason_team_seeds'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -881,7 +939,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "emailLogs" | "weekWinners" | "games" | "leaguemembers" | "leaguemessages" | "leagues" | "people" | "picks" | "superbowl" | "superbowlsquares" | "teams"
+      modelProps: "emailLogs" | "weekWinners" | "games" | "leaguemembers" | "leaguemessages" | "leagues" | "people" | "picks" | "superbowl" | "superbowlsquares" | "teams" | "postseason_games" | "postseason_team_seeds"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1699,6 +1757,154 @@ export namespace Prisma {
           }
         }
       }
+      postseason_games: {
+        payload: Prisma.$postseason_gamesPayload<ExtArgs>
+        fields: Prisma.postseason_gamesFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.postseason_gamesFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$postseason_gamesPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.postseason_gamesFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$postseason_gamesPayload>
+          }
+          findFirst: {
+            args: Prisma.postseason_gamesFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$postseason_gamesPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.postseason_gamesFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$postseason_gamesPayload>
+          }
+          findMany: {
+            args: Prisma.postseason_gamesFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$postseason_gamesPayload>[]
+          }
+          create: {
+            args: Prisma.postseason_gamesCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$postseason_gamesPayload>
+          }
+          createMany: {
+            args: Prisma.postseason_gamesCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.postseason_gamesCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$postseason_gamesPayload>[]
+          }
+          delete: {
+            args: Prisma.postseason_gamesDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$postseason_gamesPayload>
+          }
+          update: {
+            args: Prisma.postseason_gamesUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$postseason_gamesPayload>
+          }
+          deleteMany: {
+            args: Prisma.postseason_gamesDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.postseason_gamesUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.postseason_gamesUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$postseason_gamesPayload>[]
+          }
+          upsert: {
+            args: Prisma.postseason_gamesUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$postseason_gamesPayload>
+          }
+          aggregate: {
+            args: Prisma.Postseason_gamesAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregatePostseason_games>
+          }
+          groupBy: {
+            args: Prisma.postseason_gamesGroupByArgs<ExtArgs>
+            result: $Utils.Optional<Postseason_gamesGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.postseason_gamesCountArgs<ExtArgs>
+            result: $Utils.Optional<Postseason_gamesCountAggregateOutputType> | number
+          }
+        }
+      }
+      postseason_team_seeds: {
+        payload: Prisma.$postseason_team_seedsPayload<ExtArgs>
+        fields: Prisma.postseason_team_seedsFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.postseason_team_seedsFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$postseason_team_seedsPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.postseason_team_seedsFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$postseason_team_seedsPayload>
+          }
+          findFirst: {
+            args: Prisma.postseason_team_seedsFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$postseason_team_seedsPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.postseason_team_seedsFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$postseason_team_seedsPayload>
+          }
+          findMany: {
+            args: Prisma.postseason_team_seedsFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$postseason_team_seedsPayload>[]
+          }
+          create: {
+            args: Prisma.postseason_team_seedsCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$postseason_team_seedsPayload>
+          }
+          createMany: {
+            args: Prisma.postseason_team_seedsCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.postseason_team_seedsCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$postseason_team_seedsPayload>[]
+          }
+          delete: {
+            args: Prisma.postseason_team_seedsDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$postseason_team_seedsPayload>
+          }
+          update: {
+            args: Prisma.postseason_team_seedsUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$postseason_team_seedsPayload>
+          }
+          deleteMany: {
+            args: Prisma.postseason_team_seedsDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.postseason_team_seedsUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.postseason_team_seedsUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$postseason_team_seedsPayload>[]
+          }
+          upsert: {
+            args: Prisma.postseason_team_seedsUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$postseason_team_seedsPayload>
+          }
+          aggregate: {
+            args: Prisma.Postseason_team_seedsAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregatePostseason_team_seeds>
+          }
+          groupBy: {
+            args: Prisma.postseason_team_seedsGroupByArgs<ExtArgs>
+            result: $Utils.Optional<Postseason_team_seedsGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.postseason_team_seedsCountArgs<ExtArgs>
+            result: $Utils.Optional<Postseason_team_seedsCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -1806,6 +2012,8 @@ export namespace Prisma {
     superbowl?: superbowlOmit
     superbowlsquares?: superbowlsquaresOmit
     teams?: teamsOmit
+    postseason_games?: postseason_gamesOmit
+    postseason_team_seeds?: postseason_team_seedsOmit
   }
 
   /* Types for Logging */
@@ -2105,6 +2313,10 @@ export namespace Prisma {
     picks: number
     superbowl_superbowl_loserToteams: number
     superbowl_superbowl_winnerToteams: number
+    postseason_home: number
+    postseason_away: number
+    postseason_winner: number
+    postseason_seeds: number
   }
 
   export type TeamsCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -2113,6 +2325,10 @@ export namespace Prisma {
     picks?: boolean | TeamsCountOutputTypeCountPicksArgs
     superbowl_superbowl_loserToteams?: boolean | TeamsCountOutputTypeCountSuperbowl_superbowl_loserToteamsArgs
     superbowl_superbowl_winnerToteams?: boolean | TeamsCountOutputTypeCountSuperbowl_superbowl_winnerToteamsArgs
+    postseason_home?: boolean | TeamsCountOutputTypeCountPostseason_homeArgs
+    postseason_away?: boolean | TeamsCountOutputTypeCountPostseason_awayArgs
+    postseason_winner?: boolean | TeamsCountOutputTypeCountPostseason_winnerArgs
+    postseason_seeds?: boolean | TeamsCountOutputTypeCountPostseason_seedsArgs
   }
 
   // Custom InputTypes
@@ -2159,6 +2375,65 @@ export namespace Prisma {
    */
   export type TeamsCountOutputTypeCountSuperbowl_superbowl_winnerToteamsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: superbowlWhereInput
+  }
+
+  /**
+   * TeamsCountOutputType without action
+   */
+  export type TeamsCountOutputTypeCountPostseason_homeArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: postseason_gamesWhereInput
+  }
+
+  /**
+   * TeamsCountOutputType without action
+   */
+  export type TeamsCountOutputTypeCountPostseason_awayArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: postseason_gamesWhereInput
+  }
+
+  /**
+   * TeamsCountOutputType without action
+   */
+  export type TeamsCountOutputTypeCountPostseason_winnerArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: postseason_gamesWhereInput
+  }
+
+  /**
+   * TeamsCountOutputType without action
+   */
+  export type TeamsCountOutputTypeCountPostseason_seedsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: postseason_team_seedsWhereInput
+  }
+
+
+  /**
+   * Count Type Postseason_gamesCountOutputType
+   */
+
+  export type Postseason_gamesCountOutputType = {
+    advances_from: number
+  }
+
+  export type Postseason_gamesCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    advances_from?: boolean | Postseason_gamesCountOutputTypeCountAdvances_fromArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * Postseason_gamesCountOutputType without action
+   */
+  export type Postseason_gamesCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Postseason_gamesCountOutputType
+     */
+    select?: Postseason_gamesCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * Postseason_gamesCountOutputType without action
+   */
+  export type Postseason_gamesCountOutputTypeCountAdvances_fromArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: postseason_gamesWhereInput
   }
 
 
@@ -14711,6 +14986,10 @@ export namespace Prisma {
     picks?: boolean | teams$picksArgs<ExtArgs>
     superbowl_superbowl_loserToteams?: boolean | teams$superbowl_superbowl_loserToteamsArgs<ExtArgs>
     superbowl_superbowl_winnerToteams?: boolean | teams$superbowl_superbowl_winnerToteamsArgs<ExtArgs>
+    postseason_home?: boolean | teams$postseason_homeArgs<ExtArgs>
+    postseason_away?: boolean | teams$postseason_awayArgs<ExtArgs>
+    postseason_winner?: boolean | teams$postseason_winnerArgs<ExtArgs>
+    postseason_seeds?: boolean | teams$postseason_seedsArgs<ExtArgs>
     _count?: boolean | TeamsCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["teams"]>
 
@@ -14754,6 +15033,10 @@ export namespace Prisma {
     picks?: boolean | teams$picksArgs<ExtArgs>
     superbowl_superbowl_loserToteams?: boolean | teams$superbowl_superbowl_loserToteamsArgs<ExtArgs>
     superbowl_superbowl_winnerToteams?: boolean | teams$superbowl_superbowl_winnerToteamsArgs<ExtArgs>
+    postseason_home?: boolean | teams$postseason_homeArgs<ExtArgs>
+    postseason_away?: boolean | teams$postseason_awayArgs<ExtArgs>
+    postseason_winner?: boolean | teams$postseason_winnerArgs<ExtArgs>
+    postseason_seeds?: boolean | teams$postseason_seedsArgs<ExtArgs>
     _count?: boolean | TeamsCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type teamsIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -14767,6 +15050,10 @@ export namespace Prisma {
       picks: Prisma.$picksPayload<ExtArgs>[]
       superbowl_superbowl_loserToteams: Prisma.$superbowlPayload<ExtArgs>[]
       superbowl_superbowl_winnerToteams: Prisma.$superbowlPayload<ExtArgs>[]
+      postseason_home: Prisma.$postseason_gamesPayload<ExtArgs>[]
+      postseason_away: Prisma.$postseason_gamesPayload<ExtArgs>[]
+      postseason_winner: Prisma.$postseason_gamesPayload<ExtArgs>[]
+      postseason_seeds: Prisma.$postseason_team_seedsPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       teamid: number
@@ -15176,6 +15463,10 @@ export namespace Prisma {
     picks<T extends teams$picksArgs<ExtArgs> = {}>(args?: Subset<T, teams$picksArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$picksPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     superbowl_superbowl_loserToteams<T extends teams$superbowl_superbowl_loserToteamsArgs<ExtArgs> = {}>(args?: Subset<T, teams$superbowl_superbowl_loserToteamsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$superbowlPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     superbowl_superbowl_winnerToteams<T extends teams$superbowl_superbowl_winnerToteamsArgs<ExtArgs> = {}>(args?: Subset<T, teams$superbowl_superbowl_winnerToteamsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$superbowlPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    postseason_home<T extends teams$postseason_homeArgs<ExtArgs> = {}>(args?: Subset<T, teams$postseason_homeArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$postseason_gamesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    postseason_away<T extends teams$postseason_awayArgs<ExtArgs> = {}>(args?: Subset<T, teams$postseason_awayArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$postseason_gamesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    postseason_winner<T extends teams$postseason_winnerArgs<ExtArgs> = {}>(args?: Subset<T, teams$postseason_winnerArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$postseason_gamesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    postseason_seeds<T extends teams$postseason_seedsArgs<ExtArgs> = {}>(args?: Subset<T, teams$postseason_seedsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$postseason_team_seedsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -15730,6 +16021,102 @@ export namespace Prisma {
   }
 
   /**
+   * teams.postseason_home
+   */
+  export type teams$postseason_homeArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the postseason_games
+     */
+    select?: postseason_gamesSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the postseason_games
+     */
+    omit?: postseason_gamesOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: postseason_gamesInclude<ExtArgs> | null
+    where?: postseason_gamesWhereInput
+    orderBy?: postseason_gamesOrderByWithRelationInput | postseason_gamesOrderByWithRelationInput[]
+    cursor?: postseason_gamesWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: Postseason_gamesScalarFieldEnum | Postseason_gamesScalarFieldEnum[]
+  }
+
+  /**
+   * teams.postseason_away
+   */
+  export type teams$postseason_awayArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the postseason_games
+     */
+    select?: postseason_gamesSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the postseason_games
+     */
+    omit?: postseason_gamesOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: postseason_gamesInclude<ExtArgs> | null
+    where?: postseason_gamesWhereInput
+    orderBy?: postseason_gamesOrderByWithRelationInput | postseason_gamesOrderByWithRelationInput[]
+    cursor?: postseason_gamesWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: Postseason_gamesScalarFieldEnum | Postseason_gamesScalarFieldEnum[]
+  }
+
+  /**
+   * teams.postseason_winner
+   */
+  export type teams$postseason_winnerArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the postseason_games
+     */
+    select?: postseason_gamesSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the postseason_games
+     */
+    omit?: postseason_gamesOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: postseason_gamesInclude<ExtArgs> | null
+    where?: postseason_gamesWhereInput
+    orderBy?: postseason_gamesOrderByWithRelationInput | postseason_gamesOrderByWithRelationInput[]
+    cursor?: postseason_gamesWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: Postseason_gamesScalarFieldEnum | Postseason_gamesScalarFieldEnum[]
+  }
+
+  /**
+   * teams.postseason_seeds
+   */
+  export type teams$postseason_seedsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the postseason_team_seeds
+     */
+    select?: postseason_team_seedsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the postseason_team_seeds
+     */
+    omit?: postseason_team_seedsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: postseason_team_seedsInclude<ExtArgs> | null
+    where?: postseason_team_seedsWhereInput
+    orderBy?: postseason_team_seedsOrderByWithRelationInput | postseason_team_seedsOrderByWithRelationInput[]
+    cursor?: postseason_team_seedsWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: Postseason_team_seedsScalarFieldEnum | Postseason_team_seedsScalarFieldEnum[]
+  }
+
+  /**
    * teams without action
    */
   export type teamsDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -15745,6 +16132,2491 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: teamsInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model postseason_games
+   */
+
+  export type AggregatePostseason_games = {
+    _count: Postseason_gamesCountAggregateOutputType | null
+    _avg: Postseason_gamesAvgAggregateOutputType | null
+    _sum: Postseason_gamesSumAggregateOutputType | null
+    _min: Postseason_gamesMinAggregateOutputType | null
+    _max: Postseason_gamesMaxAggregateOutputType | null
+  }
+
+  export type Postseason_gamesAvgAggregateOutputType = {
+    espn_id: number | null
+    season: number | null
+    home_team: number | null
+    away_team: number | null
+    home_score: number | null
+    away_score: number | null
+    winner: number | null
+    bracket_position: number | null
+  }
+
+  export type Postseason_gamesSumAggregateOutputType = {
+    espn_id: number | null
+    season: number | null
+    home_team: number | null
+    away_team: number | null
+    home_score: number | null
+    away_score: number | null
+    winner: number | null
+    bracket_position: number | null
+  }
+
+  export type Postseason_gamesMinAggregateOutputType = {
+    game_id: string | null
+    espn_id: number | null
+    season: number | null
+    round: $Enums.PostseasonRound | null
+    conference: $Enums.Conference | null
+    ts: Date | null
+    home_team: number | null
+    away_team: number | null
+    home_score: number | null
+    away_score: number | null
+    winner: number | null
+    done: boolean | null
+    bracket_position: number | null
+    advances_to_game_id: string | null
+  }
+
+  export type Postseason_gamesMaxAggregateOutputType = {
+    game_id: string | null
+    espn_id: number | null
+    season: number | null
+    round: $Enums.PostseasonRound | null
+    conference: $Enums.Conference | null
+    ts: Date | null
+    home_team: number | null
+    away_team: number | null
+    home_score: number | null
+    away_score: number | null
+    winner: number | null
+    done: boolean | null
+    bracket_position: number | null
+    advances_to_game_id: string | null
+  }
+
+  export type Postseason_gamesCountAggregateOutputType = {
+    game_id: number
+    espn_id: number
+    season: number
+    round: number
+    conference: number
+    ts: number
+    home_team: number
+    away_team: number
+    home_score: number
+    away_score: number
+    winner: number
+    done: number
+    bracket_position: number
+    advances_to_game_id: number
+    _all: number
+  }
+
+
+  export type Postseason_gamesAvgAggregateInputType = {
+    espn_id?: true
+    season?: true
+    home_team?: true
+    away_team?: true
+    home_score?: true
+    away_score?: true
+    winner?: true
+    bracket_position?: true
+  }
+
+  export type Postseason_gamesSumAggregateInputType = {
+    espn_id?: true
+    season?: true
+    home_team?: true
+    away_team?: true
+    home_score?: true
+    away_score?: true
+    winner?: true
+    bracket_position?: true
+  }
+
+  export type Postseason_gamesMinAggregateInputType = {
+    game_id?: true
+    espn_id?: true
+    season?: true
+    round?: true
+    conference?: true
+    ts?: true
+    home_team?: true
+    away_team?: true
+    home_score?: true
+    away_score?: true
+    winner?: true
+    done?: true
+    bracket_position?: true
+    advances_to_game_id?: true
+  }
+
+  export type Postseason_gamesMaxAggregateInputType = {
+    game_id?: true
+    espn_id?: true
+    season?: true
+    round?: true
+    conference?: true
+    ts?: true
+    home_team?: true
+    away_team?: true
+    home_score?: true
+    away_score?: true
+    winner?: true
+    done?: true
+    bracket_position?: true
+    advances_to_game_id?: true
+  }
+
+  export type Postseason_gamesCountAggregateInputType = {
+    game_id?: true
+    espn_id?: true
+    season?: true
+    round?: true
+    conference?: true
+    ts?: true
+    home_team?: true
+    away_team?: true
+    home_score?: true
+    away_score?: true
+    winner?: true
+    done?: true
+    bracket_position?: true
+    advances_to_game_id?: true
+    _all?: true
+  }
+
+  export type Postseason_gamesAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which postseason_games to aggregate.
+     */
+    where?: postseason_gamesWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of postseason_games to fetch.
+     */
+    orderBy?: postseason_gamesOrderByWithRelationInput | postseason_gamesOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: postseason_gamesWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` postseason_games from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` postseason_games.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned postseason_games
+    **/
+    _count?: true | Postseason_gamesCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: Postseason_gamesAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: Postseason_gamesSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: Postseason_gamesMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: Postseason_gamesMaxAggregateInputType
+  }
+
+  export type GetPostseason_gamesAggregateType<T extends Postseason_gamesAggregateArgs> = {
+        [P in keyof T & keyof AggregatePostseason_games]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregatePostseason_games[P]>
+      : GetScalarType<T[P], AggregatePostseason_games[P]>
+  }
+
+
+
+
+  export type postseason_gamesGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: postseason_gamesWhereInput
+    orderBy?: postseason_gamesOrderByWithAggregationInput | postseason_gamesOrderByWithAggregationInput[]
+    by: Postseason_gamesScalarFieldEnum[] | Postseason_gamesScalarFieldEnum
+    having?: postseason_gamesScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: Postseason_gamesCountAggregateInputType | true
+    _avg?: Postseason_gamesAvgAggregateInputType
+    _sum?: Postseason_gamesSumAggregateInputType
+    _min?: Postseason_gamesMinAggregateInputType
+    _max?: Postseason_gamesMaxAggregateInputType
+  }
+
+  export type Postseason_gamesGroupByOutputType = {
+    game_id: string
+    espn_id: number
+    season: number
+    round: $Enums.PostseasonRound
+    conference: $Enums.Conference | null
+    ts: Date
+    home_team: number | null
+    away_team: number | null
+    home_score: number | null
+    away_score: number | null
+    winner: number | null
+    done: boolean
+    bracket_position: number
+    advances_to_game_id: string | null
+    _count: Postseason_gamesCountAggregateOutputType | null
+    _avg: Postseason_gamesAvgAggregateOutputType | null
+    _sum: Postseason_gamesSumAggregateOutputType | null
+    _min: Postseason_gamesMinAggregateOutputType | null
+    _max: Postseason_gamesMaxAggregateOutputType | null
+  }
+
+  type GetPostseason_gamesGroupByPayload<T extends postseason_gamesGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<Postseason_gamesGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof Postseason_gamesGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], Postseason_gamesGroupByOutputType[P]>
+            : GetScalarType<T[P], Postseason_gamesGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type postseason_gamesSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    game_id?: boolean
+    espn_id?: boolean
+    season?: boolean
+    round?: boolean
+    conference?: boolean
+    ts?: boolean
+    home_team?: boolean
+    away_team?: boolean
+    home_score?: boolean
+    away_score?: boolean
+    winner?: boolean
+    done?: boolean
+    bracket_position?: boolean
+    advances_to_game_id?: boolean
+    home_team_rel?: boolean | postseason_games$home_team_relArgs<ExtArgs>
+    away_team_rel?: boolean | postseason_games$away_team_relArgs<ExtArgs>
+    winner_team_rel?: boolean | postseason_games$winner_team_relArgs<ExtArgs>
+    advances_to?: boolean | postseason_games$advances_toArgs<ExtArgs>
+    advances_from?: boolean | postseason_games$advances_fromArgs<ExtArgs>
+    _count?: boolean | Postseason_gamesCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["postseason_games"]>
+
+  export type postseason_gamesSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    game_id?: boolean
+    espn_id?: boolean
+    season?: boolean
+    round?: boolean
+    conference?: boolean
+    ts?: boolean
+    home_team?: boolean
+    away_team?: boolean
+    home_score?: boolean
+    away_score?: boolean
+    winner?: boolean
+    done?: boolean
+    bracket_position?: boolean
+    advances_to_game_id?: boolean
+    home_team_rel?: boolean | postseason_games$home_team_relArgs<ExtArgs>
+    away_team_rel?: boolean | postseason_games$away_team_relArgs<ExtArgs>
+    winner_team_rel?: boolean | postseason_games$winner_team_relArgs<ExtArgs>
+    advances_to?: boolean | postseason_games$advances_toArgs<ExtArgs>
+  }, ExtArgs["result"]["postseason_games"]>
+
+  export type postseason_gamesSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    game_id?: boolean
+    espn_id?: boolean
+    season?: boolean
+    round?: boolean
+    conference?: boolean
+    ts?: boolean
+    home_team?: boolean
+    away_team?: boolean
+    home_score?: boolean
+    away_score?: boolean
+    winner?: boolean
+    done?: boolean
+    bracket_position?: boolean
+    advances_to_game_id?: boolean
+    home_team_rel?: boolean | postseason_games$home_team_relArgs<ExtArgs>
+    away_team_rel?: boolean | postseason_games$away_team_relArgs<ExtArgs>
+    winner_team_rel?: boolean | postseason_games$winner_team_relArgs<ExtArgs>
+    advances_to?: boolean | postseason_games$advances_toArgs<ExtArgs>
+  }, ExtArgs["result"]["postseason_games"]>
+
+  export type postseason_gamesSelectScalar = {
+    game_id?: boolean
+    espn_id?: boolean
+    season?: boolean
+    round?: boolean
+    conference?: boolean
+    ts?: boolean
+    home_team?: boolean
+    away_team?: boolean
+    home_score?: boolean
+    away_score?: boolean
+    winner?: boolean
+    done?: boolean
+    bracket_position?: boolean
+    advances_to_game_id?: boolean
+  }
+
+  export type postseason_gamesOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"game_id" | "espn_id" | "season" | "round" | "conference" | "ts" | "home_team" | "away_team" | "home_score" | "away_score" | "winner" | "done" | "bracket_position" | "advances_to_game_id", ExtArgs["result"]["postseason_games"]>
+  export type postseason_gamesInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    home_team_rel?: boolean | postseason_games$home_team_relArgs<ExtArgs>
+    away_team_rel?: boolean | postseason_games$away_team_relArgs<ExtArgs>
+    winner_team_rel?: boolean | postseason_games$winner_team_relArgs<ExtArgs>
+    advances_to?: boolean | postseason_games$advances_toArgs<ExtArgs>
+    advances_from?: boolean | postseason_games$advances_fromArgs<ExtArgs>
+    _count?: boolean | Postseason_gamesCountOutputTypeDefaultArgs<ExtArgs>
+  }
+  export type postseason_gamesIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    home_team_rel?: boolean | postseason_games$home_team_relArgs<ExtArgs>
+    away_team_rel?: boolean | postseason_games$away_team_relArgs<ExtArgs>
+    winner_team_rel?: boolean | postseason_games$winner_team_relArgs<ExtArgs>
+    advances_to?: boolean | postseason_games$advances_toArgs<ExtArgs>
+  }
+  export type postseason_gamesIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    home_team_rel?: boolean | postseason_games$home_team_relArgs<ExtArgs>
+    away_team_rel?: boolean | postseason_games$away_team_relArgs<ExtArgs>
+    winner_team_rel?: boolean | postseason_games$winner_team_relArgs<ExtArgs>
+    advances_to?: boolean | postseason_games$advances_toArgs<ExtArgs>
+  }
+
+  export type $postseason_gamesPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "postseason_games"
+    objects: {
+      home_team_rel: Prisma.$teamsPayload<ExtArgs> | null
+      away_team_rel: Prisma.$teamsPayload<ExtArgs> | null
+      winner_team_rel: Prisma.$teamsPayload<ExtArgs> | null
+      advances_to: Prisma.$postseason_gamesPayload<ExtArgs> | null
+      advances_from: Prisma.$postseason_gamesPayload<ExtArgs>[]
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      game_id: string
+      espn_id: number
+      season: number
+      round: $Enums.PostseasonRound
+      conference: $Enums.Conference | null
+      ts: Date
+      home_team: number | null
+      away_team: number | null
+      home_score: number | null
+      away_score: number | null
+      winner: number | null
+      done: boolean
+      bracket_position: number
+      advances_to_game_id: string | null
+    }, ExtArgs["result"]["postseason_games"]>
+    composites: {}
+  }
+
+  type postseason_gamesGetPayload<S extends boolean | null | undefined | postseason_gamesDefaultArgs> = $Result.GetResult<Prisma.$postseason_gamesPayload, S>
+
+  type postseason_gamesCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<postseason_gamesFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
+      select?: Postseason_gamesCountAggregateInputType | true
+    }
+
+  export interface postseason_gamesDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['postseason_games'], meta: { name: 'postseason_games' } }
+    /**
+     * Find zero or one Postseason_games that matches the filter.
+     * @param {postseason_gamesFindUniqueArgs} args - Arguments to find a Postseason_games
+     * @example
+     * // Get one Postseason_games
+     * const postseason_games = await prisma.postseason_games.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends postseason_gamesFindUniqueArgs>(args: SelectSubset<T, postseason_gamesFindUniqueArgs<ExtArgs>>): Prisma__postseason_gamesClient<$Result.GetResult<Prisma.$postseason_gamesPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one Postseason_games that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {postseason_gamesFindUniqueOrThrowArgs} args - Arguments to find a Postseason_games
+     * @example
+     * // Get one Postseason_games
+     * const postseason_games = await prisma.postseason_games.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends postseason_gamesFindUniqueOrThrowArgs>(args: SelectSubset<T, postseason_gamesFindUniqueOrThrowArgs<ExtArgs>>): Prisma__postseason_gamesClient<$Result.GetResult<Prisma.$postseason_gamesPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Postseason_games that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {postseason_gamesFindFirstArgs} args - Arguments to find a Postseason_games
+     * @example
+     * // Get one Postseason_games
+     * const postseason_games = await prisma.postseason_games.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends postseason_gamesFindFirstArgs>(args?: SelectSubset<T, postseason_gamesFindFirstArgs<ExtArgs>>): Prisma__postseason_gamesClient<$Result.GetResult<Prisma.$postseason_gamesPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Postseason_games that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {postseason_gamesFindFirstOrThrowArgs} args - Arguments to find a Postseason_games
+     * @example
+     * // Get one Postseason_games
+     * const postseason_games = await prisma.postseason_games.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends postseason_gamesFindFirstOrThrowArgs>(args?: SelectSubset<T, postseason_gamesFindFirstOrThrowArgs<ExtArgs>>): Prisma__postseason_gamesClient<$Result.GetResult<Prisma.$postseason_gamesPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more Postseason_games that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {postseason_gamesFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Postseason_games
+     * const postseason_games = await prisma.postseason_games.findMany()
+     * 
+     * // Get first 10 Postseason_games
+     * const postseason_games = await prisma.postseason_games.findMany({ take: 10 })
+     * 
+     * // Only select the `game_id`
+     * const postseason_gamesWithGame_idOnly = await prisma.postseason_games.findMany({ select: { game_id: true } })
+     * 
+     */
+    findMany<T extends postseason_gamesFindManyArgs>(args?: SelectSubset<T, postseason_gamesFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$postseason_gamesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a Postseason_games.
+     * @param {postseason_gamesCreateArgs} args - Arguments to create a Postseason_games.
+     * @example
+     * // Create one Postseason_games
+     * const Postseason_games = await prisma.postseason_games.create({
+     *   data: {
+     *     // ... data to create a Postseason_games
+     *   }
+     * })
+     * 
+     */
+    create<T extends postseason_gamesCreateArgs>(args: SelectSubset<T, postseason_gamesCreateArgs<ExtArgs>>): Prisma__postseason_gamesClient<$Result.GetResult<Prisma.$postseason_gamesPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many Postseason_games.
+     * @param {postseason_gamesCreateManyArgs} args - Arguments to create many Postseason_games.
+     * @example
+     * // Create many Postseason_games
+     * const postseason_games = await prisma.postseason_games.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends postseason_gamesCreateManyArgs>(args?: SelectSubset<T, postseason_gamesCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many Postseason_games and returns the data saved in the database.
+     * @param {postseason_gamesCreateManyAndReturnArgs} args - Arguments to create many Postseason_games.
+     * @example
+     * // Create many Postseason_games
+     * const postseason_games = await prisma.postseason_games.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many Postseason_games and only return the `game_id`
+     * const postseason_gamesWithGame_idOnly = await prisma.postseason_games.createManyAndReturn({
+     *   select: { game_id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends postseason_gamesCreateManyAndReturnArgs>(args?: SelectSubset<T, postseason_gamesCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$postseason_gamesPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a Postseason_games.
+     * @param {postseason_gamesDeleteArgs} args - Arguments to delete one Postseason_games.
+     * @example
+     * // Delete one Postseason_games
+     * const Postseason_games = await prisma.postseason_games.delete({
+     *   where: {
+     *     // ... filter to delete one Postseason_games
+     *   }
+     * })
+     * 
+     */
+    delete<T extends postseason_gamesDeleteArgs>(args: SelectSubset<T, postseason_gamesDeleteArgs<ExtArgs>>): Prisma__postseason_gamesClient<$Result.GetResult<Prisma.$postseason_gamesPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one Postseason_games.
+     * @param {postseason_gamesUpdateArgs} args - Arguments to update one Postseason_games.
+     * @example
+     * // Update one Postseason_games
+     * const postseason_games = await prisma.postseason_games.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends postseason_gamesUpdateArgs>(args: SelectSubset<T, postseason_gamesUpdateArgs<ExtArgs>>): Prisma__postseason_gamesClient<$Result.GetResult<Prisma.$postseason_gamesPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more Postseason_games.
+     * @param {postseason_gamesDeleteManyArgs} args - Arguments to filter Postseason_games to delete.
+     * @example
+     * // Delete a few Postseason_games
+     * const { count } = await prisma.postseason_games.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends postseason_gamesDeleteManyArgs>(args?: SelectSubset<T, postseason_gamesDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Postseason_games.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {postseason_gamesUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Postseason_games
+     * const postseason_games = await prisma.postseason_games.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends postseason_gamesUpdateManyArgs>(args: SelectSubset<T, postseason_gamesUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Postseason_games and returns the data updated in the database.
+     * @param {postseason_gamesUpdateManyAndReturnArgs} args - Arguments to update many Postseason_games.
+     * @example
+     * // Update many Postseason_games
+     * const postseason_games = await prisma.postseason_games.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more Postseason_games and only return the `game_id`
+     * const postseason_gamesWithGame_idOnly = await prisma.postseason_games.updateManyAndReturn({
+     *   select: { game_id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends postseason_gamesUpdateManyAndReturnArgs>(args: SelectSubset<T, postseason_gamesUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$postseason_gamesPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one Postseason_games.
+     * @param {postseason_gamesUpsertArgs} args - Arguments to update or create a Postseason_games.
+     * @example
+     * // Update or create a Postseason_games
+     * const postseason_games = await prisma.postseason_games.upsert({
+     *   create: {
+     *     // ... data to create a Postseason_games
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the Postseason_games we want to update
+     *   }
+     * })
+     */
+    upsert<T extends postseason_gamesUpsertArgs>(args: SelectSubset<T, postseason_gamesUpsertArgs<ExtArgs>>): Prisma__postseason_gamesClient<$Result.GetResult<Prisma.$postseason_gamesPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of Postseason_games.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {postseason_gamesCountArgs} args - Arguments to filter Postseason_games to count.
+     * @example
+     * // Count the number of Postseason_games
+     * const count = await prisma.postseason_games.count({
+     *   where: {
+     *     // ... the filter for the Postseason_games we want to count
+     *   }
+     * })
+    **/
+    count<T extends postseason_gamesCountArgs>(
+      args?: Subset<T, postseason_gamesCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], Postseason_gamesCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a Postseason_games.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {Postseason_gamesAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends Postseason_gamesAggregateArgs>(args: Subset<T, Postseason_gamesAggregateArgs>): Prisma.PrismaPromise<GetPostseason_gamesAggregateType<T>>
+
+    /**
+     * Group by Postseason_games.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {postseason_gamesGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends postseason_gamesGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: postseason_gamesGroupByArgs['orderBy'] }
+        : { orderBy?: postseason_gamesGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, postseason_gamesGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetPostseason_gamesGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the postseason_games model
+   */
+  readonly fields: postseason_gamesFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for postseason_games.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__postseason_gamesClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    home_team_rel<T extends postseason_games$home_team_relArgs<ExtArgs> = {}>(args?: Subset<T, postseason_games$home_team_relArgs<ExtArgs>>): Prisma__teamsClient<$Result.GetResult<Prisma.$teamsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    away_team_rel<T extends postseason_games$away_team_relArgs<ExtArgs> = {}>(args?: Subset<T, postseason_games$away_team_relArgs<ExtArgs>>): Prisma__teamsClient<$Result.GetResult<Prisma.$teamsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    winner_team_rel<T extends postseason_games$winner_team_relArgs<ExtArgs> = {}>(args?: Subset<T, postseason_games$winner_team_relArgs<ExtArgs>>): Prisma__teamsClient<$Result.GetResult<Prisma.$teamsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    advances_to<T extends postseason_games$advances_toArgs<ExtArgs> = {}>(args?: Subset<T, postseason_games$advances_toArgs<ExtArgs>>): Prisma__postseason_gamesClient<$Result.GetResult<Prisma.$postseason_gamesPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    advances_from<T extends postseason_games$advances_fromArgs<ExtArgs> = {}>(args?: Subset<T, postseason_games$advances_fromArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$postseason_gamesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the postseason_games model
+   */
+  interface postseason_gamesFieldRefs {
+    readonly game_id: FieldRef<"postseason_games", 'String'>
+    readonly espn_id: FieldRef<"postseason_games", 'Int'>
+    readonly season: FieldRef<"postseason_games", 'Int'>
+    readonly round: FieldRef<"postseason_games", 'PostseasonRound'>
+    readonly conference: FieldRef<"postseason_games", 'Conference'>
+    readonly ts: FieldRef<"postseason_games", 'DateTime'>
+    readonly home_team: FieldRef<"postseason_games", 'Int'>
+    readonly away_team: FieldRef<"postseason_games", 'Int'>
+    readonly home_score: FieldRef<"postseason_games", 'Int'>
+    readonly away_score: FieldRef<"postseason_games", 'Int'>
+    readonly winner: FieldRef<"postseason_games", 'Int'>
+    readonly done: FieldRef<"postseason_games", 'Boolean'>
+    readonly bracket_position: FieldRef<"postseason_games", 'Int'>
+    readonly advances_to_game_id: FieldRef<"postseason_games", 'String'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * postseason_games findUnique
+   */
+  export type postseason_gamesFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the postseason_games
+     */
+    select?: postseason_gamesSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the postseason_games
+     */
+    omit?: postseason_gamesOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: postseason_gamesInclude<ExtArgs> | null
+    /**
+     * Filter, which postseason_games to fetch.
+     */
+    where: postseason_gamesWhereUniqueInput
+    relationLoadStrategy?: RelationLoadStrategy
+  }
+
+  /**
+   * postseason_games findUniqueOrThrow
+   */
+  export type postseason_gamesFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the postseason_games
+     */
+    select?: postseason_gamesSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the postseason_games
+     */
+    omit?: postseason_gamesOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: postseason_gamesInclude<ExtArgs> | null
+    /**
+     * Filter, which postseason_games to fetch.
+     */
+    where: postseason_gamesWhereUniqueInput
+    relationLoadStrategy?: RelationLoadStrategy
+  }
+
+  /**
+   * postseason_games findFirst
+   */
+  export type postseason_gamesFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the postseason_games
+     */
+    select?: postseason_gamesSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the postseason_games
+     */
+    omit?: postseason_gamesOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: postseason_gamesInclude<ExtArgs> | null
+    /**
+     * Filter, which postseason_games to fetch.
+     */
+    where?: postseason_gamesWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of postseason_games to fetch.
+     */
+    orderBy?: postseason_gamesOrderByWithRelationInput | postseason_gamesOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for postseason_games.
+     */
+    cursor?: postseason_gamesWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` postseason_games from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` postseason_games.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of postseason_games.
+     */
+    distinct?: Postseason_gamesScalarFieldEnum | Postseason_gamesScalarFieldEnum[]
+    relationLoadStrategy?: RelationLoadStrategy
+  }
+
+  /**
+   * postseason_games findFirstOrThrow
+   */
+  export type postseason_gamesFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the postseason_games
+     */
+    select?: postseason_gamesSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the postseason_games
+     */
+    omit?: postseason_gamesOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: postseason_gamesInclude<ExtArgs> | null
+    /**
+     * Filter, which postseason_games to fetch.
+     */
+    where?: postseason_gamesWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of postseason_games to fetch.
+     */
+    orderBy?: postseason_gamesOrderByWithRelationInput | postseason_gamesOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for postseason_games.
+     */
+    cursor?: postseason_gamesWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` postseason_games from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` postseason_games.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of postseason_games.
+     */
+    distinct?: Postseason_gamesScalarFieldEnum | Postseason_gamesScalarFieldEnum[]
+    relationLoadStrategy?: RelationLoadStrategy
+  }
+
+  /**
+   * postseason_games findMany
+   */
+  export type postseason_gamesFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the postseason_games
+     */
+    select?: postseason_gamesSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the postseason_games
+     */
+    omit?: postseason_gamesOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: postseason_gamesInclude<ExtArgs> | null
+    /**
+     * Filter, which postseason_games to fetch.
+     */
+    where?: postseason_gamesWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of postseason_games to fetch.
+     */
+    orderBy?: postseason_gamesOrderByWithRelationInput | postseason_gamesOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing postseason_games.
+     */
+    cursor?: postseason_gamesWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` postseason_games from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` postseason_games.
+     */
+    skip?: number
+    distinct?: Postseason_gamesScalarFieldEnum | Postseason_gamesScalarFieldEnum[]
+    relationLoadStrategy?: RelationLoadStrategy
+  }
+
+  /**
+   * postseason_games create
+   */
+  export type postseason_gamesCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the postseason_games
+     */
+    select?: postseason_gamesSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the postseason_games
+     */
+    omit?: postseason_gamesOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: postseason_gamesInclude<ExtArgs> | null
+    /**
+     * The data needed to create a postseason_games.
+     */
+    data: XOR<postseason_gamesCreateInput, postseason_gamesUncheckedCreateInput>
+    relationLoadStrategy?: RelationLoadStrategy
+  }
+
+  /**
+   * postseason_games createMany
+   */
+  export type postseason_gamesCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many postseason_games.
+     */
+    data: postseason_gamesCreateManyInput | postseason_gamesCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * postseason_games createManyAndReturn
+   */
+  export type postseason_gamesCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the postseason_games
+     */
+    select?: postseason_gamesSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the postseason_games
+     */
+    omit?: postseason_gamesOmit<ExtArgs> | null
+    /**
+     * The data used to create many postseason_games.
+     */
+    data: postseason_gamesCreateManyInput | postseason_gamesCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: postseason_gamesIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * postseason_games update
+   */
+  export type postseason_gamesUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the postseason_games
+     */
+    select?: postseason_gamesSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the postseason_games
+     */
+    omit?: postseason_gamesOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: postseason_gamesInclude<ExtArgs> | null
+    /**
+     * The data needed to update a postseason_games.
+     */
+    data: XOR<postseason_gamesUpdateInput, postseason_gamesUncheckedUpdateInput>
+    /**
+     * Choose, which postseason_games to update.
+     */
+    where: postseason_gamesWhereUniqueInput
+    relationLoadStrategy?: RelationLoadStrategy
+  }
+
+  /**
+   * postseason_games updateMany
+   */
+  export type postseason_gamesUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update postseason_games.
+     */
+    data: XOR<postseason_gamesUpdateManyMutationInput, postseason_gamesUncheckedUpdateManyInput>
+    /**
+     * Filter which postseason_games to update
+     */
+    where?: postseason_gamesWhereInput
+    /**
+     * Limit how many postseason_games to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * postseason_games updateManyAndReturn
+   */
+  export type postseason_gamesUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the postseason_games
+     */
+    select?: postseason_gamesSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the postseason_games
+     */
+    omit?: postseason_gamesOmit<ExtArgs> | null
+    /**
+     * The data used to update postseason_games.
+     */
+    data: XOR<postseason_gamesUpdateManyMutationInput, postseason_gamesUncheckedUpdateManyInput>
+    /**
+     * Filter which postseason_games to update
+     */
+    where?: postseason_gamesWhereInput
+    /**
+     * Limit how many postseason_games to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: postseason_gamesIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * postseason_games upsert
+   */
+  export type postseason_gamesUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the postseason_games
+     */
+    select?: postseason_gamesSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the postseason_games
+     */
+    omit?: postseason_gamesOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: postseason_gamesInclude<ExtArgs> | null
+    /**
+     * The filter to search for the postseason_games to update in case it exists.
+     */
+    where: postseason_gamesWhereUniqueInput
+    /**
+     * In case the postseason_games found by the `where` argument doesn't exist, create a new postseason_games with this data.
+     */
+    create: XOR<postseason_gamesCreateInput, postseason_gamesUncheckedCreateInput>
+    /**
+     * In case the postseason_games was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<postseason_gamesUpdateInput, postseason_gamesUncheckedUpdateInput>
+    relationLoadStrategy?: RelationLoadStrategy
+  }
+
+  /**
+   * postseason_games delete
+   */
+  export type postseason_gamesDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the postseason_games
+     */
+    select?: postseason_gamesSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the postseason_games
+     */
+    omit?: postseason_gamesOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: postseason_gamesInclude<ExtArgs> | null
+    /**
+     * Filter which postseason_games to delete.
+     */
+    where: postseason_gamesWhereUniqueInput
+    relationLoadStrategy?: RelationLoadStrategy
+  }
+
+  /**
+   * postseason_games deleteMany
+   */
+  export type postseason_gamesDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which postseason_games to delete
+     */
+    where?: postseason_gamesWhereInput
+    /**
+     * Limit how many postseason_games to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * postseason_games.home_team_rel
+   */
+  export type postseason_games$home_team_relArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the teams
+     */
+    select?: teamsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the teams
+     */
+    omit?: teamsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: teamsInclude<ExtArgs> | null
+    where?: teamsWhereInput
+  }
+
+  /**
+   * postseason_games.away_team_rel
+   */
+  export type postseason_games$away_team_relArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the teams
+     */
+    select?: teamsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the teams
+     */
+    omit?: teamsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: teamsInclude<ExtArgs> | null
+    where?: teamsWhereInput
+  }
+
+  /**
+   * postseason_games.winner_team_rel
+   */
+  export type postseason_games$winner_team_relArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the teams
+     */
+    select?: teamsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the teams
+     */
+    omit?: teamsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: teamsInclude<ExtArgs> | null
+    where?: teamsWhereInput
+  }
+
+  /**
+   * postseason_games.advances_to
+   */
+  export type postseason_games$advances_toArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the postseason_games
+     */
+    select?: postseason_gamesSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the postseason_games
+     */
+    omit?: postseason_gamesOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: postseason_gamesInclude<ExtArgs> | null
+    where?: postseason_gamesWhereInput
+  }
+
+  /**
+   * postseason_games.advances_from
+   */
+  export type postseason_games$advances_fromArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the postseason_games
+     */
+    select?: postseason_gamesSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the postseason_games
+     */
+    omit?: postseason_gamesOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: postseason_gamesInclude<ExtArgs> | null
+    where?: postseason_gamesWhereInput
+    orderBy?: postseason_gamesOrderByWithRelationInput | postseason_gamesOrderByWithRelationInput[]
+    cursor?: postseason_gamesWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: Postseason_gamesScalarFieldEnum | Postseason_gamesScalarFieldEnum[]
+  }
+
+  /**
+   * postseason_games without action
+   */
+  export type postseason_gamesDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the postseason_games
+     */
+    select?: postseason_gamesSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the postseason_games
+     */
+    omit?: postseason_gamesOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: postseason_gamesInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model postseason_team_seeds
+   */
+
+  export type AggregatePostseason_team_seeds = {
+    _count: Postseason_team_seedsCountAggregateOutputType | null
+    _avg: Postseason_team_seedsAvgAggregateOutputType | null
+    _sum: Postseason_team_seedsSumAggregateOutputType | null
+    _min: Postseason_team_seedsMinAggregateOutputType | null
+    _max: Postseason_team_seedsMaxAggregateOutputType | null
+  }
+
+  export type Postseason_team_seedsAvgAggregateOutputType = {
+    season: number | null
+    teamid: number | null
+    seed: number | null
+  }
+
+  export type Postseason_team_seedsSumAggregateOutputType = {
+    season: number | null
+    teamid: number | null
+    seed: number | null
+  }
+
+  export type Postseason_team_seedsMinAggregateOutputType = {
+    id: string | null
+    season: number | null
+    teamid: number | null
+    conference: $Enums.Conference | null
+    seed: number | null
+  }
+
+  export type Postseason_team_seedsMaxAggregateOutputType = {
+    id: string | null
+    season: number | null
+    teamid: number | null
+    conference: $Enums.Conference | null
+    seed: number | null
+  }
+
+  export type Postseason_team_seedsCountAggregateOutputType = {
+    id: number
+    season: number
+    teamid: number
+    conference: number
+    seed: number
+    _all: number
+  }
+
+
+  export type Postseason_team_seedsAvgAggregateInputType = {
+    season?: true
+    teamid?: true
+    seed?: true
+  }
+
+  export type Postseason_team_seedsSumAggregateInputType = {
+    season?: true
+    teamid?: true
+    seed?: true
+  }
+
+  export type Postseason_team_seedsMinAggregateInputType = {
+    id?: true
+    season?: true
+    teamid?: true
+    conference?: true
+    seed?: true
+  }
+
+  export type Postseason_team_seedsMaxAggregateInputType = {
+    id?: true
+    season?: true
+    teamid?: true
+    conference?: true
+    seed?: true
+  }
+
+  export type Postseason_team_seedsCountAggregateInputType = {
+    id?: true
+    season?: true
+    teamid?: true
+    conference?: true
+    seed?: true
+    _all?: true
+  }
+
+  export type Postseason_team_seedsAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which postseason_team_seeds to aggregate.
+     */
+    where?: postseason_team_seedsWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of postseason_team_seeds to fetch.
+     */
+    orderBy?: postseason_team_seedsOrderByWithRelationInput | postseason_team_seedsOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: postseason_team_seedsWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` postseason_team_seeds from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` postseason_team_seeds.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned postseason_team_seeds
+    **/
+    _count?: true | Postseason_team_seedsCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: Postseason_team_seedsAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: Postseason_team_seedsSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: Postseason_team_seedsMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: Postseason_team_seedsMaxAggregateInputType
+  }
+
+  export type GetPostseason_team_seedsAggregateType<T extends Postseason_team_seedsAggregateArgs> = {
+        [P in keyof T & keyof AggregatePostseason_team_seeds]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregatePostseason_team_seeds[P]>
+      : GetScalarType<T[P], AggregatePostseason_team_seeds[P]>
+  }
+
+
+
+
+  export type postseason_team_seedsGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: postseason_team_seedsWhereInput
+    orderBy?: postseason_team_seedsOrderByWithAggregationInput | postseason_team_seedsOrderByWithAggregationInput[]
+    by: Postseason_team_seedsScalarFieldEnum[] | Postseason_team_seedsScalarFieldEnum
+    having?: postseason_team_seedsScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: Postseason_team_seedsCountAggregateInputType | true
+    _avg?: Postseason_team_seedsAvgAggregateInputType
+    _sum?: Postseason_team_seedsSumAggregateInputType
+    _min?: Postseason_team_seedsMinAggregateInputType
+    _max?: Postseason_team_seedsMaxAggregateInputType
+  }
+
+  export type Postseason_team_seedsGroupByOutputType = {
+    id: string
+    season: number
+    teamid: number
+    conference: $Enums.Conference
+    seed: number
+    _count: Postseason_team_seedsCountAggregateOutputType | null
+    _avg: Postseason_team_seedsAvgAggregateOutputType | null
+    _sum: Postseason_team_seedsSumAggregateOutputType | null
+    _min: Postseason_team_seedsMinAggregateOutputType | null
+    _max: Postseason_team_seedsMaxAggregateOutputType | null
+  }
+
+  type GetPostseason_team_seedsGroupByPayload<T extends postseason_team_seedsGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<Postseason_team_seedsGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof Postseason_team_seedsGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], Postseason_team_seedsGroupByOutputType[P]>
+            : GetScalarType<T[P], Postseason_team_seedsGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type postseason_team_seedsSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    season?: boolean
+    teamid?: boolean
+    conference?: boolean
+    seed?: boolean
+    team?: boolean | teamsDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["postseason_team_seeds"]>
+
+  export type postseason_team_seedsSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    season?: boolean
+    teamid?: boolean
+    conference?: boolean
+    seed?: boolean
+    team?: boolean | teamsDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["postseason_team_seeds"]>
+
+  export type postseason_team_seedsSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    season?: boolean
+    teamid?: boolean
+    conference?: boolean
+    seed?: boolean
+    team?: boolean | teamsDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["postseason_team_seeds"]>
+
+  export type postseason_team_seedsSelectScalar = {
+    id?: boolean
+    season?: boolean
+    teamid?: boolean
+    conference?: boolean
+    seed?: boolean
+  }
+
+  export type postseason_team_seedsOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "season" | "teamid" | "conference" | "seed", ExtArgs["result"]["postseason_team_seeds"]>
+  export type postseason_team_seedsInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    team?: boolean | teamsDefaultArgs<ExtArgs>
+  }
+  export type postseason_team_seedsIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    team?: boolean | teamsDefaultArgs<ExtArgs>
+  }
+  export type postseason_team_seedsIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    team?: boolean | teamsDefaultArgs<ExtArgs>
+  }
+
+  export type $postseason_team_seedsPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "postseason_team_seeds"
+    objects: {
+      team: Prisma.$teamsPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      season: number
+      teamid: number
+      conference: $Enums.Conference
+      seed: number
+    }, ExtArgs["result"]["postseason_team_seeds"]>
+    composites: {}
+  }
+
+  type postseason_team_seedsGetPayload<S extends boolean | null | undefined | postseason_team_seedsDefaultArgs> = $Result.GetResult<Prisma.$postseason_team_seedsPayload, S>
+
+  type postseason_team_seedsCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<postseason_team_seedsFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
+      select?: Postseason_team_seedsCountAggregateInputType | true
+    }
+
+  export interface postseason_team_seedsDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['postseason_team_seeds'], meta: { name: 'postseason_team_seeds' } }
+    /**
+     * Find zero or one Postseason_team_seeds that matches the filter.
+     * @param {postseason_team_seedsFindUniqueArgs} args - Arguments to find a Postseason_team_seeds
+     * @example
+     * // Get one Postseason_team_seeds
+     * const postseason_team_seeds = await prisma.postseason_team_seeds.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends postseason_team_seedsFindUniqueArgs>(args: SelectSubset<T, postseason_team_seedsFindUniqueArgs<ExtArgs>>): Prisma__postseason_team_seedsClient<$Result.GetResult<Prisma.$postseason_team_seedsPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one Postseason_team_seeds that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {postseason_team_seedsFindUniqueOrThrowArgs} args - Arguments to find a Postseason_team_seeds
+     * @example
+     * // Get one Postseason_team_seeds
+     * const postseason_team_seeds = await prisma.postseason_team_seeds.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends postseason_team_seedsFindUniqueOrThrowArgs>(args: SelectSubset<T, postseason_team_seedsFindUniqueOrThrowArgs<ExtArgs>>): Prisma__postseason_team_seedsClient<$Result.GetResult<Prisma.$postseason_team_seedsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Postseason_team_seeds that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {postseason_team_seedsFindFirstArgs} args - Arguments to find a Postseason_team_seeds
+     * @example
+     * // Get one Postseason_team_seeds
+     * const postseason_team_seeds = await prisma.postseason_team_seeds.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends postseason_team_seedsFindFirstArgs>(args?: SelectSubset<T, postseason_team_seedsFindFirstArgs<ExtArgs>>): Prisma__postseason_team_seedsClient<$Result.GetResult<Prisma.$postseason_team_seedsPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Postseason_team_seeds that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {postseason_team_seedsFindFirstOrThrowArgs} args - Arguments to find a Postseason_team_seeds
+     * @example
+     * // Get one Postseason_team_seeds
+     * const postseason_team_seeds = await prisma.postseason_team_seeds.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends postseason_team_seedsFindFirstOrThrowArgs>(args?: SelectSubset<T, postseason_team_seedsFindFirstOrThrowArgs<ExtArgs>>): Prisma__postseason_team_seedsClient<$Result.GetResult<Prisma.$postseason_team_seedsPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more Postseason_team_seeds that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {postseason_team_seedsFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Postseason_team_seeds
+     * const postseason_team_seeds = await prisma.postseason_team_seeds.findMany()
+     * 
+     * // Get first 10 Postseason_team_seeds
+     * const postseason_team_seeds = await prisma.postseason_team_seeds.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const postseason_team_seedsWithIdOnly = await prisma.postseason_team_seeds.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends postseason_team_seedsFindManyArgs>(args?: SelectSubset<T, postseason_team_seedsFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$postseason_team_seedsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a Postseason_team_seeds.
+     * @param {postseason_team_seedsCreateArgs} args - Arguments to create a Postseason_team_seeds.
+     * @example
+     * // Create one Postseason_team_seeds
+     * const Postseason_team_seeds = await prisma.postseason_team_seeds.create({
+     *   data: {
+     *     // ... data to create a Postseason_team_seeds
+     *   }
+     * })
+     * 
+     */
+    create<T extends postseason_team_seedsCreateArgs>(args: SelectSubset<T, postseason_team_seedsCreateArgs<ExtArgs>>): Prisma__postseason_team_seedsClient<$Result.GetResult<Prisma.$postseason_team_seedsPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many Postseason_team_seeds.
+     * @param {postseason_team_seedsCreateManyArgs} args - Arguments to create many Postseason_team_seeds.
+     * @example
+     * // Create many Postseason_team_seeds
+     * const postseason_team_seeds = await prisma.postseason_team_seeds.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends postseason_team_seedsCreateManyArgs>(args?: SelectSubset<T, postseason_team_seedsCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many Postseason_team_seeds and returns the data saved in the database.
+     * @param {postseason_team_seedsCreateManyAndReturnArgs} args - Arguments to create many Postseason_team_seeds.
+     * @example
+     * // Create many Postseason_team_seeds
+     * const postseason_team_seeds = await prisma.postseason_team_seeds.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many Postseason_team_seeds and only return the `id`
+     * const postseason_team_seedsWithIdOnly = await prisma.postseason_team_seeds.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends postseason_team_seedsCreateManyAndReturnArgs>(args?: SelectSubset<T, postseason_team_seedsCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$postseason_team_seedsPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a Postseason_team_seeds.
+     * @param {postseason_team_seedsDeleteArgs} args - Arguments to delete one Postseason_team_seeds.
+     * @example
+     * // Delete one Postseason_team_seeds
+     * const Postseason_team_seeds = await prisma.postseason_team_seeds.delete({
+     *   where: {
+     *     // ... filter to delete one Postseason_team_seeds
+     *   }
+     * })
+     * 
+     */
+    delete<T extends postseason_team_seedsDeleteArgs>(args: SelectSubset<T, postseason_team_seedsDeleteArgs<ExtArgs>>): Prisma__postseason_team_seedsClient<$Result.GetResult<Prisma.$postseason_team_seedsPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one Postseason_team_seeds.
+     * @param {postseason_team_seedsUpdateArgs} args - Arguments to update one Postseason_team_seeds.
+     * @example
+     * // Update one Postseason_team_seeds
+     * const postseason_team_seeds = await prisma.postseason_team_seeds.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends postseason_team_seedsUpdateArgs>(args: SelectSubset<T, postseason_team_seedsUpdateArgs<ExtArgs>>): Prisma__postseason_team_seedsClient<$Result.GetResult<Prisma.$postseason_team_seedsPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more Postseason_team_seeds.
+     * @param {postseason_team_seedsDeleteManyArgs} args - Arguments to filter Postseason_team_seeds to delete.
+     * @example
+     * // Delete a few Postseason_team_seeds
+     * const { count } = await prisma.postseason_team_seeds.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends postseason_team_seedsDeleteManyArgs>(args?: SelectSubset<T, postseason_team_seedsDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Postseason_team_seeds.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {postseason_team_seedsUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Postseason_team_seeds
+     * const postseason_team_seeds = await prisma.postseason_team_seeds.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends postseason_team_seedsUpdateManyArgs>(args: SelectSubset<T, postseason_team_seedsUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Postseason_team_seeds and returns the data updated in the database.
+     * @param {postseason_team_seedsUpdateManyAndReturnArgs} args - Arguments to update many Postseason_team_seeds.
+     * @example
+     * // Update many Postseason_team_seeds
+     * const postseason_team_seeds = await prisma.postseason_team_seeds.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more Postseason_team_seeds and only return the `id`
+     * const postseason_team_seedsWithIdOnly = await prisma.postseason_team_seeds.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends postseason_team_seedsUpdateManyAndReturnArgs>(args: SelectSubset<T, postseason_team_seedsUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$postseason_team_seedsPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one Postseason_team_seeds.
+     * @param {postseason_team_seedsUpsertArgs} args - Arguments to update or create a Postseason_team_seeds.
+     * @example
+     * // Update or create a Postseason_team_seeds
+     * const postseason_team_seeds = await prisma.postseason_team_seeds.upsert({
+     *   create: {
+     *     // ... data to create a Postseason_team_seeds
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the Postseason_team_seeds we want to update
+     *   }
+     * })
+     */
+    upsert<T extends postseason_team_seedsUpsertArgs>(args: SelectSubset<T, postseason_team_seedsUpsertArgs<ExtArgs>>): Prisma__postseason_team_seedsClient<$Result.GetResult<Prisma.$postseason_team_seedsPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of Postseason_team_seeds.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {postseason_team_seedsCountArgs} args - Arguments to filter Postseason_team_seeds to count.
+     * @example
+     * // Count the number of Postseason_team_seeds
+     * const count = await prisma.postseason_team_seeds.count({
+     *   where: {
+     *     // ... the filter for the Postseason_team_seeds we want to count
+     *   }
+     * })
+    **/
+    count<T extends postseason_team_seedsCountArgs>(
+      args?: Subset<T, postseason_team_seedsCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], Postseason_team_seedsCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a Postseason_team_seeds.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {Postseason_team_seedsAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends Postseason_team_seedsAggregateArgs>(args: Subset<T, Postseason_team_seedsAggregateArgs>): Prisma.PrismaPromise<GetPostseason_team_seedsAggregateType<T>>
+
+    /**
+     * Group by Postseason_team_seeds.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {postseason_team_seedsGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends postseason_team_seedsGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: postseason_team_seedsGroupByArgs['orderBy'] }
+        : { orderBy?: postseason_team_seedsGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, postseason_team_seedsGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetPostseason_team_seedsGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the postseason_team_seeds model
+   */
+  readonly fields: postseason_team_seedsFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for postseason_team_seeds.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__postseason_team_seedsClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    team<T extends teamsDefaultArgs<ExtArgs> = {}>(args?: Subset<T, teamsDefaultArgs<ExtArgs>>): Prisma__teamsClient<$Result.GetResult<Prisma.$teamsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the postseason_team_seeds model
+   */
+  interface postseason_team_seedsFieldRefs {
+    readonly id: FieldRef<"postseason_team_seeds", 'String'>
+    readonly season: FieldRef<"postseason_team_seeds", 'Int'>
+    readonly teamid: FieldRef<"postseason_team_seeds", 'Int'>
+    readonly conference: FieldRef<"postseason_team_seeds", 'Conference'>
+    readonly seed: FieldRef<"postseason_team_seeds", 'Int'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * postseason_team_seeds findUnique
+   */
+  export type postseason_team_seedsFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the postseason_team_seeds
+     */
+    select?: postseason_team_seedsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the postseason_team_seeds
+     */
+    omit?: postseason_team_seedsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: postseason_team_seedsInclude<ExtArgs> | null
+    /**
+     * Filter, which postseason_team_seeds to fetch.
+     */
+    where: postseason_team_seedsWhereUniqueInput
+    relationLoadStrategy?: RelationLoadStrategy
+  }
+
+  /**
+   * postseason_team_seeds findUniqueOrThrow
+   */
+  export type postseason_team_seedsFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the postseason_team_seeds
+     */
+    select?: postseason_team_seedsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the postseason_team_seeds
+     */
+    omit?: postseason_team_seedsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: postseason_team_seedsInclude<ExtArgs> | null
+    /**
+     * Filter, which postseason_team_seeds to fetch.
+     */
+    where: postseason_team_seedsWhereUniqueInput
+    relationLoadStrategy?: RelationLoadStrategy
+  }
+
+  /**
+   * postseason_team_seeds findFirst
+   */
+  export type postseason_team_seedsFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the postseason_team_seeds
+     */
+    select?: postseason_team_seedsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the postseason_team_seeds
+     */
+    omit?: postseason_team_seedsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: postseason_team_seedsInclude<ExtArgs> | null
+    /**
+     * Filter, which postseason_team_seeds to fetch.
+     */
+    where?: postseason_team_seedsWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of postseason_team_seeds to fetch.
+     */
+    orderBy?: postseason_team_seedsOrderByWithRelationInput | postseason_team_seedsOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for postseason_team_seeds.
+     */
+    cursor?: postseason_team_seedsWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` postseason_team_seeds from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` postseason_team_seeds.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of postseason_team_seeds.
+     */
+    distinct?: Postseason_team_seedsScalarFieldEnum | Postseason_team_seedsScalarFieldEnum[]
+    relationLoadStrategy?: RelationLoadStrategy
+  }
+
+  /**
+   * postseason_team_seeds findFirstOrThrow
+   */
+  export type postseason_team_seedsFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the postseason_team_seeds
+     */
+    select?: postseason_team_seedsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the postseason_team_seeds
+     */
+    omit?: postseason_team_seedsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: postseason_team_seedsInclude<ExtArgs> | null
+    /**
+     * Filter, which postseason_team_seeds to fetch.
+     */
+    where?: postseason_team_seedsWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of postseason_team_seeds to fetch.
+     */
+    orderBy?: postseason_team_seedsOrderByWithRelationInput | postseason_team_seedsOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for postseason_team_seeds.
+     */
+    cursor?: postseason_team_seedsWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` postseason_team_seeds from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` postseason_team_seeds.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of postseason_team_seeds.
+     */
+    distinct?: Postseason_team_seedsScalarFieldEnum | Postseason_team_seedsScalarFieldEnum[]
+    relationLoadStrategy?: RelationLoadStrategy
+  }
+
+  /**
+   * postseason_team_seeds findMany
+   */
+  export type postseason_team_seedsFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the postseason_team_seeds
+     */
+    select?: postseason_team_seedsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the postseason_team_seeds
+     */
+    omit?: postseason_team_seedsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: postseason_team_seedsInclude<ExtArgs> | null
+    /**
+     * Filter, which postseason_team_seeds to fetch.
+     */
+    where?: postseason_team_seedsWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of postseason_team_seeds to fetch.
+     */
+    orderBy?: postseason_team_seedsOrderByWithRelationInput | postseason_team_seedsOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing postseason_team_seeds.
+     */
+    cursor?: postseason_team_seedsWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` postseason_team_seeds from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` postseason_team_seeds.
+     */
+    skip?: number
+    distinct?: Postseason_team_seedsScalarFieldEnum | Postseason_team_seedsScalarFieldEnum[]
+    relationLoadStrategy?: RelationLoadStrategy
+  }
+
+  /**
+   * postseason_team_seeds create
+   */
+  export type postseason_team_seedsCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the postseason_team_seeds
+     */
+    select?: postseason_team_seedsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the postseason_team_seeds
+     */
+    omit?: postseason_team_seedsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: postseason_team_seedsInclude<ExtArgs> | null
+    /**
+     * The data needed to create a postseason_team_seeds.
+     */
+    data: XOR<postseason_team_seedsCreateInput, postseason_team_seedsUncheckedCreateInput>
+    relationLoadStrategy?: RelationLoadStrategy
+  }
+
+  /**
+   * postseason_team_seeds createMany
+   */
+  export type postseason_team_seedsCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many postseason_team_seeds.
+     */
+    data: postseason_team_seedsCreateManyInput | postseason_team_seedsCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * postseason_team_seeds createManyAndReturn
+   */
+  export type postseason_team_seedsCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the postseason_team_seeds
+     */
+    select?: postseason_team_seedsSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the postseason_team_seeds
+     */
+    omit?: postseason_team_seedsOmit<ExtArgs> | null
+    /**
+     * The data used to create many postseason_team_seeds.
+     */
+    data: postseason_team_seedsCreateManyInput | postseason_team_seedsCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: postseason_team_seedsIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * postseason_team_seeds update
+   */
+  export type postseason_team_seedsUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the postseason_team_seeds
+     */
+    select?: postseason_team_seedsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the postseason_team_seeds
+     */
+    omit?: postseason_team_seedsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: postseason_team_seedsInclude<ExtArgs> | null
+    /**
+     * The data needed to update a postseason_team_seeds.
+     */
+    data: XOR<postseason_team_seedsUpdateInput, postseason_team_seedsUncheckedUpdateInput>
+    /**
+     * Choose, which postseason_team_seeds to update.
+     */
+    where: postseason_team_seedsWhereUniqueInput
+    relationLoadStrategy?: RelationLoadStrategy
+  }
+
+  /**
+   * postseason_team_seeds updateMany
+   */
+  export type postseason_team_seedsUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update postseason_team_seeds.
+     */
+    data: XOR<postseason_team_seedsUpdateManyMutationInput, postseason_team_seedsUncheckedUpdateManyInput>
+    /**
+     * Filter which postseason_team_seeds to update
+     */
+    where?: postseason_team_seedsWhereInput
+    /**
+     * Limit how many postseason_team_seeds to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * postseason_team_seeds updateManyAndReturn
+   */
+  export type postseason_team_seedsUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the postseason_team_seeds
+     */
+    select?: postseason_team_seedsSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the postseason_team_seeds
+     */
+    omit?: postseason_team_seedsOmit<ExtArgs> | null
+    /**
+     * The data used to update postseason_team_seeds.
+     */
+    data: XOR<postseason_team_seedsUpdateManyMutationInput, postseason_team_seedsUncheckedUpdateManyInput>
+    /**
+     * Filter which postseason_team_seeds to update
+     */
+    where?: postseason_team_seedsWhereInput
+    /**
+     * Limit how many postseason_team_seeds to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: postseason_team_seedsIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * postseason_team_seeds upsert
+   */
+  export type postseason_team_seedsUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the postseason_team_seeds
+     */
+    select?: postseason_team_seedsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the postseason_team_seeds
+     */
+    omit?: postseason_team_seedsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: postseason_team_seedsInclude<ExtArgs> | null
+    /**
+     * The filter to search for the postseason_team_seeds to update in case it exists.
+     */
+    where: postseason_team_seedsWhereUniqueInput
+    /**
+     * In case the postseason_team_seeds found by the `where` argument doesn't exist, create a new postseason_team_seeds with this data.
+     */
+    create: XOR<postseason_team_seedsCreateInput, postseason_team_seedsUncheckedCreateInput>
+    /**
+     * In case the postseason_team_seeds was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<postseason_team_seedsUpdateInput, postseason_team_seedsUncheckedUpdateInput>
+    relationLoadStrategy?: RelationLoadStrategy
+  }
+
+  /**
+   * postseason_team_seeds delete
+   */
+  export type postseason_team_seedsDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the postseason_team_seeds
+     */
+    select?: postseason_team_seedsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the postseason_team_seeds
+     */
+    omit?: postseason_team_seedsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: postseason_team_seedsInclude<ExtArgs> | null
+    /**
+     * Filter which postseason_team_seeds to delete.
+     */
+    where: postseason_team_seedsWhereUniqueInput
+    relationLoadStrategy?: RelationLoadStrategy
+  }
+
+  /**
+   * postseason_team_seeds deleteMany
+   */
+  export type postseason_team_seedsDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which postseason_team_seeds to delete
+     */
+    where?: postseason_team_seedsWhereInput
+    /**
+     * Limit how many postseason_team_seeds to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * postseason_team_seeds without action
+   */
+  export type postseason_team_seedsDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the postseason_team_seeds
+     */
+    select?: postseason_team_seedsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the postseason_team_seeds
+     */
+    omit?: postseason_team_seedsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: postseason_team_seedsInclude<ExtArgs> | null
   }
 
 
@@ -15941,6 +18813,37 @@ export namespace Prisma {
   };
 
   export type TeamsScalarFieldEnum = (typeof TeamsScalarFieldEnum)[keyof typeof TeamsScalarFieldEnum]
+
+
+  export const Postseason_gamesScalarFieldEnum: {
+    game_id: 'game_id',
+    espn_id: 'espn_id',
+    season: 'season',
+    round: 'round',
+    conference: 'conference',
+    ts: 'ts',
+    home_team: 'home_team',
+    away_team: 'away_team',
+    home_score: 'home_score',
+    away_score: 'away_score',
+    winner: 'winner',
+    done: 'done',
+    bracket_position: 'bracket_position',
+    advances_to_game_id: 'advances_to_game_id'
+  };
+
+  export type Postseason_gamesScalarFieldEnum = (typeof Postseason_gamesScalarFieldEnum)[keyof typeof Postseason_gamesScalarFieldEnum]
+
+
+  export const Postseason_team_seedsScalarFieldEnum: {
+    id: 'id',
+    season: 'season',
+    teamid: 'teamid',
+    conference: 'conference',
+    seed: 'seed'
+  };
+
+  export type Postseason_team_seedsScalarFieldEnum = (typeof Postseason_team_seedsScalarFieldEnum)[keyof typeof Postseason_team_seedsScalarFieldEnum]
 
 
   export const SortOrder: {
@@ -16144,6 +19047,34 @@ export namespace Prisma {
    * Reference to a field of type 'LeagueStatus[]'
    */
   export type ListEnumLeagueStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'LeagueStatus[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'PostseasonRound'
+   */
+  export type EnumPostseasonRoundFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PostseasonRound'>
+    
+
+
+  /**
+   * Reference to a field of type 'PostseasonRound[]'
+   */
+  export type ListEnumPostseasonRoundFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PostseasonRound[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'Conference'
+   */
+  export type EnumConferenceFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Conference'>
+    
+
+
+  /**
+   * Reference to a field of type 'Conference[]'
+   */
+  export type ListEnumConferenceFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Conference[]'>
     
 
 
@@ -17065,6 +19996,10 @@ export namespace Prisma {
     picks?: PicksListRelationFilter
     superbowl_superbowl_loserToteams?: SuperbowlListRelationFilter
     superbowl_superbowl_winnerToteams?: SuperbowlListRelationFilter
+    postseason_home?: Postseason_gamesListRelationFilter
+    postseason_away?: Postseason_gamesListRelationFilter
+    postseason_winner?: Postseason_gamesListRelationFilter
+    postseason_seeds?: Postseason_team_seedsListRelationFilter
   }
 
   export type teamsOrderByWithRelationInput = {
@@ -17081,6 +20016,10 @@ export namespace Prisma {
     picks?: picksOrderByRelationAggregateInput
     superbowl_superbowl_loserToteams?: superbowlOrderByRelationAggregateInput
     superbowl_superbowl_winnerToteams?: superbowlOrderByRelationAggregateInput
+    postseason_home?: postseason_gamesOrderByRelationAggregateInput
+    postseason_away?: postseason_gamesOrderByRelationAggregateInput
+    postseason_winner?: postseason_gamesOrderByRelationAggregateInput
+    postseason_seeds?: postseason_team_seedsOrderByRelationAggregateInput
   }
 
   export type teamsWhereUniqueInput = Prisma.AtLeast<{
@@ -17100,6 +20039,10 @@ export namespace Prisma {
     picks?: PicksListRelationFilter
     superbowl_superbowl_loserToteams?: SuperbowlListRelationFilter
     superbowl_superbowl_winnerToteams?: SuperbowlListRelationFilter
+    postseason_home?: Postseason_gamesListRelationFilter
+    postseason_away?: Postseason_gamesListRelationFilter
+    postseason_winner?: Postseason_gamesListRelationFilter
+    postseason_seeds?: Postseason_team_seedsListRelationFilter
   }, "teamid">
 
   export type teamsOrderByWithAggregationInput = {
@@ -17130,6 +20073,178 @@ export namespace Prisma {
     primary_color?: StringNullableWithAggregatesFilter<"teams"> | string | null
     secondary_color?: StringNullableWithAggregatesFilter<"teams"> | string | null
     tertiary_color?: StringNullableWithAggregatesFilter<"teams"> | string | null
+  }
+
+  export type postseason_gamesWhereInput = {
+    AND?: postseason_gamesWhereInput | postseason_gamesWhereInput[]
+    OR?: postseason_gamesWhereInput[]
+    NOT?: postseason_gamesWhereInput | postseason_gamesWhereInput[]
+    game_id?: StringFilter<"postseason_games"> | string
+    espn_id?: IntFilter<"postseason_games"> | number
+    season?: IntFilter<"postseason_games"> | number
+    round?: EnumPostseasonRoundFilter<"postseason_games"> | $Enums.PostseasonRound
+    conference?: EnumConferenceNullableFilter<"postseason_games"> | $Enums.Conference | null
+    ts?: DateTimeFilter<"postseason_games"> | Date | string
+    home_team?: IntNullableFilter<"postseason_games"> | number | null
+    away_team?: IntNullableFilter<"postseason_games"> | number | null
+    home_score?: IntNullableFilter<"postseason_games"> | number | null
+    away_score?: IntNullableFilter<"postseason_games"> | number | null
+    winner?: IntNullableFilter<"postseason_games"> | number | null
+    done?: BoolFilter<"postseason_games"> | boolean
+    bracket_position?: IntFilter<"postseason_games"> | number
+    advances_to_game_id?: StringNullableFilter<"postseason_games"> | string | null
+    home_team_rel?: XOR<TeamsNullableScalarRelationFilter, teamsWhereInput> | null
+    away_team_rel?: XOR<TeamsNullableScalarRelationFilter, teamsWhereInput> | null
+    winner_team_rel?: XOR<TeamsNullableScalarRelationFilter, teamsWhereInput> | null
+    advances_to?: XOR<Postseason_gamesNullableScalarRelationFilter, postseason_gamesWhereInput> | null
+    advances_from?: Postseason_gamesListRelationFilter
+  }
+
+  export type postseason_gamesOrderByWithRelationInput = {
+    game_id?: SortOrder
+    espn_id?: SortOrder
+    season?: SortOrder
+    round?: SortOrder
+    conference?: SortOrderInput | SortOrder
+    ts?: SortOrder
+    home_team?: SortOrderInput | SortOrder
+    away_team?: SortOrderInput | SortOrder
+    home_score?: SortOrderInput | SortOrder
+    away_score?: SortOrderInput | SortOrder
+    winner?: SortOrderInput | SortOrder
+    done?: SortOrder
+    bracket_position?: SortOrder
+    advances_to_game_id?: SortOrderInput | SortOrder
+    home_team_rel?: teamsOrderByWithRelationInput
+    away_team_rel?: teamsOrderByWithRelationInput
+    winner_team_rel?: teamsOrderByWithRelationInput
+    advances_to?: postseason_gamesOrderByWithRelationInput
+    advances_from?: postseason_gamesOrderByRelationAggregateInput
+  }
+
+  export type postseason_gamesWhereUniqueInput = Prisma.AtLeast<{
+    game_id?: string
+    espn_id?: number
+    AND?: postseason_gamesWhereInput | postseason_gamesWhereInput[]
+    OR?: postseason_gamesWhereInput[]
+    NOT?: postseason_gamesWhereInput | postseason_gamesWhereInput[]
+    season?: IntFilter<"postseason_games"> | number
+    round?: EnumPostseasonRoundFilter<"postseason_games"> | $Enums.PostseasonRound
+    conference?: EnumConferenceNullableFilter<"postseason_games"> | $Enums.Conference | null
+    ts?: DateTimeFilter<"postseason_games"> | Date | string
+    home_team?: IntNullableFilter<"postseason_games"> | number | null
+    away_team?: IntNullableFilter<"postseason_games"> | number | null
+    home_score?: IntNullableFilter<"postseason_games"> | number | null
+    away_score?: IntNullableFilter<"postseason_games"> | number | null
+    winner?: IntNullableFilter<"postseason_games"> | number | null
+    done?: BoolFilter<"postseason_games"> | boolean
+    bracket_position?: IntFilter<"postseason_games"> | number
+    advances_to_game_id?: StringNullableFilter<"postseason_games"> | string | null
+    home_team_rel?: XOR<TeamsNullableScalarRelationFilter, teamsWhereInput> | null
+    away_team_rel?: XOR<TeamsNullableScalarRelationFilter, teamsWhereInput> | null
+    winner_team_rel?: XOR<TeamsNullableScalarRelationFilter, teamsWhereInput> | null
+    advances_to?: XOR<Postseason_gamesNullableScalarRelationFilter, postseason_gamesWhereInput> | null
+    advances_from?: Postseason_gamesListRelationFilter
+  }, "game_id" | "espn_id">
+
+  export type postseason_gamesOrderByWithAggregationInput = {
+    game_id?: SortOrder
+    espn_id?: SortOrder
+    season?: SortOrder
+    round?: SortOrder
+    conference?: SortOrderInput | SortOrder
+    ts?: SortOrder
+    home_team?: SortOrderInput | SortOrder
+    away_team?: SortOrderInput | SortOrder
+    home_score?: SortOrderInput | SortOrder
+    away_score?: SortOrderInput | SortOrder
+    winner?: SortOrderInput | SortOrder
+    done?: SortOrder
+    bracket_position?: SortOrder
+    advances_to_game_id?: SortOrderInput | SortOrder
+    _count?: postseason_gamesCountOrderByAggregateInput
+    _avg?: postseason_gamesAvgOrderByAggregateInput
+    _max?: postseason_gamesMaxOrderByAggregateInput
+    _min?: postseason_gamesMinOrderByAggregateInput
+    _sum?: postseason_gamesSumOrderByAggregateInput
+  }
+
+  export type postseason_gamesScalarWhereWithAggregatesInput = {
+    AND?: postseason_gamesScalarWhereWithAggregatesInput | postseason_gamesScalarWhereWithAggregatesInput[]
+    OR?: postseason_gamesScalarWhereWithAggregatesInput[]
+    NOT?: postseason_gamesScalarWhereWithAggregatesInput | postseason_gamesScalarWhereWithAggregatesInput[]
+    game_id?: StringWithAggregatesFilter<"postseason_games"> | string
+    espn_id?: IntWithAggregatesFilter<"postseason_games"> | number
+    season?: IntWithAggregatesFilter<"postseason_games"> | number
+    round?: EnumPostseasonRoundWithAggregatesFilter<"postseason_games"> | $Enums.PostseasonRound
+    conference?: EnumConferenceNullableWithAggregatesFilter<"postseason_games"> | $Enums.Conference | null
+    ts?: DateTimeWithAggregatesFilter<"postseason_games"> | Date | string
+    home_team?: IntNullableWithAggregatesFilter<"postseason_games"> | number | null
+    away_team?: IntNullableWithAggregatesFilter<"postseason_games"> | number | null
+    home_score?: IntNullableWithAggregatesFilter<"postseason_games"> | number | null
+    away_score?: IntNullableWithAggregatesFilter<"postseason_games"> | number | null
+    winner?: IntNullableWithAggregatesFilter<"postseason_games"> | number | null
+    done?: BoolWithAggregatesFilter<"postseason_games"> | boolean
+    bracket_position?: IntWithAggregatesFilter<"postseason_games"> | number
+    advances_to_game_id?: StringNullableWithAggregatesFilter<"postseason_games"> | string | null
+  }
+
+  export type postseason_team_seedsWhereInput = {
+    AND?: postseason_team_seedsWhereInput | postseason_team_seedsWhereInput[]
+    OR?: postseason_team_seedsWhereInput[]
+    NOT?: postseason_team_seedsWhereInput | postseason_team_seedsWhereInput[]
+    id?: StringFilter<"postseason_team_seeds"> | string
+    season?: IntFilter<"postseason_team_seeds"> | number
+    teamid?: IntFilter<"postseason_team_seeds"> | number
+    conference?: EnumConferenceFilter<"postseason_team_seeds"> | $Enums.Conference
+    seed?: IntFilter<"postseason_team_seeds"> | number
+    team?: XOR<TeamsScalarRelationFilter, teamsWhereInput>
+  }
+
+  export type postseason_team_seedsOrderByWithRelationInput = {
+    id?: SortOrder
+    season?: SortOrder
+    teamid?: SortOrder
+    conference?: SortOrder
+    seed?: SortOrder
+    team?: teamsOrderByWithRelationInput
+  }
+
+  export type postseason_team_seedsWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    season_teamid?: postseason_team_seedsSeasonTeamidCompoundUniqueInput
+    AND?: postseason_team_seedsWhereInput | postseason_team_seedsWhereInput[]
+    OR?: postseason_team_seedsWhereInput[]
+    NOT?: postseason_team_seedsWhereInput | postseason_team_seedsWhereInput[]
+    season?: IntFilter<"postseason_team_seeds"> | number
+    teamid?: IntFilter<"postseason_team_seeds"> | number
+    conference?: EnumConferenceFilter<"postseason_team_seeds"> | $Enums.Conference
+    seed?: IntFilter<"postseason_team_seeds"> | number
+    team?: XOR<TeamsScalarRelationFilter, teamsWhereInput>
+  }, "id" | "season_teamid">
+
+  export type postseason_team_seedsOrderByWithAggregationInput = {
+    id?: SortOrder
+    season?: SortOrder
+    teamid?: SortOrder
+    conference?: SortOrder
+    seed?: SortOrder
+    _count?: postseason_team_seedsCountOrderByAggregateInput
+    _avg?: postseason_team_seedsAvgOrderByAggregateInput
+    _max?: postseason_team_seedsMaxOrderByAggregateInput
+    _min?: postseason_team_seedsMinOrderByAggregateInput
+    _sum?: postseason_team_seedsSumOrderByAggregateInput
+  }
+
+  export type postseason_team_seedsScalarWhereWithAggregatesInput = {
+    AND?: postseason_team_seedsScalarWhereWithAggregatesInput | postseason_team_seedsScalarWhereWithAggregatesInput[]
+    OR?: postseason_team_seedsScalarWhereWithAggregatesInput[]
+    NOT?: postseason_team_seedsScalarWhereWithAggregatesInput | postseason_team_seedsScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"postseason_team_seeds"> | string
+    season?: IntWithAggregatesFilter<"postseason_team_seeds"> | number
+    teamid?: IntWithAggregatesFilter<"postseason_team_seeds"> | number
+    conference?: EnumConferenceWithAggregatesFilter<"postseason_team_seeds"> | $Enums.Conference
+    seed?: IntWithAggregatesFilter<"postseason_team_seeds"> | number
   }
 
   export type EmailLogsCreateInput = {
@@ -18061,6 +21176,10 @@ export namespace Prisma {
     picks?: picksCreateNestedManyWithoutTeamsInput
     superbowl_superbowl_loserToteams?: superbowlCreateNestedManyWithoutTeams_superbowl_loserToteamsInput
     superbowl_superbowl_winnerToteams?: superbowlCreateNestedManyWithoutTeams_superbowl_winnerToteamsInput
+    postseason_home?: postseason_gamesCreateNestedManyWithoutHome_team_relInput
+    postseason_away?: postseason_gamesCreateNestedManyWithoutAway_team_relInput
+    postseason_winner?: postseason_gamesCreateNestedManyWithoutWinner_team_relInput
+    postseason_seeds?: postseason_team_seedsCreateNestedManyWithoutTeamInput
   }
 
   export type teamsUncheckedCreateInput = {
@@ -18077,6 +21196,10 @@ export namespace Prisma {
     picks?: picksUncheckedCreateNestedManyWithoutTeamsInput
     superbowl_superbowl_loserToteams?: superbowlUncheckedCreateNestedManyWithoutTeams_superbowl_loserToteamsInput
     superbowl_superbowl_winnerToteams?: superbowlUncheckedCreateNestedManyWithoutTeams_superbowl_winnerToteamsInput
+    postseason_home?: postseason_gamesUncheckedCreateNestedManyWithoutHome_team_relInput
+    postseason_away?: postseason_gamesUncheckedCreateNestedManyWithoutAway_team_relInput
+    postseason_winner?: postseason_gamesUncheckedCreateNestedManyWithoutWinner_team_relInput
+    postseason_seeds?: postseason_team_seedsUncheckedCreateNestedManyWithoutTeamInput
   }
 
   export type teamsUpdateInput = {
@@ -18092,6 +21215,10 @@ export namespace Prisma {
     picks?: picksUpdateManyWithoutTeamsNestedInput
     superbowl_superbowl_loserToteams?: superbowlUpdateManyWithoutTeams_superbowl_loserToteamsNestedInput
     superbowl_superbowl_winnerToteams?: superbowlUpdateManyWithoutTeams_superbowl_winnerToteamsNestedInput
+    postseason_home?: postseason_gamesUpdateManyWithoutHome_team_relNestedInput
+    postseason_away?: postseason_gamesUpdateManyWithoutAway_team_relNestedInput
+    postseason_winner?: postseason_gamesUpdateManyWithoutWinner_team_relNestedInput
+    postseason_seeds?: postseason_team_seedsUpdateManyWithoutTeamNestedInput
   }
 
   export type teamsUncheckedUpdateInput = {
@@ -18108,6 +21235,10 @@ export namespace Prisma {
     picks?: picksUncheckedUpdateManyWithoutTeamsNestedInput
     superbowl_superbowl_loserToteams?: superbowlUncheckedUpdateManyWithoutTeams_superbowl_loserToteamsNestedInput
     superbowl_superbowl_winnerToteams?: superbowlUncheckedUpdateManyWithoutTeams_superbowl_winnerToteamsNestedInput
+    postseason_home?: postseason_gamesUncheckedUpdateManyWithoutHome_team_relNestedInput
+    postseason_away?: postseason_gamesUncheckedUpdateManyWithoutAway_team_relNestedInput
+    postseason_winner?: postseason_gamesUncheckedUpdateManyWithoutWinner_team_relNestedInput
+    postseason_seeds?: postseason_team_seedsUncheckedUpdateManyWithoutTeamNestedInput
   }
 
   export type teamsCreateManyInput = {
@@ -18140,6 +21271,180 @@ export namespace Prisma {
     primary_color?: NullableStringFieldUpdateOperationsInput | string | null
     secondary_color?: NullableStringFieldUpdateOperationsInput | string | null
     tertiary_color?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type postseason_gamesCreateInput = {
+    game_id?: string
+    espn_id: number
+    season: number
+    round: $Enums.PostseasonRound
+    conference?: $Enums.Conference | null
+    ts: Date | string
+    home_score?: number | null
+    away_score?: number | null
+    done?: boolean
+    bracket_position: number
+    home_team_rel?: teamsCreateNestedOneWithoutPostseason_homeInput
+    away_team_rel?: teamsCreateNestedOneWithoutPostseason_awayInput
+    winner_team_rel?: teamsCreateNestedOneWithoutPostseason_winnerInput
+    advances_to?: postseason_gamesCreateNestedOneWithoutAdvances_fromInput
+    advances_from?: postseason_gamesCreateNestedManyWithoutAdvances_toInput
+  }
+
+  export type postseason_gamesUncheckedCreateInput = {
+    game_id?: string
+    espn_id: number
+    season: number
+    round: $Enums.PostseasonRound
+    conference?: $Enums.Conference | null
+    ts: Date | string
+    home_team?: number | null
+    away_team?: number | null
+    home_score?: number | null
+    away_score?: number | null
+    winner?: number | null
+    done?: boolean
+    bracket_position: number
+    advances_to_game_id?: string | null
+    advances_from?: postseason_gamesUncheckedCreateNestedManyWithoutAdvances_toInput
+  }
+
+  export type postseason_gamesUpdateInput = {
+    game_id?: StringFieldUpdateOperationsInput | string
+    espn_id?: IntFieldUpdateOperationsInput | number
+    season?: IntFieldUpdateOperationsInput | number
+    round?: EnumPostseasonRoundFieldUpdateOperationsInput | $Enums.PostseasonRound
+    conference?: NullableEnumConferenceFieldUpdateOperationsInput | $Enums.Conference | null
+    ts?: DateTimeFieldUpdateOperationsInput | Date | string
+    home_score?: NullableIntFieldUpdateOperationsInput | number | null
+    away_score?: NullableIntFieldUpdateOperationsInput | number | null
+    done?: BoolFieldUpdateOperationsInput | boolean
+    bracket_position?: IntFieldUpdateOperationsInput | number
+    home_team_rel?: teamsUpdateOneWithoutPostseason_homeNestedInput
+    away_team_rel?: teamsUpdateOneWithoutPostseason_awayNestedInput
+    winner_team_rel?: teamsUpdateOneWithoutPostseason_winnerNestedInput
+    advances_to?: postseason_gamesUpdateOneWithoutAdvances_fromNestedInput
+    advances_from?: postseason_gamesUpdateManyWithoutAdvances_toNestedInput
+  }
+
+  export type postseason_gamesUncheckedUpdateInput = {
+    game_id?: StringFieldUpdateOperationsInput | string
+    espn_id?: IntFieldUpdateOperationsInput | number
+    season?: IntFieldUpdateOperationsInput | number
+    round?: EnumPostseasonRoundFieldUpdateOperationsInput | $Enums.PostseasonRound
+    conference?: NullableEnumConferenceFieldUpdateOperationsInput | $Enums.Conference | null
+    ts?: DateTimeFieldUpdateOperationsInput | Date | string
+    home_team?: NullableIntFieldUpdateOperationsInput | number | null
+    away_team?: NullableIntFieldUpdateOperationsInput | number | null
+    home_score?: NullableIntFieldUpdateOperationsInput | number | null
+    away_score?: NullableIntFieldUpdateOperationsInput | number | null
+    winner?: NullableIntFieldUpdateOperationsInput | number | null
+    done?: BoolFieldUpdateOperationsInput | boolean
+    bracket_position?: IntFieldUpdateOperationsInput | number
+    advances_to_game_id?: NullableStringFieldUpdateOperationsInput | string | null
+    advances_from?: postseason_gamesUncheckedUpdateManyWithoutAdvances_toNestedInput
+  }
+
+  export type postseason_gamesCreateManyInput = {
+    game_id?: string
+    espn_id: number
+    season: number
+    round: $Enums.PostseasonRound
+    conference?: $Enums.Conference | null
+    ts: Date | string
+    home_team?: number | null
+    away_team?: number | null
+    home_score?: number | null
+    away_score?: number | null
+    winner?: number | null
+    done?: boolean
+    bracket_position: number
+    advances_to_game_id?: string | null
+  }
+
+  export type postseason_gamesUpdateManyMutationInput = {
+    game_id?: StringFieldUpdateOperationsInput | string
+    espn_id?: IntFieldUpdateOperationsInput | number
+    season?: IntFieldUpdateOperationsInput | number
+    round?: EnumPostseasonRoundFieldUpdateOperationsInput | $Enums.PostseasonRound
+    conference?: NullableEnumConferenceFieldUpdateOperationsInput | $Enums.Conference | null
+    ts?: DateTimeFieldUpdateOperationsInput | Date | string
+    home_score?: NullableIntFieldUpdateOperationsInput | number | null
+    away_score?: NullableIntFieldUpdateOperationsInput | number | null
+    done?: BoolFieldUpdateOperationsInput | boolean
+    bracket_position?: IntFieldUpdateOperationsInput | number
+  }
+
+  export type postseason_gamesUncheckedUpdateManyInput = {
+    game_id?: StringFieldUpdateOperationsInput | string
+    espn_id?: IntFieldUpdateOperationsInput | number
+    season?: IntFieldUpdateOperationsInput | number
+    round?: EnumPostseasonRoundFieldUpdateOperationsInput | $Enums.PostseasonRound
+    conference?: NullableEnumConferenceFieldUpdateOperationsInput | $Enums.Conference | null
+    ts?: DateTimeFieldUpdateOperationsInput | Date | string
+    home_team?: NullableIntFieldUpdateOperationsInput | number | null
+    away_team?: NullableIntFieldUpdateOperationsInput | number | null
+    home_score?: NullableIntFieldUpdateOperationsInput | number | null
+    away_score?: NullableIntFieldUpdateOperationsInput | number | null
+    winner?: NullableIntFieldUpdateOperationsInput | number | null
+    done?: BoolFieldUpdateOperationsInput | boolean
+    bracket_position?: IntFieldUpdateOperationsInput | number
+    advances_to_game_id?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type postseason_team_seedsCreateInput = {
+    id?: string
+    season: number
+    conference: $Enums.Conference
+    seed: number
+    team: teamsCreateNestedOneWithoutPostseason_seedsInput
+  }
+
+  export type postseason_team_seedsUncheckedCreateInput = {
+    id?: string
+    season: number
+    teamid: number
+    conference: $Enums.Conference
+    seed: number
+  }
+
+  export type postseason_team_seedsUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    season?: IntFieldUpdateOperationsInput | number
+    conference?: EnumConferenceFieldUpdateOperationsInput | $Enums.Conference
+    seed?: IntFieldUpdateOperationsInput | number
+    team?: teamsUpdateOneRequiredWithoutPostseason_seedsNestedInput
+  }
+
+  export type postseason_team_seedsUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    season?: IntFieldUpdateOperationsInput | number
+    teamid?: IntFieldUpdateOperationsInput | number
+    conference?: EnumConferenceFieldUpdateOperationsInput | $Enums.Conference
+    seed?: IntFieldUpdateOperationsInput | number
+  }
+
+  export type postseason_team_seedsCreateManyInput = {
+    id?: string
+    season: number
+    teamid: number
+    conference: $Enums.Conference
+    seed: number
+  }
+
+  export type postseason_team_seedsUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    season?: IntFieldUpdateOperationsInput | number
+    conference?: EnumConferenceFieldUpdateOperationsInput | $Enums.Conference
+    seed?: IntFieldUpdateOperationsInput | number
+  }
+
+  export type postseason_team_seedsUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    season?: IntFieldUpdateOperationsInput | number
+    teamid?: IntFieldUpdateOperationsInput | number
+    conference?: EnumConferenceFieldUpdateOperationsInput | $Enums.Conference
+    seed?: IntFieldUpdateOperationsInput | number
   }
 
   export type StringFilter<$PrismaModel = never> = {
@@ -19173,7 +22478,27 @@ export namespace Prisma {
     none?: gamesWhereInput
   }
 
+  export type Postseason_gamesListRelationFilter = {
+    every?: postseason_gamesWhereInput
+    some?: postseason_gamesWhereInput
+    none?: postseason_gamesWhereInput
+  }
+
+  export type Postseason_team_seedsListRelationFilter = {
+    every?: postseason_team_seedsWhereInput
+    some?: postseason_team_seedsWhereInput
+    none?: postseason_team_seedsWhereInput
+  }
+
   export type gamesOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type postseason_gamesOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type postseason_team_seedsOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -19216,6 +22541,176 @@ export namespace Prisma {
 
   export type teamsSumOrderByAggregateInput = {
     teamid?: SortOrder
+  }
+
+  export type EnumPostseasonRoundFilter<$PrismaModel = never> = {
+    equals?: $Enums.PostseasonRound | EnumPostseasonRoundFieldRefInput<$PrismaModel>
+    in?: $Enums.PostseasonRound[] | ListEnumPostseasonRoundFieldRefInput<$PrismaModel>
+    notIn?: $Enums.PostseasonRound[] | ListEnumPostseasonRoundFieldRefInput<$PrismaModel>
+    not?: NestedEnumPostseasonRoundFilter<$PrismaModel> | $Enums.PostseasonRound
+  }
+
+  export type EnumConferenceNullableFilter<$PrismaModel = never> = {
+    equals?: $Enums.Conference | EnumConferenceFieldRefInput<$PrismaModel> | null
+    in?: $Enums.Conference[] | ListEnumConferenceFieldRefInput<$PrismaModel> | null
+    notIn?: $Enums.Conference[] | ListEnumConferenceFieldRefInput<$PrismaModel> | null
+    not?: NestedEnumConferenceNullableFilter<$PrismaModel> | $Enums.Conference | null
+  }
+
+  export type Postseason_gamesNullableScalarRelationFilter = {
+    is?: postseason_gamesWhereInput | null
+    isNot?: postseason_gamesWhereInput | null
+  }
+
+  export type postseason_gamesCountOrderByAggregateInput = {
+    game_id?: SortOrder
+    espn_id?: SortOrder
+    season?: SortOrder
+    round?: SortOrder
+    conference?: SortOrder
+    ts?: SortOrder
+    home_team?: SortOrder
+    away_team?: SortOrder
+    home_score?: SortOrder
+    away_score?: SortOrder
+    winner?: SortOrder
+    done?: SortOrder
+    bracket_position?: SortOrder
+    advances_to_game_id?: SortOrder
+  }
+
+  export type postseason_gamesAvgOrderByAggregateInput = {
+    espn_id?: SortOrder
+    season?: SortOrder
+    home_team?: SortOrder
+    away_team?: SortOrder
+    home_score?: SortOrder
+    away_score?: SortOrder
+    winner?: SortOrder
+    bracket_position?: SortOrder
+  }
+
+  export type postseason_gamesMaxOrderByAggregateInput = {
+    game_id?: SortOrder
+    espn_id?: SortOrder
+    season?: SortOrder
+    round?: SortOrder
+    conference?: SortOrder
+    ts?: SortOrder
+    home_team?: SortOrder
+    away_team?: SortOrder
+    home_score?: SortOrder
+    away_score?: SortOrder
+    winner?: SortOrder
+    done?: SortOrder
+    bracket_position?: SortOrder
+    advances_to_game_id?: SortOrder
+  }
+
+  export type postseason_gamesMinOrderByAggregateInput = {
+    game_id?: SortOrder
+    espn_id?: SortOrder
+    season?: SortOrder
+    round?: SortOrder
+    conference?: SortOrder
+    ts?: SortOrder
+    home_team?: SortOrder
+    away_team?: SortOrder
+    home_score?: SortOrder
+    away_score?: SortOrder
+    winner?: SortOrder
+    done?: SortOrder
+    bracket_position?: SortOrder
+    advances_to_game_id?: SortOrder
+  }
+
+  export type postseason_gamesSumOrderByAggregateInput = {
+    espn_id?: SortOrder
+    season?: SortOrder
+    home_team?: SortOrder
+    away_team?: SortOrder
+    home_score?: SortOrder
+    away_score?: SortOrder
+    winner?: SortOrder
+    bracket_position?: SortOrder
+  }
+
+  export type EnumPostseasonRoundWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.PostseasonRound | EnumPostseasonRoundFieldRefInput<$PrismaModel>
+    in?: $Enums.PostseasonRound[] | ListEnumPostseasonRoundFieldRefInput<$PrismaModel>
+    notIn?: $Enums.PostseasonRound[] | ListEnumPostseasonRoundFieldRefInput<$PrismaModel>
+    not?: NestedEnumPostseasonRoundWithAggregatesFilter<$PrismaModel> | $Enums.PostseasonRound
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumPostseasonRoundFilter<$PrismaModel>
+    _max?: NestedEnumPostseasonRoundFilter<$PrismaModel>
+  }
+
+  export type EnumConferenceNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.Conference | EnumConferenceFieldRefInput<$PrismaModel> | null
+    in?: $Enums.Conference[] | ListEnumConferenceFieldRefInput<$PrismaModel> | null
+    notIn?: $Enums.Conference[] | ListEnumConferenceFieldRefInput<$PrismaModel> | null
+    not?: NestedEnumConferenceNullableWithAggregatesFilter<$PrismaModel> | $Enums.Conference | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedEnumConferenceNullableFilter<$PrismaModel>
+    _max?: NestedEnumConferenceNullableFilter<$PrismaModel>
+  }
+
+  export type EnumConferenceFilter<$PrismaModel = never> = {
+    equals?: $Enums.Conference | EnumConferenceFieldRefInput<$PrismaModel>
+    in?: $Enums.Conference[] | ListEnumConferenceFieldRefInput<$PrismaModel>
+    notIn?: $Enums.Conference[] | ListEnumConferenceFieldRefInput<$PrismaModel>
+    not?: NestedEnumConferenceFilter<$PrismaModel> | $Enums.Conference
+  }
+
+  export type postseason_team_seedsSeasonTeamidCompoundUniqueInput = {
+    season: number
+    teamid: number
+  }
+
+  export type postseason_team_seedsCountOrderByAggregateInput = {
+    id?: SortOrder
+    season?: SortOrder
+    teamid?: SortOrder
+    conference?: SortOrder
+    seed?: SortOrder
+  }
+
+  export type postseason_team_seedsAvgOrderByAggregateInput = {
+    season?: SortOrder
+    teamid?: SortOrder
+    seed?: SortOrder
+  }
+
+  export type postseason_team_seedsMaxOrderByAggregateInput = {
+    id?: SortOrder
+    season?: SortOrder
+    teamid?: SortOrder
+    conference?: SortOrder
+    seed?: SortOrder
+  }
+
+  export type postseason_team_seedsMinOrderByAggregateInput = {
+    id?: SortOrder
+    season?: SortOrder
+    teamid?: SortOrder
+    conference?: SortOrder
+    seed?: SortOrder
+  }
+
+  export type postseason_team_seedsSumOrderByAggregateInput = {
+    season?: SortOrder
+    teamid?: SortOrder
+    seed?: SortOrder
+  }
+
+  export type EnumConferenceWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.Conference | EnumConferenceFieldRefInput<$PrismaModel>
+    in?: $Enums.Conference[] | ListEnumConferenceFieldRefInput<$PrismaModel>
+    notIn?: $Enums.Conference[] | ListEnumConferenceFieldRefInput<$PrismaModel>
+    not?: NestedEnumConferenceWithAggregatesFilter<$PrismaModel> | $Enums.Conference
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumConferenceFilter<$PrismaModel>
+    _max?: NestedEnumConferenceFilter<$PrismaModel>
   }
 
   export type leaguesCreateNestedOneWithoutEmailLogsInput = {
@@ -20191,6 +23686,34 @@ export namespace Prisma {
     connect?: superbowlWhereUniqueInput | superbowlWhereUniqueInput[]
   }
 
+  export type postseason_gamesCreateNestedManyWithoutHome_team_relInput = {
+    create?: XOR<postseason_gamesCreateWithoutHome_team_relInput, postseason_gamesUncheckedCreateWithoutHome_team_relInput> | postseason_gamesCreateWithoutHome_team_relInput[] | postseason_gamesUncheckedCreateWithoutHome_team_relInput[]
+    connectOrCreate?: postseason_gamesCreateOrConnectWithoutHome_team_relInput | postseason_gamesCreateOrConnectWithoutHome_team_relInput[]
+    createMany?: postseason_gamesCreateManyHome_team_relInputEnvelope
+    connect?: postseason_gamesWhereUniqueInput | postseason_gamesWhereUniqueInput[]
+  }
+
+  export type postseason_gamesCreateNestedManyWithoutAway_team_relInput = {
+    create?: XOR<postseason_gamesCreateWithoutAway_team_relInput, postseason_gamesUncheckedCreateWithoutAway_team_relInput> | postseason_gamesCreateWithoutAway_team_relInput[] | postseason_gamesUncheckedCreateWithoutAway_team_relInput[]
+    connectOrCreate?: postseason_gamesCreateOrConnectWithoutAway_team_relInput | postseason_gamesCreateOrConnectWithoutAway_team_relInput[]
+    createMany?: postseason_gamesCreateManyAway_team_relInputEnvelope
+    connect?: postseason_gamesWhereUniqueInput | postseason_gamesWhereUniqueInput[]
+  }
+
+  export type postseason_gamesCreateNestedManyWithoutWinner_team_relInput = {
+    create?: XOR<postseason_gamesCreateWithoutWinner_team_relInput, postseason_gamesUncheckedCreateWithoutWinner_team_relInput> | postseason_gamesCreateWithoutWinner_team_relInput[] | postseason_gamesUncheckedCreateWithoutWinner_team_relInput[]
+    connectOrCreate?: postseason_gamesCreateOrConnectWithoutWinner_team_relInput | postseason_gamesCreateOrConnectWithoutWinner_team_relInput[]
+    createMany?: postseason_gamesCreateManyWinner_team_relInputEnvelope
+    connect?: postseason_gamesWhereUniqueInput | postseason_gamesWhereUniqueInput[]
+  }
+
+  export type postseason_team_seedsCreateNestedManyWithoutTeamInput = {
+    create?: XOR<postseason_team_seedsCreateWithoutTeamInput, postseason_team_seedsUncheckedCreateWithoutTeamInput> | postseason_team_seedsCreateWithoutTeamInput[] | postseason_team_seedsUncheckedCreateWithoutTeamInput[]
+    connectOrCreate?: postseason_team_seedsCreateOrConnectWithoutTeamInput | postseason_team_seedsCreateOrConnectWithoutTeamInput[]
+    createMany?: postseason_team_seedsCreateManyTeamInputEnvelope
+    connect?: postseason_team_seedsWhereUniqueInput | postseason_team_seedsWhereUniqueInput[]
+  }
+
   export type gamesUncheckedCreateNestedManyWithoutTeams_games_homeToteamsInput = {
     create?: XOR<gamesCreateWithoutTeams_games_homeToteamsInput, gamesUncheckedCreateWithoutTeams_games_homeToteamsInput> | gamesCreateWithoutTeams_games_homeToteamsInput[] | gamesUncheckedCreateWithoutTeams_games_homeToteamsInput[]
     connectOrCreate?: gamesCreateOrConnectWithoutTeams_games_homeToteamsInput | gamesCreateOrConnectWithoutTeams_games_homeToteamsInput[]
@@ -20224,6 +23747,34 @@ export namespace Prisma {
     connectOrCreate?: superbowlCreateOrConnectWithoutTeams_superbowl_winnerToteamsInput | superbowlCreateOrConnectWithoutTeams_superbowl_winnerToteamsInput[]
     createMany?: superbowlCreateManyTeams_superbowl_winnerToteamsInputEnvelope
     connect?: superbowlWhereUniqueInput | superbowlWhereUniqueInput[]
+  }
+
+  export type postseason_gamesUncheckedCreateNestedManyWithoutHome_team_relInput = {
+    create?: XOR<postseason_gamesCreateWithoutHome_team_relInput, postseason_gamesUncheckedCreateWithoutHome_team_relInput> | postseason_gamesCreateWithoutHome_team_relInput[] | postseason_gamesUncheckedCreateWithoutHome_team_relInput[]
+    connectOrCreate?: postseason_gamesCreateOrConnectWithoutHome_team_relInput | postseason_gamesCreateOrConnectWithoutHome_team_relInput[]
+    createMany?: postseason_gamesCreateManyHome_team_relInputEnvelope
+    connect?: postseason_gamesWhereUniqueInput | postseason_gamesWhereUniqueInput[]
+  }
+
+  export type postseason_gamesUncheckedCreateNestedManyWithoutAway_team_relInput = {
+    create?: XOR<postseason_gamesCreateWithoutAway_team_relInput, postseason_gamesUncheckedCreateWithoutAway_team_relInput> | postseason_gamesCreateWithoutAway_team_relInput[] | postseason_gamesUncheckedCreateWithoutAway_team_relInput[]
+    connectOrCreate?: postseason_gamesCreateOrConnectWithoutAway_team_relInput | postseason_gamesCreateOrConnectWithoutAway_team_relInput[]
+    createMany?: postseason_gamesCreateManyAway_team_relInputEnvelope
+    connect?: postseason_gamesWhereUniqueInput | postseason_gamesWhereUniqueInput[]
+  }
+
+  export type postseason_gamesUncheckedCreateNestedManyWithoutWinner_team_relInput = {
+    create?: XOR<postseason_gamesCreateWithoutWinner_team_relInput, postseason_gamesUncheckedCreateWithoutWinner_team_relInput> | postseason_gamesCreateWithoutWinner_team_relInput[] | postseason_gamesUncheckedCreateWithoutWinner_team_relInput[]
+    connectOrCreate?: postseason_gamesCreateOrConnectWithoutWinner_team_relInput | postseason_gamesCreateOrConnectWithoutWinner_team_relInput[]
+    createMany?: postseason_gamesCreateManyWinner_team_relInputEnvelope
+    connect?: postseason_gamesWhereUniqueInput | postseason_gamesWhereUniqueInput[]
+  }
+
+  export type postseason_team_seedsUncheckedCreateNestedManyWithoutTeamInput = {
+    create?: XOR<postseason_team_seedsCreateWithoutTeamInput, postseason_team_seedsUncheckedCreateWithoutTeamInput> | postseason_team_seedsCreateWithoutTeamInput[] | postseason_team_seedsUncheckedCreateWithoutTeamInput[]
+    connectOrCreate?: postseason_team_seedsCreateOrConnectWithoutTeamInput | postseason_team_seedsCreateOrConnectWithoutTeamInput[]
+    createMany?: postseason_team_seedsCreateManyTeamInputEnvelope
+    connect?: postseason_team_seedsWhereUniqueInput | postseason_team_seedsWhereUniqueInput[]
   }
 
   export type gamesUpdateManyWithoutTeams_games_homeToteamsNestedInput = {
@@ -20296,6 +23847,62 @@ export namespace Prisma {
     deleteMany?: superbowlScalarWhereInput | superbowlScalarWhereInput[]
   }
 
+  export type postseason_gamesUpdateManyWithoutHome_team_relNestedInput = {
+    create?: XOR<postseason_gamesCreateWithoutHome_team_relInput, postseason_gamesUncheckedCreateWithoutHome_team_relInput> | postseason_gamesCreateWithoutHome_team_relInput[] | postseason_gamesUncheckedCreateWithoutHome_team_relInput[]
+    connectOrCreate?: postseason_gamesCreateOrConnectWithoutHome_team_relInput | postseason_gamesCreateOrConnectWithoutHome_team_relInput[]
+    upsert?: postseason_gamesUpsertWithWhereUniqueWithoutHome_team_relInput | postseason_gamesUpsertWithWhereUniqueWithoutHome_team_relInput[]
+    createMany?: postseason_gamesCreateManyHome_team_relInputEnvelope
+    set?: postseason_gamesWhereUniqueInput | postseason_gamesWhereUniqueInput[]
+    disconnect?: postseason_gamesWhereUniqueInput | postseason_gamesWhereUniqueInput[]
+    delete?: postseason_gamesWhereUniqueInput | postseason_gamesWhereUniqueInput[]
+    connect?: postseason_gamesWhereUniqueInput | postseason_gamesWhereUniqueInput[]
+    update?: postseason_gamesUpdateWithWhereUniqueWithoutHome_team_relInput | postseason_gamesUpdateWithWhereUniqueWithoutHome_team_relInput[]
+    updateMany?: postseason_gamesUpdateManyWithWhereWithoutHome_team_relInput | postseason_gamesUpdateManyWithWhereWithoutHome_team_relInput[]
+    deleteMany?: postseason_gamesScalarWhereInput | postseason_gamesScalarWhereInput[]
+  }
+
+  export type postseason_gamesUpdateManyWithoutAway_team_relNestedInput = {
+    create?: XOR<postseason_gamesCreateWithoutAway_team_relInput, postseason_gamesUncheckedCreateWithoutAway_team_relInput> | postseason_gamesCreateWithoutAway_team_relInput[] | postseason_gamesUncheckedCreateWithoutAway_team_relInput[]
+    connectOrCreate?: postseason_gamesCreateOrConnectWithoutAway_team_relInput | postseason_gamesCreateOrConnectWithoutAway_team_relInput[]
+    upsert?: postseason_gamesUpsertWithWhereUniqueWithoutAway_team_relInput | postseason_gamesUpsertWithWhereUniqueWithoutAway_team_relInput[]
+    createMany?: postseason_gamesCreateManyAway_team_relInputEnvelope
+    set?: postseason_gamesWhereUniqueInput | postseason_gamesWhereUniqueInput[]
+    disconnect?: postseason_gamesWhereUniqueInput | postseason_gamesWhereUniqueInput[]
+    delete?: postseason_gamesWhereUniqueInput | postseason_gamesWhereUniqueInput[]
+    connect?: postseason_gamesWhereUniqueInput | postseason_gamesWhereUniqueInput[]
+    update?: postseason_gamesUpdateWithWhereUniqueWithoutAway_team_relInput | postseason_gamesUpdateWithWhereUniqueWithoutAway_team_relInput[]
+    updateMany?: postseason_gamesUpdateManyWithWhereWithoutAway_team_relInput | postseason_gamesUpdateManyWithWhereWithoutAway_team_relInput[]
+    deleteMany?: postseason_gamesScalarWhereInput | postseason_gamesScalarWhereInput[]
+  }
+
+  export type postseason_gamesUpdateManyWithoutWinner_team_relNestedInput = {
+    create?: XOR<postseason_gamesCreateWithoutWinner_team_relInput, postseason_gamesUncheckedCreateWithoutWinner_team_relInput> | postseason_gamesCreateWithoutWinner_team_relInput[] | postseason_gamesUncheckedCreateWithoutWinner_team_relInput[]
+    connectOrCreate?: postseason_gamesCreateOrConnectWithoutWinner_team_relInput | postseason_gamesCreateOrConnectWithoutWinner_team_relInput[]
+    upsert?: postseason_gamesUpsertWithWhereUniqueWithoutWinner_team_relInput | postseason_gamesUpsertWithWhereUniqueWithoutWinner_team_relInput[]
+    createMany?: postseason_gamesCreateManyWinner_team_relInputEnvelope
+    set?: postseason_gamesWhereUniqueInput | postseason_gamesWhereUniqueInput[]
+    disconnect?: postseason_gamesWhereUniqueInput | postseason_gamesWhereUniqueInput[]
+    delete?: postseason_gamesWhereUniqueInput | postseason_gamesWhereUniqueInput[]
+    connect?: postseason_gamesWhereUniqueInput | postseason_gamesWhereUniqueInput[]
+    update?: postseason_gamesUpdateWithWhereUniqueWithoutWinner_team_relInput | postseason_gamesUpdateWithWhereUniqueWithoutWinner_team_relInput[]
+    updateMany?: postseason_gamesUpdateManyWithWhereWithoutWinner_team_relInput | postseason_gamesUpdateManyWithWhereWithoutWinner_team_relInput[]
+    deleteMany?: postseason_gamesScalarWhereInput | postseason_gamesScalarWhereInput[]
+  }
+
+  export type postseason_team_seedsUpdateManyWithoutTeamNestedInput = {
+    create?: XOR<postseason_team_seedsCreateWithoutTeamInput, postseason_team_seedsUncheckedCreateWithoutTeamInput> | postseason_team_seedsCreateWithoutTeamInput[] | postseason_team_seedsUncheckedCreateWithoutTeamInput[]
+    connectOrCreate?: postseason_team_seedsCreateOrConnectWithoutTeamInput | postseason_team_seedsCreateOrConnectWithoutTeamInput[]
+    upsert?: postseason_team_seedsUpsertWithWhereUniqueWithoutTeamInput | postseason_team_seedsUpsertWithWhereUniqueWithoutTeamInput[]
+    createMany?: postseason_team_seedsCreateManyTeamInputEnvelope
+    set?: postseason_team_seedsWhereUniqueInput | postseason_team_seedsWhereUniqueInput[]
+    disconnect?: postseason_team_seedsWhereUniqueInput | postseason_team_seedsWhereUniqueInput[]
+    delete?: postseason_team_seedsWhereUniqueInput | postseason_team_seedsWhereUniqueInput[]
+    connect?: postseason_team_seedsWhereUniqueInput | postseason_team_seedsWhereUniqueInput[]
+    update?: postseason_team_seedsUpdateWithWhereUniqueWithoutTeamInput | postseason_team_seedsUpdateWithWhereUniqueWithoutTeamInput[]
+    updateMany?: postseason_team_seedsUpdateManyWithWhereWithoutTeamInput | postseason_team_seedsUpdateManyWithWhereWithoutTeamInput[]
+    deleteMany?: postseason_team_seedsScalarWhereInput | postseason_team_seedsScalarWhereInput[]
+  }
+
   export type gamesUncheckedUpdateManyWithoutTeams_games_homeToteamsNestedInput = {
     create?: XOR<gamesCreateWithoutTeams_games_homeToteamsInput, gamesUncheckedCreateWithoutTeams_games_homeToteamsInput> | gamesCreateWithoutTeams_games_homeToteamsInput[] | gamesUncheckedCreateWithoutTeams_games_homeToteamsInput[]
     connectOrCreate?: gamesCreateOrConnectWithoutTeams_games_homeToteamsInput | gamesCreateOrConnectWithoutTeams_games_homeToteamsInput[]
@@ -20364,6 +23971,194 @@ export namespace Prisma {
     update?: superbowlUpdateWithWhereUniqueWithoutTeams_superbowl_winnerToteamsInput | superbowlUpdateWithWhereUniqueWithoutTeams_superbowl_winnerToteamsInput[]
     updateMany?: superbowlUpdateManyWithWhereWithoutTeams_superbowl_winnerToteamsInput | superbowlUpdateManyWithWhereWithoutTeams_superbowl_winnerToteamsInput[]
     deleteMany?: superbowlScalarWhereInput | superbowlScalarWhereInput[]
+  }
+
+  export type postseason_gamesUncheckedUpdateManyWithoutHome_team_relNestedInput = {
+    create?: XOR<postseason_gamesCreateWithoutHome_team_relInput, postseason_gamesUncheckedCreateWithoutHome_team_relInput> | postseason_gamesCreateWithoutHome_team_relInput[] | postseason_gamesUncheckedCreateWithoutHome_team_relInput[]
+    connectOrCreate?: postseason_gamesCreateOrConnectWithoutHome_team_relInput | postseason_gamesCreateOrConnectWithoutHome_team_relInput[]
+    upsert?: postseason_gamesUpsertWithWhereUniqueWithoutHome_team_relInput | postseason_gamesUpsertWithWhereUniqueWithoutHome_team_relInput[]
+    createMany?: postseason_gamesCreateManyHome_team_relInputEnvelope
+    set?: postseason_gamesWhereUniqueInput | postseason_gamesWhereUniqueInput[]
+    disconnect?: postseason_gamesWhereUniqueInput | postseason_gamesWhereUniqueInput[]
+    delete?: postseason_gamesWhereUniqueInput | postseason_gamesWhereUniqueInput[]
+    connect?: postseason_gamesWhereUniqueInput | postseason_gamesWhereUniqueInput[]
+    update?: postseason_gamesUpdateWithWhereUniqueWithoutHome_team_relInput | postseason_gamesUpdateWithWhereUniqueWithoutHome_team_relInput[]
+    updateMany?: postseason_gamesUpdateManyWithWhereWithoutHome_team_relInput | postseason_gamesUpdateManyWithWhereWithoutHome_team_relInput[]
+    deleteMany?: postseason_gamesScalarWhereInput | postseason_gamesScalarWhereInput[]
+  }
+
+  export type postseason_gamesUncheckedUpdateManyWithoutAway_team_relNestedInput = {
+    create?: XOR<postseason_gamesCreateWithoutAway_team_relInput, postseason_gamesUncheckedCreateWithoutAway_team_relInput> | postseason_gamesCreateWithoutAway_team_relInput[] | postseason_gamesUncheckedCreateWithoutAway_team_relInput[]
+    connectOrCreate?: postseason_gamesCreateOrConnectWithoutAway_team_relInput | postseason_gamesCreateOrConnectWithoutAway_team_relInput[]
+    upsert?: postseason_gamesUpsertWithWhereUniqueWithoutAway_team_relInput | postseason_gamesUpsertWithWhereUniqueWithoutAway_team_relInput[]
+    createMany?: postseason_gamesCreateManyAway_team_relInputEnvelope
+    set?: postseason_gamesWhereUniqueInput | postseason_gamesWhereUniqueInput[]
+    disconnect?: postseason_gamesWhereUniqueInput | postseason_gamesWhereUniqueInput[]
+    delete?: postseason_gamesWhereUniqueInput | postseason_gamesWhereUniqueInput[]
+    connect?: postseason_gamesWhereUniqueInput | postseason_gamesWhereUniqueInput[]
+    update?: postseason_gamesUpdateWithWhereUniqueWithoutAway_team_relInput | postseason_gamesUpdateWithWhereUniqueWithoutAway_team_relInput[]
+    updateMany?: postseason_gamesUpdateManyWithWhereWithoutAway_team_relInput | postseason_gamesUpdateManyWithWhereWithoutAway_team_relInput[]
+    deleteMany?: postseason_gamesScalarWhereInput | postseason_gamesScalarWhereInput[]
+  }
+
+  export type postseason_gamesUncheckedUpdateManyWithoutWinner_team_relNestedInput = {
+    create?: XOR<postseason_gamesCreateWithoutWinner_team_relInput, postseason_gamesUncheckedCreateWithoutWinner_team_relInput> | postseason_gamesCreateWithoutWinner_team_relInput[] | postseason_gamesUncheckedCreateWithoutWinner_team_relInput[]
+    connectOrCreate?: postseason_gamesCreateOrConnectWithoutWinner_team_relInput | postseason_gamesCreateOrConnectWithoutWinner_team_relInput[]
+    upsert?: postseason_gamesUpsertWithWhereUniqueWithoutWinner_team_relInput | postseason_gamesUpsertWithWhereUniqueWithoutWinner_team_relInput[]
+    createMany?: postseason_gamesCreateManyWinner_team_relInputEnvelope
+    set?: postseason_gamesWhereUniqueInput | postseason_gamesWhereUniqueInput[]
+    disconnect?: postseason_gamesWhereUniqueInput | postseason_gamesWhereUniqueInput[]
+    delete?: postseason_gamesWhereUniqueInput | postseason_gamesWhereUniqueInput[]
+    connect?: postseason_gamesWhereUniqueInput | postseason_gamesWhereUniqueInput[]
+    update?: postseason_gamesUpdateWithWhereUniqueWithoutWinner_team_relInput | postseason_gamesUpdateWithWhereUniqueWithoutWinner_team_relInput[]
+    updateMany?: postseason_gamesUpdateManyWithWhereWithoutWinner_team_relInput | postseason_gamesUpdateManyWithWhereWithoutWinner_team_relInput[]
+    deleteMany?: postseason_gamesScalarWhereInput | postseason_gamesScalarWhereInput[]
+  }
+
+  export type postseason_team_seedsUncheckedUpdateManyWithoutTeamNestedInput = {
+    create?: XOR<postseason_team_seedsCreateWithoutTeamInput, postseason_team_seedsUncheckedCreateWithoutTeamInput> | postseason_team_seedsCreateWithoutTeamInput[] | postseason_team_seedsUncheckedCreateWithoutTeamInput[]
+    connectOrCreate?: postseason_team_seedsCreateOrConnectWithoutTeamInput | postseason_team_seedsCreateOrConnectWithoutTeamInput[]
+    upsert?: postseason_team_seedsUpsertWithWhereUniqueWithoutTeamInput | postseason_team_seedsUpsertWithWhereUniqueWithoutTeamInput[]
+    createMany?: postseason_team_seedsCreateManyTeamInputEnvelope
+    set?: postseason_team_seedsWhereUniqueInput | postseason_team_seedsWhereUniqueInput[]
+    disconnect?: postseason_team_seedsWhereUniqueInput | postseason_team_seedsWhereUniqueInput[]
+    delete?: postseason_team_seedsWhereUniqueInput | postseason_team_seedsWhereUniqueInput[]
+    connect?: postseason_team_seedsWhereUniqueInput | postseason_team_seedsWhereUniqueInput[]
+    update?: postseason_team_seedsUpdateWithWhereUniqueWithoutTeamInput | postseason_team_seedsUpdateWithWhereUniqueWithoutTeamInput[]
+    updateMany?: postseason_team_seedsUpdateManyWithWhereWithoutTeamInput | postseason_team_seedsUpdateManyWithWhereWithoutTeamInput[]
+    deleteMany?: postseason_team_seedsScalarWhereInput | postseason_team_seedsScalarWhereInput[]
+  }
+
+  export type teamsCreateNestedOneWithoutPostseason_homeInput = {
+    create?: XOR<teamsCreateWithoutPostseason_homeInput, teamsUncheckedCreateWithoutPostseason_homeInput>
+    connectOrCreate?: teamsCreateOrConnectWithoutPostseason_homeInput
+    connect?: teamsWhereUniqueInput
+  }
+
+  export type teamsCreateNestedOneWithoutPostseason_awayInput = {
+    create?: XOR<teamsCreateWithoutPostseason_awayInput, teamsUncheckedCreateWithoutPostseason_awayInput>
+    connectOrCreate?: teamsCreateOrConnectWithoutPostseason_awayInput
+    connect?: teamsWhereUniqueInput
+  }
+
+  export type teamsCreateNestedOneWithoutPostseason_winnerInput = {
+    create?: XOR<teamsCreateWithoutPostseason_winnerInput, teamsUncheckedCreateWithoutPostseason_winnerInput>
+    connectOrCreate?: teamsCreateOrConnectWithoutPostseason_winnerInput
+    connect?: teamsWhereUniqueInput
+  }
+
+  export type postseason_gamesCreateNestedOneWithoutAdvances_fromInput = {
+    create?: XOR<postseason_gamesCreateWithoutAdvances_fromInput, postseason_gamesUncheckedCreateWithoutAdvances_fromInput>
+    connectOrCreate?: postseason_gamesCreateOrConnectWithoutAdvances_fromInput
+    connect?: postseason_gamesWhereUniqueInput
+  }
+
+  export type postseason_gamesCreateNestedManyWithoutAdvances_toInput = {
+    create?: XOR<postseason_gamesCreateWithoutAdvances_toInput, postseason_gamesUncheckedCreateWithoutAdvances_toInput> | postseason_gamesCreateWithoutAdvances_toInput[] | postseason_gamesUncheckedCreateWithoutAdvances_toInput[]
+    connectOrCreate?: postseason_gamesCreateOrConnectWithoutAdvances_toInput | postseason_gamesCreateOrConnectWithoutAdvances_toInput[]
+    createMany?: postseason_gamesCreateManyAdvances_toInputEnvelope
+    connect?: postseason_gamesWhereUniqueInput | postseason_gamesWhereUniqueInput[]
+  }
+
+  export type postseason_gamesUncheckedCreateNestedManyWithoutAdvances_toInput = {
+    create?: XOR<postseason_gamesCreateWithoutAdvances_toInput, postseason_gamesUncheckedCreateWithoutAdvances_toInput> | postseason_gamesCreateWithoutAdvances_toInput[] | postseason_gamesUncheckedCreateWithoutAdvances_toInput[]
+    connectOrCreate?: postseason_gamesCreateOrConnectWithoutAdvances_toInput | postseason_gamesCreateOrConnectWithoutAdvances_toInput[]
+    createMany?: postseason_gamesCreateManyAdvances_toInputEnvelope
+    connect?: postseason_gamesWhereUniqueInput | postseason_gamesWhereUniqueInput[]
+  }
+
+  export type EnumPostseasonRoundFieldUpdateOperationsInput = {
+    set?: $Enums.PostseasonRound
+  }
+
+  export type NullableEnumConferenceFieldUpdateOperationsInput = {
+    set?: $Enums.Conference | null
+  }
+
+  export type teamsUpdateOneWithoutPostseason_homeNestedInput = {
+    create?: XOR<teamsCreateWithoutPostseason_homeInput, teamsUncheckedCreateWithoutPostseason_homeInput>
+    connectOrCreate?: teamsCreateOrConnectWithoutPostseason_homeInput
+    upsert?: teamsUpsertWithoutPostseason_homeInput
+    disconnect?: teamsWhereInput | boolean
+    delete?: teamsWhereInput | boolean
+    connect?: teamsWhereUniqueInput
+    update?: XOR<XOR<teamsUpdateToOneWithWhereWithoutPostseason_homeInput, teamsUpdateWithoutPostseason_homeInput>, teamsUncheckedUpdateWithoutPostseason_homeInput>
+  }
+
+  export type teamsUpdateOneWithoutPostseason_awayNestedInput = {
+    create?: XOR<teamsCreateWithoutPostseason_awayInput, teamsUncheckedCreateWithoutPostseason_awayInput>
+    connectOrCreate?: teamsCreateOrConnectWithoutPostseason_awayInput
+    upsert?: teamsUpsertWithoutPostseason_awayInput
+    disconnect?: teamsWhereInput | boolean
+    delete?: teamsWhereInput | boolean
+    connect?: teamsWhereUniqueInput
+    update?: XOR<XOR<teamsUpdateToOneWithWhereWithoutPostseason_awayInput, teamsUpdateWithoutPostseason_awayInput>, teamsUncheckedUpdateWithoutPostseason_awayInput>
+  }
+
+  export type teamsUpdateOneWithoutPostseason_winnerNestedInput = {
+    create?: XOR<teamsCreateWithoutPostseason_winnerInput, teamsUncheckedCreateWithoutPostseason_winnerInput>
+    connectOrCreate?: teamsCreateOrConnectWithoutPostseason_winnerInput
+    upsert?: teamsUpsertWithoutPostseason_winnerInput
+    disconnect?: teamsWhereInput | boolean
+    delete?: teamsWhereInput | boolean
+    connect?: teamsWhereUniqueInput
+    update?: XOR<XOR<teamsUpdateToOneWithWhereWithoutPostseason_winnerInput, teamsUpdateWithoutPostseason_winnerInput>, teamsUncheckedUpdateWithoutPostseason_winnerInput>
+  }
+
+  export type postseason_gamesUpdateOneWithoutAdvances_fromNestedInput = {
+    create?: XOR<postseason_gamesCreateWithoutAdvances_fromInput, postseason_gamesUncheckedCreateWithoutAdvances_fromInput>
+    connectOrCreate?: postseason_gamesCreateOrConnectWithoutAdvances_fromInput
+    upsert?: postseason_gamesUpsertWithoutAdvances_fromInput
+    disconnect?: postseason_gamesWhereInput | boolean
+    delete?: postseason_gamesWhereInput | boolean
+    connect?: postseason_gamesWhereUniqueInput
+    update?: XOR<XOR<postseason_gamesUpdateToOneWithWhereWithoutAdvances_fromInput, postseason_gamesUpdateWithoutAdvances_fromInput>, postseason_gamesUncheckedUpdateWithoutAdvances_fromInput>
+  }
+
+  export type postseason_gamesUpdateManyWithoutAdvances_toNestedInput = {
+    create?: XOR<postseason_gamesCreateWithoutAdvances_toInput, postseason_gamesUncheckedCreateWithoutAdvances_toInput> | postseason_gamesCreateWithoutAdvances_toInput[] | postseason_gamesUncheckedCreateWithoutAdvances_toInput[]
+    connectOrCreate?: postseason_gamesCreateOrConnectWithoutAdvances_toInput | postseason_gamesCreateOrConnectWithoutAdvances_toInput[]
+    upsert?: postseason_gamesUpsertWithWhereUniqueWithoutAdvances_toInput | postseason_gamesUpsertWithWhereUniqueWithoutAdvances_toInput[]
+    createMany?: postseason_gamesCreateManyAdvances_toInputEnvelope
+    set?: postseason_gamesWhereUniqueInput | postseason_gamesWhereUniqueInput[]
+    disconnect?: postseason_gamesWhereUniqueInput | postseason_gamesWhereUniqueInput[]
+    delete?: postseason_gamesWhereUniqueInput | postseason_gamesWhereUniqueInput[]
+    connect?: postseason_gamesWhereUniqueInput | postseason_gamesWhereUniqueInput[]
+    update?: postseason_gamesUpdateWithWhereUniqueWithoutAdvances_toInput | postseason_gamesUpdateWithWhereUniqueWithoutAdvances_toInput[]
+    updateMany?: postseason_gamesUpdateManyWithWhereWithoutAdvances_toInput | postseason_gamesUpdateManyWithWhereWithoutAdvances_toInput[]
+    deleteMany?: postseason_gamesScalarWhereInput | postseason_gamesScalarWhereInput[]
+  }
+
+  export type postseason_gamesUncheckedUpdateManyWithoutAdvances_toNestedInput = {
+    create?: XOR<postseason_gamesCreateWithoutAdvances_toInput, postseason_gamesUncheckedCreateWithoutAdvances_toInput> | postseason_gamesCreateWithoutAdvances_toInput[] | postseason_gamesUncheckedCreateWithoutAdvances_toInput[]
+    connectOrCreate?: postseason_gamesCreateOrConnectWithoutAdvances_toInput | postseason_gamesCreateOrConnectWithoutAdvances_toInput[]
+    upsert?: postseason_gamesUpsertWithWhereUniqueWithoutAdvances_toInput | postseason_gamesUpsertWithWhereUniqueWithoutAdvances_toInput[]
+    createMany?: postseason_gamesCreateManyAdvances_toInputEnvelope
+    set?: postseason_gamesWhereUniqueInput | postseason_gamesWhereUniqueInput[]
+    disconnect?: postseason_gamesWhereUniqueInput | postseason_gamesWhereUniqueInput[]
+    delete?: postseason_gamesWhereUniqueInput | postseason_gamesWhereUniqueInput[]
+    connect?: postseason_gamesWhereUniqueInput | postseason_gamesWhereUniqueInput[]
+    update?: postseason_gamesUpdateWithWhereUniqueWithoutAdvances_toInput | postseason_gamesUpdateWithWhereUniqueWithoutAdvances_toInput[]
+    updateMany?: postseason_gamesUpdateManyWithWhereWithoutAdvances_toInput | postseason_gamesUpdateManyWithWhereWithoutAdvances_toInput[]
+    deleteMany?: postseason_gamesScalarWhereInput | postseason_gamesScalarWhereInput[]
+  }
+
+  export type teamsCreateNestedOneWithoutPostseason_seedsInput = {
+    create?: XOR<teamsCreateWithoutPostseason_seedsInput, teamsUncheckedCreateWithoutPostseason_seedsInput>
+    connectOrCreate?: teamsCreateOrConnectWithoutPostseason_seedsInput
+    connect?: teamsWhereUniqueInput
+  }
+
+  export type EnumConferenceFieldUpdateOperationsInput = {
+    set?: $Enums.Conference
+  }
+
+  export type teamsUpdateOneRequiredWithoutPostseason_seedsNestedInput = {
+    create?: XOR<teamsCreateWithoutPostseason_seedsInput, teamsUncheckedCreateWithoutPostseason_seedsInput>
+    connectOrCreate?: teamsCreateOrConnectWithoutPostseason_seedsInput
+    upsert?: teamsUpsertWithoutPostseason_seedsInput
+    connect?: teamsWhereUniqueInput
+    update?: XOR<XOR<teamsUpdateToOneWithWhereWithoutPostseason_seedsInput, teamsUpdateWithoutPostseason_seedsInput>, teamsUncheckedUpdateWithoutPostseason_seedsInput>
   }
 
   export type NestedStringFilter<$PrismaModel = never> = {
@@ -20733,6 +24528,57 @@ export namespace Prisma {
     _max?: NestedBoolFilter<$PrismaModel>
   }
 
+  export type NestedEnumPostseasonRoundFilter<$PrismaModel = never> = {
+    equals?: $Enums.PostseasonRound | EnumPostseasonRoundFieldRefInput<$PrismaModel>
+    in?: $Enums.PostseasonRound[] | ListEnumPostseasonRoundFieldRefInput<$PrismaModel>
+    notIn?: $Enums.PostseasonRound[] | ListEnumPostseasonRoundFieldRefInput<$PrismaModel>
+    not?: NestedEnumPostseasonRoundFilter<$PrismaModel> | $Enums.PostseasonRound
+  }
+
+  export type NestedEnumConferenceNullableFilter<$PrismaModel = never> = {
+    equals?: $Enums.Conference | EnumConferenceFieldRefInput<$PrismaModel> | null
+    in?: $Enums.Conference[] | ListEnumConferenceFieldRefInput<$PrismaModel> | null
+    notIn?: $Enums.Conference[] | ListEnumConferenceFieldRefInput<$PrismaModel> | null
+    not?: NestedEnumConferenceNullableFilter<$PrismaModel> | $Enums.Conference | null
+  }
+
+  export type NestedEnumPostseasonRoundWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.PostseasonRound | EnumPostseasonRoundFieldRefInput<$PrismaModel>
+    in?: $Enums.PostseasonRound[] | ListEnumPostseasonRoundFieldRefInput<$PrismaModel>
+    notIn?: $Enums.PostseasonRound[] | ListEnumPostseasonRoundFieldRefInput<$PrismaModel>
+    not?: NestedEnumPostseasonRoundWithAggregatesFilter<$PrismaModel> | $Enums.PostseasonRound
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumPostseasonRoundFilter<$PrismaModel>
+    _max?: NestedEnumPostseasonRoundFilter<$PrismaModel>
+  }
+
+  export type NestedEnumConferenceNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.Conference | EnumConferenceFieldRefInput<$PrismaModel> | null
+    in?: $Enums.Conference[] | ListEnumConferenceFieldRefInput<$PrismaModel> | null
+    notIn?: $Enums.Conference[] | ListEnumConferenceFieldRefInput<$PrismaModel> | null
+    not?: NestedEnumConferenceNullableWithAggregatesFilter<$PrismaModel> | $Enums.Conference | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedEnumConferenceNullableFilter<$PrismaModel>
+    _max?: NestedEnumConferenceNullableFilter<$PrismaModel>
+  }
+
+  export type NestedEnumConferenceFilter<$PrismaModel = never> = {
+    equals?: $Enums.Conference | EnumConferenceFieldRefInput<$PrismaModel>
+    in?: $Enums.Conference[] | ListEnumConferenceFieldRefInput<$PrismaModel>
+    notIn?: $Enums.Conference[] | ListEnumConferenceFieldRefInput<$PrismaModel>
+    not?: NestedEnumConferenceFilter<$PrismaModel> | $Enums.Conference
+  }
+
+  export type NestedEnumConferenceWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.Conference | EnumConferenceFieldRefInput<$PrismaModel>
+    in?: $Enums.Conference[] | ListEnumConferenceFieldRefInput<$PrismaModel>
+    notIn?: $Enums.Conference[] | ListEnumConferenceFieldRefInput<$PrismaModel>
+    not?: NestedEnumConferenceWithAggregatesFilter<$PrismaModel> | $Enums.Conference
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumConferenceFilter<$PrismaModel>
+    _max?: NestedEnumConferenceFilter<$PrismaModel>
+  }
+
   export type leaguesCreateWithoutEmailLogsInput = {
     name: string
     created_time?: Date | string
@@ -21065,6 +24911,10 @@ export namespace Prisma {
     picks?: picksCreateNestedManyWithoutTeamsInput
     superbowl_superbowl_loserToteams?: superbowlCreateNestedManyWithoutTeams_superbowl_loserToteamsInput
     superbowl_superbowl_winnerToteams?: superbowlCreateNestedManyWithoutTeams_superbowl_winnerToteamsInput
+    postseason_home?: postseason_gamesCreateNestedManyWithoutHome_team_relInput
+    postseason_away?: postseason_gamesCreateNestedManyWithoutAway_team_relInput
+    postseason_winner?: postseason_gamesCreateNestedManyWithoutWinner_team_relInput
+    postseason_seeds?: postseason_team_seedsCreateNestedManyWithoutTeamInput
   }
 
   export type teamsUncheckedCreateWithoutGames_games_homeToteamsInput = {
@@ -21080,6 +24930,10 @@ export namespace Prisma {
     picks?: picksUncheckedCreateNestedManyWithoutTeamsInput
     superbowl_superbowl_loserToteams?: superbowlUncheckedCreateNestedManyWithoutTeams_superbowl_loserToteamsInput
     superbowl_superbowl_winnerToteams?: superbowlUncheckedCreateNestedManyWithoutTeams_superbowl_winnerToteamsInput
+    postseason_home?: postseason_gamesUncheckedCreateNestedManyWithoutHome_team_relInput
+    postseason_away?: postseason_gamesUncheckedCreateNestedManyWithoutAway_team_relInput
+    postseason_winner?: postseason_gamesUncheckedCreateNestedManyWithoutWinner_team_relInput
+    postseason_seeds?: postseason_team_seedsUncheckedCreateNestedManyWithoutTeamInput
   }
 
   export type teamsCreateOrConnectWithoutGames_games_homeToteamsInput = {
@@ -21099,6 +24953,10 @@ export namespace Prisma {
     picks?: picksCreateNestedManyWithoutTeamsInput
     superbowl_superbowl_loserToteams?: superbowlCreateNestedManyWithoutTeams_superbowl_loserToteamsInput
     superbowl_superbowl_winnerToteams?: superbowlCreateNestedManyWithoutTeams_superbowl_winnerToteamsInput
+    postseason_home?: postseason_gamesCreateNestedManyWithoutHome_team_relInput
+    postseason_away?: postseason_gamesCreateNestedManyWithoutAway_team_relInput
+    postseason_winner?: postseason_gamesCreateNestedManyWithoutWinner_team_relInput
+    postseason_seeds?: postseason_team_seedsCreateNestedManyWithoutTeamInput
   }
 
   export type teamsUncheckedCreateWithoutGames_games_awayToteamsInput = {
@@ -21114,6 +24972,10 @@ export namespace Prisma {
     picks?: picksUncheckedCreateNestedManyWithoutTeamsInput
     superbowl_superbowl_loserToteams?: superbowlUncheckedCreateNestedManyWithoutTeams_superbowl_loserToteamsInput
     superbowl_superbowl_winnerToteams?: superbowlUncheckedCreateNestedManyWithoutTeams_superbowl_winnerToteamsInput
+    postseason_home?: postseason_gamesUncheckedCreateNestedManyWithoutHome_team_relInput
+    postseason_away?: postseason_gamesUncheckedCreateNestedManyWithoutAway_team_relInput
+    postseason_winner?: postseason_gamesUncheckedCreateNestedManyWithoutWinner_team_relInput
+    postseason_seeds?: postseason_team_seedsUncheckedCreateNestedManyWithoutTeamInput
   }
 
   export type teamsCreateOrConnectWithoutGames_games_awayToteamsInput = {
@@ -21183,6 +25045,10 @@ export namespace Prisma {
     picks?: picksUpdateManyWithoutTeamsNestedInput
     superbowl_superbowl_loserToteams?: superbowlUpdateManyWithoutTeams_superbowl_loserToteamsNestedInput
     superbowl_superbowl_winnerToteams?: superbowlUpdateManyWithoutTeams_superbowl_winnerToteamsNestedInput
+    postseason_home?: postseason_gamesUpdateManyWithoutHome_team_relNestedInput
+    postseason_away?: postseason_gamesUpdateManyWithoutAway_team_relNestedInput
+    postseason_winner?: postseason_gamesUpdateManyWithoutWinner_team_relNestedInput
+    postseason_seeds?: postseason_team_seedsUpdateManyWithoutTeamNestedInput
   }
 
   export type teamsUncheckedUpdateWithoutGames_games_homeToteamsInput = {
@@ -21198,6 +25064,10 @@ export namespace Prisma {
     picks?: picksUncheckedUpdateManyWithoutTeamsNestedInput
     superbowl_superbowl_loserToteams?: superbowlUncheckedUpdateManyWithoutTeams_superbowl_loserToteamsNestedInput
     superbowl_superbowl_winnerToteams?: superbowlUncheckedUpdateManyWithoutTeams_superbowl_winnerToteamsNestedInput
+    postseason_home?: postseason_gamesUncheckedUpdateManyWithoutHome_team_relNestedInput
+    postseason_away?: postseason_gamesUncheckedUpdateManyWithoutAway_team_relNestedInput
+    postseason_winner?: postseason_gamesUncheckedUpdateManyWithoutWinner_team_relNestedInput
+    postseason_seeds?: postseason_team_seedsUncheckedUpdateManyWithoutTeamNestedInput
   }
 
   export type teamsUpsertWithoutGames_games_awayToteamsInput = {
@@ -21223,6 +25093,10 @@ export namespace Prisma {
     picks?: picksUpdateManyWithoutTeamsNestedInput
     superbowl_superbowl_loserToteams?: superbowlUpdateManyWithoutTeams_superbowl_loserToteamsNestedInput
     superbowl_superbowl_winnerToteams?: superbowlUpdateManyWithoutTeams_superbowl_winnerToteamsNestedInput
+    postseason_home?: postseason_gamesUpdateManyWithoutHome_team_relNestedInput
+    postseason_away?: postseason_gamesUpdateManyWithoutAway_team_relNestedInput
+    postseason_winner?: postseason_gamesUpdateManyWithoutWinner_team_relNestedInput
+    postseason_seeds?: postseason_team_seedsUpdateManyWithoutTeamNestedInput
   }
 
   export type teamsUncheckedUpdateWithoutGames_games_awayToteamsInput = {
@@ -21238,6 +25112,10 @@ export namespace Prisma {
     picks?: picksUncheckedUpdateManyWithoutTeamsNestedInput
     superbowl_superbowl_loserToteams?: superbowlUncheckedUpdateManyWithoutTeams_superbowl_loserToteamsNestedInput
     superbowl_superbowl_winnerToteams?: superbowlUncheckedUpdateManyWithoutTeams_superbowl_winnerToteamsNestedInput
+    postseason_home?: postseason_gamesUncheckedUpdateManyWithoutHome_team_relNestedInput
+    postseason_away?: postseason_gamesUncheckedUpdateManyWithoutAway_team_relNestedInput
+    postseason_winner?: postseason_gamesUncheckedUpdateManyWithoutWinner_team_relNestedInput
+    postseason_seeds?: postseason_team_seedsUncheckedUpdateManyWithoutTeamNestedInput
   }
 
   export type picksUpsertWithWhereUniqueWithoutGamesInput = {
@@ -22640,6 +26518,10 @@ export namespace Prisma {
     games_games_awayToteams?: gamesCreateNestedManyWithoutTeams_games_awayToteamsInput
     superbowl_superbowl_loserToteams?: superbowlCreateNestedManyWithoutTeams_superbowl_loserToteamsInput
     superbowl_superbowl_winnerToteams?: superbowlCreateNestedManyWithoutTeams_superbowl_winnerToteamsInput
+    postseason_home?: postseason_gamesCreateNestedManyWithoutHome_team_relInput
+    postseason_away?: postseason_gamesCreateNestedManyWithoutAway_team_relInput
+    postseason_winner?: postseason_gamesCreateNestedManyWithoutWinner_team_relInput
+    postseason_seeds?: postseason_team_seedsCreateNestedManyWithoutTeamInput
   }
 
   export type teamsUncheckedCreateWithoutPicksInput = {
@@ -22655,6 +26537,10 @@ export namespace Prisma {
     games_games_awayToteams?: gamesUncheckedCreateNestedManyWithoutTeams_games_awayToteamsInput
     superbowl_superbowl_loserToteams?: superbowlUncheckedCreateNestedManyWithoutTeams_superbowl_loserToteamsInput
     superbowl_superbowl_winnerToteams?: superbowlUncheckedCreateNestedManyWithoutTeams_superbowl_winnerToteamsInput
+    postseason_home?: postseason_gamesUncheckedCreateNestedManyWithoutHome_team_relInput
+    postseason_away?: postseason_gamesUncheckedCreateNestedManyWithoutAway_team_relInput
+    postseason_winner?: postseason_gamesUncheckedCreateNestedManyWithoutWinner_team_relInput
+    postseason_seeds?: postseason_team_seedsUncheckedCreateNestedManyWithoutTeamInput
   }
 
   export type teamsCreateOrConnectWithoutPicksInput = {
@@ -22819,6 +26705,10 @@ export namespace Prisma {
     games_games_awayToteams?: gamesUpdateManyWithoutTeams_games_awayToteamsNestedInput
     superbowl_superbowl_loserToteams?: superbowlUpdateManyWithoutTeams_superbowl_loserToteamsNestedInput
     superbowl_superbowl_winnerToteams?: superbowlUpdateManyWithoutTeams_superbowl_winnerToteamsNestedInput
+    postseason_home?: postseason_gamesUpdateManyWithoutHome_team_relNestedInput
+    postseason_away?: postseason_gamesUpdateManyWithoutAway_team_relNestedInput
+    postseason_winner?: postseason_gamesUpdateManyWithoutWinner_team_relNestedInput
+    postseason_seeds?: postseason_team_seedsUpdateManyWithoutTeamNestedInput
   }
 
   export type teamsUncheckedUpdateWithoutPicksInput = {
@@ -22834,6 +26724,10 @@ export namespace Prisma {
     games_games_awayToteams?: gamesUncheckedUpdateManyWithoutTeams_games_awayToteamsNestedInput
     superbowl_superbowl_loserToteams?: superbowlUncheckedUpdateManyWithoutTeams_superbowl_loserToteamsNestedInput
     superbowl_superbowl_winnerToteams?: superbowlUncheckedUpdateManyWithoutTeams_superbowl_winnerToteamsNestedInput
+    postseason_home?: postseason_gamesUncheckedUpdateManyWithoutHome_team_relNestedInput
+    postseason_away?: postseason_gamesUncheckedUpdateManyWithoutAway_team_relNestedInput
+    postseason_winner?: postseason_gamesUncheckedUpdateManyWithoutWinner_team_relNestedInput
+    postseason_seeds?: postseason_team_seedsUncheckedUpdateManyWithoutTeamNestedInput
   }
 
   export type teamsCreateWithoutSuperbowl_superbowl_loserToteamsInput = {
@@ -22848,6 +26742,10 @@ export namespace Prisma {
     games_games_awayToteams?: gamesCreateNestedManyWithoutTeams_games_awayToteamsInput
     picks?: picksCreateNestedManyWithoutTeamsInput
     superbowl_superbowl_winnerToteams?: superbowlCreateNestedManyWithoutTeams_superbowl_winnerToteamsInput
+    postseason_home?: postseason_gamesCreateNestedManyWithoutHome_team_relInput
+    postseason_away?: postseason_gamesCreateNestedManyWithoutAway_team_relInput
+    postseason_winner?: postseason_gamesCreateNestedManyWithoutWinner_team_relInput
+    postseason_seeds?: postseason_team_seedsCreateNestedManyWithoutTeamInput
   }
 
   export type teamsUncheckedCreateWithoutSuperbowl_superbowl_loserToteamsInput = {
@@ -22863,6 +26761,10 @@ export namespace Prisma {
     games_games_awayToteams?: gamesUncheckedCreateNestedManyWithoutTeams_games_awayToteamsInput
     picks?: picksUncheckedCreateNestedManyWithoutTeamsInput
     superbowl_superbowl_winnerToteams?: superbowlUncheckedCreateNestedManyWithoutTeams_superbowl_winnerToteamsInput
+    postseason_home?: postseason_gamesUncheckedCreateNestedManyWithoutHome_team_relInput
+    postseason_away?: postseason_gamesUncheckedCreateNestedManyWithoutAway_team_relInput
+    postseason_winner?: postseason_gamesUncheckedCreateNestedManyWithoutWinner_team_relInput
+    postseason_seeds?: postseason_team_seedsUncheckedCreateNestedManyWithoutTeamInput
   }
 
   export type teamsCreateOrConnectWithoutSuperbowl_superbowl_loserToteamsInput = {
@@ -22912,6 +26814,10 @@ export namespace Prisma {
     games_games_awayToteams?: gamesCreateNestedManyWithoutTeams_games_awayToteamsInput
     picks?: picksCreateNestedManyWithoutTeamsInput
     superbowl_superbowl_loserToteams?: superbowlCreateNestedManyWithoutTeams_superbowl_loserToteamsInput
+    postseason_home?: postseason_gamesCreateNestedManyWithoutHome_team_relInput
+    postseason_away?: postseason_gamesCreateNestedManyWithoutAway_team_relInput
+    postseason_winner?: postseason_gamesCreateNestedManyWithoutWinner_team_relInput
+    postseason_seeds?: postseason_team_seedsCreateNestedManyWithoutTeamInput
   }
 
   export type teamsUncheckedCreateWithoutSuperbowl_superbowl_winnerToteamsInput = {
@@ -22927,6 +26833,10 @@ export namespace Prisma {
     games_games_awayToteams?: gamesUncheckedCreateNestedManyWithoutTeams_games_awayToteamsInput
     picks?: picksUncheckedCreateNestedManyWithoutTeamsInput
     superbowl_superbowl_loserToteams?: superbowlUncheckedCreateNestedManyWithoutTeams_superbowl_loserToteamsInput
+    postseason_home?: postseason_gamesUncheckedCreateNestedManyWithoutHome_team_relInput
+    postseason_away?: postseason_gamesUncheckedCreateNestedManyWithoutAway_team_relInput
+    postseason_winner?: postseason_gamesUncheckedCreateNestedManyWithoutWinner_team_relInput
+    postseason_seeds?: postseason_team_seedsUncheckedCreateNestedManyWithoutTeamInput
   }
 
   export type teamsCreateOrConnectWithoutSuperbowl_superbowl_winnerToteamsInput = {
@@ -22957,6 +26867,10 @@ export namespace Prisma {
     games_games_awayToteams?: gamesUpdateManyWithoutTeams_games_awayToteamsNestedInput
     picks?: picksUpdateManyWithoutTeamsNestedInput
     superbowl_superbowl_winnerToteams?: superbowlUpdateManyWithoutTeams_superbowl_winnerToteamsNestedInput
+    postseason_home?: postseason_gamesUpdateManyWithoutHome_team_relNestedInput
+    postseason_away?: postseason_gamesUpdateManyWithoutAway_team_relNestedInput
+    postseason_winner?: postseason_gamesUpdateManyWithoutWinner_team_relNestedInput
+    postseason_seeds?: postseason_team_seedsUpdateManyWithoutTeamNestedInput
   }
 
   export type teamsUncheckedUpdateWithoutSuperbowl_superbowl_loserToteamsInput = {
@@ -22972,6 +26886,10 @@ export namespace Prisma {
     games_games_awayToteams?: gamesUncheckedUpdateManyWithoutTeams_games_awayToteamsNestedInput
     picks?: picksUncheckedUpdateManyWithoutTeamsNestedInput
     superbowl_superbowl_winnerToteams?: superbowlUncheckedUpdateManyWithoutTeams_superbowl_winnerToteamsNestedInput
+    postseason_home?: postseason_gamesUncheckedUpdateManyWithoutHome_team_relNestedInput
+    postseason_away?: postseason_gamesUncheckedUpdateManyWithoutAway_team_relNestedInput
+    postseason_winner?: postseason_gamesUncheckedUpdateManyWithoutWinner_team_relNestedInput
+    postseason_seeds?: postseason_team_seedsUncheckedUpdateManyWithoutTeamNestedInput
   }
 
   export type leaguemembersUpsertWithoutSuperbowlInput = {
@@ -23033,6 +26951,10 @@ export namespace Prisma {
     games_games_awayToteams?: gamesUpdateManyWithoutTeams_games_awayToteamsNestedInput
     picks?: picksUpdateManyWithoutTeamsNestedInput
     superbowl_superbowl_loserToteams?: superbowlUpdateManyWithoutTeams_superbowl_loserToteamsNestedInput
+    postseason_home?: postseason_gamesUpdateManyWithoutHome_team_relNestedInput
+    postseason_away?: postseason_gamesUpdateManyWithoutAway_team_relNestedInput
+    postseason_winner?: postseason_gamesUpdateManyWithoutWinner_team_relNestedInput
+    postseason_seeds?: postseason_team_seedsUpdateManyWithoutTeamNestedInput
   }
 
   export type teamsUncheckedUpdateWithoutSuperbowl_superbowl_winnerToteamsInput = {
@@ -23048,6 +26970,10 @@ export namespace Prisma {
     games_games_awayToteams?: gamesUncheckedUpdateManyWithoutTeams_games_awayToteamsNestedInput
     picks?: picksUncheckedUpdateManyWithoutTeamsNestedInput
     superbowl_superbowl_loserToteams?: superbowlUncheckedUpdateManyWithoutTeams_superbowl_loserToteamsNestedInput
+    postseason_home?: postseason_gamesUncheckedUpdateManyWithoutHome_team_relNestedInput
+    postseason_away?: postseason_gamesUncheckedUpdateManyWithoutAway_team_relNestedInput
+    postseason_winner?: postseason_gamesUncheckedUpdateManyWithoutWinner_team_relNestedInput
+    postseason_seeds?: postseason_team_seedsUncheckedUpdateManyWithoutTeamNestedInput
   }
 
   export type gamesCreateWithoutTeams_games_homeToteamsInput = {
@@ -23257,6 +27183,162 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type postseason_gamesCreateWithoutHome_team_relInput = {
+    game_id?: string
+    espn_id: number
+    season: number
+    round: $Enums.PostseasonRound
+    conference?: $Enums.Conference | null
+    ts: Date | string
+    home_score?: number | null
+    away_score?: number | null
+    done?: boolean
+    bracket_position: number
+    away_team_rel?: teamsCreateNestedOneWithoutPostseason_awayInput
+    winner_team_rel?: teamsCreateNestedOneWithoutPostseason_winnerInput
+    advances_to?: postseason_gamesCreateNestedOneWithoutAdvances_fromInput
+    advances_from?: postseason_gamesCreateNestedManyWithoutAdvances_toInput
+  }
+
+  export type postseason_gamesUncheckedCreateWithoutHome_team_relInput = {
+    game_id?: string
+    espn_id: number
+    season: number
+    round: $Enums.PostseasonRound
+    conference?: $Enums.Conference | null
+    ts: Date | string
+    away_team?: number | null
+    home_score?: number | null
+    away_score?: number | null
+    winner?: number | null
+    done?: boolean
+    bracket_position: number
+    advances_to_game_id?: string | null
+    advances_from?: postseason_gamesUncheckedCreateNestedManyWithoutAdvances_toInput
+  }
+
+  export type postseason_gamesCreateOrConnectWithoutHome_team_relInput = {
+    where: postseason_gamesWhereUniqueInput
+    create: XOR<postseason_gamesCreateWithoutHome_team_relInput, postseason_gamesUncheckedCreateWithoutHome_team_relInput>
+  }
+
+  export type postseason_gamesCreateManyHome_team_relInputEnvelope = {
+    data: postseason_gamesCreateManyHome_team_relInput | postseason_gamesCreateManyHome_team_relInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type postseason_gamesCreateWithoutAway_team_relInput = {
+    game_id?: string
+    espn_id: number
+    season: number
+    round: $Enums.PostseasonRound
+    conference?: $Enums.Conference | null
+    ts: Date | string
+    home_score?: number | null
+    away_score?: number | null
+    done?: boolean
+    bracket_position: number
+    home_team_rel?: teamsCreateNestedOneWithoutPostseason_homeInput
+    winner_team_rel?: teamsCreateNestedOneWithoutPostseason_winnerInput
+    advances_to?: postseason_gamesCreateNestedOneWithoutAdvances_fromInput
+    advances_from?: postseason_gamesCreateNestedManyWithoutAdvances_toInput
+  }
+
+  export type postseason_gamesUncheckedCreateWithoutAway_team_relInput = {
+    game_id?: string
+    espn_id: number
+    season: number
+    round: $Enums.PostseasonRound
+    conference?: $Enums.Conference | null
+    ts: Date | string
+    home_team?: number | null
+    home_score?: number | null
+    away_score?: number | null
+    winner?: number | null
+    done?: boolean
+    bracket_position: number
+    advances_to_game_id?: string | null
+    advances_from?: postseason_gamesUncheckedCreateNestedManyWithoutAdvances_toInput
+  }
+
+  export type postseason_gamesCreateOrConnectWithoutAway_team_relInput = {
+    where: postseason_gamesWhereUniqueInput
+    create: XOR<postseason_gamesCreateWithoutAway_team_relInput, postseason_gamesUncheckedCreateWithoutAway_team_relInput>
+  }
+
+  export type postseason_gamesCreateManyAway_team_relInputEnvelope = {
+    data: postseason_gamesCreateManyAway_team_relInput | postseason_gamesCreateManyAway_team_relInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type postseason_gamesCreateWithoutWinner_team_relInput = {
+    game_id?: string
+    espn_id: number
+    season: number
+    round: $Enums.PostseasonRound
+    conference?: $Enums.Conference | null
+    ts: Date | string
+    home_score?: number | null
+    away_score?: number | null
+    done?: boolean
+    bracket_position: number
+    home_team_rel?: teamsCreateNestedOneWithoutPostseason_homeInput
+    away_team_rel?: teamsCreateNestedOneWithoutPostseason_awayInput
+    advances_to?: postseason_gamesCreateNestedOneWithoutAdvances_fromInput
+    advances_from?: postseason_gamesCreateNestedManyWithoutAdvances_toInput
+  }
+
+  export type postseason_gamesUncheckedCreateWithoutWinner_team_relInput = {
+    game_id?: string
+    espn_id: number
+    season: number
+    round: $Enums.PostseasonRound
+    conference?: $Enums.Conference | null
+    ts: Date | string
+    home_team?: number | null
+    away_team?: number | null
+    home_score?: number | null
+    away_score?: number | null
+    done?: boolean
+    bracket_position: number
+    advances_to_game_id?: string | null
+    advances_from?: postseason_gamesUncheckedCreateNestedManyWithoutAdvances_toInput
+  }
+
+  export type postseason_gamesCreateOrConnectWithoutWinner_team_relInput = {
+    where: postseason_gamesWhereUniqueInput
+    create: XOR<postseason_gamesCreateWithoutWinner_team_relInput, postseason_gamesUncheckedCreateWithoutWinner_team_relInput>
+  }
+
+  export type postseason_gamesCreateManyWinner_team_relInputEnvelope = {
+    data: postseason_gamesCreateManyWinner_team_relInput | postseason_gamesCreateManyWinner_team_relInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type postseason_team_seedsCreateWithoutTeamInput = {
+    id?: string
+    season: number
+    conference: $Enums.Conference
+    seed: number
+  }
+
+  export type postseason_team_seedsUncheckedCreateWithoutTeamInput = {
+    id?: string
+    season: number
+    conference: $Enums.Conference
+    seed: number
+  }
+
+  export type postseason_team_seedsCreateOrConnectWithoutTeamInput = {
+    where: postseason_team_seedsWhereUniqueInput
+    create: XOR<postseason_team_seedsCreateWithoutTeamInput, postseason_team_seedsUncheckedCreateWithoutTeamInput>
+  }
+
+  export type postseason_team_seedsCreateManyTeamInputEnvelope = {
+    data: postseason_team_seedsCreateManyTeamInput | postseason_team_seedsCreateManyTeamInput[]
+    skipDuplicates?: boolean
+  }
+
   export type gamesUpsertWithWhereUniqueWithoutTeams_games_homeToteamsInput = {
     where: gamesWhereUniqueInput
     update: XOR<gamesUpdateWithoutTeams_games_homeToteamsInput, gamesUncheckedUpdateWithoutTeams_games_homeToteamsInput>
@@ -23361,6 +27443,605 @@ export namespace Prisma {
   export type superbowlUpdateManyWithWhereWithoutTeams_superbowl_winnerToteamsInput = {
     where: superbowlScalarWhereInput
     data: XOR<superbowlUpdateManyMutationInput, superbowlUncheckedUpdateManyWithoutTeams_superbowl_winnerToteamsInput>
+  }
+
+  export type postseason_gamesUpsertWithWhereUniqueWithoutHome_team_relInput = {
+    where: postseason_gamesWhereUniqueInput
+    update: XOR<postseason_gamesUpdateWithoutHome_team_relInput, postseason_gamesUncheckedUpdateWithoutHome_team_relInput>
+    create: XOR<postseason_gamesCreateWithoutHome_team_relInput, postseason_gamesUncheckedCreateWithoutHome_team_relInput>
+  }
+
+  export type postseason_gamesUpdateWithWhereUniqueWithoutHome_team_relInput = {
+    where: postseason_gamesWhereUniqueInput
+    data: XOR<postseason_gamesUpdateWithoutHome_team_relInput, postseason_gamesUncheckedUpdateWithoutHome_team_relInput>
+  }
+
+  export type postseason_gamesUpdateManyWithWhereWithoutHome_team_relInput = {
+    where: postseason_gamesScalarWhereInput
+    data: XOR<postseason_gamesUpdateManyMutationInput, postseason_gamesUncheckedUpdateManyWithoutHome_team_relInput>
+  }
+
+  export type postseason_gamesScalarWhereInput = {
+    AND?: postseason_gamesScalarWhereInput | postseason_gamesScalarWhereInput[]
+    OR?: postseason_gamesScalarWhereInput[]
+    NOT?: postseason_gamesScalarWhereInput | postseason_gamesScalarWhereInput[]
+    game_id?: StringFilter<"postseason_games"> | string
+    espn_id?: IntFilter<"postseason_games"> | number
+    season?: IntFilter<"postseason_games"> | number
+    round?: EnumPostseasonRoundFilter<"postseason_games"> | $Enums.PostseasonRound
+    conference?: EnumConferenceNullableFilter<"postseason_games"> | $Enums.Conference | null
+    ts?: DateTimeFilter<"postseason_games"> | Date | string
+    home_team?: IntNullableFilter<"postseason_games"> | number | null
+    away_team?: IntNullableFilter<"postseason_games"> | number | null
+    home_score?: IntNullableFilter<"postseason_games"> | number | null
+    away_score?: IntNullableFilter<"postseason_games"> | number | null
+    winner?: IntNullableFilter<"postseason_games"> | number | null
+    done?: BoolFilter<"postseason_games"> | boolean
+    bracket_position?: IntFilter<"postseason_games"> | number
+    advances_to_game_id?: StringNullableFilter<"postseason_games"> | string | null
+  }
+
+  export type postseason_gamesUpsertWithWhereUniqueWithoutAway_team_relInput = {
+    where: postseason_gamesWhereUniqueInput
+    update: XOR<postseason_gamesUpdateWithoutAway_team_relInput, postseason_gamesUncheckedUpdateWithoutAway_team_relInput>
+    create: XOR<postseason_gamesCreateWithoutAway_team_relInput, postseason_gamesUncheckedCreateWithoutAway_team_relInput>
+  }
+
+  export type postseason_gamesUpdateWithWhereUniqueWithoutAway_team_relInput = {
+    where: postseason_gamesWhereUniqueInput
+    data: XOR<postseason_gamesUpdateWithoutAway_team_relInput, postseason_gamesUncheckedUpdateWithoutAway_team_relInput>
+  }
+
+  export type postseason_gamesUpdateManyWithWhereWithoutAway_team_relInput = {
+    where: postseason_gamesScalarWhereInput
+    data: XOR<postseason_gamesUpdateManyMutationInput, postseason_gamesUncheckedUpdateManyWithoutAway_team_relInput>
+  }
+
+  export type postseason_gamesUpsertWithWhereUniqueWithoutWinner_team_relInput = {
+    where: postseason_gamesWhereUniqueInput
+    update: XOR<postseason_gamesUpdateWithoutWinner_team_relInput, postseason_gamesUncheckedUpdateWithoutWinner_team_relInput>
+    create: XOR<postseason_gamesCreateWithoutWinner_team_relInput, postseason_gamesUncheckedCreateWithoutWinner_team_relInput>
+  }
+
+  export type postseason_gamesUpdateWithWhereUniqueWithoutWinner_team_relInput = {
+    where: postseason_gamesWhereUniqueInput
+    data: XOR<postseason_gamesUpdateWithoutWinner_team_relInput, postseason_gamesUncheckedUpdateWithoutWinner_team_relInput>
+  }
+
+  export type postseason_gamesUpdateManyWithWhereWithoutWinner_team_relInput = {
+    where: postseason_gamesScalarWhereInput
+    data: XOR<postseason_gamesUpdateManyMutationInput, postseason_gamesUncheckedUpdateManyWithoutWinner_team_relInput>
+  }
+
+  export type postseason_team_seedsUpsertWithWhereUniqueWithoutTeamInput = {
+    where: postseason_team_seedsWhereUniqueInput
+    update: XOR<postseason_team_seedsUpdateWithoutTeamInput, postseason_team_seedsUncheckedUpdateWithoutTeamInput>
+    create: XOR<postseason_team_seedsCreateWithoutTeamInput, postseason_team_seedsUncheckedCreateWithoutTeamInput>
+  }
+
+  export type postseason_team_seedsUpdateWithWhereUniqueWithoutTeamInput = {
+    where: postseason_team_seedsWhereUniqueInput
+    data: XOR<postseason_team_seedsUpdateWithoutTeamInput, postseason_team_seedsUncheckedUpdateWithoutTeamInput>
+  }
+
+  export type postseason_team_seedsUpdateManyWithWhereWithoutTeamInput = {
+    where: postseason_team_seedsScalarWhereInput
+    data: XOR<postseason_team_seedsUpdateManyMutationInput, postseason_team_seedsUncheckedUpdateManyWithoutTeamInput>
+  }
+
+  export type postseason_team_seedsScalarWhereInput = {
+    AND?: postseason_team_seedsScalarWhereInput | postseason_team_seedsScalarWhereInput[]
+    OR?: postseason_team_seedsScalarWhereInput[]
+    NOT?: postseason_team_seedsScalarWhereInput | postseason_team_seedsScalarWhereInput[]
+    id?: StringFilter<"postseason_team_seeds"> | string
+    season?: IntFilter<"postseason_team_seeds"> | number
+    teamid?: IntFilter<"postseason_team_seeds"> | number
+    conference?: EnumConferenceFilter<"postseason_team_seeds"> | $Enums.Conference
+    seed?: IntFilter<"postseason_team_seeds"> | number
+  }
+
+  export type teamsCreateWithoutPostseason_homeInput = {
+    abbrev?: string | null
+    loc: string
+    name: string
+    conference?: string | null
+    primary_color?: string | null
+    secondary_color?: string | null
+    tertiary_color?: string | null
+    games_games_homeToteams?: gamesCreateNestedManyWithoutTeams_games_homeToteamsInput
+    games_games_awayToteams?: gamesCreateNestedManyWithoutTeams_games_awayToteamsInput
+    picks?: picksCreateNestedManyWithoutTeamsInput
+    superbowl_superbowl_loserToteams?: superbowlCreateNestedManyWithoutTeams_superbowl_loserToteamsInput
+    superbowl_superbowl_winnerToteams?: superbowlCreateNestedManyWithoutTeams_superbowl_winnerToteamsInput
+    postseason_away?: postseason_gamesCreateNestedManyWithoutAway_team_relInput
+    postseason_winner?: postseason_gamesCreateNestedManyWithoutWinner_team_relInput
+    postseason_seeds?: postseason_team_seedsCreateNestedManyWithoutTeamInput
+  }
+
+  export type teamsUncheckedCreateWithoutPostseason_homeInput = {
+    teamid?: number
+    abbrev?: string | null
+    loc: string
+    name: string
+    conference?: string | null
+    primary_color?: string | null
+    secondary_color?: string | null
+    tertiary_color?: string | null
+    games_games_homeToteams?: gamesUncheckedCreateNestedManyWithoutTeams_games_homeToteamsInput
+    games_games_awayToteams?: gamesUncheckedCreateNestedManyWithoutTeams_games_awayToteamsInput
+    picks?: picksUncheckedCreateNestedManyWithoutTeamsInput
+    superbowl_superbowl_loserToteams?: superbowlUncheckedCreateNestedManyWithoutTeams_superbowl_loserToteamsInput
+    superbowl_superbowl_winnerToteams?: superbowlUncheckedCreateNestedManyWithoutTeams_superbowl_winnerToteamsInput
+    postseason_away?: postseason_gamesUncheckedCreateNestedManyWithoutAway_team_relInput
+    postseason_winner?: postseason_gamesUncheckedCreateNestedManyWithoutWinner_team_relInput
+    postseason_seeds?: postseason_team_seedsUncheckedCreateNestedManyWithoutTeamInput
+  }
+
+  export type teamsCreateOrConnectWithoutPostseason_homeInput = {
+    where: teamsWhereUniqueInput
+    create: XOR<teamsCreateWithoutPostseason_homeInput, teamsUncheckedCreateWithoutPostseason_homeInput>
+  }
+
+  export type teamsCreateWithoutPostseason_awayInput = {
+    abbrev?: string | null
+    loc: string
+    name: string
+    conference?: string | null
+    primary_color?: string | null
+    secondary_color?: string | null
+    tertiary_color?: string | null
+    games_games_homeToteams?: gamesCreateNestedManyWithoutTeams_games_homeToteamsInput
+    games_games_awayToteams?: gamesCreateNestedManyWithoutTeams_games_awayToteamsInput
+    picks?: picksCreateNestedManyWithoutTeamsInput
+    superbowl_superbowl_loserToteams?: superbowlCreateNestedManyWithoutTeams_superbowl_loserToteamsInput
+    superbowl_superbowl_winnerToteams?: superbowlCreateNestedManyWithoutTeams_superbowl_winnerToteamsInput
+    postseason_home?: postseason_gamesCreateNestedManyWithoutHome_team_relInput
+    postseason_winner?: postseason_gamesCreateNestedManyWithoutWinner_team_relInput
+    postseason_seeds?: postseason_team_seedsCreateNestedManyWithoutTeamInput
+  }
+
+  export type teamsUncheckedCreateWithoutPostseason_awayInput = {
+    teamid?: number
+    abbrev?: string | null
+    loc: string
+    name: string
+    conference?: string | null
+    primary_color?: string | null
+    secondary_color?: string | null
+    tertiary_color?: string | null
+    games_games_homeToteams?: gamesUncheckedCreateNestedManyWithoutTeams_games_homeToteamsInput
+    games_games_awayToteams?: gamesUncheckedCreateNestedManyWithoutTeams_games_awayToteamsInput
+    picks?: picksUncheckedCreateNestedManyWithoutTeamsInput
+    superbowl_superbowl_loserToteams?: superbowlUncheckedCreateNestedManyWithoutTeams_superbowl_loserToteamsInput
+    superbowl_superbowl_winnerToteams?: superbowlUncheckedCreateNestedManyWithoutTeams_superbowl_winnerToteamsInput
+    postseason_home?: postseason_gamesUncheckedCreateNestedManyWithoutHome_team_relInput
+    postseason_winner?: postseason_gamesUncheckedCreateNestedManyWithoutWinner_team_relInput
+    postseason_seeds?: postseason_team_seedsUncheckedCreateNestedManyWithoutTeamInput
+  }
+
+  export type teamsCreateOrConnectWithoutPostseason_awayInput = {
+    where: teamsWhereUniqueInput
+    create: XOR<teamsCreateWithoutPostseason_awayInput, teamsUncheckedCreateWithoutPostseason_awayInput>
+  }
+
+  export type teamsCreateWithoutPostseason_winnerInput = {
+    abbrev?: string | null
+    loc: string
+    name: string
+    conference?: string | null
+    primary_color?: string | null
+    secondary_color?: string | null
+    tertiary_color?: string | null
+    games_games_homeToteams?: gamesCreateNestedManyWithoutTeams_games_homeToteamsInput
+    games_games_awayToteams?: gamesCreateNestedManyWithoutTeams_games_awayToteamsInput
+    picks?: picksCreateNestedManyWithoutTeamsInput
+    superbowl_superbowl_loserToteams?: superbowlCreateNestedManyWithoutTeams_superbowl_loserToteamsInput
+    superbowl_superbowl_winnerToteams?: superbowlCreateNestedManyWithoutTeams_superbowl_winnerToteamsInput
+    postseason_home?: postseason_gamesCreateNestedManyWithoutHome_team_relInput
+    postseason_away?: postseason_gamesCreateNestedManyWithoutAway_team_relInput
+    postseason_seeds?: postseason_team_seedsCreateNestedManyWithoutTeamInput
+  }
+
+  export type teamsUncheckedCreateWithoutPostseason_winnerInput = {
+    teamid?: number
+    abbrev?: string | null
+    loc: string
+    name: string
+    conference?: string | null
+    primary_color?: string | null
+    secondary_color?: string | null
+    tertiary_color?: string | null
+    games_games_homeToteams?: gamesUncheckedCreateNestedManyWithoutTeams_games_homeToteamsInput
+    games_games_awayToteams?: gamesUncheckedCreateNestedManyWithoutTeams_games_awayToteamsInput
+    picks?: picksUncheckedCreateNestedManyWithoutTeamsInput
+    superbowl_superbowl_loserToteams?: superbowlUncheckedCreateNestedManyWithoutTeams_superbowl_loserToteamsInput
+    superbowl_superbowl_winnerToteams?: superbowlUncheckedCreateNestedManyWithoutTeams_superbowl_winnerToteamsInput
+    postseason_home?: postseason_gamesUncheckedCreateNestedManyWithoutHome_team_relInput
+    postseason_away?: postseason_gamesUncheckedCreateNestedManyWithoutAway_team_relInput
+    postseason_seeds?: postseason_team_seedsUncheckedCreateNestedManyWithoutTeamInput
+  }
+
+  export type teamsCreateOrConnectWithoutPostseason_winnerInput = {
+    where: teamsWhereUniqueInput
+    create: XOR<teamsCreateWithoutPostseason_winnerInput, teamsUncheckedCreateWithoutPostseason_winnerInput>
+  }
+
+  export type postseason_gamesCreateWithoutAdvances_fromInput = {
+    game_id?: string
+    espn_id: number
+    season: number
+    round: $Enums.PostseasonRound
+    conference?: $Enums.Conference | null
+    ts: Date | string
+    home_score?: number | null
+    away_score?: number | null
+    done?: boolean
+    bracket_position: number
+    home_team_rel?: teamsCreateNestedOneWithoutPostseason_homeInput
+    away_team_rel?: teamsCreateNestedOneWithoutPostseason_awayInput
+    winner_team_rel?: teamsCreateNestedOneWithoutPostseason_winnerInput
+    advances_to?: postseason_gamesCreateNestedOneWithoutAdvances_fromInput
+  }
+
+  export type postseason_gamesUncheckedCreateWithoutAdvances_fromInput = {
+    game_id?: string
+    espn_id: number
+    season: number
+    round: $Enums.PostseasonRound
+    conference?: $Enums.Conference | null
+    ts: Date | string
+    home_team?: number | null
+    away_team?: number | null
+    home_score?: number | null
+    away_score?: number | null
+    winner?: number | null
+    done?: boolean
+    bracket_position: number
+    advances_to_game_id?: string | null
+  }
+
+  export type postseason_gamesCreateOrConnectWithoutAdvances_fromInput = {
+    where: postseason_gamesWhereUniqueInput
+    create: XOR<postseason_gamesCreateWithoutAdvances_fromInput, postseason_gamesUncheckedCreateWithoutAdvances_fromInput>
+  }
+
+  export type postseason_gamesCreateWithoutAdvances_toInput = {
+    game_id?: string
+    espn_id: number
+    season: number
+    round: $Enums.PostseasonRound
+    conference?: $Enums.Conference | null
+    ts: Date | string
+    home_score?: number | null
+    away_score?: number | null
+    done?: boolean
+    bracket_position: number
+    home_team_rel?: teamsCreateNestedOneWithoutPostseason_homeInput
+    away_team_rel?: teamsCreateNestedOneWithoutPostseason_awayInput
+    winner_team_rel?: teamsCreateNestedOneWithoutPostseason_winnerInput
+    advances_from?: postseason_gamesCreateNestedManyWithoutAdvances_toInput
+  }
+
+  export type postseason_gamesUncheckedCreateWithoutAdvances_toInput = {
+    game_id?: string
+    espn_id: number
+    season: number
+    round: $Enums.PostseasonRound
+    conference?: $Enums.Conference | null
+    ts: Date | string
+    home_team?: number | null
+    away_team?: number | null
+    home_score?: number | null
+    away_score?: number | null
+    winner?: number | null
+    done?: boolean
+    bracket_position: number
+    advances_from?: postseason_gamesUncheckedCreateNestedManyWithoutAdvances_toInput
+  }
+
+  export type postseason_gamesCreateOrConnectWithoutAdvances_toInput = {
+    where: postseason_gamesWhereUniqueInput
+    create: XOR<postseason_gamesCreateWithoutAdvances_toInput, postseason_gamesUncheckedCreateWithoutAdvances_toInput>
+  }
+
+  export type postseason_gamesCreateManyAdvances_toInputEnvelope = {
+    data: postseason_gamesCreateManyAdvances_toInput | postseason_gamesCreateManyAdvances_toInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type teamsUpsertWithoutPostseason_homeInput = {
+    update: XOR<teamsUpdateWithoutPostseason_homeInput, teamsUncheckedUpdateWithoutPostseason_homeInput>
+    create: XOR<teamsCreateWithoutPostseason_homeInput, teamsUncheckedCreateWithoutPostseason_homeInput>
+    where?: teamsWhereInput
+  }
+
+  export type teamsUpdateToOneWithWhereWithoutPostseason_homeInput = {
+    where?: teamsWhereInput
+    data: XOR<teamsUpdateWithoutPostseason_homeInput, teamsUncheckedUpdateWithoutPostseason_homeInput>
+  }
+
+  export type teamsUpdateWithoutPostseason_homeInput = {
+    abbrev?: NullableStringFieldUpdateOperationsInput | string | null
+    loc?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    conference?: NullableStringFieldUpdateOperationsInput | string | null
+    primary_color?: NullableStringFieldUpdateOperationsInput | string | null
+    secondary_color?: NullableStringFieldUpdateOperationsInput | string | null
+    tertiary_color?: NullableStringFieldUpdateOperationsInput | string | null
+    games_games_homeToteams?: gamesUpdateManyWithoutTeams_games_homeToteamsNestedInput
+    games_games_awayToteams?: gamesUpdateManyWithoutTeams_games_awayToteamsNestedInput
+    picks?: picksUpdateManyWithoutTeamsNestedInput
+    superbowl_superbowl_loserToteams?: superbowlUpdateManyWithoutTeams_superbowl_loserToteamsNestedInput
+    superbowl_superbowl_winnerToteams?: superbowlUpdateManyWithoutTeams_superbowl_winnerToteamsNestedInput
+    postseason_away?: postseason_gamesUpdateManyWithoutAway_team_relNestedInput
+    postseason_winner?: postseason_gamesUpdateManyWithoutWinner_team_relNestedInput
+    postseason_seeds?: postseason_team_seedsUpdateManyWithoutTeamNestedInput
+  }
+
+  export type teamsUncheckedUpdateWithoutPostseason_homeInput = {
+    teamid?: IntFieldUpdateOperationsInput | number
+    abbrev?: NullableStringFieldUpdateOperationsInput | string | null
+    loc?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    conference?: NullableStringFieldUpdateOperationsInput | string | null
+    primary_color?: NullableStringFieldUpdateOperationsInput | string | null
+    secondary_color?: NullableStringFieldUpdateOperationsInput | string | null
+    tertiary_color?: NullableStringFieldUpdateOperationsInput | string | null
+    games_games_homeToteams?: gamesUncheckedUpdateManyWithoutTeams_games_homeToteamsNestedInput
+    games_games_awayToteams?: gamesUncheckedUpdateManyWithoutTeams_games_awayToteamsNestedInput
+    picks?: picksUncheckedUpdateManyWithoutTeamsNestedInput
+    superbowl_superbowl_loserToteams?: superbowlUncheckedUpdateManyWithoutTeams_superbowl_loserToteamsNestedInput
+    superbowl_superbowl_winnerToteams?: superbowlUncheckedUpdateManyWithoutTeams_superbowl_winnerToteamsNestedInput
+    postseason_away?: postseason_gamesUncheckedUpdateManyWithoutAway_team_relNestedInput
+    postseason_winner?: postseason_gamesUncheckedUpdateManyWithoutWinner_team_relNestedInput
+    postseason_seeds?: postseason_team_seedsUncheckedUpdateManyWithoutTeamNestedInput
+  }
+
+  export type teamsUpsertWithoutPostseason_awayInput = {
+    update: XOR<teamsUpdateWithoutPostseason_awayInput, teamsUncheckedUpdateWithoutPostseason_awayInput>
+    create: XOR<teamsCreateWithoutPostseason_awayInput, teamsUncheckedCreateWithoutPostseason_awayInput>
+    where?: teamsWhereInput
+  }
+
+  export type teamsUpdateToOneWithWhereWithoutPostseason_awayInput = {
+    where?: teamsWhereInput
+    data: XOR<teamsUpdateWithoutPostseason_awayInput, teamsUncheckedUpdateWithoutPostseason_awayInput>
+  }
+
+  export type teamsUpdateWithoutPostseason_awayInput = {
+    abbrev?: NullableStringFieldUpdateOperationsInput | string | null
+    loc?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    conference?: NullableStringFieldUpdateOperationsInput | string | null
+    primary_color?: NullableStringFieldUpdateOperationsInput | string | null
+    secondary_color?: NullableStringFieldUpdateOperationsInput | string | null
+    tertiary_color?: NullableStringFieldUpdateOperationsInput | string | null
+    games_games_homeToteams?: gamesUpdateManyWithoutTeams_games_homeToteamsNestedInput
+    games_games_awayToteams?: gamesUpdateManyWithoutTeams_games_awayToteamsNestedInput
+    picks?: picksUpdateManyWithoutTeamsNestedInput
+    superbowl_superbowl_loserToteams?: superbowlUpdateManyWithoutTeams_superbowl_loserToteamsNestedInput
+    superbowl_superbowl_winnerToteams?: superbowlUpdateManyWithoutTeams_superbowl_winnerToteamsNestedInput
+    postseason_home?: postseason_gamesUpdateManyWithoutHome_team_relNestedInput
+    postseason_winner?: postseason_gamesUpdateManyWithoutWinner_team_relNestedInput
+    postseason_seeds?: postseason_team_seedsUpdateManyWithoutTeamNestedInput
+  }
+
+  export type teamsUncheckedUpdateWithoutPostseason_awayInput = {
+    teamid?: IntFieldUpdateOperationsInput | number
+    abbrev?: NullableStringFieldUpdateOperationsInput | string | null
+    loc?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    conference?: NullableStringFieldUpdateOperationsInput | string | null
+    primary_color?: NullableStringFieldUpdateOperationsInput | string | null
+    secondary_color?: NullableStringFieldUpdateOperationsInput | string | null
+    tertiary_color?: NullableStringFieldUpdateOperationsInput | string | null
+    games_games_homeToteams?: gamesUncheckedUpdateManyWithoutTeams_games_homeToteamsNestedInput
+    games_games_awayToteams?: gamesUncheckedUpdateManyWithoutTeams_games_awayToteamsNestedInput
+    picks?: picksUncheckedUpdateManyWithoutTeamsNestedInput
+    superbowl_superbowl_loserToteams?: superbowlUncheckedUpdateManyWithoutTeams_superbowl_loserToteamsNestedInput
+    superbowl_superbowl_winnerToteams?: superbowlUncheckedUpdateManyWithoutTeams_superbowl_winnerToteamsNestedInput
+    postseason_home?: postseason_gamesUncheckedUpdateManyWithoutHome_team_relNestedInput
+    postseason_winner?: postseason_gamesUncheckedUpdateManyWithoutWinner_team_relNestedInput
+    postseason_seeds?: postseason_team_seedsUncheckedUpdateManyWithoutTeamNestedInput
+  }
+
+  export type teamsUpsertWithoutPostseason_winnerInput = {
+    update: XOR<teamsUpdateWithoutPostseason_winnerInput, teamsUncheckedUpdateWithoutPostseason_winnerInput>
+    create: XOR<teamsCreateWithoutPostseason_winnerInput, teamsUncheckedCreateWithoutPostseason_winnerInput>
+    where?: teamsWhereInput
+  }
+
+  export type teamsUpdateToOneWithWhereWithoutPostseason_winnerInput = {
+    where?: teamsWhereInput
+    data: XOR<teamsUpdateWithoutPostseason_winnerInput, teamsUncheckedUpdateWithoutPostseason_winnerInput>
+  }
+
+  export type teamsUpdateWithoutPostseason_winnerInput = {
+    abbrev?: NullableStringFieldUpdateOperationsInput | string | null
+    loc?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    conference?: NullableStringFieldUpdateOperationsInput | string | null
+    primary_color?: NullableStringFieldUpdateOperationsInput | string | null
+    secondary_color?: NullableStringFieldUpdateOperationsInput | string | null
+    tertiary_color?: NullableStringFieldUpdateOperationsInput | string | null
+    games_games_homeToteams?: gamesUpdateManyWithoutTeams_games_homeToteamsNestedInput
+    games_games_awayToteams?: gamesUpdateManyWithoutTeams_games_awayToteamsNestedInput
+    picks?: picksUpdateManyWithoutTeamsNestedInput
+    superbowl_superbowl_loserToteams?: superbowlUpdateManyWithoutTeams_superbowl_loserToteamsNestedInput
+    superbowl_superbowl_winnerToteams?: superbowlUpdateManyWithoutTeams_superbowl_winnerToteamsNestedInput
+    postseason_home?: postseason_gamesUpdateManyWithoutHome_team_relNestedInput
+    postseason_away?: postseason_gamesUpdateManyWithoutAway_team_relNestedInput
+    postseason_seeds?: postseason_team_seedsUpdateManyWithoutTeamNestedInput
+  }
+
+  export type teamsUncheckedUpdateWithoutPostseason_winnerInput = {
+    teamid?: IntFieldUpdateOperationsInput | number
+    abbrev?: NullableStringFieldUpdateOperationsInput | string | null
+    loc?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    conference?: NullableStringFieldUpdateOperationsInput | string | null
+    primary_color?: NullableStringFieldUpdateOperationsInput | string | null
+    secondary_color?: NullableStringFieldUpdateOperationsInput | string | null
+    tertiary_color?: NullableStringFieldUpdateOperationsInput | string | null
+    games_games_homeToteams?: gamesUncheckedUpdateManyWithoutTeams_games_homeToteamsNestedInput
+    games_games_awayToteams?: gamesUncheckedUpdateManyWithoutTeams_games_awayToteamsNestedInput
+    picks?: picksUncheckedUpdateManyWithoutTeamsNestedInput
+    superbowl_superbowl_loserToteams?: superbowlUncheckedUpdateManyWithoutTeams_superbowl_loserToteamsNestedInput
+    superbowl_superbowl_winnerToteams?: superbowlUncheckedUpdateManyWithoutTeams_superbowl_winnerToteamsNestedInput
+    postseason_home?: postseason_gamesUncheckedUpdateManyWithoutHome_team_relNestedInput
+    postseason_away?: postseason_gamesUncheckedUpdateManyWithoutAway_team_relNestedInput
+    postseason_seeds?: postseason_team_seedsUncheckedUpdateManyWithoutTeamNestedInput
+  }
+
+  export type postseason_gamesUpsertWithoutAdvances_fromInput = {
+    update: XOR<postseason_gamesUpdateWithoutAdvances_fromInput, postseason_gamesUncheckedUpdateWithoutAdvances_fromInput>
+    create: XOR<postseason_gamesCreateWithoutAdvances_fromInput, postseason_gamesUncheckedCreateWithoutAdvances_fromInput>
+    where?: postseason_gamesWhereInput
+  }
+
+  export type postseason_gamesUpdateToOneWithWhereWithoutAdvances_fromInput = {
+    where?: postseason_gamesWhereInput
+    data: XOR<postseason_gamesUpdateWithoutAdvances_fromInput, postseason_gamesUncheckedUpdateWithoutAdvances_fromInput>
+  }
+
+  export type postseason_gamesUpdateWithoutAdvances_fromInput = {
+    game_id?: StringFieldUpdateOperationsInput | string
+    espn_id?: IntFieldUpdateOperationsInput | number
+    season?: IntFieldUpdateOperationsInput | number
+    round?: EnumPostseasonRoundFieldUpdateOperationsInput | $Enums.PostseasonRound
+    conference?: NullableEnumConferenceFieldUpdateOperationsInput | $Enums.Conference | null
+    ts?: DateTimeFieldUpdateOperationsInput | Date | string
+    home_score?: NullableIntFieldUpdateOperationsInput | number | null
+    away_score?: NullableIntFieldUpdateOperationsInput | number | null
+    done?: BoolFieldUpdateOperationsInput | boolean
+    bracket_position?: IntFieldUpdateOperationsInput | number
+    home_team_rel?: teamsUpdateOneWithoutPostseason_homeNestedInput
+    away_team_rel?: teamsUpdateOneWithoutPostseason_awayNestedInput
+    winner_team_rel?: teamsUpdateOneWithoutPostseason_winnerNestedInput
+    advances_to?: postseason_gamesUpdateOneWithoutAdvances_fromNestedInput
+  }
+
+  export type postseason_gamesUncheckedUpdateWithoutAdvances_fromInput = {
+    game_id?: StringFieldUpdateOperationsInput | string
+    espn_id?: IntFieldUpdateOperationsInput | number
+    season?: IntFieldUpdateOperationsInput | number
+    round?: EnumPostseasonRoundFieldUpdateOperationsInput | $Enums.PostseasonRound
+    conference?: NullableEnumConferenceFieldUpdateOperationsInput | $Enums.Conference | null
+    ts?: DateTimeFieldUpdateOperationsInput | Date | string
+    home_team?: NullableIntFieldUpdateOperationsInput | number | null
+    away_team?: NullableIntFieldUpdateOperationsInput | number | null
+    home_score?: NullableIntFieldUpdateOperationsInput | number | null
+    away_score?: NullableIntFieldUpdateOperationsInput | number | null
+    winner?: NullableIntFieldUpdateOperationsInput | number | null
+    done?: BoolFieldUpdateOperationsInput | boolean
+    bracket_position?: IntFieldUpdateOperationsInput | number
+    advances_to_game_id?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type postseason_gamesUpsertWithWhereUniqueWithoutAdvances_toInput = {
+    where: postseason_gamesWhereUniqueInput
+    update: XOR<postseason_gamesUpdateWithoutAdvances_toInput, postseason_gamesUncheckedUpdateWithoutAdvances_toInput>
+    create: XOR<postseason_gamesCreateWithoutAdvances_toInput, postseason_gamesUncheckedCreateWithoutAdvances_toInput>
+  }
+
+  export type postseason_gamesUpdateWithWhereUniqueWithoutAdvances_toInput = {
+    where: postseason_gamesWhereUniqueInput
+    data: XOR<postseason_gamesUpdateWithoutAdvances_toInput, postseason_gamesUncheckedUpdateWithoutAdvances_toInput>
+  }
+
+  export type postseason_gamesUpdateManyWithWhereWithoutAdvances_toInput = {
+    where: postseason_gamesScalarWhereInput
+    data: XOR<postseason_gamesUpdateManyMutationInput, postseason_gamesUncheckedUpdateManyWithoutAdvances_toInput>
+  }
+
+  export type teamsCreateWithoutPostseason_seedsInput = {
+    abbrev?: string | null
+    loc: string
+    name: string
+    conference?: string | null
+    primary_color?: string | null
+    secondary_color?: string | null
+    tertiary_color?: string | null
+    games_games_homeToteams?: gamesCreateNestedManyWithoutTeams_games_homeToteamsInput
+    games_games_awayToteams?: gamesCreateNestedManyWithoutTeams_games_awayToteamsInput
+    picks?: picksCreateNestedManyWithoutTeamsInput
+    superbowl_superbowl_loserToteams?: superbowlCreateNestedManyWithoutTeams_superbowl_loserToteamsInput
+    superbowl_superbowl_winnerToteams?: superbowlCreateNestedManyWithoutTeams_superbowl_winnerToteamsInput
+    postseason_home?: postseason_gamesCreateNestedManyWithoutHome_team_relInput
+    postseason_away?: postseason_gamesCreateNestedManyWithoutAway_team_relInput
+    postseason_winner?: postseason_gamesCreateNestedManyWithoutWinner_team_relInput
+  }
+
+  export type teamsUncheckedCreateWithoutPostseason_seedsInput = {
+    teamid?: number
+    abbrev?: string | null
+    loc: string
+    name: string
+    conference?: string | null
+    primary_color?: string | null
+    secondary_color?: string | null
+    tertiary_color?: string | null
+    games_games_homeToteams?: gamesUncheckedCreateNestedManyWithoutTeams_games_homeToteamsInput
+    games_games_awayToteams?: gamesUncheckedCreateNestedManyWithoutTeams_games_awayToteamsInput
+    picks?: picksUncheckedCreateNestedManyWithoutTeamsInput
+    superbowl_superbowl_loserToteams?: superbowlUncheckedCreateNestedManyWithoutTeams_superbowl_loserToteamsInput
+    superbowl_superbowl_winnerToteams?: superbowlUncheckedCreateNestedManyWithoutTeams_superbowl_winnerToteamsInput
+    postseason_home?: postseason_gamesUncheckedCreateNestedManyWithoutHome_team_relInput
+    postseason_away?: postseason_gamesUncheckedCreateNestedManyWithoutAway_team_relInput
+    postseason_winner?: postseason_gamesUncheckedCreateNestedManyWithoutWinner_team_relInput
+  }
+
+  export type teamsCreateOrConnectWithoutPostseason_seedsInput = {
+    where: teamsWhereUniqueInput
+    create: XOR<teamsCreateWithoutPostseason_seedsInput, teamsUncheckedCreateWithoutPostseason_seedsInput>
+  }
+
+  export type teamsUpsertWithoutPostseason_seedsInput = {
+    update: XOR<teamsUpdateWithoutPostseason_seedsInput, teamsUncheckedUpdateWithoutPostseason_seedsInput>
+    create: XOR<teamsCreateWithoutPostseason_seedsInput, teamsUncheckedCreateWithoutPostseason_seedsInput>
+    where?: teamsWhereInput
+  }
+
+  export type teamsUpdateToOneWithWhereWithoutPostseason_seedsInput = {
+    where?: teamsWhereInput
+    data: XOR<teamsUpdateWithoutPostseason_seedsInput, teamsUncheckedUpdateWithoutPostseason_seedsInput>
+  }
+
+  export type teamsUpdateWithoutPostseason_seedsInput = {
+    abbrev?: NullableStringFieldUpdateOperationsInput | string | null
+    loc?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    conference?: NullableStringFieldUpdateOperationsInput | string | null
+    primary_color?: NullableStringFieldUpdateOperationsInput | string | null
+    secondary_color?: NullableStringFieldUpdateOperationsInput | string | null
+    tertiary_color?: NullableStringFieldUpdateOperationsInput | string | null
+    games_games_homeToteams?: gamesUpdateManyWithoutTeams_games_homeToteamsNestedInput
+    games_games_awayToteams?: gamesUpdateManyWithoutTeams_games_awayToteamsNestedInput
+    picks?: picksUpdateManyWithoutTeamsNestedInput
+    superbowl_superbowl_loserToteams?: superbowlUpdateManyWithoutTeams_superbowl_loserToteamsNestedInput
+    superbowl_superbowl_winnerToteams?: superbowlUpdateManyWithoutTeams_superbowl_winnerToteamsNestedInput
+    postseason_home?: postseason_gamesUpdateManyWithoutHome_team_relNestedInput
+    postseason_away?: postseason_gamesUpdateManyWithoutAway_team_relNestedInput
+    postseason_winner?: postseason_gamesUpdateManyWithoutWinner_team_relNestedInput
+  }
+
+  export type teamsUncheckedUpdateWithoutPostseason_seedsInput = {
+    teamid?: IntFieldUpdateOperationsInput | number
+    abbrev?: NullableStringFieldUpdateOperationsInput | string | null
+    loc?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    conference?: NullableStringFieldUpdateOperationsInput | string | null
+    primary_color?: NullableStringFieldUpdateOperationsInput | string | null
+    secondary_color?: NullableStringFieldUpdateOperationsInput | string | null
+    tertiary_color?: NullableStringFieldUpdateOperationsInput | string | null
+    games_games_homeToteams?: gamesUncheckedUpdateManyWithoutTeams_games_homeToteamsNestedInput
+    games_games_awayToteams?: gamesUncheckedUpdateManyWithoutTeams_games_awayToteamsNestedInput
+    picks?: picksUncheckedUpdateManyWithoutTeamsNestedInput
+    superbowl_superbowl_loserToteams?: superbowlUncheckedUpdateManyWithoutTeams_superbowl_loserToteamsNestedInput
+    superbowl_superbowl_winnerToteams?: superbowlUncheckedUpdateManyWithoutTeams_superbowl_winnerToteamsNestedInput
+    postseason_home?: postseason_gamesUncheckedUpdateManyWithoutHome_team_relNestedInput
+    postseason_away?: postseason_gamesUncheckedUpdateManyWithoutAway_team_relNestedInput
+    postseason_winner?: postseason_gamesUncheckedUpdateManyWithoutWinner_team_relNestedInput
   }
 
   export type picksCreateManyGamesInput = {
@@ -24092,6 +28773,61 @@ export namespace Prisma {
     member_id?: number | null
   }
 
+  export type postseason_gamesCreateManyHome_team_relInput = {
+    game_id?: string
+    espn_id: number
+    season: number
+    round: $Enums.PostseasonRound
+    conference?: $Enums.Conference | null
+    ts: Date | string
+    away_team?: number | null
+    home_score?: number | null
+    away_score?: number | null
+    winner?: number | null
+    done?: boolean
+    bracket_position: number
+    advances_to_game_id?: string | null
+  }
+
+  export type postseason_gamesCreateManyAway_team_relInput = {
+    game_id?: string
+    espn_id: number
+    season: number
+    round: $Enums.PostseasonRound
+    conference?: $Enums.Conference | null
+    ts: Date | string
+    home_team?: number | null
+    home_score?: number | null
+    away_score?: number | null
+    winner?: number | null
+    done?: boolean
+    bracket_position: number
+    advances_to_game_id?: string | null
+  }
+
+  export type postseason_gamesCreateManyWinner_team_relInput = {
+    game_id?: string
+    espn_id: number
+    season: number
+    round: $Enums.PostseasonRound
+    conference?: $Enums.Conference | null
+    ts: Date | string
+    home_team?: number | null
+    away_team?: number | null
+    home_score?: number | null
+    away_score?: number | null
+    done?: boolean
+    bracket_position: number
+    advances_to_game_id?: string | null
+  }
+
+  export type postseason_team_seedsCreateManyTeamInput = {
+    id?: string
+    season: number
+    conference: $Enums.Conference
+    seed: number
+  }
+
   export type gamesUpdateWithoutTeams_games_homeToteamsInput = {
     season?: IntFieldUpdateOperationsInput | number
     week?: IntFieldUpdateOperationsInput | number
@@ -24326,6 +29062,243 @@ export namespace Prisma {
     ts?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     season?: NullableIntFieldUpdateOperationsInput | number | null
     member_id?: NullableIntFieldUpdateOperationsInput | number | null
+  }
+
+  export type postseason_gamesUpdateWithoutHome_team_relInput = {
+    game_id?: StringFieldUpdateOperationsInput | string
+    espn_id?: IntFieldUpdateOperationsInput | number
+    season?: IntFieldUpdateOperationsInput | number
+    round?: EnumPostseasonRoundFieldUpdateOperationsInput | $Enums.PostseasonRound
+    conference?: NullableEnumConferenceFieldUpdateOperationsInput | $Enums.Conference | null
+    ts?: DateTimeFieldUpdateOperationsInput | Date | string
+    home_score?: NullableIntFieldUpdateOperationsInput | number | null
+    away_score?: NullableIntFieldUpdateOperationsInput | number | null
+    done?: BoolFieldUpdateOperationsInput | boolean
+    bracket_position?: IntFieldUpdateOperationsInput | number
+    away_team_rel?: teamsUpdateOneWithoutPostseason_awayNestedInput
+    winner_team_rel?: teamsUpdateOneWithoutPostseason_winnerNestedInput
+    advances_to?: postseason_gamesUpdateOneWithoutAdvances_fromNestedInput
+    advances_from?: postseason_gamesUpdateManyWithoutAdvances_toNestedInput
+  }
+
+  export type postseason_gamesUncheckedUpdateWithoutHome_team_relInput = {
+    game_id?: StringFieldUpdateOperationsInput | string
+    espn_id?: IntFieldUpdateOperationsInput | number
+    season?: IntFieldUpdateOperationsInput | number
+    round?: EnumPostseasonRoundFieldUpdateOperationsInput | $Enums.PostseasonRound
+    conference?: NullableEnumConferenceFieldUpdateOperationsInput | $Enums.Conference | null
+    ts?: DateTimeFieldUpdateOperationsInput | Date | string
+    away_team?: NullableIntFieldUpdateOperationsInput | number | null
+    home_score?: NullableIntFieldUpdateOperationsInput | number | null
+    away_score?: NullableIntFieldUpdateOperationsInput | number | null
+    winner?: NullableIntFieldUpdateOperationsInput | number | null
+    done?: BoolFieldUpdateOperationsInput | boolean
+    bracket_position?: IntFieldUpdateOperationsInput | number
+    advances_to_game_id?: NullableStringFieldUpdateOperationsInput | string | null
+    advances_from?: postseason_gamesUncheckedUpdateManyWithoutAdvances_toNestedInput
+  }
+
+  export type postseason_gamesUncheckedUpdateManyWithoutHome_team_relInput = {
+    game_id?: StringFieldUpdateOperationsInput | string
+    espn_id?: IntFieldUpdateOperationsInput | number
+    season?: IntFieldUpdateOperationsInput | number
+    round?: EnumPostseasonRoundFieldUpdateOperationsInput | $Enums.PostseasonRound
+    conference?: NullableEnumConferenceFieldUpdateOperationsInput | $Enums.Conference | null
+    ts?: DateTimeFieldUpdateOperationsInput | Date | string
+    away_team?: NullableIntFieldUpdateOperationsInput | number | null
+    home_score?: NullableIntFieldUpdateOperationsInput | number | null
+    away_score?: NullableIntFieldUpdateOperationsInput | number | null
+    winner?: NullableIntFieldUpdateOperationsInput | number | null
+    done?: BoolFieldUpdateOperationsInput | boolean
+    bracket_position?: IntFieldUpdateOperationsInput | number
+    advances_to_game_id?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type postseason_gamesUpdateWithoutAway_team_relInput = {
+    game_id?: StringFieldUpdateOperationsInput | string
+    espn_id?: IntFieldUpdateOperationsInput | number
+    season?: IntFieldUpdateOperationsInput | number
+    round?: EnumPostseasonRoundFieldUpdateOperationsInput | $Enums.PostseasonRound
+    conference?: NullableEnumConferenceFieldUpdateOperationsInput | $Enums.Conference | null
+    ts?: DateTimeFieldUpdateOperationsInput | Date | string
+    home_score?: NullableIntFieldUpdateOperationsInput | number | null
+    away_score?: NullableIntFieldUpdateOperationsInput | number | null
+    done?: BoolFieldUpdateOperationsInput | boolean
+    bracket_position?: IntFieldUpdateOperationsInput | number
+    home_team_rel?: teamsUpdateOneWithoutPostseason_homeNestedInput
+    winner_team_rel?: teamsUpdateOneWithoutPostseason_winnerNestedInput
+    advances_to?: postseason_gamesUpdateOneWithoutAdvances_fromNestedInput
+    advances_from?: postseason_gamesUpdateManyWithoutAdvances_toNestedInput
+  }
+
+  export type postseason_gamesUncheckedUpdateWithoutAway_team_relInput = {
+    game_id?: StringFieldUpdateOperationsInput | string
+    espn_id?: IntFieldUpdateOperationsInput | number
+    season?: IntFieldUpdateOperationsInput | number
+    round?: EnumPostseasonRoundFieldUpdateOperationsInput | $Enums.PostseasonRound
+    conference?: NullableEnumConferenceFieldUpdateOperationsInput | $Enums.Conference | null
+    ts?: DateTimeFieldUpdateOperationsInput | Date | string
+    home_team?: NullableIntFieldUpdateOperationsInput | number | null
+    home_score?: NullableIntFieldUpdateOperationsInput | number | null
+    away_score?: NullableIntFieldUpdateOperationsInput | number | null
+    winner?: NullableIntFieldUpdateOperationsInput | number | null
+    done?: BoolFieldUpdateOperationsInput | boolean
+    bracket_position?: IntFieldUpdateOperationsInput | number
+    advances_to_game_id?: NullableStringFieldUpdateOperationsInput | string | null
+    advances_from?: postseason_gamesUncheckedUpdateManyWithoutAdvances_toNestedInput
+  }
+
+  export type postseason_gamesUncheckedUpdateManyWithoutAway_team_relInput = {
+    game_id?: StringFieldUpdateOperationsInput | string
+    espn_id?: IntFieldUpdateOperationsInput | number
+    season?: IntFieldUpdateOperationsInput | number
+    round?: EnumPostseasonRoundFieldUpdateOperationsInput | $Enums.PostseasonRound
+    conference?: NullableEnumConferenceFieldUpdateOperationsInput | $Enums.Conference | null
+    ts?: DateTimeFieldUpdateOperationsInput | Date | string
+    home_team?: NullableIntFieldUpdateOperationsInput | number | null
+    home_score?: NullableIntFieldUpdateOperationsInput | number | null
+    away_score?: NullableIntFieldUpdateOperationsInput | number | null
+    winner?: NullableIntFieldUpdateOperationsInput | number | null
+    done?: BoolFieldUpdateOperationsInput | boolean
+    bracket_position?: IntFieldUpdateOperationsInput | number
+    advances_to_game_id?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type postseason_gamesUpdateWithoutWinner_team_relInput = {
+    game_id?: StringFieldUpdateOperationsInput | string
+    espn_id?: IntFieldUpdateOperationsInput | number
+    season?: IntFieldUpdateOperationsInput | number
+    round?: EnumPostseasonRoundFieldUpdateOperationsInput | $Enums.PostseasonRound
+    conference?: NullableEnumConferenceFieldUpdateOperationsInput | $Enums.Conference | null
+    ts?: DateTimeFieldUpdateOperationsInput | Date | string
+    home_score?: NullableIntFieldUpdateOperationsInput | number | null
+    away_score?: NullableIntFieldUpdateOperationsInput | number | null
+    done?: BoolFieldUpdateOperationsInput | boolean
+    bracket_position?: IntFieldUpdateOperationsInput | number
+    home_team_rel?: teamsUpdateOneWithoutPostseason_homeNestedInput
+    away_team_rel?: teamsUpdateOneWithoutPostseason_awayNestedInput
+    advances_to?: postseason_gamesUpdateOneWithoutAdvances_fromNestedInput
+    advances_from?: postseason_gamesUpdateManyWithoutAdvances_toNestedInput
+  }
+
+  export type postseason_gamesUncheckedUpdateWithoutWinner_team_relInput = {
+    game_id?: StringFieldUpdateOperationsInput | string
+    espn_id?: IntFieldUpdateOperationsInput | number
+    season?: IntFieldUpdateOperationsInput | number
+    round?: EnumPostseasonRoundFieldUpdateOperationsInput | $Enums.PostseasonRound
+    conference?: NullableEnumConferenceFieldUpdateOperationsInput | $Enums.Conference | null
+    ts?: DateTimeFieldUpdateOperationsInput | Date | string
+    home_team?: NullableIntFieldUpdateOperationsInput | number | null
+    away_team?: NullableIntFieldUpdateOperationsInput | number | null
+    home_score?: NullableIntFieldUpdateOperationsInput | number | null
+    away_score?: NullableIntFieldUpdateOperationsInput | number | null
+    done?: BoolFieldUpdateOperationsInput | boolean
+    bracket_position?: IntFieldUpdateOperationsInput | number
+    advances_to_game_id?: NullableStringFieldUpdateOperationsInput | string | null
+    advances_from?: postseason_gamesUncheckedUpdateManyWithoutAdvances_toNestedInput
+  }
+
+  export type postseason_gamesUncheckedUpdateManyWithoutWinner_team_relInput = {
+    game_id?: StringFieldUpdateOperationsInput | string
+    espn_id?: IntFieldUpdateOperationsInput | number
+    season?: IntFieldUpdateOperationsInput | number
+    round?: EnumPostseasonRoundFieldUpdateOperationsInput | $Enums.PostseasonRound
+    conference?: NullableEnumConferenceFieldUpdateOperationsInput | $Enums.Conference | null
+    ts?: DateTimeFieldUpdateOperationsInput | Date | string
+    home_team?: NullableIntFieldUpdateOperationsInput | number | null
+    away_team?: NullableIntFieldUpdateOperationsInput | number | null
+    home_score?: NullableIntFieldUpdateOperationsInput | number | null
+    away_score?: NullableIntFieldUpdateOperationsInput | number | null
+    done?: BoolFieldUpdateOperationsInput | boolean
+    bracket_position?: IntFieldUpdateOperationsInput | number
+    advances_to_game_id?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type postseason_team_seedsUpdateWithoutTeamInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    season?: IntFieldUpdateOperationsInput | number
+    conference?: EnumConferenceFieldUpdateOperationsInput | $Enums.Conference
+    seed?: IntFieldUpdateOperationsInput | number
+  }
+
+  export type postseason_team_seedsUncheckedUpdateWithoutTeamInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    season?: IntFieldUpdateOperationsInput | number
+    conference?: EnumConferenceFieldUpdateOperationsInput | $Enums.Conference
+    seed?: IntFieldUpdateOperationsInput | number
+  }
+
+  export type postseason_team_seedsUncheckedUpdateManyWithoutTeamInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    season?: IntFieldUpdateOperationsInput | number
+    conference?: EnumConferenceFieldUpdateOperationsInput | $Enums.Conference
+    seed?: IntFieldUpdateOperationsInput | number
+  }
+
+  export type postseason_gamesCreateManyAdvances_toInput = {
+    game_id?: string
+    espn_id: number
+    season: number
+    round: $Enums.PostseasonRound
+    conference?: $Enums.Conference | null
+    ts: Date | string
+    home_team?: number | null
+    away_team?: number | null
+    home_score?: number | null
+    away_score?: number | null
+    winner?: number | null
+    done?: boolean
+    bracket_position: number
+  }
+
+  export type postseason_gamesUpdateWithoutAdvances_toInput = {
+    game_id?: StringFieldUpdateOperationsInput | string
+    espn_id?: IntFieldUpdateOperationsInput | number
+    season?: IntFieldUpdateOperationsInput | number
+    round?: EnumPostseasonRoundFieldUpdateOperationsInput | $Enums.PostseasonRound
+    conference?: NullableEnumConferenceFieldUpdateOperationsInput | $Enums.Conference | null
+    ts?: DateTimeFieldUpdateOperationsInput | Date | string
+    home_score?: NullableIntFieldUpdateOperationsInput | number | null
+    away_score?: NullableIntFieldUpdateOperationsInput | number | null
+    done?: BoolFieldUpdateOperationsInput | boolean
+    bracket_position?: IntFieldUpdateOperationsInput | number
+    home_team_rel?: teamsUpdateOneWithoutPostseason_homeNestedInput
+    away_team_rel?: teamsUpdateOneWithoutPostseason_awayNestedInput
+    winner_team_rel?: teamsUpdateOneWithoutPostseason_winnerNestedInput
+    advances_from?: postseason_gamesUpdateManyWithoutAdvances_toNestedInput
+  }
+
+  export type postseason_gamesUncheckedUpdateWithoutAdvances_toInput = {
+    game_id?: StringFieldUpdateOperationsInput | string
+    espn_id?: IntFieldUpdateOperationsInput | number
+    season?: IntFieldUpdateOperationsInput | number
+    round?: EnumPostseasonRoundFieldUpdateOperationsInput | $Enums.PostseasonRound
+    conference?: NullableEnumConferenceFieldUpdateOperationsInput | $Enums.Conference | null
+    ts?: DateTimeFieldUpdateOperationsInput | Date | string
+    home_team?: NullableIntFieldUpdateOperationsInput | number | null
+    away_team?: NullableIntFieldUpdateOperationsInput | number | null
+    home_score?: NullableIntFieldUpdateOperationsInput | number | null
+    away_score?: NullableIntFieldUpdateOperationsInput | number | null
+    winner?: NullableIntFieldUpdateOperationsInput | number | null
+    done?: BoolFieldUpdateOperationsInput | boolean
+    bracket_position?: IntFieldUpdateOperationsInput | number
+    advances_from?: postseason_gamesUncheckedUpdateManyWithoutAdvances_toNestedInput
+  }
+
+  export type postseason_gamesUncheckedUpdateManyWithoutAdvances_toInput = {
+    game_id?: StringFieldUpdateOperationsInput | string
+    espn_id?: IntFieldUpdateOperationsInput | number
+    season?: IntFieldUpdateOperationsInput | number
+    round?: EnumPostseasonRoundFieldUpdateOperationsInput | $Enums.PostseasonRound
+    conference?: NullableEnumConferenceFieldUpdateOperationsInput | $Enums.Conference | null
+    ts?: DateTimeFieldUpdateOperationsInput | Date | string
+    home_team?: NullableIntFieldUpdateOperationsInput | number | null
+    away_team?: NullableIntFieldUpdateOperationsInput | number | null
+    home_score?: NullableIntFieldUpdateOperationsInput | number | null
+    away_score?: NullableIntFieldUpdateOperationsInput | number | null
+    winner?: NullableIntFieldUpdateOperationsInput | number | null
+    done?: BoolFieldUpdateOperationsInput | boolean
+    bracket_position?: IntFieldUpdateOperationsInput | number
   }
 
 

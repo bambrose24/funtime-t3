@@ -21,12 +21,13 @@ export default async function SuperbowlPicksPage(props: Props) {
     notFound();
   }
 
-  const [superbowlPicks, league, teams] = await Promise.all([
+  const [superbowlPicks, league, teams, bracket] = await Promise.all([
     serverApi.league.superbowlPicks({
       leagueId: member.league_id,
     }),
     serverApi.league.get({ leagueId: member.league_id }),
     serverApi.teams.getTeams(),
+    serverApi.postseason.getBracket({ season: member.leagues.season }),
   ]);
 
   return (
@@ -35,6 +36,7 @@ export default async function SuperbowlPicksPage(props: Props) {
       teams={teams}
       session={session}
       superbowlPicks={superbowlPicks}
+      bracket={bracket}
     />
   );
 }
