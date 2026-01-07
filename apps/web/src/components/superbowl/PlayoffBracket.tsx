@@ -47,7 +47,7 @@ type PlayoffBracketProps = {
 };
 
 type BracketSlotProps = {
-  teamId: number | null;
+  teamId: number | null; // test
   seed: number | null;
   isWinner: boolean;
   isEliminated: boolean;
