@@ -27,12 +27,10 @@ type TabType = "overview" | "picks" | "leaderboard";
 export default function LeagueScreen() {
   const { id, tab } = useLocalSearchParams<{ id: string; tab?: string }>();
 
-  // Initialize tab from route parameter, defaulting to "overview"
-  const initialTab =
+  const activeTab: TabType =
     tab && ["overview", "picks", "leaderboard"].includes(tab)
       ? (tab as TabType)
       : "overview";
-  const [activeTab, setActiveTab] = useState<TabType>(initialTab);
   const [isPicksModalVisible, setIsPicksModalVisible] = useState(false);
   const { isDarkColorScheme } = useColorScheme();
   const scaleValue = useState(new Animated.Value(1))[0];
@@ -57,10 +55,19 @@ export default function LeagueScreen() {
   const leagueIdNumber = id ? parseInt(id, 10) : undefined;
 
   // Prefetch ALL league data immediately when screen loads
-  const { prefetchLeagueData } = usePrefetchForLeague(leagueIdNumber, {
+  usePrefetchForLeague(leagueIdNumber, {
     immediate: true, // Start prefetching right away
     aggressive: true, // Prefetch historical data too
   });
+
+  const navigateToTab = (nextTab: TabType) => {
+    if (!id) return;
+    const nextPath =
+      nextTab === "overview"
+        ? `/league/${id}`
+        : `/league/${id}?tab=${nextTab}`;
+    router.replace(nextPath as any);
+  };
 
   // Fetch league data to display league name (this should be cached from prefetch)
   const { data: leagueData, isLoading: leagueLoading } =
@@ -97,7 +104,7 @@ export default function LeagueScreen() {
         return (
           <LeagueOverview
             leagueId={id}
-            onSwitchToPicks={() => setActiveTab("picks")}
+            onSwitchToPicks={() => navigateToTab("picks")}
             isPicksModalVisible={isPicksModalVisible}
             setIsPicksModalVisible={setIsPicksModalVisible}
           />
@@ -164,7 +171,7 @@ export default function LeagueScreen() {
               {tabs.map((tab) => (
                 <Pressable
                   key={tab.key}
-                  onPress={() => setActiveTab(tab.key)}
+                  onPress={() => navigateToTab(tab.key)}
                   className="mr-6 px-4 py-3"
                 >
                   <Text

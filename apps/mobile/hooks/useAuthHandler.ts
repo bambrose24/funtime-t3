@@ -3,6 +3,7 @@ import { useRouter, useSegments } from "expo-router";
 import * as Linking from "expo-linking";
 import { type Session } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase/client";
+import { clientApi } from "@/lib/trpc/react";
 
 // Lightweight hook for just Supabase session state (for auth navigation logic)
 export function useSupabaseSession() {
@@ -38,6 +39,12 @@ export function useSupabaseSession() {
  */
 export function useAuthHandler() {
   const { session, isLoading } = useSupabaseSession();
+  const { data: appSession, isLoading: isAppSessionLoading } =
+    clientApi.session.current.useQuery(undefined, {
+      enabled: !!session,
+      retry: false,
+      refetchOnWindowFocus: true,
+    });
   const segments = useSegments();
   const router = useRouter();
 
@@ -47,7 +54,7 @@ export function useAuthHandler() {
       const { path, queryParams } = Linking.parse(url);
 
       // Handle auth callback deep links (email confirmation)
-      if (path === "/auth/callback" && queryParams?.code) {
+      if ((path === "/auth/callback" || path === "auth/callback") && queryParams?.code) {
         const next = queryParams.next ? `&next=${queryParams.next}` : "";
         router.push(`/auth/callback?code=${queryParams.code}${next}` as any);
       }
@@ -70,22 +77,40 @@ export function useAuthHandler() {
   useEffect(() => {
     if (isLoading) return;
 
+    const hasSession = Boolean(session);
+    const hasDbUser = Boolean(appSession?.dbUser);
+    const waitingOnDbUser = hasSession && isAppSessionLoading;
+    if (waitingOnDbUser) return;
+
     const inAuthGroup =
       segments[0] === "auth" ||
-      segments[0] === "signup" ||
-      segments[0] === "confirm-signup";
+      segments[0] === "signup";
+    const inConfirmSignup = segments[0] === "confirm-signup";
+    const inAuthCallback = segments[0] === "auth" && segments[1] === "callback";
 
-    if (session && inAuthGroup) {
-      // User is signed in but on auth page, redirect to main app
-      router.replace("/");
-    } else if (!session && !inAuthGroup) {
-      // User is not signed in and not on auth page, redirect to auth
-      router.replace("/auth");
+    if (!hasSession) {
+      if (!inAuthGroup && !inAuthCallback) {
+        router.replace("/auth");
+      }
+      return;
     }
-  }, [session, segments, isLoading]);
+
+    // Signed in but profile not created in app DB yet.
+    if (!hasDbUser) {
+      if (!inConfirmSignup && !inAuthCallback) {
+        router.replace("/confirm-signup");
+      }
+      return;
+    }
+
+    // Fully onboarded user should not remain on auth/onboarding screens.
+    if (inAuthGroup || inConfirmSignup || inAuthCallback) {
+      router.replace("/");
+    }
+  }, [session, appSession?.dbUser, segments, isLoading, isAppSessionLoading, router]);
 
   return {
     session,
-    isLoading,
+    isLoading: isLoading || (Boolean(session) && isAppSessionLoading),
   };
 }

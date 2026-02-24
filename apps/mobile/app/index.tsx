@@ -27,13 +27,12 @@ export default function HomeScreen() {
       { enabled: !!session?.dbUser }, // Only fetch if user is authenticated
     );
 
-  // Get leagues for 2024/2025 seasons for prefetching
-  // Use useMemo to stabilize the array reference to avoid hook order issues
+  // Prefetch active season leagues for faster transitions.
   const prefetchLeagueIds = useMemo(() => {
     if (!homeData) return [];
     return homeData
-      .filter((l) => l.season === 2024 || l.season === 2025)
-      .map(l => l.league_id);
+      .filter((l) => l.season === DEFAULT_SEASON)
+      .map((l) => l.league_id);
   }, [homeData]);
 
   // Always call the hook to maintain hook order, but it will handle empty arrays gracefully

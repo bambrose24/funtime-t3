@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import { clientApi } from "@/lib/trpc/react";
 import { type Session } from "@supabase/supabase-js";
 import { createComponentLogger } from "@/lib/logging";
+import { DEFAULT_SEASON } from "@/constants";
 
 /**
  * Hook to prefetch essential data on cold start
@@ -42,7 +43,7 @@ export function useColdStartPrefetch(session: Session | null, isLoading: boolean
         // Step 5: Prefetch data for the user's most important leagues
         // Prioritize current season leagues and limit to top 3 for performance
         const priorityLeagues = homeData
-          .filter(league => league.season === 2025) // Current season
+          .filter((league) => league.season === DEFAULT_SEASON)
           .slice(0, 3); // Top 3 leagues only
 
         logger.info('Prefetching priority leagues', { 

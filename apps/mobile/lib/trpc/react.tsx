@@ -7,7 +7,6 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   QueryClient,
   QueryClientProvider,
-  MutationCache,
   onlineManager,
   focusManager,
 } from "@tanstack/react-query";
@@ -53,16 +52,18 @@ export function TRPCReactProvider({ children }: { children: React.ReactNode }) {
       deserialize: SuperJSON.parse,
     });
 
-    const [restore] = persistQueryClient({
+    const [unsubscribe, restorePromise] = persistQueryClient({
       queryClient,
       persister,
       maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
       buster: "app-v1",
     });
 
-    // Restore persisted data (synchronous), then resume mutations
-    restore();
-    queryClient.resumePausedMutations().finally(() => setIsReady(true));
+    restorePromise
+      .then(() => queryClient.resumePausedMutations())
+      .finally(() => setIsReady(true));
+
+    return unsubscribe;
   }, [queryClient]);
 
   const [trpcClient] = useState(() =>
