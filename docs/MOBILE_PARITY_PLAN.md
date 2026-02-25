@@ -118,6 +118,11 @@ Guiding rule:
   - configure runtime values:
     - iOS: `IOS_DEEPLINK_APP_IDS` (comma-separated `TEAM_ID.BUNDLE_ID`)
     - Android: either `ANDROID_DEEPLINK_TARGETS_JSON` or `ANDROID_DEEPLINK_PACKAGE_NAME` + `ANDROID_DEEPLINK_SHA256_CERT_FINGERPRINTS`
+5. Prisma migration rollout:
+  - migration workflow scripts are available in `packages/api/package.json` (`db:migrate:dev`, `db:migrate:create`, `db:migrate:deploy`, `db:migrate:status`, `db:migrate:resolve`)
+  - baseline migration for existing schema: `packages/api/prisma/migrations/20260225000000_baseline/migration.sql`
+  - incremental migration for notification tokens: `packages/api/prisma/migrations/20260225041054_add_push_notification_tokens/migration.sql`
+  - deploy environments should use `prisma migrate deploy` (not `db push`) for deterministic schema changes
 
 ## 7. Deep-Link Routing Spec
 | Shared URL | Mobile Target Route | Auth Requirement | Fallback |

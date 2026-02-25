@@ -25,6 +25,11 @@
     "clean": "rm -rf dist",
     "postinstall": "prisma generate",
     "db:generate": "prisma generate",
+    "db:migrate:dev": "DOTENV_CONFIG_PATH=../../.env.local prisma migrate dev",
+    "db:migrate:create": "DOTENV_CONFIG_PATH=../../.env.local prisma migrate dev --create-only",
+    "db:migrate:deploy": "DOTENV_CONFIG_PATH=../../.env.local prisma migrate deploy",
+    "db:migrate:status": "DOTENV_CONFIG_PATH=../../.env.local prisma migrate status",
+    "db:migrate:resolve": "DOTENV_CONFIG_PATH=../../.env.local prisma migrate resolve",
     "db:push": "DOTENV_CONFIG_PATH=../../.env.local prisma db push",
     "db:pull": "DOTENV_CONFIG_PATH=../../.env.local prisma db pull",
     "db:studio": "DOTENV_CONFIG_PATH=../../.env.local prisma studio"

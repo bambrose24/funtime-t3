@@ -11,6 +11,12 @@
 - Pre-step: `0.0 Initialize and baseline WORKLOG.md`.
 
 ## Completed Tasks
+- Task ID: `P0-PRISMA-001`
+  - Short title: Add real Prisma migration workflow scaffolding and first SQL migration.
+  - Scope touched: `packages/api/package.json`, `packages/api/prisma/migrations/20260225000000_baseline/migration.sql`, `packages/api/prisma/migrations/20260225041054_add_push_notification_tokens/migration.sql`.
+  - Outcome: Added `db:migrate:*` scripts for dev/deploy/status/resolve flows, generated a full baseline migration for existing schema state, and added an incremental push-token migration for `pushNotificationTokens` (instead of relying only on `db push`).
+  - Validation run: `pnpm --filter @funtime/mobile typecheck`, `pnpm --filter @funtime/api typecheck`, `pnpm --filter @funtime/web typecheck`.
+  - Timestamp (UTC): `2026-02-25T04:22:01Z`.
 - Task ID: `P2-NOTIFY-003`
   - Short title: Implement week-summary push/email scheduler pipeline.
   - Scope touched: `apps/web/src/cron/index.ts`, `packages/api/server/services/resend/index.ts`, `packages/api/server/services/expo-push/index.ts`, `packages/api/src/index.ts`.
@@ -176,6 +182,7 @@
 2. `P3-ADMIN-QA-001`: Validate mobile admin message/email/pick workflows under league-admin and super-admin identities.
 3. `P0-DEEPLINK-QA-001`: Validate `play-funtime.com` deep links for `/join-league`, `/league/:id`, `/settings`, and `/admin`.
 4. `P2-NOTIFY-QA-001`: Validate push/email delivery behavior in staging (token registration, message pushes, and week summary schedule).
+5. `P0-PRISMA-002`: Validate `prisma migrate status/deploy` against target DB and baseline strategy for existing environments.
 
 ## Decisions & Rationale
 - Full parity target includes player + admin (including global admin) to avoid permanent web-only operational gaps.
@@ -193,6 +200,8 @@
 - Notification foundation decision: token registration should fail soft when the push-token table is not yet deployed, so app auth/settings flows remain stable.
 - Message-push decision: notification delivery is best-effort and must not block message writes; failures are logged and writes still succeed.
 - Week-summary scheduling decision: summaries are sent once per member per league/week, no earlier than 12:00 UTC the day after the final game timestamp for that week.
+- Prisma migration decision: `db push` remains for quick local sync only; environment rollout should use checked-in SQL migrations via `prisma migrate deploy`.
+- Prisma baseline decision: existing environments should mark baseline migration as applied, then run deploy for incremental migrations.
 
 ## Risks / Blockers
 - Risk: Route refactor can cause regressions in deep links and auth redirects.
@@ -213,6 +222,9 @@
 - Risk: Week-summary "morning after" timing currently uses a fixed UTC threshold and may need timezone/business-rule tuning.
   - Owner: Implementer.
   - Mitigation: validate behavior against expected league timing and adjust scheduling window or timezone basis in a follow-up iteration.
+- Risk: `prisma migrate status` currently errors in this environment (`Schema engine error`), so DB migration state is not yet verified end-to-end.
+  - Owner: Implementer.
+  - Mitigation: rerun migrate status/deploy in target runtime with confirmed DB connectivity/credentials and resolve baseline if needed.
 
 ## Validation Evidence
 - `2026-02-25T02:52:26Z`: `pnpm --filter @funtime/mobile typecheck` passed.
@@ -265,6 +277,13 @@
 - `2026-02-25T04:10:54Z`: `pnpm --filter @funtime/mobile typecheck` passed.
 - `2026-02-25T04:10:54Z`: `pnpm --filter @funtime/api typecheck` passed.
 - `2026-02-25T04:10:54Z`: `pnpm --filter @funtime/web typecheck` passed.
+- `2026-02-25T04:22:01Z`: `pnpm --filter @funtime/mobile typecheck` passed.
+- `2026-02-25T04:22:01Z`: `pnpm --filter @funtime/api typecheck` passed.
+- `2026-02-25T04:22:01Z`: `pnpm --filter @funtime/web typecheck` passed.
+- `2026-02-25T04:22:01Z`: `pnpm --filter @funtime/api db:migrate:status` failed (`Schema engine error`; DB connectivity/runtime issue to resolve outside sandbox).
+- `2026-02-25T04:23:32Z`: `pnpm --filter @funtime/mobile typecheck` passed.
+- `2026-02-25T04:23:32Z`: `pnpm --filter @funtime/api typecheck` passed.
+- `2026-02-25T04:23:32Z`: `pnpm --filter @funtime/web typecheck` passed.
 
 ## Parity Matrix Snapshot
 | Area | Status | Notes |
