@@ -1,5 +1,6 @@
 import React from "react";
-import { View, Text, ScrollView } from "react-native";
+import { View, Text, Pressable } from "react-native";
+import { router } from "expo-router";
 import { type RouterOutputs } from "~/trpc/types";
 import { clientApi } from "@/lib/trpc/react";
 
@@ -7,9 +8,10 @@ type LeaderboardData = RouterOutputs["leaderboard"]["league"];
 
 type Props = {
   leaderboard: LeaderboardData | null;
+  leagueId: string;
 };
 
-export function MobileLeaderboardTable({ leaderboard }: Props) {
+export function MobileLeaderboardTable({ leaderboard, leagueId }: Props) {
   // Get current user to highlight their row
   const { data: session } = clientApi.session.current.useQuery();
   const currentUserId = session?.dbUser?.uid;
@@ -26,13 +28,6 @@ export function MobileLeaderboardTable({ leaderboard }: Props) {
       </View>
     );
   }
-
-  const formatRank = (rank: number) => {
-    if (rank === 1) return "1st";
-    if (rank === 2) return "2nd";
-    if (rank === 3) return "3rd";
-    return `${rank}th`;
-  };
 
   return (
     <View className="overflow-hidden rounded-lg border border-gray-200 dark:border-zinc-700">
@@ -66,9 +61,14 @@ export function MobileLeaderboardTable({ leaderboard }: Props) {
           : "bg-white dark:bg-zinc-900";
 
         return (
-          <View
+          <Pressable
             key={member.member.membership_id}
             className={`flex-row ${rowBgColor}`}
+            onPress={() =>
+              router.push(
+                `/league/${leagueId}/player/${member.member.membership_id}` as any,
+              )
+            }
           >
             {/* Rank */}
             <View className="w-20 justify-center border-r border-gray-200 px-3 py-3 dark:border-zinc-700">
@@ -77,7 +77,7 @@ export function MobileLeaderboardTable({ leaderboard }: Props) {
                   ? "text-yellow-600 dark:text-yellow-400" 
                   : "text-gray-900 dark:text-gray-100"
               }`}>
-                {formatRank(member.rank)}
+                {member.rank}
               </Text>
             </View>
 
@@ -108,7 +108,7 @@ export function MobileLeaderboardTable({ leaderboard }: Props) {
                 {member.correct}
               </Text>
             </View>
-          </View>
+          </Pressable>
         );
       })}
     </View>

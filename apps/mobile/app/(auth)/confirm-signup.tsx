@@ -65,7 +65,7 @@ export default function ConfirmSignupScreen() {
               if (redirectTo) {
                 router.replace(redirectTo as any);
               } else {
-                router.replace("/");
+                router.replace("/home" as any);
               }
             },
           },

@@ -40,26 +40,25 @@ export function LeagueWeekMessageSheetContent({
   closeSheet: () => void;
 }) {
   const { data: league } = clientApi.league.get.useQuery({ leagueId });
-  const { data: messagesData } =
-    clientApi.messages.leagueWeekMessageBoard.useQuery(
-      { leagueId, week },
-      {
-        refetchInterval: MESSAGES_REFETCH_INTERVAL_MS,
-      },
-    );
+  const { data: messagesData } = clientApi.messages.leagueMessageBoard.useQuery(
+    { leagueId },
+    {
+      refetchInterval: MESSAGES_REFETCH_INTERVAL_MS,
+    },
+  );
   const { data: session } = clientApi.session.current.useQuery();
   const utils = clientApi.useUtils();
 
   const onSuccess = async () => {
-    await utils.messages.leagueWeekMessageBoard.invalidate({
+    await utils.messages.leagueMessageBoard.invalidate({
       leagueId,
-      week,
     });
   };
-  const { mutateAsync: sendMessage } =
-    clientApi.messages.writeWeekMessage.useMutation({
+  const { mutateAsync: sendMessage } = clientApi.messages.writeMessage.useMutation(
+    {
       onSuccess,
-    });
+    },
+  );
 
   const messages = messagesData ?? [];
 
@@ -100,7 +99,7 @@ export function LeagueWeekMessageSheetContent({
       )}
     >
       <SheetHeader className="row-span-1 flex flex-col gap-4 space-y-0">
-        <SheetTitle>Week {week} Message Board</SheetTitle>
+        <SheetTitle>League Message Board</SheetTitle>
         <Separator />
       </SheetHeader>
       <ScrollArea className="row-span-1 h-full overflow-y-auto">
@@ -131,7 +130,6 @@ export function LeagueWeekMessageSheetContent({
 
                   <DeleteMessageButton
                     message={message}
-                    week={week}
                     leagueId={leagueId}
                   />
                 </div>
@@ -165,7 +163,6 @@ export function LeagueWeekMessageSheetContent({
             await sendMessage({
               content: data.message,
               leagueId,
-              week,
             });
           }}
         />
@@ -176,11 +173,9 @@ export function LeagueWeekMessageSheetContent({
 
 function DeleteMessageButton({
   message,
-  week,
   leagueId,
 }: {
-  message: RouterOutputs["messages"]["leagueWeekMessageBoard"][number];
-  week: number;
+  message: RouterOutputs["messages"]["leagueMessageBoard"][number];
   leagueId: number;
 }) {
   const utils = clientApi.useUtils();
@@ -188,9 +183,8 @@ function DeleteMessageButton({
   const { mutateAsync: deleteMessage, isPending } =
     clientApi.messages.deleteMessage.useMutation({
       onSuccess: async () => {
-        await utils.messages.leagueWeekMessageBoard.invalidate({
+        await utils.messages.leagueMessageBoard.invalidate({
           leagueId,
-          week,
         });
         toast.success(`Deleted message`);
       },

@@ -154,24 +154,40 @@ model leagues {
 }
 
 model people {
-  uid              Int             @id(map: "idx_18430_primary") @default(autoincrement())
-  username         String          @db.VarChar(255)
-  fname            String          @db.VarChar(255)
-  lname            String          @db.VarChar(255)
-  email            String          @unique @db.VarChar(255)
-  season           Int
-  email2           String?         @db.VarChar(255)
-  google_photo_url String?
-  google_email     String?
-  google_userid    String?
-  supabase_id      String?         @unique @db.VarChar(255)
-  leaguemembers    leaguemembers[]
-  leagues          leagues[]
-  picks            picks[]
+  uid                    Int                      @id(map: "idx_18430_primary") @default(autoincrement())
+  username               String                   @db.VarChar(255)
+  fname                  String                   @db.VarChar(255)
+  lname                  String                   @db.VarChar(255)
+  email                  String                   @unique @db.VarChar(255)
+  season                 Int
+  email2                 String?                  @db.VarChar(255)
+  google_photo_url       String?
+  google_email           String?
+  google_userid          String?
+  supabase_id            String?                  @unique @db.VarChar(255)
+  leaguemembers          leaguemembers[]
+  leagues                leagues[]
+  picks                  picks[]
+  pushNotificationTokens pushNotificationTokens[]
 
   @@index([email], map: "idx_18430_email_index")
   @@index([season], map: "idx_18430_season")
   @@index([supabase_id], map: "idx_18430_supabase_id")
+}
+
+model pushNotificationTokens {
+  push_token_id String   @id @default(cuid())
+  user_id       Int
+  token         String   @unique
+  platform      String?  @db.VarChar(32)
+  enabled       Boolean  @default(true)
+  created_at    DateTime @default(now()) @db.Timestamptz(6)
+  updated_at    DateTime @updatedAt @db.Timestamptz(6)
+  last_seen_at  DateTime @default(now()) @db.Timestamptz(6)
+  people        people   @relation(fields: [user_id], references: [uid], onDelete: Cascade)
+
+  @@index([user_id], map: "idx_push_tokens_user")
+  @@index([enabled], map: "idx_push_tokens_enabled")
 }
 
 model picks {

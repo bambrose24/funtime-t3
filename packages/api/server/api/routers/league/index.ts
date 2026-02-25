@@ -21,6 +21,12 @@ import {
 } from "../../trpc";
 import { leagueAdminRouter } from "./admin";
 
+const SUPER_ADMIN_EMAIL = "bambrose24@gmail.com";
+
+const isSuperAdminUser = (email?: string | null) => {
+  return email?.toLowerCase() === SUPER_ADMIN_EMAIL;
+};
+
 const picksSummarySchema = z.object({
   leagueId: z.number().int(),
   week: z.number().int(), // only allowed for specific week because otherwise the response is too big and hangs forever
@@ -246,10 +252,11 @@ export const leagueRouter = createTRPCRouter({
     .query(async ({ input, ctx }) => {
       const { leagueId } = input;
       const { db } = ctx;
+      const requestorIsSuperAdmin = isSuperAdminUser(ctx.dbUser?.email);
       const usersLeagueIds = (
         ctx.dbUser?.leaguemembers.map((m) => m.league_id) ?? []
       ).filter(Defined);
-      if (!usersLeagueIds.includes(leagueId)) {
+      if (!requestorIsSuperAdmin && !usersLeagueIds.includes(leagueId)) {
         throw UnauthorizedError;
       }
       return await db.leagues.findFirstOrThrow({
@@ -291,10 +298,11 @@ export const leagueRouter = createTRPCRouter({
     .input(leagueIdSchema)
     .query(async ({ input, ctx }) => {
       const { leagueId } = input;
+      const requestorIsSuperAdmin = isSuperAdminUser(ctx.dbUser?.email);
       const member = ctx.dbUser?.leaguemembers.find(
         (m) => m.league_id === leagueId,
       );
-      if (!member) {
+      if (!member && !requestorIsSuperAdmin) {
         throw new TRPCError({
           code: "BAD_REQUEST",
           message: `You are not in that league ${leagueId} user ${ctx.dbUser?.uid}`,
@@ -371,7 +379,7 @@ export const leagueRouter = createTRPCRouter({
           gid: {
             in: games.map((g) => g.gid),
           },
-          member_id: member.membership_id,
+          member_id: member?.membership_id ?? -1,
         },
       });
 

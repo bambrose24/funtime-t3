@@ -10,9 +10,19 @@ import { Defined } from "../../../../utils/defined";
 import { resendApi } from "../../../services/resend";
 import { authorizedProcedure, createTRPCRouter } from "../../trpc";
 
+const SUPER_ADMIN_EMAIL = "bambrose24@gmail.com";
+
+const isSuperAdminUser = (email?: string | null) => {
+  return email?.toLowerCase() === SUPER_ADMIN_EMAIL;
+};
+
 const leagueAdminProcedure = authorizedProcedure
   .input(z.object({ leagueId: z.number().int() }))
   .use(async ({ ctx, next, path, input }) => {
+    const superAdmin = isSuperAdminUser(ctx.dbUser?.email);
+    if (superAdmin) {
+      return next();
+    }
     const member = ctx.dbUser?.leaguemembers.find(
       (m) => m.league_id === input.leagueId,
     );
@@ -279,6 +289,7 @@ export const leagueAdminRouter = createTRPCRouter({
     )
     .mutation(async ({ ctx, input }) => {
       const { gameId, memberId, leagueId, winner, score } = input;
+      const requestorIsSuperAdmin = isSuperAdminUser(ctx.dbUser?.email);
       const [game, member, league] = await Promise.all([
         ctx.db.games.findFirstOrThrow({
           where: {
@@ -309,6 +320,13 @@ export const leagueAdminRouter = createTRPCRouter({
         throw new TRPCError({
           code: "BAD_REQUEST",
           message: `Could not find team ${winner} for game ${game.gid}`,
+        });
+      }
+
+      if (!requestorIsSuperAdmin && game.ts <= new Date()) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "League admins cannot edit picks after kickoff",
         });
       }
 
@@ -422,12 +440,19 @@ export const leagueAdminRouter = createTRPCRouter({
   canSendLeagueBroadcast: leagueAdminProcedure.query(async ({ ctx, input }) => {
     const { db, dbUser } = ctx;
     const { leagueId } = input;
+    const requestorIsSuperAdmin = isSuperAdminUser(dbUser?.email);
+    if (!dbUser) {
+      throw new TRPCError({
+        code: "UNAUTHORIZED",
+        message: "You must be signed in to send league broadcasts",
+      });
+    }
 
-    // Check if the user is an admin of the league
+    // League admins and super-admin can send broadcasts.
     const adminMembership = dbUser?.leaguemembers.find(
       (m) => m.role === MemberRole.admin && m.league_id === leagueId,
     );
-    if (!adminMembership || !dbUser) {
+    if (!requestorIsSuperAdmin && (!adminMembership || !dbUser)) {
       throw new TRPCError({
         code: "FORBIDDEN",
         message: "You are not an admin of this league",
@@ -445,10 +470,17 @@ export const leagueAdminRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const { db, dbUser } = ctx;
       const { leagueId, markdownString } = input;
+      const requestorIsSuperAdmin = isSuperAdminUser(dbUser?.email);
+      if (!dbUser) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "You must be signed in to send league broadcasts",
+        });
+      }
       const adminMembership = dbUser?.leaguemembers.find(
         (m) => m.role === "admin" && m.league_id === leagueId,
       );
-      if (!adminMembership || !dbUser) {
+      if (!requestorIsSuperAdmin && (!adminMembership || !dbUser)) {
         throw new TRPCError({
           code: "FORBIDDEN",
           message: "You are not an admin of this league",

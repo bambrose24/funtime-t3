@@ -20,6 +20,15 @@ const FROM = "Funtime System <no-reply@play-funtime.com>";
 
 const LOG_PREFIX = "[resend-api]";
 
+const escapeHtml = (input: string) => {
+  return input
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+};
+
 export const resendApi = {
   getMany: async (ids: string[]) => {
     const emails = await Promise.all(
@@ -299,6 +308,96 @@ export const resendApi = {
         },
       });
     }
+  },
+  sendWeekSummaryEmail: async ({
+    leagueId,
+    leagueName,
+    week,
+    standings,
+    recipients,
+  }: {
+    leagueId: number;
+    leagueName: string;
+    week: number;
+    standings: Array<{ rank: number; username: string; correctPicks: number }>;
+    recipients: Array<{
+      email: string;
+      memberId: number;
+      username: string;
+      rank: number;
+      correctPicks: number;
+    }>;
+  }) => {
+    if (recipients.length === 0) {
+      return { sent: 0 };
+    }
+
+    const standingsRows = standings
+      .map((standing) => {
+        return `<tr><td style="padding:6px 8px;border-bottom:1px solid #e5e7eb;">${standing.rank}</td><td style="padding:6px 8px;border-bottom:1px solid #e5e7eb;">${escapeHtml(standing.username)}</td><td style="padding:6px 8px;border-bottom:1px solid #e5e7eb;">${standing.correctPicks}</td></tr>`;
+      })
+      .join("");
+
+    let sent = 0;
+    for (const recipient of recipients) {
+      const html = `
+        <div style="font-family: Arial, sans-serif; color: #111827; line-height: 1.5;">
+          <h2 style="margin-bottom: 8px;">Week ${week} Summary - ${escapeHtml(leagueName)}</h2>
+          <p style="margin-top: 0;">
+            Hi ${escapeHtml(recipient.username)}, you finished <strong>#${recipient.rank}</strong> with
+            <strong>${recipient.correctPicks}</strong> correct picks this week.
+          </p>
+          <p>League standings:</p>
+          <table style="border-collapse: collapse; width: 100%; max-width: 460px;">
+            <thead>
+              <tr>
+                <th align="left" style="padding:6px 8px;border-bottom:2px solid #d1d5db;">Rank</th>
+                <th align="left" style="padding:6px 8px;border-bottom:2px solid #d1d5db;">Player</th>
+                <th align="left" style="padding:6px 8px;border-bottom:2px solid #d1d5db;">Correct</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${standingsRows}
+            </tbody>
+          </table>
+          <p style="margin-top: 16px;">
+            <a href="https://play-funtime.com/league/${leagueId}" style="color: #2563eb;">
+              View league details
+            </a>
+          </p>
+        </div>
+      `;
+
+      const { data, error } = await resend.emails.send({
+        from: FROM,
+        to: [recipient.email],
+        subject: `${leagueName} - Week ${week} Summary`,
+        html,
+      });
+
+      if (error) {
+        getLogger().error(
+          `${LOG_PREFIX} Error sending week summary email for league ${leagueId} member ${recipient.memberId}`,
+          { error },
+        );
+        continue;
+      }
+
+      sent += 1;
+      if (data?.id) {
+        await db.emailLogs.create({
+          data: {
+            email_type: "week_summary",
+            resend_id: data.id,
+            league_id: leagueId,
+            member_id: recipient.memberId,
+            week,
+          },
+        });
+      }
+    }
+
+    return { sent };
   },
   sendLeagueBroadcast: async ({
     leagueName,

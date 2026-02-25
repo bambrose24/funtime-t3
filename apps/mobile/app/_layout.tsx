@@ -35,6 +35,7 @@ import LoadingScreen from "@/components/LoadingScreen";
 import { useColdStartPrefetch } from "@/hooks/useColdStartPrefetch";
 import { useCacheDebugger } from "@/hooks/useCacheDebugger";
 import { useAuthHandler } from "@/hooks/useAuthHandler";
+import { usePushNotificationRegistration } from "@/hooks/usePushNotificationRegistration";
 import { PostHogProvider } from "@/providers/PostHogProvider";
 
 const LIGHT_THEME: Theme = {
@@ -56,6 +57,9 @@ function AppContent() {
   
   // Handle all auth logic (session, deep links, navigation)
   const { session, isLoading } = useAuthHandler();
+
+  // Register and refresh Expo push token once user session is active.
+  usePushNotificationRegistration(Boolean(session));
   
   // Prefetch essential data on cold start
   useColdStartPrefetch(session, isLoading);
@@ -78,14 +82,12 @@ function AppContent() {
   // Show router with all screens available
   return (
     <ThemeProvider value={isDarkColorScheme ? DARK_THEME : LIGHT_THEME}>
-      <Stack>
-        <Stack.Screen name="auth" options={{ headerShown: false }} />
-        <Stack.Screen name="signup" options={{ headerShown: false }} />
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="index" />
+        <Stack.Screen name="(auth)" />
+        <Stack.Screen name="(tabs)" />
         <Stack.Screen name="auth/callback" options={{ headerShown: false }} />
-        <Stack.Screen name="confirm-signup" options={{ headerShown: false }} />
-        <Stack.Screen name="index" options={{ headerShown: false }} />
-        <Stack.Screen name="league/[id]/index" options={{ headerShown: false }} />
-        <Stack.Screen name="account" options={{ headerShown: false }} />
+        <Stack.Screen name="league/[id]" options={{ headerShown: false }} />
         <Stack.Screen name="+not-found" />
       </Stack>
       <StatusBar style={isDarkColorScheme ? "light" : "dark"} />

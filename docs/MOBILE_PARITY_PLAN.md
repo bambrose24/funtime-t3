@@ -27,6 +27,10 @@ Guiding rule:
   - Week summary push (personal result only, deep-link to week page)
   - Week summary email (overall league state)
   - Near real-time league message notifications
+- Deep-link behavior:
+  - `https://play-funtime.com/*` links should open the installed mobile app to the matching route when possible.
+  - If the app is not installed, links must continue to work in web as normal.
+  - Shared URLs must resolve consistently across web and mobile.
 - Leaderboard ranking must support competition ties (example: `1, 2, 2, 4`).
 
 ## 4. Phase Plan
@@ -37,6 +41,11 @@ Guiding rule:
 2. Standardize provider/bootstrap sequence and auth gating.
 3. Standardize loading state and shared card/skeleton conventions.
 4. Establish prefetch and offline policy conventions.
+5. Implement deep-link infrastructure:
+  - Expo linking configuration (`scheme`, prefixes, route patterns)
+  - iOS Universal Links (`apple-app-site-association`)
+  - Android App Links (`.well-known/assetlinks.json`)
+  - Runtime URL parsing + guarded navigation for auth-required routes
 
 ### Phase 1: Core Player Loop
 1. Auth and session
@@ -67,38 +76,61 @@ Guiding rule:
 ## 5. Feature Mapping
 | Area | Web Source | Backend Domain | Mobile Status | Notes |
 |---|---|---|---|---|
-| Auth/session | `apps/web/src/app/(auth)/*`, user provider | `session`, `auth` | `PLANNED` | Must match Supabase token flow used in RN context. |
-| Home/nav leagues | `apps/web/src/app/page.tsx`, `_nav` | `home.nav`, `home.summary` | `PLANNED` | Include active/prior league grouping. |
-| Join league | `apps/web/src/app/join-league/[code]/*` | `league.fromJoinCode`, `league.register` | `PLANNED` | Must enforce required Super Bowl pick if enabled. |
-| Create league | `apps/web/src/app/league/create/*` | `league.create`, `league.createForm`, `league.canCreate` | `PLANNED` | Keep league policy options visible. |
-| League week view | `apps/web/src/app/league/[leagueId]/page.tsx` | `league.picksSummary`, `games.getGames`, `league.weekWinners`, `picks.weeksWithPicks` | `PLANNED` | Must preserve pick-visibility policy. |
+| Auth/session | `apps/web/src/app/(auth)/*`, user provider | `session`, `auth` | `IN_PROGRESS` | Session guard + grouped route migration complete; deep-link QA still pending. |
+| Home/nav leagues | `apps/web/src/app/page.tsx`, `_nav` | `home.nav`, `home.summary` | `IN_PROGRESS` | Active/prior sections plus join/create entry points are implemented; IA parity polish pending. |
+| Join league | `apps/web/src/app/join-league/[code]/*` | `league.fromJoinCode`, `league.register` | `IN_PROGRESS` | Join-by-code flow implemented with required Super Bowl pick support; UX parity QA pending. |
+| Create league | `apps/web/src/app/league/create/*` | `league.create`, `league.createForm`, `league.canCreate` | `IN_PROGRESS` | Core create flow and policy controls implemented; form/UX parity polish pending. |
+| Deep links + shared URLs | web route system + invite/share URLs | N/A (domain association + client routing) | `IN_PROGRESS` | App-link config and association endpoints implemented; production app IDs/fingerprints + device QA pending. |
+| League week view | `apps/web/src/app/league/[leagueId]/page.tsx` | `league.picksSummary`, `games.getGames`, `league.weekWinners`, `picks.weeksWithPicks` | `IN_PROGRESS` | Core mobile view exists; pick-visibility behavior is API-enforced and tiebreaker-sort parity fix shipped. |
 | Pick submission | `apps/web/src/app/league/[leagueId]/pick/*` | `league.weekToPick`, `member.picksForWeek`, `picks.submitPicks` | `IN_PROGRESS` | Core P1 feature. |
-| Leaderboard | `apps/web/src/app/league/[leagueId]/leaderboard/*` | `leaderboard.league` | `PLANNED` | Include competition-rank ties. |
-| Player profile | `apps/web/src/app/league/[leagueId]/player/[memberId]/*` | `playerProfile.get`, `member.updateOrCreateSuperbowlPick` | `PLANNED` | Show pick record + Super Bowl data. |
-| My profile | `apps/web/src/app/league/[leagueId]/my-profile/page.tsx` | `playerProfile.get` | `PLANNED` | Same profile model as player profile. |
-| Super Bowl picks | `apps/web/src/app/league/[leagueId]/superbowl/*` | `league.superbowlPicks`, `postseason.getBracket`, `teams.getTeams` | `PLANNED` | Required for leagues that enable competition. |
-| Settings/profile | `apps/web/src/app/settings/*` | `settings.get`, `settings.updateUsername` | `PLANNED` | Username conflict UX needed. |
-| Messaging (persistent target) | current web messages + future redesign | `messages.*` (to be redesigned) | `BLOCKED` | Blocked until backend migrates off week-scoped model. |
-| Admin members | `apps/web/src/app/league/[leagueId]/admin/members/*` | `league.admin.members`, `removeMember`, `changeMemberRole`, `setMembersPaid` | `PLANNED` | Phase 3. |
-| Admin pick edits | `MemberPicksEdit` | `league.admin.memberPicks`, `league.admin.setPick` | `PLANNED` | Enforce no-edit-after-kickoff except super admin. |
-| Admin broadcast/name | `LeagueAdminBroadcastSetting`, `LeagueAdminChangeNameSetting` | `league.admin.sendBroadcast`, `canSendLeagueBroadcast`, `changeName` | `PLANNED` | Respect weekly send limits. |
-| Admin email logs | `MemberEmailLogs` | `league.admin.memberEmails` | `PLANNED` | Phase 3. |
-| Global admin | `apps/web/src/app/admin/page.tsx` | `generalAdmin.*` | `PLANNED` | Optional mobile scope; likely web-only first. |
+| Leaderboard | `apps/web/src/app/league/[leagueId]/leaderboard/*` | `leaderboard.league` | `IN_PROGRESS` | Mobile rank display now uses numeric competition ranks (`1,2,2,4`); broader UX parity QA pending. |
+| Player profile | `apps/web/src/app/league/[leagueId]/player/[memberId]/*` | `playerProfile.get`, `member.updateOrCreateSuperbowlPick` | `IN_PROGRESS` | Member profile route and leaderboard navigation implemented in mobile; parity polish and edit interactions pending. |
+| My profile | `apps/web/src/app/league/[leagueId]/my-profile/page.tsx` | `playerProfile.get` | `IN_PROGRESS` | League-level `My Profile` tab implemented; parity polish and edit interactions pending. |
+| Super Bowl picks | `apps/web/src/app/league/[leagueId]/superbowl/*` | `league.superbowlPicks`, `postseason.getBracket`, `teams.getTeams` | `IN_PROGRESS` | Mobile Super Bowl tab + pick management flow shipped; parity polish and postseason bracket integration pending. |
+| Settings/profile | `apps/web/src/app/settings/*` | `settings.get`, `settings.updateUsername` | `IN_PROGRESS` | Username update flow is shipped on mobile account screen; notifications/preferences parity still pending. |
+| Notifications foundation | mobile bootstrap + account settings | `settings.registerPushToken`, `settings.setPushNotificationsEnabled`, `settings.pushNotificationStatus` | `IN_PROGRESS` | Token registration/preferences shipped with soft-fallback table checks; delivery behavior needs staging QA. |
+| Messaging (persistent target) | current web messages + future redesign | `messages.*` | `DONE` | Mobile and web clients are on league-wide message endpoints; cleanup of legacy aliases is a follow-up refactor. |
+| Admin members | `apps/web/src/app/league/[leagueId]/admin/members/*` | `league.admin.members`, `removeMember`, `changeMemberRole`, `setMembersPaid` | `IN_PROGRESS` | Mobile admin member management screen shipped; parity polish and additional admin workflows remain. |
+| Admin pick edits | `MemberPicksEdit` | `league.admin.memberPicks`, `league.admin.setPick` | `IN_PROGRESS` | Mobile pick editor shipped; API kickoff lock + super-admin override implemented; parity polish and QA pending. |
+| Admin broadcast/name | `LeagueAdminBroadcastSetting`, `LeagueAdminChangeNameSetting` | `league.admin.sendBroadcast`, `canSendLeagueBroadcast`, `changeName` | `IN_PROGRESS` | Mobile controls shipped; parity QA and UX polish pending. |
+| Admin email logs | `MemberEmailLogs` | `league.admin.memberEmails` | `IN_PROGRESS` | Mobile email-log list + preview shipped; parity QA and content rendering validation pending. |
+| Global admin | `apps/web/src/app/admin/page.tsx` | `generalAdmin.*` | `IN_PROGRESS` | Mobile super-admin dashboard route and account entry point shipped; metric/detail parity polish pending. |
 
 ## 6. Backend Dependencies for Mobile Parity
 1. Message system redesign:
-  - remove week-scoped message requirement
-  - add admin-delete authorization behavior
+  - done: remove week-scoped message requirement across mobile/web clients
+  - done: admin-delete authorization behavior
+  - follow-up: remove legacy week-scoped alias endpoints after stability window
 2. Notification pipeline:
-  - week summary push payload + deep-link target
-  - week summary email template + data aggregation
-  - "morning after completion" scheduler/trigger rules
-  - near real-time message push fanout
+  - done: mobile Expo push token registration + account preference foundation (`settings.registerPushToken`, `settings.setPushNotificationsEnabled`, `settings.pushNotificationStatus`)
+  - done: near real-time message push fanout on `messages.writeMessage`/`writeWeekMessage` plus notification-tap path routing in mobile
+  - done: week summary scheduler in cron with personal result pushes + overall league summary emails
+  - dependency: deploy `pushNotificationTokens` database table before enabling production push sends
+  - follow-up: validate timezone/timing semantics for "morning after completion" behavior in staging
 3. Admin pick edit guardrails:
-  - enforce kickoff lock at API layer for league admins
-  - preserve super-admin override
+  - done: kickoff lock enforced at API layer for league admins
+  - done: super-admin override preserved (`bambrose24@gmail.com`)
+  - done: super-admin access aligned for `league.get`, `league.weekToPick`, and broadcast permission checks used by mobile admin flows
+4. Deep-link domain files and app ownership:
+  - host `apple-app-site-association` for iOS Universal Links
+  - host `/.well-known/assetlinks.json` for Android App Links
+  - ensure bundle IDs/package names and signing fingerprints are current in production
+  - configure runtime values:
+    - iOS: `IOS_DEEPLINK_APP_IDS` (comma-separated `TEAM_ID.BUNDLE_ID`)
+    - Android: either `ANDROID_DEEPLINK_TARGETS_JSON` or `ANDROID_DEEPLINK_PACKAGE_NAME` + `ANDROID_DEEPLINK_SHA256_CERT_FINGERPRINTS`
 
-## 7. Update Process
+## 7. Deep-Link Routing Spec
+| Shared URL | Mobile Target Route | Auth Requirement | Fallback |
+|---|---|---|---|
+| `https://play-funtime.com/join-league/:code` | `/join-league/:code` | user must be authenticated to complete join | web join page |
+| `https://play-funtime.com/league/:leagueId` | `/league/:leagueId` | authenticated + league membership | web league page |
+| `https://play-funtime.com/league/:leagueId?tab=picks` | `/league/:leagueId?tab=picks` | authenticated + league membership | web league picks tab |
+| `https://play-funtime.com/league/:leagueId?tab=leaderboard` | `/league/:leagueId?tab=leaderboard` | authenticated + league membership | web league leaderboard tab |
+| `https://play-funtime.com/settings` | `/account` (or future mobile settings route) | authenticated | web settings page |
+| `https://play-funtime.com/admin` | `/admin` | authenticated + super-admin | web admin page |
+| `https://play-funtime.com/auth/callback?...` | `/auth/callback?...` | public callback route | web auth callback |
+
+## 8. Update Process
 When parity work changes:
 1. Update `Mobile Status` for affected rows.
 2. Add short notes for behavior differences.
@@ -106,7 +138,7 @@ When parity work changes:
 4. Keep this file aligned with `docs/PRD.md` decisions.
 5. Update `WORKLOG.md` for task start/status/commit/decision/validation events.
 
-## 8. Worklog Governance
+## 9. Worklog Governance
 - Canonical execution log: `WORKLOG.md` in repo root.
 - Required sections:
   - Program Status

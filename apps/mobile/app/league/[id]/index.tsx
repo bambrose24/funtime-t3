@@ -14,6 +14,9 @@ import { clientApi } from "@/lib/trpc/react";
 import { useUser } from "@/hooks/useUser";
 import { ClientPickPage } from "@/components/picks/ClientPickPage";
 import { ClientLeaderboardPage } from "@/components/leaderboard/ClientLeaderboardPage";
+import { LeagueMessageBoard } from "@/components/messages/LeagueMessageBoard";
+import { LeagueMyProfile } from "@/components/profile/LeagueMyProfile";
+import { LeagueSuperbowlBoard } from "@/components/superbowl/LeagueSuperbowlBoard";
 import { type RouterOutputs } from "~/trpc/types";
 import { useColorScheme } from "@/lib/useColorScheme";
 import { TeamLogo } from "@/components/shared/TeamLogo";
@@ -22,13 +25,27 @@ import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
 import { createComponentLogger } from "@/lib/logging";
 
-type TabType = "overview" | "picks" | "leaderboard";
+type TabType =
+  | "overview"
+  | "picks"
+  | "leaderboard"
+  | "messages"
+  | "profile"
+  | "superbowl";
 
 export default function LeagueScreen() {
   const { id, tab } = useLocalSearchParams<{ id: string; tab?: string }>();
 
   const activeTab: TabType =
-    tab && ["overview", "picks", "leaderboard"].includes(tab)
+    tab &&
+    [
+      "overview",
+      "picks",
+      "leaderboard",
+      "messages",
+      "profile",
+      "superbowl",
+    ].includes(tab)
       ? (tab as TabType)
       : "overview";
   const [isPicksModalVisible, setIsPicksModalVisible] = useState(false);
@@ -79,6 +96,15 @@ export default function LeagueScreen() {
         refetchOnWindowFocus: true,
       },
     );
+  const { data: session } = clientApi.session.current.useQuery();
+  const { data: isSuperAdmin } = clientApi.generalAdmin.isSuperAdmin.useQuery();
+  const isLeagueAdmin = Boolean(
+    session?.dbUser?.leaguemembers.find(
+      (member) =>
+        member.league_id === leagueIdNumber && member.role === "admin",
+    ),
+  );
+  const canManageLeague = isLeagueAdmin || Boolean(isSuperAdmin);
 
   if (!id) {
     return (
@@ -96,6 +122,11 @@ export default function LeagueScreen() {
     { key: "overview", label: "Overview" },
     { key: "picks", label: "Pick" },
     { key: "leaderboard", label: "Leaderboard" },
+    { key: "messages", label: "Messages" },
+    ...(leagueData?.superbowl_competition
+      ? [{ key: "superbowl" as TabType, label: "Super Bowl" }]
+      : []),
+    { key: "profile", label: "My Profile" },
   ];
 
   const renderTabContent = () => {
@@ -113,6 +144,12 @@ export default function LeagueScreen() {
         return <ClientPickPage leagueId={id} />;
       case "leaderboard":
         return <ClientLeaderboardPage leagueId={id} />;
+      case "messages":
+        return <LeagueMessageBoard leagueId={id} />;
+      case "profile":
+        return <LeagueMyProfile leagueId={id} />;
+      case "superbowl":
+        return <LeagueSuperbowlBoard leagueId={id} />;
       default:
         return null;
     }
@@ -147,16 +184,30 @@ export default function LeagueScreen() {
                 {leagueLoading ? "Loading..." : (leagueData?.name ?? "League")}
               </Text>
             </View>
-            <Pressable
-              onPress={() => router.push("/account")}
-              className="bg-app-card-light dark:bg-app-card-dark rounded-lg p-2"
-            >
-              <Ionicons
-                name="person"
-                size={20}
-                color={isDarkColorScheme ? "#e5e7eb" : "#374151"}
-              />
-            </Pressable>
+            <View className="flex-row items-center gap-2">
+              {canManageLeague ? (
+                <Pressable
+                  onPress={() => router.push(`/league/${id}/admin` as any)}
+                  className="bg-app-card-light dark:bg-app-card-dark rounded-lg p-2"
+                >
+                  <Ionicons
+                    name="shield-checkmark-outline"
+                    size={20}
+                    color={isDarkColorScheme ? "#e5e7eb" : "#374151"}
+                  />
+                </Pressable>
+              ) : null}
+              <Pressable
+                onPress={() => router.push("/account")}
+                className="bg-app-card-light dark:bg-app-card-dark rounded-lg p-2"
+              >
+                <Ionicons
+                  name="person"
+                  size={20}
+                  color={isDarkColorScheme ? "#e5e7eb" : "#374151"}
+                />
+              </Pressable>
+            </View>
           </View>
         </View>
 
@@ -834,11 +885,8 @@ function MobilePicksTable({
 
     // If correct picks are tied and we have an actual tiebreaker score, sort by accuracy
     if (actualTiebreakerScore !== null && tiebreakerGame) {
-      const aTiebreakerPick = a.picks.find((p) => p.gid === tiebreakerGame.gid);
-      const bTiebreakerPick = b.picks.find((p) => p.gid === tiebreakerGame.gid);
-
-      const aTiebreakerScore = (aTiebreakerPick as any)?.score || 0;
-      const bTiebreakerScore = (bTiebreakerPick as any)?.score || 0;
+      const aTiebreakerScore = a.tiebreakerScore ?? 0;
+      const bTiebreakerScore = b.tiebreakerScore ?? 0;
 
       const aDiff = Math.abs(actualTiebreakerScore - aTiebreakerScore);
       const bDiff = Math.abs(actualTiebreakerScore - bTiebreakerScore);

@@ -1,9 +1,100 @@
-import { useState, useEffect } from "react";
-import { useRouter, useSegments } from "expo-router";
+import { useState, useEffect, useRef } from "react";
+import { usePathname, useRouter } from "expo-router";
 import * as Linking from "expo-linking";
 import { type Session } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase/client";
 import { clientApi } from "@/lib/trpc/react";
+
+const WEB_DEEP_LINK_HOSTS = new Set(["play-funtime.com", "www.play-funtime.com"]);
+const WEB_PROTOCOLS = new Set(["http", "https"]);
+
+type DeepLinkTarget = {
+  href: string;
+  mode: "push" | "replace";
+};
+
+const normalizePath = (path?: string | null) => {
+  const withoutLeadingSlash = (path ?? "").replace(/^\/+/, "");
+  if (!withoutLeadingSlash) {
+    return "/";
+  }
+  return `/${withoutLeadingSlash}`;
+};
+
+const withQueryString = (path: string, query: URLSearchParams) => {
+  const queryString = query.toString();
+  return queryString.length > 0 ? `${path}?${queryString}` : path;
+};
+
+function resolveDeepLink(url: string): DeepLinkTarget | null {
+  const parsed = new URL(url);
+  const protocol = parsed.protocol.replace(":", "").toLowerCase();
+  const host = parsed.hostname.toLowerCase();
+  const searchParams = parsed.searchParams;
+
+  let routePath = normalizePath(parsed.pathname);
+
+  // Custom schemes like "funtime://auth/callback" encode route segment in hostname.
+  if (!WEB_PROTOCOLS.has(protocol) && host) {
+    routePath = normalizePath(`${host}${parsed.pathname}`);
+  }
+
+  // Expo dev URLs include "/--/" before the app route.
+  routePath = routePath.replace(/^\/--\//, "/");
+
+  if (WEB_DEEP_LINK_HOSTS.has(host)) {
+    if (routePath === "/settings") {
+      return { href: "/account", mode: "replace" };
+    }
+    if (routePath === "/login") {
+      return { href: "/auth", mode: "replace" };
+    }
+  }
+
+  if (routePath === "/auth/callback") {
+    const code = searchParams.get("code");
+    if (!code) {
+      return null;
+    }
+    const query = new URLSearchParams({ code });
+    const next = searchParams.get("next");
+    if (next) {
+      query.set("next", next);
+    }
+    return {
+      href: withQueryString("/auth/callback", query),
+      mode: "replace",
+    };
+  }
+
+  const routablePaths = [
+    "/",
+    "/join-league",
+    "/league/create",
+    "/auth",
+    "/signup",
+    "/confirm-signup",
+    "/account",
+    "/admin",
+  ];
+  const prefixPaths = ["/join-league/", "/league/"];
+
+  if (
+    routablePaths.includes(routePath) ||
+    prefixPaths.some((prefix) => routePath.startsWith(prefix))
+  ) {
+    if (routePath === "/") {
+      return { href: "/home", mode: "replace" };
+    }
+
+    return {
+      href: withQueryString(routePath, searchParams),
+      mode: "replace",
+    };
+  }
+
+  return null;
+}
 
 // Lightweight hook for just Supabase session state (for auth navigation logic)
 export function useSupabaseSession() {
@@ -45,18 +136,39 @@ export function useAuthHandler() {
       retry: false,
       refetchOnWindowFocus: true,
     });
-  const segments = useSegments();
+  const pathname = usePathname();
   const router = useRouter();
+  const pendingDeepLinkRef = useRef<string | null>(null);
 
   // Handle deep links for auth flows
   useEffect(() => {
-    const handleDeepLink = async (url: string) => {
-      const { path, queryParams } = Linking.parse(url);
+    const handleDeepLink = (url: string) => {
+      try {
+        const target = resolveDeepLink(url);
+        if (!target) {
+          return;
+        }
 
-      // Handle auth callback deep links (email confirmation)
-      if ((path === "/auth/callback" || path === "auth/callback") && queryParams?.code) {
-        const next = queryParams.next ? `&next=${queryParams.next}` : "";
-        router.push(`/auth/callback?code=${queryParams.code}${next}` as any);
+        const nextPathname = target.href.split("?")[0] ?? target.href;
+        const currentPathname = pathname.split("?")[0] ?? pathname;
+        if (nextPathname === currentPathname) {
+          return;
+        }
+
+        if (target.mode === "replace") {
+          if (!session && !target.href.startsWith("/auth")) {
+            pendingDeepLinkRef.current = target.href;
+          }
+          router.replace(target.href as any);
+          return;
+        }
+
+        if (!session && !target.href.startsWith("/auth")) {
+          pendingDeepLinkRef.current = target.href;
+        }
+        router.push(target.href as any);
+      } catch (error) {
+        console.error("Failed to parse deep link", { url, error });
       }
     };
 
@@ -71,7 +183,7 @@ export function useAuthHandler() {
     });
 
     return () => subscription?.remove();
-  }, [router]);
+  }, [pathname, router, session]);
 
   // Handle navigation based on auth state
   useEffect(() => {
@@ -82,14 +194,15 @@ export function useAuthHandler() {
     const waitingOnDbUser = hasSession && isAppSessionLoading;
     if (waitingOnDbUser) return;
 
-    const inAuthGroup =
-      segments[0] === "auth" ||
-      segments[0] === "signup";
-    const inConfirmSignup = segments[0] === "confirm-signup";
-    const inAuthCallback = segments[0] === "auth" && segments[1] === "callback";
+    const route = pathname as string;
+    const inAuthScreen = route === "/auth" || route === "/signup";
+    const inConfirmSignup = route === "/confirm-signup";
+    const inAuthCallback = route.startsWith("/auth/callback");
+    const inBootstrapRoute = route === "/";
+    const inAuthFlow = inAuthScreen || inConfirmSignup;
 
     if (!hasSession) {
-      if (!inAuthGroup && !inAuthCallback) {
+      if (!inAuthScreen && !inAuthCallback) {
         router.replace("/auth");
       }
       return;
@@ -104,10 +217,12 @@ export function useAuthHandler() {
     }
 
     // Fully onboarded user should not remain on auth/onboarding screens.
-    if (inAuthGroup || inConfirmSignup || inAuthCallback) {
-      router.replace("/");
+    if (inAuthFlow || inAuthCallback || inBootstrapRoute) {
+      const pendingDeepLink = pendingDeepLinkRef.current;
+      pendingDeepLinkRef.current = null;
+      router.replace((pendingDeepLink ?? "/home") as any);
     }
-  }, [session, appSession?.dbUser, segments, isLoading, isAppSessionLoading, router]);
+  }, [session, appSession?.dbUser, pathname, isLoading, isAppSessionLoading, router]);
 
   return {
     session,

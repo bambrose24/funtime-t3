@@ -218,6 +218,17 @@ exports.Prisma.PeopleScalarFieldEnum = {
   supabase_id: 'supabase_id'
 };
 
+exports.Prisma.PushNotificationTokensScalarFieldEnum = {
+  push_token_id: 'push_token_id',
+  user_id: 'user_id',
+  token: 'token',
+  platform: 'platform',
+  enabled: 'enabled',
+  created_at: 'created_at',
+  updated_at: 'updated_at',
+  last_seen_at: 'last_seen_at'
+};
+
 exports.Prisma.PicksScalarFieldEnum = {
   pickid: 'pickid',
   uid: 'uid',
@@ -372,6 +383,7 @@ exports.Prisma.ModelName = {
   leaguemessages: 'leaguemessages',
   leagues: 'leagues',
   people: 'people',
+  pushNotificationTokens: 'pushNotificationTokens',
   picks: 'picks',
   superbowl: 'superbowl',
   superbowlsquares: 'superbowlsquares',

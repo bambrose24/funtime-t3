@@ -103,16 +103,14 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
   const week = firstGame?.week;
 
   // Fetch messages for unread badge
-  const { data: messagesData } =
-    clientApi.messages.leagueWeekMessageBoard.useQuery(
-      { leagueId: props.leagueId, week: week ?? props.week },
-      { enabled: week !== undefined },
-    );
+  const { data: messagesData } = clientApi.messages.leagueMessageBoard.useQuery(
+    { leagueId: props.leagueId },
+  );
 
   // Use the unread messages hook
   const { unreadCount } = useUnreadMessages({
     leagueId: props.leagueId,
-    week: week ?? props.week,
+    week: 0,
     messages: messagesData ?? [],
     isChatOpen: chatSheetOpen,
   });

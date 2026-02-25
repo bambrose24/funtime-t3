@@ -49,6 +49,11 @@ export type leagues = $Result.DefaultSelection<Prisma.$leaguesPayload>
  */
 export type people = $Result.DefaultSelection<Prisma.$peoplePayload>
 /**
+ * Model pushNotificationTokens
+ * 
+ */
+export type pushNotificationTokens = $Result.DefaultSelection<Prisma.$pushNotificationTokensPayload>
+/**
  * Model picks
  * 
  */
@@ -407,6 +412,16 @@ export class PrismaClient<
     * ```
     */
   get people(): Prisma.peopleDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.pushNotificationTokens`: Exposes CRUD operations for the **pushNotificationTokens** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more PushNotificationTokens
+    * const pushNotificationTokens = await prisma.pushNotificationTokens.findMany()
+    * ```
+    */
+  get pushNotificationTokens(): Prisma.pushNotificationTokensDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.picks`: Exposes CRUD operations for the **picks** model.
@@ -915,6 +930,7 @@ export namespace Prisma {
     leaguemessages: 'leaguemessages',
     leagues: 'leagues',
     people: 'people',
+    pushNotificationTokens: 'pushNotificationTokens',
     picks: 'picks',
     superbowl: 'superbowl',
     superbowlsquares: 'superbowlsquares',
@@ -939,7 +955,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "emailLogs" | "weekWinners" | "games" | "leaguemembers" | "leaguemessages" | "leagues" | "people" | "picks" | "superbowl" | "superbowlsquares" | "teams" | "postseason_games" | "postseason_team_seeds"
+      modelProps: "emailLogs" | "weekWinners" | "games" | "leaguemembers" | "leaguemessages" | "leagues" | "people" | "pushNotificationTokens" | "picks" | "superbowl" | "superbowlsquares" | "teams" | "postseason_games" | "postseason_team_seeds"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1458,6 +1474,80 @@ export namespace Prisma {
           count: {
             args: Prisma.peopleCountArgs<ExtArgs>
             result: $Utils.Optional<PeopleCountAggregateOutputType> | number
+          }
+        }
+      }
+      pushNotificationTokens: {
+        payload: Prisma.$pushNotificationTokensPayload<ExtArgs>
+        fields: Prisma.pushNotificationTokensFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.pushNotificationTokensFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$pushNotificationTokensPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.pushNotificationTokensFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$pushNotificationTokensPayload>
+          }
+          findFirst: {
+            args: Prisma.pushNotificationTokensFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$pushNotificationTokensPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.pushNotificationTokensFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$pushNotificationTokensPayload>
+          }
+          findMany: {
+            args: Prisma.pushNotificationTokensFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$pushNotificationTokensPayload>[]
+          }
+          create: {
+            args: Prisma.pushNotificationTokensCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$pushNotificationTokensPayload>
+          }
+          createMany: {
+            args: Prisma.pushNotificationTokensCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.pushNotificationTokensCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$pushNotificationTokensPayload>[]
+          }
+          delete: {
+            args: Prisma.pushNotificationTokensDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$pushNotificationTokensPayload>
+          }
+          update: {
+            args: Prisma.pushNotificationTokensUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$pushNotificationTokensPayload>
+          }
+          deleteMany: {
+            args: Prisma.pushNotificationTokensDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.pushNotificationTokensUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.pushNotificationTokensUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$pushNotificationTokensPayload>[]
+          }
+          upsert: {
+            args: Prisma.pushNotificationTokensUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$pushNotificationTokensPayload>
+          }
+          aggregate: {
+            args: Prisma.PushNotificationTokensAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregatePushNotificationTokens>
+          }
+          groupBy: {
+            args: Prisma.pushNotificationTokensGroupByArgs<ExtArgs>
+            result: $Utils.Optional<PushNotificationTokensGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.pushNotificationTokensCountArgs<ExtArgs>
+            result: $Utils.Optional<PushNotificationTokensCountAggregateOutputType> | number
           }
         }
       }
@@ -2008,6 +2098,7 @@ export namespace Prisma {
     leaguemessages?: leaguemessagesOmit
     leagues?: leaguesOmit
     people?: peopleOmit
+    pushNotificationTokens?: pushNotificationTokensOmit
     picks?: picksOmit
     superbowl?: superbowlOmit
     superbowlsquares?: superbowlsquaresOmit
@@ -2262,12 +2353,14 @@ export namespace Prisma {
     leaguemembers: number
     leagues: number
     picks: number
+    pushNotificationTokens: number
   }
 
   export type PeopleCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     leaguemembers?: boolean | PeopleCountOutputTypeCountLeaguemembersArgs
     leagues?: boolean | PeopleCountOutputTypeCountLeaguesArgs
     picks?: boolean | PeopleCountOutputTypeCountPicksArgs
+    pushNotificationTokens?: boolean | PeopleCountOutputTypeCountPushNotificationTokensArgs
   }
 
   // Custom InputTypes
@@ -2300,6 +2393,13 @@ export namespace Prisma {
    */
   export type PeopleCountOutputTypeCountPicksArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: picksWhereInput
+  }
+
+  /**
+   * PeopleCountOutputType without action
+   */
+  export type PeopleCountOutputTypeCountPushNotificationTokensArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: pushNotificationTokensWhereInput
   }
 
 
@@ -10175,6 +10275,7 @@ export namespace Prisma {
     leaguemembers?: boolean | people$leaguemembersArgs<ExtArgs>
     leagues?: boolean | people$leaguesArgs<ExtArgs>
     picks?: boolean | people$picksArgs<ExtArgs>
+    pushNotificationTokens?: boolean | people$pushNotificationTokensArgs<ExtArgs>
     _count?: boolean | PeopleCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["people"]>
 
@@ -10225,6 +10326,7 @@ export namespace Prisma {
     leaguemembers?: boolean | people$leaguemembersArgs<ExtArgs>
     leagues?: boolean | people$leaguesArgs<ExtArgs>
     picks?: boolean | people$picksArgs<ExtArgs>
+    pushNotificationTokens?: boolean | people$pushNotificationTokensArgs<ExtArgs>
     _count?: boolean | PeopleCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type peopleIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -10236,6 +10338,7 @@ export namespace Prisma {
       leaguemembers: Prisma.$leaguemembersPayload<ExtArgs>[]
       leagues: Prisma.$leaguesPayload<ExtArgs>[]
       picks: Prisma.$picksPayload<ExtArgs>[]
+      pushNotificationTokens: Prisma.$pushNotificationTokensPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       uid: number
@@ -10646,6 +10749,7 @@ export namespace Prisma {
     leaguemembers<T extends people$leaguemembersArgs<ExtArgs> = {}>(args?: Subset<T, people$leaguemembersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$leaguemembersPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     leagues<T extends people$leaguesArgs<ExtArgs> = {}>(args?: Subset<T, people$leaguesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$leaguesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     picks<T extends people$picksArgs<ExtArgs> = {}>(args?: Subset<T, people$picksArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$picksPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    pushNotificationTokens<T extends people$pushNotificationTokensArgs<ExtArgs> = {}>(args?: Subset<T, people$pushNotificationTokensArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$pushNotificationTokensPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -11155,6 +11259,30 @@ export namespace Prisma {
   }
 
   /**
+   * people.pushNotificationTokens
+   */
+  export type people$pushNotificationTokensArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the pushNotificationTokens
+     */
+    select?: pushNotificationTokensSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the pushNotificationTokens
+     */
+    omit?: pushNotificationTokensOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: pushNotificationTokensInclude<ExtArgs> | null
+    where?: pushNotificationTokensWhereInput
+    orderBy?: pushNotificationTokensOrderByWithRelationInput | pushNotificationTokensOrderByWithRelationInput[]
+    cursor?: pushNotificationTokensWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: PushNotificationTokensScalarFieldEnum | PushNotificationTokensScalarFieldEnum[]
+  }
+
+  /**
    * people without action
    */
   export type peopleDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -11170,6 +11298,1146 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: peopleInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model pushNotificationTokens
+   */
+
+  export type AggregatePushNotificationTokens = {
+    _count: PushNotificationTokensCountAggregateOutputType | null
+    _avg: PushNotificationTokensAvgAggregateOutputType | null
+    _sum: PushNotificationTokensSumAggregateOutputType | null
+    _min: PushNotificationTokensMinAggregateOutputType | null
+    _max: PushNotificationTokensMaxAggregateOutputType | null
+  }
+
+  export type PushNotificationTokensAvgAggregateOutputType = {
+    user_id: number | null
+  }
+
+  export type PushNotificationTokensSumAggregateOutputType = {
+    user_id: number | null
+  }
+
+  export type PushNotificationTokensMinAggregateOutputType = {
+    push_token_id: string | null
+    user_id: number | null
+    token: string | null
+    platform: string | null
+    enabled: boolean | null
+    created_at: Date | null
+    updated_at: Date | null
+    last_seen_at: Date | null
+  }
+
+  export type PushNotificationTokensMaxAggregateOutputType = {
+    push_token_id: string | null
+    user_id: number | null
+    token: string | null
+    platform: string | null
+    enabled: boolean | null
+    created_at: Date | null
+    updated_at: Date | null
+    last_seen_at: Date | null
+  }
+
+  export type PushNotificationTokensCountAggregateOutputType = {
+    push_token_id: number
+    user_id: number
+    token: number
+    platform: number
+    enabled: number
+    created_at: number
+    updated_at: number
+    last_seen_at: number
+    _all: number
+  }
+
+
+  export type PushNotificationTokensAvgAggregateInputType = {
+    user_id?: true
+  }
+
+  export type PushNotificationTokensSumAggregateInputType = {
+    user_id?: true
+  }
+
+  export type PushNotificationTokensMinAggregateInputType = {
+    push_token_id?: true
+    user_id?: true
+    token?: true
+    platform?: true
+    enabled?: true
+    created_at?: true
+    updated_at?: true
+    last_seen_at?: true
+  }
+
+  export type PushNotificationTokensMaxAggregateInputType = {
+    push_token_id?: true
+    user_id?: true
+    token?: true
+    platform?: true
+    enabled?: true
+    created_at?: true
+    updated_at?: true
+    last_seen_at?: true
+  }
+
+  export type PushNotificationTokensCountAggregateInputType = {
+    push_token_id?: true
+    user_id?: true
+    token?: true
+    platform?: true
+    enabled?: true
+    created_at?: true
+    updated_at?: true
+    last_seen_at?: true
+    _all?: true
+  }
+
+  export type PushNotificationTokensAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which pushNotificationTokens to aggregate.
+     */
+    where?: pushNotificationTokensWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of pushNotificationTokens to fetch.
+     */
+    orderBy?: pushNotificationTokensOrderByWithRelationInput | pushNotificationTokensOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: pushNotificationTokensWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` pushNotificationTokens from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` pushNotificationTokens.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned pushNotificationTokens
+    **/
+    _count?: true | PushNotificationTokensCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: PushNotificationTokensAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: PushNotificationTokensSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: PushNotificationTokensMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: PushNotificationTokensMaxAggregateInputType
+  }
+
+  export type GetPushNotificationTokensAggregateType<T extends PushNotificationTokensAggregateArgs> = {
+        [P in keyof T & keyof AggregatePushNotificationTokens]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregatePushNotificationTokens[P]>
+      : GetScalarType<T[P], AggregatePushNotificationTokens[P]>
+  }
+
+
+
+
+  export type pushNotificationTokensGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: pushNotificationTokensWhereInput
+    orderBy?: pushNotificationTokensOrderByWithAggregationInput | pushNotificationTokensOrderByWithAggregationInput[]
+    by: PushNotificationTokensScalarFieldEnum[] | PushNotificationTokensScalarFieldEnum
+    having?: pushNotificationTokensScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: PushNotificationTokensCountAggregateInputType | true
+    _avg?: PushNotificationTokensAvgAggregateInputType
+    _sum?: PushNotificationTokensSumAggregateInputType
+    _min?: PushNotificationTokensMinAggregateInputType
+    _max?: PushNotificationTokensMaxAggregateInputType
+  }
+
+  export type PushNotificationTokensGroupByOutputType = {
+    push_token_id: string
+    user_id: number
+    token: string
+    platform: string | null
+    enabled: boolean
+    created_at: Date
+    updated_at: Date
+    last_seen_at: Date
+    _count: PushNotificationTokensCountAggregateOutputType | null
+    _avg: PushNotificationTokensAvgAggregateOutputType | null
+    _sum: PushNotificationTokensSumAggregateOutputType | null
+    _min: PushNotificationTokensMinAggregateOutputType | null
+    _max: PushNotificationTokensMaxAggregateOutputType | null
+  }
+
+  type GetPushNotificationTokensGroupByPayload<T extends pushNotificationTokensGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<PushNotificationTokensGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof PushNotificationTokensGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], PushNotificationTokensGroupByOutputType[P]>
+            : GetScalarType<T[P], PushNotificationTokensGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type pushNotificationTokensSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    push_token_id?: boolean
+    user_id?: boolean
+    token?: boolean
+    platform?: boolean
+    enabled?: boolean
+    created_at?: boolean
+    updated_at?: boolean
+    last_seen_at?: boolean
+    people?: boolean | peopleDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["pushNotificationTokens"]>
+
+  export type pushNotificationTokensSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    push_token_id?: boolean
+    user_id?: boolean
+    token?: boolean
+    platform?: boolean
+    enabled?: boolean
+    created_at?: boolean
+    updated_at?: boolean
+    last_seen_at?: boolean
+    people?: boolean | peopleDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["pushNotificationTokens"]>
+
+  export type pushNotificationTokensSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    push_token_id?: boolean
+    user_id?: boolean
+    token?: boolean
+    platform?: boolean
+    enabled?: boolean
+    created_at?: boolean
+    updated_at?: boolean
+    last_seen_at?: boolean
+    people?: boolean | peopleDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["pushNotificationTokens"]>
+
+  export type pushNotificationTokensSelectScalar = {
+    push_token_id?: boolean
+    user_id?: boolean
+    token?: boolean
+    platform?: boolean
+    enabled?: boolean
+    created_at?: boolean
+    updated_at?: boolean
+    last_seen_at?: boolean
+  }
+
+  export type pushNotificationTokensOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"push_token_id" | "user_id" | "token" | "platform" | "enabled" | "created_at" | "updated_at" | "last_seen_at", ExtArgs["result"]["pushNotificationTokens"]>
+  export type pushNotificationTokensInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    people?: boolean | peopleDefaultArgs<ExtArgs>
+  }
+  export type pushNotificationTokensIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    people?: boolean | peopleDefaultArgs<ExtArgs>
+  }
+  export type pushNotificationTokensIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    people?: boolean | peopleDefaultArgs<ExtArgs>
+  }
+
+  export type $pushNotificationTokensPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "pushNotificationTokens"
+    objects: {
+      people: Prisma.$peoplePayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      push_token_id: string
+      user_id: number
+      token: string
+      platform: string | null
+      enabled: boolean
+      created_at: Date
+      updated_at: Date
+      last_seen_at: Date
+    }, ExtArgs["result"]["pushNotificationTokens"]>
+    composites: {}
+  }
+
+  type pushNotificationTokensGetPayload<S extends boolean | null | undefined | pushNotificationTokensDefaultArgs> = $Result.GetResult<Prisma.$pushNotificationTokensPayload, S>
+
+  type pushNotificationTokensCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<pushNotificationTokensFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
+      select?: PushNotificationTokensCountAggregateInputType | true
+    }
+
+  export interface pushNotificationTokensDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['pushNotificationTokens'], meta: { name: 'pushNotificationTokens' } }
+    /**
+     * Find zero or one PushNotificationTokens that matches the filter.
+     * @param {pushNotificationTokensFindUniqueArgs} args - Arguments to find a PushNotificationTokens
+     * @example
+     * // Get one PushNotificationTokens
+     * const pushNotificationTokens = await prisma.pushNotificationTokens.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends pushNotificationTokensFindUniqueArgs>(args: SelectSubset<T, pushNotificationTokensFindUniqueArgs<ExtArgs>>): Prisma__pushNotificationTokensClient<$Result.GetResult<Prisma.$pushNotificationTokensPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one PushNotificationTokens that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {pushNotificationTokensFindUniqueOrThrowArgs} args - Arguments to find a PushNotificationTokens
+     * @example
+     * // Get one PushNotificationTokens
+     * const pushNotificationTokens = await prisma.pushNotificationTokens.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends pushNotificationTokensFindUniqueOrThrowArgs>(args: SelectSubset<T, pushNotificationTokensFindUniqueOrThrowArgs<ExtArgs>>): Prisma__pushNotificationTokensClient<$Result.GetResult<Prisma.$pushNotificationTokensPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first PushNotificationTokens that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {pushNotificationTokensFindFirstArgs} args - Arguments to find a PushNotificationTokens
+     * @example
+     * // Get one PushNotificationTokens
+     * const pushNotificationTokens = await prisma.pushNotificationTokens.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends pushNotificationTokensFindFirstArgs>(args?: SelectSubset<T, pushNotificationTokensFindFirstArgs<ExtArgs>>): Prisma__pushNotificationTokensClient<$Result.GetResult<Prisma.$pushNotificationTokensPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first PushNotificationTokens that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {pushNotificationTokensFindFirstOrThrowArgs} args - Arguments to find a PushNotificationTokens
+     * @example
+     * // Get one PushNotificationTokens
+     * const pushNotificationTokens = await prisma.pushNotificationTokens.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends pushNotificationTokensFindFirstOrThrowArgs>(args?: SelectSubset<T, pushNotificationTokensFindFirstOrThrowArgs<ExtArgs>>): Prisma__pushNotificationTokensClient<$Result.GetResult<Prisma.$pushNotificationTokensPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more PushNotificationTokens that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {pushNotificationTokensFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all PushNotificationTokens
+     * const pushNotificationTokens = await prisma.pushNotificationTokens.findMany()
+     * 
+     * // Get first 10 PushNotificationTokens
+     * const pushNotificationTokens = await prisma.pushNotificationTokens.findMany({ take: 10 })
+     * 
+     * // Only select the `push_token_id`
+     * const pushNotificationTokensWithPush_token_idOnly = await prisma.pushNotificationTokens.findMany({ select: { push_token_id: true } })
+     * 
+     */
+    findMany<T extends pushNotificationTokensFindManyArgs>(args?: SelectSubset<T, pushNotificationTokensFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$pushNotificationTokensPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a PushNotificationTokens.
+     * @param {pushNotificationTokensCreateArgs} args - Arguments to create a PushNotificationTokens.
+     * @example
+     * // Create one PushNotificationTokens
+     * const PushNotificationTokens = await prisma.pushNotificationTokens.create({
+     *   data: {
+     *     // ... data to create a PushNotificationTokens
+     *   }
+     * })
+     * 
+     */
+    create<T extends pushNotificationTokensCreateArgs>(args: SelectSubset<T, pushNotificationTokensCreateArgs<ExtArgs>>): Prisma__pushNotificationTokensClient<$Result.GetResult<Prisma.$pushNotificationTokensPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many PushNotificationTokens.
+     * @param {pushNotificationTokensCreateManyArgs} args - Arguments to create many PushNotificationTokens.
+     * @example
+     * // Create many PushNotificationTokens
+     * const pushNotificationTokens = await prisma.pushNotificationTokens.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends pushNotificationTokensCreateManyArgs>(args?: SelectSubset<T, pushNotificationTokensCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many PushNotificationTokens and returns the data saved in the database.
+     * @param {pushNotificationTokensCreateManyAndReturnArgs} args - Arguments to create many PushNotificationTokens.
+     * @example
+     * // Create many PushNotificationTokens
+     * const pushNotificationTokens = await prisma.pushNotificationTokens.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many PushNotificationTokens and only return the `push_token_id`
+     * const pushNotificationTokensWithPush_token_idOnly = await prisma.pushNotificationTokens.createManyAndReturn({
+     *   select: { push_token_id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends pushNotificationTokensCreateManyAndReturnArgs>(args?: SelectSubset<T, pushNotificationTokensCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$pushNotificationTokensPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a PushNotificationTokens.
+     * @param {pushNotificationTokensDeleteArgs} args - Arguments to delete one PushNotificationTokens.
+     * @example
+     * // Delete one PushNotificationTokens
+     * const PushNotificationTokens = await prisma.pushNotificationTokens.delete({
+     *   where: {
+     *     // ... filter to delete one PushNotificationTokens
+     *   }
+     * })
+     * 
+     */
+    delete<T extends pushNotificationTokensDeleteArgs>(args: SelectSubset<T, pushNotificationTokensDeleteArgs<ExtArgs>>): Prisma__pushNotificationTokensClient<$Result.GetResult<Prisma.$pushNotificationTokensPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one PushNotificationTokens.
+     * @param {pushNotificationTokensUpdateArgs} args - Arguments to update one PushNotificationTokens.
+     * @example
+     * // Update one PushNotificationTokens
+     * const pushNotificationTokens = await prisma.pushNotificationTokens.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends pushNotificationTokensUpdateArgs>(args: SelectSubset<T, pushNotificationTokensUpdateArgs<ExtArgs>>): Prisma__pushNotificationTokensClient<$Result.GetResult<Prisma.$pushNotificationTokensPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more PushNotificationTokens.
+     * @param {pushNotificationTokensDeleteManyArgs} args - Arguments to filter PushNotificationTokens to delete.
+     * @example
+     * // Delete a few PushNotificationTokens
+     * const { count } = await prisma.pushNotificationTokens.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends pushNotificationTokensDeleteManyArgs>(args?: SelectSubset<T, pushNotificationTokensDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more PushNotificationTokens.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {pushNotificationTokensUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many PushNotificationTokens
+     * const pushNotificationTokens = await prisma.pushNotificationTokens.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends pushNotificationTokensUpdateManyArgs>(args: SelectSubset<T, pushNotificationTokensUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more PushNotificationTokens and returns the data updated in the database.
+     * @param {pushNotificationTokensUpdateManyAndReturnArgs} args - Arguments to update many PushNotificationTokens.
+     * @example
+     * // Update many PushNotificationTokens
+     * const pushNotificationTokens = await prisma.pushNotificationTokens.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more PushNotificationTokens and only return the `push_token_id`
+     * const pushNotificationTokensWithPush_token_idOnly = await prisma.pushNotificationTokens.updateManyAndReturn({
+     *   select: { push_token_id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends pushNotificationTokensUpdateManyAndReturnArgs>(args: SelectSubset<T, pushNotificationTokensUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$pushNotificationTokensPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one PushNotificationTokens.
+     * @param {pushNotificationTokensUpsertArgs} args - Arguments to update or create a PushNotificationTokens.
+     * @example
+     * // Update or create a PushNotificationTokens
+     * const pushNotificationTokens = await prisma.pushNotificationTokens.upsert({
+     *   create: {
+     *     // ... data to create a PushNotificationTokens
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the PushNotificationTokens we want to update
+     *   }
+     * })
+     */
+    upsert<T extends pushNotificationTokensUpsertArgs>(args: SelectSubset<T, pushNotificationTokensUpsertArgs<ExtArgs>>): Prisma__pushNotificationTokensClient<$Result.GetResult<Prisma.$pushNotificationTokensPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of PushNotificationTokens.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {pushNotificationTokensCountArgs} args - Arguments to filter PushNotificationTokens to count.
+     * @example
+     * // Count the number of PushNotificationTokens
+     * const count = await prisma.pushNotificationTokens.count({
+     *   where: {
+     *     // ... the filter for the PushNotificationTokens we want to count
+     *   }
+     * })
+    **/
+    count<T extends pushNotificationTokensCountArgs>(
+      args?: Subset<T, pushNotificationTokensCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], PushNotificationTokensCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a PushNotificationTokens.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PushNotificationTokensAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends PushNotificationTokensAggregateArgs>(args: Subset<T, PushNotificationTokensAggregateArgs>): Prisma.PrismaPromise<GetPushNotificationTokensAggregateType<T>>
+
+    /**
+     * Group by PushNotificationTokens.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {pushNotificationTokensGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends pushNotificationTokensGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: pushNotificationTokensGroupByArgs['orderBy'] }
+        : { orderBy?: pushNotificationTokensGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, pushNotificationTokensGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetPushNotificationTokensGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the pushNotificationTokens model
+   */
+  readonly fields: pushNotificationTokensFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for pushNotificationTokens.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__pushNotificationTokensClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    people<T extends peopleDefaultArgs<ExtArgs> = {}>(args?: Subset<T, peopleDefaultArgs<ExtArgs>>): Prisma__peopleClient<$Result.GetResult<Prisma.$peoplePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the pushNotificationTokens model
+   */
+  interface pushNotificationTokensFieldRefs {
+    readonly push_token_id: FieldRef<"pushNotificationTokens", 'String'>
+    readonly user_id: FieldRef<"pushNotificationTokens", 'Int'>
+    readonly token: FieldRef<"pushNotificationTokens", 'String'>
+    readonly platform: FieldRef<"pushNotificationTokens", 'String'>
+    readonly enabled: FieldRef<"pushNotificationTokens", 'Boolean'>
+    readonly created_at: FieldRef<"pushNotificationTokens", 'DateTime'>
+    readonly updated_at: FieldRef<"pushNotificationTokens", 'DateTime'>
+    readonly last_seen_at: FieldRef<"pushNotificationTokens", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * pushNotificationTokens findUnique
+   */
+  export type pushNotificationTokensFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the pushNotificationTokens
+     */
+    select?: pushNotificationTokensSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the pushNotificationTokens
+     */
+    omit?: pushNotificationTokensOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: pushNotificationTokensInclude<ExtArgs> | null
+    /**
+     * Filter, which pushNotificationTokens to fetch.
+     */
+    where: pushNotificationTokensWhereUniqueInput
+    relationLoadStrategy?: RelationLoadStrategy
+  }
+
+  /**
+   * pushNotificationTokens findUniqueOrThrow
+   */
+  export type pushNotificationTokensFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the pushNotificationTokens
+     */
+    select?: pushNotificationTokensSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the pushNotificationTokens
+     */
+    omit?: pushNotificationTokensOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: pushNotificationTokensInclude<ExtArgs> | null
+    /**
+     * Filter, which pushNotificationTokens to fetch.
+     */
+    where: pushNotificationTokensWhereUniqueInput
+    relationLoadStrategy?: RelationLoadStrategy
+  }
+
+  /**
+   * pushNotificationTokens findFirst
+   */
+  export type pushNotificationTokensFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the pushNotificationTokens
+     */
+    select?: pushNotificationTokensSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the pushNotificationTokens
+     */
+    omit?: pushNotificationTokensOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: pushNotificationTokensInclude<ExtArgs> | null
+    /**
+     * Filter, which pushNotificationTokens to fetch.
+     */
+    where?: pushNotificationTokensWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of pushNotificationTokens to fetch.
+     */
+    orderBy?: pushNotificationTokensOrderByWithRelationInput | pushNotificationTokensOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for pushNotificationTokens.
+     */
+    cursor?: pushNotificationTokensWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` pushNotificationTokens from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` pushNotificationTokens.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of pushNotificationTokens.
+     */
+    distinct?: PushNotificationTokensScalarFieldEnum | PushNotificationTokensScalarFieldEnum[]
+    relationLoadStrategy?: RelationLoadStrategy
+  }
+
+  /**
+   * pushNotificationTokens findFirstOrThrow
+   */
+  export type pushNotificationTokensFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the pushNotificationTokens
+     */
+    select?: pushNotificationTokensSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the pushNotificationTokens
+     */
+    omit?: pushNotificationTokensOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: pushNotificationTokensInclude<ExtArgs> | null
+    /**
+     * Filter, which pushNotificationTokens to fetch.
+     */
+    where?: pushNotificationTokensWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of pushNotificationTokens to fetch.
+     */
+    orderBy?: pushNotificationTokensOrderByWithRelationInput | pushNotificationTokensOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for pushNotificationTokens.
+     */
+    cursor?: pushNotificationTokensWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` pushNotificationTokens from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` pushNotificationTokens.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of pushNotificationTokens.
+     */
+    distinct?: PushNotificationTokensScalarFieldEnum | PushNotificationTokensScalarFieldEnum[]
+    relationLoadStrategy?: RelationLoadStrategy
+  }
+
+  /**
+   * pushNotificationTokens findMany
+   */
+  export type pushNotificationTokensFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the pushNotificationTokens
+     */
+    select?: pushNotificationTokensSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the pushNotificationTokens
+     */
+    omit?: pushNotificationTokensOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: pushNotificationTokensInclude<ExtArgs> | null
+    /**
+     * Filter, which pushNotificationTokens to fetch.
+     */
+    where?: pushNotificationTokensWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of pushNotificationTokens to fetch.
+     */
+    orderBy?: pushNotificationTokensOrderByWithRelationInput | pushNotificationTokensOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing pushNotificationTokens.
+     */
+    cursor?: pushNotificationTokensWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` pushNotificationTokens from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` pushNotificationTokens.
+     */
+    skip?: number
+    distinct?: PushNotificationTokensScalarFieldEnum | PushNotificationTokensScalarFieldEnum[]
+    relationLoadStrategy?: RelationLoadStrategy
+  }
+
+  /**
+   * pushNotificationTokens create
+   */
+  export type pushNotificationTokensCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the pushNotificationTokens
+     */
+    select?: pushNotificationTokensSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the pushNotificationTokens
+     */
+    omit?: pushNotificationTokensOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: pushNotificationTokensInclude<ExtArgs> | null
+    /**
+     * The data needed to create a pushNotificationTokens.
+     */
+    data: XOR<pushNotificationTokensCreateInput, pushNotificationTokensUncheckedCreateInput>
+    relationLoadStrategy?: RelationLoadStrategy
+  }
+
+  /**
+   * pushNotificationTokens createMany
+   */
+  export type pushNotificationTokensCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many pushNotificationTokens.
+     */
+    data: pushNotificationTokensCreateManyInput | pushNotificationTokensCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * pushNotificationTokens createManyAndReturn
+   */
+  export type pushNotificationTokensCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the pushNotificationTokens
+     */
+    select?: pushNotificationTokensSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the pushNotificationTokens
+     */
+    omit?: pushNotificationTokensOmit<ExtArgs> | null
+    /**
+     * The data used to create many pushNotificationTokens.
+     */
+    data: pushNotificationTokensCreateManyInput | pushNotificationTokensCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: pushNotificationTokensIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * pushNotificationTokens update
+   */
+  export type pushNotificationTokensUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the pushNotificationTokens
+     */
+    select?: pushNotificationTokensSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the pushNotificationTokens
+     */
+    omit?: pushNotificationTokensOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: pushNotificationTokensInclude<ExtArgs> | null
+    /**
+     * The data needed to update a pushNotificationTokens.
+     */
+    data: XOR<pushNotificationTokensUpdateInput, pushNotificationTokensUncheckedUpdateInput>
+    /**
+     * Choose, which pushNotificationTokens to update.
+     */
+    where: pushNotificationTokensWhereUniqueInput
+    relationLoadStrategy?: RelationLoadStrategy
+  }
+
+  /**
+   * pushNotificationTokens updateMany
+   */
+  export type pushNotificationTokensUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update pushNotificationTokens.
+     */
+    data: XOR<pushNotificationTokensUpdateManyMutationInput, pushNotificationTokensUncheckedUpdateManyInput>
+    /**
+     * Filter which pushNotificationTokens to update
+     */
+    where?: pushNotificationTokensWhereInput
+    /**
+     * Limit how many pushNotificationTokens to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * pushNotificationTokens updateManyAndReturn
+   */
+  export type pushNotificationTokensUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the pushNotificationTokens
+     */
+    select?: pushNotificationTokensSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the pushNotificationTokens
+     */
+    omit?: pushNotificationTokensOmit<ExtArgs> | null
+    /**
+     * The data used to update pushNotificationTokens.
+     */
+    data: XOR<pushNotificationTokensUpdateManyMutationInput, pushNotificationTokensUncheckedUpdateManyInput>
+    /**
+     * Filter which pushNotificationTokens to update
+     */
+    where?: pushNotificationTokensWhereInput
+    /**
+     * Limit how many pushNotificationTokens to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: pushNotificationTokensIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * pushNotificationTokens upsert
+   */
+  export type pushNotificationTokensUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the pushNotificationTokens
+     */
+    select?: pushNotificationTokensSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the pushNotificationTokens
+     */
+    omit?: pushNotificationTokensOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: pushNotificationTokensInclude<ExtArgs> | null
+    /**
+     * The filter to search for the pushNotificationTokens to update in case it exists.
+     */
+    where: pushNotificationTokensWhereUniqueInput
+    /**
+     * In case the pushNotificationTokens found by the `where` argument doesn't exist, create a new pushNotificationTokens with this data.
+     */
+    create: XOR<pushNotificationTokensCreateInput, pushNotificationTokensUncheckedCreateInput>
+    /**
+     * In case the pushNotificationTokens was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<pushNotificationTokensUpdateInput, pushNotificationTokensUncheckedUpdateInput>
+    relationLoadStrategy?: RelationLoadStrategy
+  }
+
+  /**
+   * pushNotificationTokens delete
+   */
+  export type pushNotificationTokensDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the pushNotificationTokens
+     */
+    select?: pushNotificationTokensSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the pushNotificationTokens
+     */
+    omit?: pushNotificationTokensOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: pushNotificationTokensInclude<ExtArgs> | null
+    /**
+     * Filter which pushNotificationTokens to delete.
+     */
+    where: pushNotificationTokensWhereUniqueInput
+    relationLoadStrategy?: RelationLoadStrategy
+  }
+
+  /**
+   * pushNotificationTokens deleteMany
+   */
+  export type pushNotificationTokensDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which pushNotificationTokens to delete
+     */
+    where?: pushNotificationTokensWhereInput
+    /**
+     * Limit how many pushNotificationTokens to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * pushNotificationTokens without action
+   */
+  export type pushNotificationTokensDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the pushNotificationTokens
+     */
+    select?: pushNotificationTokensSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the pushNotificationTokens
+     */
+    omit?: pushNotificationTokensOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: pushNotificationTokensInclude<ExtArgs> | null
   }
 
 
@@ -18755,6 +20023,20 @@ export namespace Prisma {
   export type PeopleScalarFieldEnum = (typeof PeopleScalarFieldEnum)[keyof typeof PeopleScalarFieldEnum]
 
 
+  export const PushNotificationTokensScalarFieldEnum: {
+    push_token_id: 'push_token_id',
+    user_id: 'user_id',
+    token: 'token',
+    platform: 'platform',
+    enabled: 'enabled',
+    created_at: 'created_at',
+    updated_at: 'updated_at',
+    last_seen_at: 'last_seen_at'
+  };
+
+  export type PushNotificationTokensScalarFieldEnum = (typeof PushNotificationTokensScalarFieldEnum)[keyof typeof PushNotificationTokensScalarFieldEnum]
+
+
   export const PicksScalarFieldEnum: {
     pickid: 'pickid',
     uid: 'uid',
@@ -19656,6 +20938,7 @@ export namespace Prisma {
     leaguemembers?: LeaguemembersListRelationFilter
     leagues?: LeaguesListRelationFilter
     picks?: PicksListRelationFilter
+    pushNotificationTokens?: PushNotificationTokensListRelationFilter
   }
 
   export type peopleOrderByWithRelationInput = {
@@ -19673,6 +20956,7 @@ export namespace Prisma {
     leaguemembers?: leaguemembersOrderByRelationAggregateInput
     leagues?: leaguesOrderByRelationAggregateInput
     picks?: picksOrderByRelationAggregateInput
+    pushNotificationTokens?: pushNotificationTokensOrderByRelationAggregateInput
   }
 
   export type peopleWhereUniqueInput = Prisma.AtLeast<{
@@ -19693,6 +20977,7 @@ export namespace Prisma {
     leaguemembers?: LeaguemembersListRelationFilter
     leagues?: LeaguesListRelationFilter
     picks?: PicksListRelationFilter
+    pushNotificationTokens?: PushNotificationTokensListRelationFilter
   }, "uid" | "email" | "supabase_id">
 
   export type peopleOrderByWithAggregationInput = {
@@ -19729,6 +21014,78 @@ export namespace Prisma {
     google_email?: StringNullableWithAggregatesFilter<"people"> | string | null
     google_userid?: StringNullableWithAggregatesFilter<"people"> | string | null
     supabase_id?: StringNullableWithAggregatesFilter<"people"> | string | null
+  }
+
+  export type pushNotificationTokensWhereInput = {
+    AND?: pushNotificationTokensWhereInput | pushNotificationTokensWhereInput[]
+    OR?: pushNotificationTokensWhereInput[]
+    NOT?: pushNotificationTokensWhereInput | pushNotificationTokensWhereInput[]
+    push_token_id?: StringFilter<"pushNotificationTokens"> | string
+    user_id?: IntFilter<"pushNotificationTokens"> | number
+    token?: StringFilter<"pushNotificationTokens"> | string
+    platform?: StringNullableFilter<"pushNotificationTokens"> | string | null
+    enabled?: BoolFilter<"pushNotificationTokens"> | boolean
+    created_at?: DateTimeFilter<"pushNotificationTokens"> | Date | string
+    updated_at?: DateTimeFilter<"pushNotificationTokens"> | Date | string
+    last_seen_at?: DateTimeFilter<"pushNotificationTokens"> | Date | string
+    people?: XOR<PeopleScalarRelationFilter, peopleWhereInput>
+  }
+
+  export type pushNotificationTokensOrderByWithRelationInput = {
+    push_token_id?: SortOrder
+    user_id?: SortOrder
+    token?: SortOrder
+    platform?: SortOrderInput | SortOrder
+    enabled?: SortOrder
+    created_at?: SortOrder
+    updated_at?: SortOrder
+    last_seen_at?: SortOrder
+    people?: peopleOrderByWithRelationInput
+  }
+
+  export type pushNotificationTokensWhereUniqueInput = Prisma.AtLeast<{
+    push_token_id?: string
+    token?: string
+    AND?: pushNotificationTokensWhereInput | pushNotificationTokensWhereInput[]
+    OR?: pushNotificationTokensWhereInput[]
+    NOT?: pushNotificationTokensWhereInput | pushNotificationTokensWhereInput[]
+    user_id?: IntFilter<"pushNotificationTokens"> | number
+    platform?: StringNullableFilter<"pushNotificationTokens"> | string | null
+    enabled?: BoolFilter<"pushNotificationTokens"> | boolean
+    created_at?: DateTimeFilter<"pushNotificationTokens"> | Date | string
+    updated_at?: DateTimeFilter<"pushNotificationTokens"> | Date | string
+    last_seen_at?: DateTimeFilter<"pushNotificationTokens"> | Date | string
+    people?: XOR<PeopleScalarRelationFilter, peopleWhereInput>
+  }, "push_token_id" | "token">
+
+  export type pushNotificationTokensOrderByWithAggregationInput = {
+    push_token_id?: SortOrder
+    user_id?: SortOrder
+    token?: SortOrder
+    platform?: SortOrderInput | SortOrder
+    enabled?: SortOrder
+    created_at?: SortOrder
+    updated_at?: SortOrder
+    last_seen_at?: SortOrder
+    _count?: pushNotificationTokensCountOrderByAggregateInput
+    _avg?: pushNotificationTokensAvgOrderByAggregateInput
+    _max?: pushNotificationTokensMaxOrderByAggregateInput
+    _min?: pushNotificationTokensMinOrderByAggregateInput
+    _sum?: pushNotificationTokensSumOrderByAggregateInput
+  }
+
+  export type pushNotificationTokensScalarWhereWithAggregatesInput = {
+    AND?: pushNotificationTokensScalarWhereWithAggregatesInput | pushNotificationTokensScalarWhereWithAggregatesInput[]
+    OR?: pushNotificationTokensScalarWhereWithAggregatesInput[]
+    NOT?: pushNotificationTokensScalarWhereWithAggregatesInput | pushNotificationTokensScalarWhereWithAggregatesInput[]
+    push_token_id?: StringWithAggregatesFilter<"pushNotificationTokens"> | string
+    user_id?: IntWithAggregatesFilter<"pushNotificationTokens"> | number
+    token?: StringWithAggregatesFilter<"pushNotificationTokens"> | string
+    platform?: StringNullableWithAggregatesFilter<"pushNotificationTokens"> | string | null
+    enabled?: BoolWithAggregatesFilter<"pushNotificationTokens"> | boolean
+    created_at?: DateTimeWithAggregatesFilter<"pushNotificationTokens"> | Date | string
+    updated_at?: DateTimeWithAggregatesFilter<"pushNotificationTokens"> | Date | string
+    last_seen_at?: DateTimeWithAggregatesFilter<"pushNotificationTokens"> | Date | string
   }
 
   export type picksWhereInput = {
@@ -20827,6 +22184,7 @@ export namespace Prisma {
     leaguemembers?: leaguemembersCreateNestedManyWithoutPeopleInput
     leagues?: leaguesCreateNestedManyWithoutPeopleInput
     picks?: picksCreateNestedManyWithoutPeopleInput
+    pushNotificationTokens?: pushNotificationTokensCreateNestedManyWithoutPeopleInput
   }
 
   export type peopleUncheckedCreateInput = {
@@ -20844,6 +22202,7 @@ export namespace Prisma {
     leaguemembers?: leaguemembersUncheckedCreateNestedManyWithoutPeopleInput
     leagues?: leaguesUncheckedCreateNestedManyWithoutPeopleInput
     picks?: picksUncheckedCreateNestedManyWithoutPeopleInput
+    pushNotificationTokens?: pushNotificationTokensUncheckedCreateNestedManyWithoutPeopleInput
   }
 
   export type peopleUpdateInput = {
@@ -20860,6 +22219,7 @@ export namespace Prisma {
     leaguemembers?: leaguemembersUpdateManyWithoutPeopleNestedInput
     leagues?: leaguesUpdateManyWithoutPeopleNestedInput
     picks?: picksUpdateManyWithoutPeopleNestedInput
+    pushNotificationTokens?: pushNotificationTokensUpdateManyWithoutPeopleNestedInput
   }
 
   export type peopleUncheckedUpdateInput = {
@@ -20877,6 +22237,7 @@ export namespace Prisma {
     leaguemembers?: leaguemembersUncheckedUpdateManyWithoutPeopleNestedInput
     leagues?: leaguesUncheckedUpdateManyWithoutPeopleNestedInput
     picks?: picksUncheckedUpdateManyWithoutPeopleNestedInput
+    pushNotificationTokens?: pushNotificationTokensUncheckedUpdateManyWithoutPeopleNestedInput
   }
 
   export type peopleCreateManyInput = {
@@ -20918,6 +22279,82 @@ export namespace Prisma {
     google_email?: NullableStringFieldUpdateOperationsInput | string | null
     google_userid?: NullableStringFieldUpdateOperationsInput | string | null
     supabase_id?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type pushNotificationTokensCreateInput = {
+    push_token_id?: string
+    token: string
+    platform?: string | null
+    enabled?: boolean
+    created_at?: Date | string
+    updated_at?: Date | string
+    last_seen_at?: Date | string
+    people: peopleCreateNestedOneWithoutPushNotificationTokensInput
+  }
+
+  export type pushNotificationTokensUncheckedCreateInput = {
+    push_token_id?: string
+    user_id: number
+    token: string
+    platform?: string | null
+    enabled?: boolean
+    created_at?: Date | string
+    updated_at?: Date | string
+    last_seen_at?: Date | string
+  }
+
+  export type pushNotificationTokensUpdateInput = {
+    push_token_id?: StringFieldUpdateOperationsInput | string
+    token?: StringFieldUpdateOperationsInput | string
+    platform?: NullableStringFieldUpdateOperationsInput | string | null
+    enabled?: BoolFieldUpdateOperationsInput | boolean
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    last_seen_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    people?: peopleUpdateOneRequiredWithoutPushNotificationTokensNestedInput
+  }
+
+  export type pushNotificationTokensUncheckedUpdateInput = {
+    push_token_id?: StringFieldUpdateOperationsInput | string
+    user_id?: IntFieldUpdateOperationsInput | number
+    token?: StringFieldUpdateOperationsInput | string
+    platform?: NullableStringFieldUpdateOperationsInput | string | null
+    enabled?: BoolFieldUpdateOperationsInput | boolean
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    last_seen_at?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type pushNotificationTokensCreateManyInput = {
+    push_token_id?: string
+    user_id: number
+    token: string
+    platform?: string | null
+    enabled?: boolean
+    created_at?: Date | string
+    updated_at?: Date | string
+    last_seen_at?: Date | string
+  }
+
+  export type pushNotificationTokensUpdateManyMutationInput = {
+    push_token_id?: StringFieldUpdateOperationsInput | string
+    token?: StringFieldUpdateOperationsInput | string
+    platform?: NullableStringFieldUpdateOperationsInput | string | null
+    enabled?: BoolFieldUpdateOperationsInput | boolean
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    last_seen_at?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type pushNotificationTokensUncheckedUpdateManyInput = {
+    push_token_id?: StringFieldUpdateOperationsInput | string
+    user_id?: IntFieldUpdateOperationsInput | number
+    token?: StringFieldUpdateOperationsInput | string
+    platform?: NullableStringFieldUpdateOperationsInput | string | null
+    enabled?: BoolFieldUpdateOperationsInput | boolean
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    last_seen_at?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type picksCreateInput = {
@@ -22192,6 +23629,16 @@ export namespace Prisma {
     _max?: NestedEnumLeagueStatusFilter<$PrismaModel>
   }
 
+  export type PushNotificationTokensListRelationFilter = {
+    every?: pushNotificationTokensWhereInput
+    some?: pushNotificationTokensWhereInput
+    none?: pushNotificationTokensWhereInput
+  }
+
+  export type pushNotificationTokensOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
   export type peopleCountOrderByAggregateInput = {
     uid?: SortOrder
     username?: SortOrder
@@ -22242,6 +23689,60 @@ export namespace Prisma {
   export type peopleSumOrderByAggregateInput = {
     uid?: SortOrder
     season?: SortOrder
+  }
+
+  export type BoolFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolFilter<$PrismaModel> | boolean
+  }
+
+  export type pushNotificationTokensCountOrderByAggregateInput = {
+    push_token_id?: SortOrder
+    user_id?: SortOrder
+    token?: SortOrder
+    platform?: SortOrder
+    enabled?: SortOrder
+    created_at?: SortOrder
+    updated_at?: SortOrder
+    last_seen_at?: SortOrder
+  }
+
+  export type pushNotificationTokensAvgOrderByAggregateInput = {
+    user_id?: SortOrder
+  }
+
+  export type pushNotificationTokensMaxOrderByAggregateInput = {
+    push_token_id?: SortOrder
+    user_id?: SortOrder
+    token?: SortOrder
+    platform?: SortOrder
+    enabled?: SortOrder
+    created_at?: SortOrder
+    updated_at?: SortOrder
+    last_seen_at?: SortOrder
+  }
+
+  export type pushNotificationTokensMinOrderByAggregateInput = {
+    push_token_id?: SortOrder
+    user_id?: SortOrder
+    token?: SortOrder
+    platform?: SortOrder
+    enabled?: SortOrder
+    created_at?: SortOrder
+    updated_at?: SortOrder
+    last_seen_at?: SortOrder
+  }
+
+  export type pushNotificationTokensSumOrderByAggregateInput = {
+    user_id?: SortOrder
+  }
+
+  export type BoolWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedBoolFilter<$PrismaModel>
+    _max?: NestedBoolFilter<$PrismaModel>
   }
 
   export type GamesScalarRelationFilter = {
@@ -22413,11 +23914,6 @@ export namespace Prisma {
     _max?: NestedDateTimeNullableFilter<$PrismaModel>
   }
 
-  export type BoolFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolFilter<$PrismaModel> | boolean
-  }
-
   export type superbowlsquaresCountOrderByAggregateInput = {
     square_id?: SortOrder
     uid?: SortOrder
@@ -22462,14 +23958,6 @@ export namespace Prisma {
     league_id?: SortOrder
     afc_score_index?: SortOrder
     nfc_score_index?: SortOrder
-  }
-
-  export type BoolWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedBoolFilter<$PrismaModel>
-    _max?: NestedBoolFilter<$PrismaModel>
   }
 
   export type GamesListRelationFilter = {
@@ -23434,6 +24922,13 @@ export namespace Prisma {
     connect?: picksWhereUniqueInput | picksWhereUniqueInput[]
   }
 
+  export type pushNotificationTokensCreateNestedManyWithoutPeopleInput = {
+    create?: XOR<pushNotificationTokensCreateWithoutPeopleInput, pushNotificationTokensUncheckedCreateWithoutPeopleInput> | pushNotificationTokensCreateWithoutPeopleInput[] | pushNotificationTokensUncheckedCreateWithoutPeopleInput[]
+    connectOrCreate?: pushNotificationTokensCreateOrConnectWithoutPeopleInput | pushNotificationTokensCreateOrConnectWithoutPeopleInput[]
+    createMany?: pushNotificationTokensCreateManyPeopleInputEnvelope
+    connect?: pushNotificationTokensWhereUniqueInput | pushNotificationTokensWhereUniqueInput[]
+  }
+
   export type leaguemembersUncheckedCreateNestedManyWithoutPeopleInput = {
     create?: XOR<leaguemembersCreateWithoutPeopleInput, leaguemembersUncheckedCreateWithoutPeopleInput> | leaguemembersCreateWithoutPeopleInput[] | leaguemembersUncheckedCreateWithoutPeopleInput[]
     connectOrCreate?: leaguemembersCreateOrConnectWithoutPeopleInput | leaguemembersCreateOrConnectWithoutPeopleInput[]
@@ -23453,6 +24948,13 @@ export namespace Prisma {
     connectOrCreate?: picksCreateOrConnectWithoutPeopleInput | picksCreateOrConnectWithoutPeopleInput[]
     createMany?: picksCreateManyPeopleInputEnvelope
     connect?: picksWhereUniqueInput | picksWhereUniqueInput[]
+  }
+
+  export type pushNotificationTokensUncheckedCreateNestedManyWithoutPeopleInput = {
+    create?: XOR<pushNotificationTokensCreateWithoutPeopleInput, pushNotificationTokensUncheckedCreateWithoutPeopleInput> | pushNotificationTokensCreateWithoutPeopleInput[] | pushNotificationTokensUncheckedCreateWithoutPeopleInput[]
+    connectOrCreate?: pushNotificationTokensCreateOrConnectWithoutPeopleInput | pushNotificationTokensCreateOrConnectWithoutPeopleInput[]
+    createMany?: pushNotificationTokensCreateManyPeopleInputEnvelope
+    connect?: pushNotificationTokensWhereUniqueInput | pushNotificationTokensWhereUniqueInput[]
   }
 
   export type leaguemembersUpdateManyWithoutPeopleNestedInput = {
@@ -23497,6 +24999,20 @@ export namespace Prisma {
     deleteMany?: picksScalarWhereInput | picksScalarWhereInput[]
   }
 
+  export type pushNotificationTokensUpdateManyWithoutPeopleNestedInput = {
+    create?: XOR<pushNotificationTokensCreateWithoutPeopleInput, pushNotificationTokensUncheckedCreateWithoutPeopleInput> | pushNotificationTokensCreateWithoutPeopleInput[] | pushNotificationTokensUncheckedCreateWithoutPeopleInput[]
+    connectOrCreate?: pushNotificationTokensCreateOrConnectWithoutPeopleInput | pushNotificationTokensCreateOrConnectWithoutPeopleInput[]
+    upsert?: pushNotificationTokensUpsertWithWhereUniqueWithoutPeopleInput | pushNotificationTokensUpsertWithWhereUniqueWithoutPeopleInput[]
+    createMany?: pushNotificationTokensCreateManyPeopleInputEnvelope
+    set?: pushNotificationTokensWhereUniqueInput | pushNotificationTokensWhereUniqueInput[]
+    disconnect?: pushNotificationTokensWhereUniqueInput | pushNotificationTokensWhereUniqueInput[]
+    delete?: pushNotificationTokensWhereUniqueInput | pushNotificationTokensWhereUniqueInput[]
+    connect?: pushNotificationTokensWhereUniqueInput | pushNotificationTokensWhereUniqueInput[]
+    update?: pushNotificationTokensUpdateWithWhereUniqueWithoutPeopleInput | pushNotificationTokensUpdateWithWhereUniqueWithoutPeopleInput[]
+    updateMany?: pushNotificationTokensUpdateManyWithWhereWithoutPeopleInput | pushNotificationTokensUpdateManyWithWhereWithoutPeopleInput[]
+    deleteMany?: pushNotificationTokensScalarWhereInput | pushNotificationTokensScalarWhereInput[]
+  }
+
   export type leaguemembersUncheckedUpdateManyWithoutPeopleNestedInput = {
     create?: XOR<leaguemembersCreateWithoutPeopleInput, leaguemembersUncheckedCreateWithoutPeopleInput> | leaguemembersCreateWithoutPeopleInput[] | leaguemembersUncheckedCreateWithoutPeopleInput[]
     connectOrCreate?: leaguemembersCreateOrConnectWithoutPeopleInput | leaguemembersCreateOrConnectWithoutPeopleInput[]
@@ -23537,6 +25053,38 @@ export namespace Prisma {
     update?: picksUpdateWithWhereUniqueWithoutPeopleInput | picksUpdateWithWhereUniqueWithoutPeopleInput[]
     updateMany?: picksUpdateManyWithWhereWithoutPeopleInput | picksUpdateManyWithWhereWithoutPeopleInput[]
     deleteMany?: picksScalarWhereInput | picksScalarWhereInput[]
+  }
+
+  export type pushNotificationTokensUncheckedUpdateManyWithoutPeopleNestedInput = {
+    create?: XOR<pushNotificationTokensCreateWithoutPeopleInput, pushNotificationTokensUncheckedCreateWithoutPeopleInput> | pushNotificationTokensCreateWithoutPeopleInput[] | pushNotificationTokensUncheckedCreateWithoutPeopleInput[]
+    connectOrCreate?: pushNotificationTokensCreateOrConnectWithoutPeopleInput | pushNotificationTokensCreateOrConnectWithoutPeopleInput[]
+    upsert?: pushNotificationTokensUpsertWithWhereUniqueWithoutPeopleInput | pushNotificationTokensUpsertWithWhereUniqueWithoutPeopleInput[]
+    createMany?: pushNotificationTokensCreateManyPeopleInputEnvelope
+    set?: pushNotificationTokensWhereUniqueInput | pushNotificationTokensWhereUniqueInput[]
+    disconnect?: pushNotificationTokensWhereUniqueInput | pushNotificationTokensWhereUniqueInput[]
+    delete?: pushNotificationTokensWhereUniqueInput | pushNotificationTokensWhereUniqueInput[]
+    connect?: pushNotificationTokensWhereUniqueInput | pushNotificationTokensWhereUniqueInput[]
+    update?: pushNotificationTokensUpdateWithWhereUniqueWithoutPeopleInput | pushNotificationTokensUpdateWithWhereUniqueWithoutPeopleInput[]
+    updateMany?: pushNotificationTokensUpdateManyWithWhereWithoutPeopleInput | pushNotificationTokensUpdateManyWithWhereWithoutPeopleInput[]
+    deleteMany?: pushNotificationTokensScalarWhereInput | pushNotificationTokensScalarWhereInput[]
+  }
+
+  export type peopleCreateNestedOneWithoutPushNotificationTokensInput = {
+    create?: XOR<peopleCreateWithoutPushNotificationTokensInput, peopleUncheckedCreateWithoutPushNotificationTokensInput>
+    connectOrCreate?: peopleCreateOrConnectWithoutPushNotificationTokensInput
+    connect?: peopleWhereUniqueInput
+  }
+
+  export type BoolFieldUpdateOperationsInput = {
+    set?: boolean
+  }
+
+  export type peopleUpdateOneRequiredWithoutPushNotificationTokensNestedInput = {
+    create?: XOR<peopleCreateWithoutPushNotificationTokensInput, peopleUncheckedCreateWithoutPushNotificationTokensInput>
+    connectOrCreate?: peopleCreateOrConnectWithoutPushNotificationTokensInput
+    upsert?: peopleUpsertWithoutPushNotificationTokensInput
+    connect?: peopleWhereUniqueInput
+    update?: XOR<XOR<peopleUpdateToOneWithWhereWithoutPushNotificationTokensInput, peopleUpdateWithoutPushNotificationTokensInput>, peopleUncheckedUpdateWithoutPushNotificationTokensInput>
   }
 
   export type gamesCreateNestedOneWithoutPicksInput = {
@@ -23645,10 +25193,6 @@ export namespace Prisma {
     upsert?: teamsUpsertWithoutSuperbowl_superbowl_winnerToteamsInput
     connect?: teamsWhereUniqueInput
     update?: XOR<XOR<teamsUpdateToOneWithWhereWithoutSuperbowl_superbowl_winnerToteamsInput, teamsUpdateWithoutSuperbowl_superbowl_winnerToteamsInput>, teamsUncheckedUpdateWithoutSuperbowl_superbowl_winnerToteamsInput>
-  }
-
-  export type BoolFieldUpdateOperationsInput = {
-    set?: boolean
   }
 
   export type gamesCreateNestedManyWithoutTeams_games_homeToteamsInput = {
@@ -24490,6 +26034,19 @@ export namespace Prisma {
     _max?: NestedEnumLeagueStatusFilter<$PrismaModel>
   }
 
+  export type NestedBoolFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolFilter<$PrismaModel> | boolean
+  }
+
+  export type NestedBoolWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedBoolFilter<$PrismaModel>
+    _max?: NestedBoolFilter<$PrismaModel>
+  }
+
   export type NestedDateTimeNullableFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
     in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
@@ -24513,19 +26070,6 @@ export namespace Prisma {
     _count?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedDateTimeNullableFilter<$PrismaModel>
     _max?: NestedDateTimeNullableFilter<$PrismaModel>
-  }
-
-  export type NestedBoolFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolFilter<$PrismaModel> | boolean
-  }
-
-  export type NestedBoolWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedBoolFilter<$PrismaModel>
-    _max?: NestedBoolFilter<$PrismaModel>
   }
 
   export type NestedEnumPostseasonRoundFilter<$PrismaModel = never> = {
@@ -25219,6 +26763,7 @@ export namespace Prisma {
     supabase_id?: string | null
     leagues?: leaguesCreateNestedManyWithoutPeopleInput
     picks?: picksCreateNestedManyWithoutPeopleInput
+    pushNotificationTokens?: pushNotificationTokensCreateNestedManyWithoutPeopleInput
   }
 
   export type peopleUncheckedCreateWithoutLeaguemembersInput = {
@@ -25235,6 +26780,7 @@ export namespace Prisma {
     supabase_id?: string | null
     leagues?: leaguesUncheckedCreateNestedManyWithoutPeopleInput
     picks?: picksUncheckedCreateNestedManyWithoutPeopleInput
+    pushNotificationTokens?: pushNotificationTokensUncheckedCreateNestedManyWithoutPeopleInput
   }
 
   export type peopleCreateOrConnectWithoutLeaguemembersInput = {
@@ -25465,6 +27011,7 @@ export namespace Prisma {
     supabase_id?: NullableStringFieldUpdateOperationsInput | string | null
     leagues?: leaguesUpdateManyWithoutPeopleNestedInput
     picks?: picksUpdateManyWithoutPeopleNestedInput
+    pushNotificationTokens?: pushNotificationTokensUpdateManyWithoutPeopleNestedInput
   }
 
   export type peopleUncheckedUpdateWithoutLeaguemembersInput = {
@@ -25481,6 +27028,7 @@ export namespace Prisma {
     supabase_id?: NullableStringFieldUpdateOperationsInput | string | null
     leagues?: leaguesUncheckedUpdateManyWithoutPeopleNestedInput
     picks?: picksUncheckedUpdateManyWithoutPeopleNestedInput
+    pushNotificationTokens?: pushNotificationTokensUncheckedUpdateManyWithoutPeopleNestedInput
   }
 
   export type leaguesUpsertWithoutLeaguemembersInput = {
@@ -25900,6 +27448,7 @@ export namespace Prisma {
     supabase_id?: string | null
     leaguemembers?: leaguemembersCreateNestedManyWithoutPeopleInput
     picks?: picksCreateNestedManyWithoutPeopleInput
+    pushNotificationTokens?: pushNotificationTokensCreateNestedManyWithoutPeopleInput
   }
 
   export type peopleUncheckedCreateWithoutLeaguesInput = {
@@ -25916,6 +27465,7 @@ export namespace Prisma {
     supabase_id?: string | null
     leaguemembers?: leaguemembersUncheckedCreateNestedManyWithoutPeopleInput
     picks?: picksUncheckedCreateNestedManyWithoutPeopleInput
+    pushNotificationTokens?: pushNotificationTokensUncheckedCreateNestedManyWithoutPeopleInput
   }
 
   export type peopleCreateOrConnectWithoutLeaguesInput = {
@@ -26116,6 +27666,7 @@ export namespace Prisma {
     supabase_id?: NullableStringFieldUpdateOperationsInput | string | null
     leaguemembers?: leaguemembersUpdateManyWithoutPeopleNestedInput
     picks?: picksUpdateManyWithoutPeopleNestedInput
+    pushNotificationTokens?: pushNotificationTokensUpdateManyWithoutPeopleNestedInput
   }
 
   export type peopleUncheckedUpdateWithoutLeaguesInput = {
@@ -26132,6 +27683,7 @@ export namespace Prisma {
     supabase_id?: NullableStringFieldUpdateOperationsInput | string | null
     leaguemembers?: leaguemembersUncheckedUpdateManyWithoutPeopleNestedInput
     picks?: picksUncheckedUpdateManyWithoutPeopleNestedInput
+    pushNotificationTokens?: pushNotificationTokensUncheckedUpdateManyWithoutPeopleNestedInput
   }
 
   export type leaguesUpsertWithoutFuture_leaguesInput = {
@@ -26342,6 +27894,36 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type pushNotificationTokensCreateWithoutPeopleInput = {
+    push_token_id?: string
+    token: string
+    platform?: string | null
+    enabled?: boolean
+    created_at?: Date | string
+    updated_at?: Date | string
+    last_seen_at?: Date | string
+  }
+
+  export type pushNotificationTokensUncheckedCreateWithoutPeopleInput = {
+    push_token_id?: string
+    token: string
+    platform?: string | null
+    enabled?: boolean
+    created_at?: Date | string
+    updated_at?: Date | string
+    last_seen_at?: Date | string
+  }
+
+  export type pushNotificationTokensCreateOrConnectWithoutPeopleInput = {
+    where: pushNotificationTokensWhereUniqueInput
+    create: XOR<pushNotificationTokensCreateWithoutPeopleInput, pushNotificationTokensUncheckedCreateWithoutPeopleInput>
+  }
+
+  export type pushNotificationTokensCreateManyPeopleInputEnvelope = {
+    data: pushNotificationTokensCreateManyPeopleInput | pushNotificationTokensCreateManyPeopleInput[]
+    skipDuplicates?: boolean
+  }
+
   export type leaguemembersUpsertWithWhereUniqueWithoutPeopleInput = {
     where: leaguemembersWhereUniqueInput
     update: XOR<leaguemembersUpdateWithoutPeopleInput, leaguemembersUncheckedUpdateWithoutPeopleInput>
@@ -26388,6 +27970,118 @@ export namespace Prisma {
   export type picksUpdateManyWithWhereWithoutPeopleInput = {
     where: picksScalarWhereInput
     data: XOR<picksUpdateManyMutationInput, picksUncheckedUpdateManyWithoutPeopleInput>
+  }
+
+  export type pushNotificationTokensUpsertWithWhereUniqueWithoutPeopleInput = {
+    where: pushNotificationTokensWhereUniqueInput
+    update: XOR<pushNotificationTokensUpdateWithoutPeopleInput, pushNotificationTokensUncheckedUpdateWithoutPeopleInput>
+    create: XOR<pushNotificationTokensCreateWithoutPeopleInput, pushNotificationTokensUncheckedCreateWithoutPeopleInput>
+  }
+
+  export type pushNotificationTokensUpdateWithWhereUniqueWithoutPeopleInput = {
+    where: pushNotificationTokensWhereUniqueInput
+    data: XOR<pushNotificationTokensUpdateWithoutPeopleInput, pushNotificationTokensUncheckedUpdateWithoutPeopleInput>
+  }
+
+  export type pushNotificationTokensUpdateManyWithWhereWithoutPeopleInput = {
+    where: pushNotificationTokensScalarWhereInput
+    data: XOR<pushNotificationTokensUpdateManyMutationInput, pushNotificationTokensUncheckedUpdateManyWithoutPeopleInput>
+  }
+
+  export type pushNotificationTokensScalarWhereInput = {
+    AND?: pushNotificationTokensScalarWhereInput | pushNotificationTokensScalarWhereInput[]
+    OR?: pushNotificationTokensScalarWhereInput[]
+    NOT?: pushNotificationTokensScalarWhereInput | pushNotificationTokensScalarWhereInput[]
+    push_token_id?: StringFilter<"pushNotificationTokens"> | string
+    user_id?: IntFilter<"pushNotificationTokens"> | number
+    token?: StringFilter<"pushNotificationTokens"> | string
+    platform?: StringNullableFilter<"pushNotificationTokens"> | string | null
+    enabled?: BoolFilter<"pushNotificationTokens"> | boolean
+    created_at?: DateTimeFilter<"pushNotificationTokens"> | Date | string
+    updated_at?: DateTimeFilter<"pushNotificationTokens"> | Date | string
+    last_seen_at?: DateTimeFilter<"pushNotificationTokens"> | Date | string
+  }
+
+  export type peopleCreateWithoutPushNotificationTokensInput = {
+    username: string
+    fname: string
+    lname: string
+    email: string
+    season: number
+    email2?: string | null
+    google_photo_url?: string | null
+    google_email?: string | null
+    google_userid?: string | null
+    supabase_id?: string | null
+    leaguemembers?: leaguemembersCreateNestedManyWithoutPeopleInput
+    leagues?: leaguesCreateNestedManyWithoutPeopleInput
+    picks?: picksCreateNestedManyWithoutPeopleInput
+  }
+
+  export type peopleUncheckedCreateWithoutPushNotificationTokensInput = {
+    uid?: number
+    username: string
+    fname: string
+    lname: string
+    email: string
+    season: number
+    email2?: string | null
+    google_photo_url?: string | null
+    google_email?: string | null
+    google_userid?: string | null
+    supabase_id?: string | null
+    leaguemembers?: leaguemembersUncheckedCreateNestedManyWithoutPeopleInput
+    leagues?: leaguesUncheckedCreateNestedManyWithoutPeopleInput
+    picks?: picksUncheckedCreateNestedManyWithoutPeopleInput
+  }
+
+  export type peopleCreateOrConnectWithoutPushNotificationTokensInput = {
+    where: peopleWhereUniqueInput
+    create: XOR<peopleCreateWithoutPushNotificationTokensInput, peopleUncheckedCreateWithoutPushNotificationTokensInput>
+  }
+
+  export type peopleUpsertWithoutPushNotificationTokensInput = {
+    update: XOR<peopleUpdateWithoutPushNotificationTokensInput, peopleUncheckedUpdateWithoutPushNotificationTokensInput>
+    create: XOR<peopleCreateWithoutPushNotificationTokensInput, peopleUncheckedCreateWithoutPushNotificationTokensInput>
+    where?: peopleWhereInput
+  }
+
+  export type peopleUpdateToOneWithWhereWithoutPushNotificationTokensInput = {
+    where?: peopleWhereInput
+    data: XOR<peopleUpdateWithoutPushNotificationTokensInput, peopleUncheckedUpdateWithoutPushNotificationTokensInput>
+  }
+
+  export type peopleUpdateWithoutPushNotificationTokensInput = {
+    username?: StringFieldUpdateOperationsInput | string
+    fname?: StringFieldUpdateOperationsInput | string
+    lname?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    season?: IntFieldUpdateOperationsInput | number
+    email2?: NullableStringFieldUpdateOperationsInput | string | null
+    google_photo_url?: NullableStringFieldUpdateOperationsInput | string | null
+    google_email?: NullableStringFieldUpdateOperationsInput | string | null
+    google_userid?: NullableStringFieldUpdateOperationsInput | string | null
+    supabase_id?: NullableStringFieldUpdateOperationsInput | string | null
+    leaguemembers?: leaguemembersUpdateManyWithoutPeopleNestedInput
+    leagues?: leaguesUpdateManyWithoutPeopleNestedInput
+    picks?: picksUpdateManyWithoutPeopleNestedInput
+  }
+
+  export type peopleUncheckedUpdateWithoutPushNotificationTokensInput = {
+    uid?: IntFieldUpdateOperationsInput | number
+    username?: StringFieldUpdateOperationsInput | string
+    fname?: StringFieldUpdateOperationsInput | string
+    lname?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    season?: IntFieldUpdateOperationsInput | number
+    email2?: NullableStringFieldUpdateOperationsInput | string | null
+    google_photo_url?: NullableStringFieldUpdateOperationsInput | string | null
+    google_email?: NullableStringFieldUpdateOperationsInput | string | null
+    google_userid?: NullableStringFieldUpdateOperationsInput | string | null
+    supabase_id?: NullableStringFieldUpdateOperationsInput | string | null
+    leaguemembers?: leaguemembersUncheckedUpdateManyWithoutPeopleNestedInput
+    leagues?: leaguesUncheckedUpdateManyWithoutPeopleNestedInput
+    picks?: picksUncheckedUpdateManyWithoutPeopleNestedInput
   }
 
   export type gamesCreateWithoutPicksInput = {
@@ -26453,6 +28147,7 @@ export namespace Prisma {
     supabase_id?: string | null
     leaguemembers?: leaguemembersCreateNestedManyWithoutPeopleInput
     leagues?: leaguesCreateNestedManyWithoutPeopleInput
+    pushNotificationTokens?: pushNotificationTokensCreateNestedManyWithoutPeopleInput
   }
 
   export type peopleUncheckedCreateWithoutPicksInput = {
@@ -26469,6 +28164,7 @@ export namespace Prisma {
     supabase_id?: string | null
     leaguemembers?: leaguemembersUncheckedCreateNestedManyWithoutPeopleInput
     leagues?: leaguesUncheckedCreateNestedManyWithoutPeopleInput
+    pushNotificationTokens?: pushNotificationTokensUncheckedCreateNestedManyWithoutPeopleInput
   }
 
   export type peopleCreateOrConnectWithoutPicksInput = {
@@ -26628,6 +28324,7 @@ export namespace Prisma {
     supabase_id?: NullableStringFieldUpdateOperationsInput | string | null
     leaguemembers?: leaguemembersUpdateManyWithoutPeopleNestedInput
     leagues?: leaguesUpdateManyWithoutPeopleNestedInput
+    pushNotificationTokens?: pushNotificationTokensUpdateManyWithoutPeopleNestedInput
   }
 
   export type peopleUncheckedUpdateWithoutPicksInput = {
@@ -26644,6 +28341,7 @@ export namespace Prisma {
     supabase_id?: NullableStringFieldUpdateOperationsInput | string | null
     leaguemembers?: leaguemembersUncheckedUpdateManyWithoutPeopleNestedInput
     leagues?: leaguesUncheckedUpdateManyWithoutPeopleNestedInput
+    pushNotificationTokens?: pushNotificationTokensUncheckedUpdateManyWithoutPeopleNestedInput
   }
 
   export type leaguemembersUpsertWithoutPicksInput = {
@@ -28563,6 +30261,16 @@ export namespace Prisma {
     member_id?: number | null
   }
 
+  export type pushNotificationTokensCreateManyPeopleInput = {
+    push_token_id?: string
+    token: string
+    platform?: string | null
+    enabled?: boolean
+    created_at?: Date | string
+    updated_at?: Date | string
+    last_seen_at?: Date | string
+  }
+
   export type leaguemembersUpdateWithoutPeopleInput = {
     ts?: DateTimeFieldUpdateOperationsInput | Date | string
     role?: NullableEnumMemberRoleFieldUpdateOperationsInput | $Enums.MemberRole | null
@@ -28692,6 +30400,36 @@ export namespace Prisma {
     done?: NullableIntFieldUpdateOperationsInput | number | null
     is_random?: NullableBoolFieldUpdateOperationsInput | boolean | null
     member_id?: NullableIntFieldUpdateOperationsInput | number | null
+  }
+
+  export type pushNotificationTokensUpdateWithoutPeopleInput = {
+    push_token_id?: StringFieldUpdateOperationsInput | string
+    token?: StringFieldUpdateOperationsInput | string
+    platform?: NullableStringFieldUpdateOperationsInput | string | null
+    enabled?: BoolFieldUpdateOperationsInput | boolean
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    last_seen_at?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type pushNotificationTokensUncheckedUpdateWithoutPeopleInput = {
+    push_token_id?: StringFieldUpdateOperationsInput | string
+    token?: StringFieldUpdateOperationsInput | string
+    platform?: NullableStringFieldUpdateOperationsInput | string | null
+    enabled?: BoolFieldUpdateOperationsInput | boolean
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    last_seen_at?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type pushNotificationTokensUncheckedUpdateManyWithoutPeopleInput = {
+    push_token_id?: StringFieldUpdateOperationsInput | string
+    token?: StringFieldUpdateOperationsInput | string
+    platform?: NullableStringFieldUpdateOperationsInput | string | null
+    enabled?: BoolFieldUpdateOperationsInput | boolean
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    last_seen_at?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type gamesCreateManyTeams_games_homeToteamsInput = {

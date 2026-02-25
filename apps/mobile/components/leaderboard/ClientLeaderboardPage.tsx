@@ -72,7 +72,7 @@ export function ClientLeaderboardPage({ leagueId }: Props) {
 
         {/* Leaderboard Table */}
         <View className="px-4">
-          <MobileLeaderboardTable leaderboard={leaderboard} />
+          <MobileLeaderboardTable leaderboard={leaderboard} leagueId={leagueId} />
         </View>
       </View>
     </ScrollView>

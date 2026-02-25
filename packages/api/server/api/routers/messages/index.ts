@@ -2,6 +2,7 @@ import { z } from "zod";
 import { authorizedProcedure, createTRPCRouter } from "../../trpc";
 import { TRPCError } from "@trpc/server";
 import { MemberRole } from "../../../../src/generated/prisma-client";
+import { expoPushApi } from "../../../services/expo-push";
 
 const leagueMessageInput = z.object({
   leagueId: z.number().int(),
@@ -94,6 +95,12 @@ export const messagesRouter = createTRPCRouter({
     .input(writeMessageInput)
     .mutation(async ({ ctx, input }) => {
       const { dbUser } = ctx;
+      if (!dbUser) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "You must be signed in to write messages",
+        });
+      }
       const member = getLeagueMember(dbUser, input.leagueId);
       if (!member) {
         throw new TRPCError({
@@ -112,6 +119,15 @@ export const messagesRouter = createTRPCRouter({
           status: "PUBLISHED",
         },
       });
+
+      await expoPushApi.sendLeagueMessageNotification({
+        db: ctx.db,
+        leagueId: input.leagueId,
+        authorUserId: dbUser.uid,
+        authorUsername: dbUser.username,
+        messageContent: input.content,
+      });
+
       return created;
     }),
   writeWeekMessage: authorizedProcedure
@@ -124,6 +140,12 @@ export const messagesRouter = createTRPCRouter({
     )
     .mutation(async ({ ctx, input }) => {
       const { dbUser } = ctx;
+      if (!dbUser) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "You must be signed in to write messages",
+        });
+      }
       const member = getLeagueMember(dbUser, input.leagueId);
       if (!member) {
         throw new TRPCError({
@@ -142,6 +164,15 @@ export const messagesRouter = createTRPCRouter({
           status: "PUBLISHED",
         },
       });
+
+      await expoPushApi.sendLeagueMessageNotification({
+        db: ctx.db,
+        leagueId: input.leagueId,
+        authorUserId: dbUser.uid,
+        authorUsername: dbUser.username,
+        messageContent: input.content,
+      });
+
       return created;
     }),
 
