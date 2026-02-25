@@ -6,6 +6,7 @@ This document tracks feature parity work from the web app to the mobile companio
 Guiding rule:
 - End-state is full feature parity.
 - Delivery order is player core loop first, then admin tooling.
+- `WORKLOG.md` is the mandatory implementation companion and source of execution truth.
 
 ## 2. Status Legend
 - `DONE`: shipped in mobile with acceptable parity.
@@ -29,6 +30,13 @@ Guiding rule:
 - Leaderboard ranking must support competition ties (example: `1, 2, 2, 4`).
 
 ## 4. Phase Plan
+
+### Phase 0: Foundation + Worklog Governance
+0. `0.0` Initialize and baseline `WORKLOG.md` at repo root.
+1. Refactor route/layout architecture (`(auth)`, `(tabs)`, bootstrap shell).
+2. Standardize provider/bootstrap sequence and auth gating.
+3. Standardize loading state and shared card/skeleton conventions.
+4. Establish prefetch and offline policy conventions.
 
 ### Phase 1: Core Player Loop
 1. Auth and session
@@ -96,3 +104,29 @@ When parity work changes:
 2. Add short notes for behavior differences.
 3. If backend changes are required, add/update `Backend Dependencies`.
 4. Keep this file aligned with `docs/PRD.md` decisions.
+5. Update `WORKLOG.md` for task start/status/commit/decision/validation events.
+
+## 8. Worklog Governance
+- Canonical execution log: `WORKLOG.md` in repo root.
+- Required sections:
+  - Program Status
+  - Current Phase
+  - Completed Tasks
+  - In Progress
+  - Next Up
+  - Decisions & Rationale
+  - Risks / Blockers
+  - Validation Evidence
+  - Parity Matrix Snapshot
+- Task entries must include:
+  - Task ID
+  - Short title
+  - Scope touched
+  - Outcome
+  - Validation run
+  - Timestamp (UTC)
+- `Worklog Gate Check` before phase transitions:
+  1. `In Progress` is empty or deferred with reason.
+  2. `Parity Matrix Snapshot` is updated.
+  3. Validation evidence is recorded.
+  4. Open risks are explicitly listed.
