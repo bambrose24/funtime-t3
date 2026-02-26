@@ -22,6 +22,7 @@ import { Button } from "@/components/ui/button";
 export default function HomeScreen() {
   const { isDarkColorScheme } = useColorScheme();
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [showPriorLeagues, setShowPriorLeagues] = useState(false);
   
   // Debug data availability (remove in production)
   if (__DEV__) {
@@ -89,6 +90,9 @@ export default function HomeScreen() {
   const priorLeagues = useMemo(() => {
     return sortedLeagues.filter((l) => l.season !== DEFAULT_SEASON);
   }, [sortedLeagues]);
+  const visiblePriorLeagues = useMemo(() => {
+    return showPriorLeagues ? priorLeagues : priorLeagues.slice(0, 3);
+  }, [priorLeagues, showPriorLeagues]);
 
   // Show loading while fetching session
   if (sessionLoading) {
@@ -178,6 +182,37 @@ export default function HomeScreen() {
         </View>
 
         <View className="px-4">
+          {!homeLoading ? (
+            <View className="mb-4 mx-2 rounded-xl border border-gray-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-800">
+              <View className="flex-row items-center justify-between">
+                <View className="items-center">
+                  <Text className="text-[11px] uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                    Active
+                  </Text>
+                  <Text className="text-app-fg-light dark:text-app-fg-dark mt-1 text-base font-semibold">
+                    {activeLeagues.length}
+                  </Text>
+                </View>
+                <View className="items-center">
+                  <Text className="text-[11px] uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                    Prior
+                  </Text>
+                  <Text className="text-app-fg-light dark:text-app-fg-dark mt-1 text-base font-semibold">
+                    {priorLeagues.length}
+                  </Text>
+                </View>
+                <View className="items-center">
+                  <Text className="text-[11px] uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                    Season
+                  </Text>
+                  <Text className="text-app-fg-light dark:text-app-fg-dark mt-1 text-base font-semibold">
+                    {DEFAULT_SEASON}
+                  </Text>
+                </View>
+              </View>
+            </View>
+          ) : null}
+
           {homeLoading ? (
             <View className="gap-4">
               {Array.from({ length: 3 }).map((_, i) => (
@@ -229,15 +264,31 @@ export default function HomeScreen() {
         {/* Prior Leagues Section */}
         {priorLeagues.length > 0 && (
           <>
-            <View className="px-6 pb-4 pt-8">
-              <Text className="text-app-fg-light dark:text-app-fg-dark text-2xl font-bold">
-                Prior Leagues
-              </Text>
+            <View className="px-6 pb-4 pt-8 flex-row items-center justify-between">
+              <View>
+                <Text className="text-app-fg-light dark:text-app-fg-dark text-2xl font-bold">
+                  Prior Leagues
+                </Text>
+                <Text className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                  Sorted by season then league size.
+                </Text>
+              </View>
+              {priorLeagues.length > 3 ? (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onPress={() => setShowPriorLeagues((show) => !show)}
+                >
+                  {showPriorLeagues
+                    ? "Show less"
+                    : `Show all (${priorLeagues.length})`}
+                </Button>
+              ) : null}
             </View>
 
             <View className="px-4">
               <View className="gap-4">
-                {priorLeagues.map((league) => (
+                {visiblePriorLeagues.map((league) => (
                   <HomeLeagueCard key={league.league_id} data={league} />
                 ))}
               </View>

@@ -30,6 +30,10 @@ export function PickGameCard({
 }: Props) {
   const started = game.ts < new Date();
   const isDisabled = disabled || started;
+  const statusLabel = isDisabled ? "Locked" : "Open";
+  const lockedMessage = selectedWinner
+    ? "Locked at kickoff"
+    : "Game started before pick was submitted";
 
   // Determine which team is selected
   const homeSelected = selectedWinner === homeTeam.teamid;
@@ -44,10 +48,27 @@ export function PickGameCard({
       }`}
     >
       {/* Game Time */}
-      <View className="mb-2 items-center">
+      <View className="mb-2 items-center gap-1">
         <Text className="text-center text-sm text-secondary-foreground">
           {format(game.ts, "EEE MMM d, h:mm a")}
         </Text>
+        <View
+          className={
+            isDisabled
+              ? "rounded-full border border-amber-300 bg-amber-50 px-2 py-0.5 dark:border-amber-800 dark:bg-amber-950"
+              : "rounded-full border border-emerald-300 bg-emerald-50 px-2 py-0.5 dark:border-emerald-800 dark:bg-emerald-950"
+          }
+        >
+          <Text
+            className={
+              isDisabled
+                ? "text-[10px] font-semibold uppercase tracking-wide text-amber-700 dark:text-amber-200"
+                : "text-[10px] font-semibold uppercase tracking-wide text-emerald-700 dark:text-emerald-200"
+            }
+          >
+            {statusLabel}
+          </Text>
+        </View>
         {game.is_tiebreaker && (
           <Text className="mt-1 text-center text-xs font-medium text-secondary-foreground">
             Tiebreaker Game
@@ -117,7 +138,7 @@ export function PickGameCard({
       {/* Disabled message */}
       {started && (
         <Text className="mt-2 text-center text-sm text-warning">
-          Game started
+          {lockedMessage}
         </Text>
       )}
 

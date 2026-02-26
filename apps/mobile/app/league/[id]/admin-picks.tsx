@@ -16,6 +16,7 @@ import { Input } from "@/components/ui/input";
 import { SelectOption } from "@/components/ui/select-option";
 import { clientApi } from "@/lib/trpc/react";
 import { useColorScheme } from "@/lib/useColorScheme";
+import { cn } from "@/lib/utils";
 
 export default function LeagueAdminPicksScreen() {
   const { isDarkColorScheme } = useColorScheme();
@@ -136,10 +137,15 @@ export default function LeagueAdminPicksScreen() {
     if (!allGames) {
       return [];
     }
-    if (!latestWeek) {
-      return allGames;
-    }
-    return allGames.filter((game) => game.week <= latestWeek);
+    const scopedGames = latestWeek
+      ? allGames.filter((game) => game.week <= latestWeek)
+      : allGames;
+    return [...scopedGames].sort((a, b) => {
+      if (a.week !== b.week) {
+        return a.week - b.week;
+      }
+      return new Date(a.ts).getTime() - new Date(b.ts).getTime();
+    });
   }, [allGames, weekToPick?.week]);
 
   const loading =
@@ -147,6 +153,20 @@ export default function LeagueAdminPicksScreen() {
     superAdminLoading ||
     (canManageLeague && (leagueLoading || weekLoading || gamesLoading || picksLoading));
   const nowMs = Date.now();
+  const editableGamesCount = gamesToShow.filter(
+    (game) => Boolean(isSuperAdmin) || new Date(game.ts).getTime() > nowMs,
+  ).length;
+  const lockedGamesCount = Math.max(gamesToShow.length - editableGamesCount, 0);
+  const pickedGamesCount = gamesToShow.filter((game) =>
+    pickByGameId.has(game.gid),
+  ).length;
+  const tiebreakerPendingCount = gamesToShow.filter((game) => {
+    if (!game.is_tiebreaker) {
+      return false;
+    }
+    const pick = pickByGameId.get(game.gid);
+    return !pick?.score;
+  }).length;
 
   const savePick = async (gameId: number, winner: number, score?: number) => {
     try {
@@ -253,6 +273,37 @@ export default function LeagueAdminPicksScreen() {
             </View>
           </View>
 
+          <View className="gap-2 rounded-xl border border-gray-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-800">
+            <Text className="text-app-fg-light dark:text-app-fg-dark text-base font-semibold">
+              Editor Snapshot
+            </Text>
+            <View className="flex-row flex-wrap gap-2">
+              <View className="rounded-full border border-blue-200 bg-blue-50 px-2.5 py-1 dark:border-blue-800 dark:bg-blue-950">
+                <Text className="text-[10px] font-semibold uppercase tracking-[0.8px] text-blue-700 dark:text-blue-300">
+                  Picks: {pickedGamesCount}/{gamesToShow.length}
+                </Text>
+              </View>
+              <View className="rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 dark:border-emerald-800 dark:bg-emerald-950">
+                <Text className="text-[10px] font-semibold uppercase tracking-[0.8px] text-emerald-700 dark:text-emerald-300">
+                  Editable: {editableGamesCount}
+                </Text>
+              </View>
+              <View className="rounded-full border border-amber-200 bg-amber-50 px-2.5 py-1 dark:border-amber-800 dark:bg-amber-950">
+                <Text className="text-[10px] font-semibold uppercase tracking-[0.8px] text-amber-700 dark:text-amber-300">
+                  Locked: {lockedGamesCount}
+                </Text>
+              </View>
+              <View className="rounded-full border border-gray-200 bg-gray-50 px-2.5 py-1 dark:border-zinc-700 dark:bg-zinc-900">
+                <Text className="text-[10px] font-semibold uppercase tracking-[0.8px] text-gray-600 dark:text-gray-300">
+                  TB Missing: {tiebreakerPendingCount}
+                </Text>
+              </View>
+            </View>
+            <Text className="text-xs text-gray-500 dark:text-gray-400">
+              Non-super-admin edits lock at kickoff. Super-admin overrides remain available.
+            </Text>
+          </View>
+
           {gamesToShow.map((game) => {
             const homeTeam = teamById.get(game.home);
             const awayTeam = teamById.get(game.away);
@@ -267,15 +318,71 @@ export default function LeagueAdminPicksScreen() {
             const gameStarted = new Date(game.ts).getTime() <= nowMs;
             const canEditThisGame = Boolean(isSuperAdmin) || !gameStarted;
             const gameBusy = busyGid === game.gid;
+            const kickoffLabel = new Date(game.ts).toLocaleString("en-US", {
+              month: "short",
+              day: "numeric",
+              hour: "numeric",
+              minute: "2-digit",
+            });
+            const statusLabel = !gameStarted
+              ? "Open"
+              : game.done
+                ? "Final"
+                : "Live";
+            const selectedWinnerTeam = selectedWinner
+              ? teamById.get(selectedWinner)
+              : null;
+            const winningTeam = game.winner ? teamById.get(game.winner) : null;
 
             return (
               <View
                 key={game.gid}
-                className="gap-3 rounded-xl border border-gray-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-800"
+                className={cn(
+                  "gap-3 rounded-xl border bg-white p-4 dark:bg-zinc-800",
+                  canEditThisGame
+                    ? "border-gray-200 dark:border-zinc-700"
+                    : "border-amber-300 dark:border-amber-700",
+                )}
               >
-                <Text className="text-app-fg-light dark:text-app-fg-dark text-sm font-semibold">
-                  Week {game.week}: {awayTeam.abbrev} @ {homeTeam.abbrev}
-                </Text>
+                <View className="flex-row items-start justify-between gap-2">
+                  <View className="flex-1">
+                    <Text className="text-app-fg-light dark:text-app-fg-dark text-sm font-semibold">
+                      Week {game.week}: {awayTeam.abbrev} @ {homeTeam.abbrev}
+                    </Text>
+                    <Text className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                      Kickoff: {kickoffLabel}
+                    </Text>
+                    <Text className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
+                      Current pick: {selectedWinnerTeam?.abbrev ?? "--"}
+                      {game.is_tiebreaker
+                        ? ` - Tiebreaker: ${currentPick?.score ?? "--"}`
+                        : ""}
+                    </Text>
+                  </View>
+                  <View
+                    className={cn(
+                      "rounded-full px-2 py-1",
+                      statusLabel === "Open"
+                        ? "bg-emerald-100 dark:bg-emerald-900/40"
+                        : statusLabel === "Live"
+                          ? "bg-blue-100 dark:bg-blue-900/40"
+                          : "bg-zinc-200 dark:bg-zinc-700",
+                    )}
+                  >
+                    <Text
+                      className={cn(
+                        "text-[10px] font-semibold uppercase tracking-wide",
+                        statusLabel === "Open"
+                          ? "text-emerald-700 dark:text-emerald-300"
+                          : statusLabel === "Live"
+                            ? "text-blue-700 dark:text-blue-300"
+                            : "text-zinc-700 dark:text-zinc-200",
+                      )}
+                    >
+                      {statusLabel}
+                    </Text>
+                  </View>
+                </View>
                 {!canEditThisGame ? (
                   <Text className="text-xs font-medium text-amber-700 dark:text-amber-300">
                     Locked after kickoff for league admins.
@@ -283,6 +390,11 @@ export default function LeagueAdminPicksScreen() {
                 ) : gameStarted ? (
                   <Text className="text-xs text-blue-600 dark:text-blue-400">
                     Kickoff passed. Super-admin override enabled.
+                  </Text>
+                ) : null}
+                {game.done && winningTeam ? (
+                  <Text className="text-xs text-gray-600 dark:text-gray-400">
+                    Final winner: {winningTeam.abbrev}
                   </Text>
                 ) : null}
 

@@ -9,6 +9,8 @@ import { SelectOption } from "@/components/ui/select-option";
 import { TeamLogo } from "@/components/shared/TeamLogo";
 import { useColorScheme } from "@/lib/useColorScheme";
 
+type ConferencePickerField = "afc" | "nfc";
+
 export default function JoinLeagueCodeScreen() {
   const { isDarkColorScheme } = useColorScheme();
   const { code } = useLocalSearchParams<{ code?: string }>();
@@ -19,6 +21,8 @@ export default function JoinLeagueCodeScreen() {
   const [nfcTeamId, setNfcTeamId] = useState<string>("");
   const [winnerTeamId, setWinnerTeamId] = useState<string>("");
   const [totalScore, setTotalScore] = useState("");
+  const [activeConferencePicker, setActiveConferencePicker] =
+    useState<ConferencePickerField | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
   const { data: session, isLoading: sessionLoading } =
@@ -44,11 +48,17 @@ export default function JoinLeagueCodeScreen() {
   }, [leagueData, session?.dbUser]);
 
   const afcTeams = useMemo(
-    () => (teams ?? []).filter((team) => team.conference === "AFC"),
+    () =>
+      (teams ?? [])
+        .filter((team) => team.conference === "AFC")
+        .sort((a, b) => `${a.loc} ${a.name}`.localeCompare(`${b.loc} ${b.name}`)),
     [teams],
   );
   const nfcTeams = useMemo(
-    () => (teams ?? []).filter((team) => team.conference === "NFC"),
+    () =>
+      (teams ?? [])
+        .filter((team) => team.conference === "NFC")
+        .sort((a, b) => `${a.loc} ${a.name}`.localeCompare(`${b.loc} ${b.name}`)),
     [teams],
   );
 
@@ -67,6 +77,11 @@ export default function JoinLeagueCodeScreen() {
       Boolean(nfcTeamId) &&
       Boolean(winnerTeamId) &&
       validScore);
+  const registerButtonText = superbowlRequired
+    ? superbowlReady
+      ? "Register for League"
+      : "Finish Super Bowl pick"
+    : "Register for League";
 
   const onRegister = async () => {
     if (!leagueData) {
@@ -246,51 +261,141 @@ export default function JoinLeagueCodeScreen() {
               </Text>
 
               <View className="gap-2">
-                <Text className="text-app-fg-light dark:text-app-fg-dark text-sm font-medium">
-                  AFC Team
-                </Text>
-                {afcTeams.map((team) => (
-                  <SelectOption
-                    key={`afc_${team.teamid}`}
-                    selected={afcTeamId === team.teamid.toString()}
-                    onPress={() => {
-                      setAfcTeamId(team.teamid.toString());
-                      setWinnerTeamId("");
-                    }}
-                    className="justify-start px-3 py-2"
-                  >
-                    <View className="flex-row items-center gap-2">
-                      <TeamLogo abbrev={team.abbrev ?? ""} width={20} height={20} />
-                      <Text className="text-app-fg-light dark:text-app-fg-dark text-sm">
-                        {team.loc} {team.name}
+                <Pressable
+                  onPress={() =>
+                    setActiveConferencePicker((current) =>
+                      current === "afc" ? null : "afc",
+                    )
+                  }
+                  className="rounded-lg border border-gray-200 bg-gray-50 px-3 py-3 dark:border-zinc-700 dark:bg-zinc-900"
+                >
+                  <Text className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                    AFC Team
+                  </Text>
+                  {selectedAfcTeam ? (
+                    <View className="mt-1 flex-row items-center gap-2">
+                      <TeamLogo
+                        abbrev={selectedAfcTeam.abbrev ?? ""}
+                        width={18}
+                        height={18}
+                      />
+                      <Text className="text-app-fg-light dark:text-app-fg-dark text-sm font-semibold">
+                        {selectedAfcTeam.loc} {selectedAfcTeam.name}
                       </Text>
                     </View>
-                  </SelectOption>
-                ))}
+                  ) : (
+                    <Text className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                      Select AFC team
+                    </Text>
+                  )}
+                </Pressable>
+
+                {activeConferencePicker === "afc" ? (
+                  <View className="rounded-lg border border-gray-200 bg-white p-2 dark:border-zinc-700 dark:bg-zinc-900">
+                    <View className="flex-row flex-wrap gap-2">
+                      {afcTeams.map((team) => {
+                        const selected = afcTeamId === team.teamid.toString();
+                        return (
+                          <Pressable
+                            key={`afc_${team.teamid}`}
+                            onPress={() => {
+                              setAfcTeamId(team.teamid.toString());
+                              setWinnerTeamId("");
+                              setActiveConferencePicker(null);
+                            }}
+                            className={
+                              selected
+                                ? "rounded-md border border-blue-500 bg-blue-50 px-2.5 py-2 dark:border-blue-500 dark:bg-blue-950"
+                                : "rounded-md border border-gray-200 bg-gray-50 px-2.5 py-2 dark:border-zinc-700 dark:bg-zinc-800"
+                            }
+                          >
+                            <View className="flex-row items-center gap-1.5">
+                              <TeamLogo abbrev={team.abbrev ?? ""} width={14} height={14} />
+                              <Text
+                                className={
+                                  selected
+                                    ? "text-[11px] font-semibold text-blue-700 dark:text-blue-200"
+                                    : "text-[11px] font-semibold text-gray-700 dark:text-gray-200"
+                                }
+                              >
+                                {team.abbrev}
+                              </Text>
+                            </View>
+                          </Pressable>
+                        );
+                      })}
+                    </View>
+                  </View>
+                ) : null}
               </View>
 
               <View className="gap-2">
-                <Text className="text-app-fg-light dark:text-app-fg-dark text-sm font-medium">
-                  NFC Team
-                </Text>
-                {nfcTeams.map((team) => (
-                  <SelectOption
-                    key={`nfc_${team.teamid}`}
-                    selected={nfcTeamId === team.teamid.toString()}
-                    onPress={() => {
-                      setNfcTeamId(team.teamid.toString());
-                      setWinnerTeamId("");
-                    }}
-                    className="justify-start px-3 py-2"
-                  >
-                    <View className="flex-row items-center gap-2">
-                      <TeamLogo abbrev={team.abbrev ?? ""} width={20} height={20} />
-                      <Text className="text-app-fg-light dark:text-app-fg-dark text-sm">
-                        {team.loc} {team.name}
+                <Pressable
+                  onPress={() =>
+                    setActiveConferencePicker((current) =>
+                      current === "nfc" ? null : "nfc",
+                    )
+                  }
+                  className="rounded-lg border border-gray-200 bg-gray-50 px-3 py-3 dark:border-zinc-700 dark:bg-zinc-900"
+                >
+                  <Text className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                    NFC Team
+                  </Text>
+                  {selectedNfcTeam ? (
+                    <View className="mt-1 flex-row items-center gap-2">
+                      <TeamLogo
+                        abbrev={selectedNfcTeam.abbrev ?? ""}
+                        width={18}
+                        height={18}
+                      />
+                      <Text className="text-app-fg-light dark:text-app-fg-dark text-sm font-semibold">
+                        {selectedNfcTeam.loc} {selectedNfcTeam.name}
                       </Text>
                     </View>
-                  </SelectOption>
-                ))}
+                  ) : (
+                    <Text className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                      Select NFC team
+                    </Text>
+                  )}
+                </Pressable>
+
+                {activeConferencePicker === "nfc" ? (
+                  <View className="rounded-lg border border-gray-200 bg-white p-2 dark:border-zinc-700 dark:bg-zinc-900">
+                    <View className="flex-row flex-wrap gap-2">
+                      {nfcTeams.map((team) => {
+                        const selected = nfcTeamId === team.teamid.toString();
+                        return (
+                          <Pressable
+                            key={`nfc_${team.teamid}`}
+                            onPress={() => {
+                              setNfcTeamId(team.teamid.toString());
+                              setWinnerTeamId("");
+                              setActiveConferencePicker(null);
+                            }}
+                            className={
+                              selected
+                                ? "rounded-md border border-blue-500 bg-blue-50 px-2.5 py-2 dark:border-blue-500 dark:bg-blue-950"
+                                : "rounded-md border border-gray-200 bg-gray-50 px-2.5 py-2 dark:border-zinc-700 dark:bg-zinc-800"
+                            }
+                          >
+                            <View className="flex-row items-center gap-1.5">
+                              <TeamLogo abbrev={team.abbrev ?? ""} width={14} height={14} />
+                              <Text
+                                className={
+                                  selected
+                                    ? "text-[11px] font-semibold text-blue-700 dark:text-blue-200"
+                                    : "text-[11px] font-semibold text-gray-700 dark:text-gray-200"
+                                }
+                              >
+                                {team.abbrev}
+                              </Text>
+                            </View>
+                          </Pressable>
+                        );
+                      })}
+                    </View>
+                  </View>
+                ) : null}
               </View>
 
               {selectedAfcTeam && selectedNfcTeam && (
@@ -349,13 +454,18 @@ export default function JoinLeagueCodeScreen() {
                   placeholder="e.g. 47"
                   keyboardType="number-pad"
                 />
+                {totalScore.length > 0 && !validScore ? (
+                  <Text className="text-xs text-red-500">
+                    Enter a whole number greater than 0.
+                  </Text>
+                ) : null}
               </View>
             </View>
           )}
 
           <View className="gap-3">
             <Button onPress={onRegister} disabled={submitting || !superbowlReady}>
-              {submitting ? "Registering..." : "Register for League"}
+              {submitting ? "Registering..." : registerButtonText}
             </Button>
             <Button variant="outline" onPress={() => router.back()} disabled={submitting}>
               Back

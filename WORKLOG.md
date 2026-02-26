@@ -11,6 +11,84 @@
 - Pre-step: `0.0 Initialize and baseline WORKLOG.md`.
 
 ## Completed Tasks
+- Task ID: `P5-UX-SWEEP-001T`
+  - Short title: Finalize remaining UX sweep surfaces (Super Bowl + league/global admin).
+  - Scope touched: `apps/mobile/components/superbowl/LeagueSuperbowlBoard.tsx`, `apps/mobile/app/league/[id]/admin-picks.tsx`, `apps/mobile/app/league/[id]/admin.tsx`, `apps/mobile/app/admin.tsx`, `WORKLOG.md`, `docs/MOBILE_PARITY_PLAN.md`.
+  - Outcome: Closed remaining UX-polish surfaces by adding postseason snapshot context and improved picker/board readability on Super Bowl tab, richer lock/live/final context plus summary metrics in admin pick editor, stronger league-admin operation context (snapshot + validation/counter guidance), and global-admin refresh/system snapshot cues for faster operational scanning.
+  - Validation run: `pnpm --filter @funtime/mobile typecheck`.
+  - Timestamp (UTC): `2026-02-26T17:47:26Z`.
+- Task ID: `P5-UX-SWEEP-001S`
+  - Short title: Redesign mobile pick-summary modal for fast weekly outcome scanning.
+  - Scope touched: `apps/mobile/app/league/[id]/index.tsx`, `WORKLOG.md`, `docs/MOBILE_PARITY_PLAN.md`.
+  - Outcome: Reworked "View Pick Summary" into a richer mobile modal with top-line correct/wrong/pending summary, per-game kickoff/outcome context, stronger card state styling, explicit selected-team labels, and direct "Edit Open Picks" navigation to reduce context switching when reviewing and fixing picks.
+  - Validation run: `pnpm --filter @funtime/mobile typecheck`.
+  - Timestamp (UTC): `2026-02-26T17:21:25Z`.
+- Task ID: `P5-UX-SWEEP-001R`
+  - Short title: Improve mobile league-picks table ranking and state readability.
+  - Scope touched: `apps/mobile/app/league/[id]/index.tsx`, `WORKLOG.md`, `docs/MOBILE_PARITY_PLAN.md`.
+  - Outcome: Upgraded the overview picks table with explicit rank column (tie-aware competition ranking), zebra-row scanability, status legend chips, submitted-member progress context, and clearer per-cell states for pending/missed/correct/wrong picks to reduce dense-grid ambiguity on mobile.
+  - Validation run: `pnpm --filter @funtime/mobile typecheck`.
+  - Timestamp (UTC): `2026-02-26T16:15:27Z`.
+- Task ID: `P5-UX-SWEEP-001Q`
+  - Short title: Add smart week-status and action hierarchy to mobile league overview.
+  - Scope touched: `apps/mobile/app/league/[id]/index.tsx`, `WORKLOG.md`, `docs/MOBILE_PARITY_PLAN.md`.
+  - Outcome: Upgraded league overview with a week snapshot card (open/locked/personal/league progress), refresh-status microcopy with haptic pull-to-refresh feedback, clearer dynamic pick-action states, compact game-section open/locked counters, and horizontal-table guidance for dense pick grids.
+  - Validation run: `pnpm --filter @funtime/mobile typecheck`.
+  - Timestamp (UTC): `2026-02-26T16:07:21Z`.
+- Task ID: `P5-UX-SWEEP-001P`
+  - Short title: Modernize mobile league-chat sync/composer behavior.
+  - Scope touched: `apps/mobile/components/messages/LeagueMessageBoard.tsx`, `WORKLOG.md`, `docs/MOBILE_PARITY_PLAN.md`.
+  - Outcome: Upgraded league chat with pull-to-refresh, live sync metadata, smarter auto-scroll behavior that avoids snapping users away while reading history, "new messages" + "jump to latest" affordances, and a bounded composer with character-limit feedback/submit ergonomics tuned for mobile.
+  - Validation run: `pnpm --filter @funtime/mobile typecheck`.
+  - Timestamp (UTC): `2026-02-26T15:41:28Z`.
+- Task ID: `P5-UX-SWEEP-001O`
+  - Short title: Upgrade mobile account notification controls with live status guidance.
+  - Scope touched: `apps/mobile/app/(tabs)/account.tsx`, `WORKLOG.md`, `docs/MOBILE_PARITY_PLAN.md`.
+  - Outcome: Enhanced account notifications UX with explicit status labeling, token/preference chips, context-aware guidance copy, inline toggle switch behavior, manual status-refresh affordance, and last-sync microcopy so users can quickly understand whether push is actually configured on-device.
+  - Validation run: `pnpm --filter @funtime/mobile typecheck`.
+  - Timestamp (UTC): `2026-02-26T15:38:02Z`.
+- Task ID: `P5-UX-SWEEP-001N`
+  - Short title: Improve mobile home/nav league scanability and prior-league clutter control.
+  - Scope touched: `apps/mobile/app/(tabs)/home.tsx`, `apps/mobile/components/home/HomeLeagueCard.tsx`, `WORKLOG.md`, `docs/MOBILE_PARITY_PLAN.md`.
+  - Outcome: Added home summary strip metrics (active/prior/season), collapsed prior-leagues list with show-all/show-less control for long histories, and denser league-card metadata (season pill, member count, accuracy row, chevron affordance) to speed top-level league scanning.
+  - Validation run: `pnpm --filter @funtime/mobile typecheck`.
+  - Timestamp (UTC): `2026-02-26T15:33:53Z`.
+- Task ID: `P5-UX-SWEEP-001M`
+  - Short title: Improve leaderboard refresh/retry affordances and standings scanability.
+  - Scope touched: `apps/mobile/components/leaderboard/ClientLeaderboardPage.tsx`, `apps/mobile/components/leaderboard/MobileLeaderboardTable.tsx`, `WORKLOG.md`, `docs/MOBILE_PARITY_PLAN.md`.
+  - Outcome: Added pull-to-refresh with haptics plus explicit retry CTA on leaderboard load errors, introduced a compact standings summary strip (members, leader correct total, tie count), added tap guidance copy, and improved row scanability with alternating non-user row backgrounds plus press-state feedback.
+  - Validation run: `pnpm --filter @funtime/mobile typecheck`.
+  - Timestamp (UTC): `2026-02-26T15:28:08Z`.
+- Task ID: `P5-UX-SWEEP-001L`
+  - Short title: Clarify mobile pick-submission lock state and completion affordances.
+  - Scope touched: `apps/mobile/components/picks/ClientPickPage.tsx`, `apps/mobile/components/picks/PickGameCard.tsx`, `WORKLOG.md`, `docs/MOBILE_PARITY_PLAN.md`.
+  - Outcome: Added top-level pick progress/lock summary, disabled randomize and submit CTAs with explicit completion-aware labels, improved tiebreaker lock messaging/editability after kickoff, and surfaced per-game open/locked status pills with clearer lock copy on pick cards.
+  - Validation run: `pnpm --filter @funtime/mobile typecheck`.
+  - Timestamp (UTC): `2026-02-26T15:06:55Z`.
+- Task ID: `P5-UX-SWEEP-001K`
+  - Short title: Modernize mobile player-profile layout density and header navigation parity.
+  - Scope touched: `apps/mobile/components/profile/LeagueMemberProfile.tsx`, `apps/mobile/app/league/[id]/player/[memberId].tsx`, `WORKLOG.md`, `docs/MOBILE_PARITY_PLAN.md`.
+  - Outcome: Upgraded member profile with pull-to-refresh, denser season-summary readability (including pick-accuracy and week-win chips), and clearer Super Bowl winner/loser card rows with team logos; replaced text-button route back control with a persistent header chevron/title layout matching broader mobile league navigation patterns.
+  - Validation run: `pnpm --filter @funtime/mobile typecheck`.
+  - Timestamp (UTC): `2026-02-26T14:44:07Z`.
+- Task ID: `P5-UX-SWEEP-001J`
+  - Short title: Add editable Super Bowl pick workflow and refresh polish to mobile My Profile.
+  - Scope touched: `apps/mobile/components/profile/LeagueMyProfile.tsx`, `WORKLOG.md`, `docs/MOBILE_PARITY_PLAN.md`.
+  - Outcome: Upgraded My Profile with pull-to-refresh, denser season summary readability (including pick accuracy + week-win chips), and an in-place pre-season Super Bowl edit flow (winner/loser/score selectors + save/cancel) that hard-locks once the season starts.
+  - Validation run: `pnpm --filter @funtime/mobile typecheck`.
+  - Timestamp (UTC): `2026-02-26T14:26:40Z`.
+- Task ID: `P5-UX-SWEEP-001I`
+  - Short title: Compact create-league selection UX and inline form guidance.
+  - Scope touched: `apps/mobile/app/league/create.tsx`, `WORKLOG.md`, `docs/MOBILE_PARITY_PLAN.md`.
+  - Outcome: Reworked mobile create-league prior-league selection into a collapsed picker (instead of always rendering the full list), added inline league-name validation and completion-aware CTA state, and added concise policy guidance copy for late/reminder/Super Bowl settings.
+  - Validation run: `pnpm --filter @funtime/mobile typecheck`.
+  - Timestamp (UTC): `2026-02-26T14:19:22Z`.
+- Task ID: `P5-UX-SWEEP-001H`
+  - Short title: Compact Super Bowl picker UX in mobile join-league registration.
+  - Scope touched: `apps/mobile/app/join-league/[code].tsx`, `WORKLOG.md`, `docs/MOBILE_PARITY_PLAN.md`.
+  - Outcome: Replaced always-expanded AFC/NFC team lists in join registration with compact tap-to-open conference selectors, kept winner/score requirements with inline score validation feedback, and aligned the register CTA label with Super Bowl form completion state.
+  - Validation run: `pnpm --filter @funtime/mobile typecheck`.
+  - Timestamp (UTC): `2026-02-26T14:08:37Z`.
 - Task ID: `P3-ADMIN-QA-001B9`
   - Short title: Enforce API self-protection for league-admin role/remove mutations.
   - Scope touched: `packages/api/server/api/routers/league/admin.ts`, `WORKLOG.md`, `docs/MOBILE_PARITY_PLAN.md`.
@@ -425,16 +503,14 @@
   - Short title: End-to-end parity QA pass and regression fixes.
   - Status: `IN_PROGRESS` (started `2026-02-25T20:24:07Z`).
   - Immediate execution checklist:
-    1. Continue focused parity walk-through for top mobile surfaces and convert findings into scoped fix tasks. Recent closes: `P5-PARITY-QA-001A` through `P5-PARITY-QA-001J`, `P5-UX-SWEEP-001G`, `P3-ADMIN-QA-001A`, and `P3-ADMIN-QA-001B1` through `P3-ADMIN-QA-001B9`.
-    2. Continue `P5-UX-SWEEP-001`: high-friction interaction/layout polish sweep with one concrete improvement per touched surface.
-    3. Run device-gated validation tracks after in-app fixes stabilize: `P0-DEEPLINK-QA-001` and `P2-NOTIFY-QA-001`.
-    4. Execute `P0-PRISMA-002`: validate migration status/deploy workflow against target DB environment.
+    1. Continue focused parity walk-through for top mobile surfaces and convert findings into scoped fix tasks. Recent closes: `P5-PARITY-QA-001A` through `P5-PARITY-QA-001J`, `P5-UX-SWEEP-001G` through `P5-UX-SWEEP-001T`, `P3-ADMIN-QA-001A`, and `P3-ADMIN-QA-001B1` through `P3-ADMIN-QA-001B9`.
+    2. `P5-UX-SWEEP-001` is closed; shift execution to device-gated validation tracks: `P0-DEEPLINK-QA-001` and `P2-NOTIFY-QA-001`.
+    3. Execute `P0-PRISMA-002`: validate migration status/deploy workflow against target DB environment.
 
 ## Next Up
-1. `P5-UX-SWEEP-001`: Screen-by-screen UX polish sweep (interaction latency, layout hierarchy, motion, empty/error states) with one concrete improvement shipped per touched surface.
-2. `P0-DEEPLINK-QA-001`: Validate `play-funtime.com` deep links for `/join-league`, `/league/:id`, `/settings`, and `/admin`.
-3. `P2-NOTIFY-QA-001`: Validate push/email delivery behavior in staging (token registration, message pushes, and week summary schedule).
-4. `P0-PRISMA-002`: Validate `prisma migrate status/deploy` against target DB and baseline strategy for existing environments.
+1. `P0-DEEPLINK-QA-001`: Validate `play-funtime.com` deep links for `/join-league`, `/league/:id`, `/settings`, and `/admin`.
+2. `P2-NOTIFY-QA-001`: Validate push/email delivery behavior in staging (token registration, message pushes, and week summary schedule).
+3. `P0-PRISMA-002`: Validate `prisma migrate status/deploy` against target DB and baseline strategy for existing environments.
 
 ## Decisions & Rationale
 - Full parity target includes player + admin (including global admin) to avoid permanent web-only operational gaps.
@@ -471,10 +547,23 @@
 - Execution focus decision: with `P3-ADMIN-QA-001B` workflow validation slice now closed, prioritize remaining in-app parity polish (`P5-UX-SWEEP-001`) before device-gated deep-link/notification QA to reduce re-test churn.
 - League UX decision: entity-level tabs on `/league/:id` should switch content in-screen via local state (with subtle transition) rather than route-level query-param navigation.
 - League tab chrome decision: use compact text tabs with active underlines (not filled pills) on `/league/:id` to keep navigation lean and prioritize page content.
+- League overview UX decision: `/league/:id` overview should front-load week context (open/locked game state, personal and league submission progress, refresh recency) and adapt pick-action CTA copy to user completion/lock state to reduce decision friction before entering picks.
+- League picks-table UX decision: dense weekly picks tables should expose explicit ranking plus a visible state legend (correct/wrong/pending/not-picked) and clearer missed-pick treatment so users can parse outcomes quickly without inferring cell color meaning.
+- Pick-summary modal UX decision: weekly pick-review modals should surface outcome summary and kickoff context inline, then offer one-step transition back into editable pick flow while games remain open.
+- UX sweep closeout decision: after `P5-UX-SWEEP-001T`, the targeted in-app UX sweep (`P5-UX-SWEEP-001`) is considered complete; remaining parity risk is primarily device-gated validation and environment-specific behavior checks.
 - Super Bowl IA decision: keep in-screen Super Bowl pick UI focused on selected AFC-vs-NFC matchup and winner choice; move full team lists into a dedicated picker surface instead of rendering all teams inline.
 - Super Bowl save-flow decision: Super Bowl pick UI should behave like an explicit form before season start (winner/loser/score + manual save), and become fully read-only once the season starts.
 - Super Bowl table decision: league board winner/loser cells should render as compact team cards (logo + abbrev) to mirror web table readability in a dense mobile layout.
 - Account settings IA decision: settings should favor compact list-style row groups with minimal chrome, quick inline edits, and clear status affordances while keeping confirmation on destructive session actions.
+- Account notification UX decision: notification controls should expose both preference and registration state (token count + preference chips, guidance copy, and last-sync timestamp) with inline toggle plus explicit refresh to reduce ambiguity from OS-level permission differences.
+- Messaging UX decision: league chat should keep users anchored when reading history (no forced auto-scroll), while surfacing explicit sync state and one-tap "new messages/jump to latest" controls so real-time updates feel predictable on mobile.
+- Join registration UX decision: required Super Bowl picks in join flow should use compact tap-to-open conference selectors (not always-expanded team lists) to reduce vertical scan/load while preserving AFC/NFC and winner constraints.
+- Create-league UX decision: prior-league selection should default to a collapsed picker with summary state, and create submission should stay disabled until the league name is valid to reduce avoidable alert-driven error loops.
+- My-profile edit decision: mobile My Profile should support in-place pre-season Super Bowl pick edits with explicit save/cancel and season-start lock messaging so personal profile flows do not require tab-hopping to the league Super Bowl screen.
+- Player-profile UX decision: player route screens should use persistent header-level chevron navigation (not utility text buttons), and profile stats should mirror My Profile's compact scanability patterns to reduce context-switch friction between self and member views.
+- Pick-submission UX decision: mobile picks should communicate open-vs-locked game state at both page and card level, and submit/randomize controls should expose completion-aware disabled reasons directly in CTA copy instead of relying on silent disabled state.
+- Leaderboard UX decision: mobile leaderboard should include explicit refresh/retry affordances plus compact contextual standing summaries, and non-user rows should use subtle zebra striping with preserved current-user highlight priority for faster visual scanning.
+- Home/nav IA decision: mobile home should surface compact top-level league context (active/prior/season counts), keep long prior-league history collapsed by default with explicit expand affordance, and enrich league cards with quick-scan metadata (season, member count, accuracy) to reduce cognitive load before drill-in.
 - Admin IA decision: league admin member controls should use a compact table for scanability and a per-member bottom sheet for edits/actions to reduce vertical waste.
 - Admin flow reliability decision: member-sheet navigation actions should close the sheet before routing, and member-role/paid/remove updates should trigger explicit member refetch after invalidation to avoid stale post-mutation table state.
 - Admin pick-edit data-integrity decision: `league.admin.setPick` should preserve existing tiebreaker score unless a new score is explicitly submitted, preventing winner-only edits from silently clearing stored score.
@@ -533,6 +622,32 @@
   - Mitigation: add backend cursor pagination for `messages.leagueMessageBoard` in a follow-up if payload size becomes a bottleneck in staging/production QA.
 
 ## Validation Evidence
+- `2026-02-26T17:47:26Z`: `P5-UX-SWEEP-001T` shipped: Super Bowl tab now includes postseason snapshot context plus stronger picker/board readability; league-admin pick editor now includes status snapshot and clearer lock/live/final context; league admin now surfaces operation snapshot plus name/broadcast validation cues; global admin now includes system snapshot and refresh-recency context.
+- `2026-02-26T17:47:26Z`: `pnpm --filter @funtime/mobile typecheck` passed.
+- `2026-02-26T17:21:25Z`: `P5-UX-SWEEP-001S` shipped: "View Pick Summary" now includes correct/wrong/pending rollup, per-game kickoff/outcome context, stronger card state styling, explicit selected-team labels, and quick "Edit Open Picks" navigation.
+- `2026-02-26T17:21:25Z`: `pnpm --filter @funtime/mobile typecheck` passed.
+- `2026-02-26T16:15:27Z`: `P5-UX-SWEEP-001R` shipped: overview picks table now includes tie-aware rank column, zebra rows, state legend chips, member submission context, and clearer pending/missed/correct/wrong cell semantics.
+- `2026-02-26T16:15:27Z`: `pnpm --filter @funtime/mobile typecheck` passed.
+- `2026-02-26T16:07:21Z`: `P5-UX-SWEEP-001Q` shipped: league overview now includes week snapshot status chips, refresh-status microcopy, completion-aware pick CTA states, compact open/locked game counters, and swipe guidance for wide pick tables.
+- `2026-02-26T16:07:21Z`: `pnpm --filter @funtime/mobile typecheck` passed.
+- `2026-02-26T15:41:28Z`: `P5-UX-SWEEP-001P` shipped: league chat now includes live sync metadata, pull-to-refresh, history-safe auto-scroll behavior, new-message/jump-to-latest affordances, and composer character-limit feedback.
+- `2026-02-26T15:41:28Z`: `pnpm --filter @funtime/mobile typecheck` passed.
+- `2026-02-26T15:38:02Z`: `P5-UX-SWEEP-001O` shipped: account notifications now provide explicit status state, token/preference chips, guidance text, inline switch controls, refresh status CTA, and last-sync microcopy.
+- `2026-02-26T15:38:02Z`: `pnpm --filter @funtime/mobile typecheck` passed.
+- `2026-02-26T15:33:53Z`: `P5-UX-SWEEP-001N` shipped: home now includes summary metrics, collapsible prior-league list controls, and denser league-card metadata/affordances for faster scanability.
+- `2026-02-26T15:33:53Z`: `pnpm --filter @funtime/mobile typecheck` passed.
+- `2026-02-26T15:28:08Z`: `P5-UX-SWEEP-001M` shipped: leaderboard now supports pull-to-refresh + retry CTA, compact standings summary metrics, tap guidance copy, and improved row scanability/press affordance.
+- `2026-02-26T15:28:08Z`: `pnpm --filter @funtime/mobile typecheck` passed.
+- `2026-02-26T15:06:55Z`: `P5-UX-SWEEP-001L` shipped: picks flow now shows open/locked progress summary, completion-aware submit/randomize CTA copy, locked tiebreaker messaging, and per-card open/locked status pills.
+- `2026-02-26T15:06:55Z`: `pnpm --filter @funtime/mobile typecheck` passed.
+- `2026-02-26T14:44:07Z`: `P5-UX-SWEEP-001K` shipped: player profile now has pull-to-refresh, denser summary/chip layout, logo-backed Super Bowl rows, and a persistent header chevron/title route shell.
+- `2026-02-26T14:44:07Z`: `pnpm --filter @funtime/mobile typecheck` passed.
+- `2026-02-26T14:26:40Z`: `P5-UX-SWEEP-001J` shipped: My Profile now supports pull-to-refresh, denser season summary display, and in-place pre-season Super Bowl pick edits with season-start locking.
+- `2026-02-26T14:26:40Z`: `pnpm --filter @funtime/mobile typecheck` passed.
+- `2026-02-26T14:19:22Z`: `P5-UX-SWEEP-001I` shipped: create-league now uses a collapsed prior-league picker, inline name validation with completion-aware CTA copy, and clearer policy guidance text.
+- `2026-02-26T14:19:22Z`: `pnpm --filter @funtime/mobile typecheck` passed.
+- `2026-02-26T14:08:37Z`: `P5-UX-SWEEP-001H` shipped: join-league Super Bowl registration now uses compact tap-to-open AFC/NFC selectors, keeps winner/score constraints visible, and shows completion-aware CTA copy.
+- `2026-02-26T14:08:37Z`: `pnpm --filter @funtime/mobile typecheck` passed.
 - `2026-02-26T02:27:20Z`: `P3-ADMIN-QA-001B9` shipped: API now blocks non-super-admin league admins from self-role-change and self-removal mutations, matching client-side UI safeguards.
 - `2026-02-26T02:27:20Z`: `pnpm --filter @funtime/api typecheck` passed.
 - `2026-02-26T02:27:20Z`: `pnpm --filter @funtime/web typecheck` passed.
@@ -723,16 +838,16 @@
 |---|---|---|
 | Auth/session | `in_progress` | Guard/bootstrap improvements done, route-group migration complete, stale-refresh-token fail-closed handling is in bootstrap + tRPC headers, and latest on-device smoke reported stable startup; deep-link QA remains. |
 | Deep links | `in_progress` | Domain association endpoints and mobile route handling are in place; launch deep links are now processed once per app boot (no stale replay on route/session changes), and production app-id/cert values plus real-device verification remain. |
-| Home/nav leagues | `in_progress` | Functional baseline exists with join/create entry points, pull-to-refresh UX, and server-aggregated home-card viewer stats consumed by both mobile and web cards; broader IA parity polish remains. |
-| Join league | `in_progress` | Join-by-code flow implemented with persistent header back navigation on nested join entry/detail screens; deeper UX parity and on-device QA pending. |
-| Create league | `in_progress` | Core create flow and policies implemented with persistent header back navigation; parity polish and QA pending. |
-| League week view | `in_progress` | Existing implementation now uses in-screen tab swaps (no route remount), lighter underline-style top tabs, and tiebreaker sort parity fix; overview picks table now relies on blue row/name styling for the current user (no overflowing `You` badge). |
-| Pick submission | `in_progress` | Core flow exists and now supports in-tab multi-league switching; loading state now uses shared league-tab skeleton styling, with full parity and QA coverage still pending. |
-| Leaderboard | `in_progress` | Mobile leaderboard shows numeric competition ranks and now uses blue row/name current-user highlighting without an inline `You` badge; broader UX parity QA still pending. |
-| Player/my profile | `in_progress` | Added league-scoped my profile tab plus leaderboard-to-player profile navigation; loading state now uses shared league-tab skeleton styling and edit flows still pending. |
-| Super Bowl picks | `in_progress` | Super Bowl tab now uses a compact pre-season `Your Super Bowl pick` form (winner/loser/score with explicit save), is read-only after season start, and renders a denser member/winner/loser/score board that fits without horizontal scrolling; postseason bracket parity and member-profile linking still pending. |
-| Settings/profile | `in_progress` | Account settings now use a cleaner compact "My Account" layout (reduced card chrome, denser row groups, inline username edit controls) while preserving draft-sync/validation/pull-to-refresh; notifications/preferences parity still pending. |
-| Messaging persistent board | `done` | Mobile + web clients moved to league-wide message APIs with admin delete controls. |
+| Home/nav leagues | `in_progress` | Functional baseline exists with join/create entry points, pull-to-refresh UX, and server-aggregated home-card viewer stats consumed by both mobile/web cards; home now adds compact active/prior/season summary metrics, collapsible prior-league history controls, and denser league-card metadata (season, members, accuracy, chevron affordance), with broader parity QA still pending. |
+| Join league | `in_progress` | Join-by-code flow implemented with persistent header back navigation; required Super Bowl registration now uses compact tap-to-open AFC/NFC selectors with inline score validation and completion-aware CTA copy, while broader parity QA and on-device validation remain pending. |
+| Create league | `in_progress` | Core create flow and policies implemented with persistent header back navigation; prior-league selection now defaults to a collapsed picker (summary + expandable options), create CTA now reflects league-name validity, and policy sections include concise guidance copy, with broader parity QA still pending. |
+| League week view | `in_progress` | Existing implementation now uses in-screen tab swaps (no route remount), lighter underline-style top tabs, and tiebreaker sort parity fix; overview now adds a week snapshot context card (open/locked counts, personal + league progress, refresh recency), completion-aware pick CTA state/copy, compact game-state counters, a clearer picks table (tie-aware rank column, zebra rows, state legend, explicit pending/missed/correct/wrong cells), and a richer pick-summary modal with outcome rollups plus one-tap "Edit Open Picks" navigation. |
+| Pick submission | `in_progress` | Core flow exists and now supports in-tab multi-league switching with shared league-tab skeleton loading; picks page now includes open/locked progress summary, completion-aware submit/randomize CTA labels, locked tiebreaker guidance, and per-game open/locked status pills, with remaining parity work focused on broader QA validation. |
+| Leaderboard | `in_progress` | Mobile leaderboard shows numeric competition ranks with blue current-user row/name highlighting (no inline `You` badge), now adds pull-to-refresh + retry affordances, compact standing-summary metrics, and improved zebra/press row scanability, with remaining work focused on broader parity QA validation. |
+| Player/my profile | `in_progress` | Added league-scoped my profile tab plus leaderboard-to-player profile navigation; My Profile now includes pull-to-refresh, denser season-summary readability, and in-place pre-season Super Bowl edit flow with season-start lock behavior, and player profile now matches with pull-to-refresh, compact summary/chip treatment, logo-backed Super Bowl rows, and persistent header chevron navigation, while remaining parity polish is minor. |
+| Super Bowl picks | `in_progress` | Super Bowl tab now uses a compact pre-season `Your Super Bowl pick` form (winner/loser/score with explicit save), is read-only after season start, renders a denser member/winner/loser/score board, and now includes postseason snapshot context plus conference-filtered team picker controls; remaining work is primarily end-to-end QA validation and deeper postseason-link parity checks. |
+| Settings/profile | `in_progress` | Account settings now use a cleaner compact "My Account" layout (reduced card chrome, denser row groups, inline username edit controls), and notifications now show explicit status state with token/preference chips, guidance copy, inline switch control, refresh action, and last-sync context; remaining work is broader delivery QA parity. |
+| Messaging persistent board | `done` | Mobile + web clients moved to league-wide message APIs with admin delete controls; mobile chat now adds live sync metadata, pull-to-refresh, history-safe auto-scroll, and quick "new messages/jump to latest" affordances for smarter real-time behavior. |
 | Notifications | `in_progress` | Token registration, preferences, message fanout, and week-summary scheduler are implemented; push-token registration now fails soft when `projectId` is missing (with `EXPO_PUBLIC_EAS_PROJECT_ID` fallback), notification-tap routing now de-duplicates/clears stale last responses, and deployment + staging QA validation remain. |
-| League admin | `in_progress` | Member management/pick editing/rename/broadcast/email logs are shipped with compact member-table workflows validated (`P3-ADMIN-QA-001B` slice closed): nested admin screens use persistent header back navigation, member-sheet actions close before nested routing with explicit post-mutation member refetch reliability, admin pick edits preserve existing tiebreaker score on winner-only saves and surface kickoff lock/override state with non-super-admin post-kickoff UI lock, API guards block non-super-admin self-demotion/self-removal direct calls, and email logs combine resilient timestamp fallback (`created_at ?? sent_at`), newest-first ordering, compact `M/D/YY h:mma` row dates, and a compact row/table layout with HTML-or-text preview fallback + explicit unavailable-preview messaging. |
-| Global admin | `in_progress` | Super-admin dashboard route, entry point, and key metric sections are shipped; header-level back navigation plus dense KPI/table-style metric/detail parity polish are now in mobile, with remaining work focused on broader end-to-end QA validation. |
+| League admin | `in_progress` | Member management/pick editing/rename/broadcast/email logs are shipped with compact member-table workflows validated (`P3-ADMIN-QA-001B` slice closed): nested admin screens use persistent header back navigation, member-sheet actions close before nested routing with explicit post-mutation member refetch reliability, admin pick edits preserve existing tiebreaker score on winner-only saves and surface kickoff lock/override state with non-super-admin post-kickoff UI lock (now with summary + clearer lock/live/final context), API guards block non-super-admin self-demotion/self-removal direct calls, league-admin name/broadcast controls now include stronger validation/counter guidance, and email logs combine resilient timestamp fallback (`created_at ?? sent_at`), newest-first ordering, compact `M/D/YY h:mma` row dates, and a compact row/table layout with HTML-or-text preview fallback + explicit unavailable-preview messaging. |
+| Global admin | `in_progress` | Super-admin dashboard route, entry point, and key metric sections are shipped; header-level back navigation plus dense KPI/table-style metric/detail parity polish are in mobile, and dashboard now includes system snapshot + refresh-recency context; remaining work is broader end-to-end QA validation. |

@@ -18,6 +18,7 @@ export default function CreateLeagueScreen() {
   const { isDarkColorScheme } = useColorScheme();
   const [name, setName] = useState("");
   const [priorLeagueId, setPriorLeagueId] = useState<string>("none");
+  const [priorLeaguePickerOpen, setPriorLeaguePickerOpen] = useState(false);
   const [latePolicy, setLatePolicy] = useState<
     "allow_late_and_lock_after_start" | "close_at_first_game_start"
   >("allow_late_and_lock_after_start");
@@ -50,9 +51,24 @@ export default function CreateLeagueScreen() {
   const priorLeagues = useMemo(() => {
     return (navData?.leagues ?? []).filter((l) => l.season < DEFAULT_SEASON);
   }, [navData]);
+  const selectedPriorLeague = useMemo(
+    () =>
+      priorLeagueId === "none"
+        ? null
+        : priorLeagues.find((league) => league.league_id.toString() === priorLeagueId) ??
+          null,
+    [priorLeagueId, priorLeagues],
+  );
+  const trimmedName = name.trim();
+  const nameError =
+    trimmedName.length > 0 && trimmedName.length < 5
+      ? "League name must be at least 5 characters."
+      : null;
+  const canSubmit = trimmedName.length >= 5 && !submitting;
+  const createButtonText =
+    submitting ? "Creating..." : canSubmit ? "Create League" : "Name must be 5+ chars";
 
   const onSubmit = async () => {
-    const trimmedName = name.trim();
     if (trimmedName.length < 5) {
       Alert.alert(
         "Invalid League Name",
@@ -165,38 +181,81 @@ export default function CreateLeagueScreen() {
               onChangeText={setName}
               placeholder="My Funtime League"
             />
+            {nameError ? <Text className="text-xs text-red-500">{nameError}</Text> : null}
           </View>
 
           <View className="gap-3">
             <Text className="text-app-fg-light dark:text-app-fg-dark text-base font-semibold">
               Prior League
             </Text>
-            <SelectOption
-              selected={priorLeagueId === "none"}
-              onPress={() => setPriorLeagueId("none")}
-              className="justify-start px-4 py-3"
+            <Pressable
+              onPress={() => setPriorLeaguePickerOpen((open) => !open)}
+              className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 dark:border-zinc-700 dark:bg-zinc-900"
             >
-              <Text className="text-app-fg-light dark:text-app-fg-dark text-sm">
-                None
+              <Text className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                Selected
               </Text>
-            </SelectOption>
-            {priorLeagues.map((league) => (
-              <SelectOption
-                key={league.league_id}
-                selected={priorLeagueId === league.league_id.toString()}
-                onPress={() => setPriorLeagueId(league.league_id.toString())}
-                className="justify-start px-4 py-3"
+              <Text className="text-app-fg-light dark:text-app-fg-dark mt-1 text-sm font-semibold">
+                {selectedPriorLeague
+                  ? `${selectedPriorLeague.name} (${selectedPriorLeague.season})`
+                  : "None"}
+              </Text>
+              <Text className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                {priorLeaguePickerOpen ? "Hide prior leagues" : "Choose prior league"}
+              </Text>
+            </Pressable>
+            {priorLeaguePickerOpen ? (
+              <View
+                className="gap-2 rounded-xl border border-gray-200 bg-white p-3 dark:border-zinc-700 dark:bg-zinc-800"
+                style={{ maxHeight: 220 }}
               >
-                <Text className="text-app-fg-light dark:text-app-fg-dark text-sm">
-                  {league.name} ({league.season})
-                </Text>
-              </SelectOption>
-            ))}
+                <ScrollView
+                  nestedScrollEnabled
+                  showsVerticalScrollIndicator={false}
+                  contentContainerStyle={{ gap: 8 }}
+                >
+                  <SelectOption
+                    selected={priorLeagueId === "none"}
+                    onPress={() => {
+                      setPriorLeagueId("none");
+                      setPriorLeaguePickerOpen(false);
+                    }}
+                    className="justify-start px-4 py-3"
+                  >
+                    <Text className="text-app-fg-light dark:text-app-fg-dark text-sm">
+                      None
+                    </Text>
+                  </SelectOption>
+                  {priorLeagues.map((league) => (
+                    <SelectOption
+                      key={league.league_id}
+                      selected={priorLeagueId === league.league_id.toString()}
+                      onPress={() => {
+                        setPriorLeagueId(league.league_id.toString());
+                        setPriorLeaguePickerOpen(false);
+                      }}
+                      className="justify-start px-4 py-3"
+                    >
+                      <Text className="text-app-fg-light dark:text-app-fg-dark text-sm">
+                        {league.name} ({league.season})
+                      </Text>
+                    </SelectOption>
+                  ))}
+                </ScrollView>
+              </View>
+            ) : null}
+            <Text className="text-xs text-gray-500 dark:text-gray-400">
+              Reuse a prior league to simplify member re-invites.
+            </Text>
           </View>
 
           <View className="gap-3">
             <Text className="text-app-fg-light dark:text-app-fg-dark text-base font-semibold">
               Late Policy
+            </Text>
+            <Text className="text-xs text-gray-500 dark:text-gray-400">
+              Controls whether members can still pick games that have not started after
+              missing early kickoff.
             </Text>
             {(createForm?.latePolicy ?? [
               "allow_late_and_lock_after_start",
@@ -222,6 +281,9 @@ export default function CreateLeagueScreen() {
             <Text className="text-app-fg-light dark:text-app-fg-dark text-base font-semibold">
               Reminder Policy
             </Text>
+            <Text className="text-xs text-gray-500 dark:text-gray-400">
+              Reminders notify members without picks roughly three hours before kickoff.
+            </Text>
             <SelectOption
               selected={reminderPolicy === "three_hours_before"}
               onPress={() => setReminderPolicy("three_hours_before")}
@@ -245,6 +307,9 @@ export default function CreateLeagueScreen() {
           <View className="gap-3">
             <Text className="text-app-fg-light dark:text-app-fg-dark text-base font-semibold">
               Super Bowl Competition
+            </Text>
+            <Text className="text-xs text-gray-500 dark:text-gray-400">
+              Adds a season-end winner/loser/score competition after regular weekly picks.
             </Text>
             <View className="flex-row gap-3">
               <View className="flex-1">
@@ -273,8 +338,8 @@ export default function CreateLeagueScreen() {
           </View>
 
           <View className="gap-3 pt-2">
-            <Button onPress={onSubmit} disabled={submitting}>
-              {submitting ? "Creating..." : "Create League"}
+            <Button onPress={onSubmit} disabled={!canSubmit}>
+              {createButtonText}
             </Button>
             <Button
               variant="outline"

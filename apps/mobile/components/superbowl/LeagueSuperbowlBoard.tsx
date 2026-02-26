@@ -12,6 +12,7 @@ type Props = {
 };
 
 type TeamPickerField = "winner" | "loser";
+type ConferenceFilter = "ALL" | "AFC" | "NFC";
 
 export function LeagueSuperbowlBoard({ leagueId }: Props) {
   const leagueIdNumber = Number(leagueId);
@@ -23,10 +24,25 @@ export function LeagueSuperbowlBoard({ leagueId }: Props) {
   const [activePickerField, setActivePickerField] = useState<TeamPickerField | null>(
     null,
   );
+  const [pickerConferenceFilter, setPickerConferenceFilter] =
+    useState<ConferenceFilter>("ALL");
 
   const utils = clientApi.useUtils();
   const { data: session } = clientApi.session.current.useQuery();
   const { data: teams, isLoading: teamsLoading } = clientApi.teams.getTeams.useQuery();
+  const { data: leagueData, isLoading: leagueLoading } = clientApi.league.get.useQuery(
+    { leagueId: leagueIdNumber },
+    {
+      enabled: Number.isFinite(leagueIdNumber),
+    },
+  );
+  const { data: bracketData, isLoading: bracketLoading } =
+    clientApi.postseason.getBracket.useQuery(
+      { season: leagueData?.season ?? 0 },
+      {
+        enabled: Boolean(leagueData?.season),
+      },
+    );
 
   const viewerMembership = useMemo(() => {
     return session?.dbUser?.leaguemembers.find(
@@ -67,6 +83,14 @@ export function LeagueSuperbowlBoard({ leagueId }: Props) {
       return `${a.loc} ${a.name}`.localeCompare(`${b.loc} ${b.name}`);
     });
   }, [teams]);
+  const filteredPickerTeams = useMemo(() => {
+    if (pickerConferenceFilter === "ALL") {
+      return sortedTeams;
+    }
+    return sortedTeams.filter(
+      (team) => (team.conference ?? "") === pickerConferenceFilter,
+    );
+  }, [pickerConferenceFilter, sortedTeams]);
 
   const myPick = useMemo(() => {
     if (!viewerMembership) {
@@ -119,6 +143,62 @@ export function LeagueSuperbowlBoard({ leagueId }: Props) {
 
   const selectedWinner = winnerTeamId ? teamById.get(Number(winnerTeamId)) : null;
   const selectedLoser = loserTeamId ? teamById.get(Number(loserTeamId)) : null;
+  const sortedPicks = useMemo(() => {
+    return [...(superbowlData?.superbowlPicks ?? [])].sort((a, b) => {
+      const aUser = a.leaguemembers?.people.username ?? "";
+      const bUser = b.leaguemembers?.people.username ?? "";
+      return aUser.localeCompare(bUser);
+    });
+  }, [superbowlData?.superbowlPicks]);
+  const completedPicksCount = sortedPicks.filter(
+    (pick) => pick.winner !== null && pick.loser !== null && pick.score !== null,
+  ).length;
+  const pendingPicksCount = Math.max(sortedPicks.length - completedPicksCount, 0);
+  const bracketSummary = useMemo(() => {
+    if (!bracketData) {
+      return null;
+    }
+
+    const allGames = [
+      ...bracketData.wild_card.AFC,
+      ...bracketData.wild_card.NFC,
+      ...bracketData.divisional.AFC,
+      ...bracketData.divisional.NFC,
+      ...bracketData.conference.AFC,
+      ...bracketData.conference.NFC,
+      ...bracketData.super_bowl,
+    ];
+    const totalGames = allGames.length;
+    const completedGames = allGames.filter((game) => Boolean(game.done)).length;
+    const remainingGames = Math.max(totalGames - completedGames, 0);
+    const totalSeededTeams =
+      (bracketData.seedsByConference.AFC?.length ?? 0) +
+      (bracketData.seedsByConference.NFC?.length ?? 0);
+
+    return {
+      totalGames,
+      completedGames,
+      remainingGames,
+      totalSeededTeams,
+      hasData: totalGames > 0,
+      wildCardTotal:
+        bracketData.wild_card.AFC.length + bracketData.wild_card.NFC.length,
+      wildCardDone:
+        bracketData.wild_card.AFC.filter((game) => game.done).length +
+        bracketData.wild_card.NFC.filter((game) => game.done).length,
+      divisionalTotal:
+        bracketData.divisional.AFC.length + bracketData.divisional.NFC.length,
+      divisionalDone:
+        bracketData.divisional.AFC.filter((game) => game.done).length +
+        bracketData.divisional.NFC.filter((game) => game.done).length,
+      conferenceTotal:
+        bracketData.conference.AFC.length + bracketData.conference.NFC.length,
+      conferenceDone:
+        bracketData.conference.AFC.filter((game) => game.done).length +
+        bracketData.conference.NFC.filter((game) => game.done).length,
+      superBowlDone: bracketData.super_bowl.some((game) => Boolean(game.done)),
+    };
+  }, [bracketData]);
 
   const onSavePick = async () => {
     if (!viewerMembership) {
@@ -166,8 +246,9 @@ export function LeagueSuperbowlBoard({ leagueId }: Props) {
   if (teamsLoading || superbowlLoading || hasSeasonStartedLoading) {
     return <LeagueTabLoadingSkeleton rows={4} />;
   }
-
-  const picks = superbowlData?.superbowlPicks ?? [];
+  if (leagueLoading || bracketLoading) {
+    return <LeagueTabLoadingSkeleton rows={3} />;
+  }
 
   return (
     <ScrollView
@@ -176,6 +257,40 @@ export function LeagueSuperbowlBoard({ leagueId }: Props) {
       contentContainerStyle={{ padding: 16, paddingBottom: 32 }}
     >
       <View className="gap-4">
+        <View className="gap-3 rounded-xl border border-gray-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-800">
+          <Text className="text-app-fg-light dark:text-app-fg-dark text-base font-semibold">
+            Postseason Snapshot
+          </Text>
+          {bracketSummary?.hasData ? (
+            <>
+              <View className="flex-row flex-wrap gap-2">
+                <View className="rounded-full border border-gray-200 bg-gray-50 px-2.5 py-1 dark:border-zinc-700 dark:bg-zinc-900">
+                  <Text className="text-[10px] font-semibold uppercase tracking-[0.8px] text-gray-600 dark:text-gray-300">
+                    Games: {bracketSummary.completedGames}/{bracketSummary.totalGames}
+                  </Text>
+                </View>
+                <View className="rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 dark:border-emerald-800 dark:bg-emerald-950">
+                  <Text className="text-[10px] font-semibold uppercase tracking-[0.8px] text-emerald-700 dark:text-emerald-300">
+                    Remaining: {bracketSummary.remainingGames}
+                  </Text>
+                </View>
+                <View className="rounded-full border border-blue-200 bg-blue-50 px-2.5 py-1 dark:border-blue-800 dark:bg-blue-950">
+                  <Text className="text-[10px] font-semibold uppercase tracking-[0.8px] text-blue-700 dark:text-blue-300">
+                    Teams: {bracketSummary.totalSeededTeams}
+                  </Text>
+                </View>
+              </View>
+              <Text className="text-xs text-gray-600 dark:text-gray-400">
+                Wild Card {bracketSummary.wildCardDone}/{bracketSummary.wildCardTotal} - Divisional {bracketSummary.divisionalDone}/{bracketSummary.divisionalTotal} - Conference {bracketSummary.conferenceDone}/{bracketSummary.conferenceTotal} - Super Bowl {bracketSummary.superBowlDone ? "Final" : "Pending"}
+              </Text>
+            </>
+          ) : (
+            <Text className="text-xs text-gray-600 dark:text-gray-400">
+              Bracket data is not published yet for this season.
+            </Text>
+          )}
+        </View>
+
         <View className="gap-4 rounded-xl border border-gray-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-800">
           <View>
             <Text className="text-app-fg-light dark:text-app-fg-dark text-base font-semibold">
@@ -262,8 +377,35 @@ export function LeagueSuperbowlBoard({ leagueId }: Props) {
                 <Text className="mb-2 px-1 text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
                   Select {activePickerField}
                 </Text>
+                <View className="mb-2 flex-row gap-2 px-1">
+                  {(["ALL", "AFC", "NFC"] as ConferenceFilter[]).map(
+                    (conference) => (
+                      <Pressable
+                        key={`picker_filter_${conference}`}
+                        onPress={() => setPickerConferenceFilter(conference)}
+                        className={cn(
+                          "rounded-full border px-2.5 py-1",
+                          pickerConferenceFilter === conference
+                            ? "border-blue-500 bg-blue-50 dark:border-blue-500 dark:bg-blue-950"
+                            : "border-gray-200 bg-gray-50 dark:border-zinc-700 dark:bg-zinc-800",
+                        )}
+                      >
+                        <Text
+                          className={cn(
+                            "text-[10px] font-semibold uppercase tracking-wide",
+                            pickerConferenceFilter === conference
+                              ? "text-blue-700 dark:text-blue-300"
+                              : "text-gray-600 dark:text-gray-300",
+                          )}
+                        >
+                          {conference}
+                        </Text>
+                      </Pressable>
+                    ),
+                  )}
+                </View>
                 <View className="flex-row flex-wrap gap-2">
-                  {sortedTeams.map((team) => {
+                  {filteredPickerTeams.map((team) => {
                     const teamId = String(team.teamid);
                     const isSelected =
                       activePickerField === "winner"
@@ -336,8 +478,20 @@ export function LeagueSuperbowlBoard({ leagueId }: Props) {
           <Text className="text-app-fg-light dark:text-app-fg-dark text-base font-semibold">
             League Super Bowl Board
           </Text>
+          <View className="flex-row flex-wrap gap-2">
+            <View className="rounded-full border border-gray-200 bg-gray-50 px-2.5 py-1 dark:border-zinc-700 dark:bg-zinc-900">
+              <Text className="text-[10px] font-semibold uppercase tracking-[0.8px] text-gray-600 dark:text-gray-300">
+                Picks: {completedPicksCount}/{sortedPicks.length}
+              </Text>
+            </View>
+            <View className="rounded-full border border-amber-200 bg-amber-50 px-2.5 py-1 dark:border-amber-800 dark:bg-amber-950">
+              <Text className="text-[10px] font-semibold uppercase tracking-[0.8px] text-amber-700 dark:text-amber-300">
+                Pending: {pendingPicksCount}
+              </Text>
+            </View>
+          </View>
 
-          {picks.length === 0 ? (
+          {sortedPicks.length === 0 ? (
             <Text className="text-sm text-gray-600 dark:text-gray-400">
               No picks have been submitted.
             </Text>
@@ -366,19 +520,24 @@ export function LeagueSuperbowlBoard({ leagueId }: Props) {
                 </View>
               </View>
 
-              {picks.map((pick, index) => {
+              {sortedPicks.map((pick, index) => {
                 const winner = pick.winner ? teamById.get(pick.winner) : null;
                 const loser = pick.loser ? teamById.get(pick.loser) : null;
                 const hidden =
                   pick.winner === null || pick.loser === null || pick.score === null;
                 const username = pick.leaguemembers?.people.username ?? "member";
+                const isViewerPick =
+                  pick.member_id === viewerMembership?.membership_id;
 
                 return (
                   <View
                     key={`sb_pick_${pick.pickid}`}
                     className={cn(
                       "flex-row items-center px-2.5 py-2",
-                      index < picks.length - 1
+                      isViewerPick
+                        ? "bg-blue-50 dark:bg-blue-950/20"
+                        : "",
+                      index < sortedPicks.length - 1
                         ? "border-t border-gray-200 dark:border-zinc-700"
                         : "",
                     )}

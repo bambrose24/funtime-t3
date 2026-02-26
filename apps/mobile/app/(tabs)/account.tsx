@@ -7,6 +7,7 @@ import {
   SafeAreaView,
   Pressable,
   RefreshControl,
+  Switch,
 } from "react-native";
 import { router } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -143,6 +144,7 @@ export default function AccountScreen() {
   const [isSigningOut, setIsSigningOut] = useState(false);
   const [usernameDraft, setUsernameDraft] = useState("");
   const [loadedUsername, setLoadedUsername] = useState("");
+  const [lastSyncedAt, setLastSyncedAt] = useState<Date | null>(null);
   const [isUpdatingUsername, setIsUpdatingUsername] = useState(false);
   const [isUpdatingPushPreference, setIsUpdatingPushPreference] =
     useState(false);
@@ -204,6 +206,24 @@ export default function AccountScreen() {
     : pushStatus?.tokenCount
       ? `Enabled on ${pushStatus.tokenCount} device${pushStatus.tokenCount === 1 ? "" : "s"}.`
       : "No registered device token yet. Enable notifications at the OS level first.";
+  const pushStatusState = pushStatus?.unavailable
+    ? "Unavailable"
+    : pushStatus?.enabled
+      ? "Enabled"
+      : "Disabled";
+  const pushGuidance = pushStatus?.unavailable
+    ? "Notification delivery settings are temporarily unavailable."
+    : !pushStatus?.tokenCount
+      ? "Allow notifications on a physical device to register a push token."
+      : pushStatus.enabled
+        ? "Weekly reminders and league updates will be delivered to your device."
+        : "Turn this on to receive reminders, summaries, and message alerts.";
+  const lastSyncLabel = lastSyncedAt
+    ? `Synced ${lastSyncedAt.toLocaleTimeString([], {
+        hour: "numeric",
+        minute: "2-digit",
+      })}`
+    : "Syncing status...";
 
   const canTogglePushNotifications =
     !isUpdatingPushPreference &&
@@ -234,6 +254,7 @@ export default function AccountScreen() {
       if (userData?.dbUser) {
         await refetchPushStatus();
       }
+      setLastSyncedAt(new Date());
     } finally {
       setIsRefreshing(false);
     }
@@ -294,6 +315,7 @@ export default function AccountScreen() {
       await updateUsername({ username: nextUsername });
       await utils.settings.get.invalidate();
       await utils.session.current.invalidate();
+      setLastSyncedAt(new Date());
       triggerSuccessHaptic();
       Alert.alert("Updated", "Username updated successfully.");
     } catch (error) {
@@ -322,6 +344,7 @@ export default function AccountScreen() {
       triggerSelectionHaptic();
       await setPushNotificationsEnabled({ enabled: nextEnabled });
       await refetchPushStatus();
+      setLastSyncedAt(new Date());
       triggerSuccessHaptic();
       Alert.alert(
         "Updated",
@@ -384,6 +407,9 @@ export default function AccountScreen() {
                         numberOfLines={1}
                       >
                         {email}
+                      </Text>
+                      <Text className="mt-1 text-[11px] text-gray-500 dark:text-gray-400">
+                        {lastSyncLabel}
                       </Text>
                     </View>
                   </View>
@@ -469,14 +495,8 @@ export default function AccountScreen() {
               <SettingsSection title="Notifications">
                 <SettingsRow
                   icon="notifications-outline"
-                  title="Push Notifications"
-                  value={
-                    pushStatus?.unavailable
-                      ? "Unavailable"
-                      : pushStatus?.enabled
-                        ? "Enabled"
-                        : "Disabled"
-                  }
+                  title="Notification Status"
+                  value={pushStatusState}
                   trailing={
                     <View
                       className={cn(
@@ -509,20 +529,67 @@ export default function AccountScreen() {
                 />
                 <View className="h-px bg-gray-200 dark:bg-zinc-700" />
                 <View className="gap-2 p-3">
+                  <View className="flex-row flex-wrap gap-2">
+                    <View className="rounded-full border border-gray-200 bg-gray-50 px-2.5 py-1 dark:border-zinc-700 dark:bg-zinc-900">
+                      <Text className="text-[10px] font-semibold uppercase tracking-[0.8px] text-gray-600 dark:text-gray-300">
+                        Tokens: {pushStatus?.tokenCount ?? 0}
+                      </Text>
+                    </View>
+                    <View
+                      className={cn(
+                        "rounded-full border px-2.5 py-1",
+                        pushStatus?.enabled
+                          ? "border-emerald-300 bg-emerald-50 dark:border-emerald-800 dark:bg-emerald-950"
+                          : "border-gray-200 bg-gray-50 dark:border-zinc-700 dark:bg-zinc-900",
+                      )}
+                    >
+                      <Text
+                        className={cn(
+                          "text-[10px] font-semibold uppercase tracking-[0.8px]",
+                          pushStatus?.enabled
+                            ? "text-emerald-700 dark:text-emerald-300"
+                            : "text-gray-600 dark:text-gray-300",
+                        )}
+                      >
+                        Preference: {pushStatus?.enabled ? "On" : "Off"}
+                      </Text>
+                    </View>
+                  </View>
                   <Text className="text-xs text-gray-500 dark:text-gray-400">
                     {pushStatusSummary}
                   </Text>
+                  <Text className="text-xs text-gray-500 dark:text-gray-400">
+                    {pushGuidance}
+                  </Text>
+
+                  <View className="mt-1 flex-row items-center justify-between rounded-md border border-gray-200 bg-gray-50 px-3 py-2.5 dark:border-zinc-700 dark:bg-zinc-900">
+                    <View className="flex-1 pr-3">
+                      <Text className="text-app-fg-light dark:text-app-fg-dark text-sm font-medium">
+                        Allow Push Notifications
+                      </Text>
+                      <Text className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
+                        {canTogglePushNotifications
+                          ? "Toggle notification delivery for this account."
+                          : "Enable OS notifications and register a token first."}
+                      </Text>
+                    </View>
+                    <Switch
+                      value={Boolean(pushStatus?.enabled)}
+                      onValueChange={() => {
+                        void onTogglePushNotifications();
+                      }}
+                      disabled={!canTogglePushNotifications}
+                      trackColor={{ false: "#9ca3af", true: "#22c55e" }}
+                      thumbColor={pushStatus?.enabled ? "#ffffff" : "#f3f4f6"}
+                    />
+                  </View>
                   <Button
                     size="sm"
-                    variant={pushStatus?.enabled ? "outline" : "default"}
-                    disabled={!canTogglePushNotifications}
-                    onPress={onTogglePushNotifications}
+                    variant="outline"
+                    disabled={isUpdatingPushPreference}
+                    onPress={() => void onRefresh()}
                   >
-                    {isUpdatingPushPreference
-                      ? "Saving..."
-                      : pushStatus?.enabled
-                        ? "Disable Notifications"
-                        : "Enable Notifications"}
+                    {isUpdatingPushPreference ? "Saving..." : "Refresh Notification Status"}
                   </Button>
                 </View>
               </SettingsSection>

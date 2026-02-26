@@ -12,6 +12,7 @@ import {
 import { router, useLocalSearchParams, useFocusEffect } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
+import { formatDistanceToNow } from "date-fns";
 import { clientApi } from "@/lib/trpc/react";
 import { useUser } from "@/hooks/useUser";
 import { ClientPickPage } from "@/components/picks/ClientPickPage";
@@ -491,6 +492,7 @@ function LeagueOverview({
 }) {
   const { isDarkColorScheme } = useColorScheme();
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [lastRefreshedAt, setLastRefreshedAt] = useState<Date | null>(null);
   const {
     leagueData,
     activeWeek,
@@ -505,10 +507,83 @@ function LeagueOverview({
     refetchAll,
   } = useLeagueOverviewData(leagueId);
 
+  const now = new Date();
+  const totalGames = games?.length ?? 0;
+  const myPickCount = userPicks?.length ?? 0;
+  const openGamesCount =
+    games?.filter((game) => new Date(game.ts) > now).length ?? 0;
+  const lockedGamesCount = Math.max(totalGames - openGamesCount, 0);
+  const submittedMembersCount =
+    picksSummary?.filter((member) => member.picks.length > 0).length ?? 0;
+  const totalMembersCount = picksSummary?.length ?? 0;
+  const picksRemainingCount = Math.max(totalGames - myPickCount, 0);
+  const weekProgressLabel =
+    totalGames > 0
+      ? `${myPickCount}/${totalGames} picks submitted`
+      : "No games posted yet";
+  const leagueProgressLabel =
+    totalMembersCount > 0
+      ? `${submittedMembersCount}/${totalMembersCount} members submitted`
+      : "League submissions will appear once picks are posted";
+  const refreshStatusLabel = isRefreshing
+    ? "Refreshing..."
+    : lastRefreshedAt
+      ? `Updated ${formatDistanceToNow(lastRefreshedAt, { addSuffix: true })}`
+      : "Pull down to refresh latest standings and picks";
+  const picksActionLabel =
+    totalGames === 0
+      ? "Awaiting Schedule"
+      : myPickCount === 0
+        ? "Start Picks"
+        : openGamesCount === 0
+          ? "Review Locked Picks"
+          : myPickCount < totalGames
+            ? `Finish Picks (${myPickCount}/${totalGames})`
+            : "Review Picks";
+  const picksActionDescription =
+    totalGames === 0
+      ? `Week ${displayWeek} matchups will appear once published.`
+      : openGamesCount === 0
+        ? "Kickoff locks are active. You can still review your submitted picks."
+        : picksRemainingCount > 0
+          ? `${picksRemainingCount} pick${picksRemainingCount === 1 ? "" : "s"} left before kickoff.`
+          : "All picks submitted. You can still update games that have not started.";
+  const pickOutcomeSummary = useMemo(() => {
+    let correct = 0;
+    let wrong = 0;
+    let pending = 0;
+
+    for (const pick of userPicks ?? []) {
+      const game = games?.find((candidate) => candidate.gid === pick.gid);
+      if (!game || !pick.winner || !game.winner) {
+        pending += 1;
+        continue;
+      }
+      if (game.winner === pick.winner) {
+        correct += 1;
+      } else {
+        wrong += 1;
+      }
+    }
+
+    return { correct, wrong, pending };
+  }, [games, userPicks]);
+
+  useEffect(() => {
+    if (!isLoading && !isUserPicksLoading && !lastRefreshedAt) {
+      setLastRefreshedAt(new Date());
+    }
+  }, [isLoading, isUserPicksLoading, lastRefreshedAt]);
+
   const onRefresh = useCallback(async () => {
+    Haptics.selectionAsync().catch(() => {
+      // No-op if haptics are unavailable.
+    });
+
     setIsRefreshing(true);
     try {
       await refetchAll();
+      setLastRefreshedAt(new Date());
     } finally {
       setIsRefreshing(false);
     }
@@ -566,6 +641,40 @@ function LeagueOverview({
           )}
         </View>
 
+        {/* Week Status Summary */}
+        {!isLoading && !isUserPicksLoading && (
+          <View className="mx-4 mb-5 rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3 dark:border-zinc-700 dark:bg-zinc-900">
+            <View className="flex-row items-center justify-between">
+              <Text className="text-app-fg-light dark:text-app-fg-dark text-sm font-semibold">
+                Week Snapshot
+              </Text>
+              <Text className="text-xs text-gray-500 dark:text-gray-400">
+                {refreshStatusLabel}
+              </Text>
+            </View>
+            <View className="mt-2 flex-row flex-wrap gap-2">
+              <View className="rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 dark:border-emerald-800 dark:bg-emerald-950">
+                <Text className="text-[10px] font-semibold uppercase tracking-[0.8px] text-emerald-700 dark:text-emerald-300">
+                  Open: {openGamesCount}
+                </Text>
+              </View>
+              <View className="rounded-full border border-gray-200 bg-white px-2.5 py-1 dark:border-zinc-700 dark:bg-zinc-800">
+                <Text className="text-[10px] font-semibold uppercase tracking-[0.8px] text-gray-600 dark:text-gray-300">
+                  Locked: {lockedGamesCount}
+                </Text>
+              </View>
+              <View className="rounded-full border border-blue-200 bg-blue-50 px-2.5 py-1 dark:border-blue-800 dark:bg-blue-950">
+                <Text className="text-[10px] font-semibold uppercase tracking-[0.8px] text-blue-700 dark:text-blue-300">
+                  Your Picks: {myPickCount}/{totalGames}
+                </Text>
+              </View>
+            </View>
+            <Text className="mt-2 text-xs text-gray-600 dark:text-gray-400">
+              {leagueProgressLabel}
+            </Text>
+          </View>
+        )}
+
         {/* Loading Skeletons */}
         {(isLoading || isUserPicksLoading) && (
           <>
@@ -621,35 +730,68 @@ function LeagueOverview({
 
         {/* Your Picks - Only show after loading is complete */}
         {!isLoading && !isUserPicksLoading && displayWeek && (
-          <View className="mx-4 mb-6">
-            {userPicks && userPicks.length > 0 ? (
-              <Pressable
-                onPress={() => setIsPicksModalVisible(true)}
-                className="rounded-lg border border-gray-300 bg-gray-50 px-4 py-2 dark:border-zinc-600 dark:bg-zinc-700"
-              >
-                <Text className="text-center font-medium text-gray-700 dark:text-gray-300">
-                  View Your Picks
-                </Text>
-              </Pressable>
-            ) : (
+          <View className="mx-4 mb-6 rounded-2xl border border-gray-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-800">
+            <Text className="text-app-fg-light dark:text-app-fg-dark text-base font-semibold">
+              Your Week Picks
+            </Text>
+            <Text className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+              {weekProgressLabel}
+            </Text>
+            <Text className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+              {picksActionDescription}
+            </Text>
+
+            <View className="mt-3 gap-2">
               <Pressable
                 onPress={onSwitchToPicks}
-                className="rounded-lg bg-blue-500 px-4 py-2"
+                disabled={totalGames === 0}
+                className={cn(
+                  "rounded-lg px-4 py-2.5",
+                  totalGames === 0
+                    ? "bg-gray-300 dark:bg-zinc-700"
+                    : "bg-blue-500",
+                )}
               >
                 <Text className="text-center font-medium text-white">
-                  Make Picks Now
+                  {picksActionLabel}
                 </Text>
               </Pressable>
-            )}
+              {myPickCount > 0 ? (
+                <Pressable
+                  onPress={() => setIsPicksModalVisible(true)}
+                  className="rounded-lg border border-gray-300 bg-gray-50 px-4 py-2.5 dark:border-zinc-600 dark:bg-zinc-700"
+                >
+                  <Text className="text-center font-medium text-gray-700 dark:text-gray-300">
+                    View Pick Summary
+                  </Text>
+                </Pressable>
+              ) : null}
+            </View>
           </View>
         )}
 
         {/* Games This Week */}
         {games && games.length > 0 && (
           <View className="mb-6">
-            <Text className="text-app-fg-light dark:text-app-fg-dark mb-3 px-4 text-lg font-semibold">
-              This Week's Games
-            </Text>
+            <View className="mb-3 flex-row items-center justify-between px-4">
+              <Text className="text-app-fg-light dark:text-app-fg-dark text-lg font-semibold">
+                This Week's Games
+              </Text>
+              <View className="flex-row items-center gap-1.5">
+                <View className="rounded-full border border-emerald-200 bg-emerald-50 px-2 py-1 dark:border-emerald-800 dark:bg-emerald-950">
+                  <Text className="text-[10px] font-semibold text-emerald-700 dark:text-emerald-300">
+                    {openGamesCount} open
+                  </Text>
+                </View>
+                <Pressable
+                  className="rounded-full border border-gray-200 bg-white px-2 py-1 dark:border-zinc-700 dark:bg-zinc-800"
+                >
+                  <Text className="text-[10px] font-semibold text-gray-600 dark:text-gray-300">
+                    {lockedGamesCount} locked
+                  </Text>
+                </Pressable>
+              </View>
+            </View>
             <ScrollView
               horizontal
               showsHorizontalScrollIndicator={false}
@@ -693,6 +835,11 @@ function LeagueOverview({
             <Text className="text-app-fg-light dark:text-app-fg-dark mb-3 px-4 text-lg font-semibold">
               League Picks
             </Text>
+            {games.length > 5 ? (
+              <Text className="mb-2 px-4 text-xs text-gray-500 dark:text-gray-400">
+                Swipe horizontally to view every game column.
+              </Text>
+            ) : null}
             <MobilePicksTable
               picksSummary={picksSummary}
               games={games}
@@ -735,118 +882,226 @@ function LeagueOverview({
           <View className="bg-app-bg-light dark:bg-app-bg-dark rounded-t-3xl">
             <SafeAreaView>
               {/* Modal Header */}
-              <View className="flex-row items-center justify-between border-b border-gray-200 px-4 py-3 dark:border-zinc-700">
-                <Text className="text-app-fg-light dark:text-app-fg-dark text-lg font-semibold">
-                  Your Week {displayWeek}, {leagueData?.season} Picks
+              <View className="border-b border-gray-200 px-4 py-3 dark:border-zinc-700">
+                <View className="flex-row items-center justify-between">
+                  <Text className="text-app-fg-light dark:text-app-fg-dark text-lg font-semibold">
+                    Your Week {displayWeek}, {leagueData?.season} Picks
+                  </Text>
+                  <Pressable
+                    onPress={() => setIsPicksModalVisible(false)}
+                    className="rounded-full p-2"
+                  >
+                    <Ionicons
+                      name="close"
+                      size={24}
+                      color={isDarkColorScheme ? "#ffffff" : "#000000"}
+                    />
+                  </Pressable>
+                </View>
+                <Text className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                  {pickOutcomeSummary.correct} correct / {pickOutcomeSummary.wrong} wrong / {pickOutcomeSummary.pending} pending
                 </Text>
-                <Pressable
-                  onPress={() => setIsPicksModalVisible(false)}
-                  className="rounded-full p-2"
-                >
-                  <Ionicons
-                    name="close"
-                    size={24}
-                    color={isDarkColorScheme ? "#ffffff" : "#000000"}
-                  />
-                </Pressable>
               </View>
 
               {/* Modal Content */}
-              <View className="p-4">
+              <ScrollView
+                style={{ maxHeight: 520 }}
+                contentContainerStyle={{ padding: 16, paddingBottom: 20 }}
+                showsVerticalScrollIndicator={false}
+              >
                 {userPicks && userPicks.length > 0 ? (
-                  <View className="flex-row flex-wrap justify-between gap-3">
-                    {userPicks.map((pick) => {
-                      const game = games?.find((g) => g.gid === pick.gid);
-                      if (!game) return null;
+                  <>
+                    <View className="mb-3 flex-row flex-wrap gap-2">
+                      <View className="rounded-full border border-green-200 bg-green-50 px-2.5 py-1 dark:border-green-800 dark:bg-green-950">
+                        <Text className="text-[10px] font-semibold uppercase tracking-[0.8px] text-green-700 dark:text-green-300">
+                          Correct: {pickOutcomeSummary.correct}
+                        </Text>
+                      </View>
+                      <View className="rounded-full border border-red-200 bg-red-50 px-2.5 py-1 dark:border-red-800 dark:bg-red-950">
+                        <Text className="text-[10px] font-semibold uppercase tracking-[0.8px] text-red-700 dark:text-red-300">
+                          Wrong: {pickOutcomeSummary.wrong}
+                        </Text>
+                      </View>
+                      <View className="rounded-full border border-blue-200 bg-blue-50 px-2.5 py-1 dark:border-blue-800 dark:bg-blue-950">
+                        <Text className="text-[10px] font-semibold uppercase tracking-[0.8px] text-blue-700 dark:text-blue-300">
+                          Pending: {pickOutcomeSummary.pending}
+                        </Text>
+                      </View>
+                    </View>
 
-                      const homeTeam = teams?.find(
-                        (t) => t.teamid === game.home,
-                      );
-                      const awayTeam = teams?.find(
-                        (t) => t.teamid === game.away,
-                      );
+                    <View className="flex-row flex-wrap justify-between gap-3">
+                      {userPicks.map((pick) => {
+                        const game = games?.find((g) => g.gid === pick.gid);
+                        if (!game) return null;
 
-                      if (!homeTeam || !awayTeam) return null;
+                        const homeTeam = teamById.get(game.home);
+                        const awayTeam = teamById.get(game.away);
+                        const pickedTeam = pick.winner ? teamById.get(pick.winner) : null;
 
-                      const choseHome = pick.winner === game.home;
-                      const choseAway = pick.winner === game.away;
-                      const gameWinner = game.winner;
+                        if (!homeTeam || !awayTeam) return null;
 
-                      const status =
-                        !gameWinner || !pick.winner
-                          ? "empty-state"
-                          : gameWinner === pick.winner
-                            ? "correct"
-                            : "wrong";
+                        const choseHome = pick.winner === game.home;
+                        const choseAway = pick.winner === game.away;
+                        const gameWinner = game.winner;
+                        const gameStarted = new Date(game.ts) <= new Date();
+                        const gameEnded = Boolean(game.done);
+                        const status =
+                          !gameWinner || !pick.winner
+                            ? "empty-state"
+                            : gameWinner === pick.winner
+                              ? "correct"
+                              : "wrong";
+                        const statusLabel =
+                          status === "correct"
+                            ? "Correct"
+                            : status === "wrong"
+                              ? "Wrong"
+                              : gameStarted && !gameEnded
+                                ? "Live"
+                                : "Pending";
+                        const kickoffLabel = new Date(game.ts).toLocaleString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                          hour: "numeric",
+                          minute: "2-digit",
+                        });
 
-                      return (
-                        <View
-                          key={pick.gid}
-                          className="rounded-xl border-2 border-gray-200 bg-white px-5 py-3 dark:border-zinc-700 dark:bg-zinc-800"
-                          style={{ width: "48%" }}
-                        >
-                          {/* Teams Layout: Away @ Home */}
-                          <View className="flex-row items-center justify-center gap-2">
-                            {/* Away Team */}
-                            <View
-                              className={`flex-1 flex-row items-center justify-center gap-1 rounded-md border px-2 py-1.5 ${
-                                choseAway && status === "correct"
-                                  ? "border-green-500 bg-green-50 dark:bg-green-900/20"
-                                  : choseAway && status === "wrong"
-                                    ? "border-red-500 bg-red-50 dark:bg-red-900/20"
-                                    : choseAway && status === "empty-state"
-                                      ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
-                                      : "border-gray-300 dark:border-zinc-600"
-                              }`}
-                            >
-                              <TeamLogo
-                                abbrev={awayTeam.abbrev ?? ""}
-                                width={16}
-                                height={16}
-                              />
-                              <Text className="text-app-fg-light dark:text-app-fg-dark text-xs font-medium">
-                                {awayTeam.abbrev}
+                        return (
+                          <View
+                            key={pick.gid}
+                            className={cn(
+                              "rounded-xl border-2 bg-white px-4 py-3 dark:bg-zinc-800",
+                              status === "correct"
+                                ? "border-green-300 dark:border-green-700"
+                                : status === "wrong"
+                                  ? "border-red-300 dark:border-red-700"
+                                  : "border-gray-200 dark:border-zinc-700",
+                            )}
+                            style={{ width: "48%" }}
+                          >
+                            <View className="mb-2 flex-row items-center justify-between">
+                              <Text className="text-[11px] text-gray-500 dark:text-gray-400">
+                                {kickoffLabel}
                               </Text>
+                              <View
+                                className={cn(
+                                  "rounded-full px-2 py-0.5",
+                                  status === "correct"
+                                    ? "bg-green-100 dark:bg-green-900/40"
+                                    : status === "wrong"
+                                      ? "bg-red-100 dark:bg-red-900/40"
+                                      : "bg-blue-100 dark:bg-blue-900/40",
+                                )}
+                              >
+                                <Text
+                                  className={cn(
+                                    "text-[10px] font-semibold uppercase",
+                                    status === "correct"
+                                      ? "text-green-700 dark:text-green-300"
+                                      : status === "wrong"
+                                        ? "text-red-700 dark:text-red-300"
+                                        : "text-blue-700 dark:text-blue-300",
+                                  )}
+                                >
+                                  {statusLabel}
+                                </Text>
+                              </View>
                             </View>
 
-                            <Text className="px-1 text-xs text-gray-500 dark:text-gray-400">
-                              @
+                            {/* Teams Layout: Away @ Home */}
+                            <View className="flex-row items-center justify-center gap-2">
+                              {/* Away Team */}
+                              <View
+                                className={cn(
+                                  "flex-1 flex-row items-center justify-center gap-1 rounded-md border px-2 py-1.5",
+                                  choseAway && status === "correct"
+                                    ? "border-green-500 bg-green-50 dark:bg-green-900/20"
+                                    : choseAway && status === "wrong"
+                                      ? "border-red-500 bg-red-50 dark:bg-red-900/20"
+                                      : choseAway && status === "empty-state"
+                                        ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
+                                        : "border-gray-300 dark:border-zinc-600",
+                                )}
+                              >
+                                <TeamLogo
+                                  abbrev={awayTeam.abbrev ?? ""}
+                                  width={16}
+                                  height={16}
+                                />
+                                <Text className="text-app-fg-light dark:text-app-fg-dark text-xs font-medium">
+                                  {awayTeam.abbrev}
+                                </Text>
+                              </View>
+
+                              <Text className="px-1 text-xs text-gray-500 dark:text-gray-400">
+                                @
+                              </Text>
+
+                              {/* Home Team */}
+                              <View
+                                className={cn(
+                                  "flex-1 flex-row items-center justify-center gap-1 rounded-md border px-2 py-1.5",
+                                  choseHome && status === "correct"
+                                    ? "border-green-500 bg-green-50 dark:bg-green-900/20"
+                                    : choseHome && status === "wrong"
+                                      ? "border-red-500 bg-red-50 dark:bg-red-900/20"
+                                      : choseHome && status === "empty-state"
+                                        ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
+                                        : "border-gray-300 dark:border-zinc-600",
+                                )}
+                              >
+                                <TeamLogo
+                                  abbrev={homeTeam.abbrev ?? ""}
+                                  width={16}
+                                  height={16}
+                                />
+                                <Text className="text-app-fg-light dark:text-app-fg-dark text-xs font-medium">
+                                  {homeTeam.abbrev}
+                                </Text>
+                              </View>
+                            </View>
+
+                            <Text className="mt-2 text-center text-[11px] text-gray-600 dark:text-gray-400">
+                              Pick: {pickedTeam?.abbrev ?? "-"}
                             </Text>
-
-                            {/* Home Team */}
-                            <View
-                              className={`flex-1 flex-row items-center justify-center gap-1 rounded-md border px-2 py-1.5 ${
-                                choseHome && status === "correct"
-                                  ? "border-green-500 bg-green-50 dark:bg-green-900/20"
-                                  : choseHome && status === "wrong"
-                                    ? "border-red-500 bg-red-50 dark:bg-red-900/20"
-                                    : choseHome && status === "empty-state"
-                                      ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
-                                      : "border-gray-300 dark:border-zinc-600"
-                              }`}
-                            >
-                              <TeamLogo
-                                abbrev={homeTeam.abbrev ?? ""}
-                                width={16}
-                                height={16}
-                              />
-                              <Text className="text-app-fg-light dark:text-app-fg-dark text-xs font-medium">
-                                {homeTeam.abbrev}
-                              </Text>
-                            </View>
                           </View>
-                        </View>
-                      );
-                    })}
-                  </View>
+                        );
+                      })}
+                    </View>
+
+                    {openGamesCount > 0 ? (
+                      <Pressable
+                        onPress={() => {
+                          setIsPicksModalVisible(false);
+                          onSwitchToPicks();
+                        }}
+                        className="mt-4 rounded-lg bg-blue-500 px-4 py-2.5"
+                      >
+                        <Text className="text-center font-medium text-white">
+                          Edit Open Picks
+                        </Text>
+                      </Pressable>
+                    ) : null}
+                  </>
                 ) : (
-                  <View className="flex-1 items-center justify-center py-20">
+                  <View className="items-center justify-center py-14">
                     <Text className="text-center text-gray-600 dark:text-gray-400">
-                      No picks found for this week
+                      No picks found for this week.
                     </Text>
+                    <Pressable
+                      onPress={() => {
+                        setIsPicksModalVisible(false);
+                        onSwitchToPicks();
+                      }}
+                      className="mt-4 rounded-lg bg-blue-500 px-4 py-2.5"
+                    >
+                      <Text className="text-center font-medium text-white">
+                        Open Picks Tab
+                      </Text>
+                    </Pressable>
                   </View>
                 )}
-              </View>
+              </ScrollView>
             </SafeAreaView>
           </View>
         </View>
@@ -997,6 +1252,16 @@ function MobilePicksTable({
     tiebreakerGame && tiebreakerGame.done
       ? (tiebreakerGame.homescore || 0) + (tiebreakerGame.awayscore || 0)
       : null;
+  const now = new Date();
+  const gameStateById = new Map(
+    games.map((game) => [
+      game.gid,
+      {
+        started: new Date(game.ts) <= now,
+        done: Boolean(game.done),
+      },
+    ]),
+  );
 
   // Sort picks summary by correct picks (desc), then by tiebreaker accuracy (asc)
   const sortedPicksSummary = [...picksSummary].sort((a, b) => {
@@ -1019,104 +1284,194 @@ function MobilePicksTable({
     // If no tiebreaker or game not done, maintain original order
     return 0;
   });
+  const rankedPicksSummary: {
+    member: RouterOutputs["league"]["picksSummary"][number];
+    rank: number;
+  }[] = [];
+  sortedPicksSummary.forEach((member, index) => {
+    const previousMember = sortedPicksSummary[index - 1];
+    if (!previousMember) {
+      rankedPicksSummary.push({ member, rank: 1 });
+      return;
+    }
+
+    const sameCorrectPicks = previousMember.correctPicks === member.correctPicks;
+    const sameTiebreakerDiff =
+      actualTiebreakerScore === null || !tiebreakerGame
+        ? true
+        : Math.abs((previousMember.tiebreakerScore ?? 0) - actualTiebreakerScore) ===
+          Math.abs((member.tiebreakerScore ?? 0) - actualTiebreakerScore);
+    const previousRank = rankedPicksSummary[index - 1]?.rank ?? index;
+
+    rankedPicksSummary.push({
+      member,
+      rank:
+        sameCorrectPicks && sameTiebreakerDiff ? previousRank : index + 1,
+    });
+  });
+  const submittedMembersCount = rankedPicksSummary.filter(
+    ({ member }) => member.picks.length > 0,
+  ).length;
 
   return (
-    <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-      <View className="overflow-hidden rounded-lg border border-gray-200 dark:border-zinc-700">
-        {/* Header Row */}
-        <View className="flex-row bg-gray-50 dark:bg-zinc-800">
-          {/* Player Column */}
-          <View className="w-24 border-r border-gray-200 px-2 py-3 dark:border-zinc-700">
-            <Text className="text-xs font-semibold text-gray-700 dark:text-gray-300">
-              Player
-            </Text>
-          </View>
-          {/* Correct Picks Column */}
-          <View className="w-16 border-r border-gray-200 px-2 py-3 dark:border-zinc-700">
-            <Text className="text-xs font-semibold text-gray-700 dark:text-gray-300">
+    <View className="gap-2">
+      <View className="px-1">
+        <View className="flex-row flex-wrap gap-2">
+          <View className="rounded-full border border-green-200 bg-green-50 px-2 py-1 dark:border-green-800 dark:bg-green-950">
+            <Text className="text-[10px] font-semibold text-green-700 dark:text-green-300">
               Correct
             </Text>
           </View>
-          {/* Game Columns */}
-          {games.map((game) => {
-            const homeTeam = teams.get(game.home);
-            const awayTeam = teams.get(game.away);
+          <View className="rounded-full border border-red-200 bg-red-50 px-2 py-1 dark:border-red-800 dark:bg-red-950">
+            <Text className="text-[10px] font-semibold text-red-700 dark:text-red-300">
+              Wrong
+            </Text>
+          </View>
+          <View className="rounded-full border border-blue-200 bg-blue-50 px-2 py-1 dark:border-blue-800 dark:bg-blue-950">
+            <Text className="text-[10px] font-semibold text-blue-700 dark:text-blue-300">
+              Pending
+            </Text>
+          </View>
+          <View className="rounded-full border border-amber-200 bg-amber-50 px-2 py-1 dark:border-amber-800 dark:bg-amber-950">
+            <Text className="text-[10px] font-semibold text-amber-700 dark:text-amber-300">
+              Not Picked
+            </Text>
+          </View>
+        </View>
+        <Text className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+          {submittedMembersCount}/{rankedPicksSummary.length} members submitted at least one pick.
+        </Text>
+      </View>
+
+      <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+        <View className="overflow-hidden rounded-lg border border-gray-200 dark:border-zinc-700">
+          {/* Header Row */}
+          <View className="flex-row bg-gray-50 dark:bg-zinc-800">
+            {/* Rank Column */}
+            <View className="w-12 border-r border-gray-200 px-2 py-3 dark:border-zinc-700">
+              <Text className="text-center text-xs font-semibold text-gray-700 dark:text-gray-300">
+                Rank
+              </Text>
+            </View>
+            {/* Player Column */}
+            <View className="w-24 border-r border-gray-200 px-2 py-3 dark:border-zinc-700">
+              <Text className="text-xs font-semibold text-gray-700 dark:text-gray-300">
+                Player
+              </Text>
+            </View>
+            {/* Correct Picks Column */}
+            <View className="w-16 border-r border-gray-200 px-2 py-3 dark:border-zinc-700">
+              <Text className="text-xs font-semibold text-gray-700 dark:text-gray-300">
+                Correct
+              </Text>
+            </View>
+            {/* Game Columns */}
+            {games.map((game) => {
+              const homeTeam = teams.get(game.home);
+              const awayTeam = teams.get(game.away);
+              return (
+                <View
+                  key={game.gid}
+                  className="w-12 border-r border-gray-200 px-1 py-3 dark:border-zinc-700"
+                >
+                  <Text className="text-center text-xs font-semibold text-gray-700 dark:text-gray-300">
+                    {awayTeam?.abbrev}
+                  </Text>
+                  <Text className="text-center text-xs font-semibold text-gray-700 dark:text-gray-300">
+                    {homeTeam?.abbrev}
+                  </Text>
+                </View>
+              );
+            })}
+          </View>
+
+          {/* Data Rows */}
+          {rankedPicksSummary.map(({ member, rank }, index) => {
+            const isCurrentUser = member.people.uid === currentUserId;
+            const rowBgColor = isCurrentUser
+              ? "bg-blue-50 dark:bg-blue-900/20"
+              : index % 2 === 0
+                ? "bg-white dark:bg-zinc-900"
+                : "bg-gray-50 dark:bg-zinc-950";
+
             return (
               <View
-                key={game.gid}
-                className="w-12 border-r border-gray-200 px-1 py-3 dark:border-zinc-700"
+                key={member.membership_id}
+                className={`flex-row ${rowBgColor}`}
               >
-                <Text className="text-center text-xs font-semibold text-gray-700 dark:text-gray-300">
-                  {awayTeam?.abbrev}
-                </Text>
-                <Text className="text-center text-xs font-semibold text-gray-700 dark:text-gray-300">
-                  {homeTeam?.abbrev}
-                </Text>
+                {/* Rank */}
+                <View className="w-12 justify-center border-r border-gray-200 px-2 py-3 dark:border-zinc-700">
+                  <Text
+                    className={cn(
+                      "text-center text-xs font-semibold",
+                      isCurrentUser
+                        ? "text-blue-700 dark:text-blue-300"
+                        : "text-gray-700 dark:text-gray-200",
+                    )}
+                  >
+                    {rank}
+                  </Text>
+                </View>
+                {/* Player Name */}
+                <View className="w-24 justify-center border-r border-gray-200 px-2 py-3 dark:border-zinc-700">
+                  <Text
+                    className={cn(
+                      "text-xs",
+                      isCurrentUser
+                        ? "font-bold text-blue-600 dark:text-blue-400"
+                        : "text-gray-900 dark:text-gray-100",
+                    )}
+                    numberOfLines={1}
+                  >
+                    {member.people.username}
+                  </Text>
+                </View>
+                {/* Correct Count */}
+                <View className="w-16 justify-center border-r border-gray-200 px-2 py-3 dark:border-zinc-700">
+                  <Text className="text-center text-xs text-gray-900 dark:text-gray-100">
+                    {member.correctPicks}
+                  </Text>
+                </View>
+                {/* Game Picks */}
+                {games.map((game) => {
+                  const pick = member.picks.find((p) => p.gid === game.gid);
+                  const pickedTeam = pick?.winner ? teams.get(pick.winner) : null;
+                  const gameState = gameStateById.get(game.gid);
+
+                  let bgColor = "bg-blue-50 dark:bg-blue-950/40";
+                  let textColor = "text-gray-900 dark:text-gray-100";
+                  let cellValue = pickedTeam?.abbrev ?? "-";
+
+                  if (pick?.correct === 1) {
+                    bgColor = "bg-green-100 dark:bg-green-900/50";
+                  } else if (pick?.correct === 0) {
+                    bgColor = "bg-red-100 dark:bg-red-900/50";
+                  } else if (!pick) {
+                    if (gameState?.started) {
+                      bgColor = "bg-zinc-200 dark:bg-zinc-700";
+                      textColor = "text-zinc-700 dark:text-zinc-200";
+                      cellValue = "x";
+                    } else {
+                      bgColor = "bg-amber-100 dark:bg-amber-900/50";
+                    }
+                  }
+
+                  return (
+                    <View
+                      key={`${member.membership_id}-${game.gid}`}
+                      className={`w-12 justify-center border-r border-gray-200 px-1 py-3 dark:border-zinc-700 ${bgColor}`}
+                    >
+                      <Text className={`text-center text-xs ${textColor}`}>
+                        {cellValue}
+                      </Text>
+                    </View>
+                  );
+                })}
               </View>
             );
           })}
         </View>
-
-        {/* Data Rows */}
-        {sortedPicksSummary.map((member) => {
-          const isCurrentUser = member.people.uid === currentUserId;
-          const rowBgColor = isCurrentUser
-            ? "bg-blue-50 dark:bg-blue-900/20"
-            : "bg-white dark:bg-zinc-900";
-
-          return (
-            <View
-              key={member.membership_id}
-              className={`flex-row ${rowBgColor}`}
-            >
-              {/* Player Name */}
-              <View className="w-24 justify-center border-r border-gray-200 px-2 py-3 dark:border-zinc-700">
-                <Text
-                  className={`text-xs ${
-                    isCurrentUser
-                      ? "font-bold text-blue-600 dark:text-blue-400"
-                      : "text-gray-900 dark:text-gray-100"
-                  }`}
-                  numberOfLines={1}
-                >
-                  {member.people.username}
-                </Text>
-              </View>
-              {/* Correct Count */}
-              <View className="w-16 justify-center border-r border-gray-200 px-2 py-3 dark:border-zinc-700">
-                <Text className="text-center text-xs text-gray-900 dark:text-gray-100">
-                  {member.correctPicks}
-                </Text>
-              </View>
-              {/* Game Picks */}
-              {games.map((game) => {
-                const pick = member.picks.find((p) => p.gid === game.gid);
-                const pickedTeam = pick?.winner ? teams.get(pick.winner) : null;
-
-                let bgColor = "bg-white dark:bg-zinc-900"; // Default
-                if (pick?.correct === 1) {
-                  bgColor = "bg-green-100 dark:bg-green-900/50"; // Correct
-                } else if (pick?.correct === 0) {
-                  bgColor = "bg-red-100 dark:bg-red-900/50"; // Wrong
-                } else if (!pick) {
-                  bgColor = "bg-yellow-100 dark:bg-yellow-900/50"; // No pick
-                }
-
-                return (
-                  <View
-                    key={`${member.membership_id}-${game.gid}`}
-                    className={`w-12 justify-center border-r border-gray-200 px-1 py-3 dark:border-zinc-700 ${bgColor}`}
-                  >
-                    <Text className="text-center text-xs text-gray-900 dark:text-gray-100">
-                      {pickedTeam?.abbrev || "-"}
-                    </Text>
-                  </View>
-                );
-              })}
-            </View>
-          );
-        })}
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 }

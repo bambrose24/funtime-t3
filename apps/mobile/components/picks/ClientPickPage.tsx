@@ -215,6 +215,31 @@ function PickForm({ league, weekToPick, teams, existingPicks, leagueIdNumber }: 
 
   const isFormValid = form.formState.isValid;
   const isFormDirty = form.formState.isDirty;
+  const currentPicks = form.watch("picks");
+  const pickableGameCount = currentPicks.filter((pick) => pick.type === "toPick").length;
+  const pickedOpenGameCount = currentPicks.filter(
+    (pick) => pick.type === "toPick" && pick.winner !== null,
+  ).length;
+  const remainingPickCount = pickableGameCount - pickedOpenGameCount;
+  const lockedGameCount = games.length - pickableGameCount;
+  const canRandomize = pickableGameCount > 0 && !submitting;
+  const submitDisabled =
+    submitting || !isFormValid || !isFormDirty || pickableGameCount === 0;
+  const submitLabel = submitting
+    ? "Submitting..."
+    : pickableGameCount === 0
+      ? hasSubmittedAlready
+        ? "All games locked"
+        : "Games already started"
+      : remainingPickCount > 0
+        ? `Pick ${remainingPickCount} more ${remainingPickCount === 1 ? "game" : "games"}`
+        : !isFormDirty
+          ? hasSubmittedAlready
+            ? "No changes yet"
+            : "Ready to submit"
+          : hasSubmittedAlready
+            ? "Update Picks"
+            : "Submit Picks";
 
   return (
     <ScrollView
@@ -233,14 +258,46 @@ function PickForm({ league, weekToPick, teams, existingPicks, leagueIdNumber }: 
           </Text>
         </View>
 
-        <Button onPress={randomizePicks} variant="secondary" className="mb-6">
-          Randomize Picks
+        <View className="mb-4 rounded-xl border border-gray-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-800">
+          <Text className="text-app-fg-light dark:text-app-fg-dark text-sm font-semibold">
+            {pickedOpenGameCount}/{pickableGameCount} open games picked
+          </Text>
+          {lockedGameCount > 0 ? (
+            <Text className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+              {lockedGameCount} game{lockedGameCount === 1 ? "" : "s"} locked at kickoff.
+            </Text>
+          ) : null}
+          {pickableGameCount === 0 ? (
+            <Text className="mt-2 text-xs text-amber-700 dark:text-amber-300">
+              No open games remain to edit this week.
+            </Text>
+          ) : remainingPickCount > 0 ? (
+            <Text className="mt-2 text-xs text-amber-700 dark:text-amber-300">
+              Pick {remainingPickCount} more game{remainingPickCount === 1 ? "" : "s"} to
+              submit.
+            </Text>
+          ) : (
+            <Text className="mt-2 text-xs text-emerald-700 dark:text-emerald-300">
+              All open games are picked.
+            </Text>
+          )}
+        </View>
+
+        <Button
+          onPress={randomizePicks}
+          variant="secondary"
+          className="mb-6"
+          disabled={!canRandomize}
+        >
+          {pickableGameCount > 0 ? "Randomize Open Picks" : "No Open Games to Randomize"}
         </Button>
 
         <View className="mb-6 gap-4">
           {picksField.fields.map((field, idx) => {
             const game = games.find((g) => g.gid === field.gid);
             if (!game) return null;
+            const isTiebreakerEditable =
+              field.type === "toPick" && game.ts >= new Date();
 
             const winner =
               field.type === "toPick"
@@ -272,14 +329,19 @@ function PickForm({ league, weekToPick, teams, existingPicks, leagueIdNumber }: 
                         placeholder="Total score"
                         keyboardType="numeric"
                         value={form.watch("tiebreakerScore.score")}
+                        editable={isTiebreakerEditable}
                         onChangeText={(text: string) =>
-                          form.setValue("tiebreakerScore.score", text, {
-                            shouldValidate: true,
-                          })
+                          isTiebreakerEditable
+                            ? form.setValue("tiebreakerScore.score", text, {
+                                shouldValidate: true,
+                              })
+                            : undefined
                         }
                       />
-                      <Text className="mt-2 text-xs text-muted-foreground">
-                        You must enter a score between 1 and 200
+                      <Text className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                        {isTiebreakerEditable
+                          ? "Enter a whole number between 1 and 200."
+                          : "Tiebreaker score is locked for started games."}
                       </Text>
                     </View>
                   ) : null
@@ -292,15 +354,11 @@ function PickForm({ league, weekToPick, teams, existingPicks, leagueIdNumber }: 
         {/* Submit Button */}
         <Button
           onPress={form.handleSubmit(onSubmit)}
-          disabled={submitting || !isFormValid || !isFormDirty}
+          disabled={submitDisabled}
           variant="default"
           size="lg"
         >
-          {submitting
-            ? "Submitting..."
-            : hasSubmittedAlready
-              ? "Update Picks"
-              : "Submit Picks"}
+          {submitLabel}
         </Button>
 
         {/* Form validation errors */}

@@ -54,16 +54,18 @@ export function MobileLeaderboardTable({ leaderboard, leagueId }: Props) {
       </View>
 
       {/* Data Rows */}
-      {sortedMembers.map((member) => {
+      {sortedMembers.map((member, index) => {
         const isCurrentUser = member.member.user_id === currentUserId;
         const rowBgColor = isCurrentUser
           ? "bg-blue-50 dark:bg-blue-900/20"
-          : "bg-white dark:bg-zinc-900";
+          : index % 2 === 0
+            ? "bg-white dark:bg-zinc-900"
+            : "bg-gray-50 dark:bg-zinc-950";
 
         return (
           <Pressable
             key={member.member.membership_id}
-            className={`flex-row ${rowBgColor}`}
+            className={`flex-row active:opacity-80 ${rowBgColor}`}
             onPress={() =>
               router.push(
                 `/league/${leagueId}/player/${member.member.membership_id}` as any,

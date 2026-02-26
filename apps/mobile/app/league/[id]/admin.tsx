@@ -13,6 +13,7 @@ import {
 import { router, useLocalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
+import { formatDistanceToNow } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { clientApi } from "@/lib/trpc/react";
 import { Input } from "@/components/ui/input";
@@ -20,6 +21,9 @@ import { useColorScheme } from "@/lib/useColorScheme";
 import { cn } from "@/lib/utils";
 
 type EditableRole = "admin" | "player";
+const LEAGUE_NAME_MIN_LENGTH = 5;
+const LEAGUE_NAME_MAX_LENGTH = 50;
+const BROADCAST_SOFT_MAX_LENGTH = 1200;
 
 export default function LeagueAdminScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -29,6 +33,7 @@ export default function LeagueAdminScreen() {
   const [leagueNameDraft, setLeagueNameDraft] = useState("");
   const [broadcastDraft, setBroadcastDraft] = useState("");
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [lastRefreshedAt, setLastRefreshedAt] = useState<Date | null>(null);
   const [isMemberSheetOpen, setIsMemberSheetOpen] = useState(false);
   const [editingMemberId, setEditingMemberId] = useState<number | null>(null);
   const [sheetRoleDraft, setSheetRoleDraft] = useState<EditableRole>("player");
@@ -73,6 +78,25 @@ export default function LeagueAdminScreen() {
     );
 
   const members = membersData?.members ?? [];
+  const adminCount = members.filter((member) => member.role === "admin").length;
+  const paidCount = members.filter((member) => Boolean(member.paid)).length;
+  const unpaidCount = Math.max(members.length - paidCount, 0);
+  const trimmedLeagueName = leagueNameDraft.trim();
+  const leagueNameCharsRemaining =
+    LEAGUE_NAME_MAX_LENGTH - leagueNameDraft.length;
+  const leagueNameChanged =
+    trimmedLeagueName.length > 0 && trimmedLeagueName !== (leagueData?.name ?? "");
+  const canSaveLeagueName =
+    leagueNameChanged &&
+    trimmedLeagueName.length >= LEAGUE_NAME_MIN_LENGTH &&
+    trimmedLeagueName.length <= LEAGUE_NAME_MAX_LENGTH;
+  const broadcastCharsRemaining =
+    BROADCAST_SOFT_MAX_LENGTH - broadcastDraft.length;
+  const refreshStatusLabel = isRefreshing
+    ? "Refreshing..."
+    : lastRefreshedAt
+      ? `Updated ${formatDistanceToNow(lastRefreshedAt, { addSuffix: true })}`
+      : "Pull to refresh admin data";
 
   const selectedMember = useMemo(() => {
     if (editingMemberId === null) {
@@ -102,6 +126,7 @@ export default function LeagueAdminScreen() {
           refetchBroadcastStatus(),
         ]);
       }
+      setLastRefreshedAt(new Date());
     } finally {
       setIsRefreshing(false);
     }
@@ -138,6 +163,24 @@ export default function LeagueAdminScreen() {
       setEditingMemberId(null);
     }
   }, [isMemberSheetOpen, selectedMember]);
+
+  useEffect(() => {
+    if (
+      canManageLeague &&
+      !sessionLoading &&
+      !superAdminLoading &&
+      !membersLoading &&
+      !lastRefreshedAt
+    ) {
+      setLastRefreshedAt(new Date());
+    }
+  }, [
+    canManageLeague,
+    lastRefreshedAt,
+    membersLoading,
+    sessionLoading,
+    superAdminLoading,
+  ]);
 
   const invalidateMembers = async () => {
     await utils.league.admin.members.invalidate({ leagueId: leagueIdNumber });
@@ -245,8 +288,11 @@ export default function LeagueAdminScreen() {
 
   const onChangeLeagueName = async () => {
     const trimmedName = leagueNameDraft.trim();
-    if (trimmedName.length < 5) {
+    if (trimmedName.length < LEAGUE_NAME_MIN_LENGTH) {
       Alert.alert("Invalid Name", "League name must be at least 5 characters.");
+      return;
+    }
+    if (!canSaveLeagueName) {
       return;
     }
     const actionKey = "change-name";
@@ -376,18 +422,68 @@ export default function LeagueAdminScreen() {
             </View>
           </View>
 
+          <View className="gap-2 rounded-xl border border-gray-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-800">
+            <View className="flex-row items-center justify-between">
+              <Text className="text-app-fg-light dark:text-app-fg-dark text-base font-semibold">
+                Admin Snapshot
+              </Text>
+              <Text className="text-xs text-gray-500 dark:text-gray-400">
+                {refreshStatusLabel}
+              </Text>
+            </View>
+            <View className="flex-row flex-wrap gap-2">
+              <View className="rounded-full border border-blue-200 bg-blue-50 px-2.5 py-1 dark:border-blue-800 dark:bg-blue-950">
+                <Text className="text-[10px] font-semibold uppercase tracking-[0.8px] text-blue-700 dark:text-blue-300">
+                  Members: {members.length}
+                </Text>
+              </View>
+              <View className="rounded-full border border-gray-200 bg-gray-50 px-2.5 py-1 dark:border-zinc-700 dark:bg-zinc-900">
+                <Text className="text-[10px] font-semibold uppercase tracking-[0.8px] text-gray-700 dark:text-gray-200">
+                  Admins: {adminCount}
+                </Text>
+              </View>
+              <View className="rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 dark:border-emerald-800 dark:bg-emerald-950">
+                <Text className="text-[10px] font-semibold uppercase tracking-[0.8px] text-emerald-700 dark:text-emerald-300">
+                  Paid: {paidCount}
+                </Text>
+              </View>
+              <View className="rounded-full border border-amber-200 bg-amber-50 px-2.5 py-1 dark:border-amber-800 dark:bg-amber-950">
+                <Text className="text-[10px] font-semibold uppercase tracking-[0.8px] text-amber-700 dark:text-amber-300">
+                  Unpaid: {unpaidCount}
+                </Text>
+              </View>
+            </View>
+          </View>
+
           <View className="rounded-xl border border-gray-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-800 gap-3">
             <Text className="text-app-fg-light dark:text-app-fg-dark text-base font-semibold">
               League Name
             </Text>
             <Input value={leagueNameDraft} onChangeText={setLeagueNameDraft} />
+            <View className="flex-row items-center justify-between">
+              <Text className="text-xs text-gray-500 dark:text-gray-400">
+                {canSaveLeagueName
+                  ? "Name is valid and ready to save."
+                  : `Use ${LEAGUE_NAME_MIN_LENGTH}-${LEAGUE_NAME_MAX_LENGTH} characters.`}
+              </Text>
+              <Text
+                className={cn(
+                  "text-xs",
+                  leagueNameCharsRemaining < 0
+                    ? "text-red-500"
+                    : "text-gray-500 dark:text-gray-400",
+                )}
+              >
+                {leagueNameCharsRemaining}
+              </Text>
+            </View>
             <Button
               variant="outline"
               size="sm"
-              disabled={busyKey === "change-name"}
+              disabled={busyKey === "change-name" || !canSaveLeagueName}
               onPress={onChangeLeagueName}
             >
-              Update League Name
+              {leagueNameChanged ? "Update League Name" : "League Name Saved"}
             </Button>
           </View>
 
@@ -409,10 +505,19 @@ export default function LeagueAdminScreen() {
               onChangeText={setBroadcastDraft}
               multiline
               numberOfLines={5}
+              maxLength={BROADCAST_SOFT_MAX_LENGTH}
               placeholder="Write your league message..."
               className="rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground"
               textAlignVertical="top"
             />
+            <View className="flex-row items-center justify-between">
+              <Text className="text-xs text-gray-500 dark:text-gray-400">
+                Keep broadcasts concise and actionable for better engagement.
+              </Text>
+              <Text className="text-xs text-gray-500 dark:text-gray-400">
+                {broadcastCharsRemaining}
+              </Text>
+            </View>
             <Button
               size="sm"
               disabled={busyKey === "send-broadcast" || !broadcastDraft.trim()}
