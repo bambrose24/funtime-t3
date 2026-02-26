@@ -72,10 +72,13 @@ Minimum required coverage set:
 ## 6. Rollout Plan
 1. `P6-TEST-FOUNDATION-001`:
   - Add Jest + `jest-expo` + RNTL configuration and scripts for `@funtime/mobile`.
-  - Add baseline tests for auth bootstrap, home, join/create validation, and picks lock-state behavior.
+  - Add initial baseline tests for highest-risk behavior slices (auth refresh recovery, picks lock-state behavior, leaderboard interaction).
+  - Status: complete (`2026-02-26`) with baseline auth/picks/leaderboard suites; home/join/create/deep-link expansions move to `P6-TEST-COVERAGE-002`.
 2. `P6-TEST-E2E-001`:
   - Add Maestro critical-flow smoke suite and wire it to EAS workflow execution.
-3. `P6-TEST-GOVERNANCE-001`:
+3. `P6-TEST-COVERAGE-002`:
+  - Expand Jest/RNTL coverage to home/nav, join/create validation, and deep-link path behavior.
+4. `P6-TEST-GOVERNANCE-001`:
   - Enforce CI test checks and PR checklist language requiring test updates for changed flows/screens.
 
 ## 7. References

@@ -64,9 +64,10 @@ Guiding rule:
   - require cache-cleared on-device smoke validation after dependency/plugin changes
   - completed gate (`P0-MOBILE-FOUNDATION-QA-005`): invalid-refresh-token fail-closed handling is implemented in auth bootstrap + tRPC header session lookup, and latest on-device smoke reported stable startup with no push `projectId` runtime error after env fallback setup
   - active execution focus: `P5-PARITY-QA-001` (end-to-end parity QA and highest-severity regression cleanup)
-  - current execution slice: testing foundation (`P6-TEST-FOUNDATION-001`) -> device-gated QA (`P0-DEEPLINK-QA-001`, `P2-NOTIFY-QA-001`) -> `P0-PRISMA-002` (migration status/deploy validation); targeted in-app UX sweep (`P5-UX-SWEEP-001`) is now closed
+  - current execution slice: testing expansion (`P6-TEST-E2E-001`, `P6-TEST-COVERAGE-002`, `P6-TEST-GOVERNANCE-001`) -> device-gated QA (`P0-DEEPLINK-QA-001`, `P2-NOTIFY-QA-001`) -> `P0-PRISMA-002` (migration status/deploy validation); targeted in-app UX sweep (`P5-UX-SWEEP-001`) is now closed
 7. Establish mobile testing foundation and governance:
   - adopt Expo-aligned unit/integration/E2E strategy from `docs/TESTING_STRATEGY.md`
+  - baseline Jest + `jest-expo` + RNTL foundation is now shipped (`P6-TEST-FOUNDATION-001`) with initial auth/picks/leaderboard coverage
   - enforce "flow change -> test change" policy in worklog/plan updates and PR execution
 
 ### Phase 1: Core Player Loop
@@ -170,6 +171,7 @@ When parity work changes:
 
 ## 9. Testing Governance
 - Canonical mobile testing policy lives in `docs/TESTING_STRATEGY.md`.
+- Current baseline status: `P6-TEST-FOUNDATION-001` is complete (test harness + initial flow coverage); next testing slice is E2E + additional flow coverage + CI governance enforcement.
 - Required rule: any behavior change to user-visible flow/screen must include test updates in the same PR whenever feasible.
 - Allowed exception path:
   1. Document reason for deferral in `WORKLOG.md`.

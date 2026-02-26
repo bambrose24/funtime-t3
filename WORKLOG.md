@@ -11,6 +11,13 @@
 - Pre-step: `0.0 Initialize and baseline WORKLOG.md`.
 
 ## Completed Tasks
+- Task ID: `P6-TEST-FOUNDATION-001`
+  - Short title: Bootstrap Expo mobile Jest/RNTL test foundation and baseline flow coverage.
+  - Scope touched: `apps/mobile/package.json`, `apps/mobile/jest.config.js`, `apps/mobile/jest.setup.ts`, `apps/mobile/lib/supabase/client.ts`, `apps/mobile/lib/supabase/errors.ts`, `apps/mobile/tests/auth/isInvalidRefreshTokenError.test.ts`, `apps/mobile/tests/picks/PickGameCard.test.tsx`, `apps/mobile/tests/leaderboard/MobileLeaderboardTable.test.tsx`, `pnpm-lock.yaml`.
+  - Outcome: Added `@funtime/mobile` test scripts and Expo-aligned Jest setup, introduced initial baseline coverage for auth invalid-refresh-token detection, pick-card open/locked behavior, and leaderboard tie-rank/profile-navigation behavior.
+  - Test impact: Added 3 suites / 7 passing tests for critical auth/picks/leaderboard behavior.
+  - Validation run: `pnpm --filter @funtime/mobile test -- --runInBand`, `pnpm --filter @funtime/mobile typecheck`.
+  - Timestamp (UTC): `2026-02-26T19:38:04Z`.
 - Task ID: `P6-TEST-STRATEGY-001`
   - Short title: Define Expo-aligned mobile testing strategy and governance policy.
   - Scope touched: `WORKLOG.md`, `docs/MOBILE_PARITY_PLAN.md`, `docs/TESTING_STRATEGY.md`.
@@ -513,14 +520,16 @@
     1. Continue focused parity walk-through for top mobile surfaces and convert findings into scoped fix tasks. Recent closes: `P5-PARITY-QA-001A` through `P5-PARITY-QA-001J`, `P5-UX-SWEEP-001G` through `P5-UX-SWEEP-001T`, `P3-ADMIN-QA-001A`, and `P3-ADMIN-QA-001B1` through `P3-ADMIN-QA-001B9`.
     2. `P5-UX-SWEEP-001` is closed; shift execution to device-gated validation tracks: `P0-DEEPLINK-QA-001` and `P2-NOTIFY-QA-001`.
     3. Execute `P0-PRISMA-002`: validate migration status/deploy workflow against target DB environment.
-    4. Start `P6-TEST-FOUNDATION-001`: wire Expo-aligned Jest/RNTL foundation and cover highest-risk mobile flows.
+    4. Start `P6-TEST-E2E-001`: add critical-flow Maestro smoke coverage and wire to EAS workflow execution.
+    5. Start `P6-TEST-COVERAGE-002`: expand Jest/RNTL flow coverage to home, join/create validation, and deep-link path behavior.
 
 ## Next Up
-1. `P6-TEST-FOUNDATION-001`: Add `@funtime/mobile` Jest + `jest-expo` + RNTL setup and baseline coverage for auth bootstrap, home/nav, join/create validation, and picks lock-state behavior.
-2. `P6-TEST-E2E-001`: Add Maestro critical-flow mobile smoke suite and execute via EAS workflow.
-3. `P0-DEEPLINK-QA-001`: Validate `play-funtime.com` deep links for `/join-league`, `/league/:id`, `/settings`, and `/admin`.
-4. `P2-NOTIFY-QA-001`: Validate push/email delivery behavior in staging (token registration, message pushes, and week summary schedule).
-5. `P0-PRISMA-002`: Validate `prisma migrate status/deploy` against target DB and baseline strategy for existing environments.
+1. `P6-TEST-E2E-001`: Add Maestro critical-flow mobile smoke suite and execute via EAS workflow.
+2. `P6-TEST-COVERAGE-002`: Expand unit/integration coverage to home/nav, join/create validation, and deep-link route behavior.
+3. `P6-TEST-GOVERNANCE-001`: Add CI gating and PR checklist enforcement for mandatory flow/screen test updates.
+4. `P0-DEEPLINK-QA-001`: Validate `play-funtime.com` deep links for `/join-league`, `/league/:id`, `/settings`, and `/admin`.
+5. `P2-NOTIFY-QA-001`: Validate push/email delivery behavior in staging (token registration, message pushes, and week summary schedule).
+6. `P0-PRISMA-002`: Validate `prisma migrate status/deploy` against target DB and baseline strategy for existing environments.
 
 ## Decisions & Rationale
 - Full parity target includes player + admin (including global admin) to avoid permanent web-only operational gaps.
@@ -590,6 +599,7 @@
 - Admin/account UX decision: management and settings surfaces should support user-initiated pull-to-refresh with lightweight haptic acknowledgment.
 - UX quality decision: every mobile parity change should include a critical UX pass and ship concrete polish improvements, not only functional parity.
 - Testing governance decision: any user-visible flow/screen behavior change must include matching test updates in the same PR whenever feasible; if deferred, the reason and follow-up ticket must be recorded in `WORKLOG.md` and `docs/MOBILE_PARITY_PLAN.md` per `docs/TESTING_STRATEGY.md`.
+- Testing stack decision: adopt Expo-managed `jest-expo` + React Native Testing Library for unit/integration coverage in `@funtime/mobile`, with initial baseline tests anchored on auth error handling, pick lock-state behavior, and leaderboard interaction flows.
 
 ## Risks / Blockers
 - Risk: Route refactor can cause regressions in deep links and auth redirects.
@@ -633,6 +643,9 @@
   - Mitigation: add backend cursor pagination for `messages.leagueMessageBoard` in a follow-up if payload size becomes a bottleneck in staging/production QA.
 
 ## Validation Evidence
+- `2026-02-26T19:38:04Z`: `P6-TEST-FOUNDATION-001` shipped: added `@funtime/mobile` Jest + `jest-expo` + RNTL setup plus baseline auth/picks/leaderboard flow coverage (3 suites / 7 tests).
+- `2026-02-26T19:38:04Z`: `pnpm --filter @funtime/mobile test -- --runInBand` passed.
+- `2026-02-26T19:38:04Z`: `pnpm --filter @funtime/mobile typecheck` passed.
 - `2026-02-26T19:02:28Z`: Testing strategy documentation slice (`P6-TEST-STRATEGY-001`) completed: added canonical Expo-aligned mobile testing strategy in `docs/TESTING_STRATEGY.md` and enforced "flow change -> test change" governance in parity plan/worklog.
 - `2026-02-26T17:47:26Z`: `P5-UX-SWEEP-001T` shipped: Super Bowl tab now includes postseason snapshot context plus stronger picker/board readability; league-admin pick editor now includes status snapshot and clearer lock/live/final context; league admin now surfaces operation snapshot plus name/broadcast validation cues; global admin now includes system snapshot and refresh-recency context.
 - `2026-02-26T17:47:26Z`: `pnpm --filter @funtime/mobile typecheck` passed.
