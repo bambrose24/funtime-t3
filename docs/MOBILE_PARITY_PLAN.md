@@ -32,6 +32,13 @@ Guiding rule:
   - If the app is not installed, links must continue to work in web as normal.
   - Shared URLs must resolve consistently across web and mobile.
 - Leaderboard ranking must support competition ties (example: `1, 2, 2, 4`).
+- Workspace dependency consistency:
+  - Keep a single monorepo `@types/react` strategy across web/mobile to avoid cross-app type collisions.
+  - Expo mobile advisories about `@types/react` are informational unless workspace typechecks fail.
+- Mobile UX quality bar:
+  - In-screen context switches (tabs/filters/segments) should prefer local state swaps over route-level remount navigation.
+  - Interactions should feel immediate (subtle transitions, stable headers, preserved context, no avoidable full-screen flashes).
+  - Each parity task should include a brief UX critique pass and ship at least one concrete polish improvement where reasonable.
 
 ## 4. Phase Plan
 
@@ -46,6 +53,14 @@ Guiding rule:
   - iOS Universal Links (`apple-app-site-association`)
   - Android App Links (`.well-known/assetlinks.json`)
   - Runtime URL parsing + guarded navigation for auth-required routes
+6. Stabilize mobile runtime/toolchain compatibility:
+  - keep Expo SDK package set aligned with bundled native modules
+  - keep Babel config compatible with NativeWind + Reanimated without implicit `react-native-worklets/plugin` requirement
+  - preserve monorepo React type compatibility while upgrading Expo-facing dependencies
+  - harden auth bootstrap recovery for stale/invalid refresh tokens
+  - require cache-cleared on-device smoke validation after dependency/plugin changes
+  - completed gate (`P0-MOBILE-FOUNDATION-QA-005`): invalid-refresh-token fail-closed handling is implemented in auth bootstrap + tRPC header session lookup, and latest on-device smoke reported stable startup with no push `projectId` runtime error after env fallback setup
+  - active execution focus: `P5-PARITY-QA-001` (end-to-end parity QA and highest-severity regression cleanup)
 
 ### Phase 1: Core Player Loop
 1. Auth and session
@@ -76,24 +91,24 @@ Guiding rule:
 ## 5. Feature Mapping
 | Area | Web Source | Backend Domain | Mobile Status | Notes |
 |---|---|---|---|---|
-| Auth/session | `apps/web/src/app/(auth)/*`, user provider | `session`, `auth` | `IN_PROGRESS` | Session guard + grouped route migration complete; deep-link QA still pending. |
-| Home/nav leagues | `apps/web/src/app/page.tsx`, `_nav` | `home.nav`, `home.summary` | `IN_PROGRESS` | Active/prior sections plus join/create entry points are implemented; IA parity polish pending. |
+| Auth/session | `apps/web/src/app/(auth)/*`, user provider | `session`, `auth` | `IN_PROGRESS` | Session guard + grouped route migration complete; stale-refresh-token fail-closed recovery is implemented in startup bootstrap + tRPC headers, and latest on-device smoke reported stable startup. Deep-link replay regression from repeated initial URL handling is fixed; remaining follow-up is broader parity QA + deep-link device validation. |
+| Home/nav leagues | `apps/web/src/app/page.tsx`, `_nav` | `home.nav`, `home.summary` | `IN_PROGRESS` | Active/prior sections plus join/create entry points are implemented; pull-to-refresh/haptics and server-aggregated home-card viewer stats are shipped, stale per-league correct-pick prefetch fan-out was removed, and both mobile/web home cards now consume the shared summary stats payload, with broader IA parity polish still pending. |
 | Join league | `apps/web/src/app/join-league/[code]/*` | `league.fromJoinCode`, `league.register` | `IN_PROGRESS` | Join-by-code flow implemented with required Super Bowl pick support; UX parity QA pending. |
 | Create league | `apps/web/src/app/league/create/*` | `league.create`, `league.createForm`, `league.canCreate` | `IN_PROGRESS` | Core create flow and policy controls implemented; form/UX parity polish pending. |
-| Deep links + shared URLs | web route system + invite/share URLs | N/A (domain association + client routing) | `IN_PROGRESS` | App-link config and association endpoints implemented; production app IDs/fingerprints + device QA pending. |
-| League week view | `apps/web/src/app/league/[leagueId]/page.tsx` | `league.picksSummary`, `games.getGames`, `league.weekWinners`, `picks.weeksWithPicks` | `IN_PROGRESS` | Core mobile view exists; pick-visibility behavior is API-enforced and tiebreaker-sort parity fix shipped. |
-| Pick submission | `apps/web/src/app/league/[leagueId]/pick/*` | `league.weekToPick`, `member.picksForWeek`, `picks.submitPicks` | `IN_PROGRESS` | Core P1 feature. |
-| Leaderboard | `apps/web/src/app/league/[leagueId]/leaderboard/*` | `leaderboard.league` | `IN_PROGRESS` | Mobile rank display now uses numeric competition ranks (`1,2,2,4`); broader UX parity QA pending. |
+| Deep links + shared URLs | web route system + invite/share URLs | N/A (domain association + client routing) | `IN_PROGRESS` | App-link config and association endpoints are implemented, and mobile now handles launch deep links once per app boot (no stale replay on route/session changes); production app IDs/fingerprints + device QA remain pending. |
+| League week view | `apps/web/src/app/league/[leagueId]/page.tsx` | `league.picksSummary`, `games.getGames`, `league.weekWinners`, `picks.weeksWithPicks` | `IN_PROGRESS` | Core mobile view exists; tab switching now happens in-screen (no route remount), tab chrome is now lean compact text + underline (no heavy pills), league-tab loading now uses shared skeleton styling, pick-visibility behavior is API-enforced, and tiebreaker-sort parity fix shipped. |
+| Pick submission | `apps/web/src/app/league/[leagueId]/pick/*` | `league.weekToPick`, `member.picksForWeek`, `picks.submitPicks` | `IN_PROGRESS` | Core flow shipped; tab-level pick entry now supports in-screen multi-league switching (chips + transition) instead of hard-locking to the first active league, and loading uses shared league-tab skeleton UI. |
+| Leaderboard | `apps/web/src/app/league/[leagueId]/leaderboard/*` | `leaderboard.league` | `IN_PROGRESS` | Mobile rank display now uses numeric competition ranks (`1,2,2,4`) and shared league-tab skeleton loading; broader UX parity QA pending. |
 | Player profile | `apps/web/src/app/league/[leagueId]/player/[memberId]/*` | `playerProfile.get`, `member.updateOrCreateSuperbowlPick` | `IN_PROGRESS` | Member profile route and leaderboard navigation implemented in mobile; parity polish and edit interactions pending. |
-| My profile | `apps/web/src/app/league/[leagueId]/my-profile/page.tsx` | `playerProfile.get` | `IN_PROGRESS` | League-level `My Profile` tab implemented; parity polish and edit interactions pending. |
-| Super Bowl picks | `apps/web/src/app/league/[leagueId]/superbowl/*` | `league.superbowlPicks`, `postseason.getBracket`, `teams.getTeams` | `IN_PROGRESS` | Mobile Super Bowl tab + pick management flow shipped; parity polish and postseason bracket integration pending. |
-| Settings/profile | `apps/web/src/app/settings/*` | `settings.get`, `settings.updateUsername` | `IN_PROGRESS` | Username update flow is shipped on mobile account screen; notifications/preferences parity still pending. |
-| Notifications foundation | mobile bootstrap + account settings | `settings.registerPushToken`, `settings.setPushNotificationsEnabled`, `settings.pushNotificationStatus` | `IN_PROGRESS` | Token registration/preferences shipped with soft-fallback table checks; delivery behavior needs staging QA. |
-| Messaging (persistent target) | current web messages + future redesign | `messages.*` | `DONE` | Mobile and web clients are on league-wide message endpoints; cleanup of legacy aliases is a follow-up refactor. |
-| Admin members | `apps/web/src/app/league/[leagueId]/admin/members/*` | `league.admin.members`, `removeMember`, `changeMemberRole`, `setMembersPaid` | `IN_PROGRESS` | Mobile admin member management screen shipped; parity polish and additional admin workflows remain. |
-| Admin pick edits | `MemberPicksEdit` | `league.admin.memberPicks`, `league.admin.setPick` | `IN_PROGRESS` | Mobile pick editor shipped; API kickoff lock + super-admin override implemented; parity polish and QA pending. |
+| My profile | `apps/web/src/app/league/[leagueId]/my-profile/page.tsx` | `playerProfile.get` | `IN_PROGRESS` | League-level `My Profile` tab implemented with shared league-tab skeleton loading; parity polish and edit interactions pending. |
+| Super Bowl picks | `apps/web/src/app/league/[leagueId]/superbowl/*` | `league.superbowlPicks`, `postseason.getBracket`, `teams.getTeams` | `IN_PROGRESS` | Mobile Super Bowl tab now uses a compact pre-season form card (`Your Super Bowl pick`: winner/loser/score with explicit save), becomes read-only after season start, and renders a denser member/winner/loser/score board that fits without horizontal scrolling; postseason bracket integration and remaining parity polish are pending. |
+| Settings/profile | `apps/web/src/app/settings/*` | `settings.get`, `settings.updateUsername` | `IN_PROGRESS` | Mobile account settings now use a modern sectioned IA (profile hero, row-based controls, status pills, safer sign-out confirmation), while username updates retain inline validation and pull-to-refresh; notifications/preferences parity is still pending. |
+| Notifications foundation | mobile bootstrap + account settings | `settings.registerPushToken`, `settings.setPushNotificationsEnabled`, `settings.pushNotificationStatus` | `IN_PROGRESS` | Token registration/preferences shipped with soft-fallback table checks and graceful missing-`projectId` handling (`EXPO_PUBLIC_EAS_PROJECT_ID` fallback); notification-tap routing now de-duplicates/clears stale last responses, and delivery behavior still needs staging QA. |
+| Messaging (persistent target) | current web messages + future redesign | `messages.*` | `DONE` | Mobile and web clients are on league-wide message endpoints; mobile now uses virtualized + incremental message rendering for long-thread responsiveness, and cleanup of legacy aliases is a follow-up refactor. |
+| Admin members | `apps/web/src/app/league/[leagueId]/admin/members/*` | `league.admin.members`, `removeMember`, `changeMemberRole`, `setMembersPaid` | `IN_PROGRESS` | Mobile admin member management now uses a compact actionable table with per-member edit bottom sheet and header back navigation; parity workflow QA and additional polish remain. |
+| Admin pick edits | `MemberPicksEdit` | `league.admin.memberPicks`, `league.admin.setPick` | `IN_PROGRESS` | Mobile pick editor shipped with pull-to-refresh UX; API kickoff lock + super-admin override implemented; parity polish and QA pending. |
 | Admin broadcast/name | `LeagueAdminBroadcastSetting`, `LeagueAdminChangeNameSetting` | `league.admin.sendBroadcast`, `canSendLeagueBroadcast`, `changeName` | `IN_PROGRESS` | Mobile controls shipped; parity QA and UX polish pending. |
-| Admin email logs | `MemberEmailLogs` | `league.admin.memberEmails` | `IN_PROGRESS` | Mobile email-log list + preview shipped; parity QA and content rendering validation pending. |
+| Admin email logs | `MemberEmailLogs` | `league.admin.memberEmails` | `IN_PROGRESS` | Mobile email-log list + preview shipped with pull-to-refresh UX; parity QA and content rendering validation pending. |
 | Global admin | `apps/web/src/app/admin/page.tsx` | `generalAdmin.*` | `IN_PROGRESS` | Mobile super-admin dashboard route and account entry point shipped; metric/detail parity polish pending. |
 
 ## 6. Backend Dependencies for Mobile Parity
@@ -105,6 +120,7 @@ Guiding rule:
   - done: mobile Expo push token registration + account preference foundation (`settings.registerPushToken`, `settings.setPushNotificationsEnabled`, `settings.pushNotificationStatus`)
   - done: near real-time message push fanout on `messages.writeMessage`/`writeWeekMessage` plus notification-tap path routing in mobile
   - done: week summary scheduler in cron with personal result pushes + overall league summary emails
+  - runtime config dependency: Expo token registration requires an EAS `projectId` at runtime; in local/dev where manifest metadata is missing, provide `EXPO_PUBLIC_EAS_PROJECT_ID`
   - dependency: deploy `pushNotificationTokens` database table before enabling production push sends
   - follow-up: validate timezone/timing semantics for "morning after completion" behavior in staging
 3. Admin pick edit guardrails:
@@ -142,6 +158,7 @@ When parity work changes:
 3. If backend changes are required, add/update `Backend Dependencies`.
 4. Keep this file aligned with `docs/PRD.md` decisions.
 5. Update `WORKLOG.md` for task start/status/commit/decision/validation events.
+6. Include a UX quality note for touched screens (what felt off, what was improved, what remains).
 
 ## 9. Worklog Governance
 - Canonical execution log: `WORKLOG.md` in repo root.

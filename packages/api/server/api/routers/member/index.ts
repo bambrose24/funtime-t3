@@ -72,10 +72,31 @@ export const memberRouter = createTRPCRouter({
         }),
       ]);
 
+      const hasSeasonStarted = Boolean(
+        await db.games.findFirst({
+          where: {
+            season: league.season,
+            ts: {
+              lte: new Date(),
+            },
+          },
+          select: {
+            gid: true,
+          },
+        }),
+      );
+
       if (!league.superbowl_competition) {
         throw new TRPCError({
           code: "BAD_REQUEST",
           message: "Superbowl competition is not enabled for this league",
+        });
+      }
+
+      if (hasSeasonStarted) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Superbowl picks are locked after the season starts",
         });
       }
 

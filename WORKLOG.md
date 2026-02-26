@@ -11,6 +11,174 @@
 - Pre-step: `0.0 Initialize and baseline WORKLOG.md`.
 
 ## Completed Tasks
+- Task ID: `P5-PARITY-QA-001H`
+  - Short title: Refactor Super Bowl tab to pre-season form and no-scroll compact board.
+  - Scope touched: `apps/mobile/components/superbowl/LeagueSuperbowlBoard.tsx`, `packages/api/server/api/routers/member/index.ts`, `WORKLOG.md`, `docs/MOBILE_PARITY_PLAN.md`.
+  - Outcome: Removed AFC/NFC pill-sheet picker flow, replaced with a compact `Your Super Bowl pick` form card (winner/loser/score) that is editable only before season start, removed auto-save copy in favor of explicit save action, compacted board columns to fit without horizontal scrolling, and added API-side lock enforcement to reject Super Bowl pick edits once games have started.
+  - Validation run: `pnpm --filter @funtime/mobile typecheck`, `pnpm --filter @funtime/api typecheck`, `pnpm --filter @funtime/web typecheck`.
+  - Timestamp (UTC): `2026-02-26T01:22:05Z`.
+- Task ID: `P5-UX-SWEEP-001F`
+  - Short title: Modernize mobile account settings IA and interaction model.
+  - Scope touched: `apps/mobile/app/(tabs)/account.tsx`, `WORKLOG.md`, `docs/MOBILE_PARITY_PLAN.md`.
+  - Outcome: Rebuilt account settings into a modern sectioned layout with profile hero, row-based settings cards, status pills, stronger notification controls, improved loading skeletons, and safer sign-out confirmation flow while keeping existing settings APIs and pull-to-refresh behavior.
+  - Validation run: `pnpm --filter @funtime/mobile typecheck`.
+  - Timestamp (UTC): `2026-02-26T01:14:26Z`.
+- Task ID: `P5-PARITY-QA-001G`
+  - Short title: Polish Super Bowl winner-first UI chrome and table team cards.
+  - Scope touched: `apps/mobile/components/superbowl/LeagueSuperbowlBoard.tsx`, `WORKLOG.md`, `docs/MOBILE_PARITY_PLAN.md`.
+  - Outcome: Removed extra top heading chrome from the personal Super Bowl pick area, kept winner-first selection behavior with auto-save (no manual save button), and rendered winner/loser table cells as compact logo+abbrev cards for clearer scanability.
+  - Validation run: `pnpm --filter @funtime/mobile typecheck`.
+  - Timestamp (UTC): `2026-02-26T01:10:24Z`.
+- Task ID: `P5-PARITY-QA-001F`
+  - Short title: Simplify Super Bowl pick UI to winner-only focus with auto-save and table-style board.
+  - Scope touched: `apps/mobile/components/superbowl/LeagueSuperbowlBoard.tsx`, `WORKLOG.md`, `docs/MOBILE_PARITY_PLAN.md`.
+  - Outcome: Removed visible matchup section and explicit winner header from the Super Bowl pick card, removed manual `Save Super Bowl Pick` action in favor of auto-save on valid edits, and converted league picks display to a compact web-style member/winner/loser/score table with team logos + abbreviations.
+  - Validation run: `pnpm --filter @funtime/mobile typecheck`, `pnpm --filter @funtime/web typecheck`, `pnpm --filter @funtime/api typecheck`.
+  - Timestamp (UTC): `2026-02-26T01:07:37Z`.
+- Task ID: `P3-ADMIN-QA-001A`
+  - Short title: Refactor league-admin member management into compact table + member edit sheet.
+  - Scope touched: `apps/mobile/app/league/[id]/admin.tsx`, `WORKLOG.md`, `docs/MOBILE_PARITY_PLAN.md`.
+  - Outcome: Added persistent header back navigation on mobile league admin, replaced per-member cards with a compact actionable table (Email Logs + Edit actions), and introduced a per-member bottom sheet for role/paid updates, pick editing, email-log navigation, and remove-member action.
+  - Validation run: `pnpm --filter @funtime/mobile typecheck`, `pnpm --filter @funtime/web typecheck`, `pnpm --filter @funtime/api typecheck`.
+  - Timestamp (UTC): `2026-02-26T00:25:53Z`.
+- Task ID: `P5-PARITY-QA-001E`
+  - Short title: Simplify Super Bowl tab layout to matchup card + winner highlight flow.
+  - Scope touched: `apps/mobile/components/superbowl/LeagueSuperbowlBoard.tsx`, `WORKLOG.md`, `docs/MOBILE_PARITY_PLAN.md`.
+  - Outcome: Removed in-screen AFC/NFC full-team lists, replaced with compact matchup selectors and winner highlight cards, and moved conference team selection into a modal picker to reduce vertical bloat while preserving pick functionality.
+  - Validation run: `pnpm --filter @funtime/mobile typecheck`, `pnpm --filter @funtime/web typecheck`, `pnpm --filter @funtime/api typecheck`.
+  - Timestamp (UTC): `2026-02-26T00:25:53Z`.
+- Task ID: `P5-PARITY-QA-001D`
+  - Short title: Unify league-tab loading skeletons and harden message-board scalability.
+  - Scope touched: `apps/mobile/components/league/LeagueTabLoadingSkeleton.tsx`, `apps/mobile/components/messages/LeagueMessageBoard.tsx`, `apps/mobile/components/superbowl/LeagueSuperbowlBoard.tsx`, `apps/mobile/components/leaderboard/ClientLeaderboardPage.tsx`, `apps/mobile/components/profile/LeagueMyProfile.tsx`, `apps/mobile/components/picks/ClientPickPage.tsx`, `WORKLOG.md`, `docs/MOBILE_PARITY_PLAN.md`.
+  - Outcome: Added a shared league-tab loading skeleton used across picks/leaderboard/messages/profile/superbowl tabs, and replaced the messages `ScrollView` mapping with a virtualized `FlatList` plus incremental older-message paging to avoid heavy long-thread render stalls during tab transitions.
+  - Validation run: `pnpm --filter @funtime/mobile typecheck`, `pnpm --filter @funtime/web typecheck`, `pnpm --filter @funtime/api typecheck`.
+  - Timestamp (UTC): `2026-02-26T00:25:53Z`.
+- Task ID: `P5-PARITY-QA-001C`
+  - Short title: Harden notification deep-link handling against stale response replay.
+  - Scope touched: `apps/mobile/hooks/usePushNotificationRegistration.ts`, `WORKLOG.md`, `docs/MOBILE_PARITY_PLAN.md`.
+  - Outcome: Notification tap navigation now de-duplicates by notification response identifier and clears the consumed last notification response after handling, preventing stale notification deep links from re-triggering on later app launches.
+  - Validation run: `pnpm --filter @funtime/mobile typecheck`, `pnpm --filter @funtime/web typecheck`, `pnpm --filter @funtime/api typecheck`.
+  - Timestamp (UTC): `2026-02-25T21:54:54Z`.
+- Task ID: `P5-PARITY-QA-001B`
+  - Short title: Replace league-screen pill tabs with lean underline tabs.
+  - Scope touched: `apps/mobile/app/league/[id]/index.tsx`, `WORKLOG.md`, `docs/MOBILE_PARITY_PLAN.md`.
+  - Outcome: Swapped the league screen's heavy pill-style tab chips for compact text tabs with a subtle active underline, improving visual hierarchy and reducing chrome weight while preserving existing in-screen tab switching and transition behavior.
+  - Validation run: `pnpm --filter @funtime/mobile typecheck`, `pnpm --filter @funtime/web typecheck`, `pnpm --filter @funtime/api typecheck`.
+  - Timestamp (UTC): `2026-02-25T21:53:06Z`.
+- Task ID: `P5-PARITY-QA-001A`
+  - Short title: Stop replaying initial launch deep links on routine route/session updates.
+  - Scope touched: `apps/mobile/hooks/useAuthHandler.ts`, `WORKLOG.md`, `docs/MOBILE_PARITY_PLAN.md`.
+  - Outcome: Updated mobile deep-link handling to process `Linking.getInitialURL()` once per app launch and keep the runtime link listener stable with `pathname`/`session` refs, preventing stale launch links from being replayed and unexpectedly forcing users back into old routes during normal in-app navigation.
+  - Validation run: `pnpm --filter @funtime/mobile typecheck`, `pnpm --filter @funtime/web typecheck`, `pnpm --filter @funtime/api typecheck`.
+  - Timestamp (UTC): `2026-02-25T20:27:17Z`.
+- Task ID: `P0-MOBILE-FOUNDATION-QA-005C`
+  - Short title: Confirm on-device startup smoke after auth/push runtime hardening.
+  - Scope touched: `WORKLOG.md`, `docs/MOBILE_PARITY_PLAN.md`.
+  - Outcome: User confirmed on-device smoke passes with no `No "projectId" found` push-registration error after setting `EXPO_PUBLIC_EAS_PROJECT_ID`, and reported app flows are broadly working; foundation runtime hardening is no longer a gating blocker.
+  - Validation run: `npx expo start -c` (user on-device smoke confirmation).
+  - Timestamp (UTC): `2026-02-25T20:24:07Z`.
+- Task ID: `P0-MOBILE-FOUNDATION-QA-005B`
+  - Short title: Guard Expo push-token registration when EAS `projectId` is unavailable.
+  - Scope touched: `apps/mobile/hooks/usePushNotificationRegistration.ts`, `WORKLOG.md`, `docs/MOBILE_PARITY_PLAN.md`.
+  - Outcome: Added `EXPO_PUBLIC_EAS_PROJECT_ID` fallback for push-token registration and fail-soft behavior that skips registration with explicit warning when no `projectId` can be resolved, preventing recurring runtime error spam during local smoke tests.
+  - Validation run: `pnpm --filter @funtime/mobile typecheck`, `pnpm --filter @funtime/web typecheck`, `pnpm --filter @funtime/api typecheck`.
+  - Timestamp (UTC): `2026-02-25T19:09:33Z`.
+- Task ID: `P0-MOBILE-FOUNDATION-QA-005A`
+  - Short title: Implement fail-closed invalid-refresh-token recovery in mobile auth bootstrap and request headers.
+  - Scope touched: `apps/mobile/lib/supabase/client.ts`, `apps/mobile/hooks/useAuthHandler.ts`, `apps/mobile/lib/trpc/react.tsx`, `WORKLOG.md`, `docs/MOBILE_PARITY_PLAN.md`.
+  - Outcome: Added shared invalid-refresh-token detection and local-session clearing utilities, hardened startup `supabase.auth.getSession()` handling to force signed-out fallback instead of repeated runtime exceptions, and guarded tRPC auth-header session lookup with the same recovery path.
+  - Validation run: `pnpm --filter @funtime/mobile typecheck`, `pnpm --filter @funtime/web typecheck`, `pnpm --filter @funtime/api typecheck`.
+  - Timestamp (UTC): `2026-02-25T18:37:43Z`.
+- Task ID: `P5-DOCSYNC-002`
+  - Short title: Resume parity docs and activate foundation runtime QA track.
+  - Scope touched: `WORKLOG.md`, `docs/MOBILE_PARITY_PLAN.md`.
+  - Outcome: Moved `P0-MOBILE-FOUNDATION-QA-005` from queued `Next Up` into active `In Progress`, captured immediate execution checkpoints for invalid-refresh-token handling and Hermes startup smoke, and aligned auth/session parity notes with that active track.
+  - Validation run: Docs-only update; no runtime validation required.
+  - Timestamp (UTC): `2026-02-25T18:29:39Z`.
+- Task ID: `P5-DOCSYNC-001`
+  - Short title: Sync parity documentation with latest runtime and UX context.
+  - Scope touched: `WORKLOG.md`, `docs/MOBILE_PARITY_PLAN.md`.
+  - Outcome: Captured latest mobile foundation/UX context in plan + worklog, including intentional monorepo `@types/react` pin strategy, startup auth-refresh recovery follow-up, and refreshed near-term parity priorities.
+  - Validation run: Docs-only update; no runtime validation required.
+  - Timestamp (UTC): `2026-02-25T18:25:19Z`.
+- Task ID: `P5-PERF-002`
+  - Short title: Remove web home-card query fan-out using shared summary payload.
+  - Scope touched: `apps/web/src/components/home/HomeLeagueCard.tsx`, `WORKLOG.md`.
+  - Outcome: Updated web home cards to consume `viewerCorrectPickCount` and `viewerWeekWins` from `home.summary`, removing per-card `league.get` and `correctPickCount` queries for parity with the mobile performance model.
+  - Validation run: `pnpm --filter @funtime/mobile typecheck`, `pnpm --filter @funtime/web typecheck`, `pnpm --filter @funtime/api typecheck`.
+  - Timestamp (UTC): `2026-02-25T18:12:38Z`.
+- Task ID: `P5-PERF-001`
+  - Short title: Eliminate mobile home-card query fan-out with server-aggregated viewer stats.
+  - Scope touched: `packages/api/server/api/routers/home.ts`, `apps/mobile/components/home/HomeLeagueCard.tsx`, `apps/mobile/hooks/usePrefetchForLeague.ts`, `docs/MOBILE_PARITY_PLAN.md`, `WORKLOG.md`.
+  - Outcome: Moved per-league viewer stats (correct pick counts and week wins) into `home.summary` so mobile home cards render from a single query payload instead of issuing per-card `league.get`/`correctPickCount`/`session` requests, and removed stale `correctPickCount` background prefetch calls from league prefetch hooks.
+  - Validation run: `pnpm --filter @funtime/mobile typecheck`, `pnpm --filter @funtime/web typecheck`, `pnpm --filter @funtime/api typecheck`.
+  - Timestamp (UTC): `2026-02-25T18:09:39Z`.
+- Task ID: `P5-UX-SWEEP-001E`
+  - Short title: Account and league-admin refresh UX polish.
+  - Scope touched: `apps/mobile/app/(tabs)/account.tsx`, `apps/mobile/app/league/[id]/admin.tsx`, `apps/mobile/app/league/[id]/admin-picks.tsx`, `apps/mobile/app/league/[id]/admin-emails.tsx`, `docs/MOBILE_PARITY_PLAN.md`, `WORKLOG.md`.
+  - Outcome: Added pull-to-refresh with haptic feedback on account/admin screens, improved account information hierarchy with card sections, and added inline username validation feedback for faster error recovery.
+  - Validation run: `pnpm --filter @funtime/mobile typecheck`, `pnpm --filter @funtime/web typecheck`, `pnpm --filter @funtime/api typecheck`.
+  - Timestamp (UTC): `2026-02-25T18:08:13Z`.
+- Task ID: `P5-UX-SWEEP-001D`
+  - Short title: Home screen pull-to-refresh and refresh micro-interaction polish.
+  - Scope touched: `apps/mobile/app/(tabs)/home.tsx`, `docs/MOBILE_PARITY_PLAN.md`, `WORKLOG.md`.
+  - Outcome: Added pull-to-refresh on the home league list, wired explicit session/home-summary refetch behavior, added refresh haptics, and stabilized league sorting to avoid in-place mutation side effects from cached query arrays.
+  - Validation run: `pnpm --filter @funtime/mobile typecheck`, `pnpm --filter @funtime/web typecheck`, `pnpm --filter @funtime/api typecheck`.
+  - Timestamp (UTC): `2026-02-25T17:58:11Z`.
+- Task ID: `P5-UX-SWEEP-001C`
+  - Short title: Pick tab multi-league selector and in-screen transition polish.
+  - Scope touched: `apps/mobile/app/(tabs)/pick.tsx`, `apps/mobile/components/picks/ClientPickPage.tsx`, `docs/MOBILE_PARITY_PLAN.md`, `WORKLOG.md`.
+  - Outcome: Reworked pick-tab entry UX to support in-screen league switching (instead of auto-selecting only the first active league), added haptic + fade transitions between selected leagues, removed duplicate top-level pick data queries, added actionable Join/Create CTAs for users with no active-season leagues, and restored an explicit season-over empty state in shared pick rendering.
+  - Validation run: `pnpm --filter @funtime/mobile typecheck`, `pnpm --filter @funtime/web typecheck`, `pnpm --filter @funtime/api typecheck`.
+  - Timestamp (UTC): `2026-02-25T17:57:07Z`.
+- Task ID: `P5-UX-SWEEP-001B`
+  - Short title: Bottom tab bar safe-area modernization for core layout.
+  - Scope touched: `apps/mobile/app/(tabs)/_layout.tsx`, `WORKLOG.md`.
+  - Outcome: Replaced fixed tab-bar sizing with safe-area-aware sizing/padding via `useSafeAreaInsets`, added keyboard-hide behavior, and tightened item/label layout so bottom navigation sits correctly above the home indicator across devices.
+  - Validation run: `pnpm --filter @funtime/mobile typecheck`, `pnpm --filter @funtime/web typecheck`, `pnpm --filter @funtime/api typecheck`.
+  - Timestamp (UTC): `2026-02-25T17:42:40Z`.
+- Task ID: `P5-UX-SWEEP-001A`
+  - Short title: League overview micro-interaction polish (refresh, haptics, and empty states).
+  - Scope touched: `apps/mobile/app/league/[id]/index.tsx`, `WORKLOG.md`.
+  - Outcome: Added pull-to-refresh on league overview, added haptic feedback on tab changes, and added explicit empty-state cards for missing weekly games/picks to avoid ambiguous blank sections.
+  - Validation run: `pnpm --filter @funtime/mobile typecheck`, `pnpm --filter @funtime/web typecheck`, `pnpm --filter @funtime/api typecheck`.
+  - Timestamp (UTC): `2026-02-25T17:41:15Z`.
+- Task ID: `P1-LEAGUE-UX-002`
+  - Short title: Replace route-level league tab navigation with in-screen tab swaps and smoother transitions.
+  - Scope touched: `apps/mobile/app/league/[id]/index.tsx`, `WORKLOG.md`.
+  - Outcome: Reworked league tab interactions to use local state instead of `router.replace` query-param navigation, added lightweight fade transitions between tab panels, preserved deep-link tab initialization, and updated the tab bar styling for clearer modern active-state affordances.
+  - Validation run: `pnpm --filter @funtime/mobile typecheck`, `pnpm --filter @funtime/web typecheck`, `pnpm --filter @funtime/api typecheck`.
+  - Timestamp (UTC): `2026-02-25T17:27:44Z`.
+- Task ID: `P0-MOBILE-FOUNDATION-QA-004`
+  - Short title: Complete manual post-foundation startup smoke validation.
+  - Scope touched: `WORKLOG.md`.
+  - Outcome: Confirmed mobile app boot and primary flow usability after foundation upgrades; runtime blocker is no longer preventing normal app use.
+  - Validation run: `npx expo start -c` (user local run confirmation).
+  - Timestamp (UTC): `2026-02-25T17:27:44Z`.
+- Task ID: `P0-MOBILE-FOUNDATION-004`
+  - Short title: Remove unused `react-native-worklets` dependency and keep Babel on explicit css-interop/reanimated plugins.
+  - Scope touched: `apps/mobile/package.json`, `pnpm-lock.yaml`, `WORKLOG.md`.
+  - Outcome: Removed top-level `react-native-worklets` from mobile dependencies now that Babel no longer references `react-native-worklets/plugin`; confirmed mobile/web/api typechecks and iOS export still succeed with the custom NativeWind-compatible Babel chain.
+  - Validation run: `pnpm --store-dir /Users/bambrose/Library/pnpm/store/v3 --filter @funtime/mobile remove react-native-worklets`, `pnpm --filter @funtime/mobile typecheck`, `pnpm --filter @funtime/web typecheck`, `pnpm --filter @funtime/api typecheck`, `CI=1 pnpm --filter @funtime/mobile exec expo export --platform ios --output-dir dist-export-no-worklets --no-bytecode`.
+  - Timestamp (UTC): `2026-02-25T17:00:37Z`.
+- Task ID: `P0-MOBILE-FOUNDATION-003`
+  - Short title: Re-baseline Babel/workspace after dependency relink and isolate NativeWind plugin path.
+  - Scope touched: `apps/mobile/babel.config.js`, `WORKLOG.md`.
+  - Outcome: Restored mobile Babel to an explicit NativeWind-compatible plugin chain (`react-native-css-interop` + JSX importSource + `react-native-reanimated/plugin`) without using `nativewind/babel` (which implicitly requires `react-native-worklets/plugin`), then revalidated workspace type safety and iOS bundle export after reinstalling dependencies.
+  - Validation run: `pnpm install`, `pnpm --filter @funtime/mobile typecheck`, `pnpm --filter @funtime/web typecheck`, `pnpm --filter @funtime/api typecheck`, `CI=1 pnpm --filter @funtime/mobile exec expo export --platform ios --output-dir dist-export-foundation-rerun --no-bytecode`, `pnpm --filter @funtime/mobile why react-native-reanimated`.
+  - Timestamp (UTC): `2026-02-25T16:54:46Z`.
+- Task ID: `P0-MOBILE-FOUNDATION-002`
+  - Short title: Unblock mobile startup bundling and align Expo SDK dependencies.
+  - Scope touched: `apps/mobile/package.json`, `pnpm-lock.yaml`, `WORKLOG.md`.
+  - Outcome: Updated mobile dependencies to Expo-compatible versions (`expo`, `expo-router`, `expo-notifications`, `expo-constants`, `react-native`, `@react-native-async-storage/async-storage`), added `react-native-worklets` to satisfy `nativewind` Babel plugin resolution, and confirmed iOS bundle generation from `expo-router` entry succeeds.
+  - Validation run: `pnpm --filter @funtime/mobile add @react-native-async-storage/async-storage@2.1.2 expo-constants@~17.1.8 expo-notifications@~0.31.5 expo-router@~5.1.11 react-native@0.79.6 react-native-worklets --store-dir /Users/bambrose/Library/pnpm/store/v3`, `pnpm --filter @funtime/mobile add -D expo@~53.0.27 --store-dir /Users/bambrose/Library/pnpm/store/v3`, `pnpm --filter @funtime/mobile exec expo install --check`, `pnpm --filter @funtime/mobile exec node -e \"const babel=require('@babel/core'); babel.transformSync('const el = <View />', {filename:'App.tsx', configFile:'./babel.config.js'}); console.log('babel-ok');\"`, `CI=1 pnpm --filter @funtime/mobile exec expo export --platform ios --output-dir dist-export`, `pnpm --filter @funtime/mobile typecheck`, `pnpm --filter @funtime/web typecheck`, `pnpm --filter @funtime/api typecheck`.
+  - Timestamp (UTC): `2026-02-25T16:11:35Z`.
+- Task ID: `P0-MOBILE-FOUNDATION-LOG-001`
+  - Short title: Capture mobile startup dependency warnings and bundling blocker.
+  - Scope touched: `WORKLOG.md`.
+  - Outcome: Logged Expo package compatibility warnings and the iOS bundling failure caused by missing Babel plugin module `react-native-worklets/plugin`, then queued remediation in `In Progress` and `Next Up`.
+  - Validation run: `npx expo start` (user local run) output reviewed and recorded.
+  - Timestamp (UTC): `2026-02-25T14:29:35Z`.
 - Task ID: `P0-PRISMA-001`
   - Short title: Add real Prisma migration workflow scaffolding and first SQL migration.
   - Scope touched: `packages/api/package.json`, `packages/api/prisma/migrations/20260225000000_baseline/migration.sql`, `packages/api/prisma/migrations/20260225041054_add_push_notification_tokens/migration.sql`.
@@ -175,11 +343,17 @@
   - Timestamp (UTC): `2026-02-25T02:52:26Z`.
 
 ## In Progress
-- None.
+- Task ID: `P5-PARITY-QA-001`
+  - Short title: End-to-end parity QA pass and regression fixes.
+  - Status: `IN_PROGRESS` (started `2026-02-25T20:24:07Z`).
+  - Immediate execution checklist:
+    1. Continue focused parity walk-through for top mobile surfaces (auth/session, home/pick/league tabs, account/settings, league admin flows) and convert findings into scoped fix tasks. Recent closes: `P5-PARITY-QA-001A` (launch deep-link replay regression), `P5-PARITY-QA-001B` (league tab chrome simplification), `P5-PARITY-QA-001C` (notification deep-link replay hardening), `P5-PARITY-QA-001D` (tab loading + message virtualization), `P5-PARITY-QA-001E` (compact Super Bowl layout), `P5-PARITY-QA-001F` (winner-only Super Bowl auto-save + table board), `P5-PARITY-QA-001G` (winner-first Super Bowl chrome polish + team cards), `P5-PARITY-QA-001H` (pre-season Super Bowl form + compact no-scroll board + API lock), and `P3-ADMIN-QA-001A` (compact admin member management).
+    2. Verify deep-link + notification touchpoints after runtime hardening changes (`/join-league/:code`, `/league/:id`, notification path navigation).
+    3. Ship and validate highest-severity parity regressions first, with evidence recorded per fix.
 
 ## Next Up
-1. `P5-PARITY-QA-001`: End-to-end parity QA pass and regression fixes.
-2. `P3-ADMIN-QA-001`: Validate mobile admin message/email/pick workflows under league-admin and super-admin identities.
+1. `P5-UX-SWEEP-001`: Screen-by-screen UX polish sweep (interaction latency, layout hierarchy, motion, empty/error states) with one concrete improvement shipped per touched surface.
+2. `P3-ADMIN-QA-001`: Validate compact table + member edit sheet admin workflows (member edits, picks, email logs, remove flow) under league-admin and super-admin identities.
 3. `P0-DEEPLINK-QA-001`: Validate `play-funtime.com` deep links for `/join-league`, `/league/:id`, `/settings`, and `/admin`.
 4. `P2-NOTIFY-QA-001`: Validate push/email delivery behavior in staging (token registration, message pushes, and week summary schedule).
 5. `P0-PRISMA-002`: Validate `prisma migrate status/deploy` against target DB and baseline strategy for existing environments.
@@ -202,6 +376,31 @@
 - Week-summary scheduling decision: summaries are sent once per member per league/week, no earlier than 12:00 UTC the day after the final game timestamp for that week.
 - Prisma migration decision: `db push` remains for quick local sync only; environment rollout should use checked-in SQL migrations via `prisma migrate deploy`.
 - Prisma baseline decision: existing environments should mark baseline migration as applied, then run deploy for incremental migrations.
+- Foundation decision: mobile runtime/toolchain compatibility issues (Expo package drift and bundler plugin resolution) are tracked as parity prerequisites and prioritized before broader QA.
+- Type-collision decision: keep workspace-level `@types/react` override unchanged for monorepo consistency, and gate with mobile/web/api typecheck validation after mobile dependency updates.
+- Babel decision: for Expo 53 + NativeWind 4 in this workspace, use explicit `react-native-css-interop` + `react-native-reanimated/plugin` config instead of `nativewind/babel` to avoid implicit `react-native-worklets/plugin` coupling.
+- Dependency decision: keep `react-native-worklets` out of top-level mobile dependencies unless a direct plugin/runtime requirement is reintroduced.
+- Session resilience decision: startup auth failures from stale/invalid refresh tokens should fail closed into explicit re-auth state (not repeated runtime exceptions), since those exceptions can cascade into misleading route export warnings during module evaluation.
+- Auth-header decision: mobile tRPC auth-header construction must treat invalid-refresh-token errors as a signed-out recovery case (clear local session and continue unauthenticated) instead of surfacing hard startup failures.
+- Push-token decision: mobile push registration should fail soft (skip + warning) when no EAS `projectId` can be inferred, with `EXPO_PUBLIC_EAS_PROJECT_ID` as an explicit fallback for local/dev contexts.
+- Deep-link listener decision: initial launch URLs must be handled once per app boot, while ongoing deep-link events should be handled by a stable listener using current `pathname`/`session` refs to avoid stale-link replays.
+- Notification tap decision: mobile should clear consumed last-notification responses and de-duplicate by response identifier so stale notification taps do not re-navigate on later launches.
+- League-tab loading decision: league tabs should share one skeleton loading language (`LeagueTabLoadingSkeleton`) to keep transitions visually consistent between overview/picks/leaderboard/messages/profile/superbowl.
+- Message scaling decision: league messages should render via virtualized list with incremental older-message paging (instead of full `ScrollView` mapping) to keep tab switches responsive on long threads.
+- QA sequencing decision: with foundation runtime smoke now green, active execution focus shifts from `P0-MOBILE-FOUNDATION-QA-005` to `P5-PARITY-QA-001` for end-to-end parity validation and targeted regression cleanup.
+- Execution sequencing decision: `P0-MOBILE-FOUNDATION-QA-005` was treated as the gate before broad parity QA because startup auth/runtime stability was required for trustworthy end-to-end validation results.
+- League UX decision: entity-level tabs on `/league/:id` should switch content in-screen via local state (with subtle transition) rather than route-level query-param navigation.
+- League tab chrome decision: use compact text tabs with active underlines (not filled pills) on `/league/:id` to keep navigation lean and prioritize page content.
+- Super Bowl IA decision: keep in-screen Super Bowl pick UI focused on selected AFC-vs-NFC matchup and winner choice; move full team lists into a dedicated picker surface instead of rendering all teams inline.
+- Super Bowl save-flow decision: Super Bowl pick UI should behave like an explicit form before season start (winner/loser/score + manual save), and become fully read-only once the season starts.
+- Super Bowl table decision: league board winner/loser cells should render as compact team cards (logo + abbrev) to mirror web table readability in a dense mobile layout.
+- Account settings IA decision: settings should use sectioned row-based controls with persistent status affordances (badges/pills), stronger identity hierarchy, and confirmation before destructive session actions.
+- Admin IA decision: league admin member controls should use a compact table for scanability and a per-member bottom sheet for edits/actions to reduce vertical waste.
+- Pick-tab UX decision: `/pick` must support explicit in-screen league selection for multi-league users instead of auto-binding to the first active league.
+- Home UX decision: `/home` should support user-initiated pull-to-refresh for league data instead of relying only on implicit background refetches.
+- Home performance decision: home-card viewer stats should be aggregated in `home.summary` and consumed by both mobile and web cards to avoid per-card request fan-out and reduce first-render network chatter.
+- Admin/account UX decision: management and settings surfaces should support user-initiated pull-to-refresh with lightweight haptic acknowledgment.
+- UX quality decision: every mobile parity change should include a critical UX pass and ship concrete polish improvements, not only functional parity.
 
 ## Risks / Blockers
 - Risk: Route refactor can cause regressions in deep links and auth redirects.
@@ -225,8 +424,120 @@
 - Risk: `prisma migrate status` currently errors in this environment (`Schema engine error`), so DB migration state is not yet verified end-to-end.
   - Owner: Implementer.
   - Mitigation: rerun migrate status/deploy in target runtime with confirmed DB connectivity/credentials and resolve baseline if needed.
+- Risk: Expo SDK guidance and workspace React type override can drift (`@types/react` expected by Expo vs monorepo-pinned version).
+  - Owner: Implementer.
+  - Mitigation: keep a single workspace override to prevent cross-app type collisions and run `@funtime/mobile`, `@funtime/web`, and `@funtime/api` typechecks on each mobile SDK dependency update.
+- Risk: Hermes runtime `_toString` failure may still appear on device despite successful export/typecheck; static bundle validation cannot confirm runtime initialization path.
+  - Owner: Implementer.
+  - Mitigation: latest user on-device smoke reported no `_toString` crash; keep targeted stack capture in place if issue reappears during broader parity QA.
+- Risk: stale Supabase refresh tokens can trigger `AuthApiError: Invalid Refresh Token` during startup and cascade into route render instability.
+  - Owner: Implementer.
+  - Mitigation: explicit invalid-refresh-token recovery now exists in auth bootstrap and tRPC header session lookup (clear local session + controlled signed-out fallback), and latest on-device smoke reported stable startup.
+- Risk: push-token registration is skipped when EAS `projectId` is absent from runtime config (common in local/dev without EAS metadata), so notification token coverage can appear inactive.
+  - Owner: Implementer.
+  - Mitigation: `EXPO_PUBLIC_EAS_PROJECT_ID` fallback is now supported and missing-config behavior is explicit/non-fatal; ensure the env var is set in local/dev or EAS metadata is present in builds where push validation is required.
+- Risk: local-only league tab switching no longer updates URL query params during interaction, so copying URL may not reflect currently visible tab.
+  - Owner: Implementer.
+  - Mitigation: evaluate whether shareable tab-specific links are needed; if so, add explicit share/deeplink actions instead of route remount navigation.
+- Risk: message virtualization currently paginates rendering client-side but still fetches the full league message payload, so very large leagues may still incur heavier query payloads.
+  - Owner: Implementer.
+  - Mitigation: add backend cursor pagination for `messages.leagueMessageBoard` in a follow-up if payload size becomes a bottleneck in staging/production QA.
 
 ## Validation Evidence
+- `2026-02-26T01:22:05Z`: `P5-PARITY-QA-001H` shipped: Super Bowl tab now uses a compact pre-season form card (winner/loser/score), no AFC/NFC pill-sheet picker flow, and a denser no-horizontal-scroll board layout; API now rejects pick edits after season start.
+- `2026-02-26T01:22:05Z`: `pnpm --filter @funtime/mobile typecheck` passed.
+- `2026-02-26T01:22:05Z`: `pnpm --filter @funtime/api typecheck` passed.
+- `2026-02-26T01:22:05Z`: `pnpm --filter @funtime/web typecheck` passed.
+- `2026-02-26T01:14:26Z`: `P5-UX-SWEEP-001F` shipped: account settings now use a sectioned modern IA (profile hero, settings rows, stronger push controls/status pills, skeleton loading, and confirm-before-sign-out session action).
+- `2026-02-26T01:14:26Z`: `pnpm --filter @funtime/mobile typecheck` passed.
+- `2026-02-26T01:10:24Z`: `P5-PARITY-QA-001G` shipped: Super Bowl personal pick area now uses lean winner-first chrome (no extra top heading), and winner/loser board cells now render as compact team cards with logo + abbrev.
+- `2026-02-26T01:10:24Z`: `pnpm --filter @funtime/mobile typecheck` passed.
+- `2026-02-26T01:07:37Z`: `P5-PARITY-QA-001F` shipped: Super Bowl pick card now removes visible matchup/winner headers and manual save button, auto-saves valid edits, and uses table-style member/winner/loser/score board with logos/abbrevs.
+- `2026-02-26T01:07:37Z`: `pnpm --filter @funtime/mobile typecheck` passed.
+- `2026-02-26T01:07:37Z`: `pnpm --filter @funtime/web typecheck` passed.
+- `2026-02-26T01:07:37Z`: `pnpm --filter @funtime/api typecheck` passed.
+- `2026-02-26T00:28:18Z`: Post-refactor typecheck re-run passed after message-list type tightening (`RouterOutputs` typing cleanup, no behavior change).
+- `2026-02-26T00:28:18Z`: `pnpm --filter @funtime/mobile typecheck` passed.
+- `2026-02-26T00:28:18Z`: `pnpm --filter @funtime/web typecheck` passed.
+- `2026-02-26T00:28:18Z`: `pnpm --filter @funtime/api typecheck` passed.
+- `2026-02-26T00:25:53Z`: `P3-ADMIN-QA-001A` shipped: league admin now has persistent header back navigation, compact member table rows, and per-member bottom-sheet editing/actions.
+- `2026-02-26T00:25:53Z`: `P5-PARITY-QA-001E` shipped: Super Bowl tab now uses compact matchup + winner highlight UI with conference team selection moved into modal picker.
+- `2026-02-26T00:25:53Z`: `P5-PARITY-QA-001D` shipped: shared league-tab loading skeleton adopted and messages board moved to virtualized/paged list rendering.
+- `2026-02-26T00:25:53Z`: `pnpm --filter @funtime/mobile typecheck` passed.
+- `2026-02-26T00:25:53Z`: `pnpm --filter @funtime/web typecheck` passed.
+- `2026-02-26T00:25:53Z`: `pnpm --filter @funtime/api typecheck` passed.
+- `2026-02-25T21:54:54Z`: `P5-PARITY-QA-001C` shipped: notification deep-link handling now de-duplicates by response ID and clears consumed last responses to prevent stale replay on relaunch.
+- `2026-02-25T21:54:54Z`: `pnpm --filter @funtime/mobile typecheck` passed.
+- `2026-02-25T21:54:54Z`: `pnpm --filter @funtime/web typecheck` passed.
+- `2026-02-25T21:54:54Z`: `pnpm --filter @funtime/api typecheck` passed.
+- `2026-02-25T21:53:06Z`: `P5-PARITY-QA-001B` shipped: league-screen tab chrome switched from filled pills to compact underline tabs based on user feedback.
+- `2026-02-25T21:53:06Z`: `pnpm --filter @funtime/mobile typecheck` passed.
+- `2026-02-25T21:53:06Z`: `pnpm --filter @funtime/web typecheck` passed.
+- `2026-02-25T21:53:06Z`: `pnpm --filter @funtime/api typecheck` passed.
+- `2026-02-25T20:27:17Z`: Parity QA regression fix `P5-PARITY-QA-001A` landed: deep-link handling now runs `getInitialURL()` once per app launch and no longer replays stale launch links on route/session updates.
+- `2026-02-25T20:27:17Z`: `pnpm --filter @funtime/mobile typecheck` passed.
+- `2026-02-25T20:27:17Z`: `pnpm --filter @funtime/web typecheck` passed.
+- `2026-02-25T20:27:17Z`: `pnpm --filter @funtime/api typecheck` passed.
+- `2026-02-25T20:24:07Z`: User confirmed on-device smoke after adding `EXPO_PUBLIC_EAS_PROJECT_ID`: push registration `projectId` error is gone and app flows are working well.
+- `2026-02-25T19:09:33Z`: User smoke test reported app flows mostly stable with single push-registration error (`No "projectId" found`), which triggered targeted push registration hardening.
+- `2026-02-25T19:09:33Z`: `pnpm --filter @funtime/mobile typecheck` passed.
+- `2026-02-25T19:09:33Z`: `pnpm --filter @funtime/web typecheck` passed.
+- `2026-02-25T19:09:33Z`: `pnpm --filter @funtime/api typecheck` passed.
+- `2026-02-25T18:39:23Z`: `pnpm --filter @funtime/mobile start -- --clear` launched successfully to project startup (no immediate Metro bootstrap failure observed); full on-device runtime smoke remains pending.
+- `2026-02-25T18:37:43Z`: Implemented invalid-refresh-token fail-closed recovery in mobile auth bootstrap + tRPC header session lookup and kept `P0-MOBILE-FOUNDATION-QA-005` open for on-device Hermes smoke follow-up.
+- `2026-02-25T18:37:43Z`: `pnpm --filter @funtime/mobile typecheck` passed.
+- `2026-02-25T18:37:43Z`: `pnpm --filter @funtime/web typecheck` passed.
+- `2026-02-25T18:37:43Z`: `pnpm --filter @funtime/api typecheck` passed.
+- `2026-02-25T18:29:39Z`: Documentation continuation pass completed; promoted `P0-MOBILE-FOUNDATION-QA-005` into active `In Progress` and aligned auth/session parity notes with the current runtime-hardening checklist.
+- `2026-02-25T18:25:19Z`: Documentation sync pass completed; reflected latest user-reported startup context (`@types/react` Expo advisory, `AuthApiError: Invalid Refresh Token`, Hermes `_toString` risk) into plan/worklog follow-up items.
+- `2026-02-25T18:13:23Z`: `pnpm --filter @funtime/mobile typecheck` passed.
+- `2026-02-25T18:13:23Z`: `pnpm --filter @funtime/web typecheck` passed.
+- `2026-02-25T18:13:23Z`: `pnpm --filter @funtime/api typecheck` passed.
+- `2026-02-25T18:12:38Z`: `pnpm --filter @funtime/mobile typecheck` passed.
+- `2026-02-25T18:12:38Z`: `pnpm --filter @funtime/web typecheck` passed.
+- `2026-02-25T18:12:38Z`: `pnpm --filter @funtime/api typecheck` passed.
+- `2026-02-25T18:09:39Z`: `pnpm --filter @funtime/mobile typecheck` passed.
+- `2026-02-25T18:09:39Z`: `pnpm --filter @funtime/web typecheck` passed.
+- `2026-02-25T18:09:39Z`: `pnpm --filter @funtime/api typecheck` passed.
+- `2026-02-25T18:08:13Z`: `pnpm --filter @funtime/mobile typecheck` passed.
+- `2026-02-25T18:08:13Z`: `pnpm --filter @funtime/web typecheck` passed.
+- `2026-02-25T18:08:13Z`: `pnpm --filter @funtime/api typecheck` passed.
+- `2026-02-25T17:58:11Z`: `pnpm --filter @funtime/mobile typecheck` passed.
+- `2026-02-25T17:58:11Z`: `pnpm --filter @funtime/web typecheck` passed.
+- `2026-02-25T17:58:11Z`: `pnpm --filter @funtime/api typecheck` passed.
+- `2026-02-25T17:57:07Z`: `pnpm --filter @funtime/mobile typecheck` passed.
+- `2026-02-25T17:57:07Z`: `pnpm --filter @funtime/web typecheck` passed.
+- `2026-02-25T17:57:07Z`: `pnpm --filter @funtime/api typecheck` passed.
+- `2026-02-25T17:55:51Z`: `pnpm --filter @funtime/mobile typecheck` passed.
+- `2026-02-25T17:55:51Z`: `pnpm --filter @funtime/web typecheck` passed.
+- `2026-02-25T17:55:51Z`: `pnpm --filter @funtime/api typecheck` passed.
+- `2026-02-25T17:42:40Z`: `pnpm --filter @funtime/mobile typecheck` passed.
+- `2026-02-25T17:42:40Z`: `pnpm --filter @funtime/web typecheck` passed.
+- `2026-02-25T17:42:40Z`: `pnpm --filter @funtime/api typecheck` passed.
+- `2026-02-25T17:41:15Z`: `pnpm --filter @funtime/mobile typecheck` passed.
+- `2026-02-25T17:41:15Z`: `pnpm --filter @funtime/web typecheck` passed.
+- `2026-02-25T17:41:15Z`: `pnpm --filter @funtime/api typecheck` passed.
+- `2026-02-25T17:27:44Z`: `pnpm --filter @funtime/mobile typecheck` passed.
+- `2026-02-25T17:27:44Z`: `pnpm --filter @funtime/web typecheck` passed.
+- `2026-02-25T17:27:44Z`: `pnpm --filter @funtime/api typecheck` passed.
+- `2026-02-25T17:27:44Z`: `npx expo start -c` user local run confirmed app boots and is usable post-foundation.
+- `2026-02-25T17:00:37Z`: `pnpm --store-dir /Users/bambrose/Library/pnpm/store/v3 --filter @funtime/mobile remove react-native-worklets` passed.
+- `2026-02-25T17:00:37Z`: `CI=1 pnpm --filter @funtime/mobile exec expo export --platform ios --output-dir dist-export-no-worklets --no-bytecode` passed (`iOS Bundled`, `Exported: dist-export-no-worklets`).
+- `2026-02-25T16:54:46Z`: `pnpm install` passed (workspace dependency relink complete after interrupted offline reinstall).
+- `2026-02-25T16:54:46Z`: `pnpm --filter @funtime/mobile typecheck` passed.
+- `2026-02-25T16:54:46Z`: `pnpm --filter @funtime/web typecheck` passed.
+- `2026-02-25T16:54:46Z`: `pnpm --filter @funtime/api typecheck` passed.
+- `2026-02-25T16:54:46Z`: `CI=1 pnpm --filter @funtime/mobile exec expo export --platform ios --output-dir dist-export-foundation-rerun --no-bytecode` passed (`iOS Bundled`, `Exported: dist-export-foundation-rerun`).
+- `2026-02-25T16:54:46Z`: `pnpm --filter @funtime/mobile why react-native-reanimated` confirms `react-native-reanimated 3.17.4`.
+- `2026-02-25T16:11:35Z`: `pnpm --filter @funtime/mobile add @react-native-async-storage/async-storage@2.1.2 expo-constants@~17.1.8 expo-notifications@~0.31.5 expo-router@~5.1.11 react-native@0.79.6 react-native-worklets --store-dir /Users/bambrose/Library/pnpm/store/v3` passed.
+- `2026-02-25T16:11:35Z`: `pnpm --filter @funtime/mobile add -D expo@~53.0.27 --store-dir /Users/bambrose/Library/pnpm/store/v3` passed.
+- `2026-02-25T16:11:35Z`: `pnpm --filter @funtime/mobile exec expo install --check` passed (`Dependencies are up to date`).
+- `2026-02-25T16:11:35Z`: `pnpm --filter @funtime/mobile exec node -e "const babel=require('@babel/core'); babel.transformSync('const el = <View />', {filename:'App.tsx', configFile:'./babel.config.js'}); console.log('babel-ok');"` passed.
+- `2026-02-25T16:11:35Z`: `CI=1 pnpm --filter @funtime/mobile exec expo export --platform ios --output-dir dist-export` passed (`iOS Bundled`, `Exported: dist-export`).
+- `2026-02-25T16:11:35Z`: `pnpm --filter @funtime/mobile typecheck` passed.
+- `2026-02-25T16:11:35Z`: `pnpm --filter @funtime/web typecheck` passed.
+- `2026-02-25T16:11:35Z`: `pnpm --filter @funtime/api typecheck` passed.
+- `2026-02-25T14:29:35Z`: `npx expo start` (user local run) reported Expo compatibility warnings plus repeated iOS bundling failure: `Cannot find module 'react-native-worklets/plugin'` from `expo-router` entry transform.
 - `2026-02-25T02:52:26Z`: `pnpm --filter @funtime/mobile typecheck` passed.
 - `2026-02-25T02:52:26Z`: `pnpm --filter @funtime/api typecheck` passed.
 - `2026-02-25T02:52:26Z`: `pnpm --filter @funtime/web typecheck` passed.
@@ -288,18 +599,18 @@
 ## Parity Matrix Snapshot
 | Area | Status | Notes |
 |---|---|---|
-| Auth/session | `in_progress` | Guard/bootstrap improvements done, route-group migration complete; deep-link QA remains. |
-| Deep links | `in_progress` | Domain association endpoints and mobile route handling are in place; production app-id/cert values and device verification remain. |
-| Home/nav leagues | `in_progress` | Functional baseline exists with join/create entry points; parity polish and IA refactor pending. |
+| Auth/session | `in_progress` | Guard/bootstrap improvements done, route-group migration complete, stale-refresh-token fail-closed handling is in bootstrap + tRPC headers, and latest on-device smoke reported stable startup; deep-link QA remains. |
+| Deep links | `in_progress` | Domain association endpoints and mobile route handling are in place; launch deep links are now processed once per app boot (no stale replay on route/session changes), and production app-id/cert values plus real-device verification remain. |
+| Home/nav leagues | `in_progress` | Functional baseline exists with join/create entry points, pull-to-refresh UX, and server-aggregated home-card viewer stats consumed by both mobile and web cards; broader IA parity polish remains. |
 | Join league | `in_progress` | Join-by-code flow implemented; deeper UX parity and on-device QA pending. |
 | Create league | `in_progress` | Core create flow and policies implemented; parity polish and QA pending. |
-| League week view | `in_progress` | Existing implementation with tiebreaker sort parity fix; broader parity behavior and UX consistency QA pending. |
-| Pick submission | `in_progress` | Core flow exists; full parity and QA pending. |
+| League week view | `in_progress` | Existing implementation now uses in-screen tab swaps (no route remount), lighter underline-style top tabs, and tiebreaker sort parity fix; broader parity behavior and UX consistency QA pending. |
+| Pick submission | `in_progress` | Core flow exists and now supports in-tab multi-league switching; loading state now uses shared league-tab skeleton styling, with full parity and QA coverage still pending. |
 | Leaderboard | `in_progress` | Present but parity verification/tie ranking QA pending. |
-| Player/my profile | `in_progress` | Added league-scoped my profile tab plus leaderboard-to-player profile navigation; edit flows still pending. |
-| Super Bowl picks | `in_progress` | Super Bowl tab + pick management shipped; parity polish and member-profile linking still pending. |
-| Settings/profile | `in_progress` | Username update flow plus draft-sync edge-case fixes are shipped; notifications/preferences parity still pending. |
+| Player/my profile | `in_progress` | Added league-scoped my profile tab plus leaderboard-to-player profile navigation; loading state now uses shared league-tab skeleton styling and edit flows still pending. |
+| Super Bowl picks | `in_progress` | Super Bowl tab now uses a compact pre-season `Your Super Bowl pick` form (winner/loser/score with explicit save), is read-only after season start, and renders a denser member/winner/loser/score board that fits without horizontal scrolling; postseason bracket parity and member-profile linking still pending. |
+| Settings/profile | `in_progress` | Account settings IA is now modernized with profile hero, row-based sections, stronger notification controls/status pills, confirmation on sign-out, plus draft-sync/validation/pull-to-refresh; notifications/preferences parity still pending. |
 | Messaging persistent board | `done` | Mobile + web clients moved to league-wide message APIs with admin delete controls. |
-| Notifications | `in_progress` | Token registration, preferences, message fanout, and week-summary scheduler are implemented; deployment + staging QA validation remain. |
-| League admin | `in_progress` | Member management, pick editing, rename/broadcast, and email logs are shipped; remaining work is parity QA and polish. |
+| Notifications | `in_progress` | Token registration, preferences, message fanout, and week-summary scheduler are implemented; push-token registration now fails soft when `projectId` is missing (with `EXPO_PUBLIC_EAS_PROJECT_ID` fallback), notification-tap routing now de-duplicates/clears stale last responses, and deployment + staging QA validation remain. |
+| League admin | `in_progress` | Member management/pick editing/rename/broadcast/email logs are shipped; member management UI now uses a compact actionable table + per-member edit sheet with header back navigation, and full workflow QA remains. |
 | Global admin | `in_progress` | Super-admin dashboard route, entry point, and key metric sections are shipped; final QA/polish remains. |

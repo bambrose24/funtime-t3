@@ -1,23 +1,28 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Alert, ScrollView, Text, View } from "react-native";
+import { Alert, Pressable, ScrollView, Text, View } from "react-native";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { SelectOption } from "@/components/ui/select-option";
 import { TeamLogo } from "@/components/shared/TeamLogo";
+import { LeagueTabLoadingSkeleton } from "@/components/league/LeagueTabLoadingSkeleton";
 import { clientApi } from "@/lib/trpc/react";
+import { cn } from "@/lib/utils";
 
 type Props = {
   leagueId: string;
 };
 
+type TeamPickerField = "winner" | "loser";
+
 export function LeagueSuperbowlBoard({ leagueId }: Props) {
   const leagueIdNumber = Number(leagueId);
-  const [afcTeamId, setAfcTeamId] = useState<string>("");
-  const [nfcTeamId, setNfcTeamId] = useState<string>("");
   const [winnerTeamId, setWinnerTeamId] = useState<string>("");
+  const [loserTeamId, setLoserTeamId] = useState<string>("");
   const [score, setScore] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [formInitialized, setFormInitialized] = useState(false);
+  const [activePickerField, setActivePickerField] = useState<TeamPickerField | null>(
+    null,
+  );
 
   const utils = clientApi.useUtils();
   const { data: session } = clientApi.session.current.useQuery();
@@ -31,9 +36,15 @@ export function LeagueSuperbowlBoard({ leagueId }: Props) {
 
   const { data: superbowlData, isLoading: superbowlLoading } =
     clientApi.league.superbowlPicks.useQuery(
+      { leagueId: leagueIdNumber },
       {
-        leagueId: leagueIdNumber,
+        enabled: Number.isFinite(leagueIdNumber) && !!viewerMembership,
       },
+    );
+
+  const { data: hasSeasonStarted, isLoading: hasSeasonStartedLoading } =
+    clientApi.league.hasStarted.useQuery(
+      { leagueId: leagueIdNumber },
       {
         enabled: Number.isFinite(leagueIdNumber) && !!viewerMembership,
       },
@@ -42,17 +53,19 @@ export function LeagueSuperbowlBoard({ leagueId }: Props) {
   const { mutateAsync: updateSuperbowlPick } =
     clientApi.member.updateOrCreateSuperbowlPick.useMutation();
 
-  const afcTeams = useMemo(
-    () => (teams ?? []).filter((team) => team.conference === "AFC"),
-    [teams],
-  );
-  const nfcTeams = useMemo(
-    () => (teams ?? []).filter((team) => team.conference === "NFC"),
-    [teams],
-  );
-
   const teamById = useMemo(() => {
     return new Map((teams ?? []).map((team) => [team.teamid, team]));
+  }, [teams]);
+
+  const sortedTeams = useMemo(() => {
+    return [...(teams ?? [])].sort((a, b) => {
+      const aConference = a.conference ?? "";
+      const bConference = b.conference ?? "";
+      if (aConference !== bConference) {
+        return aConference.localeCompare(bConference);
+      }
+      return `${a.loc} ${a.name}`.localeCompare(`${b.loc} ${b.name}`);
+    });
   }, [teams]);
 
   const myPick = useMemo(() => {
@@ -70,62 +83,74 @@ export function LeagueSuperbowlBoard({ leagueId }: Props) {
     if (formInitialized) {
       return;
     }
-    if (!myPick) {
+
+    if (!viewerMembership) {
       setFormInitialized(true);
       return;
     }
-    if (myPick.winner && myPick.loser) {
-      const winnerTeam = teamById.get(myPick.winner);
-      const loserTeam = teamById.get(myPick.loser);
-      if (winnerTeam?.conference === "AFC" || loserTeam?.conference === "AFC") {
-        setAfcTeamId(
-          winnerTeam?.conference === "AFC"
-            ? String(winnerTeam.teamid)
-            : String(loserTeam?.teamid ?? ""),
-        );
+
+    if (myPick) {
+      if (myPick.winner) {
+        setWinnerTeamId(String(myPick.winner));
       }
-      if (winnerTeam?.conference === "NFC" || loserTeam?.conference === "NFC") {
-        setNfcTeamId(
-          winnerTeam?.conference === "NFC"
-            ? String(winnerTeam.teamid)
-            : String(loserTeam?.teamid ?? ""),
-        );
+      if (myPick.loser) {
+        setLoserTeamId(String(myPick.loser));
       }
-      setWinnerTeamId(String(myPick.winner));
       if (myPick.score) {
         setScore(String(myPick.score));
       }
     }
-    setFormInitialized(true);
-  }, [formInitialized, myPick, teamById]);
 
-  const onSubmit = async () => {
+    setFormInitialized(true);
+  }, [formInitialized, myPick, viewerMembership]);
+
+  const scoreValue = Number(score);
+  const scoreIsValid =
+    Number.isFinite(scoreValue) && scoreValue >= 1 && scoreValue <= 200;
+  const isEditable = formInitialized && !hasSeasonStarted;
+  const canSubmit =
+    isEditable &&
+    !!viewerMembership &&
+    !!winnerTeamId &&
+    !!loserTeamId &&
+    winnerTeamId !== loserTeamId &&
+    scoreIsValid &&
+    !submitting;
+
+  const selectedWinner = winnerTeamId ? teamById.get(Number(winnerTeamId)) : null;
+  const selectedLoser = loserTeamId ? teamById.get(Number(loserTeamId)) : null;
+
+  const onSavePick = async () => {
     if (!viewerMembership) {
       return;
     }
-    if (!afcTeamId || !nfcTeamId || !winnerTeamId) {
-      Alert.alert("Incomplete Pick", "Select AFC team, NFC team, and winner.");
+    if (hasSeasonStarted) {
+      Alert.alert("Locked", "Super Bowl picks are locked after the season starts.");
       return;
     }
-
-    const parsedScore = Number(score);
-    if (!Number.isFinite(parsedScore) || parsedScore < 1 || parsedScore > 200) {
+    if (!winnerTeamId || !loserTeamId) {
+      Alert.alert("Incomplete Pick", "Select both a winner and loser.");
+      return;
+    }
+    if (winnerTeamId === loserTeamId) {
+      Alert.alert("Invalid Pick", "Winner and loser must be different teams.");
+      return;
+    }
+    if (!scoreIsValid) {
       Alert.alert("Invalid Score", "Score must be between 1 and 200.");
       return;
     }
-
-    const winner = Number(winnerTeamId);
-    const loser = winner === Number(afcTeamId) ? Number(nfcTeamId) : Number(afcTeamId);
 
     try {
       setSubmitting(true);
       await updateSuperbowlPick({
         memberId: viewerMembership.membership_id,
-        winnerTeamId: winner,
-        loserTeamId: loser,
-        score: parsedScore,
+        winnerTeamId: Number(winnerTeamId),
+        loserTeamId: Number(loserTeamId),
+        score: scoreValue,
       });
       await utils.league.superbowlPicks.invalidate({ leagueId: leagueIdNumber });
+      setActivePickerField(null);
       Alert.alert("Saved", "Super Bowl pick updated.");
     } catch (error) {
       console.error("Failed to update Super Bowl pick", error);
@@ -138,18 +163,10 @@ export function LeagueSuperbowlBoard({ leagueId }: Props) {
     }
   };
 
-  if (teamsLoading || superbowlLoading) {
-    return (
-      <View className="flex-1 items-center justify-center px-6">
-        <Text className="text-base text-gray-500 dark:text-gray-400">
-          Loading Super Bowl board...
-        </Text>
-      </View>
-    );
+  if (teamsLoading || superbowlLoading || hasSeasonStartedLoading) {
+    return <LeagueTabLoadingSkeleton rows={4} />;
   }
 
-  const selectedAfcTeam = afcTeams.find((team) => String(team.teamid) === afcTeamId);
-  const selectedNfcTeam = nfcTeams.find((team) => String(team.teamid) === nfcTeamId);
   const picks = superbowlData?.superbowlPicks ?? [];
 
   return (
@@ -159,149 +176,277 @@ export function LeagueSuperbowlBoard({ leagueId }: Props) {
       contentContainerStyle={{ padding: 16, paddingBottom: 32 }}
     >
       <View className="gap-4">
-        <View className="rounded-xl border border-gray-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-800 gap-4">
-          <Text className="text-app-fg-light dark:text-app-fg-dark text-base font-semibold">
-            Your Super Bowl Pick
-          </Text>
-
-          <View className="gap-2">
-            <Text className="text-sm text-gray-600 dark:text-gray-400">AFC Team</Text>
-            {afcTeams.map((team) => (
-              <SelectOption
-                key={`sb_afc_${team.teamid}`}
-                selected={afcTeamId === String(team.teamid)}
-                onPress={() => {
-                  setAfcTeamId(String(team.teamid));
-                  setWinnerTeamId("");
-                }}
-                className="justify-start px-3 py-2"
-              >
-                <View className="flex-row items-center gap-2">
-                  <TeamLogo abbrev={team.abbrev ?? ""} width={20} height={20} />
-                  <Text className="text-app-fg-light dark:text-app-fg-dark text-sm">
-                    {team.loc} {team.name}
-                  </Text>
-                </View>
-              </SelectOption>
-            ))}
+        <View className="gap-4 rounded-xl border border-gray-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-800">
+          <View>
+            <Text className="text-app-fg-light dark:text-app-fg-dark text-base font-semibold">
+              Your Super Bowl pick
+            </Text>
+            <Text className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+              {isEditable
+                ? "Set winner, loser, and total score. Picks lock when the season starts."
+                : "Picks are locked because the season has started."}
+            </Text>
           </View>
 
           <View className="gap-2">
-            <Text className="text-sm text-gray-600 dark:text-gray-400">NFC Team</Text>
-            {nfcTeams.map((team) => (
-              <SelectOption
-                key={`sb_nfc_${team.teamid}`}
-                selected={nfcTeamId === String(team.teamid)}
-                onPress={() => {
-                  setNfcTeamId(String(team.teamid));
-                  setWinnerTeamId("");
-                }}
-                className="justify-start px-3 py-2"
-              >
-                <View className="flex-row items-center gap-2">
-                  <TeamLogo abbrev={team.abbrev ?? ""} width={20} height={20} />
-                  <Text className="text-app-fg-light dark:text-app-fg-dark text-sm">
-                    {team.loc} {team.name}
+            <Pressable
+              onPress={() => {
+                if (isEditable) {
+                  setActivePickerField((curr) =>
+                    curr === "winner" ? null : "winner",
+                  );
+                }
+              }}
+              disabled={!isEditable}
+              className={cn(
+                "rounded-lg border border-gray-200 bg-gray-50 px-3 py-3 dark:border-zinc-700 dark:bg-zinc-900",
+                isEditable ? "active:opacity-80" : "opacity-95",
+              )}
+            >
+              <Text className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                Winner
+              </Text>
+              {selectedWinner ? (
+                <View className="mt-1 flex-row items-center gap-2">
+                  <TeamLogo
+                    abbrev={selectedWinner.abbrev ?? ""}
+                    width={18}
+                    height={18}
+                  />
+                  <Text className="text-app-fg-light dark:text-app-fg-dark text-sm font-semibold">
+                    {selectedWinner.loc} {selectedWinner.name}
                   </Text>
                 </View>
-              </SelectOption>
-            ))}
-          </View>
+              ) : (
+                <Text className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                  {isEditable ? "Select winner" : "--"}
+                </Text>
+              )}
+            </Pressable>
 
-          {selectedAfcTeam && selectedNfcTeam ? (
-            <View className="gap-2">
-              <Text className="text-sm text-gray-600 dark:text-gray-400">Winner</Text>
-              <View className="flex-row gap-2">
-                <View className="flex-1">
-                  <SelectOption
-                    selected={winnerTeamId === String(selectedAfcTeam.teamid)}
-                    onPress={() => setWinnerTeamId(String(selectedAfcTeam.teamid))}
-                    className="justify-start px-3 py-2"
-                  >
-                    <View className="flex-row items-center gap-2">
-                      <TeamLogo
-                        abbrev={selectedAfcTeam.abbrev ?? ""}
-                        width={20}
-                        height={20}
-                      />
-                      <Text className="text-app-fg-light dark:text-app-fg-dark text-sm">
-                        {selectedAfcTeam.abbrev}
-                      </Text>
-                    </View>
-                  </SelectOption>
+            <Pressable
+              onPress={() => {
+                if (isEditable) {
+                  setActivePickerField((curr) => (curr === "loser" ? null : "loser"));
+                }
+              }}
+              disabled={!isEditable}
+              className={cn(
+                "rounded-lg border border-gray-200 bg-gray-50 px-3 py-3 dark:border-zinc-700 dark:bg-zinc-900",
+                isEditable ? "active:opacity-80" : "opacity-95",
+              )}
+            >
+              <Text className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                Loser
+              </Text>
+              {selectedLoser ? (
+                <View className="mt-1 flex-row items-center gap-2">
+                  <TeamLogo
+                    abbrev={selectedLoser.abbrev ?? ""}
+                    width={18}
+                    height={18}
+                  />
+                  <Text className="text-app-fg-light dark:text-app-fg-dark text-sm font-semibold">
+                    {selectedLoser.loc} {selectedLoser.name}
+                  </Text>
                 </View>
-                <View className="flex-1">
-                  <SelectOption
-                    selected={winnerTeamId === String(selectedNfcTeam.teamid)}
-                    onPress={() => setWinnerTeamId(String(selectedNfcTeam.teamid))}
-                    className="justify-start px-3 py-2"
-                  >
-                    <View className="flex-row items-center gap-2">
-                      <TeamLogo
-                        abbrev={selectedNfcTeam.abbrev ?? ""}
-                        width={20}
-                        height={20}
-                      />
-                      <Text className="text-app-fg-light dark:text-app-fg-dark text-sm">
-                        {selectedNfcTeam.abbrev}
-                      </Text>
-                    </View>
-                  </SelectOption>
+              ) : (
+                <Text className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                  {isEditable ? "Select loser" : "--"}
+                </Text>
+              )}
+            </Pressable>
+
+            {isEditable && activePickerField ? (
+              <View className="rounded-lg border border-gray-200 bg-white p-2 dark:border-zinc-700 dark:bg-zinc-900">
+                <Text className="mb-2 px-1 text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                  Select {activePickerField}
+                </Text>
+                <View className="flex-row flex-wrap gap-2">
+                  {sortedTeams.map((team) => {
+                    const teamId = String(team.teamid);
+                    const isSelected =
+                      activePickerField === "winner"
+                        ? teamId === winnerTeamId
+                        : teamId === loserTeamId;
+                    return (
+                      <Pressable
+                        key={`sb_pick_team_${activePickerField}_${team.teamid}`}
+                        onPress={() => {
+                          if (activePickerField === "winner") {
+                            setWinnerTeamId(teamId);
+                            if (loserTeamId === teamId) {
+                              setLoserTeamId("");
+                            }
+                          } else {
+                            setLoserTeamId(teamId);
+                            if (winnerTeamId === teamId) {
+                              setWinnerTeamId("");
+                            }
+                          }
+                          setActivePickerField(null);
+                        }}
+                        className={cn(
+                          "rounded-md border px-2 py-1.5",
+                          isSelected
+                            ? "border-blue-500 bg-blue-50 dark:border-blue-500 dark:bg-blue-950"
+                            : "border-gray-200 bg-gray-50 dark:border-zinc-700 dark:bg-zinc-800",
+                        )}
+                      >
+                        <View className="flex-row items-center gap-1.5">
+                          <TeamLogo abbrev={team.abbrev ?? ""} width={14} height={14} />
+                          <Text className="text-[11px] font-semibold text-gray-700 dark:text-gray-200">
+                            {team.abbrev}
+                          </Text>
+                        </View>
+                      </Pressable>
+                    );
+                  })}
                 </View>
               </View>
+            ) : null}
+
+            <View className="gap-1.5">
+              <Text className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                Total Score
+              </Text>
+              <Input
+                value={score}
+                onChangeText={setScore}
+                keyboardType="number-pad"
+                placeholder="1 - 200"
+                editable={isEditable}
+              />
+              {isEditable && score.length > 0 && !scoreIsValid ? (
+                <Text className="text-xs text-red-500">
+                  Enter a whole number between 1 and 200.
+                </Text>
+              ) : null}
             </View>
-          ) : null}
 
-          <View className="gap-2">
-            <Text className="text-sm text-gray-600 dark:text-gray-400">Total Score</Text>
-            <Input
-              value={score}
-              onChangeText={setScore}
-              keyboardType="number-pad"
-              placeholder="Score (1-200)"
-            />
+            {isEditable ? (
+              <Button onPress={onSavePick} disabled={!canSubmit}>
+                {submitting ? "Saving..." : "Save Super Bowl Pick"}
+              </Button>
+            ) : null}
           </View>
-
-          <Button onPress={onSubmit} disabled={submitting}>
-            {submitting ? "Saving..." : "Save Super Bowl Pick"}
-          </Button>
         </View>
 
-        <View className="rounded-xl border border-gray-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-800 gap-3">
+        <View className="gap-3 rounded-xl border border-gray-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-800">
           <Text className="text-app-fg-light dark:text-app-fg-dark text-base font-semibold">
             League Super Bowl Board
           </Text>
+
           {picks.length === 0 ? (
             <Text className="text-sm text-gray-600 dark:text-gray-400">
               No picks have been submitted.
             </Text>
           ) : (
-            picks.map((pick) => {
-              const winner = pick.winner ? teamById.get(pick.winner) : null;
-              const loser = pick.loser ? teamById.get(pick.loser) : null;
-              const hidden = pick.winner === null || pick.loser === null || pick.score === null;
-              return (
-                <View
-                  key={`sb_pick_${pick.pickid}`}
-                  className="rounded-lg border border-gray-200 px-3 py-2 dark:border-zinc-700"
-                >
-                  <Text className="text-app-fg-light dark:text-app-fg-dark text-sm font-semibold">
-                    @{pick.leaguemembers?.people.username}
+            <View className="overflow-hidden rounded-lg border border-gray-200 dark:border-zinc-700">
+              <View className="flex-row items-center bg-gray-50 px-2.5 py-2 dark:bg-zinc-900">
+                <View style={{ flex: 1.6 }}>
+                  <Text className="text-[10px] font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                    Member
                   </Text>
-                  {hidden ? (
-                    <Text className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                      Pick hidden until season starts.
-                    </Text>
-                  ) : (
-                    <Text className="mt-1 text-xs text-gray-600 dark:text-gray-400">
-                      {winner ? `${winner.loc} ${winner.name}` : pick.winner} over{" "}
-                      {loser ? `${loser.loc} ${loser.name}` : pick.loser} • Score{" "}
-                      {pick.score}
-                    </Text>
-                  )}
                 </View>
-              );
-            })
+                <View style={{ flex: 1 }}>
+                  <Text className="text-[10px] font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                    W
+                  </Text>
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text className="text-[10px] font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                    L
+                  </Text>
+                </View>
+                <View style={{ width: 42 }}>
+                  <Text className="text-right text-[10px] font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                    Score
+                  </Text>
+                </View>
+              </View>
+
+              {picks.map((pick, index) => {
+                const winner = pick.winner ? teamById.get(pick.winner) : null;
+                const loser = pick.loser ? teamById.get(pick.loser) : null;
+                const hidden =
+                  pick.winner === null || pick.loser === null || pick.score === null;
+                const username = pick.leaguemembers?.people.username ?? "member";
+
+                return (
+                  <View
+                    key={`sb_pick_${pick.pickid}`}
+                    className={cn(
+                      "flex-row items-center px-2.5 py-2",
+                      index < picks.length - 1
+                        ? "border-t border-gray-200 dark:border-zinc-700"
+                        : "",
+                    )}
+                  >
+                    <View style={{ flex: 1.6, paddingRight: 6 }}>
+                      <Text
+                        className="text-app-fg-light dark:text-app-fg-dark text-xs font-semibold"
+                        numberOfLines={1}
+                      >
+                        @{username}
+                      </Text>
+                    </View>
+
+                    <View style={{ flex: 1 }}>
+                      {hidden ? (
+                        <Text className="text-[11px] text-gray-500 dark:text-gray-400">
+                          --
+                        </Text>
+                      ) : (
+                        <View className="self-start rounded-md border border-gray-200 bg-gray-50 px-1.5 py-1 dark:border-zinc-700 dark:bg-zinc-900">
+                          <View className="flex-row items-center gap-1.5">
+                            {winner ? (
+                              <TeamLogo
+                                abbrev={winner.abbrev ?? ""}
+                                width={12}
+                                height={12}
+                              />
+                            ) : null}
+                            <Text className="text-[10px] font-semibold text-gray-700 dark:text-gray-200">
+                              {winner?.abbrev ?? "--"}
+                            </Text>
+                          </View>
+                        </View>
+                      )}
+                    </View>
+
+                    <View style={{ flex: 1 }}>
+                      {hidden ? (
+                        <Text className="text-[11px] text-gray-500 dark:text-gray-400">
+                          --
+                        </Text>
+                      ) : (
+                        <View className="self-start rounded-md border border-gray-200 bg-gray-50 px-1.5 py-1 dark:border-zinc-700 dark:bg-zinc-900">
+                          <View className="flex-row items-center gap-1.5">
+                            {loser ? (
+                              <TeamLogo
+                                abbrev={loser.abbrev ?? ""}
+                                width={12}
+                                height={12}
+                              />
+                            ) : null}
+                            <Text className="text-[10px] font-semibold text-gray-700 dark:text-gray-200">
+                              {loser?.abbrev ?? "--"}
+                            </Text>
+                          </View>
+                        </View>
+                      )}
+                    </View>
+
+                    <View style={{ width: 42 }}>
+                      <Text className="text-right text-xs text-gray-700 dark:text-gray-300">
+                        {hidden ? "--" : pick.score}
+                      </Text>
+                    </View>
+                  </View>
+                );
+              })}
+            </View>
           )}
         </View>
       </View>
