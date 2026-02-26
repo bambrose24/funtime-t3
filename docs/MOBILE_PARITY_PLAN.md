@@ -39,6 +39,9 @@ Guiding rule:
   - In-screen context switches (tabs/filters/segments) should prefer local state swaps over route-level remount navigation.
   - Interactions should feel immediate (subtle transitions, stable headers, preserved context, no avoidable full-screen flashes).
   - Each parity task should include a brief UX critique pass and ship at least one concrete polish improvement where reasonable.
+- Mobile testing quality bar:
+  - Follow `docs/TESTING_STRATEGY.md` as the canonical test strategy for mobile flow coverage and tooling choices.
+  - Any behavior change to a flow/screen requires test updates in the same PR (or an explicitly logged/scheduled exception).
 
 ## 4. Phase Plan
 
@@ -61,7 +64,10 @@ Guiding rule:
   - require cache-cleared on-device smoke validation after dependency/plugin changes
   - completed gate (`P0-MOBILE-FOUNDATION-QA-005`): invalid-refresh-token fail-closed handling is implemented in auth bootstrap + tRPC header session lookup, and latest on-device smoke reported stable startup with no push `projectId` runtime error after env fallback setup
   - active execution focus: `P5-PARITY-QA-001` (end-to-end parity QA and highest-severity regression cleanup)
-  - current execution slice: device-gated QA (`P0-DEEPLINK-QA-001`, `P2-NOTIFY-QA-001`) -> `P0-PRISMA-002` (migration status/deploy validation); targeted in-app UX sweep (`P5-UX-SWEEP-001`) is now closed
+  - current execution slice: testing foundation (`P6-TEST-FOUNDATION-001`) -> device-gated QA (`P0-DEEPLINK-QA-001`, `P2-NOTIFY-QA-001`) -> `P0-PRISMA-002` (migration status/deploy validation); targeted in-app UX sweep (`P5-UX-SWEEP-001`) is now closed
+7. Establish mobile testing foundation and governance:
+  - adopt Expo-aligned unit/integration/E2E strategy from `docs/TESTING_STRATEGY.md`
+  - enforce "flow change -> test change" policy in worklog/plan updates and PR execution
 
 ### Phase 1: Core Player Loop
 1. Auth and session
@@ -160,8 +166,21 @@ When parity work changes:
 4. Keep this file aligned with `docs/PRD.md` decisions.
 5. Update `WORKLOG.md` for task start/status/commit/decision/validation events.
 6. Include a UX quality note for touched screens (what felt off, what was improved, what remains).
+7. Include a test-impact note for touched flows/screens (tests updated, or explicit deferred follow-up ticket).
 
-## 9. Worklog Governance
+## 9. Testing Governance
+- Canonical mobile testing policy lives in `docs/TESTING_STRATEGY.md`.
+- Required rule: any behavior change to user-visible flow/screen must include test updates in the same PR whenever feasible.
+- Allowed exception path:
+  1. Document reason for deferral in `WORKLOG.md`.
+  2. Add a dated follow-up testing ticket to `In Progress` or `Next Up`.
+  3. Keep parity/task status as `IN_PROGRESS` until the coverage gap is closed.
+- Minimum required automation trajectory:
+  1. Jest + `jest-expo` + React Native Testing Library coverage for critical flows.
+  2. Expo Router route-behavior tests for navigation/deep-link semantics.
+  3. Maestro critical-flow smoke coverage executed in EAS workflows.
+
+## 10. Worklog Governance
 - Canonical execution log: `WORKLOG.md` in repo root.
 - Required sections:
   - Program Status
@@ -178,6 +197,7 @@ When parity work changes:
   - Short title
   - Scope touched
   - Outcome
+  - Test impact (tests added/updated, or deferred with linked follow-up ticket)
   - Validation run
   - Timestamp (UTC)
 - `Worklog Gate Check` before phase transitions:
