@@ -1,13 +1,16 @@
 import React, { useMemo, useState } from "react";
-import { Alert, SafeAreaView, ScrollView, Text, View } from "react-native";
+import { Alert, Pressable, SafeAreaView, ScrollView, Text, View } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
 import { clientApi } from "@/lib/trpc/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { SelectOption } from "@/components/ui/select-option";
 import { TeamLogo } from "@/components/shared/TeamLogo";
+import { useColorScheme } from "@/lib/useColorScheme";
 
 export default function JoinLeagueCodeScreen() {
+  const { isDarkColorScheme } = useColorScheme();
   const { code } = useLocalSearchParams<{ code?: string }>();
   const leagueCode = typeof code === "string" ? code : "";
   const utils = clientApi.useUtils();
@@ -193,13 +196,25 @@ export default function JoinLeagueCodeScreen() {
         contentContainerStyle={{ padding: 24, paddingBottom: 40 }}
       >
         <View className="mx-auto w-full max-w-3xl gap-6">
-          <View className="gap-2">
-            <Text className="text-app-fg-light dark:text-app-fg-dark text-3xl font-bold">
-              Join {leagueData.name}
-            </Text>
-            <Text className="text-base text-gray-600 dark:text-gray-400">
-              You're signing in as @{session.dbUser.username}.
-            </Text>
+          <View className="flex-row items-start gap-3">
+            <Pressable
+              onPress={() => router.back()}
+              className="mt-1 rounded-lg bg-app-card-light p-2 dark:bg-app-card-dark"
+            >
+              <Ionicons
+                name="chevron-back"
+                size={22}
+                color={isDarkColorScheme ? "#e5e7eb" : "#374151"}
+              />
+            </Pressable>
+            <View className="flex-1 gap-2">
+              <Text className="text-app-fg-light dark:text-app-fg-dark text-3xl font-bold">
+                Join {leagueData.name}
+              </Text>
+              <Text className="text-base text-gray-600 dark:text-gray-400">
+                You're signing in as @{session.dbUser.username}.
+              </Text>
+            </View>
           </View>
 
           <View className="gap-3 rounded-xl border border-gray-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-800">

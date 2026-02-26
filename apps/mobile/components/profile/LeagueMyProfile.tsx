@@ -1,6 +1,7 @@
 import React, { useMemo } from "react";
 import { ScrollView, Text, View } from "react-native";
 import { clientApi } from "@/lib/trpc/react";
+import { LeagueTabLoadingSkeleton } from "@/components/league/LeagueTabLoadingSkeleton";
 
 type Props = {
   leagueId: string;
@@ -35,13 +36,7 @@ export function LeagueMyProfile({ leagueId }: Props) {
   }, [teams]);
 
   if (sessionLoading || profileLoading) {
-    return (
-      <View className="flex-1 items-center justify-center px-6">
-        <Text className="text-base text-gray-500 dark:text-gray-400">
-          Loading profile...
-        </Text>
-      </View>
-    );
+    return <LeagueTabLoadingSkeleton rows={3} />;
   }
 
   if (!viewerMembership || !profileData) {

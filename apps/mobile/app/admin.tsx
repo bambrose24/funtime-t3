@@ -1,16 +1,38 @@
-import React, { useMemo } from "react";
-import { SafeAreaView, ScrollView, Text, View } from "react-native";
+import React, { useCallback, useMemo, useState } from "react";
+import {
+  Pressable,
+  RefreshControl,
+  SafeAreaView,
+  ScrollView,
+  Text,
+  View,
+} from "react-native";
 import { router } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
+import * as Haptics from "expo-haptics";
 import { Button } from "@/components/ui/button";
 import { clientApi } from "@/lib/trpc/react";
 import { DEFAULT_SEASON } from "@/constants";
+import { useColorScheme } from "@/lib/useColorScheme";
 
 export default function MobileGlobalAdminScreen() {
-  const { data: session, isLoading: sessionLoading } =
-    clientApi.session.current.useQuery();
-  const { data: isSuperAdmin, isLoading: isSuperAdminLoading } =
-    clientApi.generalAdmin.isSuperAdmin.useQuery();
-  const { data: adminData, isLoading: adminDataLoading } =
+  const { isDarkColorScheme } = useColorScheme();
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const {
+    data: session,
+    isLoading: sessionLoading,
+    refetch: refetchSession,
+  } = clientApi.session.current.useQuery();
+  const {
+    data: isSuperAdmin,
+    isLoading: isSuperAdminLoading,
+    refetch: refetchSuperAdmin,
+  } = clientApi.generalAdmin.isSuperAdmin.useQuery();
+  const {
+    data: adminData,
+    isLoading: adminDataLoading,
+    refetch: refetchAdminData,
+  } =
     clientApi.generalAdmin.getAdminData.useQuery(undefined, {
       enabled: Boolean(isSuperAdmin),
     });
@@ -45,6 +67,53 @@ export default function MobileGlobalAdminScreen() {
       0,
     );
   }, [adminData?.emailsSent]);
+
+  const metricTiles = useMemo(() => {
+    return [
+      {
+        label: "All-time Picks",
+        value: totalPicksAllTime,
+      },
+      {
+        label: `${DEFAULT_SEASON} Leagues`,
+        value: seasonLeagues.length,
+      },
+      {
+        label: `${DEFAULT_SEASON} Players`,
+        value: thisSeasonPlayers,
+      },
+      {
+        label: "Messages Sent",
+        value: totalMessages,
+      },
+      {
+        label: "Emails Sent",
+        value: totalEmails,
+      },
+    ];
+  }, [
+    seasonLeagues.length,
+    thisSeasonPlayers,
+    totalEmails,
+    totalMessages,
+    totalPicksAllTime,
+  ]);
+
+  const onRefresh = useCallback(async () => {
+    setIsRefreshing(true);
+    Haptics.selectionAsync().catch(() => {
+      // No-op if haptics are unavailable.
+    });
+    try {
+      await refetchSession();
+      await refetchSuperAdmin();
+      if (isSuperAdmin) {
+        await refetchAdminData();
+      }
+    } finally {
+      setIsRefreshing(false);
+    }
+  }, [isSuperAdmin, refetchAdminData, refetchSession, refetchSuperAdmin]);
 
   if (
     sessionLoading ||
@@ -84,122 +153,177 @@ export default function MobileGlobalAdminScreen() {
         className="flex-1"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ padding: 16, paddingBottom: 32 }}
+        refreshControl={
+          <RefreshControl
+            refreshing={isRefreshing}
+            onRefresh={onRefresh}
+          />
+        }
       >
         <View className="gap-4">
-          <View className="gap-1">
-            <Text className="text-app-fg-light dark:text-app-fg-dark text-2xl font-bold">
-              Global Admin
-            </Text>
-            <Text className="text-sm text-gray-600 dark:text-gray-400">
-              Cross-league system metrics and quick admin access.
-            </Text>
+          <View className="flex-row items-start gap-3 px-1">
+            <Pressable
+              onPress={() => router.back()}
+              className="mt-1 rounded-lg bg-app-card-light p-2 dark:bg-app-card-dark"
+            >
+              <Ionicons
+                name="chevron-back"
+                size={22}
+                color={isDarkColorScheme ? "#e5e7eb" : "#374151"}
+              />
+            </Pressable>
+            <View className="flex-1 gap-1">
+              <Text className="text-app-fg-light dark:text-app-fg-dark text-2xl font-bold">
+                Global Admin
+              </Text>
+              <Text className="text-sm text-gray-600 dark:text-gray-400">
+                Cross-league system metrics and quick admin access.
+              </Text>
+            </View>
           </View>
 
-          <View className="rounded-xl border border-gray-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-800">
-            <Text className="text-sm text-gray-600 dark:text-gray-400">
-              All-time Picks
-            </Text>
-            <Text className="text-app-fg-light dark:text-app-fg-dark text-2xl font-bold">
-              {totalPicksAllTime.toLocaleString()}
-            </Text>
-          </View>
-
-          <View className="rounded-xl border border-gray-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-800">
-            <Text className="text-sm text-gray-600 dark:text-gray-400">
-              {DEFAULT_SEASON} Season Leagues
-            </Text>
-            <Text className="text-app-fg-light dark:text-app-fg-dark text-2xl font-bold">
-              {seasonLeagues.length.toLocaleString()}
-            </Text>
-          </View>
-
-          <View className="rounded-xl border border-gray-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-800">
-            <Text className="text-sm text-gray-600 dark:text-gray-400">
-              {DEFAULT_SEASON} Season Players
-            </Text>
-            <Text className="text-app-fg-light dark:text-app-fg-dark text-2xl font-bold">
-              {thisSeasonPlayers.toLocaleString()}
-            </Text>
-          </View>
-
-          <View className="rounded-xl border border-gray-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-800">
-            <Text className="text-sm text-gray-600 dark:text-gray-400">
-              Messages Sent
-            </Text>
-            <Text className="text-app-fg-light dark:text-app-fg-dark text-2xl font-bold">
-              {totalMessages.toLocaleString()}
-            </Text>
-          </View>
-
-          <View className="rounded-xl border border-gray-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-800">
-            <Text className="text-sm text-gray-600 dark:text-gray-400">
-              Emails Sent
-            </Text>
-            <Text className="text-app-fg-light dark:text-app-fg-dark text-2xl font-bold">
-              {totalEmails.toLocaleString()}
-            </Text>
-          </View>
-
-          <View className="rounded-xl border border-gray-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-800 gap-3">
-            <Text className="text-app-fg-light dark:text-app-fg-dark text-base font-semibold">
-              Picks by Season
-            </Text>
-            {(adminData?.picksBySeason ?? []).map((seasonData) => (
+          <View className="flex-row flex-wrap gap-3">
+            {metricTiles.map((tile) => (
               <View
-                key={seasonData.season}
-                className="flex-row items-center justify-between border-b border-gray-100 pb-2 dark:border-zinc-700"
+                key={tile.label}
+                style={{ width: "48%" }}
+                className="rounded-xl border border-gray-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-800"
               >
-                <Text className="text-sm text-gray-600 dark:text-gray-300">
-                  {seasonData.season}
+                <Text className="text-xs text-gray-600 dark:text-gray-400">
+                  {tile.label}
                 </Text>
-                <Text className="text-sm font-semibold text-app-fg-light dark:text-app-fg-dark">
-                  {seasonData._count.toLocaleString()}
+                <Text className="text-app-fg-light dark:text-app-fg-dark mt-1 text-2xl font-bold">
+                  {tile.value.toLocaleString()}
                 </Text>
               </View>
             ))}
           </View>
 
-          <View className="gap-1 px-1">
-            <Text className="text-app-fg-light dark:text-app-fg-dark text-lg font-semibold">
-              {DEFAULT_SEASON} Leagues
-            </Text>
-          </View>
-
-          {seasonLeagues.length === 0 ? (
-            <View className="rounded-xl border border-gray-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-800">
-              <Text className="text-sm text-gray-600 dark:text-gray-400">
-                No leagues found for the current season.
+          <View className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-zinc-700 dark:bg-zinc-800">
+            <View className="border-b border-gray-100 px-4 py-3 dark:border-zinc-700">
+              <Text className="text-app-fg-light dark:text-app-fg-dark text-base font-semibold">
+                Picks by Season
               </Text>
             </View>
-          ) : (
-            seasonLeagues.map((league) => (
-              <View
-                key={league.league_id}
-                className="rounded-xl border border-gray-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-800 gap-3"
-              >
-                <View className="gap-1">
-                  <Text className="text-app-fg-light dark:text-app-fg-dark text-base font-semibold">
-                    {league.name}
+            <View className="flex-row items-center border-b border-gray-200 bg-gray-50 px-4 py-2 dark:border-zinc-700 dark:bg-zinc-900">
+              <Text className="w-20 text-[11px] font-semibold uppercase tracking-wide text-gray-600 dark:text-gray-400">
+                Season
+              </Text>
+              <Text className="flex-1 text-right text-[11px] font-semibold uppercase tracking-wide text-gray-600 dark:text-gray-400">
+                Picks
+              </Text>
+            </View>
+            {(adminData?.picksBySeason ?? []).length === 0 ? (
+              <View className="px-4 py-3">
+                <Text className="text-sm text-gray-600 dark:text-gray-400">
+                  No picks found.
+                </Text>
+              </View>
+            ) : (
+              (adminData?.picksBySeason ?? []).map((seasonData, index, arr) => (
+                <View
+                  key={seasonData.season}
+                  className={`flex-row items-center px-4 py-2 ${
+                    index < arr.length - 1
+                      ? "border-b border-gray-100 dark:border-zinc-800"
+                      : ""
+                  }`}
+                >
+                  <Text className="w-20 text-sm text-gray-700 dark:text-gray-200">
+                    {seasonData.season}
                   </Text>
-                  <Text className="text-xs text-gray-600 dark:text-gray-400">
-                    League #{league.league_id} • Members: {league.members}
+                  <Text className="flex-1 text-right text-sm font-semibold text-app-fg-light dark:text-app-fg-dark">
+                    {seasonData._count.toLocaleString()}
                   </Text>
                 </View>
+              ))
+            )}
+          </View>
 
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onPress={() => router.push(`/league/${league.league_id}/admin` as any)}
-                >
-                  Open Admin Tools
-                </Button>
+          <View className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-zinc-700 dark:bg-zinc-800">
+            <View className="border-b border-gray-100 px-4 py-3 dark:border-zinc-700">
+              <Text className="text-app-fg-light dark:text-app-fg-dark text-base font-semibold">
+                {DEFAULT_SEASON} Leagues
+              </Text>
+            </View>
+            <View className="flex-row items-center border-b border-gray-200 bg-gray-50 px-4 py-2 dark:border-zinc-700 dark:bg-zinc-900">
+              <Text className="flex-1 text-[11px] font-semibold uppercase tracking-wide text-gray-600 dark:text-gray-400">
+                League
+              </Text>
+              <Text className="w-20 text-right text-[11px] font-semibold uppercase tracking-wide text-gray-600 dark:text-gray-400">
+                Members
+              </Text>
+              <Text className="w-16 text-right text-[11px] font-semibold uppercase tracking-wide text-gray-600 dark:text-gray-400">
+                Action
+              </Text>
+            </View>
+            {seasonLeagues.length === 0 ? (
+              <View className="px-4 py-3">
+                <Text className="text-sm text-gray-600 dark:text-gray-400">
+                  No leagues found for the current season.
+                </Text>
               </View>
-            ))
-          )}
+            ) : (
+              seasonLeagues.map((league, index) => (
+                <View
+                  key={league.league_id}
+                  className={`flex-row items-center px-4 py-2 ${
+                    index < seasonLeagues.length - 1
+                      ? "border-b border-gray-100 dark:border-zinc-800"
+                      : ""
+                  }`}
+                >
+                  <View className="flex-1 pr-2">
+                    <Text
+                      numberOfLines={1}
+                      className="text-sm font-semibold text-app-fg-light dark:text-app-fg-dark"
+                    >
+                      {league.name}
+                    </Text>
+                    <Text className="text-xs text-gray-500 dark:text-gray-400">
+                      #{league.league_id}
+                    </Text>
+                  </View>
+                  <Text className="w-20 text-right text-sm text-gray-700 dark:text-gray-200">
+                    {league.members.toLocaleString()}
+                  </Text>
+                  <Pressable
+                    className="w-16 items-end"
+                    onPress={() =>
+                      router.push(`/league/${league.league_id}/admin` as any)
+                    }
+                  >
+                    <Text className="text-xs font-semibold text-blue-600 dark:text-blue-400">
+                      Open
+                    </Text>
+                  </Pressable>
+                </View>
+              ))
+            )}
+          </View>
 
-          <Button variant="outline" onPress={() => router.back()}>
-            Back
-          </Button>
+          <View className="rounded-xl border border-gray-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-800 gap-3">
+            <Text className="text-app-fg-light dark:text-app-fg-dark text-base font-semibold">
+              Quick Totals
+            </Text>
+            {metricTiles.map((tile, index) => (
+              <View
+                key={tile.label}
+                className={`flex-row items-center justify-between ${
+                  index < metricTiles.length - 1
+                    ? "border-b border-gray-100 pb-2 dark:border-zinc-700"
+                    : ""
+                }`}
+              >
+                <Text className="text-sm text-gray-600 dark:text-gray-300">
+                  {tile.label}
+                </Text>
+                <Text className="text-sm font-semibold text-app-fg-light dark:text-app-fg-dark">
+                  {tile.value.toLocaleString()}
+                </Text>
+              </View>
+            ))}
+          </View>
         </View>
       </ScrollView>
     </SafeAreaView>

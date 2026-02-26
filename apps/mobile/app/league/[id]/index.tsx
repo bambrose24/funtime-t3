@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Suspense, useMemo } from "react";
+import React, { useState, useEffect, Suspense, useMemo, useCallback } from "react";
 import {
   View,
   Text,
@@ -7,9 +7,11 @@ import {
   ScrollView,
   Modal,
   Animated,
+  RefreshControl,
 } from "react-native";
 import { router, useLocalSearchParams, useFocusEffect } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import * as Haptics from "expo-haptics";
 import { clientApi } from "@/lib/trpc/react";
 import { useUser } from "@/hooks/useUser";
 import { ClientPickPage } from "@/components/picks/ClientPickPage";
@@ -33,25 +35,38 @@ type TabType =
   | "profile"
   | "superbowl";
 
+const TAB_KEYS: TabType[] = [
+  "overview",
+  "picks",
+  "leaderboard",
+  "messages",
+  "profile",
+  "superbowl",
+];
+
+function parseTabParam(tabParam?: string): TabType {
+  if (tabParam && TAB_KEYS.includes(tabParam as TabType)) {
+    return tabParam as TabType;
+  }
+  return "overview";
+}
+
 export default function LeagueScreen() {
   const { id, tab } = useLocalSearchParams<{ id: string; tab?: string }>();
-
-  const activeTab: TabType =
-    tab &&
-    [
-      "overview",
-      "picks",
-      "leaderboard",
-      "messages",
-      "profile",
-      "superbowl",
-    ].includes(tab)
-      ? (tab as TabType)
-      : "overview";
+  const [activeTab, setActiveTab] = useState<TabType>(parseTabParam(tab));
   const [isPicksModalVisible, setIsPicksModalVisible] = useState(false);
   const { isDarkColorScheme } = useColorScheme();
   const scaleValue = useState(new Animated.Value(1))[0];
   const translateValue = useState(new Animated.Value(0))[0];
+  const tabOpacity = useState(new Animated.Value(1))[0];
+  const [isTabTransitioning, setIsTabTransitioning] = useState(false);
+
+  useEffect(() => {
+    const nextTab = parseTabParam(tab);
+    setActiveTab((currentTab) =>
+      currentTab === nextTab ? currentTab : nextTab,
+    );
+  }, [tab]);
 
   // Animate background when modal opens/closes
   useEffect(() => {
@@ -77,13 +92,34 @@ export default function LeagueScreen() {
     aggressive: true, // Prefetch historical data too
   });
 
-  const navigateToTab = (nextTab: TabType) => {
-    if (!id) return;
-    const nextPath =
-      nextTab === "overview"
-        ? `/league/${id}`
-        : `/league/${id}?tab=${nextTab}`;
-    router.replace(nextPath as any);
+  const switchToTab = (nextTab: TabType) => {
+    if (nextTab === activeTab || isTabTransitioning) return;
+
+    Haptics.selectionAsync().catch(() => {
+      // No-op if haptics are unavailable.
+    });
+
+    setIsTabTransitioning(true);
+    tabOpacity.stopAnimation();
+    Animated.timing(tabOpacity, {
+      toValue: 0,
+      duration: 90,
+      useNativeDriver: true,
+    }).start(({ finished }) => {
+      if (!finished) {
+        setIsTabTransitioning(false);
+        return;
+      }
+
+      setActiveTab(nextTab);
+      Animated.timing(tabOpacity, {
+        toValue: 1,
+        duration: 150,
+        useNativeDriver: true,
+      }).start(() => {
+        setIsTabTransitioning(false);
+      });
+    });
   };
 
   // Fetch league data to display league name (this should be cached from prefetch)
@@ -106,6 +142,16 @@ export default function LeagueScreen() {
   );
   const canManageLeague = isLeagueAdmin || Boolean(isSuperAdmin);
 
+  useEffect(() => {
+    if (
+      activeTab === "superbowl" &&
+      leagueData &&
+      !leagueData.superbowl_competition
+    ) {
+      setActiveTab("overview");
+    }
+  }, [activeTab, leagueData]);
+
   if (!id) {
     return (
       <SafeAreaView className="bg-app-bg-light dark:bg-app-bg-dark flex-1">
@@ -118,12 +164,15 @@ export default function LeagueScreen() {
     );
   }
 
+  const showSuperbowlTab =
+    leagueData?.superbowl_competition ?? activeTab === "superbowl";
+
   const tabs: { key: TabType; label: string }[] = [
     { key: "overview", label: "Overview" },
     { key: "picks", label: "Pick" },
     { key: "leaderboard", label: "Leaderboard" },
     { key: "messages", label: "Messages" },
-    ...(leagueData?.superbowl_competition
+    ...(showSuperbowlTab
       ? [{ key: "superbowl" as TabType, label: "Super Bowl" }]
       : []),
     { key: "profile", label: "My Profile" },
@@ -135,7 +184,7 @@ export default function LeagueScreen() {
         return (
           <LeagueOverview
             leagueId={id}
-            onSwitchToPicks={() => navigateToTab("picks")}
+            onSwitchToPicks={() => switchToTab("picks")}
             isPicksModalVisible={isPicksModalVisible}
             setIsPicksModalVisible={setIsPicksModalVisible}
           />
@@ -216,31 +265,37 @@ export default function LeagueScreen() {
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
-            contentContainerStyle={{ paddingHorizontal: 16 }}
+            contentContainerStyle={{ paddingHorizontal: 20 }}
           >
-            <View className="flex-row">
-              {tabs.map((tab) => (
-                <Pressable
-                  key={tab.key}
-                  onPress={() => navigateToTab(tab.key)}
-                  className="mr-6 px-4 py-3"
-                >
-                  <Text
-                    className={cn(
-                      "text-base font-medium",
-                      activeTab === tab.key
-                        ? "text-gray-900 dark:text-gray-100"
-                        : "text-gray-500 dark:text-gray-400",
-                    )}
+            <View className="flex-row items-end">
+              {tabs.map((tab) => {
+                const isActive = activeTab === tab.key;
+                return (
+                  <Pressable
+                    key={tab.key}
+                    onPress={() => switchToTab(tab.key)}
+                    className="relative mr-6 pb-3 pt-2"
+                    hitSlop={8}
                   >
-                    {tab.label}
-                  </Text>
-                  {/* Active Tab Indicator */}
-                  {activeTab === tab.key && (
-                    <View className="absolute bottom-0 left-4 right-4 h-0.5 rounded-full bg-gray-900 dark:bg-gray-100" />
-                  )}
-                </Pressable>
-              ))}
+                    <Text
+                      className={cn(
+                        "text-sm font-semibold tracking-tight",
+                        isActive
+                          ? "text-gray-900 dark:text-gray-100"
+                          : "text-gray-500 dark:text-gray-400",
+                      )}
+                    >
+                      {tab.label}
+                    </Text>
+                    <View
+                      className={cn(
+                        "absolute -bottom-px left-0 right-0 h-0.5 rounded-full",
+                        isActive ? "bg-gray-900 dark:bg-gray-100" : "bg-transparent",
+                      )}
+                    />
+                  </Pressable>
+                );
+              })}
             </View>
           </ScrollView>
           {/* Bottom Border */}
@@ -248,7 +303,9 @@ export default function LeagueScreen() {
         </View>
 
         {/* Tab Content */}
-        <View className="flex-1">{renderTabContent()}</View>
+        <Animated.View className="flex-1" style={{ opacity: tabOpacity }}>
+          {renderTabContent()}
+        </Animated.View>
       </Animated.View>
     </SafeAreaView>
   );
@@ -381,6 +438,26 @@ function useLeagueOverviewData(leagueId: string) {
     }
   }, [displayWeek, leagueQuery.data?.season, leagueIdNumber, utils]);
 
+  const refetchAll = useCallback(async () => {
+    await Promise.all([
+      leagueQuery.refetch(),
+      activeWeekQuery.refetch(),
+      teamsQuery.refetch(),
+      allUserPicksQuery.refetch(),
+      gamesQuery.refetch(),
+      picksSummaryQuery.refetch(),
+      userPicksQuery.refetch(),
+    ]);
+  }, [
+    leagueQuery,
+    activeWeekQuery,
+    teamsQuery,
+    allUserPicksQuery,
+    gamesQuery,
+    picksSummaryQuery,
+    userPicksQuery,
+  ]);
+
   return {
     leagueData: leagueQuery.data,
     activeWeek: activeWeekQuery.data,
@@ -396,6 +473,7 @@ function useLeagueOverviewData(leagueId: string) {
     isUserPicksLoading: userPicksQuery.isLoading,
     isError:
       leagueQuery.isError || activeWeekQuery.isError || teamsQuery.isError,
+    refetchAll,
   };
 }
 
@@ -412,6 +490,7 @@ function LeagueOverview({
   setIsPicksModalVisible: (visible: boolean) => void;
 }) {
   const { isDarkColorScheme } = useColorScheme();
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const {
     leagueData,
     activeWeek,
@@ -423,7 +502,17 @@ function LeagueOverview({
     isLoading,
     isUserPicksLoading,
     isError,
+    refetchAll,
   } = useLeagueOverviewData(leagueId);
+
+  const onRefresh = useCallback(async () => {
+    setIsRefreshing(true);
+    try {
+      await refetchAll();
+    } finally {
+      setIsRefreshing(false);
+    }
+  }, [refetchAll]);
 
   // Show error state
   if (isError) {
@@ -455,6 +544,13 @@ function LeagueOverview({
       className="flex-1"
       showsVerticalScrollIndicator={false}
       contentContainerStyle={{ paddingBottom: 32 }}
+      refreshControl={
+        <RefreshControl
+          refreshing={isRefreshing}
+          onRefresh={onRefresh}
+          tintColor={isDarkColorScheme ? "#e5e7eb" : "#374151"}
+        />
+      }
     >
       <View className="py-6">
         {/* Week Header - Remove league name since it's already in nav */}
@@ -580,6 +676,17 @@ function LeagueOverview({
           </View>
         )}
 
+        {!isLoading && !isUserPicksLoading && (!games || games.length === 0) && (
+          <View className="mx-4 mb-6 rounded-xl border border-gray-200 bg-gray-50 px-4 py-5 dark:border-zinc-700 dark:bg-zinc-800">
+            <Text className="text-app-fg-light dark:text-app-fg-dark text-base font-semibold">
+              No Games Posted Yet
+            </Text>
+            <Text className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+              Week {displayWeek} matchups will appear here once the schedule is available.
+            </Text>
+          </View>
+        )}
+
         {/* Picks Table */}
         {picksSummary && picksSummary.length > 0 && games && (
           <View className="mb-6">
@@ -593,6 +700,21 @@ function LeagueOverview({
             />
           </View>
         )}
+
+        {!isLoading &&
+          !isUserPicksLoading &&
+          games &&
+          games.length > 0 &&
+          (!picksSummary || picksSummary.length === 0) && (
+            <View className="mx-4 mb-6 rounded-xl border border-gray-200 bg-gray-50 px-4 py-5 dark:border-zinc-700 dark:bg-zinc-800">
+              <Text className="text-app-fg-light dark:text-app-fg-dark text-base font-semibold">
+                No League Picks Yet
+              </Text>
+              <Text className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                Picks will populate once members submit for this week.
+              </Text>
+            </View>
+          )}
       </View>
 
       {/* Picks Modal */}
@@ -936,7 +1058,7 @@ function MobilePicksTable({
         </View>
 
         {/* Data Rows */}
-        {sortedPicksSummary.map((member, index) => {
+        {sortedPicksSummary.map((member) => {
           const isCurrentUser = member.people.uid === currentUserId;
           const rowBgColor = isCurrentUser
             ? "bg-blue-50 dark:bg-blue-900/20"
@@ -949,25 +1071,16 @@ function MobilePicksTable({
             >
               {/* Player Name */}
               <View className="w-24 justify-center border-r border-gray-200 px-2 py-3 dark:border-zinc-700">
-                <View className="flex-row items-center">
-                  <Text
-                    className={`text-xs ${
-                      isCurrentUser
-                        ? "font-bold text-blue-600 dark:text-blue-400"
-                        : "text-gray-900 dark:text-gray-100"
-                    }`}
-                    numberOfLines={1}
-                  >
-                    {member.people.username}
-                  </Text>
-                  {isCurrentUser && (
-                    <View className="ml-1 rounded-full bg-blue-500 px-1.5 py-0.5">
-                      <Text className="text-xs font-medium text-white">
-                        You
-                      </Text>
-                    </View>
-                  )}
-                </View>
+                <Text
+                  className={`text-xs ${
+                    isCurrentUser
+                      ? "font-bold text-blue-600 dark:text-blue-400"
+                      : "text-gray-900 dark:text-gray-100"
+                  }`}
+                  numberOfLines={1}
+                >
+                  {member.people.username}
+                </Text>
               </View>
               {/* Correct Count */}
               <View className="w-16 justify-center border-r border-gray-200 px-2 py-3 dark:border-zinc-700">

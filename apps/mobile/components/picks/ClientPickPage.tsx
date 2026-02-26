@@ -10,6 +10,7 @@ import { Button } from "../ui/button";
 import { Text } from "../ui/text";
 import { createComponentLogger } from "@/lib/logging";
 import { Input } from "../ui/input";
+import { LeagueTabLoadingSkeleton } from "@/components/league/LeagueTabLoadingSkeleton";
 
 type Props = {
   leagueId: string;
@@ -351,17 +352,33 @@ export function ClientPickPage({ leagueId }: Props) {
 
   // Show loading state
   if (leagueLoading || weekLoading || teamsLoading || picksLoading) {
+    return <LeagueTabLoadingSkeleton rows={4} />;
+  }
+
+  if (!league || !teams) {
     return (
-      <View className="flex-1 items-center justify-center">
-        <Text className="text-base text-gray-500 dark:text-gray-400">
-          Loading picks...
+      <View className="flex-1 items-center justify-center px-4">
+        <Text className="text-center text-base text-gray-500 dark:text-gray-400">
+          Unable to load picks data. Please try again.
         </Text>
       </View>
     );
   }
 
-  // Show error if data is missing
-  if (!league || !weekToPick || !teams || !existingPicks) {
+  if (!weekToPick?.week || !weekToPick?.games?.length) {
+    return (
+      <View className="flex-1 items-center justify-center px-4">
+        <Text className="text-app-fg-light dark:text-app-fg-dark mb-3 text-center text-2xl font-bold">
+          Season Over
+        </Text>
+        <Text className="text-center text-base text-gray-500 dark:text-gray-400">
+          There are no remaining games to pick right now.
+        </Text>
+      </View>
+    );
+  }
+
+  if (!existingPicks) {
     return (
       <View className="flex-1 items-center justify-center px-4">
         <Text className="text-center text-base text-gray-500 dark:text-gray-400">

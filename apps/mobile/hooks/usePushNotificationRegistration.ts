@@ -17,6 +17,7 @@ Notifications.setNotificationHandler({
 
 export function usePushNotificationRegistration(hasSession: boolean) {
   const registrationAttemptedForUserRef = useRef<number | null>(null);
+  const lastHandledNotificationResponseIdRef = useRef<string | null>(null);
   const { data: appSession } = clientApi.session.current.useQuery(undefined, {
     enabled: hasSession,
     refetchOnWindowFocus: false,
@@ -25,18 +26,37 @@ export function usePushNotificationRegistration(hasSession: boolean) {
     clientApi.settings.registerPushToken.useMutation();
 
   useEffect(() => {
-    const navigateFromNotification = (
+    const navigateFromNotification = async (
       response: Notifications.NotificationResponse | null,
     ) => {
+      if (!response) {
+        return;
+      }
+
+      const responseId = response.notification.request.identifier;
+      if (
+        responseId &&
+        lastHandledNotificationResponseIdRef.current === responseId
+      ) {
+        return;
+      }
+
       const path = response?.notification.request.content.data?.path;
       if (typeof path === "string" && path.length > 0) {
+        lastHandledNotificationResponseIdRef.current = responseId;
         router.push(path as any);
+      }
+
+      try {
+        await Notifications.clearLastNotificationResponseAsync();
+      } catch (error) {
+        console.warn("Failed clearing last notification response", error);
       }
     };
 
     Notifications.getLastNotificationResponseAsync()
       .then((response) => {
-        navigateFromNotification(response);
+        void navigateFromNotification(response);
       })
       .catch((error) => {
         console.error("Failed reading last notification response", error);
@@ -44,7 +64,7 @@ export function usePushNotificationRegistration(hasSession: boolean) {
 
     const subscription =
       Notifications.addNotificationResponseReceivedListener((response) => {
-        navigateFromNotification(response);
+        void navigateFromNotification(response);
       });
     return () => {
       subscription.remove();
@@ -81,12 +101,20 @@ export function usePushNotificationRegistration(hasSession: boolean) {
       }
 
       const projectId =
+        process.env.EXPO_PUBLIC_EAS_PROJECT_ID ??
         Constants.easConfig?.projectId ??
         Constants.expoConfig?.extra?.eas?.projectId;
 
-      const tokenResult = await Notifications.getExpoPushTokenAsync(
-        projectId ? { projectId } : undefined,
-      );
+      if (!projectId) {
+        console.warn(
+          "[Push] Skipping Expo push token registration because no EAS projectId is configured. Set EXPO_PUBLIC_EAS_PROJECT_ID or expose expo.extra.eas.projectId.",
+        );
+        return;
+      }
+
+      const tokenResult = await Notifications.getExpoPushTokenAsync({
+        projectId,
+      });
 
       const platform: "ios" | "android" | "web" =
         Platform.OS === "ios" || Platform.OS === "android"

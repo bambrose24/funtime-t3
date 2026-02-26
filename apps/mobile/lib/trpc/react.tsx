@@ -19,7 +19,11 @@ import SuperJSON from "superjson";
 
 import { type AppRouter } from "@funtime/api";
 import { getBaseUrl } from "@/utils/getBaseUrl";
-import { supabase } from "@/lib/supabase/client";
+import {
+  clearPersistedSupabaseSession,
+  isInvalidRefreshTokenError,
+  supabase,
+} from "@/lib/supabase/client";
 import { createQueryClient } from "./create-query-client";
 
 export const clientApi = createTRPCReact<AppRouter>();
@@ -79,12 +83,46 @@ export function TRPCReactProvider({ children }: { children: React.ReactNode }) {
           headers: async () => {
             const headers = new Headers();
             headers.set("x-trpc-source", "react-native");
-            const {
-              data: { session },
-            } = await supabase.auth.getSession();
-            if (session?.access_token) {
-              headers.set("Authorization", `Bearer ${session.access_token}`);
+
+            try {
+              const {
+                data: { session },
+                error,
+              } = await supabase.auth.getSession();
+
+              if (error) {
+                if (isInvalidRefreshTokenError(error)) {
+                  console.warn(
+                    "[tRPC] Invalid refresh token while building auth headers; clearing local auth state.",
+                  );
+                  await clearPersistedSupabaseSession("trpc:headers:getSession");
+                } else {
+                  console.error(
+                    "[tRPC] Failed to read Supabase session while building auth headers.",
+                    error,
+                  );
+                }
+
+                return headers;
+              }
+
+              if (session?.access_token) {
+                headers.set("Authorization", `Bearer ${session.access_token}`);
+              }
+            } catch (error) {
+              if (isInvalidRefreshTokenError(error)) {
+                console.warn(
+                  "[tRPC] Invalid refresh token thrown while building auth headers; clearing local auth state.",
+                );
+                await clearPersistedSupabaseSession("trpc:headers:throw");
+              } else {
+                console.error(
+                  "[tRPC] Unexpected error while building auth headers.",
+                  error,
+                );
+              }
             }
+
             return headers;
           },
         }),

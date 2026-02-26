@@ -56,8 +56,8 @@ export function MobileLeaderboardTable({ leaderboard, leagueId }: Props) {
       {/* Data Rows */}
       {sortedMembers.map((member) => {
         const isCurrentUser = member.member.user_id === currentUserId;
-        const rowBgColor = isCurrentUser 
-          ? "bg-blue-50 dark:bg-blue-900/20" 
+        const rowBgColor = isCurrentUser
+          ? "bg-blue-50 dark:bg-blue-900/20"
           : "bg-white dark:bg-zinc-900";
 
         return (
@@ -72,34 +72,29 @@ export function MobileLeaderboardTable({ leaderboard, leagueId }: Props) {
           >
             {/* Rank */}
             <View className="w-20 justify-center border-r border-gray-200 px-3 py-3 dark:border-zinc-700">
-              <Text className={`text-center text-sm font-semibold ${
-                member.rank <= 3 
-                  ? "text-yellow-600 dark:text-yellow-400" 
-                  : "text-gray-900 dark:text-gray-100"
-              }`}>
+              <Text
+                className={`text-center text-sm font-semibold ${
+                  member.rank <= 3
+                    ? "text-yellow-600 dark:text-yellow-400"
+                    : "text-gray-900 dark:text-gray-100"
+                }`}
+              >
                 {member.rank}
               </Text>
             </View>
 
             {/* Player Name */}
             <View className="flex-1 justify-center border-r border-gray-200 px-3 py-3 dark:border-zinc-700">
-              <View className="flex-row items-center">
-                <Text
-                  className={`text-sm ${
-                    isCurrentUser 
-                      ? "font-bold text-blue-600 dark:text-blue-400" 
-                      : "text-gray-900 dark:text-gray-100"
-                  }`}
-                  numberOfLines={1}
-                >
-                  {member.member.people.username}
-                </Text>
-                {isCurrentUser && (
-                  <View className="ml-2 rounded-full bg-blue-500 px-2 py-0.5">
-                    <Text className="text-xs font-medium text-white">You</Text>
-                  </View>
-                )}
-              </View>
+              <Text
+                className={`text-sm ${
+                  isCurrentUser
+                    ? "font-bold text-blue-600 dark:text-blue-400"
+                    : "text-gray-900 dark:text-gray-100"
+                }`}
+                numberOfLines={1}
+              >
+                {member.member.people.username}
+              </Text>
             </View>
 
             {/* Correct Count */}

@@ -11,6 +11,84 @@
 - Pre-step: `0.0 Initialize and baseline WORKLOG.md`.
 
 ## Completed Tasks
+- Task ID: `P3-ADMIN-QA-001B9`
+  - Short title: Enforce API self-protection for league-admin role/remove mutations.
+  - Scope touched: `packages/api/server/api/routers/league/admin.ts`, `WORKLOG.md`, `docs/MOBILE_PARITY_PLAN.md`.
+  - Outcome: Added API guardrails so non-super-admin league admins cannot remove themselves or change their own role via direct API calls, aligning server-side behavior with existing mobile UI protections.
+  - Validation run: `pnpm --filter @funtime/api typecheck`, `pnpm --filter @funtime/web typecheck`, `pnpm --filter @funtime/mobile typecheck`.
+  - Timestamp (UTC): `2026-02-26T02:27:20Z`.
+- Task ID: `P3-ADMIN-QA-001B8`
+  - Short title: Surface kickoff lock state in mobile admin pick editor.
+  - Scope touched: `apps/mobile/app/league/[id]/admin-picks.tsx`, `WORKLOG.md`, `docs/MOBILE_PARITY_PLAN.md`.
+  - Outcome: Admin pick editor now explicitly shows per-game lock/override status, disables winner and tiebreaker edits after kickoff for non-super-admin users, and keeps super-admin override visibility clear in UI.
+  - Validation run: `pnpm --filter @funtime/mobile typecheck`.
+  - Timestamp (UTC): `2026-02-26T02:21:14Z`.
+- Task ID: `P3-ADMIN-QA-001B7`
+  - Short title: Match mobile email-log table date format to compact `M/D/YY h:mma`.
+  - Scope touched: `apps/mobile/app/league/[id]/admin-emails.tsx`, `WORKLOG.md`, `docs/MOBILE_PARITY_PLAN.md`.
+  - Outcome: Updated compact email-log table timestamps to render as `M/D/YY h:mma` (for example `1/20/25 4:30pm`) for consistent scanability and reduced horizontal space.
+  - Validation run: `pnpm --filter @funtime/mobile typecheck`.
+  - Timestamp (UTC): `2026-02-26T02:19:09Z`.
+- Task ID: `P3-ADMIN-QA-001B6`
+  - Short title: Preserve existing tiebreaker score when admin updates winner without score payload.
+  - Scope touched: `packages/api/server/api/routers/league/admin.ts`, `WORKLOG.md`, `docs/MOBILE_PARITY_PLAN.md`.
+  - Outcome: Updated `league.admin.setPick` to only overwrite `score` when a score is explicitly provided, preventing unintended score clearing during winner-only admin edits.
+  - Validation run: `pnpm --filter @funtime/api typecheck`, `pnpm --filter @funtime/web typecheck`, `pnpm --filter @funtime/mobile typecheck`.
+  - Timestamp (UTC): `2026-02-26T02:13:10Z`.
+- Task ID: `P3-ADMIN-QA-001B5`
+  - Short title: Harden mobile league-admin member-sheet navigation and post-edit refresh reliability.
+  - Scope touched: `apps/mobile/app/league/[id]/admin.tsx`, `WORKLOG.md`, `docs/MOBILE_PARITY_PLAN.md`.
+  - Outcome: Member-sheet actions now close cleanly before pushing to picks/email-log screens, and role/paid/remove mutations now explicitly refetch members after cache invalidation so table state updates immediately after edits.
+  - Validation run: `pnpm --filter @funtime/mobile typecheck`.
+  - Timestamp (UTC): `2026-02-26T02:12:04Z`.
+- Task ID: `P5-PARITY-QA-001J`
+  - Short title: Polish mobile global-admin metric/detail parity with web.
+  - Scope touched: `apps/mobile/app/admin.tsx`, `WORKLOG.md`, `docs/MOBILE_PARITY_PLAN.md`.
+  - Outcome: Upgraded mobile global-admin to a denser metric/detail layout (compact KPI grid, table-style picks-by-season and league rows, quick totals), added pull-to-refresh with haptics, and tightened league action scanability to better match web dashboard information density.
+  - Validation run: `pnpm --filter @funtime/mobile typecheck`.
+  - Timestamp (UTC): `2026-02-26T02:07:56Z`.
+- Task ID: `P3-ADMIN-QA-001B4`
+  - Short title: Include full year in compact mobile email-log table dates.
+  - Scope touched: `apps/mobile/app/league/[id]/admin-emails.tsx`, `WORKLOG.md`, `docs/MOBILE_PARITY_PLAN.md`.
+  - Outcome: Updated compact email-log row timestamps to include month/day/year (plus time) so scanable rows still preserve full date context.
+  - Validation run: `pnpm --filter @funtime/mobile typecheck`.
+  - Timestamp (UTC): `2026-02-26T02:05:38Z`.
+- Task ID: `P3-ADMIN-QA-001B3`
+  - Short title: Compact mobile email-log table and improve preview fallback clarity.
+  - Scope touched: `apps/mobile/app/league/[id]/admin-emails.tsx`, `WORKLOG.md`, `docs/MOBILE_PARITY_PLAN.md`.
+  - Outcome: Replaced stacked email-log cards with a denser row/table layout for faster scanability, added HTML-or-text preview fallback rendering, and added explicit in-app reason messaging when Resend does not return previewable content.
+  - Validation run: `pnpm --filter @funtime/mobile typecheck`.
+  - Timestamp (UTC): `2026-02-26T02:01:24Z`.
+- Task ID: `P3-ADMIN-QA-001B2`
+  - Short title: Add persistent header back navigation across nested mobile admin/join/create screens.
+  - Scope touched: `apps/mobile/app/league/[id]/admin-emails.tsx`, `apps/mobile/app/league/[id]/admin-picks.tsx`, `apps/mobile/app/join-league/index.tsx`, `apps/mobile/app/join-league/[code].tsx`, `apps/mobile/app/league/create.tsx`, `WORKLOG.md`, `docs/MOBILE_PARITY_PLAN.md`.
+  - Outcome: Added visible top-level chevron back controls to nested screens that previously relied on bottom/back actions, including email logs, pick editor, join-league entry/detail, and create-league flow, so back navigation is always available at the top of the screen.
+  - Validation run: `pnpm --filter @funtime/mobile typecheck`, `pnpm --filter @funtime/web typecheck`, `pnpm --filter @funtime/api typecheck`.
+  - Timestamp (UTC): `2026-02-26T01:55:18Z`.
+- Task ID: `P3-ADMIN-QA-001B1`
+  - Short title: Fix admin email-log dates and enforce newest-first ordering.
+  - Scope touched: `packages/api/server/api/routers/league/admin.ts`, `apps/mobile/app/league/[id]/admin-emails.tsx`, `apps/web/src/app/league/[leagueId]/admin/members/MemberEmailLogs.tsx`, `WORKLOG.md`, `docs/MOBILE_PARITY_PLAN.md`.
+  - Outcome: Added API-level `sent_at` fallback sourced from `EmailLogs.ts`, updated mobile/web email-log rendering to use `resend_data.created_at ?? sent_at`, and explicitly sorted logs by newest timestamp so dates render consistently even when Resend omits `created_at`.
+  - Validation run: `pnpm --filter @funtime/api typecheck`, `pnpm --filter @funtime/web typecheck`, `pnpm --filter @funtime/mobile typecheck`.
+  - Timestamp (UTC): `2026-02-26T01:52:04Z`.
+- Task ID: `P5-UX-SWEEP-001G`
+  - Short title: Redesign mobile Account tab into a cleaner compact "My Account" layout.
+  - Scope touched: `apps/mobile/app/(tabs)/account.tsx`, `WORKLOG.md`, `docs/MOBILE_PARITY_PLAN.md`.
+  - Outcome: Reworked the Account screen into a tighter list-style information architecture with reduced card chrome, a compact profile strip, denser settings rows, inline username editing controls, and streamlined notifications/admin/session sections while preserving existing settings behavior.
+  - Validation run: `pnpm --filter @funtime/mobile typecheck`.
+  - Timestamp (UTC): `2026-02-26T01:47:12Z`.
+- Task ID: `P5-DOCSYNC-003`
+  - Short title: Re-prioritize parity QA execution queue and sync planning docs.
+  - Scope touched: `WORKLOG.md`, `docs/MOBILE_PARITY_PLAN.md`.
+  - Outcome: Updated active parity QA checklist with concrete near-term ticket sequencing (`P5-PARITY-QA-001J`, `P3-ADMIN-QA-001B`, and device-gated QA tracks), and aligned the parity plan's execution-focus notes to the same queue.
+  - Validation run: Docs-only update; no runtime validation required.
+  - Timestamp (UTC): `2026-02-26T01:43:34Z`.
+- Task ID: `P5-PARITY-QA-001I`
+  - Short title: Remove mobile table `You` badges and add visible global-admin back navigation.
+  - Scope touched: `apps/mobile/app/league/[id]/index.tsx`, `apps/mobile/components/leaderboard/MobileLeaderboardTable.tsx`, `apps/mobile/app/admin.tsx`, `WORKLOG.md`, `docs/MOBILE_PARITY_PLAN.md`.
+  - Outcome: Removed inline `You` pills from mobile table rows that already highlight the current user in blue (league overview picks table + leaderboard table), and added a persistent header-level chevron back button to the global admin page.
+  - Validation run: `pnpm --filter @funtime/mobile typecheck`.
+  - Timestamp (UTC): `2026-02-26T01:39:05Z`.
 - Task ID: `P5-PARITY-QA-001H`
   - Short title: Refactor Super Bowl tab to pre-season form and no-scroll compact board.
   - Scope touched: `apps/mobile/components/superbowl/LeagueSuperbowlBoard.tsx`, `packages/api/server/api/routers/member/index.ts`, `WORKLOG.md`, `docs/MOBILE_PARITY_PLAN.md`.
@@ -347,16 +425,16 @@
   - Short title: End-to-end parity QA pass and regression fixes.
   - Status: `IN_PROGRESS` (started `2026-02-25T20:24:07Z`).
   - Immediate execution checklist:
-    1. Continue focused parity walk-through for top mobile surfaces (auth/session, home/pick/league tabs, account/settings, league admin flows) and convert findings into scoped fix tasks. Recent closes: `P5-PARITY-QA-001A` (launch deep-link replay regression), `P5-PARITY-QA-001B` (league tab chrome simplification), `P5-PARITY-QA-001C` (notification deep-link replay hardening), `P5-PARITY-QA-001D` (tab loading + message virtualization), `P5-PARITY-QA-001E` (compact Super Bowl layout), `P5-PARITY-QA-001F` (winner-only Super Bowl auto-save + table board), `P5-PARITY-QA-001G` (winner-first Super Bowl chrome polish + team cards), `P5-PARITY-QA-001H` (pre-season Super Bowl form + compact no-scroll board + API lock), and `P3-ADMIN-QA-001A` (compact admin member management).
-    2. Verify deep-link + notification touchpoints after runtime hardening changes (`/join-league/:code`, `/league/:id`, notification path navigation).
-    3. Ship and validate highest-severity parity regressions first, with evidence recorded per fix.
+    1. Continue focused parity walk-through for top mobile surfaces and convert findings into scoped fix tasks. Recent closes: `P5-PARITY-QA-001A` through `P5-PARITY-QA-001J`, `P5-UX-SWEEP-001G`, `P3-ADMIN-QA-001A`, and `P3-ADMIN-QA-001B1` through `P3-ADMIN-QA-001B9`.
+    2. Continue `P5-UX-SWEEP-001`: high-friction interaction/layout polish sweep with one concrete improvement per touched surface.
+    3. Run device-gated validation tracks after in-app fixes stabilize: `P0-DEEPLINK-QA-001` and `P2-NOTIFY-QA-001`.
+    4. Execute `P0-PRISMA-002`: validate migration status/deploy workflow against target DB environment.
 
 ## Next Up
 1. `P5-UX-SWEEP-001`: Screen-by-screen UX polish sweep (interaction latency, layout hierarchy, motion, empty/error states) with one concrete improvement shipped per touched surface.
-2. `P3-ADMIN-QA-001`: Validate compact table + member edit sheet admin workflows (member edits, picks, email logs, remove flow) under league-admin and super-admin identities.
-3. `P0-DEEPLINK-QA-001`: Validate `play-funtime.com` deep links for `/join-league`, `/league/:id`, `/settings`, and `/admin`.
-4. `P2-NOTIFY-QA-001`: Validate push/email delivery behavior in staging (token registration, message pushes, and week summary schedule).
-5. `P0-PRISMA-002`: Validate `prisma migrate status/deploy` against target DB and baseline strategy for existing environments.
+2. `P0-DEEPLINK-QA-001`: Validate `play-funtime.com` deep links for `/join-league`, `/league/:id`, `/settings`, and `/admin`.
+3. `P2-NOTIFY-QA-001`: Validate push/email delivery behavior in staging (token registration, message pushes, and week summary schedule).
+4. `P0-PRISMA-002`: Validate `prisma migrate status/deploy` against target DB and baseline strategy for existing environments.
 
 ## Decisions & Rationale
 - Full parity target includes player + admin (including global admin) to avoid permanent web-only operational gaps.
@@ -369,6 +447,7 @@
 - Deep-link hosting decision: web serves iOS/Android association payloads from route handlers so app ownership config can be environment-driven.
 - Super-admin parity decision: critical admin paths must be authorized by role OR super-admin email at both API and mobile UI layers to avoid unreachable override workflows.
 - Leaderboard parity decision: rank labels in mobile should be raw numeric values to match web and make tie rankings explicit.
+- Current-user row affordance decision: compact mobile tables should highlight the viewer by row/background and name color only (no inline `You` pill) to avoid narrow-cell overflow.
 - Week-summary parity decision: tie-resolution sorting in mobile must use server summary fields (`tiebreakerScore`) instead of inferring from truncated pick rows.
 - Settings parity decision: local username drafts should only auto-sync when the server username changes, not on every refetch.
 - Notification foundation decision: token registration should fail soft when the push-token table is not yet deployed, so app auth/settings flows remain stable.
@@ -389,13 +468,23 @@
 - Message scaling decision: league messages should render via virtualized list with incremental older-message paging (instead of full `ScrollView` mapping) to keep tab switches responsive on long threads.
 - QA sequencing decision: with foundation runtime smoke now green, active execution focus shifts from `P0-MOBILE-FOUNDATION-QA-005` to `P5-PARITY-QA-001` for end-to-end parity validation and targeted regression cleanup.
 - Execution sequencing decision: `P0-MOBILE-FOUNDATION-QA-005` was treated as the gate before broad parity QA because startup auth/runtime stability was required for trustworthy end-to-end validation results.
+- Execution focus decision: with `P3-ADMIN-QA-001B` workflow validation slice now closed, prioritize remaining in-app parity polish (`P5-UX-SWEEP-001`) before device-gated deep-link/notification QA to reduce re-test churn.
 - League UX decision: entity-level tabs on `/league/:id` should switch content in-screen via local state (with subtle transition) rather than route-level query-param navigation.
 - League tab chrome decision: use compact text tabs with active underlines (not filled pills) on `/league/:id` to keep navigation lean and prioritize page content.
 - Super Bowl IA decision: keep in-screen Super Bowl pick UI focused on selected AFC-vs-NFC matchup and winner choice; move full team lists into a dedicated picker surface instead of rendering all teams inline.
 - Super Bowl save-flow decision: Super Bowl pick UI should behave like an explicit form before season start (winner/loser/score + manual save), and become fully read-only once the season starts.
 - Super Bowl table decision: league board winner/loser cells should render as compact team cards (logo + abbrev) to mirror web table readability in a dense mobile layout.
-- Account settings IA decision: settings should use sectioned row-based controls with persistent status affordances (badges/pills), stronger identity hierarchy, and confirmation before destructive session actions.
+- Account settings IA decision: settings should favor compact list-style row groups with minimal chrome, quick inline edits, and clear status affordances while keeping confirmation on destructive session actions.
 - Admin IA decision: league admin member controls should use a compact table for scanability and a per-member bottom sheet for edits/actions to reduce vertical waste.
+- Admin flow reliability decision: member-sheet navigation actions should close the sheet before routing, and member-role/paid/remove updates should trigger explicit member refetch after invalidation to avoid stale post-mutation table state.
+- Admin pick-edit data-integrity decision: `league.admin.setPick` should preserve existing tiebreaker score unless a new score is explicitly submitted, preventing winner-only edits from silently clearing stored score.
+- Admin pick-edit UX decision: mobile pick editor should communicate kickoff lock state inline and disable non-super-admin edits for started games, while still indicating super-admin override availability.
+- Admin authorization-integrity decision: league-admin self-role-change and self-removal protections must be enforced at API level (not only UI) to prevent direct-call lockout scenarios.
+- Global-admin IA decision: mobile global admin should present web-equivalent KPI + seasonal details in dense table-style sections with pull-to-refresh so cross-league metrics remain high-signal on small screens.
+- Email-log timestamp decision: admin email logs should display `resend_data.created_at` when present, with DB `EmailLogs.ts` as the authoritative fallback timestamp, and always render newest-first.
+- Email-log compact-format decision: mobile email-log table rows should render compact timestamps as `M/D/YY h:mma` (e.g., `1/20/25 4:30pm`) for higher-density scanability.
+- Email-log preview decision: mobile email logs should present dense row/table scanability and allow preview via `resend_data.html` with `resend_data.text` fallback, while clearly stating when provider response omits both.
+- Nested navigation decision: all non-tab nested mobile screens should expose a visible header-level back control, not only footer/back CTAs.
 - Pick-tab UX decision: `/pick` must support explicit in-screen league selection for multi-league users instead of auto-binding to the first active league.
 - Home UX decision: `/home` should support user-initiated pull-to-refresh for league data instead of relying only on implicit background refetches.
 - Home performance decision: home-card viewer stats should be aggregated in `home.summary` and consumed by both mobile and web cards to avoid per-card request fan-out and reduce first-render network chatter.
@@ -444,6 +533,39 @@
   - Mitigation: add backend cursor pagination for `messages.leagueMessageBoard` in a follow-up if payload size becomes a bottleneck in staging/production QA.
 
 ## Validation Evidence
+- `2026-02-26T02:27:20Z`: `P3-ADMIN-QA-001B9` shipped: API now blocks non-super-admin league admins from self-role-change and self-removal mutations, matching client-side UI safeguards.
+- `2026-02-26T02:27:20Z`: `pnpm --filter @funtime/api typecheck` passed.
+- `2026-02-26T02:27:20Z`: `pnpm --filter @funtime/web typecheck` passed.
+- `2026-02-26T02:27:20Z`: `pnpm --filter @funtime/mobile typecheck` passed.
+- `2026-02-26T02:21:14Z`: `P3-ADMIN-QA-001B8` shipped: mobile admin pick editor now shows kickoff lock/override state per game and disables non-super-admin post-kickoff edits in UI.
+- `2026-02-26T02:21:14Z`: `pnpm --filter @funtime/mobile typecheck` passed.
+- `2026-02-26T02:19:09Z`: `P3-ADMIN-QA-001B7` shipped: mobile email-log table timestamps now render in compact `M/D/YY h:mma` format (for example `1/20/25 4:30pm`).
+- `2026-02-26T02:19:09Z`: `pnpm --filter @funtime/mobile typecheck` passed.
+- `2026-02-26T02:13:10Z`: `P3-ADMIN-QA-001B6` shipped: `league.admin.setPick` now preserves existing tiebreaker score on winner-only edits by updating score only when explicitly provided.
+- `2026-02-26T02:13:10Z`: `pnpm --filter @funtime/api typecheck` passed.
+- `2026-02-26T02:13:10Z`: `pnpm --filter @funtime/web typecheck` passed.
+- `2026-02-26T02:13:10Z`: `pnpm --filter @funtime/mobile typecheck` passed.
+- `2026-02-26T02:12:04Z`: `P3-ADMIN-QA-001B5` shipped: league-admin member sheet now closes before routing to picks/email logs, and role/paid/remove mutations explicitly refetch members after invalidation for reliable post-save state.
+- `2026-02-26T02:12:04Z`: `pnpm --filter @funtime/mobile typecheck` passed.
+- `2026-02-26T02:07:56Z`: `P5-PARITY-QA-001J` shipped: mobile global admin now has compact KPI tiles, table-style picks-by-season/league detail rows, quick totals, and pull-to-refresh/haptic polish for closer web parity.
+- `2026-02-26T02:07:56Z`: `pnpm --filter @funtime/mobile typecheck` passed.
+- `2026-02-26T02:05:38Z`: `P3-ADMIN-QA-001B4` shipped: compact mobile email-log table now shows month/day/year (plus time) instead of month/day-only row dates.
+- `2026-02-26T02:05:38Z`: `pnpm --filter @funtime/mobile typecheck` passed.
+- `2026-02-26T02:01:24Z`: `P3-ADMIN-QA-001B3` shipped: mobile admin email logs now use a compact row/table layout, preview supports HTML-or-text fallback, and unavailable previews show explicit reason/context in modal.
+- `2026-02-26T02:01:24Z`: `pnpm --filter @funtime/mobile typecheck` passed.
+- `2026-02-26T01:55:18Z`: `P3-ADMIN-QA-001B2` shipped: added persistent header back navigation to nested admin/join/create mobile screens that previously lacked a visible top back control.
+- `2026-02-26T01:55:18Z`: `pnpm --filter @funtime/mobile typecheck` passed.
+- `2026-02-26T01:55:18Z`: `pnpm --filter @funtime/web typecheck` passed.
+- `2026-02-26T01:55:18Z`: `pnpm --filter @funtime/api typecheck` passed.
+- `2026-02-26T01:52:04Z`: `P3-ADMIN-QA-001B1` shipped: admin email logs now show real sent dates via `created_at ?? sent_at` fallback and are explicitly sorted newest-first on mobile and web.
+- `2026-02-26T01:52:04Z`: `pnpm --filter @funtime/api typecheck` passed.
+- `2026-02-26T01:52:04Z`: `pnpm --filter @funtime/web typecheck` passed.
+- `2026-02-26T01:52:04Z`: `pnpm --filter @funtime/mobile typecheck` passed.
+- `2026-02-26T01:47:12Z`: `P5-UX-SWEEP-001G` shipped: Account tab now uses a cleaner compact "My Account" layout with reduced card chrome, denser row groups, and inline username edit controls.
+- `2026-02-26T01:47:12Z`: `pnpm --filter @funtime/mobile typecheck` passed.
+- `2026-02-26T01:43:34Z`: Docs continuation pass completed (`P5-DOCSYNC-003`): re-prioritized active parity QA queue and aligned worklog/plan sequencing for next execution slice.
+- `2026-02-26T01:39:05Z`: `P5-PARITY-QA-001I` shipped: removed inline `You` pills from mobile picks/leaderboard tables in favor of existing blue current-user row + name styling, and added header-level global-admin back navigation.
+- `2026-02-26T01:39:05Z`: `pnpm --filter @funtime/mobile typecheck` passed.
 - `2026-02-26T01:22:05Z`: `P5-PARITY-QA-001H` shipped: Super Bowl tab now uses a compact pre-season form card (winner/loser/score), no AFC/NFC pill-sheet picker flow, and a denser no-horizontal-scroll board layout; API now rejects pick edits after season start.
 - `2026-02-26T01:22:05Z`: `pnpm --filter @funtime/mobile typecheck` passed.
 - `2026-02-26T01:22:05Z`: `pnpm --filter @funtime/api typecheck` passed.
@@ -602,15 +724,15 @@
 | Auth/session | `in_progress` | Guard/bootstrap improvements done, route-group migration complete, stale-refresh-token fail-closed handling is in bootstrap + tRPC headers, and latest on-device smoke reported stable startup; deep-link QA remains. |
 | Deep links | `in_progress` | Domain association endpoints and mobile route handling are in place; launch deep links are now processed once per app boot (no stale replay on route/session changes), and production app-id/cert values plus real-device verification remain. |
 | Home/nav leagues | `in_progress` | Functional baseline exists with join/create entry points, pull-to-refresh UX, and server-aggregated home-card viewer stats consumed by both mobile and web cards; broader IA parity polish remains. |
-| Join league | `in_progress` | Join-by-code flow implemented; deeper UX parity and on-device QA pending. |
-| Create league | `in_progress` | Core create flow and policies implemented; parity polish and QA pending. |
-| League week view | `in_progress` | Existing implementation now uses in-screen tab swaps (no route remount), lighter underline-style top tabs, and tiebreaker sort parity fix; broader parity behavior and UX consistency QA pending. |
+| Join league | `in_progress` | Join-by-code flow implemented with persistent header back navigation on nested join entry/detail screens; deeper UX parity and on-device QA pending. |
+| Create league | `in_progress` | Core create flow and policies implemented with persistent header back navigation; parity polish and QA pending. |
+| League week view | `in_progress` | Existing implementation now uses in-screen tab swaps (no route remount), lighter underline-style top tabs, and tiebreaker sort parity fix; overview picks table now relies on blue row/name styling for the current user (no overflowing `You` badge). |
 | Pick submission | `in_progress` | Core flow exists and now supports in-tab multi-league switching; loading state now uses shared league-tab skeleton styling, with full parity and QA coverage still pending. |
-| Leaderboard | `in_progress` | Present but parity verification/tie ranking QA pending. |
+| Leaderboard | `in_progress` | Mobile leaderboard shows numeric competition ranks and now uses blue row/name current-user highlighting without an inline `You` badge; broader UX parity QA still pending. |
 | Player/my profile | `in_progress` | Added league-scoped my profile tab plus leaderboard-to-player profile navigation; loading state now uses shared league-tab skeleton styling and edit flows still pending. |
 | Super Bowl picks | `in_progress` | Super Bowl tab now uses a compact pre-season `Your Super Bowl pick` form (winner/loser/score with explicit save), is read-only after season start, and renders a denser member/winner/loser/score board that fits without horizontal scrolling; postseason bracket parity and member-profile linking still pending. |
-| Settings/profile | `in_progress` | Account settings IA is now modernized with profile hero, row-based sections, stronger notification controls/status pills, confirmation on sign-out, plus draft-sync/validation/pull-to-refresh; notifications/preferences parity still pending. |
+| Settings/profile | `in_progress` | Account settings now use a cleaner compact "My Account" layout (reduced card chrome, denser row groups, inline username edit controls) while preserving draft-sync/validation/pull-to-refresh; notifications/preferences parity still pending. |
 | Messaging persistent board | `done` | Mobile + web clients moved to league-wide message APIs with admin delete controls. |
 | Notifications | `in_progress` | Token registration, preferences, message fanout, and week-summary scheduler are implemented; push-token registration now fails soft when `projectId` is missing (with `EXPO_PUBLIC_EAS_PROJECT_ID` fallback), notification-tap routing now de-duplicates/clears stale last responses, and deployment + staging QA validation remain. |
-| League admin | `in_progress` | Member management/pick editing/rename/broadcast/email logs are shipped; member management UI now uses a compact actionable table + per-member edit sheet with header back navigation, and full workflow QA remains. |
-| Global admin | `in_progress` | Super-admin dashboard route, entry point, and key metric sections are shipped; final QA/polish remains. |
+| League admin | `in_progress` | Member management/pick editing/rename/broadcast/email logs are shipped with compact member-table workflows validated (`P3-ADMIN-QA-001B` slice closed): nested admin screens use persistent header back navigation, member-sheet actions close before nested routing with explicit post-mutation member refetch reliability, admin pick edits preserve existing tiebreaker score on winner-only saves and surface kickoff lock/override state with non-super-admin post-kickoff UI lock, API guards block non-super-admin self-demotion/self-removal direct calls, and email logs combine resilient timestamp fallback (`created_at ?? sent_at`), newest-first ordering, compact `M/D/YY h:mma` row dates, and a compact row/table layout with HTML-or-text preview fallback + explicit unavailable-preview messaging. |
+| Global admin | `in_progress` | Super-admin dashboard route, entry point, and key metric sections are shipped; header-level back navigation plus dense KPI/table-style metric/detail parity polish are now in mobile, with remaining work focused on broader end-to-end QA validation. |

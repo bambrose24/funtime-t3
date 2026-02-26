@@ -61,8 +61,7 @@ export function usePrefetchForLeague(leagueId: number | undefined, options?: {
       ];
 
       // League info/settings data
-      const infoPromises = [
-        utils.league.correctPickCount.prefetch({ leagueId }),
+      const infoPromises: Promise<unknown>[] = [
         // utils.league.members.prefetch({ leagueId }),
         // utils.league.settings.prefetch({ leagueId }),
       ];
@@ -188,9 +187,7 @@ export function usePrefetchActiveSeasonLeagues(
         ];
 
         // League info/settings data
-        const infoPromises = [
-          utils.league.correctPickCount.prefetch({ leagueId }),
-        ];
+        const infoPromises: Promise<unknown>[] = [];
 
         // Execute all tab-specific prefetches in parallel
         await Promise.all([

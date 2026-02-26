@@ -1,12 +1,24 @@
-import React, { useMemo, useState } from "react";
-import { Alert, SafeAreaView, ScrollView, Text, View } from "react-native";
+import React, { useCallback, useMemo, useState } from "react";
+import {
+  Alert,
+  Pressable,
+  RefreshControl,
+  SafeAreaView,
+  ScrollView,
+  Text,
+  View,
+} from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
+import * as Haptics from "expo-haptics";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { SelectOption } from "@/components/ui/select-option";
 import { clientApi } from "@/lib/trpc/react";
+import { useColorScheme } from "@/lib/useColorScheme";
 
 export default function LeagueAdminPicksScreen() {
+  const { isDarkColorScheme } = useColorScheme();
   const { id, memberId } = useLocalSearchParams<{
     id: string;
     memberId?: string;
@@ -15,11 +27,16 @@ export default function LeagueAdminPicksScreen() {
   const memberIdNumber = Number(memberId);
   const [busyGid, setBusyGid] = useState<number | null>(null);
   const [scoreDrafts, setScoreDrafts] = useState<Record<number, string>>({});
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const utils = clientApi.useUtils();
-  const { data: session, isLoading: sessionLoading } =
+  const { data: session, isLoading: sessionLoading, refetch: refetchSession } =
     clientApi.session.current.useQuery();
-  const { data: isSuperAdmin, isLoading: superAdminLoading } =
+  const {
+    data: isSuperAdmin,
+    isLoading: superAdminLoading,
+    refetch: refetchSuperAdmin,
+  } =
     clientApi.generalAdmin.isSuperAdmin.useQuery();
 
   const viewerMember = useMemo(() => {
@@ -30,25 +47,25 @@ export default function LeagueAdminPicksScreen() {
   const canManageLeague =
     viewerMember?.role === "admin" || Boolean(isSuperAdmin);
 
-  const { data: league, isLoading: leagueLoading } = clientApi.league.get.useQuery(
+  const { data: league, isLoading: leagueLoading, refetch: refetchLeague } = clientApi.league.get.useQuery(
     { leagueId: leagueIdNumber },
     {
       enabled: Number.isFinite(leagueIdNumber) && canManageLeague,
     },
   );
-  const { data: weekToPick, isLoading: weekLoading } =
+  const { data: weekToPick, isLoading: weekLoading, refetch: refetchWeekToPick } =
     clientApi.league.weekToPick.useQuery(
       { leagueId: leagueIdNumber },
       { enabled: Number.isFinite(leagueIdNumber) && canManageLeague },
     );
-  const { data: teams } = clientApi.teams.getTeams.useQuery();
-  const { data: allGames, isLoading: gamesLoading } = clientApi.games.getGames.useQuery(
+  const { data: teams, refetch: refetchTeams } = clientApi.teams.getTeams.useQuery();
+  const { data: allGames, isLoading: gamesLoading, refetch: refetchGames } = clientApi.games.getGames.useQuery(
     {
       season: league?.season ?? 0,
     },
     { enabled: !!league?.season },
   );
-  const { data: memberPicks, isLoading: picksLoading } =
+  const { data: memberPicks, isLoading: picksLoading, refetch: refetchMemberPicks } =
     clientApi.league.admin.memberPicks.useQuery(
       {
         leagueId: leagueIdNumber,
@@ -61,10 +78,44 @@ export default function LeagueAdminPicksScreen() {
           canManageLeague,
       },
     );
-  const { data: membersData } = clientApi.league.admin.members.useQuery(
+  const { data: membersData, refetch: refetchMembers } = clientApi.league.admin.members.useQuery(
     { leagueId: leagueIdNumber },
     { enabled: Number.isFinite(leagueIdNumber) && canManageLeague },
   );
+
+  const onRefresh = useCallback(async () => {
+    setIsRefreshing(true);
+    Haptics.selectionAsync().catch(() => {
+      // No-op if haptics are unavailable.
+    });
+
+    try {
+      await refetchSession();
+      await refetchSuperAdmin();
+      if (canManageLeague) {
+        await Promise.all([
+          refetchLeague(),
+          refetchWeekToPick(),
+          refetchTeams(),
+          refetchGames(),
+          refetchMemberPicks(),
+          refetchMembers(),
+        ]);
+      }
+    } finally {
+      setIsRefreshing(false);
+    }
+  }, [
+    canManageLeague,
+    refetchGames,
+    refetchLeague,
+    refetchMemberPicks,
+    refetchMembers,
+    refetchSession,
+    refetchSuperAdmin,
+    refetchTeams,
+    refetchWeekToPick,
+  ]);
 
   const { mutateAsync: setPick } = clientApi.league.admin.setPick.useMutation();
 
@@ -95,6 +146,7 @@ export default function LeagueAdminPicksScreen() {
     sessionLoading ||
     superAdminLoading ||
     (canManageLeague && (leagueLoading || weekLoading || gamesLoading || picksLoading));
+  const nowMs = Date.now();
 
   const savePick = async (gameId: number, winner: number, score?: number) => {
     try {
@@ -172,15 +224,33 @@ export default function LeagueAdminPicksScreen() {
         className="flex-1"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ padding: 16, paddingBottom: 32 }}
+        refreshControl={
+          <RefreshControl
+            refreshing={isRefreshing}
+            onRefresh={onRefresh}
+          />
+        }
       >
         <View className="gap-4">
-          <View className="gap-1">
-            <Text className="text-app-fg-light dark:text-app-fg-dark text-2xl font-bold">
-              Edit Picks
-            </Text>
-            <Text className="text-sm text-gray-600 dark:text-gray-400">
-              Editing picks for @{member?.people.username ?? memberIdNumber}
-            </Text>
+          <View className="flex-row items-start gap-3 px-1">
+            <Pressable
+              onPress={() => router.back()}
+              className="mt-1 rounded-lg bg-app-card-light p-2 dark:bg-app-card-dark"
+            >
+              <Ionicons
+                name="chevron-back"
+                size={22}
+                color={isDarkColorScheme ? "#e5e7eb" : "#374151"}
+              />
+            </Pressable>
+            <View className="flex-1 gap-1">
+              <Text className="text-app-fg-light dark:text-app-fg-dark text-2xl font-bold">
+                Edit Picks
+              </Text>
+              <Text className="text-sm text-gray-600 dark:text-gray-400">
+                Editing picks for @{member?.people.username ?? memberIdNumber}
+              </Text>
+            </View>
           </View>
 
           {gamesToShow.map((game) => {
@@ -194,6 +264,9 @@ export default function LeagueAdminPicksScreen() {
             const selectedWinner = currentPick?.winner;
             const scoreDraft =
               scoreDrafts[game.gid] ?? currentPick?.score?.toString() ?? "";
+            const gameStarted = new Date(game.ts).getTime() <= nowMs;
+            const canEditThisGame = Boolean(isSuperAdmin) || !gameStarted;
+            const gameBusy = busyGid === game.gid;
 
             return (
               <View
@@ -203,13 +276,25 @@ export default function LeagueAdminPicksScreen() {
                 <Text className="text-app-fg-light dark:text-app-fg-dark text-sm font-semibold">
                   Week {game.week}: {awayTeam.abbrev} @ {homeTeam.abbrev}
                 </Text>
+                {!canEditThisGame ? (
+                  <Text className="text-xs font-medium text-amber-700 dark:text-amber-300">
+                    Locked after kickoff for league admins.
+                  </Text>
+                ) : gameStarted ? (
+                  <Text className="text-xs text-blue-600 dark:text-blue-400">
+                    Kickoff passed. Super-admin override enabled.
+                  </Text>
+                ) : null}
 
                 <View className="flex-row gap-2">
                   <View className="flex-1">
                     <SelectOption
                       selected={selectedWinner === game.away}
+                      disabled={!canEditThisGame || gameBusy}
                       onPress={() => savePick(game.gid, game.away)}
-                      className="justify-start px-3 py-2"
+                      className={`justify-start px-3 py-2 ${
+                        !canEditThisGame || gameBusy ? "opacity-50" : ""
+                      }`}
                     >
                       <Text className="text-app-fg-light dark:text-app-fg-dark text-sm">
                         {awayTeam.loc} {awayTeam.name}
@@ -219,8 +304,11 @@ export default function LeagueAdminPicksScreen() {
                   <View className="flex-1">
                     <SelectOption
                       selected={selectedWinner === game.home}
+                      disabled={!canEditThisGame || gameBusy}
                       onPress={() => savePick(game.gid, game.home)}
-                      className="justify-start px-3 py-2"
+                      className={`justify-start px-3 py-2 ${
+                        !canEditThisGame || gameBusy ? "opacity-50" : ""
+                      }`}
                     >
                       <Text className="text-app-fg-light dark:text-app-fg-dark text-sm">
                         {homeTeam.loc} {homeTeam.name}
@@ -239,13 +327,14 @@ export default function LeagueAdminPicksScreen() {
                       onChangeText={(value) =>
                         setScoreDrafts((prev) => ({ ...prev, [game.gid]: value }))
                       }
+                      editable={canEditThisGame && !gameBusy}
                       keyboardType="number-pad"
                       placeholder="Score (1-200)"
                     />
                     <Button
                       size="sm"
                       variant="outline"
-                      disabled={busyGid === game.gid || !selectedWinner}
+                      disabled={gameBusy || !selectedWinner || !canEditThisGame}
                       onPress={() => {
                         if (!selectedWinner) {
                           return;
@@ -266,7 +355,7 @@ export default function LeagueAdminPicksScreen() {
                   </View>
                 ) : null}
 
-                {busyGid === game.gid ? (
+                {gameBusy ? (
                   <Text className="text-xs text-gray-500 dark:text-gray-400">
                     Saving...
                   </Text>

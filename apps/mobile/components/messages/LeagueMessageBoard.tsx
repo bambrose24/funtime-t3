@@ -1,33 +1,40 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   Alert,
+  FlatList,
   KeyboardAvoidingView,
   Platform,
-  ScrollView,
+  Pressable,
   Text,
   View,
-  Pressable,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { formatDistanceToNow } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { LeagueTabLoadingSkeleton } from "@/components/league/LeagueTabLoadingSkeleton";
 import { clientApi } from "@/lib/trpc/react";
 import { useColorScheme } from "@/lib/useColorScheme";
+import { type RouterOutputs } from "~/trpc/types";
 
 const MESSAGES_REFETCH_INTERVAL_MS = 10 * 1000;
+const MESSAGE_PAGE_SIZE = 80;
 
 type Props = {
   leagueId: string;
 };
 
+type LeagueMessage = RouterOutputs["messages"]["leagueMessageBoard"][number];
+
 export function LeagueMessageBoard({ leagueId }: Props) {
   const leagueIdNumber = Number(leagueId);
   const { isDarkColorScheme } = useColorScheme();
   const utils = clientApi.useUtils();
-  const scrollRef = useRef<ScrollView>(null);
+  const listRef = useRef<FlatList<LeagueMessage>>(null);
+  const previousTotalMessagesRef = useRef(0);
   const [draft, setDraft] = useState("");
   const [sending, setSending] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(MESSAGE_PAGE_SIZE);
 
   const { data: session } = clientApi.session.current.useQuery();
   const { data: messages, isLoading } = clientApi.messages.leagueMessageBoard.useQuery(
@@ -45,8 +52,28 @@ export function LeagueMessageBoard({ leagueId }: Props) {
     return session?.dbUser?.leaguemembers.find((member) => member.league_id === leagueIdNumber);
   }, [leagueIdNumber, session?.dbUser?.leaguemembers]);
 
+  const pagedMessages = useMemo(() => {
+    const allMessages = messages ?? [];
+    const startIndex = Math.max(allMessages.length - visibleCount, 0);
+    return allMessages.slice(startIndex);
+  }, [messages, visibleCount]);
+
+  const hasOlderMessages = (messages?.length ?? 0) > pagedMessages.length;
+
   useEffect(() => {
-    scrollRef.current?.scrollToEnd({ animated: true });
+    const totalMessages = messages?.length ?? 0;
+    const hadMessagesBefore = previousTotalMessagesRef.current;
+    const hasNewMessages = totalMessages > hadMessagesBefore;
+    const initialLoad = hadMessagesBefore === 0 && totalMessages > 0;
+    previousTotalMessagesRef.current = totalMessages;
+
+    if (!hasNewMessages && !initialLoad) {
+      return;
+    }
+
+    requestAnimationFrame(() => {
+      listRef.current?.scrollToEnd({ animated: !initialLoad });
+    });
   }, [messages?.length]);
 
   const invalidateMessages = async () => {
@@ -103,81 +130,99 @@ export function LeagueMessageBoard({ leagueId }: Props) {
     );
   };
 
+  if (isLoading) {
+    return <LeagueTabLoadingSkeleton rows={4} />;
+  }
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       className="flex-1"
     >
       <View className="flex-1">
-        <ScrollView
-          ref={scrollRef}
+        <FlatList<LeagueMessage>
+          ref={listRef}
+          data={pagedMessages}
+          keyExtractor={(message) => message.message_id}
           className="flex-1 px-4 pt-4"
-          showsVerticalScrollIndicator={false}
           contentContainerStyle={{ gap: 12, paddingBottom: 16 }}
-        >
-          {isLoading ? (
-            <View className="py-12">
-              <Text className="text-center text-base text-gray-500 dark:text-gray-400">
-                Loading messages...
-              </Text>
-            </View>
-          ) : (messages?.length ?? 0) === 0 ? (
+          showsVerticalScrollIndicator={false}
+          initialNumToRender={20}
+          maxToRenderPerBatch={20}
+          updateCellsBatchingPeriod={50}
+          windowSize={7}
+          removeClippedSubviews
+          ListHeaderComponent={
+            hasOlderMessages ? (
+              <View className="pb-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onPress={() =>
+                    setVisibleCount((current) => current + MESSAGE_PAGE_SIZE)
+                  }
+                >
+                  Load Older Messages
+                </Button>
+              </View>
+            ) : null
+          }
+          ListEmptyComponent={
             <View className="py-12">
               <Text className="text-center text-base text-gray-500 dark:text-gray-400">
                 No messages yet. Start the conversation.
               </Text>
             </View>
-          ) : (
-            messages?.map((message) => {
-              const mine =
-                viewerLeagueMember?.membership_id === message.member_id;
-              const canDelete = mine || viewerLeagueMember?.role === "admin";
-              const username = message.leaguemembers?.people.username ?? "Member";
-              const createdAt = new Date(message.createdAt);
-              return (
-                <View key={message.message_id} className="gap-1">
-                  <View
-                    className={[
-                      "rounded-xl border px-3 py-2",
-                      mine
-                        ? "ml-8 border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950"
-                        : "mr-8 border-gray-200 bg-white dark:border-zinc-700 dark:bg-zinc-800",
-                    ].join(" ")}
-                  >
-                    <Text className="text-app-fg-light dark:text-app-fg-dark text-sm">
-                      {message.content}
-                    </Text>
-                  </View>
-                  <View
-                    className={[
-                      "flex-row items-center gap-2 px-1",
-                      mine ? "justify-end" : "justify-start",
-                    ].join(" ")}
-                  >
-                    <Text className="text-xs text-gray-500 dark:text-gray-400">
-                      {mine ? "You" : username} •{" "}
-                      {formatDistanceToNow(createdAt, { addSuffix: true })}
-                    </Text>
-                    {canDelete ? (
-                      <Pressable
-                        onPress={() =>
-                          onDelete(message.message_id, username, Boolean(mine))
-                        }
-                        className="rounded-md p-1"
-                      >
-                        <Ionicons
-                          name="trash-outline"
-                          size={14}
-                          color={isDarkColorScheme ? "#a1a1aa" : "#6b7280"}
-                        />
-                      </Pressable>
-                    ) : null}
-                  </View>
+          }
+          renderItem={({ item: message }) => {
+            const mine = viewerLeagueMember?.membership_id === message.member_id;
+            const canDelete = mine || viewerLeagueMember?.role === "admin";
+            const username = message.leaguemembers?.people.username ?? "Member";
+            const createdAt = new Date(message.createdAt);
+
+            return (
+              <View className="gap-1">
+                <View
+                  className={[
+                    "rounded-xl border px-3 py-2",
+                    mine
+                      ? "ml-8 border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950"
+                      : "mr-8 border-gray-200 bg-white dark:border-zinc-700 dark:bg-zinc-800",
+                  ].join(" ")}
+                >
+                  <Text className="text-app-fg-light dark:text-app-fg-dark text-sm">
+                    {message.content}
+                  </Text>
                 </View>
-              );
-            })
-          )}
-        </ScrollView>
+                <View
+                  className={[
+                    "flex-row items-center gap-2 px-1",
+                    mine ? "justify-end" : "justify-start",
+                  ].join(" ")}
+                >
+                  <Text className="text-xs text-gray-500 dark:text-gray-400">
+                    {mine ? "You" : username} •{" "}
+                    {formatDistanceToNow(createdAt, { addSuffix: true })}
+                  </Text>
+                  {canDelete ? (
+                    <Pressable
+                      onPress={() =>
+                        onDelete(message.message_id, username, Boolean(mine))
+                      }
+                      className="rounded-md p-1"
+                    >
+                      <Ionicons
+                        name="trash-outline"
+                        size={14}
+                        color={isDarkColorScheme ? "#a1a1aa" : "#6b7280"}
+                      />
+                    </Pressable>
+                  ) : null}
+                </View>
+              </View>
+            );
+          }}
+        />
 
         <View className="border-t border-gray-200 px-4 pb-4 pt-3 dark:border-zinc-800">
           <View className="gap-2">

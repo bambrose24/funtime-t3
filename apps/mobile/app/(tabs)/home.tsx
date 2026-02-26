@@ -1,7 +1,15 @@
-import React, { useMemo } from "react";
-import { ScrollView, View, Text, SafeAreaView, Pressable } from "react-native";
+import React, { useCallback, useMemo, useState } from "react";
+import {
+  ScrollView,
+  View,
+  Text,
+  SafeAreaView,
+  Pressable,
+  RefreshControl,
+} from "react-native";
 import { router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import * as Haptics from "expo-haptics";
 import { useColorScheme } from "@/lib/useColorScheme";
 import { clientApi } from "@/lib/trpc/react";
 import { HomeLeagueCard } from "@/components/home/HomeLeagueCard";
@@ -13,6 +21,7 @@ import { Button } from "@/components/ui/button";
 
 export default function HomeScreen() {
   const { isDarkColorScheme } = useColorScheme();
+  const [isRefreshing, setIsRefreshing] = useState(false);
   
   // Debug data availability (remove in production)
   if (__DEV__) {
@@ -20,13 +29,27 @@ export default function HomeScreen() {
   }
   
   // Fetch session and home summary data
-  const { data: session, isLoading: sessionLoading } =
+  const { data: session, isLoading: sessionLoading, refetch: refetchSession } =
     clientApi.session.current.useQuery();
-  const { data: homeData, isLoading: homeLoading } =
+  const { data: homeData, isLoading: homeLoading, refetch: refetchHomeData } =
     clientApi.home.summary.useQuery(
       undefined,
       { enabled: !!session?.dbUser }, // Only fetch if user is authenticated
     );
+
+  const onRefresh = useCallback(async () => {
+    setIsRefreshing(true);
+    Haptics.selectionAsync().catch(() => {
+      // No-op if haptics are unavailable.
+    });
+
+    try {
+      await refetchSession();
+      await refetchHomeData();
+    } finally {
+      setIsRefreshing(false);
+    }
+  }, [refetchHomeData, refetchSession]);
 
   // Prefetch active season leagues for faster transitions.
   const prefetchLeagueIds = useMemo(() => {
@@ -45,7 +68,7 @@ export default function HomeScreen() {
   // Sort all leagues by season first (descending), then by member count (descending)
   // These must be called before any early returns to maintain hook order
   const sortedLeagues = useMemo(() => {
-    return (homeData ?? [])
+    return [...(homeData ?? [])]
       .sort((a, b) => {
         // First sort by season (descending - newer seasons first)
         if (a.season !== b.season) {
@@ -111,6 +134,13 @@ export default function HomeScreen() {
         className="flex-1"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 32 }}
+        refreshControl={
+          <RefreshControl
+            refreshing={isRefreshing}
+            onRefresh={onRefresh}
+            tintColor={isDarkColorScheme ? "#9ca3af" : "#6b7280"}
+          />
+        }
       >
         {/* Header with Account button */}
         <View className="flex-row justify-between items-center px-6 pt-6 pb-4">

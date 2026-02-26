@@ -2,7 +2,11 @@ import { useState, useEffect, useRef } from "react";
 import { usePathname, useRouter } from "expo-router";
 import * as Linking from "expo-linking";
 import { type Session } from "@supabase/supabase-js";
-import { supabase } from "@/lib/supabase/client";
+import {
+  clearPersistedSupabaseSession,
+  isInvalidRefreshTokenError,
+  supabase,
+} from "@/lib/supabase/client";
 import { clientApi } from "@/lib/trpc/react";
 
 const WEB_DEEP_LINK_HOSTS = new Set(["play-funtime.com", "www.play-funtime.com"]);
@@ -102,21 +106,78 @@ export function useSupabaseSession() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setIsLoading(false);
-    });
+    let isActive = true;
+
+    const syncInitialSession = async () => {
+      try {
+        const {
+          data: { session: currentSession },
+          error,
+        } = await supabase.auth.getSession();
+
+        if (error) {
+          if (isInvalidRefreshTokenError(error)) {
+            console.warn(
+              "[Auth] Invalid refresh token during session bootstrap; clearing local auth state.",
+            );
+            await clearPersistedSupabaseSession("bootstrap:getSession");
+          } else {
+            console.error("[Auth] Failed to load session on startup.", error);
+          }
+
+          if (isActive) {
+            setSession(null);
+          }
+          return;
+        }
+
+        if (isActive) {
+          setSession(currentSession);
+        }
+      } catch (error) {
+        if (isInvalidRefreshTokenError(error)) {
+          console.warn(
+            "[Auth] Invalid refresh token thrown during session bootstrap; clearing local auth state.",
+          );
+          await clearPersistedSupabaseSession("bootstrap:throw");
+        } else {
+          console.error("[Auth] Unexpected session bootstrap failure.", error);
+        }
+
+        if (isActive) {
+          setSession(null);
+        }
+      } finally {
+        if (isActive) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    void syncInitialSession();
 
     // Listen for auth changes
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
+    } = supabase.auth.onAuthStateChange((event, nextSession) => {
+      if (
+        event === "TOKEN_REFRESHED" &&
+        !nextSession?.access_token &&
+        !nextSession?.refresh_token
+      ) {
+        console.warn(
+          "[Auth] TOKEN_REFRESHED emitted without tokens; forcing signed-out state.",
+        );
+      }
+
+      setSession(nextSession);
       setIsLoading(false);
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      isActive = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
   return { session, isLoading };
@@ -139,9 +200,19 @@ export function useAuthHandler() {
   const pathname = usePathname();
   const router = useRouter();
   const pendingDeepLinkRef = useRef<string | null>(null);
+  const pathnameRef = useRef(pathname);
+  const sessionRef = useRef(session);
+  const initialDeepLinkHandledRef = useRef(false);
+
+  useEffect(() => {
+    pathnameRef.current = pathname;
+    sessionRef.current = session;
+  }, [pathname, session]);
 
   // Handle deep links for auth flows
   useEffect(() => {
+    let isActive = true;
+
     const handleDeepLink = (url: string) => {
       try {
         const target = resolveDeepLink(url);
@@ -150,20 +221,22 @@ export function useAuthHandler() {
         }
 
         const nextPathname = target.href.split("?")[0] ?? target.href;
-        const currentPathname = pathname.split("?")[0] ?? pathname;
+        const currentPath = pathnameRef.current ?? "/";
+        const currentPathname = currentPath.split("?")[0] ?? currentPath;
         if (nextPathname === currentPathname) {
           return;
         }
 
+        const hasSession = Boolean(sessionRef.current);
         if (target.mode === "replace") {
-          if (!session && !target.href.startsWith("/auth")) {
+          if (!hasSession && !target.href.startsWith("/auth")) {
             pendingDeepLinkRef.current = target.href;
           }
           router.replace(target.href as any);
           return;
         }
 
-        if (!session && !target.href.startsWith("/auth")) {
+        if (!hasSession && !target.href.startsWith("/auth")) {
           pendingDeepLinkRef.current = target.href;
         }
         router.push(target.href as any);
@@ -173,17 +246,29 @@ export function useAuthHandler() {
     };
 
     // Handle initial deep link (app opened from link)
-    Linking.getInitialURL().then((url) => {
-      if (url) handleDeepLink(url);
-    });
+    if (!initialDeepLinkHandledRef.current) {
+      initialDeepLinkHandledRef.current = true;
+      Linking.getInitialURL()
+        .then((url) => {
+          if (isActive && url) {
+            handleDeepLink(url);
+          }
+        })
+        .catch((error) => {
+          console.error("Failed to read initial deep link URL", error);
+        });
+    }
 
     // Handle deep links while app is running
     const subscription = Linking.addEventListener("url", ({ url }) => {
       handleDeepLink(url);
     });
 
-    return () => subscription?.remove();
-  }, [pathname, router, session]);
+    return () => {
+      isActive = false;
+      subscription?.remove();
+    };
+  }, [router]);
 
   // Handle navigation based on auth state
   useEffect(() => {

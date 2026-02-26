@@ -1,6 +1,9 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   Alert,
+  Modal,
+  Pressable,
+  RefreshControl,
   SafeAreaView,
   ScrollView,
   Text,
@@ -8,22 +11,37 @@ import {
   View,
 } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
+import * as Haptics from "expo-haptics";
 import { Button } from "@/components/ui/button";
 import { clientApi } from "@/lib/trpc/react";
 import { Input } from "@/components/ui/input";
+import { useColorScheme } from "@/lib/useColorScheme";
+import { cn } from "@/lib/utils";
+
+type EditableRole = "admin" | "player";
 
 export default function LeagueAdminScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const leagueIdNumber = Number(id);
+  const { isDarkColorScheme } = useColorScheme();
   const [busyKey, setBusyKey] = useState<string | null>(null);
   const [leagueNameDraft, setLeagueNameDraft] = useState("");
   const [broadcastDraft, setBroadcastDraft] = useState("");
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isMemberSheetOpen, setIsMemberSheetOpen] = useState(false);
+  const [editingMemberId, setEditingMemberId] = useState<number | null>(null);
+  const [sheetRoleDraft, setSheetRoleDraft] = useState<EditableRole>("player");
+  const [sheetPaidDraft, setSheetPaidDraft] = useState(false);
 
   const utils = clientApi.useUtils();
-  const { data: session, isLoading: sessionLoading } =
+  const { data: session, isLoading: sessionLoading, refetch: refetchSession } =
     clientApi.session.current.useQuery();
-  const { data: isSuperAdmin, isLoading: superAdminLoading } =
-    clientApi.generalAdmin.isSuperAdmin.useQuery();
+  const {
+    data: isSuperAdmin,
+    isLoading: superAdminLoading,
+    refetch: refetchSuperAdmin,
+  } = clientApi.generalAdmin.isSuperAdmin.useQuery();
 
   const viewerMember = useMemo(() => {
     return session?.dbUser?.leaguemembers.find(
@@ -34,24 +52,68 @@ export default function LeagueAdminScreen() {
   const isLeagueAdmin = viewerMember?.role === "admin";
   const canManageLeague = isLeagueAdmin || Boolean(isSuperAdmin);
 
-  const { data: membersData, isLoading: membersLoading } =
-    clientApi.league.admin.members.useQuery(
-      { leagueId: leagueIdNumber },
-      {
-        enabled: Number.isFinite(leagueIdNumber) && canManageLeague,
-      },
-    );
-  const { data: leagueData } = clientApi.league.get.useQuery(
-    { leagueId: leagueIdNumber },
-    { enabled: Number.isFinite(leagueIdNumber) && canManageLeague },
-  );
   const {
-    data: canSendBroadcastData,
-    refetch: refetchBroadcastStatus,
-  } = clientApi.league.admin.canSendLeagueBroadcast.useQuery(
+    data: membersData,
+    isLoading: membersLoading,
+    refetch: refetchMembers,
+  } = clientApi.league.admin.members.useQuery(
+    { leagueId: leagueIdNumber },
+    {
+      enabled: Number.isFinite(leagueIdNumber) && canManageLeague,
+    },
+  );
+  const { data: leagueData, refetch: refetchLeague } = clientApi.league.get.useQuery(
     { leagueId: leagueIdNumber },
     { enabled: Number.isFinite(leagueIdNumber) && canManageLeague },
   );
+  const { data: canSendBroadcastData, refetch: refetchBroadcastStatus } =
+    clientApi.league.admin.canSendLeagueBroadcast.useQuery(
+      { leagueId: leagueIdNumber },
+      { enabled: Number.isFinite(leagueIdNumber) && canManageLeague },
+    );
+
+  const members = membersData?.members ?? [];
+
+  const selectedMember = useMemo(() => {
+    if (editingMemberId === null) {
+      return null;
+    }
+    return (
+      members.find((member) => member.membership_id === editingMemberId) ?? null
+    );
+  }, [editingMemberId, members]);
+
+  const selectedMemberIsViewer =
+    selectedMember?.membership_id === viewerMember?.membership_id;
+
+  const onRefresh = useCallback(async () => {
+    setIsRefreshing(true);
+    Haptics.selectionAsync().catch(() => {
+      // No-op if haptics are unavailable.
+    });
+
+    try {
+      await refetchSession();
+      await refetchSuperAdmin();
+      if (Number.isFinite(leagueIdNumber) && canManageLeague) {
+        await Promise.all([
+          refetchMembers(),
+          refetchLeague(),
+          refetchBroadcastStatus(),
+        ]);
+      }
+    } finally {
+      setIsRefreshing(false);
+    }
+  }, [
+    canManageLeague,
+    leagueIdNumber,
+    refetchBroadcastStatus,
+    refetchLeague,
+    refetchMembers,
+    refetchSession,
+    refetchSuperAdmin,
+  ]);
 
   const { mutateAsync: changeMemberRole } =
     clientApi.league.admin.changeMemberRole.useMutation();
@@ -70,48 +132,84 @@ export default function LeagueAdminScreen() {
     }
   }, [leagueData?.name, leagueNameDraft]);
 
+  useEffect(() => {
+    if (isMemberSheetOpen && !selectedMember) {
+      setIsMemberSheetOpen(false);
+      setEditingMemberId(null);
+    }
+  }, [isMemberSheetOpen, selectedMember]);
+
   const invalidateMembers = async () => {
     await utils.league.admin.members.invalidate({ leagueId: leagueIdNumber });
   };
 
-  const onToggleRole = async (memberId: number, currentRole: string | null) => {
-    const nextRole = currentRole === "admin" ? "player" : "admin";
-    const actionKey = `role-${memberId}`;
+  const openMemberSheet = (member: (typeof members)[number]) => {
+    setEditingMemberId(member.membership_id);
+    setSheetRoleDraft(member.role === "admin" ? "admin" : "player");
+    setSheetPaidDraft(Boolean(member.paid));
+    setIsMemberSheetOpen(true);
+  };
+
+  const closeMemberSheet = () => {
+    setIsMemberSheetOpen(false);
+    setEditingMemberId(null);
+  };
+
+  const pushMemberRouteFromSheet = (href: string) => {
+    closeMemberSheet();
+    requestAnimationFrame(() => {
+      router.push(href as any);
+    });
+  };
+
+  const onSaveMemberSettings = async () => {
+    if (!selectedMember) {
+      return;
+    }
+
+    const memberId = selectedMember.membership_id;
+    const currentRole = selectedMember.role === "admin" ? "admin" : "player";
+    const currentPaid = Boolean(selectedMember.paid);
+    const roleChanged = !selectedMemberIsViewer && sheetRoleDraft !== currentRole;
+    const paidChanged = sheetPaidDraft !== currentPaid;
+
+    if (!roleChanged && !paidChanged) {
+      closeMemberSheet();
+      return;
+    }
+
+    const actionKey = `edit-${memberId}`;
     try {
       setBusyKey(actionKey);
-      await changeMemberRole({
-        leagueId: leagueIdNumber,
-        memberId,
-        role: nextRole,
-      });
+
+      if (roleChanged) {
+        await changeMemberRole({
+          leagueId: leagueIdNumber,
+          memberId,
+          role: sheetRoleDraft,
+        });
+      }
+
+      if (paidChanged) {
+        await setMembersPaid({
+          leagueId: leagueIdNumber,
+          memberIds: [memberId],
+          paid: sheetPaidDraft,
+        });
+      }
+
       await invalidateMembers();
+      await refetchMembers();
+      closeMemberSheet();
     } catch (error) {
-      console.error("Failed to change role", error);
-      Alert.alert("Update Failed", "Unable to update role.");
+      console.error("Failed to update member settings", error);
+      Alert.alert("Update Failed", "Unable to save member settings.");
     } finally {
       setBusyKey(null);
     }
   };
 
-  const onTogglePaid = async (memberId: number, currentPaid: boolean | null) => {
-    const actionKey = `paid-${memberId}`;
-    try {
-      setBusyKey(actionKey);
-      await setMembersPaid({
-        leagueId: leagueIdNumber,
-        memberIds: [memberId],
-        paid: !Boolean(currentPaid),
-      });
-      await invalidateMembers();
-    } catch (error) {
-      console.error("Failed to update paid status", error);
-      Alert.alert("Update Failed", "Unable to update paid status.");
-    } finally {
-      setBusyKey(null);
-    }
-  };
-
-  const onRemoveMember = (memberId: number, username: string) => {
+  const onRemoveMember = (memberId: number, username: string, closeSheet = false) => {
     Alert.alert(
       "Remove Member",
       `Remove @${username} from this league?`,
@@ -129,6 +227,10 @@ export default function LeagueAdminScreen() {
                 memberId,
               });
               await invalidateMembers();
+              await refetchMembers();
+              if (closeSheet) {
+                closeMemberSheet();
+              }
             } catch (error) {
               console.error("Failed to remove member", error);
               Alert.alert("Remove Failed", "Unable to remove member.");
@@ -242,23 +344,36 @@ export default function LeagueAdminScreen() {
     );
   }
 
-  const members = membersData?.members ?? [];
-
   return (
     <SafeAreaView className="bg-app-bg-light dark:bg-app-bg-dark flex-1">
       <ScrollView
         className="flex-1"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ padding: 16, paddingBottom: 32 }}
+        refreshControl={
+          <RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />
+        }
       >
         <View className="gap-4">
-          <View className="gap-1 px-1">
-            <Text className="text-app-fg-light dark:text-app-fg-dark text-2xl font-bold">
-              League Admin
-            </Text>
-            <Text className="text-sm text-gray-600 dark:text-gray-400">
-              Manage league settings, broadcasts, and members.
-            </Text>
+          <View className="flex-row items-start gap-3 px-1">
+            <Pressable
+              onPress={() => router.back()}
+              className="mt-1 rounded-lg bg-app-card-light p-2 dark:bg-app-card-dark"
+            >
+              <Ionicons
+                name="chevron-back"
+                size={22}
+                color={isDarkColorScheme ? "#e5e7eb" : "#374151"}
+              />
+            </Pressable>
+            <View className="flex-1 gap-1">
+              <Text className="text-app-fg-light dark:text-app-fg-dark text-2xl font-bold">
+                League Admin
+              </Text>
+              <Text className="text-sm text-gray-600 dark:text-gray-400">
+                Compact member management, broadcasts, and league settings.
+              </Text>
+            </View>
           </View>
 
           <View className="rounded-xl border border-gray-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-800 gap-3">
@@ -311,41 +426,203 @@ export default function LeagueAdminScreen() {
             <Text className="text-app-fg-light dark:text-app-fg-dark text-lg font-semibold">
               Members
             </Text>
+            <Text className="text-xs text-gray-600 dark:text-gray-400">
+              Use Edit for role/paid actions and Email Logs for member history.
+            </Text>
           </View>
 
-          {members.map((member) => {
-            const isViewer = member.membership_id === viewerMember?.membership_id;
-            const roleActionKey = `role-${member.membership_id}`;
-            const paidActionKey = `paid-${member.membership_id}`;
-            const removeActionKey = `remove-${member.membership_id}`;
-
-            return (
-              <View
-                key={member.membership_id}
-                className="rounded-xl border border-gray-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-800 gap-3"
-              >
-                <View className="gap-1">
-                  <Text className="text-app-fg-light dark:text-app-fg-dark text-base font-semibold">
-                    @{member.people.username}
+          <View className="rounded-xl border border-gray-200 bg-white dark:border-zinc-700 dark:bg-zinc-800 overflow-hidden">
+            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+              <View style={{ minWidth: 620 }}>
+                <View className="flex-row items-center border-b border-gray-200 bg-gray-50 px-3 py-2 dark:border-zinc-700 dark:bg-zinc-900">
+                  <Text className="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400" style={{ width: 240 }}>
+                    Member
                   </Text>
-                  <Text className="text-sm text-gray-600 dark:text-gray-400">
-                    {member.people.email}
+                  <Text className="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400" style={{ width: 80 }}>
+                    Role
+                  </Text>
+                  <Text className="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400" style={{ width: 70 }}>
+                    Paid
+                  </Text>
+                  <Text className="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400" style={{ width: 120 }}>
+                    Email Logs
+                  </Text>
+                  <Text className="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400" style={{ width: 100 }}>
+                    Edit
                   </Text>
                 </View>
 
-                <View className="flex-row flex-wrap gap-2">
-                  <Text className="text-xs text-gray-600 dark:text-gray-400">
-                    Role: {member.role}
-                  </Text>
-                  <Text className="text-xs text-gray-600 dark:text-gray-400">
-                    Paid: {member.paid ? "Yes" : "No"}
-                  </Text>
-                  <Text className="text-xs text-gray-600 dark:text-gray-400">
-                    Correct Picks: {member.correctPicks}
-                  </Text>
-                  <Text className="text-xs text-gray-600 dark:text-gray-400">
-                    Missed Picks: {member.misssedPicks}
-                  </Text>
+                {members.length === 0 ? (
+                  <View className="px-3 py-4">
+                    <Text className="text-sm text-gray-600 dark:text-gray-400">
+                      No members found.
+                    </Text>
+                  </View>
+                ) : (
+                  members.map((member, index) => (
+                    <View
+                      key={member.membership_id}
+                      className={cn(
+                        "flex-row items-center px-3 py-3",
+                        index < members.length - 1
+                          ? "border-b border-gray-200 dark:border-zinc-700"
+                          : "",
+                      )}
+                    >
+                      <View style={{ width: 240 }} className="pr-2">
+                        <Text
+                          className="text-app-fg-light dark:text-app-fg-dark text-sm font-semibold"
+                          numberOfLines={1}
+                        >
+                          @{member.people.username}
+                        </Text>
+                        <Text
+                          className="text-xs text-gray-600 dark:text-gray-400"
+                          numberOfLines={1}
+                        >
+                          {member.people.email}
+                        </Text>
+                      </View>
+
+                      <Text
+                        className="text-sm text-gray-700 dark:text-gray-300"
+                        style={{ width: 80 }}
+                      >
+                        {member.role ?? "player"}
+                      </Text>
+                      <Text
+                        className="text-sm text-gray-700 dark:text-gray-300"
+                        style={{ width: 70 }}
+                      >
+                        {member.paid ? "Yes" : "No"}
+                      </Text>
+
+                      <View style={{ width: 120 }} className="pr-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onPress={() =>
+                            router.push(
+                              `/league/${leagueIdNumber}/admin-emails?memberId=${member.membership_id}` as any,
+                            )
+                          }
+                        >
+                          Emails
+                        </Button>
+                      </View>
+
+                      <View style={{ width: 100 }}>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onPress={() => openMemberSheet(member)}
+                        >
+                          Edit
+                        </Button>
+                      </View>
+                    </View>
+                  ))
+                )}
+              </View>
+            </ScrollView>
+          </View>
+        </View>
+      </ScrollView>
+
+      <Modal
+        visible={isMemberSheetOpen}
+        transparent
+        animationType="slide"
+        onRequestClose={closeMemberSheet}
+      >
+        <View className="flex-1 justify-end bg-black/40">
+          <Pressable className="flex-1" onPress={closeMemberSheet} />
+          <View className="rounded-t-2xl border border-gray-200 bg-white px-4 pb-8 pt-4 dark:border-zinc-700 dark:bg-zinc-900">
+            {selectedMember ? (
+              <View className="gap-4">
+                <View className="flex-row items-center justify-between">
+                  <View className="flex-1 pr-3">
+                    <Text className="text-app-fg-light dark:text-app-fg-dark text-lg font-semibold">
+                      Edit Member
+                    </Text>
+                    <Text className="text-sm text-gray-600 dark:text-gray-400">
+                      @{selectedMember.people.username}
+                    </Text>
+                  </View>
+                  <Button variant="outline" size="sm" onPress={closeMemberSheet}>
+                    Close
+                  </Button>
+                </View>
+
+                <View className="gap-2">
+                  <Text className="text-sm text-gray-600 dark:text-gray-400">Role</Text>
+                  <View className="flex-row gap-2">
+                    <Pressable
+                      disabled={selectedMemberIsViewer}
+                      onPress={() => setSheetRoleDraft("player")}
+                      className={cn(
+                        "flex-1 rounded-lg border px-3 py-2",
+                        sheetRoleDraft === "player"
+                          ? "border-blue-500 bg-blue-50 dark:border-blue-500 dark:bg-blue-950"
+                          : "border-gray-200 bg-white dark:border-zinc-700 dark:bg-zinc-800",
+                      )}
+                    >
+                      <Text className="text-app-fg-light dark:text-app-fg-dark text-center text-sm font-medium">
+                        Player
+                      </Text>
+                    </Pressable>
+                    <Pressable
+                      disabled={selectedMemberIsViewer}
+                      onPress={() => setSheetRoleDraft("admin")}
+                      className={cn(
+                        "flex-1 rounded-lg border px-3 py-2",
+                        sheetRoleDraft === "admin"
+                          ? "border-blue-500 bg-blue-50 dark:border-blue-500 dark:bg-blue-950"
+                          : "border-gray-200 bg-white dark:border-zinc-700 dark:bg-zinc-800",
+                      )}
+                    >
+                      <Text className="text-app-fg-light dark:text-app-fg-dark text-center text-sm font-medium">
+                        Admin
+                      </Text>
+                    </Pressable>
+                  </View>
+                  {selectedMemberIsViewer ? (
+                    <Text className="text-xs text-gray-500 dark:text-gray-400">
+                      You cannot change your own role.
+                    </Text>
+                  ) : null}
+                </View>
+
+                <View className="gap-2">
+                  <Text className="text-sm text-gray-600 dark:text-gray-400">Paid Status</Text>
+                  <View className="flex-row gap-2">
+                    <Pressable
+                      onPress={() => setSheetPaidDraft(true)}
+                      className={cn(
+                        "flex-1 rounded-lg border px-3 py-2",
+                        sheetPaidDraft
+                          ? "border-blue-500 bg-blue-50 dark:border-blue-500 dark:bg-blue-950"
+                          : "border-gray-200 bg-white dark:border-zinc-700 dark:bg-zinc-800",
+                      )}
+                    >
+                      <Text className="text-app-fg-light dark:text-app-fg-dark text-center text-sm font-medium">
+                        Paid
+                      </Text>
+                    </Pressable>
+                    <Pressable
+                      onPress={() => setSheetPaidDraft(false)}
+                      className={cn(
+                        "flex-1 rounded-lg border px-3 py-2",
+                        !sheetPaidDraft
+                          ? "border-blue-500 bg-blue-50 dark:border-blue-500 dark:bg-blue-950"
+                          : "border-gray-200 bg-white dark:border-zinc-700 dark:bg-zinc-800",
+                      )}
+                    >
+                      <Text className="text-app-fg-light dark:text-app-fg-dark text-center text-sm font-medium">
+                        Unpaid
+                      </Text>
+                    </Pressable>
+                  </View>
                 </View>
 
                 <View className="gap-2">
@@ -353,8 +630,8 @@ export default function LeagueAdminScreen() {
                     variant="outline"
                     size="sm"
                     onPress={() =>
-                      router.push(
-                        `/league/${leagueIdNumber}/admin-picks?memberId=${member.membership_id}` as any,
+                      pushMemberRouteFromSheet(
+                        `/league/${leagueIdNumber}/admin-picks?memberId=${selectedMember.membership_id}`,
                       )
                     }
                   >
@@ -364,53 +641,49 @@ export default function LeagueAdminScreen() {
                     variant="outline"
                     size="sm"
                     onPress={() =>
-                      router.push(
-                        `/league/${leagueIdNumber}/admin-emails?memberId=${member.membership_id}` as any,
+                      pushMemberRouteFromSheet(
+                        `/league/${leagueIdNumber}/admin-emails?memberId=${selectedMember.membership_id}`,
                       )
                     }
                   >
                     View Email Logs
                   </Button>
+                </View>
+
+                <View className="gap-2">
                   <Button
-                    variant="outline"
-                    size="sm"
-                    disabled={busyKey === roleActionKey || isViewer}
-                    onPress={() =>
-                      onToggleRole(member.membership_id, member.role ?? "player")
-                    }
+                    disabled={busyKey === `edit-${selectedMember.membership_id}`}
+                    onPress={onSaveMemberSettings}
                   >
-                    {member.role === "admin" ? "Set as Player" : "Set as Admin"}
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    disabled={busyKey === paidActionKey}
-                    onPress={() =>
-                      onTogglePaid(member.membership_id, member.paid ?? false)
-                    }
-                  >
-                    {member.paid ? "Mark Unpaid" : "Mark Paid"}
+                    Save Changes
                   </Button>
                   <Button
                     variant="destructive"
                     size="sm"
-                    disabled={busyKey === removeActionKey || isViewer}
+                    disabled={
+                      selectedMemberIsViewer ||
+                      busyKey === `remove-${selectedMember.membership_id}`
+                    }
                     onPress={() =>
-                      onRemoveMember(member.membership_id, member.people.username)
+                      onRemoveMember(
+                        selectedMember.membership_id,
+                        selectedMember.people.username,
+                        true,
+                      )
                     }
                   >
                     Remove Member
                   </Button>
                 </View>
               </View>
-            );
-          })}
-
-          <Button variant="outline" onPress={() => router.back()}>
-            Back to League
-          </Button>
+            ) : (
+              <Text className="text-sm text-gray-600 dark:text-gray-400">
+                Member not found.
+              </Text>
+            )}
+          </View>
         </View>
-      </ScrollView>
+      </Modal>
     </SafeAreaView>
   );
 }

@@ -22,20 +22,16 @@ import { cn } from "@/lib/utils";
 
 type SettingsSectionProps = {
   title: string;
-  subtitle?: string;
   children: React.ReactNode;
 };
 
-function SettingsSection({ title, subtitle, children }: SettingsSectionProps) {
+function SettingsSection({ title, children }: SettingsSectionProps) {
   return (
-    <View className="gap-2">
+    <View className="gap-2.5">
       <Text className="text-xs font-semibold uppercase tracking-[1px] text-gray-500 dark:text-gray-400">
         {title}
       </Text>
-      {subtitle ? (
-        <Text className="text-xs text-gray-500 dark:text-gray-400">{subtitle}</Text>
-      ) : null}
-      <View className="rounded-2xl border border-gray-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-800">
+      <View className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-zinc-700 dark:bg-zinc-800">
         {children}
       </View>
     </View>
@@ -45,6 +41,7 @@ function SettingsSection({ title, subtitle, children }: SettingsSectionProps) {
 type SettingsRowProps = {
   icon: React.ComponentProps<typeof Ionicons>["name"];
   title: string;
+  value?: string;
   subtitle?: string;
   trailing?: React.ReactNode;
   onPress?: () => void;
@@ -55,6 +52,7 @@ type SettingsRowProps = {
 function SettingsRow({
   icon,
   title,
+  value,
   subtitle,
   trailing,
   onPress,
@@ -66,15 +64,15 @@ function SettingsRow({
       disabled={disabled || !onPress}
       onPress={onPress}
       className={cn(
-        "rounded-xl px-2 py-2",
+        "px-3 py-3",
         onPress ? "active:bg-gray-100 dark:active:bg-zinc-700" : "",
         disabled ? "opacity-50" : "",
       )}
     >
-      <View className="flex-row items-start gap-3">
+      <View className="flex-row items-center gap-3">
         <View
           className={cn(
-            "mt-0.5 h-9 w-9 items-center justify-center rounded-lg",
+            "h-8 w-8 items-center justify-center rounded-md",
             danger
               ? "bg-red-100 dark:bg-red-950"
               : "bg-gray-100 dark:bg-zinc-700",
@@ -89,7 +87,7 @@ function SettingsRow({
         <View className="flex-1">
           <Text
             className={cn(
-              "text-sm font-semibold",
+              "text-sm font-medium",
               danger
                 ? "text-red-600 dark:text-red-400"
                 : "text-app-fg-light dark:text-app-fg-dark",
@@ -97,7 +95,12 @@ function SettingsRow({
           >
             {title}
           </Text>
-          {subtitle ? (
+          {value ? (
+            <Text className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
+              {value}
+            </Text>
+          ) : null}
+          {!value && subtitle ? (
             <Text className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
               {subtitle}
             </Text>
@@ -111,27 +114,26 @@ function SettingsRow({
 
 function AccountLoadingSkeleton() {
   return (
-    <View className="gap-5">
-      <View className="rounded-2xl border border-gray-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-800">
+    <View className="gap-4">
+      <View className="rounded-xl border border-gray-200 bg-white p-3 dark:border-zinc-700 dark:bg-zinc-800">
         <View className="flex-row items-center gap-3">
-          <Skeleton className="h-14 w-14 rounded-full" />
+          <Skeleton className="h-10 w-10 rounded-full" />
           <View className="flex-1 gap-2">
-            <Skeleton className="h-4 w-36 rounded" />
-            <Skeleton className="h-3 w-48 rounded" />
+            <Skeleton className="h-4 w-28 rounded" />
+            <Skeleton className="h-3 w-44 rounded" />
           </View>
         </View>
       </View>
 
-      <View className="rounded-2xl border border-gray-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-800">
-        <Skeleton className="mb-4 h-4 w-24 rounded" />
-        <Skeleton className="mb-2 h-10 w-full rounded-md" />
-        <Skeleton className="h-3 w-40 rounded" />
+      <View className="rounded-xl border border-gray-200 bg-white p-3 dark:border-zinc-700 dark:bg-zinc-800">
+        <Skeleton className="mb-2 h-4 w-24 rounded" />
+        <Skeleton className="mb-2 h-4 w-full rounded" />
+        <Skeleton className="h-10 w-full rounded-md" />
       </View>
 
-      <View className="rounded-2xl border border-gray-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-800">
-        <Skeleton className="mb-4 h-4 w-32 rounded" />
-        <Skeleton className="mb-2 h-3 w-full rounded" />
-        <Skeleton className="h-10 w-44 rounded-full" />
+      <View className="rounded-xl border border-gray-200 bg-white p-3 dark:border-zinc-700 dark:bg-zinc-800">
+        <Skeleton className="mb-3 h-4 w-28 rounded" />
+        <Skeleton className="h-10 w-36 rounded-md" />
       </View>
     </View>
   );
@@ -342,12 +344,9 @@ export default function AccountScreen() {
 
   return (
     <SafeAreaView className="bg-app-bg-light dark:bg-app-bg-dark flex-1">
-      <View className="border-b border-gray-200 px-6 pb-4 pt-5 dark:border-zinc-800">
-        <Text className="text-app-fg-light dark:text-app-fg-dark text-3xl font-bold">
-          Settings
-        </Text>
-        <Text className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-          Manage account identity, notifications, and access.
+      <View className="px-5 pb-3 pt-4">
+        <Text className="text-app-fg-light dark:text-app-fg-dark text-2xl font-bold tracking-tight">
+          My Account
         </Text>
       </View>
 
@@ -363,59 +362,66 @@ export default function AccountScreen() {
           />
         }
       >
-        <View className="gap-6 px-6 py-6">
+        <View className="gap-5 px-4 py-4">
           {userLoading ? (
             <AccountLoadingSkeleton />
           ) : userData?.dbUser ? (
-            <View className="gap-6">
-              <View className="rounded-2xl border border-gray-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-800">
-                <View className="flex-row items-center gap-3">
-                  <View className="h-14 w-14 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-950">
-                    <Text className="text-lg font-bold text-blue-700 dark:text-blue-300">
-                      {initials}
-                    </Text>
-                  </View>
-                  <View className="flex-1">
-                    <Text className="text-app-fg-light dark:text-app-fg-dark text-lg font-semibold">
-                      @{username}
-                    </Text>
-                    <Text className="text-sm text-gray-600 dark:text-gray-400">
-                      {email}
-                    </Text>
+            <View className="gap-5">
+              <View className="rounded-xl border border-gray-200 bg-white px-3 py-3 dark:border-zinc-700 dark:bg-zinc-800">
+                <View className="flex-row items-center justify-between gap-3">
+                  <View className="flex-1 flex-row items-center gap-3">
+                    <View className="h-10 w-10 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-950">
+                      <Text className="text-sm font-bold text-blue-700 dark:text-blue-300">
+                        {initials}
+                      </Text>
+                    </View>
+                    <View className="flex-1">
+                      <Text className="text-app-fg-light dark:text-app-fg-dark text-base font-semibold">
+                        @{username}
+                      </Text>
+                      <Text
+                        className="text-xs text-gray-500 dark:text-gray-400"
+                        numberOfLines={1}
+                      >
+                        {email}
+                      </Text>
+                    </View>
                   </View>
                   {isSuperAdmin ? (
-                    <View className="rounded-full border border-emerald-300 bg-emerald-100 px-3 py-1 dark:border-emerald-700 dark:bg-emerald-950">
-                      <Text className="text-xs font-semibold text-emerald-800 dark:text-emerald-200">
-                        SUPER ADMIN
+                    <View className="rounded-full bg-emerald-100 px-2 py-1 dark:bg-emerald-950">
+                      <Text className="text-[10px] font-semibold text-emerald-700 dark:text-emerald-300">
+                        ADMIN
                       </Text>
                     </View>
                   ) : null}
                 </View>
               </View>
 
-              <SettingsSection
-                title="Identity"
-                subtitle="Keep your username clean and recognizable across leagues."
-              >
-                <View className="gap-3">
-                  <SettingsRow
-                    icon="at-outline"
-                    title="Current Username"
-                    subtitle={`@${username}`}
-                    trailing={
-                      <Text className="text-xs font-semibold text-gray-500 dark:text-gray-400">
-                        LIVE
-                      </Text>
-                    }
-                  />
-                  <View className="h-px bg-gray-200 dark:bg-zinc-700" />
-                  <Input
-                    value={usernameDraft}
-                    onChangeText={setUsernameDraft}
-                    autoCapitalize="none"
-                    autoCorrect={false}
-                    placeholder="New username"
-                  />
+              <SettingsSection title="Account">
+                <SettingsRow
+                  icon="at-outline"
+                  title="Username"
+                  value={`@${username}`}
+                />
+                <View className="h-px bg-gray-200 dark:bg-zinc-700" />
+                <View className="gap-2 p-3">
+                  <View className="flex-row items-center gap-2">
+                    <Input
+                      className="flex-1"
+                      value={usernameDraft}
+                      onChangeText={setUsernameDraft}
+                      autoCapitalize="none"
+                      autoCorrect={false}
+                      placeholder="New username"
+                    />
+                    <Button
+                      size="sm"
+                      disabled={!canSubmitUsername}
+                      onPress={onUpdateUsername}
+                    >
+                      {isUpdatingUsername ? "Saving..." : "Save"}
+                    </Button>
+                  </View>
                   <View className="flex-row items-center justify-between">
                     <Text
                       className={cn(
@@ -429,72 +435,85 @@ export default function AccountScreen() {
                         ? "Use 8-30 letters and numbers."
                         : "8-30 letters or numbers only."}
                     </Text>
-                    <Text className="text-xs text-gray-500 dark:text-gray-400">
-                      {Math.min(trimmedUsernameDraft.length, 30)}/30
-                    </Text>
-                  </View>
-                  <View className="flex-row gap-2">
-                    <View className="flex-1">
-                      <Button
-                        disabled={!canSubmitUsername}
-                        onPress={onUpdateUsername}
-                      >
-                        {isUpdatingUsername ? "Saving..." : "Save Username"}
-                      </Button>
-                    </View>
-                    <View className="flex-1">
-                      <Button
-                        variant="outline"
-                        disabled={trimmedUsernameDraft === username || isUpdatingUsername}
-                        onPress={() => setUsernameDraft(username)}
-                      >
+                    <Pressable
+                      disabled={
+                        trimmedUsernameDraft === username || isUpdatingUsername
+                      }
+                      onPress={() => setUsernameDraft(username)}
+                      className={cn(
+                        "rounded-md px-2 py-1",
+                        trimmedUsernameDraft === username || isUpdatingUsername
+                          ? "opacity-40"
+                          : "active:bg-gray-100 dark:active:bg-zinc-700",
+                      )}
+                    >
+                      <Text className="text-xs font-medium text-gray-600 dark:text-gray-300">
                         Reset
-                      </Button>
-                    </View>
+                      </Text>
+                    </Pressable>
                   </View>
                 </View>
+                <View className="h-px bg-gray-200 dark:bg-zinc-700" />
+                <SettingsRow
+                  icon="mail-outline"
+                  title="Email"
+                  value={email}
+                  trailing={
+                    <Text className="text-[10px] font-semibold uppercase tracking-[0.8px] text-gray-500 dark:text-gray-400">
+                      Verified
+                    </Text>
+                  }
+                />
               </SettingsSection>
 
-              <SettingsSection
-                title="Notifications"
-                subtitle="Control whether this account receives push updates."
-              >
-                <View className="gap-3">
-                  <SettingsRow
-                    icon="notifications-outline"
-                    title="Push Notifications"
-                    subtitle={pushStatusSummary}
-                    trailing={
-                      <View
+              <SettingsSection title="Notifications">
+                <SettingsRow
+                  icon="notifications-outline"
+                  title="Push Notifications"
+                  value={
+                    pushStatus?.unavailable
+                      ? "Unavailable"
+                      : pushStatus?.enabled
+                        ? "Enabled"
+                        : "Disabled"
+                  }
+                  trailing={
+                    <View
+                      className={cn(
+                        "rounded-full px-2 py-0.5",
+                        pushStatus?.unavailable
+                          ? "bg-amber-100 dark:bg-amber-950"
+                          : pushStatus?.enabled
+                            ? "bg-emerald-100 dark:bg-emerald-950"
+                            : "bg-gray-100 dark:bg-zinc-700",
+                      )}
+                    >
+                      <Text
                         className={cn(
-                          "rounded-full px-2.5 py-1",
+                          "text-[10px] font-semibold",
                           pushStatus?.unavailable
-                            ? "bg-amber-100 dark:bg-amber-950"
+                            ? "text-amber-700 dark:text-amber-300"
                             : pushStatus?.enabled
-                              ? "bg-emerald-100 dark:bg-emerald-950"
-                              : "bg-gray-100 dark:bg-zinc-700",
+                              ? "text-emerald-700 dark:text-emerald-300"
+                              : "text-gray-600 dark:text-gray-300",
                         )}
                       >
-                        <Text
-                          className={cn(
-                            "text-[10px] font-semibold",
-                            pushStatus?.unavailable
-                              ? "text-amber-700 dark:text-amber-300"
-                              : pushStatus?.enabled
-                                ? "text-emerald-700 dark:text-emerald-300"
-                                : "text-gray-600 dark:text-gray-300",
-                          )}
-                        >
-                          {pushStatus?.unavailable
-                            ? "UNAVAILABLE"
-                            : pushStatus?.enabled
-                              ? "ON"
-                              : "OFF"}
-                        </Text>
-                      </View>
-                    }
-                  />
+                        {pushStatus?.unavailable
+                          ? "N/A"
+                          : pushStatus?.enabled
+                            ? "ON"
+                            : "OFF"}
+                      </Text>
+                    </View>
+                  }
+                />
+                <View className="h-px bg-gray-200 dark:bg-zinc-700" />
+                <View className="gap-2 p-3">
+                  <Text className="text-xs text-gray-500 dark:text-gray-400">
+                    {pushStatusSummary}
+                  </Text>
                   <Button
+                    size="sm"
                     variant={pushStatus?.enabled ? "outline" : "default"}
                     disabled={!canTogglePushNotifications}
                     onPress={onTogglePushNotifications}
@@ -502,31 +521,17 @@ export default function AccountScreen() {
                     {isUpdatingPushPreference
                       ? "Saving..."
                       : pushStatus?.enabled
-                        ? "Disable Push Notifications"
-                        : "Enable Push Notifications"}
+                        ? "Disable Notifications"
+                        : "Enable Notifications"}
                   </Button>
                 </View>
               </SettingsSection>
 
-              <SettingsSection title="Contact">
-                <SettingsRow
-                  icon="mail-outline"
-                  title="Email"
-                  subtitle={email}
-                  trailing={
-                    <Text className="text-xs text-gray-500 dark:text-gray-400">
-                      Verified
-                    </Text>
-                  }
-                />
-              </SettingsSection>
-
               {isSuperAdmin ? (
-                <SettingsSection title="Admin Tools">
+                <SettingsSection title="Admin">
                   <SettingsRow
                     icon="shield-checkmark-outline"
                     title="Global Admin Dashboard"
-                    subtitle="Review platform stats and manage leagues."
                     onPress={() => {
                       triggerSelectionHaptic();
                       router.push("/admin" as any);
@@ -546,7 +551,6 @@ export default function AccountScreen() {
                 <SettingsRow
                   icon="log-out-outline"
                   title={isSigningOut ? "Signing Out..." : "Sign Out"}
-                  subtitle="End this session on this device."
                   danger
                   disabled={isSigningOut}
                   onPress={onPressSignOut}
@@ -561,7 +565,7 @@ export default function AccountScreen() {
               </SettingsSection>
             </View>
           ) : (
-            <View className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-zinc-700 dark:bg-zinc-800">
+            <View className="rounded-xl border border-gray-200 bg-white p-5 dark:border-zinc-700 dark:bg-zinc-800">
               <Text className="text-center text-base leading-6 text-gray-500 dark:text-gray-400">
                 Unable to load profile data. Please try signing in again.
               </Text>

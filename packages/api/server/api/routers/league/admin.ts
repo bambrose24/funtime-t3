@@ -6,7 +6,6 @@ import {
   MemberRole,
   type PrismaClient,
 } from "../../../../src/generated/prisma-client";
-import { Defined } from "../../../../utils/defined";
 import { resendApi } from "../../../services/resend";
 import { authorizedProcedure, createTRPCRouter } from "../../trpc";
 
@@ -77,6 +76,19 @@ export const leagueAdminRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const { db } = ctx;
       const { leagueId, memberId, role } = input;
+      const requestorIsSuperAdmin = isSuperAdminUser(ctx.dbUser?.email);
+      const requestorMembership = ctx.dbUser?.leaguemembers.find(
+        (m) => m.league_id === leagueId,
+      );
+      if (
+        !requestorIsSuperAdmin &&
+        requestorMembership?.membership_id === memberId
+      ) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "League admins cannot change their own role",
+        });
+      }
       const memberInLeague = await db.leaguemembers.findFirstOrThrow({
         where: {
           membership_id: memberId,
@@ -104,6 +116,19 @@ export const leagueAdminRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const { db } = ctx;
       const { leagueId, memberId } = input;
+      const requestorIsSuperAdmin = isSuperAdminUser(ctx.dbUser?.email);
+      const requestorMembership = ctx.dbUser?.leaguemembers.find(
+        (m) => m.league_id === leagueId,
+      );
+      if (
+        !requestorIsSuperAdmin &&
+        requestorMembership?.membership_id === memberId
+      ) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "League admins cannot remove themselves",
+        });
+      }
       const memberInLeague = await db.leaguemembers.findFirstOrThrow({
         where: {
           membership_id: memberId,
@@ -346,7 +371,7 @@ export const leagueAdminRouter = createTRPCRouter({
             winner,
             correct: null,
             done: null,
-            score: Boolean(score) ? score : null,
+            ...(typeof score === "number" ? { score } : {}),
           },
         });
       } else {
@@ -358,7 +383,7 @@ export const leagueAdminRouter = createTRPCRouter({
             week: game.week,
             gid: gameId,
             winner,
-            score: Boolean(score) ? score : null,
+            ...(typeof score === "number" ? { score } : {}),
           },
         });
       }
@@ -404,6 +429,7 @@ export const leagueAdminRouter = createTRPCRouter({
             return {
               id: log.email_log_id,
               resend_id: log.resend_id,
+              sent_at: log.ts,
               resend_data: data,
             };
           } catch (error) {
@@ -411,12 +437,17 @@ export const leagueAdminRouter = createTRPCRouter({
               `Failed to fetch email content for ID ${log.resend_id}:`,
               error,
             );
-            return null;
+            return {
+              id: log.email_log_id,
+              resend_id: log.resend_id,
+              sent_at: log.ts,
+              resend_data: null,
+            };
           }
         }),
       );
 
-      return { emails: emailsResponse.filter(Defined) };
+      return { emails: emailsResponse };
     }),
   changeName: leagueAdminProcedure
     .input(

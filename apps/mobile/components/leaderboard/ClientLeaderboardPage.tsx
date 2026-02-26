@@ -2,6 +2,7 @@ import React from "react";
 import { View, Text, ScrollView } from "react-native";
 import { clientApi } from "@/lib/trpc/react";
 import { MobileLeaderboardTable } from "./MobileLeaderboardTable";
+import { LeagueTabLoadingSkeleton } from "@/components/league/LeagueTabLoadingSkeleton";
 
 type Props = {
   leagueId: string;
@@ -22,13 +23,7 @@ export function ClientLeaderboardPage({ leagueId }: Props) {
 
   // Show loading state
   if (isLoading) {
-    return (
-      <View className="flex-1 items-center justify-center">
-        <Text className="text-base text-gray-500 dark:text-gray-400">
-          Loading leaderboard...
-        </Text>
-      </View>
-    );
+    return <LeagueTabLoadingSkeleton rows={4} />;
   }
 
   // Show error state

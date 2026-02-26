@@ -63,6 +63,12 @@
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "5221f508-d78a-4715-a43b-12f8fcd2d1ed"
+      }
+    },
+    "owner": "funtime-org"
   }
 }

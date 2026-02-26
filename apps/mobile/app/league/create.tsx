@@ -1,11 +1,13 @@
 import React, { useMemo, useState } from "react";
-import { Alert, SafeAreaView, ScrollView, Text, View } from "react-native";
+import { Alert, Pressable, SafeAreaView, ScrollView, Text, View } from "react-native";
 import { router } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { SelectOption } from "@/components/ui/select-option";
 import { clientApi } from "@/lib/trpc/react";
 import { DEFAULT_SEASON } from "@/constants";
+import { useColorScheme } from "@/lib/useColorScheme";
 
 const LATE_POLICY_LABELS = {
   allow_late_and_lock_after_start: "Allow Late Picks",
@@ -13,6 +15,7 @@ const LATE_POLICY_LABELS = {
 } as const;
 
 export default function CreateLeagueScreen() {
+  const { isDarkColorScheme } = useColorScheme();
   const [name, setName] = useState("");
   const [priorLeagueId, setPriorLeagueId] = useState<string>("none");
   const [latePolicy, setLatePolicy] = useState<
@@ -132,13 +135,25 @@ export default function CreateLeagueScreen() {
         contentContainerStyle={{ padding: 24, paddingBottom: 40 }}
       >
         <View className="mx-auto w-full max-w-2xl gap-6">
-          <View className="gap-2">
-            <Text className="text-app-fg-light dark:text-app-fg-dark text-3xl font-bold">
-              Create League
-            </Text>
-            <Text className="text-base text-gray-600 dark:text-gray-400">
-              Configure your league and invite friends to play.
-            </Text>
+          <View className="flex-row items-start gap-3">
+            <Pressable
+              onPress={() => router.back()}
+              className="mt-1 rounded-lg bg-app-card-light p-2 dark:bg-app-card-dark"
+            >
+              <Ionicons
+                name="chevron-back"
+                size={22}
+                color={isDarkColorScheme ? "#e5e7eb" : "#374151"}
+              />
+            </Pressable>
+            <View className="flex-1 gap-2">
+              <Text className="text-app-fg-light dark:text-app-fg-dark text-3xl font-bold">
+                Create League
+              </Text>
+              <Text className="text-base text-gray-600 dark:text-gray-400">
+                Configure your league and invite friends to play.
+              </Text>
+            </View>
           </View>
 
           <View className="gap-2">

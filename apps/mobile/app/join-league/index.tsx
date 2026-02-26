@@ -1,9 +1,11 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Alert, SafeAreaView, ScrollView, Text, View } from "react-native";
+import { Alert, Pressable, SafeAreaView, ScrollView, Text, View } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useColorScheme } from "@/lib/useColorScheme";
 
 const joinLeagueSchema = z.object({
   leagueCode: z.string().trim().min(1, "League code is required"),
@@ -26,6 +28,7 @@ function extractLeagueCode(rawInput: string) {
 }
 
 export default function JoinLeagueEntryScreen() {
+  const { isDarkColorScheme } = useColorScheme();
   const { code } = useLocalSearchParams<{ code?: string }>();
   const [leagueCode, setLeagueCode] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -61,13 +64,25 @@ export default function JoinLeagueEntryScreen() {
         contentContainerStyle={{ flexGrow: 1, padding: 24 }}
       >
         <View className="mx-auto w-full max-w-xl justify-center gap-6 py-10">
-          <View className="gap-2">
-            <Text className="text-app-fg-light dark:text-app-fg-dark text-3xl font-bold">
-              Join a League
-            </Text>
-            <Text className="text-base text-gray-600 dark:text-gray-400">
-              Paste a join URL or enter a league code.
-            </Text>
+          <View className="flex-row items-start gap-3">
+            <Pressable
+              onPress={() => router.back()}
+              className="mt-1 rounded-lg bg-app-card-light p-2 dark:bg-app-card-dark"
+            >
+              <Ionicons
+                name="chevron-back"
+                size={22}
+                color={isDarkColorScheme ? "#e5e7eb" : "#374151"}
+              />
+            </Pressable>
+            <View className="flex-1 gap-2">
+              <Text className="text-app-fg-light dark:text-app-fg-dark text-3xl font-bold">
+                Join a League
+              </Text>
+              <Text className="text-base text-gray-600 dark:text-gray-400">
+                Paste a join URL or enter a league code.
+              </Text>
+            </View>
           </View>
 
           <View className="gap-3">

@@ -1,6 +1,7 @@
 import React from "react";
 import { Tabs } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useColorScheme } from "@/lib/useColorScheme";
 
 type TabIconName = "home" | "football" | "person";
@@ -13,10 +14,14 @@ const iconMap: Record<TabIconName, { inactive: string; active: string }> = {
 
 export default function TabsLayout() {
   const { isDarkColorScheme } = useColorScheme();
+  const insets = useSafeAreaInsets();
   const activeColor = isDarkColorScheme ? "#e5e7eb" : "#111827";
   const inactiveColor = isDarkColorScheme ? "#9ca3af" : "#6b7280";
   const barColor = isDarkColorScheme ? "#18181b" : "#ffffff";
   const borderColor = isDarkColorScheme ? "#27272a" : "#e5e7eb";
+  const tabBarTopPadding = 8;
+  const tabBarBottomPadding = Math.max(insets.bottom, 10);
+  const tabBarHeight = 44 + tabBarTopPadding + tabBarBottomPadding;
 
   const renderTabIcon = (tab: TabIconName, focused: boolean) => {
     const iconName = focused ? iconMap[tab].active : iconMap[tab].inactive;
@@ -33,14 +38,22 @@ export default function TabsLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
+        tabBarHideOnKeyboard: true,
         tabBarActiveTintColor: activeColor,
         tabBarInactiveTintColor: inactiveColor,
+        tabBarLabelStyle: {
+          fontSize: 12,
+          fontWeight: "600",
+        },
+        tabBarItemStyle: {
+          paddingVertical: 0,
+        },
         tabBarStyle: {
           backgroundColor: barColor,
           borderTopColor: borderColor,
-          height: 58,
-          paddingBottom: 6,
-          paddingTop: 6,
+          height: tabBarHeight,
+          paddingBottom: tabBarBottomPadding,
+          paddingTop: tabBarTopPadding,
         },
       }}
     >

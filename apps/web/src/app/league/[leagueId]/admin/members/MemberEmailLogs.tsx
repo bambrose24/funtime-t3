@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { format } from "date-fns";
 import { clientApi } from "~/trpc/react";
 import {
@@ -26,6 +26,28 @@ type Props = {
   leagueId: number;
 };
 
+const toTimestamp = (value?: string | Date | null) => {
+  if (!value) {
+    return 0;
+  }
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) {
+    return 0;
+  }
+  return parsed.getTime();
+};
+
+const toDateLabel = (value?: string | Date | null) => {
+  if (!value) {
+    return "No date";
+  }
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) {
+    return "No date";
+  }
+  return format(parsed, "M/d/yyyy h:mm a");
+};
+
 export function MemberEmailLogs({ memberId, leagueId }: Props) {
   const { data, isLoading } = clientApi.league.admin.memberEmails.useQuery({
     memberId,
@@ -33,12 +55,22 @@ export function MemberEmailLogs({ memberId, leagueId }: Props) {
   });
   const [selectedEmail, setSelectedEmail] = useState<string | null>(null);
   const emails = data?.emails;
+  const sortedEmails = useMemo(() => {
+    if (!emails) {
+      return [];
+    }
+    return [...emails].sort((a, b) => {
+      const aTime = toTimestamp(a.resend_data?.created_at ?? a.sent_at);
+      const bTime = toTimestamp(b.resend_data?.created_at ?? b.sent_at);
+      return bTime - aTime;
+    });
+  }, [emails]);
 
   if (isLoading) {
     return <div>Loading...</div>;
   }
 
-  if (!emails || emails.length === 0) {
+  if (!sortedEmails || sortedEmails.length === 0) {
     return <div>No emails found</div>;
   }
 
@@ -54,14 +86,11 @@ export function MemberEmailLogs({ memberId, leagueId }: Props) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {emails.map((email) => {
+            {sortedEmails.map((email) => {
               const subject = email.resend_data?.subject ?? "No subject";
-              const date = email.resend_data?.created_at
-                ? format(
-                    new Date(email.resend_data.created_at),
-                    "M/d/yyyy h:mm a",
-                  )
-                : "No date";
+              const date = toDateLabel(
+                email.resend_data?.created_at ?? email.sent_at,
+              );
               const htmlContent = email.resend_data?.html ?? null;
 
               return (

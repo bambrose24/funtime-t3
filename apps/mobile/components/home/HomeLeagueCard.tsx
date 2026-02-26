@@ -1,38 +1,17 @@
-import React, { useMemo } from "react";
-import { View, Text, Pressable, TouchableOpacity } from "react-native";
+import React from "react";
+import { View, Text, TouchableOpacity } from "react-native";
 import { router } from "expo-router";
-import { clientApi } from "@/lib/trpc/react";
 import { type RouterOutputs } from "~/trpc/types";
 
 // Type for league data from home.summary - matches the web app approach
 type LeagueCardData = NonNullable<RouterOutputs["home"]["summary"]>[number];
 
 export function HomeLeagueCard({ data }: { data: LeagueCardData }) {
-  // Fetch additional league data and picks count
-  const { data: leagueData, isPending: leagueDataPending } =
-    clientApi.league.get.useQuery({
-      leagueId: data.league_id,
-    });
-
-  const { data: correctPicksData, isPending: correctPicksPending } =
-    clientApi.league.correctPickCount.useQuery({
-      leagueId: data.league_id,
-    });
-
-  // Get current user's week wins
-  const { data: session } = clientApi.session.current.useQuery();
-  const userMemberIds =
-    session?.dbUser?.leaguemembers?.map((m) => m.membership_id) ?? [];
-
-  const weekWins = useMemo(() => {
-    return (
-      leagueData?.WeekWinners?.filter((w) =>
-        userMemberIds.includes(w.membership_id),
-      ).map((w) => {
-        return { week: w.week, league_id: data.league_id };
-      }) ?? []
-    );
-  }, [leagueData?.WeekWinners, userMemberIds, data.league_id]);
+  const weekWins = data.viewerWeekWins ?? [];
+  const correctPickCount = data.viewerCorrectPickCount ?? {
+    correct: 0,
+    total: 0,
+  };
 
   return (
     <TouchableOpacity
@@ -60,13 +39,7 @@ export function HomeLeagueCard({ data }: { data: LeagueCardData }) {
               Correct Picks
             </Text>
             <Text className="text-app-fg-light dark:text-app-fg-dark text-sm font-medium">
-              {correctPicksPending ? (
-                <Text className="text-gray-400">Loading...</Text>
-              ) : correctPicksData ? (
-                `${correctPicksData.correct} / ${correctPicksData.total}`
-              ) : (
-                "0 / 0"
-              )}
+              {`${correctPickCount.correct} / ${correctPickCount.total}`}
             </Text>
           </View>
 
@@ -79,23 +52,19 @@ export function HomeLeagueCard({ data }: { data: LeagueCardData }) {
               Week Wins
             </Text>
             <View className="ml-4 flex-1">
-              {leagueDataPending ? (
-                <Text className="text-right text-sm text-gray-400">
-                  Loading...
-                </Text>
-              ) : weekWins.length === 0 ? (
+              {weekWins.length === 0 ? (
                 <Text className="text-app-fg-light dark:text-app-fg-dark text-right text-sm">
                   None
                 </Text>
               ) : (
                 <View className="flex-row flex-wrap justify-end gap-1">
-                  {weekWins.map((w) => (
+                  {weekWins.map((week) => (
                     <View
-                      key={`week_win_${w.week}_${w.league_id}`}
+                      key={`week_win_${week}_${data.league_id}`}
                       className="rounded-md bg-green-100 px-2 py-1 dark:bg-green-900"
                     >
                       <Text className="text-xs font-medium text-green-800 dark:text-green-200">
-                        Week {w.week}
+                        Week {week}
                       </Text>
                     </View>
                   ))}
