@@ -355,18 +355,37 @@ export const resendApi = {
     leagueName,
     week,
     standings,
+    weekWinners,
+    tiebreakerTotal,
     recipients,
   }: {
     leagueId: number;
     leagueName: string;
     week: number;
-    standings: Array<{ rank: number; username: string; correctPicks: number }>;
+    standings: Array<{
+      rank: number;
+      username: string;
+      correctPicks: number;
+      seasonTotal: number;
+    }>;
+    weekWinners: string[];
+    tiebreakerTotal: number | null;
     recipients: Array<{
       email: string;
       memberId: number;
       username: string;
       rank: number;
       correctPicks: number;
+      seasonRank: number;
+      seasonTotal: number;
+      seasonMovement: number | null;
+      tiebreakerPick: number | null;
+      tiebreakerDiff: number | null;
+      picks: Array<{
+        game: string;
+        pick: string;
+        result: "Correct" | "Wrong" | "Pending";
+      }>;
     }>;
   }) => {
     if (recipients.length === 0) {
@@ -375,12 +394,38 @@ export const resendApi = {
 
     const standingsRows = standings
       .map((standing) => {
-        return `<tr><td style="padding:6px 8px;border-bottom:1px solid #e5e7eb;">${standing.rank}</td><td style="padding:6px 8px;border-bottom:1px solid #e5e7eb;">${escapeHtml(standing.username)}</td><td style="padding:6px 8px;border-bottom:1px solid #e5e7eb;">${standing.correctPicks}</td></tr>`;
+        return `<tr><td style="padding:6px 8px;border-bottom:1px solid #e5e7eb;">${standing.rank}</td><td style="padding:6px 8px;border-bottom:1px solid #e5e7eb;">${escapeHtml(standing.username)}</td><td style="padding:6px 8px;border-bottom:1px solid #e5e7eb;">${standing.correctPicks}</td><td style="padding:6px 8px;border-bottom:1px solid #e5e7eb;">${standing.seasonTotal}</td></tr>`;
       })
       .join("");
+    const winnersText =
+      weekWinners.length > 0 ? weekWinners.map(escapeHtml).join(", ") : "TBD";
+    const tiebreakerText =
+      tiebreakerTotal === null
+        ? "No completed tiebreaker total."
+        : `Tiebreaker total: ${tiebreakerTotal}.`;
 
     let sent = 0;
     for (const recipient of recipients) {
+      const movementText =
+        recipient.seasonMovement === null
+          ? "no prior week comparison"
+          : recipient.seasonMovement === 0
+            ? "no rank change"
+            : recipient.seasonMovement > 0
+              ? `up ${recipient.seasonMovement}`
+              : `down ${Math.abs(recipient.seasonMovement)}`;
+      const recipientTiebreakerText =
+        recipient.tiebreakerPick === null || recipient.tiebreakerDiff === null
+          ? ""
+          : `<p style="margin: 0 0 12px;">Your tiebreaker pick: ${recipient.tiebreakerPick} (${recipient.tiebreakerDiff} off).</p>`;
+      const picksRows =
+        recipient.picks.length > 0
+          ? recipient.picks
+              .map((pick) => {
+                return `<tr><td style="padding:6px 8px;border-bottom:1px solid #e5e7eb;">${escapeHtml(pick.game)}</td><td style="padding:6px 8px;border-bottom:1px solid #e5e7eb;">${escapeHtml(pick.pick)}</td><td style="padding:6px 8px;border-bottom:1px solid #e5e7eb;">${pick.result}</td></tr>`;
+              })
+              .join("")
+          : `<tr><td colspan="3" style="padding:6px 8px;border-bottom:1px solid #e5e7eb;">No picks submitted.</td></tr>`;
       const html = `
         <div style="font-family: Arial, sans-serif; color: #111827; line-height: 1.5;">
           <h2 style="margin-bottom: 8px;">Week ${week} Summary - ${escapeHtml(leagueName)}</h2>
@@ -388,21 +433,38 @@ export const resendApi = {
             Hi ${escapeHtml(recipient.username)}, you finished <strong>#${recipient.rank}</strong> with
             <strong>${recipient.correctPicks}</strong> correct picks this week.
           </p>
-          <p>League standings:</p>
+          <p style="margin: 0 0 12px;">Week winner(s): <strong>${winnersText}</strong>. ${tiebreakerText}</p>
+          ${recipientTiebreakerText}
+          <p style="margin: 0 0 12px;">Season: <strong>#${recipient.seasonRank}</strong>, <strong>${recipient.seasonTotal}</strong> correct (${movementText}).</p>
+          <p>Week standings:</p>
           <table style="border-collapse: collapse; width: 100%; max-width: 460px;">
             <thead>
               <tr>
                 <th align="left" style="padding:6px 8px;border-bottom:2px solid #d1d5db;">Rank</th>
                 <th align="left" style="padding:6px 8px;border-bottom:2px solid #d1d5db;">Player</th>
                 <th align="left" style="padding:6px 8px;border-bottom:2px solid #d1d5db;">Correct</th>
+                <th align="left" style="padding:6px 8px;border-bottom:2px solid #d1d5db;">Season</th>
               </tr>
             </thead>
             <tbody>
               ${standingsRows}
             </tbody>
           </table>
+          <p>Your picks:</p>
+          <table style="border-collapse: collapse; width: 100%; max-width: 560px;">
+            <thead>
+              <tr>
+                <th align="left" style="padding:6px 8px;border-bottom:2px solid #d1d5db;">Game</th>
+                <th align="left" style="padding:6px 8px;border-bottom:2px solid #d1d5db;">Pick</th>
+                <th align="left" style="padding:6px 8px;border-bottom:2px solid #d1d5db;">Result</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${picksRows}
+            </tbody>
+          </table>
           <p style="margin-top: 16px;">
-            <a href="https://play-funtime.com/league/${leagueId}?week=${week}" style="color: #2563eb;">
+            <a href="https://www.play-funtime.com/league/${leagueId}?week=${week}" style="color: #2563eb;">
               View league details
             </a>
           </p>

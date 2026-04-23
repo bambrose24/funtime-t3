@@ -10,7 +10,7 @@ const LOG_PREFIX = "[cron]";
 const E2E_MODE = ["1", "true", "yes", "on"].includes(
   (process.env.E2E_MODE ?? "").toLowerCase(),
 );
-const WEEK_SUMMARY_EMAILS_ENABLED = false;
+const WEEK_SUMMARY_EMAILS_ENABLED = true;
 
 export async function run() {
   if (E2E_MODE) {
@@ -430,6 +430,13 @@ export async function run() {
         continue;
       }
 
+      if (addMonths(latestWeekGame.ts, 1) < now) {
+        console.log(
+          `${LOG_PREFIX} Skipping week-summary notifications for league ${league.league_id} week ${week}; latest game start is more than 1 month old`,
+        );
+        continue;
+      }
+
       // Send summaries the next morning (12:00 UTC) after week completion.
       const earliestSendTime = addHours(startOfDay(addDays(latestWeekGame.ts, 1)), 12);
       if (now < earliestSendTime) {
@@ -463,15 +470,73 @@ export async function run() {
         continue;
       }
 
-      const weekPicks = await db.picks.findMany({
-        where: {
-          week,
-          member_id: {
-            in: members.map((member) => member.membership_id),
+      const memberIds = members.map((member) => member.membership_id);
+      const [weekPicks, seasonPicks] = await Promise.all([
+        db.picks.findMany({
+          where: {
+            week,
+            member_id: {
+              in: memberIds,
+            },
           },
-        },
-      });
+        }),
+        db.picks.findMany({
+          where: {
+            week: {
+              lte: week,
+            },
+            member_id: {
+              in: memberIds,
+            },
+          },
+        }),
+      ]);
       const picksByMember = groupBy(weekPicks, (pick) => pick.member_id);
+      const seasonPicksByMember = groupBy(seasonPicks, (pick) => pick.member_id);
+      const teamById = new Map(teams.map((team) => [team.teamid, team]));
+      const gameById = new Map(weekGames.map((game) => [game.gid, game]));
+      const teamLabel = (teamId: number | null | undefined) => {
+        const team = teamId ? teamById.get(teamId) : null;
+        if (!team) {
+          return "No pick";
+        }
+        return team.abbrev ?? `${team.loc} ${team.name}`;
+      };
+      const getSeasonRanks = (throughWeek: number) => {
+        const rows = members.map((member) => {
+          const picks = seasonPicksByMember[member.membership_id] ?? [];
+          return {
+            member,
+            total: picks.filter(
+              (pick) => pick.week <= throughWeek && pick.correct === 1,
+            ).length,
+          };
+        });
+        const sortedRows = orderBy(
+          rows,
+          [(row) => row.total, (row) => row.member.people.username.toLowerCase()],
+          ["desc", "asc"],
+        );
+        let currentRank = 0;
+        let previousTotal: number | null = null;
+        return new Map(
+          sortedRows.map((row, index) => {
+            if (previousTotal !== row.total) {
+              currentRank = index + 1;
+              previousTotal = row.total;
+            }
+            return [
+              row.member.membership_id,
+              {
+                rank: currentRank,
+                total: row.total,
+              },
+            ];
+          }),
+        );
+      };
+      const currentSeasonRanks = getSeasonRanks(week);
+      const previousSeasonRanks = week > 1 ? getSeasonRanks(week - 1) : null;
 
       const tiebreakerGame = weekGames.find((game) => game.is_tiebreaker);
       const tiebreakerTotal =
@@ -528,7 +593,12 @@ export async function run() {
         rank: standing.rank,
         username: standing.member.people.username,
         correctPicks: standing.correctPicks,
+        seasonTotal:
+          currentSeasonRanks.get(standing.member.membership_id)?.total ?? 0,
       }));
+      const weekWinners = standings
+        .filter((standing) => standing.rank === 1)
+        .map((standing) => standing.member.people.username);
 
       const recipientMemberIds = new Set(
         membersToNotify.map((member) => member.membership_id),
@@ -536,13 +606,58 @@ export async function run() {
       const recipients = standings
         .filter((standing) => recipientMemberIds.has(standing.member.membership_id))
         .filter((standing) => Boolean(standing.member.people.email))
-        .map((standing) => ({
-          email: standing.member.people.email ?? "",
-          memberId: standing.member.membership_id,
-          username: standing.member.people.username,
-          rank: standing.rank,
-          correctPicks: standing.correctPicks,
-        }));
+        .map((standing) => {
+          const memberId = standing.member.membership_id;
+          const seasonRank = currentSeasonRanks.get(memberId);
+          const previousSeasonRank = previousSeasonRanks?.get(memberId);
+          const picks = orderBy(
+            picksByMember[memberId] ?? [],
+            [(pick) => gameById.get(pick.gid)?.ts ?? pick.ts],
+            ["asc"],
+          );
+          const tiebreakerPick =
+            tiebreakerGame && tiebreakerTotal !== null
+              ? picks.find((pick) => pick.gid === tiebreakerGame.gid)
+              : null;
+          const tiebreakerPickScore =
+            tiebreakerPick?.score == null ? null : tiebreakerPick.score;
+          const tiebreakerDiff =
+            tiebreakerPickScore === null || tiebreakerTotal === null
+              ? null
+              : Math.abs(tiebreakerPickScore - tiebreakerTotal);
+
+          return {
+            email: standing.member.people.email ?? "",
+            memberId,
+            username: standing.member.people.username,
+            rank: standing.rank,
+            correctPicks: standing.correctPicks,
+            seasonRank: seasonRank?.rank ?? standings.length,
+            seasonTotal: seasonRank?.total ?? 0,
+            seasonMovement:
+              previousSeasonRank && seasonRank
+                ? previousSeasonRank.rank - seasonRank.rank
+                : null,
+            tiebreakerPick: tiebreakerPickScore,
+            tiebreakerDiff,
+            picks: picks.map((pick) => {
+              const game = gameById.get(pick.gid);
+              const gameLabel = game
+                ? `${teamLabel(game.away)} at ${teamLabel(game.home)}`
+                : `Game ${pick.gid}`;
+              return {
+                game: gameLabel,
+                pick: teamLabel(pick.winner),
+                result:
+                  pick.correct === 1
+                    ? ("Correct" as const)
+                    : pick.correct === 0
+                      ? ("Wrong" as const)
+                      : ("Pending" as const),
+              };
+            }),
+          };
+        });
 
       if (WEEK_SUMMARY_EMAILS_ENABLED && recipients.length > 0) {
         const emailResult = await resendApi.sendWeekSummaryEmail({
@@ -550,6 +665,8 @@ export async function run() {
           leagueName: league.name,
           week,
           standings: standingsForEmail,
+          weekWinners,
+          tiebreakerTotal,
           recipients,
         });
         weekSummaryEmailsSent += emailResult.sent;
