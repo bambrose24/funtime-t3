@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { serverApi } from "~/trpc/server";
 import { ClientLeaguePage } from "./client-league-page";
 import { NotStartedLeaguePage } from "./not-started/NotStartedLeaguePage";
+import { SeasonOverLeaguePage } from "./SeasonOverLeaguePage";
 
 // dynamic route params come in as `params` arg
 type Props = {
@@ -32,6 +33,10 @@ export default async function LeaguePage(props: Props) {
     serverApi.league.get({ leagueId }),
     serverApi.time.activeWeekByLeague({ leagueId }),
   ]);
+
+  if (league.status === "completed") {
+    return <SeasonOverLeaguePage league={league} />;
+  }
 
   const [picks] = await Promise.all([
     serverApi.member.picksForWeek({

@@ -769,6 +769,42 @@ function LeagueOverview({
 
   // Show skeleton loading for initial load - no intermediate loading state needed
 
+  if (!isLoading && leagueData?.status === "completed") {
+    return (
+      <ScrollView
+        className="flex-1"
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: 32, paddingTop: 24 }}
+        refreshControl={
+          <RefreshControl
+            refreshing={isRefreshing}
+            onRefresh={onRefresh}
+            tintColor={isDarkColorScheme ? "#e5e7eb" : "#374151"}
+          />
+        }
+      >
+        <View className="px-4">
+          <View className="items-center rounded-2xl border border-blue-200 bg-blue-50 px-5 py-6 dark:border-blue-800 dark:bg-blue-950">
+            <View className="mb-3 rounded-full border border-blue-200 bg-white p-3 dark:border-blue-800 dark:bg-blue-900">
+              <Ionicons
+                name="calendar-clear-outline"
+                size={28}
+                color={isDarkColorScheme ? "#93c5fd" : "#2563eb"}
+              />
+            </View>
+            <Text className="text-app-fg-light dark:text-app-fg-dark text-center text-lg font-semibold">
+              The Season Is Over
+            </Text>
+            <Text className="mt-2 text-center text-sm text-gray-600 dark:text-gray-300">
+              Thanks for playing this year. Kick back for now, and we'll see you
+              next season.
+            </Text>
+          </View>
+        </View>
+      </ScrollView>
+    );
+  }
+
   // Create team lookup map
   const teamById = teams ? new Map(teams.map((t) => [t.teamid, t])) : new Map();
 

@@ -1,5 +1,5 @@
 import { prisma as db, espn, expoPushApi, resendApi } from "@funtime/api";
-import { addDays, addHours, startOfDay } from "date-fns";
+import { addDays, addHours, addMonths, startOfDay } from "date-fns";
 import { chunk, groupBy, orderBy } from "lodash";
 
 import { DEFAULT_SEASON } from "../utils/const";
@@ -111,6 +111,38 @@ export async function run() {
 
   games = await db.games.findMany({ where: { season } });
   const gamesById = groupBy(games, (g) => g.gid);
+
+  // ========================================
+  // Complete leagues after the season is truly over
+  // ========================================
+  console.log(`${LOG_PREFIX} Checking season completion...`);
+
+  const lastSeasonGame = orderBy(games, ["ts", "gid"], ["desc", "desc"]).at(0);
+  const seasonCompletedAt = lastSeasonGame
+    ? addMonths(lastSeasonGame.ts, 1)
+    : null;
+  const shouldCompleteSeason = Boolean(
+    lastSeasonGame?.done && seasonCompletedAt && seasonCompletedAt < new Date(),
+  );
+
+  if (shouldCompleteSeason) {
+    const completedLeagues = await db.leagues.updateMany({
+      where: {
+        season,
+        status: {
+          not: "completed",
+        },
+      },
+      data: {
+        status: "completed",
+      },
+    });
+    console.log(
+      `${LOG_PREFIX} ✓ Marked ${completedLeagues.count} league(s) completed for season ${season}`,
+    );
+  } else {
+    console.log(`${LOG_PREFIX} ✓ Season ${season} is not ready to complete`);
+  }
 
   const picks = await db.picks.findMany({
     where: { gid: { in: games.map((g) => g.gid) } },
