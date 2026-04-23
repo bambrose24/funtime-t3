@@ -10,6 +10,7 @@ const LOG_PREFIX = "[cron]";
 const E2E_MODE = ["1", "true", "yes", "on"].includes(
   (process.env.E2E_MODE ?? "").toLowerCase(),
 );
+const WEEK_SUMMARY_EMAILS_ENABLED = false;
 
 export async function run() {
   if (E2E_MODE) {
@@ -474,7 +475,7 @@ export async function run() {
 
       const tiebreakerGame = weekGames.find((game) => game.is_tiebreaker);
       const tiebreakerTotal =
-        tiebreakerGame && tiebreakerGame.done
+        tiebreakerGame?.done
           ? (tiebreakerGame.homescore ?? 0) + (tiebreakerGame.awayscore ?? 0)
           : null;
 
@@ -543,7 +544,7 @@ export async function run() {
           correctPicks: standing.correctPicks,
         }));
 
-      if (recipients.length > 0) {
+      if (WEEK_SUMMARY_EMAILS_ENABLED && recipients.length > 0) {
         const emailResult = await resendApi.sendWeekSummaryEmail({
           leagueId: league.league_id,
           leagueName: league.name,
@@ -552,6 +553,10 @@ export async function run() {
           recipients,
         });
         weekSummaryEmailsSent += emailResult.sent;
+      } else if (recipients.length > 0) {
+        console.log(
+          `${LOG_PREFIX} Week-summary emails disabled; skipped ${recipients.length} recipient(s) for league ${league.league_id} week ${week}`,
+        );
       }
 
       const pushRecipients = standings

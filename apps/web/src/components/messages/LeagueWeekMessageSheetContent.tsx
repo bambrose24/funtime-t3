@@ -29,7 +29,6 @@ import {
 import { type RouterOutputs } from "~/trpc/types";
 
 export function LeagueWeekMessageSheetContent({
-  week,
   leagueId,
   className,
   closeSheet,
