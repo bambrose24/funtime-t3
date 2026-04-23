@@ -12,10 +12,16 @@
       "supportsTablet": true,
       "associatedDomains": [
         "applinks:play-funtime.com",
+        "applinks:www.play-funtime.com",
+        "applinks:play-funtime.com",
         "applinks:www.play-funtime.com"
-      ]
+      ],
+      "runtimeVersion": {
+        "policy": "appVersion"
+      }
     },
     "android": {
+      "package": "com.funtime.mobile",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
@@ -39,8 +45,27 @@
               "host": "www.play-funtime.com"
             }
           ]
+        },
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ],
+          "data": [
+            {
+              "scheme": "https",
+              "host": "play-funtime.com"
+            },
+            {
+              "scheme": "https",
+              "host": "www.play-funtime.com"
+            }
+          ]
         }
-      ]
+      ],
+      "runtimeVersion": "1.0.0"
     },
     "web": {
       "bundler": "metro",
@@ -48,6 +73,7 @@
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
+      "expo-dev-client",
       "expo-router",
       [
         "expo-splash-screen",
@@ -69,6 +95,9 @@
         "projectId": "5221f508-d78a-4715-a43b-12f8fcd2d1ed"
       }
     },
-    "owner": "funtime-org"
+    "owner": "funtime-org",
+    "updates": {
+      "url": "https://u.expo.dev/5221f508-d78a-4715-a43b-12f8fcd2d1ed"
+    }
   }
 }

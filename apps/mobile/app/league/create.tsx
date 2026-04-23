@@ -1,6 +1,6 @@
-import React, { useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Alert, Pressable, SafeAreaView, ScrollView, Text, View } from "react-native";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,23 +8,27 @@ import { SelectOption } from "@/components/ui/select-option";
 import { clientApi } from "@/lib/trpc/react";
 import { DEFAULT_SEASON } from "@/constants";
 import { useColorScheme } from "@/lib/useColorScheme";
-
-const LATE_POLICY_LABELS = {
-  allow_late_and_lock_after_start: "Allow Late Picks",
-  close_at_first_game_start: "Close at First Kickoff",
-} as const;
+import {
+  buildPrefillFromPriorLeague,
+  getCreateLeagueNameError,
+  MOBILE_LATE_POLICY_LABELS,
+  type MobileLatePolicy,
+  type MobileReminderPolicy,
+} from "@/lib/league/createLeagueForm";
 
 export default function CreateLeagueScreen() {
   const { isDarkColorScheme } = useColorScheme();
+  const { priorLeagueId: routePriorLeagueIdParam } = useLocalSearchParams<{
+    priorLeagueId?: string;
+  }>();
+  const hasAppliedRoutePrefillRef = useRef(false);
   const [name, setName] = useState("");
   const [priorLeagueId, setPriorLeagueId] = useState<string>("none");
   const [priorLeaguePickerOpen, setPriorLeaguePickerOpen] = useState(false);
-  const [latePolicy, setLatePolicy] = useState<
-    "allow_late_and_lock_after_start" | "close_at_first_game_start"
-  >("allow_late_and_lock_after_start");
-  const [reminderPolicy, setReminderPolicy] = useState<
-    "three_hours_before" | "none"
-  >("three_hours_before");
+  const [latePolicy, setLatePolicy] =
+    useState<MobileLatePolicy>("allow_late_and_lock_after_start");
+  const [reminderPolicy, setReminderPolicy] =
+    useState<MobileReminderPolicy>("three_hours_before");
   const [superbowlCompetition, setSuperbowlCompetition] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
@@ -51,6 +55,45 @@ export default function CreateLeagueScreen() {
   const priorLeagues = useMemo(() => {
     return (navData?.leagues ?? []).filter((l) => l.season < DEFAULT_SEASON);
   }, [navData]);
+  const parsedRoutePriorLeagueId = useMemo(() => {
+    if (typeof routePriorLeagueIdParam !== "string") {
+      return null;
+    }
+    const parsed = Number(routePriorLeagueIdParam);
+    return Number.isInteger(parsed) && parsed > 0 ? parsed : null;
+  }, [routePriorLeagueIdParam]);
+  const applyPriorLeagueTemplate = useCallback(
+    (league: (typeof priorLeagues)[number]) => {
+      const prefill = buildPrefillFromPriorLeague(league);
+      setPriorLeagueId(prefill.priorLeagueId);
+      setLatePolicy(prefill.latePolicy);
+      setReminderPolicy(prefill.reminderPolicy);
+      setSuperbowlCompetition(prefill.superbowlCompetition);
+    },
+    [],
+  );
+
+  useEffect(() => {
+    if (hasAppliedRoutePrefillRef.current) {
+      return;
+    }
+    if (parsedRoutePriorLeagueId === null) {
+      return;
+    }
+    if (priorLeagues.length === 0) {
+      return;
+    }
+    const matchedLeague = priorLeagues.find(
+      (league) => league.league_id === parsedRoutePriorLeagueId,
+    );
+    if (!matchedLeague) {
+      hasAppliedRoutePrefillRef.current = true;
+      return;
+    }
+    applyPriorLeagueTemplate(matchedLeague);
+    hasAppliedRoutePrefillRef.current = true;
+  }, [applyPriorLeagueTemplate, parsedRoutePriorLeagueId, priorLeagues]);
+
   const selectedPriorLeague = useMemo(
     () =>
       priorLeagueId === "none"
@@ -59,21 +102,24 @@ export default function CreateLeagueScreen() {
           null,
     [priorLeagueId, priorLeagues],
   );
+  const availableLatePolicies = useMemo(() => {
+    const basePolicies = (createForm?.latePolicy ?? [
+      "allow_late_and_lock_after_start",
+      "close_at_first_game_start",
+    ]) as MobileLatePolicy[];
+    return Array.from(new Set([...basePolicies, latePolicy])).filter(
+      (policy): policy is MobileLatePolicy => policy in MOBILE_LATE_POLICY_LABELS,
+    );
+  }, [createForm?.latePolicy, latePolicy]);
   const trimmedName = name.trim();
-  const nameError =
-    trimmedName.length > 0 && trimmedName.length < 5
-      ? "League name must be at least 5 characters."
-      : null;
-  const canSubmit = trimmedName.length >= 5 && !submitting;
+  const nameError = getCreateLeagueNameError(name);
+  const canSubmit = trimmedName.length > 0 && nameError === null && !submitting;
   const createButtonText =
-    submitting ? "Creating..." : canSubmit ? "Create League" : "Name must be 5+ chars";
+    submitting ? "Creating..." : canSubmit ? "Create League" : "Name must be 5-100 chars";
 
   const onSubmit = async () => {
-    if (trimmedName.length < 5) {
-      Alert.alert(
-        "Invalid League Name",
-        "League name must be at least 5 characters.",
-      );
+    if (nameError) {
+      Alert.alert("Invalid League Name", nameError);
       return;
     }
 
@@ -122,7 +168,15 @@ export default function CreateLeagueScreen() {
           <Text className="text-app-fg-light dark:text-app-fg-dark mb-4 text-center text-2xl font-bold">
             Sign In Required
           </Text>
-          <Button onPress={() => router.replace("/auth")}>Go to Login</Button>
+          <Button
+            onPress={() =>
+              router.replace(
+                `/auth?redirectTo=${encodeURIComponent("/league/create")}` as any,
+              )
+            }
+          >
+            Go to Login
+          </Button>
         </View>
       </SafeAreaView>
     );
@@ -231,7 +285,7 @@ export default function CreateLeagueScreen() {
                       key={league.league_id}
                       selected={priorLeagueId === league.league_id.toString()}
                       onPress={() => {
-                        setPriorLeagueId(league.league_id.toString());
+                        applyPriorLeagueTemplate(league);
                         setPriorLeaguePickerOpen(false);
                       }}
                       className="justify-start px-4 py-3"
@@ -249,6 +303,18 @@ export default function CreateLeagueScreen() {
             </Text>
           </View>
 
+          {selectedPriorLeague ? (
+            <View className="gap-2 rounded-xl border border-blue-200 bg-blue-50 p-4 dark:border-blue-900 dark:bg-blue-950">
+              <Text className="text-sm font-semibold text-blue-800 dark:text-blue-200">
+                Using {selectedPriorLeague.name} as a template
+              </Text>
+              <Text className="text-xs text-blue-700 dark:text-blue-300">
+                Late policy, reminder policy, and Super Bowl settings were prefilled.
+                You can still edit any of them below.
+              </Text>
+            </View>
+          ) : null}
+
           <View className="gap-3">
             <Text className="text-app-fg-light dark:text-app-fg-dark text-base font-semibold">
               Late Policy
@@ -257,20 +323,16 @@ export default function CreateLeagueScreen() {
               Controls whether members can still pick games that have not started after
               missing early kickoff.
             </Text>
-            {(createForm?.latePolicy ?? [
-              "allow_late_and_lock_after_start",
-              "close_at_first_game_start",
-            ]).map((policy) => {
-              const typedPolicy = policy as keyof typeof LATE_POLICY_LABELS;
+            {availableLatePolicies.map((policy) => {
               return (
                 <SelectOption
                   key={policy}
-                  selected={latePolicy === typedPolicy}
-                  onPress={() => setLatePolicy(typedPolicy)}
+                  selected={latePolicy === policy}
+                  onPress={() => setLatePolicy(policy)}
                   className="justify-start px-4 py-3"
                 >
                   <Text className="text-app-fg-light dark:text-app-fg-dark text-sm">
-                    {LATE_POLICY_LABELS[typedPolicy]}
+                    {MOBILE_LATE_POLICY_LABELS[policy]}
                   </Text>
                 </SelectOption>
               );

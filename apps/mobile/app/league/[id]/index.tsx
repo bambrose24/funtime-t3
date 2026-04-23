@@ -8,6 +8,8 @@ import {
   Modal,
   Animated,
   RefreshControl,
+  Share,
+  Alert,
 } from "react-native";
 import { router, useLocalSearchParams, useFocusEffect } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
@@ -20,6 +22,7 @@ import { ClientLeaderboardPage } from "@/components/leaderboard/ClientLeaderboar
 import { LeagueMessageBoard } from "@/components/messages/LeagueMessageBoard";
 import { LeagueMyProfile } from "@/components/profile/LeagueMyProfile";
 import { LeagueSuperbowlBoard } from "@/components/superbowl/LeagueSuperbowlBoard";
+import { LeagueInfoTab } from "@/components/league/LeagueInfoTab";
 import { type RouterOutputs } from "~/trpc/types";
 import { useColorScheme } from "@/lib/useColorScheme";
 import { TeamLogo } from "@/components/shared/TeamLogo";
@@ -27,12 +30,14 @@ import { usePrefetchForLeague } from "@/hooks/usePrefetchForLeague";
 import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
 import { createComponentLogger } from "@/lib/logging";
+import { getShareLeagueInvite } from "@/lib/league/getShareLeagueInvite";
 
 type TabType =
   | "overview"
   | "picks"
   | "leaderboard"
   | "messages"
+  | "info"
   | "profile"
   | "superbowl";
 
@@ -41,6 +46,7 @@ const TAB_KEYS: TabType[] = [
   "picks",
   "leaderboard",
   "messages",
+  "info",
   "profile",
   "superbowl",
 ];
@@ -53,7 +59,12 @@ function parseTabParam(tabParam?: string): TabType {
 }
 
 export default function LeagueScreen() {
-  const { id, tab } = useLocalSearchParams<{ id: string; tab?: string }>();
+  const { id, tab, week } = useLocalSearchParams<{
+    id: string;
+    tab?: string;
+    week?: string;
+  }>();
+  const logger = createComponentLogger("LeagueScreen");
   const [activeTab, setActiveTab] = useState<TabType>(parseTabParam(tab));
   const [isPicksModalVisible, setIsPicksModalVisible] = useState(false);
   const { isDarkColorScheme } = useColorScheme();
@@ -86,6 +97,16 @@ export default function LeagueScreen() {
 
   // Parse league ID and set up comprehensive prefetching
   const leagueIdNumber = id ? parseInt(id, 10) : undefined;
+  const selectedWeekFromParams = useMemo(() => {
+    if (typeof week !== "string" || week.length === 0) {
+      return undefined;
+    }
+    const parsedWeek = Number(week);
+    if (!Number.isInteger(parsedWeek) || parsedWeek <= 0) {
+      return undefined;
+    }
+    return parsedWeek;
+  }, [week]);
 
   // Prefetch ALL league data immediately when screen loads
   usePrefetchForLeague(leagueIdNumber, {
@@ -93,12 +114,36 @@ export default function LeagueScreen() {
     aggressive: true, // Prefetch historical data too
   });
 
+  const buildLeagueHref = useCallback(
+    (params: { tab?: TabType; week?: number }) => {
+      const query = new URLSearchParams();
+      if (params.tab && params.tab !== "overview") {
+        query.set("tab", params.tab);
+      }
+      if (params.week && Number.isInteger(params.week) && params.week > 0) {
+        query.set("week", params.week.toString());
+      }
+      const queryString = query.toString();
+      return queryString.length > 0
+        ? `/league/${id}?${queryString}`
+        : `/league/${id}`;
+    },
+    [id],
+  );
+
   const switchToTab = (nextTab: TabType) => {
     if (nextTab === activeTab || isTabTransitioning) return;
 
     Haptics.selectionAsync().catch(() => {
       // No-op if haptics are unavailable.
     });
+
+    router.replace(
+      buildLeagueHref({
+        tab: nextTab,
+        week: selectedWeekFromParams,
+      }) as any,
+    );
 
     setIsTabTransitioning(true);
     tabOpacity.stopAnimation();
@@ -142,6 +187,31 @@ export default function LeagueScreen() {
     ),
   );
   const canManageLeague = isLeagueAdmin || Boolean(isSuperAdmin);
+  const shareInvite = getShareLeagueInvite(leagueData ?? null);
+  const canShareInvite = isLeagueAdmin && Boolean(shareInvite);
+
+  const onShareInvite = useCallback(async () => {
+    if (!shareInvite) {
+      return;
+    }
+
+    try {
+      await Share.share({
+        title: "League Invite",
+        message: shareInvite.message,
+        url: shareInvite.url,
+      });
+    } catch (error) {
+      logger.error("Failed to share invite", {
+        leagueId: leagueIdNumber,
+        error: error instanceof Error ? error.message : String(error),
+      });
+      Alert.alert(
+        "Unable to share invite",
+        "Please try again in a moment.",
+      );
+    }
+  }, [leagueIdNumber, logger, shareInvite]);
 
   useEffect(() => {
     if (
@@ -173,6 +243,7 @@ export default function LeagueScreen() {
     { key: "picks", label: "Pick" },
     { key: "leaderboard", label: "Leaderboard" },
     { key: "messages", label: "Messages" },
+    { key: "info", label: "Info" },
     ...(showSuperbowlTab
       ? [{ key: "superbowl" as TabType, label: "Super Bowl" }]
       : []),
@@ -185,6 +256,15 @@ export default function LeagueScreen() {
         return (
           <LeagueOverview
             leagueId={id}
+            selectedWeekParam={selectedWeekFromParams}
+            onSelectWeek={(selectedWeek) =>
+              router.replace(
+                buildLeagueHref({
+                  tab: activeTab,
+                  week: selectedWeek,
+                }) as any,
+              )
+            }
             onSwitchToPicks={() => switchToTab("picks")}
             isPicksModalVisible={isPicksModalVisible}
             setIsPicksModalVisible={setIsPicksModalVisible}
@@ -196,6 +276,8 @@ export default function LeagueScreen() {
         return <ClientLeaderboardPage leagueId={id} />;
       case "messages":
         return <LeagueMessageBoard leagueId={id} />;
+      case "info":
+        return <LeagueInfoTab leagueId={id} />;
       case "profile":
         return <LeagueMyProfile leagueId={id} />;
       case "superbowl":
@@ -242,6 +324,18 @@ export default function LeagueScreen() {
                 >
                   <Ionicons
                     name="shield-checkmark-outline"
+                    size={20}
+                    color={isDarkColorScheme ? "#e5e7eb" : "#374151"}
+                  />
+                </Pressable>
+              ) : null}
+              {canShareInvite ? (
+                <Pressable
+                  onPress={onShareInvite}
+                  className="bg-app-card-light dark:bg-app-card-dark rounded-lg p-2"
+                >
+                  <Ionicons
+                    name="share-social-outline"
                     size={20}
                     color={isDarkColorScheme ? "#e5e7eb" : "#374151"}
                   />
@@ -313,7 +407,10 @@ export default function LeagueScreen() {
 }
 
 // Custom hook for prefetching and persisting league overview data
-function useLeagueOverviewData(leagueId: string) {
+function useLeagueOverviewData(
+  leagueId: string,
+  selectedWeekParam?: number,
+) {
   const leagueIdNumber = parseInt(leagueId, 10);
   const utils = clientApi.useUtils();
 
@@ -323,6 +420,7 @@ function useLeagueOverviewData(leagueId: string) {
       // Prefetch core data immediately
       utils.league.get.prefetch({ leagueId: leagueIdNumber });
       utils.time.activeWeekByLeague.prefetch({ leagueId: leagueIdNumber });
+      utils.picks.weeksWithPicks.prefetch({ leagueId: leagueIdNumber });
       utils.teams.getTeams.prefetch();
     }, [leagueIdNumber, utils]),
   );
@@ -347,6 +445,14 @@ function useLeagueOverviewData(leagueId: string) {
       refetchOnMount: true,
     },
   );
+  const weeksWithPicksQuery = clientApi.picks.weeksWithPicks.useQuery(
+    { leagueId: leagueIdNumber },
+    {
+      enabled: !!leagueIdNumber,
+      staleTime: 2 * 60 * 1000,
+      refetchOnWindowFocus: true,
+    },
+  );
 
   const teamsQuery = clientApi.teams.getTeams.useQuery(undefined, {
     staleTime: 30 * 60 * 1000, // 30 minutes (teams rarely change)
@@ -368,11 +474,20 @@ function useLeagueOverviewData(leagueId: string) {
 
   // Determine the correct week to display (following web app logic)
   const displayWeek = useMemo(() => {
+    if (selectedWeekParam && selectedWeekParam > 0) {
+      return selectedWeekParam;
+    }
+
     const activeWeek = activeWeekQuery.data?.week;
     const userPicks = allUserPicksQuery.data || [];
+    const pickedWeeks = weeksWithPicksQuery.data?.weeks ?? [];
 
     if (activeWeek) {
       return activeWeek;
+    }
+
+    if (pickedWeeks.length > 0) {
+      return Math.max(...pickedWeeks);
     }
 
     // If no active week but user has picks, use their most recent pick week
@@ -382,7 +497,12 @@ function useLeagueOverviewData(leagueId: string) {
 
     // Default to week 1
     return 1;
-  }, [activeWeekQuery.data?.week, allUserPicksQuery.data]);
+  }, [
+    activeWeekQuery.data?.week,
+    allUserPicksQuery.data,
+    selectedWeekParam,
+    weeksWithPicksQuery.data?.weeks,
+  ]);
 
   // Dependent queries that wait for displayWeek
   const gamesQuery = clientApi.games.getGames.useQuery(
@@ -420,6 +540,17 @@ function useLeagueOverviewData(leagueId: string) {
       refetchOnWindowFocus: true,
     },
   );
+  const weekWinnersQuery = clientApi.league.weekWinners.useQuery(
+    {
+      leagueId: leagueIdNumber,
+      week: displayWeek,
+    },
+    {
+      enabled: !!leagueIdNumber && !!displayWeek,
+      staleTime: 2 * 60 * 1000,
+      refetchOnWindowFocus: true,
+    },
+  );
 
   // Prefetch dependent data when we have displayWeek
   useEffect(() => {
@@ -436,6 +567,10 @@ function useLeagueOverviewData(leagueId: string) {
         leagueId: leagueIdNumber,
         week: displayWeek,
       });
+      utils.league.weekWinners.prefetch({
+        leagueId: leagueIdNumber,
+        week: displayWeek,
+      });
     }
   }, [displayWeek, leagueQuery.data?.season, leagueIdNumber, utils]);
 
@@ -448,6 +583,8 @@ function useLeagueOverviewData(leagueId: string) {
       gamesQuery.refetch(),
       picksSummaryQuery.refetch(),
       userPicksQuery.refetch(),
+      weeksWithPicksQuery.refetch(),
+      weekWinnersQuery.refetch(),
     ]);
   }, [
     leagueQuery,
@@ -457,23 +594,32 @@ function useLeagueOverviewData(leagueId: string) {
     gamesQuery,
     picksSummaryQuery,
     userPicksQuery,
+    weeksWithPicksQuery,
+    weekWinnersQuery,
   ]);
 
   return {
     leagueData: leagueQuery.data,
     activeWeek: activeWeekQuery.data,
+    weeksWithPicks: weeksWithPicksQuery.data,
     displayWeek,
     games: gamesQuery.data,
     teams: teamsQuery.data,
     picksSummary: picksSummaryQuery.data,
     userPicks: userPicksQuery.data,
+    weekWinners: weekWinnersQuery.data,
     isLoading:
       leagueQuery.isLoading ||
       activeWeekQuery.isLoading ||
-      teamsQuery.isLoading,
+      teamsQuery.isLoading ||
+      weeksWithPicksQuery.isLoading,
     isUserPicksLoading: userPicksQuery.isLoading,
     isError:
-      leagueQuery.isError || activeWeekQuery.isError || teamsQuery.isError,
+      leagueQuery.isError ||
+      activeWeekQuery.isError ||
+      teamsQuery.isError ||
+      weeksWithPicksQuery.isError ||
+      weekWinnersQuery.isError,
     refetchAll,
   };
 }
@@ -481,11 +627,15 @@ function useLeagueOverviewData(leagueId: string) {
 // League Overview Component with Suspense and Error Boundaries
 function LeagueOverview({
   leagueId,
+  selectedWeekParam,
+  onSelectWeek,
   onSwitchToPicks,
   isPicksModalVisible,
   setIsPicksModalVisible,
 }: {
   leagueId: string;
+  selectedWeekParam?: number;
+  onSelectWeek: (week: number) => void;
   onSwitchToPicks: () => void;
   isPicksModalVisible: boolean;
   setIsPicksModalVisible: (visible: boolean) => void;
@@ -496,16 +646,32 @@ function LeagueOverview({
   const {
     leagueData,
     activeWeek,
+    weeksWithPicks,
     displayWeek,
     games,
     teams,
     picksSummary,
     userPicks,
+    weekWinners,
     isLoading,
     isUserPicksLoading,
     isError,
     refetchAll,
-  } = useLeagueOverviewData(leagueId);
+  } = useLeagueOverviewData(leagueId, selectedWeekParam);
+
+  const weekOptions = useMemo(() => {
+    const options = new Set<number>();
+    if (activeWeek?.week) {
+      options.add(activeWeek.week);
+    }
+    if (displayWeek) {
+      options.add(displayWeek);
+    }
+    (weeksWithPicks?.weeks ?? []).forEach((week) => {
+      options.add(week);
+    });
+    return [...options].sort((a, b) => b - a);
+  }, [activeWeek?.week, displayWeek, weeksWithPicks?.weeks]);
 
   const now = new Date();
   const totalGames = games?.length ?? 0;
@@ -568,6 +734,7 @@ function LeagueOverview({
 
     return { correct, wrong, pending };
   }, [games, userPicks]);
+  const weekWinnerEntries = weekWinners?.winners ?? [];
 
   useEffect(() => {
     if (!isLoading && !isUserPicksLoading && !lastRefreshedAt) {
@@ -634,12 +801,75 @@ function LeagueOverview({
             <Skeleton className="mx-auto h-6 w-32 rounded" />
           ) : (
             displayWeek && (
-              <Text className="text-app-fg-light dark:text-app-fg-dark text-center text-lg font-semibold">
-                Week {displayWeek}, {leagueData?.season}
-              </Text>
+              <>
+                <Text className="text-app-fg-light dark:text-app-fg-dark text-center text-lg font-semibold">
+                  Week {displayWeek}, {leagueData?.season}
+                </Text>
+                {weekOptions.length > 1 ? (
+                  <ScrollView
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    contentContainerStyle={{ paddingHorizontal: 4, paddingTop: 12 }}
+                  >
+                    <View className="flex-row gap-2">
+                      {weekOptions.map((weekOption) => {
+                        const selected = weekOption === displayWeek;
+                        return (
+                          <Pressable
+                            key={`league_week_option_${weekOption}`}
+                            onPress={() => onSelectWeek(weekOption)}
+                            className={cn(
+                              "rounded-full border px-3 py-1.5",
+                              selected
+                                ? "border-blue-500 bg-blue-50 dark:border-blue-500 dark:bg-blue-950"
+                                : "border-gray-200 bg-white dark:border-zinc-700 dark:bg-zinc-800",
+                            )}
+                          >
+                            <Text
+                              className={cn(
+                                "text-xs font-semibold",
+                                selected
+                                  ? "text-blue-700 dark:text-blue-300"
+                                  : "text-gray-600 dark:text-gray-300",
+                              )}
+                            >
+                              Week {weekOption}
+                            </Text>
+                          </Pressable>
+                        );
+                      })}
+                    </View>
+                  </ScrollView>
+                ) : null}
+              </>
             )
           )}
         </View>
+
+        {weekWinnerEntries.length > 0 && (
+          <View className="mx-4 mb-4 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 dark:border-emerald-800 dark:bg-emerald-950">
+            <Text className="text-xs uppercase tracking-wide text-emerald-700 dark:text-emerald-300">
+              Week {displayWeek} {weekWinnerEntries.length > 1 ? "Winners" : "Winner"}
+            </Text>
+            <View className="mt-2 flex-row flex-wrap gap-2">
+              {weekWinnerEntries.map((winner) => (
+                <Pressable
+                  key={`week_winner_${winner.membership_id}`}
+                  onPress={() =>
+                    router.push(
+                      `/league/${leagueId}/player/${winner.membership_id}` as any,
+                    )
+                  }
+                  className="rounded-full border border-emerald-300 bg-white px-2.5 py-1 dark:border-emerald-700 dark:bg-emerald-900"
+                >
+                  <Text className="text-xs font-semibold text-emerald-700 dark:text-emerald-200">
+                    @{winner.leaguemembers.people.username}
+                  </Text>
+                </Pressable>
+              ))}
+            </View>
+          </View>
+        )}
 
         {/* Week Status Summary */}
         {!isLoading && !isUserPicksLoading && (

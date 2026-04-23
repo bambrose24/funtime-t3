@@ -4,6 +4,7 @@ import Constants from "expo-constants";
 import * as Notifications from "expo-notifications";
 import { router } from "expo-router";
 import { clientApi } from "@/lib/trpc/react";
+import { isE2EMode } from "@/lib/e2e";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -26,6 +27,10 @@ export function usePushNotificationRegistration(hasSession: boolean) {
     clientApi.settings.registerPushToken.useMutation();
 
   useEffect(() => {
+    if (isE2EMode) {
+      return;
+    }
+
     const navigateFromNotification = async (
       response: Notifications.NotificationResponse | null,
     ) => {
@@ -72,6 +77,10 @@ export function usePushNotificationRegistration(hasSession: boolean) {
   }, []);
 
   useEffect(() => {
+    if (isE2EMode) {
+      return;
+    }
+
     const dbUser = appSession?.dbUser;
     if (!hasSession || !dbUser) {
       registrationAttemptedForUserRef.current = null;

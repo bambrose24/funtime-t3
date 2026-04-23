@@ -1,4 +1,5 @@
 import { type PrismaClient } from "../../../src/generated/prisma-client";
+import { isE2EMode } from "../../../utils/e2e";
 
 const EXPO_PUSH_ENDPOINT = "https://exp.host/--/api/v2/push/send";
 const EXPO_PUSH_BATCH_SIZE = 100;
@@ -72,6 +73,10 @@ const sendExpoMessages = async ({
   messages: ExpoPushMessage[];
   type: "league_message" | "week_summary";
 }) => {
+  if (isE2EMode) {
+    return { sent: 0, skipped: true as const };
+  }
+
   if (messages.length === 0) {
     return { sent: 0, skipped: true as const };
   }
@@ -229,7 +234,7 @@ export const expoPushApi = {
             title: `Week ${week} is final in ${league?.name ?? "your league"}`,
             body: `You finished #${recipient.rank} with ${recipient.correctPicks} correct picks.`,
             data: {
-              path: `/league/${leagueId}`,
+              path: `/league/${leagueId}?week=${week}`,
               leagueId,
               week,
               type: "week_summary",

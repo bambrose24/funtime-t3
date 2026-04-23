@@ -6,26 +6,11 @@ import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useColorScheme } from "@/lib/useColorScheme";
+import { extractLeagueCode } from "@/lib/join/extractLeagueCode";
 
 const joinLeagueSchema = z.object({
   leagueCode: z.string().trim().min(1, "League code is required"),
 });
-
-function extractLeagueCode(rawInput: string) {
-  const input = rawInput.trim();
-  if (!input) {
-    return "";
-  }
-
-  const normalized = input.endsWith("/") ? input.slice(0, -1) : input;
-  const marker = "/join-league/";
-  const markerIndex = normalized.lastIndexOf(marker);
-  if (markerIndex >= 0) {
-    return normalized.slice(markerIndex + marker.length);
-  }
-
-  return normalized;
-}
 
 export default function JoinLeagueEntryScreen() {
   const { isDarkColorScheme } = useColorScheme();

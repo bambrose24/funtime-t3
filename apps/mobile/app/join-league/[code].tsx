@@ -179,7 +179,15 @@ export default function JoinLeagueCodeScreen() {
           <Text className="mb-4 text-center text-base text-gray-600 dark:text-gray-400">
             Sign in to join {leagueData.name}.
           </Text>
-          <Button onPress={() => router.replace("/auth" as any)}>Go to Login</Button>
+          <Button
+            onPress={() =>
+              router.replace(
+                `/auth?redirectTo=${encodeURIComponent(`/join-league/${leagueCode}`)}` as any,
+              )
+            }
+          >
+            Go to Login
+          </Button>
         </View>
       </SafeAreaView>
     );

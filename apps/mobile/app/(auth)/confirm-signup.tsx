@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
   View,
   Text,
@@ -15,7 +15,6 @@ import { z } from "zod";
 import { clientApi } from "@/lib/trpc/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useColorScheme } from "@/lib/useColorScheme";
 
 const signupFormSchema = z.object({
   username: z.string().min(5, "Username must be at least 5 characters"),
@@ -28,8 +27,23 @@ type SignupFormData = z.infer<typeof signupFormSchema>;
 export default function ConfirmSignupScreen() {
   const router = useRouter();
   const { redirectTo } = useLocalSearchParams<{ redirectTo?: string }>();
-  const { isDarkColorScheme } = useColorScheme();
   const [submitting, setSubmitting] = useState(false);
+  const normalizedRedirectTo = useMemo(() => {
+    if (typeof redirectTo !== "string" || redirectTo.length === 0) {
+      return null;
+    }
+    try {
+      return decodeURIComponent(redirectTo);
+    } catch {
+      return redirectTo;
+    }
+  }, [redirectTo]);
+  const withRedirectTo = (path: string) => {
+    if (!normalizedRedirectTo) {
+      return path;
+    }
+    return `${path}?redirectTo=${encodeURIComponent(normalizedRedirectTo)}`;
+  };
 
   const {
     control,
@@ -63,7 +77,7 @@ export default function ConfirmSignupScreen() {
             onPress: () => {
               // Redirect to the specified page or home
               if (redirectTo) {
-                router.replace(redirectTo as any);
+                router.replace((normalizedRedirectTo ?? redirectTo) as any);
               } else {
                 router.replace("/home" as any);
               }
@@ -206,7 +220,7 @@ export default function ConfirmSignupScreen() {
                   Already have an account?{" "}
                   <Text
                     className="text-blue-500 underline"
-                    onPress={() => router.push("/auth")}
+                    onPress={() => router.push(withRedirectTo("/auth") as any)}
                   >
                     Sign in
                   </Text>

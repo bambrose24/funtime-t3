@@ -5,6 +5,7 @@ import {
   Pressable,
   RefreshControl,
   SafeAreaView,
+  Share,
   ScrollView,
   Text,
   TextInput,
@@ -97,6 +98,60 @@ export default function LeagueAdminScreen() {
     : lastRefreshedAt
       ? `Updated ${formatDistanceToNow(lastRefreshedAt, { addSuffix: true })}`
       : "Pull to refresh admin data";
+  const exportMembersCsv = useCallback(async () => {
+    if (members.length === 0) {
+      Alert.alert("No Members", "There are no members to export.");
+      return;
+    }
+
+    const escapeCsvValue = (value: string | number | boolean | null | undefined) => {
+      const normalized = value === null || value === undefined ? "" : String(value);
+      if (!/[",\n]/.test(normalized)) {
+        return normalized;
+      }
+      return `"${normalized.replace(/"/g, '""')}"`;
+    };
+
+    const header = [
+      "Username",
+      "Email",
+      "Role",
+      "Paid",
+      "Week Wins",
+      "Correct Picks",
+      "Wrong Picks",
+      "Missed Picks",
+    ];
+    const rows = members.map((member) => {
+      const weekWins = member.WeekWinners.map((weekWinner) => weekWinner.week).sort(
+        (a, b) => a - b,
+      );
+      return [
+        member.people.username,
+        member.people.email,
+        member.role ?? "player",
+        member.paid ? "Yes" : "No",
+        weekWins.length > 0 ? weekWins.join("|") : "--",
+        member.correctPicks,
+        member.wrongPicks,
+        member.misssedPicks,
+      ];
+    });
+
+    const csv = [header, ...rows]
+      .map((row) => row.map((value) => escapeCsvValue(value)).join(","))
+      .join("\n");
+
+    try {
+      await Share.share({
+        title: `${leagueData?.name ?? "League"} members export`,
+        message: csv,
+      });
+    } catch (error) {
+      console.error("Failed to export members CSV", error);
+      Alert.alert("Export Failed", "Unable to export member data right now.");
+    }
+  }, [leagueData?.name, members]);
 
   const selectedMember = useMemo(() => {
     if (editingMemberId === null) {
@@ -528,31 +583,48 @@ export default function LeagueAdminScreen() {
           </View>
 
           <View className="gap-1 px-1">
-            <Text className="text-app-fg-light dark:text-app-fg-dark text-lg font-semibold">
-              Members
-            </Text>
+            <View className="flex-row items-center justify-between">
+              <Text className="text-app-fg-light dark:text-app-fg-dark text-lg font-semibold">
+                Members
+              </Text>
+              <Button variant="outline" size="sm" onPress={exportMembersCsv}>
+                Export CSV
+              </Button>
+            </View>
             <Text className="text-xs text-gray-600 dark:text-gray-400">
-              Use Edit for role/paid actions and Email Logs for member history.
+              Includes wins, pick accuracy, missed picks, and payment status.
             </Text>
           </View>
 
           <View className="rounded-xl border border-gray-200 bg-white dark:border-zinc-700 dark:bg-zinc-800 overflow-hidden">
             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-              <View style={{ minWidth: 620 }}>
+              <View style={{ minWidth: 930 }}>
                 <View className="flex-row items-center border-b border-gray-200 bg-gray-50 px-3 py-2 dark:border-zinc-700 dark:bg-zinc-900">
-                  <Text className="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400" style={{ width: 240 }}>
+                  <Text className="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400" style={{ width: 220 }}>
                     Member
                   </Text>
                   <Text className="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400" style={{ width: 80 }}>
                     Role
                   </Text>
+                  <Text className="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400" style={{ width: 110 }}>
+                    Week Wins
+                  </Text>
+                  <Text className="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400" style={{ width: 70 }}>
+                    Correct
+                  </Text>
+                  <Text className="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400" style={{ width: 70 }}>
+                    Wrong
+                  </Text>
+                  <Text className="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400" style={{ width: 70 }}>
+                    Missed
+                  </Text>
                   <Text className="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400" style={{ width: 70 }}>
                     Paid
                   </Text>
-                  <Text className="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400" style={{ width: 120 }}>
+                  <Text className="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400" style={{ width: 130 }}>
                     Email Logs
                   </Text>
-                  <Text className="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400" style={{ width: 100 }}>
+                  <Text className="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400" style={{ width: 90 }}>
                     Edit
                   </Text>
                 </View>
@@ -574,7 +646,7 @@ export default function LeagueAdminScreen() {
                           : "",
                       )}
                     >
-                      <View style={{ width: 240 }} className="pr-2">
+                      <View style={{ width: 220 }} className="pr-2">
                         <Text
                           className="text-app-fg-light dark:text-app-fg-dark text-sm font-semibold"
                           numberOfLines={1}
@@ -596,13 +668,42 @@ export default function LeagueAdminScreen() {
                         {member.role ?? "player"}
                       </Text>
                       <Text
+                        className="text-xs text-gray-700 dark:text-gray-300"
+                        style={{ width: 110 }}
+                        numberOfLines={1}
+                      >
+                        {member.WeekWinners.length === 0
+                          ? "--"
+                          : member.WeekWinners.map((weekWinner) => `W${weekWinner.week}`)
+                              .sort((a, b) => a.localeCompare(b))
+                              .join(", ")}
+                      </Text>
+                      <Text
+                        className="text-sm text-gray-700 dark:text-gray-300"
+                        style={{ width: 70 }}
+                      >
+                        {member.correctPicks}
+                      </Text>
+                      <Text
+                        className="text-sm text-gray-700 dark:text-gray-300"
+                        style={{ width: 70 }}
+                      >
+                        {member.wrongPicks}
+                      </Text>
+                      <Text
+                        className="text-sm text-gray-700 dark:text-gray-300"
+                        style={{ width: 70 }}
+                      >
+                        {member.misssedPicks}
+                      </Text>
+                      <Text
                         className="text-sm text-gray-700 dark:text-gray-300"
                         style={{ width: 70 }}
                       >
                         {member.paid ? "Yes" : "No"}
                       </Text>
 
-                      <View style={{ width: 120 }} className="pr-2">
+                      <View style={{ width: 130 }} className="pr-2">
                         <Button
                           variant="outline"
                           size="sm"
@@ -616,7 +717,7 @@ export default function LeagueAdminScreen() {
                         </Button>
                       </View>
 
-                      <View style={{ width: 100 }}>
+                      <View style={{ width: 90 }}>
                         <Button
                           variant="outline"
                           size="sm"

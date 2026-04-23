@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
   View,
   Text,
@@ -7,9 +7,8 @@ import {
   SafeAreaView,
   Pressable,
 } from "react-native";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { supabase } from "@/lib/supabase/client";
-import { useColorScheme } from "@/lib/useColorScheme";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { clientApi } from "@/lib/trpc/react";
@@ -22,6 +21,7 @@ const loginSchema = z.object({
 });
 
 export default function LoginScreen() {
+  const { redirectTo } = useLocalSearchParams<{ redirectTo?: string }>();
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -29,6 +29,22 @@ export default function LoginScreen() {
     {},
   );
   const utils = clientApi.useUtils();
+  const normalizedRedirectTo = useMemo(() => {
+    if (typeof redirectTo !== "string" || redirectTo.length === 0) {
+      return null;
+    }
+    try {
+      return decodeURIComponent(redirectTo);
+    } catch {
+      return redirectTo;
+    }
+  }, [redirectTo]);
+  const withRedirectTo = (path: string) => {
+    if (!normalizedRedirectTo) {
+      return path;
+    }
+    return `${path}?redirectTo=${encodeURIComponent(normalizedRedirectTo)}`;
+  };
 
   const handleLogin = async () => {
     // Clear previous errors
@@ -122,9 +138,18 @@ export default function LoginScreen() {
 
             {/* Password Field */}
             <View className="mb-6">
-              <Text className="text-app-fg-light dark:text-app-fg-dark mb-2 text-base font-medium">
-                Password
-              </Text>
+              <View className="mb-2 flex-row items-center justify-between">
+                <Text className="text-app-fg-light dark:text-app-fg-dark text-base font-medium">
+                  Password
+                </Text>
+                <Pressable
+                  onPress={() => router.push(withRedirectTo("/forgot-password") as any)}
+                >
+                  <Text className="text-sm text-blue-600 dark:text-blue-400">
+                    Forgot password?
+                  </Text>
+                </Pressable>
+              </View>
               <Input
                 value={password}
                 onChangeText={(text) => {
@@ -156,7 +181,7 @@ export default function LoginScreen() {
 
           {/* Footer Links */}
           <View className="mt-6">
-            <Pressable onPress={() => router.push("/signup" as any)}>
+            <Pressable onPress={() => router.push(withRedirectTo("/signup") as any)}>
               <Text className="text-center text-blue-600 dark:text-blue-400">
                 Don't have an account? Sign up
               </Text>

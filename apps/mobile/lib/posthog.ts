@@ -1,8 +1,13 @@
 import PostHog from "posthog-react-native";
+import { isE2EMode } from "./e2e";
 
 let posthogInstance: PostHog | null = null;
 
 export function initPostHog() {
+  if (isE2EMode) {
+    return null;
+  }
+
   if (posthogInstance) {
     return posthogInstance;
   }

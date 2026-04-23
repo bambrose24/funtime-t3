@@ -3,6 +3,9 @@ import { groupBy } from "lodash";
 import { DEFAULT_SEASON } from "../utils/const";
 
 const LOG_PREFIX = "[postseason]";
+const E2E_MODE = ["1", "true", "yes", "on"].includes(
+  (process.env.E2E_MODE ?? process.env.NEXT_PUBLIC_E2E_MODE ?? "").toLowerCase()
+);
 
 export interface PostseasonSyncResult {
   seeds: {
@@ -20,6 +23,14 @@ export interface PostseasonSyncResult {
 export async function syncPostseason(
   season: number = DEFAULT_SEASON
 ): Promise<PostseasonSyncResult> {
+  if (E2E_MODE) {
+    console.log(`${LOG_PREFIX} E2E_MODE enabled; skipping postseason sync.`);
+    return {
+      seeds: { processed: 0, errors: 0 },
+      games: { created: 0, updated: 0, skipped: 0, errors: 0 },
+    };
+  }
+
   console.log(`${LOG_PREFIX} Starting postseason sync for season ${season}...`);
 
   const teams = await db.teams.findMany();
@@ -274,4 +285,3 @@ async function main() {
 if (require.main === module) {
   void main();
 }
-

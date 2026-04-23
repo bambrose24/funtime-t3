@@ -30,6 +30,8 @@
     "db:migrate:deploy": "DOTENV_CONFIG_PATH=../../.env.local prisma migrate deploy",
     "db:migrate:status": "DOTENV_CONFIG_PATH=../../.env.local prisma migrate status",
     "db:migrate:resolve": "DOTENV_CONFIG_PATH=../../.env.local prisma migrate resolve",
+    "db:migrate:check": "node ../../scripts/prisma/validate-migrations.mjs",
+    "db:migrate:check:apply": "node ../../scripts/prisma/validate-migrations.mjs --apply",
     "db:push": "DOTENV_CONFIG_PATH=../../.env.local prisma db push",
     "db:pull": "DOTENV_CONFIG_PATH=../../.env.local prisma db pull",
     "db:studio": "DOTENV_CONFIG_PATH=../../.env.local prisma studio"

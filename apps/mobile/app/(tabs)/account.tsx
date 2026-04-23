@@ -1,8 +1,11 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
+  ActivityIndicator,
   View,
   Text,
   Alert,
+  Modal,
+  Platform,
   ScrollView,
   SafeAreaView,
   Pressable,
@@ -10,15 +13,23 @@ import {
   Switch,
 } from "react-native";
 import { router } from "expo-router";
+import * as Clipboard from "expo-clipboard";
+import Constants from "expo-constants";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
+import * as Updates from "expo-updates";
 import { useColorScheme } from "@/lib/useColorScheme";
 import { supabase } from "@/lib/supabase/client";
 import { clientApi } from "@/lib/trpc/react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  APP_DIAGNOSTICS_FIELDS,
+  buildAppDiagnostics,
+  formatAppDiagnosticsForClipboard,
+} from "@/lib/settings/appDiagnostics";
 import { cn } from "@/lib/utils";
 
 type SettingsSectionProps = {
@@ -145,6 +156,9 @@ export default function AccountScreen() {
   const [usernameDraft, setUsernameDraft] = useState("");
   const [loadedUsername, setLoadedUsername] = useState("");
   const [lastSyncedAt, setLastSyncedAt] = useState<Date | null>(null);
+  const [isDiagnosticsSheetOpen, setIsDiagnosticsSheetOpen] = useState(false);
+  const [isCheckingForUpdates, setIsCheckingForUpdates] = useState(false);
+  const [updateCheckStatus, setUpdateCheckStatus] = useState<string | null>(null);
   const [isUpdatingUsername, setIsUpdatingUsername] = useState(false);
   const [isUpdatingPushPreference, setIsUpdatingPushPreference] =
     useState(false);
@@ -224,6 +238,41 @@ export default function AccountScreen() {
         minute: "2-digit",
       })}`
     : "Syncing status...";
+  const appDiagnostics = useMemo(() => {
+    const appVersion = Constants.expoConfig?.version;
+    const buildVersionFromPlatform =
+      Platform.OS === "ios"
+        ? Constants.platform?.ios?.buildNumber
+        : Platform.OS === "android"
+          ? Constants.platform?.android?.versionCode?.toString()
+          : null;
+    const bundleIdentifier =
+      Platform.OS === "ios"
+        ? Constants.expoConfig?.ios?.bundleIdentifier
+        : Platform.OS === "android"
+          ? Constants.expoConfig?.android?.package
+          : null;
+
+    return buildAppDiagnostics({
+      appVersion,
+      buildVersion: buildVersionFromPlatform ?? appVersion ?? null,
+      bundleIdentifier,
+      applicationName: Constants.expoConfig?.name,
+      isEmbeddedLaunch: Updates.isEmbeddedLaunch,
+      updateId: Updates.updateId,
+      createdAt: Updates.createdAt,
+      runtimeVersion: Updates.runtimeVersion ?? Constants.expoRuntimeVersion,
+      updateChannel: Updates.channel,
+      updatesEnabled: Updates.isEnabled,
+      platform: Platform.OS,
+      executionEnvironment: Constants.executionEnvironment,
+    });
+  }, []);
+  const appVersionSummary =
+    appDiagnostics.appVersion === "n/a"
+      ? "Version unavailable"
+      : `v${appDiagnostics.appVersion} (${appDiagnostics.buildVersion})`;
+  const appVersionTypeSummary = `${appDiagnostics.otaSource} • ${appDiagnostics.otaVersion}`;
 
   const canTogglePushNotifications =
     !isUpdatingPushPreference &&
@@ -365,11 +414,90 @@ export default function AccountScreen() {
     }
   };
 
+  const onCopyAppDiagnostics = useCallback(async () => {
+    try {
+      const diagnosticsText = formatAppDiagnosticsForClipboard(appDiagnostics);
+      await Clipboard.setStringAsync(diagnosticsText);
+      triggerSuccessHaptic();
+      Alert.alert("Copied", "App diagnostics copied to clipboard.");
+    } catch (error) {
+      console.error("Failed to copy app diagnostics", error);
+      Alert.alert("Copy Failed", "Unable to copy diagnostics right now.");
+    }
+  }, [appDiagnostics, triggerSuccessHaptic]);
+
+  const onCheckForUpdates = useCallback(async () => {
+    if (!Updates.isEnabled) {
+      Alert.alert(
+        "Updates Disabled",
+        "OTA updates are disabled for this app build.",
+      );
+      return;
+    }
+
+    setIsCheckingForUpdates(true);
+    setUpdateCheckStatus("Checking for updates...");
+    triggerSelectionHaptic();
+
+    try {
+      const update = await Updates.checkForUpdateAsync();
+      if (!update.isAvailable) {
+        setUpdateCheckStatus(
+          `Up to date • ${new Date().toLocaleTimeString([], {
+            hour: "numeric",
+            minute: "2-digit",
+          })}`,
+        );
+        Alert.alert("Up to Date", "You are already on the latest OTA update.");
+        return;
+      }
+
+      setUpdateCheckStatus("Downloading update...");
+      const fetchedUpdate = await Updates.fetchUpdateAsync();
+      if (!fetchedUpdate.isNew) {
+        setUpdateCheckStatus("No new update downloaded.");
+        Alert.alert("No New Update", "No newer OTA package was downloaded.");
+        return;
+      }
+
+      setUpdateCheckStatus("Update ready to apply.");
+      Alert.alert(
+        "Update Ready",
+        "A new OTA update has been downloaded. Restart now to apply it?",
+        [
+          { text: "Later", style: "cancel" },
+          {
+            text: "Restart",
+            onPress: () => {
+              void Updates.reloadAsync().catch((error) => {
+                console.error("Failed to reload app for OTA update", error);
+                Alert.alert(
+                  "Restart Failed",
+                  "Please close and reopen the app to apply the update.",
+                );
+              });
+            },
+          },
+        ],
+      );
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Unable to check for updates right now.";
+      console.error("OTA update check failed", error);
+      setUpdateCheckStatus("Update check failed.");
+      Alert.alert("Update Check Failed", errorMessage);
+    } finally {
+      setIsCheckingForUpdates(false);
+    }
+  }, [triggerSelectionHaptic]);
+
   return (
     <SafeAreaView className="bg-app-bg-light dark:bg-app-bg-dark flex-1">
       <View className="px-5 pb-3 pt-4">
         <Text className="text-app-fg-light dark:text-app-fg-dark text-2xl font-bold tracking-tight">
-          My Account
+          Settings
         </Text>
       </View>
 
@@ -594,6 +722,63 @@ export default function AccountScreen() {
                 </View>
               </SettingsSection>
 
+              <SettingsSection title="App Info">
+                <View className="gap-3 p-3">
+                  <View className="flex-row items-start justify-between gap-3">
+                    <View className="flex-1">
+                      <Text className="text-app-fg-light dark:text-app-fg-dark text-lg font-semibold">
+                        {appVersionSummary}
+                      </Text>
+                      <Text className="mt-1 text-xs font-semibold uppercase tracking-[0.8px] text-gray-500 dark:text-gray-400">
+                        {appVersionTypeSummary}
+                      </Text>
+                      {updateCheckStatus ? (
+                        <Text className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                          {updateCheckStatus}
+                        </Text>
+                      ) : null}
+                    </View>
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      onPress={() => setIsDiagnosticsSheetOpen(true)}
+                    >
+                      Details
+                    </Button>
+                  </View>
+
+                  <View className="flex-row gap-2">
+                    <Button
+                      className="flex-1"
+                      variant="secondary"
+                      onPress={() => void onCheckForUpdates()}
+                      disabled={isCheckingForUpdates}
+                    >
+                      <View className="flex-row items-center gap-2">
+                        {isCheckingForUpdates ? (
+                          <ActivityIndicator
+                            size="small"
+                            color={isDarkColorScheme ? "#d1d5db" : "#111827"}
+                          />
+                        ) : null}
+                        <Text className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                          {isCheckingForUpdates ? "Checking..." : "Check for updates"}
+                        </Text>
+                      </View>
+                    </Button>
+                    <Button
+                      className="flex-1"
+                      variant="secondary"
+                      onPress={() => void onCopyAppDiagnostics()}
+                    >
+                      <Text className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                        Copy app info
+                      </Text>
+                    </Button>
+                  </View>
+                </View>
+              </SettingsSection>
+
               {isSuperAdmin ? (
                 <SettingsSection title="Admin">
                   <SettingsRow
@@ -645,6 +830,70 @@ export default function AccountScreen() {
           )}
         </View>
       </ScrollView>
+
+      <Modal
+        visible={isDiagnosticsSheetOpen}
+        animationType="slide"
+        transparent
+        onRequestClose={() => setIsDiagnosticsSheetOpen(false)}
+      >
+        <View className="flex-1 bg-black/55">
+          <Pressable
+            className="flex-1"
+            onPress={() => setIsDiagnosticsSheetOpen(false)}
+          />
+          <View className="max-h-[82%] rounded-t-3xl border border-gray-200 bg-white px-5 pb-5 pt-4 dark:border-zinc-700 dark:bg-zinc-900">
+            <View className="mb-3 flex-row items-center justify-between">
+              <Text className="text-app-fg-light dark:text-app-fg-dark text-2xl font-bold tracking-tight">
+                App diagnostics
+              </Text>
+              <Pressable
+                className="rounded-full bg-gray-100 p-2 dark:bg-zinc-800"
+                onPress={() => setIsDiagnosticsSheetOpen(false)}
+              >
+                <Ionicons
+                  name="close"
+                  size={20}
+                  color={isDarkColorScheme ? "#d1d5db" : "#374151"}
+                />
+              </Pressable>
+            </View>
+
+            <ScrollView
+              className="flex-1"
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={{ paddingBottom: 16 }}
+            >
+              {APP_DIAGNOSTICS_FIELDS.map((field, index) => (
+                <View key={field.key}>
+                  <View className="py-3">
+                    <Text className="text-xs font-semibold uppercase tracking-[0.9px] text-gray-500 dark:text-gray-400">
+                      {field.label}
+                    </Text>
+                    <Text className="text-app-fg-light dark:text-app-fg-dark mt-1 text-2xl font-medium leading-8">
+                      {appDiagnostics[field.key]}
+                    </Text>
+                  </View>
+                  {index < APP_DIAGNOSTICS_FIELDS.length - 1 ? (
+                    <View className="h-px bg-gray-200 dark:bg-zinc-700" />
+                  ) : null}
+                </View>
+              ))}
+            </ScrollView>
+
+            <View className="mt-2">
+              <Button
+                variant="secondary"
+                onPress={() => void onCopyAppDiagnostics()}
+              >
+                <Text className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                  Copy diagnostics
+                </Text>
+              </Button>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }

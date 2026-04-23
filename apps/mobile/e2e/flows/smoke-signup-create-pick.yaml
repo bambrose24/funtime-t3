@@ -1,0 +1,67 @@
+appId: com.funtime.mobile
+---
+- launchApp
+- repeat:
+    times: 8
+    commands:
+      - openLink: ${E2E_APP_BOOT_URL}
+      - tapOn:
+          text: ${E2E_DEV_SERVER_URL}
+          optional: true
+      - tapOn:
+          text: "Continue"
+          optional: true
+      - tapOn:
+          text: "Reload"
+          optional: true
+      - tapOn:
+          text: "Go home"
+          optional: true
+      - waitForAnimationToEnd
+- extendedWaitUntil:
+    visible: "Enter your email"
+    timeout: 180000
+- tapOn: "Don't have an account? Sign up"
+- extendedWaitUntil:
+    visible: "Create an account"
+    timeout: 30000
+- tapOn: "example@gmail.com"
+- inputText: ${E2E_EMAIL}
+- tapOn: "Enter your password"
+- inputText: "Password123!"
+- tapOn: "Confirm your password"
+- inputText: "Password123!"
+- tapOn: "Create Account"
+- tapOn: "Create an account"
+- tapOn:
+    text: "GO TO LOGIN"
+    optional: true
+- tapOn: "Go to Login"
+- extendedWaitUntil:
+    visible: "Welcome Back"
+    timeout: 30000
+- tapOn: "Enter your email"
+- inputText: ${E2E_EMAIL}
+- tapOn: "Enter your password"
+- inputText: "Password123!"
+- tapOn: "Sign In"
+- extendedWaitUntil:
+    visible: "First Name"
+    timeout: 30000
+- tapOn: "First Name"
+- inputText: "Maestro"
+- tapOn: "Last Name"
+- inputText: "Tester"
+- tapOn: "Username"
+- inputText: ${E2E_USERNAME}
+- tapOn: "Finish Signup"
+- tapOn: "Continue"
+- tapOn: "Create League"
+- tapOn: "My Funtime League"
+- inputText: "E2E League One"
+- tapOn: "Disabled"
+- tapOn: "Create League"
+- tapOn: "Pick"
+- tapOn: "Randomize Open Picks"
+- tapOn: "Submit Picks"
+- assertVisible: "Update Picks"

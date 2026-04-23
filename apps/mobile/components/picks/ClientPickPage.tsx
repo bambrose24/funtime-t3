@@ -1,5 +1,6 @@
-import React, { useState } from "react";
-import { View, ScrollView, Alert } from "react-native";
+import React, { useMemo, useState } from "react";
+import { View, ScrollView, Alert, Pressable } from "react-native";
+import { router } from "expo-router";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -11,12 +12,14 @@ import { Text } from "../ui/text";
 import { createComponentLogger } from "@/lib/logging";
 import { Input } from "../ui/input";
 import { LeagueTabLoadingSkeleton } from "@/components/league/LeagueTabLoadingSkeleton";
+import { getSeasonOverUpsell } from "@/lib/picks/getSeasonOverUpsell";
 
 type Props = {
   leagueId: string;
 };
 
 const picksSchema = z.object({
+  applyToAllSeasonLeagues: z.boolean(),
   picks: z
     .array(
       z.union([
@@ -78,6 +81,20 @@ function PickForm({ league, weekToPick, teams, existingPicks, leagueIdNumber }: 
   const { week, season, games } = weekToPick;
   const [submitting, setSubmitting] = useState(false);
   const logger = createComponentLogger('PickForm', { leagueId: leagueIdNumber });
+  const { data: session } = clientApi.session.current.useQuery();
+  const sameSeasonMemberships = useMemo(() => {
+    return (
+      session?.dbUser?.leaguemembers.filter(
+        (membership) => membership.leagues.season === league.season,
+      ) ?? []
+    );
+  }, [league.season, session?.dbUser?.leaguemembers]);
+  const sameSeasonLeagueIds = useMemo(() => {
+    return Array.from(
+      new Set(sameSeasonMemberships.map((membership) => membership.league_id)),
+    );
+  }, [sameSeasonMemberships]);
+  const hasMultipleLeagues = sameSeasonLeagueIds.length > 1;
 
   // Create team lookup
   const teamById = new Map(teams.map((t) => [t.teamid, t]));
@@ -91,6 +108,7 @@ function PickForm({ league, weekToPick, teams, existingPicks, leagueIdNumber }: 
   const form = useForm<PicksFormData>({
     resolver: zodResolver(picksSchema),
     defaultValues: {
+      applyToAllSeasonLeagues: false,
       picks: games.map((g) => {
         const existingPick = existingPicks.find((p) => p.gid === g.gid);
         if (g.ts < new Date()) {
@@ -150,13 +168,20 @@ function PickForm({ league, weekToPick, teams, existingPicks, leagueIdNumber }: 
 
       await submitPicks({
         picks: picksToSubmit,
-        leagueIds: [leagueIdNumber],
+        leagueIds:
+          data.applyToAllSeasonLeagues && hasMultipleLeagues
+            ? sameSeasonLeagueIds
+            : [leagueIdNumber],
         overrideMemberId: undefined,
       });
 
+      const applyAllMessage =
+        data.applyToAllSeasonLeagues && hasMultipleLeagues
+          ? `\n\nThese picks were submitted to all ${sameSeasonLeagueIds.length} of your ${season} leagues.`
+          : "";
       Alert.alert(
         "Success!",
-        `Your picks are in for week ${week}!\n\nYou can come back to update them until the week starts.`,
+        `Your picks are in for week ${week}!\n\nYou can come back to update them until the week starts.${applyAllMessage}`,
         [{ text: "OK" }],
       );
     } catch (error) {
@@ -215,6 +240,7 @@ function PickForm({ league, weekToPick, teams, existingPicks, leagueIdNumber }: 
 
   const isFormValid = form.formState.isValid;
   const isFormDirty = form.formState.isDirty;
+  const applyToAllSeasonLeagues = form.watch("applyToAllSeasonLeagues");
   const currentPicks = form.watch("picks");
   const pickableGameCount = currentPicks.filter((pick) => pick.type === "toPick").length;
   const pickedOpenGameCount = currentPicks.filter(
@@ -282,6 +308,26 @@ function PickForm({ league, weekToPick, teams, existingPicks, leagueIdNumber }: 
             </Text>
           )}
         </View>
+
+        {hasMultipleLeagues ? (
+          <Pressable
+            onPress={() =>
+              form.setValue("applyToAllSeasonLeagues", !applyToAllSeasonLeagues, {
+                shouldDirty: true,
+              })
+            }
+            className="mb-4 rounded-xl border border-gray-200 bg-white px-4 py-3 dark:border-zinc-700 dark:bg-zinc-800"
+          >
+            <Text className="text-app-fg-light dark:text-app-fg-dark text-sm font-semibold">
+              Apply picks to all {sameSeasonLeagueIds.length} season leagues
+            </Text>
+            <Text className="mt-1 text-xs text-gray-600 dark:text-gray-400">
+              {applyToAllSeasonLeagues
+                ? "Enabled - this submission updates each league in your current season."
+                : "Disabled - only this league will be updated."}
+            </Text>
+          </Pressable>
+        ) : null}
 
         <Button
           onPress={randomizePicks}
@@ -408,6 +454,17 @@ export function ClientPickPage({ leagueId }: Props) {
     refetchOnWindowFocus: true,
   });
 
+  const { data: nextLeagueResult } = clientApi.league.nextLeague.useQuery(
+    {
+      leagueId: leagueIdNumber,
+    },
+    {
+      enabled: Number.isInteger(leagueIdNumber),
+      staleTime: 5 * 60 * 1000,
+      refetchOnWindowFocus: true,
+    },
+  );
+
   // Show loading state
   if (leagueLoading || weekLoading || teamsLoading || picksLoading) {
     return <LeagueTabLoadingSkeleton rows={4} />;
@@ -424,14 +481,43 @@ export function ClientPickPage({ leagueId }: Props) {
   }
 
   if (!weekToPick?.week || !weekToPick?.games?.length) {
+    const seasonOverUpsell = getSeasonOverUpsell(nextLeagueResult?.nextLeague ?? null);
+
     return (
-      <View className="flex-1 items-center justify-center px-4">
-        <Text className="text-app-fg-light dark:text-app-fg-dark mb-3 text-center text-2xl font-bold">
-          Season Over
-        </Text>
-        <Text className="text-center text-base text-gray-500 dark:text-gray-400">
-          There are no remaining games to pick right now.
-        </Text>
+      <View className="flex-1 px-4 py-8">
+        <View className="w-full max-w-2xl self-center rounded-2xl border border-gray-200 bg-white p-5 dark:border-zinc-700 dark:bg-zinc-800">
+          <Text className="text-app-fg-light dark:text-app-fg-dark mb-2 text-center text-2xl font-bold">
+            Season Complete
+          </Text>
+          <Text className="text-center text-base text-gray-600 dark:text-gray-400">
+            Great run this year. There are no remaining games to pick in this league.
+          </Text>
+
+          {seasonOverUpsell ? (
+            <View className="mt-5 rounded-xl border border-emerald-200 bg-emerald-50/70 p-4 dark:border-emerald-900 dark:bg-emerald-950/40">
+              <Text className="text-sm font-semibold text-emerald-800 dark:text-emerald-200">
+                Next season is open
+              </Text>
+              <Text className="mt-1 text-sm text-emerald-700 dark:text-emerald-300">
+                Join {seasonOverUpsell.leagueName}
+                {seasonOverUpsell.season ? ` (${seasonOverUpsell.season})` : ""} before week
+                1 starts.
+              </Text>
+              <Button
+                className="mt-3"
+                onPress={() =>
+                  router.push(`/join-league/${seasonOverUpsell.shareCode}` as any)
+                }
+              >
+                Join Next Season League
+              </Button>
+            </View>
+          ) : (
+            <Text className="mt-4 text-center text-sm text-gray-500 dark:text-gray-400">
+              No follow-up league is open yet. Check back soon or ask your league admin.
+            </Text>
+          )}
+        </View>
       </View>
     );
   }

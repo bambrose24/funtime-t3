@@ -12,6 +12,7 @@ import type {
   people,
 } from "../../../src/generated/prisma-client";
 import { Defined } from "../../../utils/defined";
+import { isE2EMode } from "../../../utils/e2e";
 import { getLogger } from "../../../utils/logging";
 import { db } from "../../db";
 const resend = new Resend(process.env.RESEND_API_KEY ?? "");
@@ -19,6 +20,37 @@ const resend = new Resend(process.env.RESEND_API_KEY ?? "");
 const FROM = "Funtime System <no-reply@play-funtime.com>";
 
 const LOG_PREFIX = "[resend-api]";
+const EMAILS_DISABLED =
+  isE2EMode ||
+  ["1", "true", "yes", "on"].includes(
+    (process.env.FUNTIME_DISABLE_EMAILS ?? "").toLowerCase(),
+  );
+
+const sendEmail = async (
+  payload: Parameters<typeof resend.emails.send>[0],
+  context: string,
+) => {
+  if (EMAILS_DISABLED) {
+    getLogger().info(
+      `${LOG_PREFIX} Skipping email send (${context}) because FUNTIME_DISABLE_EMAILS is enabled.`,
+    );
+    return { data: null, error: null };
+  }
+  return await resend.emails.send(payload);
+};
+
+const sendBatchEmail = async (
+  payload: Parameters<typeof resend.batch.send>[0],
+  context: string,
+) => {
+  if (EMAILS_DISABLED) {
+    getLogger().info(
+      `${LOG_PREFIX} Skipping batch email send (${context}) because FUNTIME_DISABLE_EMAILS is enabled.`,
+    );
+    return { data: null, error: null };
+  }
+  return await resend.batch.send(payload);
+};
 
 const escapeHtml = (input: string) => {
   return input
@@ -90,7 +122,8 @@ export const resendApi = {
     getLogger().info(
       `${LOG_PREFIX} Going to send league registration email for league ${league.league_id} for member ${memberId}`,
     );
-    const { data, error } = await resend.emails.send({
+    const { data, error } = await sendEmail(
+      {
       from: FROM,
       to: [email],
       subject: `Welcome to ${league.name}!`,
@@ -104,7 +137,9 @@ export const resendApi = {
         season: league.season,
         username: member.people.username,
       }),
-    });
+      },
+      `league_registration:${league.league_id}:${memberId}`,
+    );
 
     if (error) {
       getLogger().error(
@@ -211,12 +246,15 @@ export const resendApi = {
         }),
       );
 
-      const { data, error } = await resend.emails.send({
+      const { data, error } = await sendEmail(
+        {
         from: FROM,
         to: [email],
         subject: `Your ${leagues.length === 1 ? (leagues.at(0)?.name ?? "") : "Funtime"} picks for Week ${week}!`,
         html: emailHtml,
-      });
+        },
+        `week_picks:${userId}:${week}`,
+      );
 
       if (error) {
         getLogger().error(
@@ -274,7 +312,8 @@ export const resendApi = {
       `${LOG_PREFIX} Going to send pick reminder email for league ${league.league_id} for member ${member.membership_id}`,
     );
 
-    const { data, error } = await resend.emails.send({
+    const { data, error } = await sendEmail(
+      {
       from: FROM,
       to: [user.email],
       subject: `Reminder: Make Your Picks for ${league.name}!`,
@@ -283,7 +322,9 @@ export const resendApi = {
         leagueName: league.name,
         leagueHomeHref: `https://www.play-funtime.com/league/${league.league_id}`,
       }),
-    });
+      },
+      `pick_reminder:${league.league_id}:${member.membership_id}:${week}`,
+    );
 
     if (error) {
       getLogger().error(
@@ -361,19 +402,22 @@ export const resendApi = {
             </tbody>
           </table>
           <p style="margin-top: 16px;">
-            <a href="https://play-funtime.com/league/${leagueId}" style="color: #2563eb;">
+            <a href="https://play-funtime.com/league/${leagueId}?week=${week}" style="color: #2563eb;">
               View league details
             </a>
           </p>
         </div>
       `;
 
-      const { data, error } = await resend.emails.send({
+      const { data, error } = await sendEmail(
+        {
         from: FROM,
         to: [recipient.email],
         subject: `${leagueName} - Week ${week} Summary`,
         html,
-      });
+        },
+        `week_summary:${leagueId}:${recipient.memberId}:${week}`,
+      );
 
       if (error) {
         getLogger().error(
@@ -419,7 +463,7 @@ export const resendApi = {
     // Have to chunk into <100 per batch here, so let's chunk into 90 per group and send batches that way to stay under the limit
     const chunks = chunk(to, 90);
     for (const emailChunk of chunks) {
-      const { data, error } = await resend.batch.send(
+      const { data, error } = await sendBatchEmail(
         emailChunk.map((t) => {
           return {
             from: FROM,
@@ -433,6 +477,7 @@ export const resendApi = {
             }),
           };
         }),
+        `league_broadcast:${leagueId}`,
       );
 
       if (error) {

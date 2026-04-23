@@ -7,7 +7,11 @@ import { useEffect } from "react";
 import { clientApi } from "~/trpc/react";
 import { type RouterOutputs } from "~/trpc/types";
 
-if (typeof window !== "undefined") {
+const e2eModeEnabled = ["1", "true", "yes", "on"].includes(
+  (process.env.NEXT_PUBLIC_E2E_MODE ?? "").toLowerCase(),
+);
+
+if (typeof window !== "undefined" && !e2eModeEnabled) {
   posthog.init(process.env.NEXT_PUBLIC_POSTHOG_KEY ?? "", {
     api_host: process.env.NEXT_PUBLIC_POSTHOG_HOST ?? "",
     person_profiles: "identified_only",
@@ -32,6 +36,9 @@ export function UserProviderClient({ children, data: initialData }: Props) {
     initialData,
   });
   useEffect(() => {
+    if (e2eModeEnabled) {
+      return;
+    }
     if (user.dbUser) {
       posthog.identify(user.dbUser.email, {
         userId: user.dbUser.uid,
@@ -40,6 +47,11 @@ export function UserProviderClient({ children, data: initialData }: Props) {
       });
     }
   }, [user.dbUser]);
+
+  if (e2eModeEnabled) {
+    return <>{children}</>;
+  }
+
   return (
     <PostHogProvider client={posthog}>
       {children}
@@ -53,6 +65,10 @@ export default function PostHogPageView() {
   const searchParams = useSearchParams();
   const posthogClient = usePostHog();
   useEffect(() => {
+    if (e2eModeEnabled) {
+      return;
+    }
+
     // Track pageviews
     if (pathname && posthogClient) {
       let url = window.origin + pathname;

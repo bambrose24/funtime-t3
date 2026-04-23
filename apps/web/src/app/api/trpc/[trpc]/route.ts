@@ -19,7 +19,11 @@ const createContext = async (req: NextRequest) => {
   return context;
 };
 
-const handler = withAxiom(async (req: NextRequest) => {
+const e2eModeEnabled = ["1", "true", "yes", "on"].includes(
+  (process.env.E2E_MODE ?? process.env.NEXT_PUBLIC_E2E_MODE ?? "").toLowerCase(),
+);
+
+const baseHandler = async (req: NextRequest) => {
   return fetchRequestHandler({
     endpoint: "/api/trpc",
     req,
@@ -35,6 +39,8 @@ const handler = withAxiom(async (req: NextRequest) => {
           }
         : undefined,
   });
-});
+};
+
+const handler = e2eModeEnabled ? baseHandler : withAxiom(baseHandler);
 
 export { handler as GET, handler as POST };

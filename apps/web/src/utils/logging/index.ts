@@ -3,6 +3,10 @@ import { config, env } from "@funtime/api/utils/config";
 import { RequestContext } from "../requestContext";
 import { WinstonTransport as AxiomTransport } from "@axiomhq/winston";
 
+const e2eModeEnabled = ["1", "true", "yes", "on"].includes(
+  (process.env.E2E_MODE ?? process.env.NEXT_PUBLIC_E2E_MODE ?? "").toLowerCase(),
+);
+
 const baseLogger = winston.createLogger({
   level: config.logging.level,
   format: winston.format.json(),
@@ -13,7 +17,7 @@ const baseLogger = winston.createLogger({
     ...(config.logging.shouldLogToConsole
       ? [new winston.transports.Console()]
       : []),
-    ...(config.logging.shouldLogToAxiom
+    ...(config.logging.shouldLogToAxiom && !e2eModeEnabled
       ? [
           new AxiomTransport({
             dataset: "funtime-t3-winston",

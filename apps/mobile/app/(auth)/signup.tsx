@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
   View,
   Text,
@@ -7,13 +7,11 @@ import {
   SafeAreaView,
   Pressable,
 } from "react-native";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import * as Linking from "expo-linking";
 import { supabase } from "@/lib/supabase/client";
-import { useColorScheme } from "@/lib/useColorScheme";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { clientApi } from "@/lib/trpc/react";
 import { z } from "zod";
 
 // Validation schema matching web app
@@ -34,6 +32,7 @@ const signupSchema = z
   });
 
 export default function SignupScreen() {
+  const { redirectTo } = useLocalSearchParams<{ redirectTo?: string }>();
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password1, setPassword1] = useState("");
@@ -44,8 +43,22 @@ export default function SignupScreen() {
     password2?: string;
   }>({});
   const [success, setSuccess] = useState(false);
-  const { isDarkColorScheme } = useColorScheme();
-  const utils = clientApi.useUtils();
+  const normalizedRedirectTo = useMemo(() => {
+    if (typeof redirectTo !== "string" || redirectTo.length === 0) {
+      return null;
+    }
+    try {
+      return decodeURIComponent(redirectTo);
+    } catch {
+      return redirectTo;
+    }
+  }, [redirectTo]);
+  const withRedirectTo = (path: string) => {
+    if (!normalizedRedirectTo) {
+      return path;
+    }
+    return `${path}?redirectTo=${encodeURIComponent(normalizedRedirectTo)}`;
+  };
 
   const handleSignup = async () => {
     // Clear previous errors
@@ -72,7 +85,10 @@ export default function SignupScreen() {
 
     try {
       // Create the redirect URL for email confirmation
-      const redirectUrl = Linking.createURL('/auth/callback');
+      const callbackPath = normalizedRedirectTo
+        ? `/auth/callback?redirectTo=${encodeURIComponent(normalizedRedirectTo)}`
+        : "/auth/callback";
+      const redirectUrl = Linking.createURL(callbackPath);
       
       const { error, data } = await supabase.auth.signUp({
         email: email.trim(),
@@ -103,7 +119,7 @@ export default function SignupScreen() {
         [
           {
             text: "Go to Login",
-            onPress: () => router.replace("/auth"),
+            onPress: () => router.replace(withRedirectTo("/auth") as any),
           },
         ]
       );
@@ -127,7 +143,7 @@ export default function SignupScreen() {
               We've sent you a confirmation email. Click the link in your email to
               verify your account and complete your profile setup.
             </Text>
-            <Button onPress={() => router.replace("/auth")}>
+            <Button onPress={() => router.replace(withRedirectTo("/auth") as any)}>
               Go to Login
             </Button>
           </View>
@@ -154,12 +170,12 @@ export default function SignupScreen() {
             </Text>
             <Text className="text-center text-gray-600 dark:text-gray-400 mt-2">
               If you have played before, you can{" "}
-              <Text 
-                className="text-blue-600 dark:text-blue-400" 
-                onPress={() => router.replace("/auth")}
-              >
-                sign in with your existing account
-              </Text>
+                <Text 
+                  className="text-blue-600 dark:text-blue-400" 
+                  onPress={() => router.replace(withRedirectTo("/auth") as any)}
+                >
+                  sign in with your existing account
+                </Text>
               .
             </Text>
           </View>
@@ -242,7 +258,7 @@ export default function SignupScreen() {
 
           {/* Footer Links */}
           <View className="mt-6">
-            <Pressable onPress={() => router.replace('/auth')}>
+            <Pressable onPress={() => router.replace(withRedirectTo("/auth") as any)}>
               <Text className="text-center text-blue-600 dark:text-blue-400">
                 Already have an account? Sign in
               </Text>

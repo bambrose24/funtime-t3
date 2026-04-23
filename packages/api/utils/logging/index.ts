@@ -2,6 +2,7 @@ import * as winston from "winston";
 import { config, env } from "../config";
 import { RequestContext } from "../requestContext";
 import { WinstonTransport as AxiomTransport } from "@axiomhq/winston";
+import { isE2EMode } from "../e2e";
 
 const baseLogger = winston.createLogger({
   level: config.logging.level,
@@ -10,7 +11,7 @@ const baseLogger = winston.createLogger({
     ...(config.logging.shouldLogToConsole
       ? [new winston.transports.Console()]
       : []),
-    ...(config.logging.shouldLogToAxiom
+    ...(config.logging.shouldLogToAxiom && !isE2EMode
       ? [
           new AxiomTransport({
             dataset: "funtime-t3-winston",

@@ -18,7 +18,15 @@
     "db:generate": "turbo run db:generate",
     "db:push": "turbo run db:push",
     "db:pull": "turbo run db:pull",
-    "db:studio": "turbo run db:studio"
+    "db:studio": "turbo run db:studio",
+    "prisma:migrate:check": "node scripts/prisma/validate-migrations.mjs",
+    "prisma:migrate:apply": "node scripts/prisma/validate-migrations.mjs --apply",
+    "e2e:fixtures:refresh": "node scripts/e2e/refresh-fixtures-from-live.mjs",
+    "e2e:fixtures:build-seed": "node scripts/e2e/generate-seed-from-fixture.mjs",
+    "e2e:backend:up": "bash scripts/e2e/backend-up.sh",
+    "e2e:seed:verify": "node scripts/e2e/verify-seed.mjs",
+    "e2e:mobile:install-dev-client": "bash scripts/e2e/install-dev-client.sh",
+    "e2e:mobile:maestro": "bash scripts/e2e/run-maestro.sh"
   },
   "devDependencies": {
     "@types/eslint": "^8.56.2",

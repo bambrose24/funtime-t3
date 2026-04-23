@@ -4,6 +4,7 @@ const APPLINK_PATHS = [
   "/join-league/*",
   "/league/*",
   "/settings",
+  "/admin",
   "/auth/callback*",
   "/login",
   "/signup",

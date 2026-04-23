@@ -5,12 +5,132 @@
 - Branch: `codex/mobile-core-features`.
 - Status: `IN_PROGRESS`.
 - Worklog policy: mandatory update on task start/status change/commit/blocker/decision/validation, plus test-impact logging for any flow/screen behavior change.
+- Testing-plan stream (`P6-TEST-*` / E2E infra): `PAUSED` by request with handoff snapshot captured for later resume.
 
 ## Current Phase
 - Active phase: `Phase 3 - Admin + Ops Parity`.
 - Pre-step: `0.0 Initialize and baseline WORKLOG.md`.
 
 ## Completed Tasks
+- Task ID: `P2-SETTINGS-OTA-001`
+  - Short title: Add mobile settings app-diagnostics card with OTA check/copy flows.
+  - Scope touched: `apps/mobile/app/(tabs)/account.tsx`, `apps/mobile/lib/settings/appDiagnostics.ts`, `apps/mobile/tests/account/appDiagnostics.test.ts`, `apps/mobile/package.json`, `pnpm-lock.yaml`.
+  - Outcome: Renamed account header to `Settings`, added an `App Info` card that surfaces current app/build version plus explicit `BUILD`/`OTA` source, added a native `Check for updates` action wired to `expo-updates` (`checkForUpdateAsync` + `fetchUpdateAsync` + restart prompt), added `Copy app info` and bottom-sheet diagnostics view with full copy-to-clipboard export, and normalized diagnostics formatting via a shared helper.
+  - Test impact: Added helper coverage for embedded vs OTA diagnostics derivation and clipboard export formatting.
+  - Validation run: `pnpm --filter @funtime/mobile test -- --runInBand tests/account/appDiagnostics.test.ts`, `pnpm --filter @funtime/mobile typecheck`.
+  - Timestamp (UTC): `2026-03-13T19:05:00Z`.
+- Task ID: `P2-PARITY-CLOSURE-001`
+  - Short title: Ship full mobile parity closure pass across auth, league, picks, leaderboard, superbowl, admin, and deep-link/push routing.
+  - Scope touched: `apps/mobile/app/(auth)/auth.tsx`, `apps/mobile/app/(auth)/signup.tsx`, `apps/mobile/app/(auth)/confirm-signup.tsx`, `apps/mobile/app/(auth)/forgot-password.tsx`, `apps/mobile/app/(auth)/confirm-reset-password.tsx`, `apps/mobile/app/auth/callback.tsx`, `apps/mobile/hooks/useAuthHandler.ts`, `apps/mobile/lib/deeplink/resolveDeepLink.ts`, `apps/mobile/tests/deeplink/resolveDeepLink.test.ts`, `apps/mobile/app/league/[id]/index.tsx`, `apps/mobile/components/league/LeagueInfoTab.tsx`, `apps/mobile/components/picks/ClientPickPage.tsx`, `apps/mobile/components/leaderboard/ClientLeaderboardPage.tsx`, `apps/mobile/components/leaderboard/MobileLeaderboardTrendChart.tsx`, `apps/mobile/components/superbowl/LeagueSuperbowlBoard.tsx`, `apps/mobile/app/league/[id]/admin.tsx`, `apps/mobile/app/join-league/[code].tsx`, `apps/mobile/app/league/create.tsx`, `apps/mobile/app/login.tsx`, `packages/api/server/services/expo-push/index.ts`, `packages/api/server/services/resend/index.ts`, `.github/workflows/mobile-e2e-supabase.yml`, `docs/MOBILE_PARITY_PLAN.md`, `WORKLOG.md`.
+  - Outcome: Added missing auth recovery screens + callback/session handling, preserved auth return-intent (`redirectTo`) through login/signup/onboarding, shipped league Info tab + week query/week selector + week-winner context, enabled multi-league same-season picks submit, added leaderboard season-winners summary + selectable weekly trend chart, added postseason bracket/contest ranking/elimination context on Super Bowl, expanded admin member stats table with CSV export action, expanded deep-link route mapping (including league subroutes and recovery params), moved week-summary push/email links to explicit week context, and aligned mobile E2E CI workflow to dev-client Maestro orchestration.
+  - Test impact: Updated deep-link coverage for new route mappings/recovery handling and validated all touched mobile/auth/deeplink/type surfaces.
+  - Validation run: `pnpm --filter @funtime/mobile test -- --runInBand tests/deeplink/resolveDeepLink.test.ts`, `pnpm --filter @funtime/mobile typecheck`, `pnpm --filter @funtime/api typecheck`.
+  - Timestamp (UTC): `2026-03-12T23:58:00Z`.
+- Task ID: `P1-HOME-UX-004`
+  - Short title: Add mobile home league search/filter for faster active/prior scanning.
+  - Scope touched: `apps/mobile/app/(tabs)/home.tsx`, `apps/mobile/lib/home/filterLeaguesByQuery.ts`, `apps/mobile/tests/home/filterLeaguesByQuery.test.ts`, `docs/MOBILE_PARITY_PLAN.md`, `WORKLOG.md`.
+  - Outcome: Home now includes a lightweight league search input with clear action, filtering active and prior league lists in place and showing query-aware empty-state copy to reduce scrolling/load for users in many leagues.
+  - Test impact: Added helper coverage (3 tests) for query normalization and case-insensitive filtering behavior.
+  - Validation run: `pnpm --filter @funtime/mobile test -- --runInBand tests/home/filterLeaguesByQuery.test.ts`, `pnpm --filter @funtime/mobile typecheck`.
+  - Timestamp (UTC): `2026-03-02T04:20:11Z`.
+- Task ID: `P1-LEAGUE-UX-003`
+  - Short title: Add mobile-native admin invite sharing from league header for pre-season leagues.
+  - Scope touched: `apps/mobile/app/league/[id]/index.tsx`, `apps/mobile/lib/league/getShareLeagueInvite.ts`, `apps/mobile/tests/league/getShareLeagueInvite.test.ts`, `docs/MOBILE_PARITY_PLAN.md`, `WORKLOG.md`.
+  - Outcome: Mobile league header now exposes a native share action for league admins when the league has not started and has a join code, enabling one-tap invite sharing from the core league surface instead of forcing web/admin-only workflows.
+  - Test impact: Added helper coverage (3 tests) for invite-share eligibility and payload formatting.
+  - Validation run: `pnpm --filter @funtime/mobile test -- --runInBand tests/league/getShareLeagueInvite.test.ts`, `pnpm --filter @funtime/mobile typecheck`.
+  - Timestamp (UTC): `2026-03-01T22:35:56Z`.
+- Task ID: `P1-PICK-UX-004`
+  - Short title: Add season-complete next-league upsell parity and CTA on mobile pick flow.
+  - Scope touched: `apps/mobile/components/picks/ClientPickPage.tsx`, `apps/mobile/lib/picks/getSeasonOverUpsell.ts`, `apps/mobile/tests/picks/getSeasonOverUpsell.test.ts`, `docs/MOBILE_PARITY_PLAN.md`, `WORKLOG.md`.
+  - Outcome: Replaced the bare mobile season-over picks empty state with a richer season-complete card that surfaces a direct join CTA for the linked next-season league when available (`league.nextLeague` with `not_started` status), plus clear fallback guidance when no follow-up league is open yet.
+  - Test impact: Added helper coverage (4 tests) for next-league upsell eligibility and normalization.
+  - Validation run: `pnpm --filter @funtime/mobile test -- --runInBand tests/picks/getSeasonOverUpsell.test.ts`, `pnpm --filter @funtime/mobile typecheck`.
+  - Timestamp (UTC): `2026-03-01T22:34:35Z`.
+- Task ID: `P1-CREATE-UX-003`
+  - Short title: Add prior-league template prefill parity and stronger create-name validation on mobile.
+  - Scope touched: `apps/mobile/app/league/create.tsx`, `apps/mobile/lib/league/createLeagueForm.ts`, `apps/mobile/tests/league/createLeagueForm.test.ts`, `docs/MOBILE_PARITY_PLAN.md`, `WORKLOG.md`.
+  - Outcome: Mobile create-league now supports `priorLeagueId` route prefill and applies prior-league late/reminder/Super Bowl settings as a template (including explicit template context copy), while league-name validation now enforces the web-equivalent `5-100` character range with clearer CTA/alert messaging.
+  - Test impact: Added create-form helper coverage (5 tests) for league-name validation and prior-league template policy coercion/prefill behavior.
+  - Validation run: `pnpm --filter @funtime/mobile test -- --runInBand tests/league/createLeagueForm.test.ts`, `pnpm --filter @funtime/mobile typecheck`.
+  - Timestamp (UTC): `2026-03-01T22:28:38Z`.
+- Task ID: `P1-HOME-UX-003`
+  - Short title: Add single-active-league auto-open parity and quick-return affordance on mobile home.
+  - Scope touched: `apps/mobile/app/(tabs)/home.tsx`, `apps/mobile/lib/home/getSingleActiveLeague.ts`, `apps/mobile/tests/home/getSingleActiveLeague.test.ts`, `docs/MOBILE_PARITY_PLAN.md`, `WORKLOG.md`.
+  - Outcome: Mobile home now mirrors web behavior by auto-opening the only active-season league on first home load, and adds a compact quick-return active-league callout when users revisit home.
+  - Test impact: Added helper coverage for single-active-league detection logic (4 tests) used by home auto-open behavior.
+  - Validation run: `pnpm --filter @funtime/mobile test -- --runInBand tests/home/getSingleActiveLeague.test.ts`, `pnpm --filter @funtime/mobile typecheck`.
+  - Timestamp (UTC): `2026-03-01T22:05:11Z`.
+- Task ID: `P1-JOIN-UX-003`
+  - Short title: Harden mobile join-code parsing for real-world shared link inputs.
+  - Scope touched: `apps/mobile/lib/join/extractLeagueCode.ts`, `apps/mobile/app/join-league/index.tsx`, `apps/mobile/tests/join/extractLeagueCode.test.ts`, `docs/MOBILE_PARITY_PLAN.md`, `WORKLOG.md`.
+  - Outcome: Replaced fragile join-code extraction with a shared parser that handles canonical web URLs, custom-scheme deep links, Expo `/--/` paths, query/hash noise, and `/join-league?code=...` variants so pasted invite links resolve reliably.
+  - Test impact: Added join-flow parser coverage (6 tests) to protect URL/code normalization behavior.
+  - Validation run: `pnpm --filter @funtime/mobile test -- --runInBand tests/join/extractLeagueCode.test.ts`, `pnpm --filter @funtime/mobile typecheck`.
+  - Timestamp (UTC): `2026-03-01T21:35:57Z`.
+- Task ID: `P0-DEEPLINK-QA-001A`
+  - Short title: Harden deep-link parity mapping and add coverage for required shared URLs.
+  - Scope touched: `apps/mobile/lib/deeplink/resolveDeepLink.ts`, `apps/mobile/hooks/useAuthHandler.ts`, `apps/mobile/tests/deeplink/resolveDeepLink.test.ts`, `apps/web/src/app/apple-app-site-association/route.ts`, `docs/MOBILE_PARITY_PLAN.md`, `WORKLOG.md`.
+  - Outcome: Extracted mobile deep-link resolution into a pure shared module, added focused test coverage for canonical `play-funtime.com` paths (`/join-league`, `/league/:id`, `/settings`, `/admin`, auth callback, query preservation), and added `/admin` to iOS universal-link association paths so super-admin links can resolve to app routes.
+  - Test impact: Added new mobile deep-link route-behavior suite (5 tests) to guard parity-critical URL mappings.
+  - Validation run: `pnpm --filter @funtime/mobile test -- --runInBand tests/deeplink/resolveDeepLink.test.ts`, `pnpm --filter @funtime/mobile typecheck`, `pnpm --filter @funtime/web typecheck`.
+  - Timestamp (UTC): `2026-02-28T00:34:24Z`.
+- Task ID: `P0-PRISMA-002A`
+  - Short title: Add actionable Prisma migration validation diagnostics for parity rollout.
+  - Scope touched: `scripts/prisma/validate-migrations.mjs`, `package.json`, `packages/api/package.json`, `docs/MOBILE_PARITY_PLAN.md`, `WORKLOG.md`.
+  - Outcome: Added `prisma:migrate:check` / `db:migrate:check` commands that run `prisma migrate status` plus DNS/TCP/pooler-host diagnostics so `Schema engine error` failures are actionable; current environment now clearly reports DNS resolution failure and pooler-host configuration risk.
+  - Test impact: Infra/ops task only (no user-flow behavior change).
+  - Validation run: `node --check scripts/prisma/validate-migrations.mjs`, `node scripts/prisma/validate-migrations.mjs`, `pnpm --filter @funtime/api db:migrate:check`.
+  - Timestamp (UTC): `2026-02-28T00:28:16Z`.
+- Task ID: `P6-TEST-E2E-INFRA-007`
+  - Short title: Record paused testing-plan handoff state with restart checklist.
+  - Scope touched: `WORKLOG.md`, `E2E_INFRA_WORKLOG.md`, `docs/E2E_INFRA_PLAN.md`.
+  - Outcome: Captured detailed current status (validated unit/typecheck state, unresolved full-E2E execution caveat, and exact restart commands/log artifacts) so testing-plan execution can resume later without re-triage.
+  - Test impact: No new runtime tests; status/operations handoff only.
+  - Validation run: `pnpm --filter @funtime/mobile test -- --runInBand` (pass), `pnpm --filter @funtime/api typecheck` (pass), `pnpm --filter @funtime/web typecheck` (pass).
+  - Timestamp (UTC): `2026-02-27T21:36:04Z`.
+- Task ID: `P6-TEST-E2E-INFRA-006`
+  - Short title: Mock remaining outbound telemetry/providers behind `E2E_MODE` guard.
+  - Scope touched: `packages/api/utils/logging/index.ts`, `apps/web/src/app/(auth)/provider/UserProviderClient.tsx`, `apps/web/src/cron/postseason.ts`, `apps/web/src/utils/logging/index.ts`, `docs/E2E_INFRA_PLAN.md`, `docs/TESTING_STRATEGY.md`, `E2E_INFRA_WORKLOG.md`.
+  - Outcome: Added guard-based suppression for Axiom/PostHog side effects during E2E and added postseason cron E2E short-circuit; documented this as required E2E behavior in testing/infra docs.
+  - Test impact: Keeps mobile E2E deterministic by removing external telemetry/provider dependencies from local and CI test runs.
+  - Validation run: `pnpm --filter @funtime/api typecheck`, `pnpm --filter @funtime/web typecheck`.
+  - Timestamp (UTC): `2026-02-27T20:43:44Z`.
+- Task ID: `P6-TEST-E2E-INFRA-005`
+  - Short title: Switch mobile E2E runtime from Expo Go to Android dev build.
+  - Scope touched: `scripts/e2e/run-maestro.sh`, `scripts/e2e/install-dev-client.sh`, `apps/mobile/app.json`, `apps/mobile/package.json`, `apps/mobile/e2e/flows/*`, `package.json`, `docs/E2E_INFRA_PLAN.md`, `docs/TESTING_STRATEGY.md`, `E2E_INFRA_WORKLOG.md`.
+  - Outcome: Updated E2E startup to launch the app dev build (`com.funtime.mobile`) instead of Expo Go, added automatic/manual dev-client install command (`pnpm e2e:mobile:install-dev-client`), and aligned docs/governance around dev-client-first mobile E2E.
+  - Test impact: Improves E2E startup determinism by removing Expo Go account/launcher overlays; flow selectors remain in progress for full happy-path completion.
+  - Validation run: `bash -n scripts/e2e/run-maestro.sh`, `bash -n scripts/e2e/install-dev-client.sh`.
+  - Timestamp (UTC): `2026-02-27T01:41:31Z`.
+- Task ID: `P6-TEST-E2E-INFRA-004`
+  - Short title: Auto-start Android emulator in mobile E2E runner with Pixel 9a default.
+  - Scope touched: `scripts/e2e/run-maestro.sh`, `docs/E2E_INFRA_PLAN.md`, `E2E_INFRA_WORKLOG.md`.
+  - Outcome: Updated `pnpm e2e:mobile:maestro` to automatically launch an emulator when no device is connected, defaulting to `Pixel 9a` (with `E2E_ANDROID_AVD` override), and added clearer timeout/log diagnostics for emulator boot failures.
+  - Test impact: Improves E2E execution reliability/ergonomics; no mobile Jest suites changed.
+  - Validation run: `bash -n scripts/e2e/run-maestro.sh`, `pnpm e2e:mobile:maestro -- --skip-backend-up` (dry run hit auto-start path and emitted expected boot wait logs).
+  - Timestamp (UTC): `2026-02-27T01:03:06Z`.
+- Task ID: `P6-TEST-E2E-INFRA-003`
+  - Short title: Install local Maestro/Android prerequisites and verify device-gated E2E preflight.
+  - Scope touched: `scripts/e2e/run-maestro.sh`, `E2E_INFRA_WORKLOG.md`.
+  - Outcome: Installed required local tooling (`maestro`, Java 17, `adb`), hardened `run-maestro` with explicit `adb` + connected-device preflight checks, and verified the E2E command now fails only on missing emulator/device instead of tooling/runtime issues.
+  - Test impact: Improved E2E operator feedback and reduced setup ambiguity; no mobile Jest suites changed.
+  - Validation run: `maestro --version`, `adb --version`, `pnpm e2e:mobile:maestro -- --skip-backend-up` (expected preflight failure: no device/emulator).
+  - Timestamp (UTC): `2026-02-27T00:18:11Z`.
+- Task ID: `P6-TEST-E2E-INFRA-002`
+  - Short title: Validate Docker-backed Supabase bootstrap and harden against local port collisions.
+  - Scope touched: `supabase/config.toml`, `scripts/e2e/backend-up.sh`, `scripts/e2e/verify-seed.mjs`, `scripts/e2e/run-maestro.sh`, `.github/workflows/mobile-e2e-supabase.yml`, `docs/E2E_INFRA_PLAN.md`, `E2E_INFRA_WORKLOG.md`.
+  - Outcome: Resolved local Supabase port collision by moving this project to dedicated `5542x` ports, fixed seed-verification SQL insert/query bug, and validated end-to-end backend bootstrap (`supabase start/reset -> Prisma migrate -> deterministic seed -> pickability verification`) with week-1-open and persisted-picks assertions passing.
+  - Test impact: Strengthened infrastructure-level E2E confidence; no mobile Jest suites changed.
+  - Validation run: `pnpm e2e:backend:up`.
+  - Timestamp (UTC): `2026-02-26T21:59:38Z`.
+- Task ID: `P6-TEST-E2E-INFRA-001`
+  - Short title: Stand up portable local Supabase-backed mobile E2E infrastructure stream.
+  - Scope touched: `docs/E2E_INFRA_PLAN.md`, `E2E_INFRA_WORKLOG.md`, `supabase/config.toml`, `supabase/fixtures/season-2025.json`, `supabase/seed.sql`, `scripts/e2e/*`, `.github/workflows/mobile-e2e-supabase.yml`, `package.json`, season/env constants in API/mobile/web, and testing/parity docs.
+  - Outcome: Added a separate E2E infra project/worklog, env-backed season abstraction (`CURRENT_SEASON`) across API/mobile/web, deterministic `teams+games` seed pipeline (with optional live refresh + future timestamp transform), one-command backend bootstrap/verification scripts, initial Maestro smoke flows, and a manual+nightly CI scaffold for local Supabase + Android emulator E2E.
+  - Test impact: Added infrastructure-level E2E validation path (`pnpm e2e:seed:verify`) and Maestro flow scaffolding; no existing mobile Jest suites were changed in this task.
+  - Validation run: `pnpm e2e:fixtures:build-seed`.
+  - Timestamp (UTC): `2026-02-26T21:05:02Z`.
 - Task ID: `P6-TEST-FOUNDATION-001`
   - Short title: Bootstrap Expo mobile Jest/RNTL test foundation and baseline flow coverage.
   - Scope touched: `apps/mobile/package.json`, `apps/mobile/jest.config.js`, `apps/mobile/jest.setup.ts`, `apps/mobile/lib/supabase/client.ts`, `apps/mobile/lib/supabase/errors.ts`, `apps/mobile/tests/auth/isInvalidRefreshTokenError.test.ts`, `apps/mobile/tests/picks/PickGameCard.test.tsx`, `apps/mobile/tests/leaderboard/MobileLeaderboardTable.test.tsx`, `pnpm-lock.yaml`.
@@ -517,9 +637,9 @@
   - Short title: End-to-end parity QA pass and regression fixes.
   - Status: `IN_PROGRESS` (started `2026-02-25T20:24:07Z`).
   - Immediate execution checklist:
-    1. Continue focused parity walk-through for top mobile surfaces and convert findings into scoped fix tasks. Recent closes: `P5-PARITY-QA-001A` through `P5-PARITY-QA-001J`, `P5-UX-SWEEP-001G` through `P5-UX-SWEEP-001T`, `P3-ADMIN-QA-001A`, and `P3-ADMIN-QA-001B1` through `P3-ADMIN-QA-001B9`.
-    2. `P5-UX-SWEEP-001` is closed; shift execution to device-gated validation tracks: `P0-DEEPLINK-QA-001` and `P2-NOTIFY-QA-001`.
-    3. Execute `P0-PRISMA-002`: validate migration status/deploy workflow against target DB environment.
+    1. Continue focused parity walk-through for top mobile surfaces and convert findings into scoped fix tasks. Recent closes: `P5-PARITY-QA-001A` through `P5-PARITY-QA-001J`, `P5-UX-SWEEP-001G` through `P5-UX-SWEEP-001T`, `P3-ADMIN-QA-001A`, `P3-ADMIN-QA-001B1` through `P3-ADMIN-QA-001B9`, `P1-PICK-UX-004`, `P1-LEAGUE-UX-003`, and `P1-HOME-UX-004`.
+    2. `P5-UX-SWEEP-001` is closed; device-gated validation tracks are active. `P0-DEEPLINK-QA-001A` (mapping + association + route tests) is complete, and device-level deep-link validation is intentionally deferred for now in favor of core UX/feature parity execution.
+    3. Execute `P0-PRISMA-002`: run `pnpm prisma:migrate:check` (and `pnpm prisma:migrate:apply` when ready) against target DB with direct-host `DIRECT_URL`, then record baseline/deploy status.
     4. Start `P6-TEST-E2E-001`: add critical-flow Maestro smoke coverage and wire to EAS workflow execution.
     5. Start `P6-TEST-COVERAGE-002`: expand Jest/RNTL flow coverage to home, join/create validation, and deep-link path behavior.
 
@@ -527,9 +647,9 @@
 1. `P6-TEST-E2E-001`: Add Maestro critical-flow mobile smoke suite and execute via EAS workflow.
 2. `P6-TEST-COVERAGE-002`: Expand unit/integration coverage to home/nav, join/create validation, and deep-link route behavior.
 3. `P6-TEST-GOVERNANCE-001`: Add CI gating and PR checklist enforcement for mandatory flow/screen test updates.
-4. `P0-DEEPLINK-QA-001`: Validate `play-funtime.com` deep links for `/join-league`, `/league/:id`, `/settings`, and `/admin`.
+4. `P0-DEEPLINK-QA-001`: Deferred (by request) device validation of `play-funtime.com` deep links for `/join-league`, `/league/:id`, `/settings`, and `/admin` (mapping/tests + iOS `/admin` association path are already in place).
 5. `P2-NOTIFY-QA-001`: Validate push/email delivery behavior in staging (token registration, message pushes, and week summary schedule).
-6. `P0-PRISMA-002`: Validate `prisma migrate status/deploy` against target DB and baseline strategy for existing environments.
+6. `P0-PRISMA-002`: Validate `prisma migrate status/deploy` against target DB and baseline strategy for existing environments (using `pnpm prisma:migrate:check` diagnostics).
 
 ## Decisions & Rationale
 - Full parity target includes player + admin (including global admin) to avoid permanent web-only operational gaps.
@@ -540,6 +660,7 @@
 - Route IA decision: move auth pages under `(auth)` and primary app navigation under `(tabs)` to make parity expansion predictable.
 - Deep-link strategy: shared `play-funtime.com` links are canonical and must resolve to equivalent app routes when installed, with web fallback otherwise.
 - Deep-link hosting decision: web serves iOS/Android association payloads from route handlers so app ownership config can be environment-driven.
+- Deep-link QA decision: keep route resolution in a pure mobile helper with explicit tests for parity-critical shared URLs, and include `/admin` in iOS universal-link paths to preserve super-admin deep-link parity.
 - Super-admin parity decision: critical admin paths must be authorized by role OR super-admin email at both API and mobile UI layers to avoid unreachable override workflows.
 - Leaderboard parity decision: rank labels in mobile should be raw numeric values to match web and make tie rankings explicit.
 - Current-user row affordance decision: compact mobile tables should highlight the viewer by row/background and name color only (no inline `You` pill) to avoid narrow-cell overflow.
@@ -558,6 +679,7 @@
 - Auth-header decision: mobile tRPC auth-header construction must treat invalid-refresh-token errors as a signed-out recovery case (clear local session and continue unauthenticated) instead of surfacing hard startup failures.
 - Push-token decision: mobile push registration should fail soft (skip + warning) when no EAS `projectId` can be inferred, with `EXPO_PUBLIC_EAS_PROJECT_ID` as an explicit fallback for local/dev contexts.
 - Deep-link listener decision: initial launch URLs must be handled once per app boot, while ongoing deep-link events should be handled by a stable listener using current `pathname`/`session` refs to avoid stale-link replays.
+- Sequencing decision: defer device-level deep-link QA temporarily when requested and prioritize direct user-facing flow parity/UX work, while keeping deep-link validation explicitly queued.
 - Notification tap decision: mobile should clear consumed last-notification responses and de-duplicate by response identifier so stale notification taps do not re-navigate on later launches.
 - League-tab loading decision: league tabs should share one skeleton loading language (`LeagueTabLoadingSkeleton`) to keep transitions visually consistent between overview/picks/leaderboard/messages/profile/superbowl.
 - Message scaling decision: league messages should render via virtualized list with incremental older-message paging (instead of full `ScrollView` mapping) to keep tab switches responsive on long threads.
@@ -578,11 +700,13 @@
 - Messaging UX decision: league chat should keep users anchored when reading history (no forced auto-scroll), while surfacing explicit sync state and one-tap "new messages/jump to latest" controls so real-time updates feel predictable on mobile.
 - Join registration UX decision: required Super Bowl picks in join flow should use compact tap-to-open conference selectors (not always-expanded team lists) to reduce vertical scan/load while preserving AFC/NFC and winner constraints.
 - Create-league UX decision: prior-league selection should default to a collapsed picker with summary state, and create submission should stay disabled until the league name is valid to reduce avoidable alert-driven error loops.
+- Create-league parity decision: when creating from a prior league (`priorLeagueId` route or picker selection), mobile should prefill late/reminder/Super Bowl settings from that league as an editable template to match web intent and reduce admin setup churn.
 - My-profile edit decision: mobile My Profile should support in-place pre-season Super Bowl pick edits with explicit save/cancel and season-start lock messaging so personal profile flows do not require tab-hopping to the league Super Bowl screen.
 - Player-profile UX decision: player route screens should use persistent header-level chevron navigation (not utility text buttons), and profile stats should mirror My Profile's compact scanability patterns to reduce context-switch friction between self and member views.
 - Pick-submission UX decision: mobile picks should communicate open-vs-locked game state at both page and card level, and submit/randomize controls should expose completion-aware disabled reasons directly in CTA copy instead of relying on silent disabled state.
 - Leaderboard UX decision: mobile leaderboard should include explicit refresh/retry affordances plus compact contextual standing summaries, and non-user rows should use subtle zebra striping with preserved current-user highlight priority for faster visual scanning.
 - Home/nav IA decision: mobile home should surface compact top-level league context (active/prior/season counts), keep long prior-league history collapsed by default with explicit expand affordance, and enrich league cards with quick-scan metadata (season, member count, accuracy) to reduce cognitive load before drill-in.
+- Home parity behavior decision: when exactly one active-season league exists, mobile home should auto-open that league (matching web), with a visible quick-return affordance when users navigate back to home.
 - Admin IA decision: league admin member controls should use a compact table for scanability and a per-member bottom sheet for edits/actions to reduce vertical waste.
 - Admin flow reliability decision: member-sheet navigation actions should close the sheet before routing, and member-role/paid/remove updates should trigger explicit member refetch after invalidation to avoid stale post-mutation table state.
 - Admin pick-edit data-integrity decision: `league.admin.setPick` should preserve existing tiebreaker score unless a new score is explicitly submitted, preventing winner-only edits from silently clearing stored score.
@@ -620,9 +744,9 @@
 - Risk: Week-summary "morning after" timing currently uses a fixed UTC threshold and may need timezone/business-rule tuning.
   - Owner: Implementer.
   - Mitigation: validate behavior against expected league timing and adjust scheduling window or timezone basis in a follow-up iteration.
-- Risk: `prisma migrate status` currently errors in this environment (`Schema engine error`), so DB migration state is not yet verified end-to-end.
+- Risk: Prisma migrate status/deploy is still not verified end-to-end in target environment; new diagnostics indicate current env uses unresolved Supabase pooler host DNS plus pooler-style URLs for both `DATABASE_URL` and `DIRECT_URL`.
   - Owner: Implementer.
-  - Mitigation: rerun migrate status/deploy in target runtime with confirmed DB connectivity/credentials and resolve baseline if needed.
+  - Mitigation: run `pnpm prisma:migrate:check` in target runtime, set `DIRECT_URL` to direct DB host (not pooler), then execute deploy/baseline resolve flow once connectivity succeeds.
 - Risk: Expo SDK guidance and workspace React type override can drift (`@types/react` expected by Expo vs monorepo-pinned version).
   - Owner: Implementer.
   - Mitigation: keep a single workspace override to prevent cross-app type collisions and run `@funtime/mobile`, `@funtime/web`, and `@funtime/api` typechecks on each mobile SDK dependency update.
@@ -643,6 +767,30 @@
   - Mitigation: add backend cursor pagination for `messages.leagueMessageBoard` in a follow-up if payload size becomes a bottleneck in staging/production QA.
 
 ## Validation Evidence
+- `2026-03-02T04:20:11Z`: `P1-HOME-UX-004` shipped: mobile home now supports league search/filter with clear action and query-aware empty states for faster high-volume league navigation.
+- `2026-03-02T04:20:11Z`: `pnpm --filter @funtime/mobile test -- --runInBand tests/home/filterLeaguesByQuery.test.ts` passed (3/3 tests).
+- `2026-03-02T04:20:11Z`: `pnpm --filter @funtime/mobile typecheck` passed.
+- `2026-03-01T22:35:56Z`: `P1-LEAGUE-UX-003` shipped: mobile league header now includes admin-only pre-season native invite sharing (`Share.share`) when a join code is available, matching web invite-sharing intent with mobile-first ergonomics.
+- `2026-03-01T22:35:56Z`: `pnpm --filter @funtime/mobile test -- --runInBand tests/league/getShareLeagueInvite.test.ts` passed (3/3 tests).
+- `2026-03-01T22:35:56Z`: `pnpm --filter @funtime/mobile typecheck` passed.
+- `2026-03-01T22:34:35Z`: `P1-PICK-UX-004` shipped: mobile pick season-complete state now includes next-season upsell context and direct join CTA when a `not_started` follow-up league exists.
+- `2026-03-01T22:34:35Z`: `pnpm --filter @funtime/mobile test -- --runInBand tests/picks/getSeasonOverUpsell.test.ts` passed (4/4 tests).
+- `2026-03-01T22:34:35Z`: `pnpm --filter @funtime/mobile typecheck` passed.
+- `2026-03-01T22:28:38Z`: `P1-CREATE-UX-003` shipped: mobile create-league now supports route-based prior-league template prefill, applies inherited policy defaults on prior-league selection, and enforces 5-100 character league-name validation parity.
+- `2026-03-01T22:28:38Z`: `pnpm --filter @funtime/mobile test -- --runInBand tests/league/createLeagueForm.test.ts` passed (5/5 tests).
+- `2026-03-01T22:28:38Z`: `pnpm --filter @funtime/mobile typecheck` passed.
+- `2026-03-01T22:05:11Z`: `P1-HOME-UX-003` shipped: mobile home now auto-opens a single active league and surfaces a compact "Active League" quick-return callout when revisiting home.
+- `2026-03-01T22:05:11Z`: `pnpm --filter @funtime/mobile test -- --runInBand tests/home/getSingleActiveLeague.test.ts` passed (4/4 tests).
+- `2026-03-01T22:05:11Z`: `pnpm --filter @funtime/mobile typecheck` passed.
+- `2026-03-01T21:35:57Z`: `P1-JOIN-UX-003` shipped: join-code parsing now supports web/custom deep-link formats, query/hash-stripped invite URLs, Expo `/--/` paths, and `/join-league?code=...` variants via shared helper.
+- `2026-03-01T21:35:57Z`: `pnpm --filter @funtime/mobile test -- --runInBand tests/join/extractLeagueCode.test.ts` passed (6/6 tests).
+- `2026-03-01T21:35:57Z`: `pnpm --filter @funtime/mobile typecheck` passed.
+- `2026-02-28T00:34:24Z`: `P0-DEEPLINK-QA-001A` shipped: extracted deep-link resolver into `apps/mobile/lib/deeplink/resolveDeepLink.ts`, added required-route mapping coverage, and added `/admin` to iOS AASA route output.
+- `2026-02-28T00:34:24Z`: `pnpm --filter @funtime/mobile test -- --runInBand tests/deeplink/resolveDeepLink.test.ts` passed (5/5 tests).
+- `2026-02-28T00:34:24Z`: `pnpm --filter @funtime/mobile typecheck` passed.
+- `2026-02-28T00:34:24Z`: `pnpm --filter @funtime/web typecheck` passed.
+- `2026-02-28T00:28:16Z`: `P0-PRISMA-002A` added migration validation diagnostics: `node scripts/prisma/validate-migrations.mjs` and `pnpm --filter @funtime/api db:migrate:check` now fail with explicit DNS/TCP + pooler-host guidance instead of opaque `Schema engine error`.
+- `2026-02-28T00:28:16Z`: `node --check scripts/prisma/validate-migrations.mjs` passed.
 - `2026-02-26T19:38:04Z`: `P6-TEST-FOUNDATION-001` shipped: added `@funtime/mobile` Jest + `jest-expo` + RNTL setup plus baseline auth/picks/leaderboard flow coverage (3 suites / 7 tests).
 - `2026-02-26T19:38:04Z`: `pnpm --filter @funtime/mobile test -- --runInBand` passed.
 - `2026-02-26T19:38:04Z`: `pnpm --filter @funtime/mobile typecheck` passed.
@@ -863,11 +1011,11 @@
 |---|---|---|
 | Auth/session | `in_progress` | Guard/bootstrap improvements done, route-group migration complete, stale-refresh-token fail-closed handling is in bootstrap + tRPC headers, and latest on-device smoke reported stable startup; deep-link QA remains. |
 | Deep links | `in_progress` | Domain association endpoints and mobile route handling are in place; launch deep links are now processed once per app boot (no stale replay on route/session changes), and production app-id/cert values plus real-device verification remain. |
-| Home/nav leagues | `in_progress` | Functional baseline exists with join/create entry points, pull-to-refresh UX, and server-aggregated home-card viewer stats consumed by both mobile/web cards; home now adds compact active/prior/season summary metrics, collapsible prior-league history controls, and denser league-card metadata (season, members, accuracy, chevron affordance), with broader parity QA still pending. |
+| Home/nav leagues | `in_progress` | Functional baseline exists with join/create entry points, pull-to-refresh UX, and server-aggregated home-card viewer stats consumed by both mobile/web cards; home now adds compact active/prior/season summary metrics, collapsible prior-league history controls, denser league-card metadata (season, members, accuracy, chevron affordance), and in-screen league search/filter with clear action + query-aware empty states, with broader parity QA still pending. |
 | Join league | `in_progress` | Join-by-code flow implemented with persistent header back navigation; required Super Bowl registration now uses compact tap-to-open AFC/NFC selectors with inline score validation and completion-aware CTA copy, while broader parity QA and on-device validation remain pending. |
 | Create league | `in_progress` | Core create flow and policies implemented with persistent header back navigation; prior-league selection now defaults to a collapsed picker (summary + expandable options), create CTA now reflects league-name validity, and policy sections include concise guidance copy, with broader parity QA still pending. |
-| League week view | `in_progress` | Existing implementation now uses in-screen tab swaps (no route remount), lighter underline-style top tabs, and tiebreaker sort parity fix; overview now adds a week snapshot context card (open/locked counts, personal + league progress, refresh recency), completion-aware pick CTA state/copy, compact game-state counters, a clearer picks table (tie-aware rank column, zebra rows, state legend, explicit pending/missed/correct/wrong cells), and a richer pick-summary modal with outcome rollups plus one-tap "Edit Open Picks" navigation. |
-| Pick submission | `in_progress` | Core flow exists and now supports in-tab multi-league switching with shared league-tab skeleton loading; picks page now includes open/locked progress summary, completion-aware submit/randomize CTA labels, locked tiebreaker guidance, and per-game open/locked status pills, with remaining parity work focused on broader QA validation. |
+| League week view | `in_progress` | Existing implementation now uses in-screen tab swaps (no route remount), lighter underline-style top tabs, and tiebreaker sort parity fix; overview now adds a week snapshot context card (open/locked counts, personal + league progress, refresh recency), completion-aware pick CTA state/copy, compact game-state counters, a clearer picks table (tie-aware rank column, zebra rows, state legend, explicit pending/missed/correct/wrong cells), a richer pick-summary modal with outcome rollups plus one-tap "Edit Open Picks" navigation, and admin pre-season native invite sharing from the league header. |
+| Pick submission | `in_progress` | Core flow exists and now supports in-tab multi-league switching with shared league-tab skeleton loading; picks page now includes open/locked progress summary, completion-aware submit/randomize CTA labels, locked tiebreaker guidance, per-game open/locked status pills, and season-complete next-league upsell CTA when a follow-up league is open, with remaining parity work focused on broader QA validation. |
 | Leaderboard | `in_progress` | Mobile leaderboard shows numeric competition ranks with blue current-user row/name highlighting (no inline `You` badge), now adds pull-to-refresh + retry affordances, compact standing-summary metrics, and improved zebra/press row scanability, with remaining work focused on broader parity QA validation. |
 | Player/my profile | `in_progress` | Added league-scoped my profile tab plus leaderboard-to-player profile navigation; My Profile now includes pull-to-refresh, denser season-summary readability, and in-place pre-season Super Bowl edit flow with season-start lock behavior, and player profile now matches with pull-to-refresh, compact summary/chip treatment, logo-backed Super Bowl rows, and persistent header chevron navigation, while remaining parity polish is minor. |
 | Super Bowl picks | `in_progress` | Super Bowl tab now uses a compact pre-season `Your Super Bowl pick` form (winner/loser/score with explicit save), is read-only after season start, renders a denser member/winner/loser/score board, and now includes postseason snapshot context plus conference-filtered team picker controls; remaining work is primarily end-to-end QA validation and deeper postseason-link parity checks. |

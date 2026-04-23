@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { isE2EMode } from "../../../utils/e2e";
 import { getLogger } from "../../../utils/logging";
 import { MSFGameSchema } from "./types";
 
@@ -41,6 +42,9 @@ export class MSFClient {
     week,
     season,
   }: WeekSeasonOptions): Promise<Array<MSFGame>> {
+    if (isE2EMode) {
+      return [];
+    }
     getLogger().info(`Fetching games by week ${week} ${season}`);
     const res = await fetch(gamesURL({ week, season }), {
       headers: new Headers({
@@ -53,6 +57,9 @@ export class MSFClient {
   }
 
   async getGamesBySeason({ season }: SeasonOptions): Promise<Array<MSFGame>> {
+    if (isE2EMode) {
+      return [];
+    }
     getLogger().info(`Fetching games by season ${season}`);
     const res = await fetch(seasonURL({ season }), {
       headers: new Headers({

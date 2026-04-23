@@ -22,6 +22,7 @@ export const env = createEnv({
         "You forgot to change the default DIRECT_URL",
       ),
     REDIS_URL: z.string().url().optional().default("redis://localhost:6379"),
+    FUNTIME_CURRENT_SEASON: z.coerce.number().int().optional().default(2025),
     NODE_ENV: z
       .enum(["development", "test", "production"])
       .default("development"),
@@ -49,6 +50,7 @@ export const env = createEnv({
     DATABASE_URL: process.env.DATABASE_URL,
     DIRECT_URL: process.env.DIRECT_URL,
     REDIS_URL: process.env.REDIS_URL,
+    FUNTIME_CURRENT_SEASON: process.env.FUNTIME_CURRENT_SEASON,
     NODE_ENV: process.env.NODE_ENV,
     // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
     NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,

@@ -8,6 +8,11 @@ Goals:
 - Keep tests aligned with modern Expo + React Native guidance.
 - Make test maintenance a required part of flow and screen changes.
 
+Execution snapshot (UTC `2026-02-27T21:36:04Z`):
+- Testing-plan execution is paused for later pickup.
+- Current validated baseline: mobile Jest suite passing (`3/3`, `7/7`) and API/web typechecks passing.
+- Outstanding closure item: definitive full Android E2E (`pnpm e2e:mobile:maestro`) pass/fail capture on a non-sandboxed host terminal.
+
 Mandatory policy:
 - Any PR that changes behavior for a user flow or screen must update tests in the same PR.
 - If a test cannot be added/updated immediately, the PR must include:
@@ -23,6 +28,7 @@ Mandatory policy:
   - Scope: route entry, tab/screen transitions, deep-link parsing behavior, auth-gated navigation outcomes.
 3. End-to-end tests (smallest layer):
   - Tooling: Maestro flows executed in EAS Workflows/device cloud.
+  - Runtime target: Expo dev build (`com.funtime.mobile`) rather than Expo Go for stable startup behavior.
   - Scope: mission-critical happy paths and highest-risk failures across real app runtime boundaries.
 
 ## 3. Tooling Standards
@@ -87,3 +93,21 @@ Minimum required coverage set:
 - Expo E2E in EAS workflows: https://docs.expo.dev/eas/workflows/examples/e2e-tests/
 - React Native testing overview: https://reactnative.dev/docs/testing-overview
 - React Native Testing Library docs: https://callstack.github.io/react-native-testing-library/docs/start/intro
+
+## 8. Local Supabase E2E Infrastructure
+- Canonical infra plan: `docs/E2E_INFRA_PLAN.md`.
+- Execution/work tracking log: `E2E_INFRA_WORKLOG.md`.
+- Deterministic seeded E2E baseline:
+  - committed fixture: `supabase/fixtures/season-2025.json`
+  - generated seed SQL: `supabase/seed.sql`
+  - dev-build install command: `pnpm e2e:mobile:install-dev-client`
+  - bootstrap command: `pnpm e2e:backend:up`
+  - seed verification command: `pnpm e2e:seed:verify`
+- E2E side-effect isolation:
+  - `E2E_MODE=1` must be enabled for E2E runs.
+  - External side-effect providers are mocked/short-circuited in this mode (Resend, Expo Push, ESPN/MySportsFeeds pulls, Axiom transports, web PostHog, cron/postseason runners).
+- Mandatory governance extension:
+  - Any change affecting auth/signup, league creation/join, season/week selection, or picks persistence must update:
+    1. Jest/RNTL coverage where applicable,
+    2. Maestro flow coverage where user-visible E2E behavior changes, and
+    3. `pnpm e2e:seed:verify` logic when backend season/pickability rules change.

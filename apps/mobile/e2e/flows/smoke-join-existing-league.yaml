@@ -1,0 +1,59 @@
+appId: com.funtime.mobile
+---
+# Requires MAESTRO_JOIN_CODE to be provided by the caller.
+- launchApp
+- repeat:
+    times: 8
+    commands:
+      - openLink: ${E2E_APP_BOOT_URL}
+      - tapOn:
+          text: ${E2E_DEV_SERVER_URL}
+          optional: true
+      - tapOn:
+          text: "Continue"
+          optional: true
+      - tapOn:
+          text: "Reload"
+          optional: true
+      - tapOn:
+          text: "Go home"
+          optional: true
+      - waitForAnimationToEnd
+- extendedWaitUntil:
+    visible: "Enter your email"
+    timeout: 180000
+- tapOn: "Don't have an account? Sign up"
+- tapOn: "example@gmail.com"
+- inputText: "maestro.e2e+user2@example.com"
+- tapOn: "Enter your password"
+- inputText: "Password123!"
+- tapOn: "Confirm your password"
+- inputText: "Password123!"
+- tapOn: "Create Account"
+- tapOn: "Create an account"
+- tapOn:
+    text: "GO TO LOGIN"
+    optional: true
+- tapOn: "Go to Login"
+- tapOn: "Enter your email"
+- inputText: "maestro.e2e+user2@example.com"
+- tapOn: "Enter your password"
+- inputText: "Password123!"
+- tapOn: "Sign In"
+- tapOn: "First Name"
+- inputText: "Maestro"
+- tapOn: "Last Name"
+- inputText: "Joiner"
+- tapOn: "Username"
+- inputText: "maestrojoiner2"
+- tapOn: "Finish Signup"
+- tapOn: "Continue"
+- tapOn: "Join League"
+- tapOn: "ABC123 or https://play-funtime.com/join-league/ABC123"
+- inputText: "${MAESTRO_JOIN_CODE}"
+- tapOn: "Continue"
+- tapOn: "Register for League"
+- tapOn: "Pick"
+- tapOn: "Randomize Open Picks"
+- tapOn: "Submit Picks"
+- assertVisible: "Update Picks"

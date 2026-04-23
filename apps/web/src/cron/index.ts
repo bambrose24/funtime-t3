@@ -7,8 +7,16 @@ import { Defined } from "../utils/defined";
 import { syncPostseason } from "./postseason";
 
 const LOG_PREFIX = "[cron]";
+const E2E_MODE = ["1", "true", "yes", "on"].includes(
+  (process.env.E2E_MODE ?? "").toLowerCase(),
+);
 
 export async function run() {
+  if (E2E_MODE) {
+    console.log(`${LOG_PREFIX} E2E_MODE enabled; skipping cron execution.`);
+    return;
+  }
+
   const _startTime = Date.now();
 
   const season = DEFAULT_SEASON;

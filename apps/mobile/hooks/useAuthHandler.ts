@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { usePathname, useRouter } from "expo-router";
+import { useGlobalSearchParams, usePathname, useRouter } from "expo-router";
 import * as Linking from "expo-linking";
 import { type Session } from "@supabase/supabase-js";
 import {
@@ -7,98 +7,8 @@ import {
   isInvalidRefreshTokenError,
   supabase,
 } from "@/lib/supabase/client";
+import { resolveDeepLink } from "@/lib/deeplink/resolveDeepLink";
 import { clientApi } from "@/lib/trpc/react";
-
-const WEB_DEEP_LINK_HOSTS = new Set(["play-funtime.com", "www.play-funtime.com"]);
-const WEB_PROTOCOLS = new Set(["http", "https"]);
-
-type DeepLinkTarget = {
-  href: string;
-  mode: "push" | "replace";
-};
-
-const normalizePath = (path?: string | null) => {
-  const withoutLeadingSlash = (path ?? "").replace(/^\/+/, "");
-  if (!withoutLeadingSlash) {
-    return "/";
-  }
-  return `/${withoutLeadingSlash}`;
-};
-
-const withQueryString = (path: string, query: URLSearchParams) => {
-  const queryString = query.toString();
-  return queryString.length > 0 ? `${path}?${queryString}` : path;
-};
-
-function resolveDeepLink(url: string): DeepLinkTarget | null {
-  const parsed = new URL(url);
-  const protocol = parsed.protocol.replace(":", "").toLowerCase();
-  const host = parsed.hostname.toLowerCase();
-  const searchParams = parsed.searchParams;
-
-  let routePath = normalizePath(parsed.pathname);
-
-  // Custom schemes like "funtime://auth/callback" encode route segment in hostname.
-  if (!WEB_PROTOCOLS.has(protocol) && host) {
-    routePath = normalizePath(`${host}${parsed.pathname}`);
-  }
-
-  // Expo dev URLs include "/--/" before the app route.
-  routePath = routePath.replace(/^\/--\//, "/");
-
-  if (WEB_DEEP_LINK_HOSTS.has(host)) {
-    if (routePath === "/settings") {
-      return { href: "/account", mode: "replace" };
-    }
-    if (routePath === "/login") {
-      return { href: "/auth", mode: "replace" };
-    }
-  }
-
-  if (routePath === "/auth/callback") {
-    const code = searchParams.get("code");
-    if (!code) {
-      return null;
-    }
-    const query = new URLSearchParams({ code });
-    const next = searchParams.get("next");
-    if (next) {
-      query.set("next", next);
-    }
-    return {
-      href: withQueryString("/auth/callback", query),
-      mode: "replace",
-    };
-  }
-
-  const routablePaths = [
-    "/",
-    "/join-league",
-    "/league/create",
-    "/auth",
-    "/signup",
-    "/confirm-signup",
-    "/account",
-    "/admin",
-  ];
-  const prefixPaths = ["/join-league/", "/league/"];
-
-  if (
-    routablePaths.includes(routePath) ||
-    prefixPaths.some((prefix) => routePath.startsWith(prefix))
-  ) {
-    if (routePath === "/") {
-      return { href: "/home", mode: "replace" };
-    }
-
-    return {
-      href: withQueryString(routePath, searchParams),
-      mode: "replace",
-    };
-  }
-
-  return null;
-}
 
 // Lightweight hook for just Supabase session state (for auth navigation logic)
 export function useSupabaseSession() {
@@ -198,11 +108,23 @@ export function useAuthHandler() {
       refetchOnWindowFocus: true,
     });
   const pathname = usePathname();
+  const globalSearchParams = useGlobalSearchParams<{ redirectTo?: string }>();
   const router = useRouter();
   const pendingDeepLinkRef = useRef<string | null>(null);
   const pathnameRef = useRef(pathname);
   const sessionRef = useRef(session);
   const initialDeepLinkHandledRef = useRef(false);
+  const routeRedirectTo =
+    typeof globalSearchParams.redirectTo === "string" &&
+    globalSearchParams.redirectTo.length > 0
+      ? (() => {
+          try {
+            return decodeURIComponent(globalSearchParams.redirectTo);
+          } catch {
+            return globalSearchParams.redirectTo;
+          }
+        })()
+      : null;
 
   useEffect(() => {
     pathnameRef.current = pathname;
@@ -228,15 +150,21 @@ export function useAuthHandler() {
         }
 
         const hasSession = Boolean(sessionRef.current);
+        const isAuthSurface =
+          target.href.startsWith("/auth") ||
+          target.href.startsWith("/signup") ||
+          target.href.startsWith("/forgot-password") ||
+          target.href.startsWith("/confirm-signup") ||
+          target.href.startsWith("/confirm-reset-password");
         if (target.mode === "replace") {
-          if (!hasSession && !target.href.startsWith("/auth")) {
+          if (!hasSession && !isAuthSurface) {
             pendingDeepLinkRef.current = target.href;
           }
           router.replace(target.href as any);
           return;
         }
 
-        if (!hasSession && !target.href.startsWith("/auth")) {
+        if (!hasSession && !isAuthSurface) {
           pendingDeepLinkRef.current = target.href;
         }
         router.push(target.href as any);
@@ -280,23 +208,34 @@ export function useAuthHandler() {
     if (waitingOnDbUser) return;
 
     const route = pathname as string;
-    const inAuthScreen = route === "/auth" || route === "/signup";
+    const inAuthScreen =
+      route === "/auth" ||
+      route === "/signup" ||
+      route === "/forgot-password";
     const inConfirmSignup = route === "/confirm-signup";
+    const inConfirmResetPassword = route === "/confirm-reset-password";
     const inAuthCallback = route.startsWith("/auth/callback");
     const inBootstrapRoute = route === "/";
     const inAuthFlow = inAuthScreen || inConfirmSignup;
 
     if (!hasSession) {
-      if (!inAuthScreen && !inAuthCallback) {
-        router.replace("/auth");
+      if (!inAuthScreen && !inAuthCallback && !inConfirmResetPassword) {
+        const authHref =
+          route && route !== "/"
+            ? `/auth?redirectTo=${encodeURIComponent(route)}`
+            : "/auth";
+        router.replace(authHref as any);
       }
       return;
     }
 
     // Signed in but profile not created in app DB yet.
     if (!hasDbUser) {
-      if (!inConfirmSignup && !inAuthCallback) {
-        router.replace("/confirm-signup");
+      if (!inConfirmSignup && !inAuthCallback && !inConfirmResetPassword) {
+        const confirmSignupHref = routeRedirectTo
+          ? `/confirm-signup?redirectTo=${encodeURIComponent(routeRedirectTo)}`
+          : "/confirm-signup";
+        router.replace(confirmSignupHref as any);
       }
       return;
     }
@@ -305,9 +244,17 @@ export function useAuthHandler() {
     if (inAuthFlow || inAuthCallback || inBootstrapRoute) {
       const pendingDeepLink = pendingDeepLinkRef.current;
       pendingDeepLinkRef.current = null;
-      router.replace((pendingDeepLink ?? "/home") as any);
+      router.replace((pendingDeepLink ?? routeRedirectTo ?? "/home") as any);
     }
-  }, [session, appSession?.dbUser, pathname, isLoading, isAppSessionLoading, router]);
+  }, [
+    appSession?.dbUser,
+    isAppSessionLoading,
+    isLoading,
+    pathname,
+    routeRedirectTo,
+    router,
+    session,
+  ]);
 
   return {
     session,

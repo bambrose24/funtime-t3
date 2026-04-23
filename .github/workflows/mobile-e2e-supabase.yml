@@ -1,0 +1,86 @@
+name: Mobile E2E (Supabase Local)
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 10 * * *"
+
+jobs:
+  android-e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+
+    env:
+      FUNTIME_CURRENT_SEASON: "2025"
+      NEXT_PUBLIC_CURRENT_SEASON: "2025"
+      EXPO_PUBLIC_CURRENT_SEASON: "2025"
+      SUPABASE_DB_URL: "postgresql://postgres:postgres@127.0.0.1:55422/postgres"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "pnpm"
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.0
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Install Maestro CLI
+        run: |
+          curl -Ls "https://get.maestro.mobile.dev" | bash
+          echo "$HOME/.maestro/bin" >> "$GITHUB_PATH"
+
+      - name: Build deterministic seed
+        run: pnpm e2e:fixtures:build-seed
+
+      - name: Start backend + seed + verify
+        run: pnpm e2e:backend:up
+
+      - name: Run Android emulator + Maestro flow
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          arch: x86_64
+          profile: pixel_7
+          script: |
+            eval "$(supabase status -o env | sed 's/^/export /')"
+
+            export E2E_MAESTRO_FLOW="apps/mobile/e2e/flows/smoke-signup-create-pick.yaml"
+            export E2E_INSTALL_DEV_CLIENT=1
+            export E2E_FORCE_REINSTALL_DEV_CLIENT=0
+            export E2E_CLEAR_DEV_CLIENT_DATA=1
+            export E2E_EMULATOR_WAIT_SECONDS=300
+            export FUNTIME_CURRENT_SEASON="$FUNTIME_CURRENT_SEASON"
+            export EXPO_PUBLIC_CURRENT_SEASON="$EXPO_PUBLIC_CURRENT_SEASON"
+
+            pnpm e2e:mobile:maestro -- --skip-backend-up
+
+      - name: Upload logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mobile-e2e-logs
+          path: |
+            /tmp/funtime-web.log
+            /tmp/funtime-expo.log
+            /tmp/funtime-e2e-web.log
+            /tmp/funtime-e2e-expo.log
+            /tmp/funtime-e2e-open-link.log
+            /tmp/funtime-e2e-dev-client-build.log
+            /tmp/funtime-e2e-dev-client-prebuild.log
+            apps/mobile/e2e/flows
+          if-no-files-found: warn

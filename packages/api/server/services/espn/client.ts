@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { isE2EMode } from "../../../utils/e2e";
 
 const BASE_URL = "https://site.api.espn.com/apis/site/v2/sports/football/nfl";
 
@@ -161,6 +162,9 @@ export type PostseasonRound = "wild_card" | "divisional" | "conference" | "super
 
 export class ESPNClient {
   async getGamesBySeason({ season }: { season: number }): Promise<ESPNEvent[]> {
+    if (isE2EMode) {
+      return [];
+    }
     const startDate = `${season}0901`; // September 1st of the season year
     const endDate = `${season + 1}0301`; // March 1st of the following year
     const url = `${BASE_URL}/scoreboard?limit=1000&dates=${startDate}-${endDate}&seasontype=2`;
@@ -177,6 +181,9 @@ export class ESPNClient {
     season: number;
     week: number;
   }): Promise<ESPNEvent[]> {
+    if (isE2EMode) {
+      return [];
+    }
     const url = `${BASE_URL}/scoreboard?limit=100&seasontype=2&week=${week}&season=${season}`;
     const response = await fetch(url);
     const data = (await response.json()) as unknown;
@@ -190,6 +197,9 @@ export class ESPNClient {
    * e.g., 2024 season playoffs are in January-February 2025.
    */
   async getPostseasonGames({ season }: { season: number }): Promise<ESPNEvent[]> {
+    if (isE2EMode) {
+      return [];
+    }
     // Playoffs start in January of the following year
     const startDate = `${season + 1}0101`; // January 1st
     const endDate = `${season + 1}0220`; // February 20th (after Super Bowl)
@@ -253,6 +263,9 @@ export class ESPNClient {
     teamName: string;
     seed: number;
   }[]> {
+    if (isE2EMode) {
+      return [];
+    }
     const url = `https://site.api.espn.com/apis/v2/sports/football/nfl/standings?season=${season}`;
     const response = await fetch(url);
     const data = (await response.json()) as {

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Alert, Pressable, ScrollView, Text, View } from "react-native";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,6 +6,7 @@ import { TeamLogo } from "@/components/shared/TeamLogo";
 import { LeagueTabLoadingSkeleton } from "@/components/league/LeagueTabLoadingSkeleton";
 import { clientApi } from "@/lib/trpc/react";
 import { cn } from "@/lib/utils";
+import { type RouterOutputs } from "~/trpc/types";
 
 type Props = {
   leagueId: string;
@@ -13,6 +14,82 @@ type Props = {
 
 type TeamPickerField = "winner" | "loser";
 type ConferenceFilter = "ALL" | "AFC" | "NFC";
+type SuperbowlPick = RouterOutputs["league"]["superbowlPicks"]["superbowlPicks"][number];
+type ContestResult = {
+  pick: SuperbowlPick;
+  winnerCorrect: boolean;
+  loserCorrect: boolean;
+  scoreDiff: number;
+  rank: number;
+  isWinner: boolean;
+};
+
+function calculateContestResults(
+  picks: SuperbowlPick[],
+  actualWinner: number | null,
+  actualLoser: number | null,
+  actualTotalScore: number | null,
+): ContestResult[] {
+  if (actualWinner === null || actualLoser === null || actualTotalScore === null) {
+    return [];
+  }
+
+  const withBaseScores = picks.map((pick) => {
+    const winnerCorrect = pick.winner === actualWinner;
+    const loserCorrect = pick.loser === actualLoser;
+    const scoreDiff =
+      typeof pick.score === "number"
+        ? Math.abs(pick.score - actualTotalScore)
+        : Number.POSITIVE_INFINITY;
+    return {
+      pick,
+      winnerCorrect,
+      loserCorrect,
+      scoreDiff,
+      rank: 0,
+      isWinner: false,
+    };
+  });
+
+  withBaseScores.sort((a, b) => {
+    if (a.winnerCorrect !== b.winnerCorrect) {
+      return a.winnerCorrect ? -1 : 1;
+    }
+    if (a.loserCorrect !== b.loserCorrect) {
+      return a.loserCorrect ? -1 : 1;
+    }
+    if (a.scoreDiff !== b.scoreDiff) {
+      return a.scoreDiff - b.scoreDiff;
+    }
+    const aUsername = a.pick.leaguemembers?.people.username ?? "";
+    const bUsername = b.pick.leaguemembers?.people.username ?? "";
+    return aUsername.localeCompare(bUsername);
+  });
+
+  withBaseScores.forEach((result, index) => {
+    if (index === 0) {
+      result.rank = 1;
+      result.isWinner = true;
+      return;
+    }
+
+    const previous = withBaseScores[index - 1];
+    if (!previous) {
+      result.rank = index + 1;
+      result.isWinner = false;
+      return;
+    }
+
+    const tiedWithPrevious =
+      previous.winnerCorrect === result.winnerCorrect &&
+      previous.loserCorrect === result.loserCorrect &&
+      previous.scoreDiff === result.scoreDiff;
+    result.rank = tiedWithPrevious ? previous.rank : index + 1;
+    result.isWinner = result.rank === 1;
+  });
+
+  return withBaseScores;
+}
 
 export function LeagueSuperbowlBoard({ leagueId }: Props) {
   const leagueIdNumber = Number(leagueId);
@@ -143,23 +220,19 @@ export function LeagueSuperbowlBoard({ leagueId }: Props) {
 
   const selectedWinner = winnerTeamId ? teamById.get(Number(winnerTeamId)) : null;
   const selectedLoser = loserTeamId ? teamById.get(Number(loserTeamId)) : null;
-  const sortedPicks = useMemo(() => {
+  const alphabeticalPicks = useMemo(() => {
     return [...(superbowlData?.superbowlPicks ?? [])].sort((a, b) => {
       const aUser = a.leaguemembers?.people.username ?? "";
       const bUser = b.leaguemembers?.people.username ?? "";
       return aUser.localeCompare(bUser);
     });
   }, [superbowlData?.superbowlPicks]);
-  const completedPicksCount = sortedPicks.filter(
-    (pick) => pick.winner !== null && pick.loser !== null && pick.score !== null,
-  ).length;
-  const pendingPicksCount = Math.max(sortedPicks.length - completedPicksCount, 0);
-  const bracketSummary = useMemo(() => {
-    if (!bracketData) {
-      return null;
-    }
 
-    const allGames = [
+  const allBracketGames = useMemo(() => {
+    if (!bracketData) {
+      return [];
+    }
+    return [
       ...bracketData.wild_card.AFC,
       ...bracketData.wild_card.NFC,
       ...bracketData.divisional.AFC,
@@ -168,8 +241,115 @@ export function LeagueSuperbowlBoard({ leagueId }: Props) {
       ...bracketData.conference.NFC,
       ...bracketData.super_bowl,
     ];
-    const totalGames = allGames.length;
-    const completedGames = allGames.filter((game) => Boolean(game.done)).length;
+  }, [bracketData]);
+
+  const finalSuperBowlGame = useMemo(() => {
+    return (
+      bracketData?.super_bowl.find(
+        (game) =>
+          Boolean(game.done) &&
+          game.winner !== null &&
+          game.home_team !== null &&
+          game.away_team !== null,
+      ) ?? null
+    );
+  }, [bracketData?.super_bowl]);
+  const finalSuperBowlWinner = finalSuperBowlGame?.winner ?? null;
+  const finalSuperBowlLoser =
+    finalSuperBowlGame && finalSuperBowlWinner !== null
+      ? finalSuperBowlWinner === finalSuperBowlGame.home_team
+        ? finalSuperBowlGame.away_team
+        : finalSuperBowlGame.home_team
+      : null;
+  const finalSuperBowlTotalScore =
+    finalSuperBowlGame &&
+    typeof finalSuperBowlGame.home_score === "number" &&
+    typeof finalSuperBowlGame.away_score === "number"
+      ? finalSuperBowlGame.home_score + finalSuperBowlGame.away_score
+      : null;
+
+  const contestResults = useMemo(() => {
+    return calculateContestResults(
+      alphabeticalPicks,
+      finalSuperBowlWinner,
+      finalSuperBowlLoser,
+      finalSuperBowlTotalScore,
+    );
+  }, [
+    alphabeticalPicks,
+    finalSuperBowlLoser,
+    finalSuperBowlTotalScore,
+    finalSuperBowlWinner,
+  ]);
+  const contestResultsByMemberId = useMemo(() => {
+    return new Map(
+      contestResults.map((result) => [result.pick.member_id ?? -1, result]),
+    );
+  }, [contestResults]);
+
+  const sortedPicks = useMemo(() => {
+    if (contestResults.length === 0) {
+      return alphabeticalPicks;
+    }
+    return [...alphabeticalPicks].sort((a, b) => {
+      const aResult = contestResultsByMemberId.get(a.member_id ?? -1);
+      const bResult = contestResultsByMemberId.get(b.member_id ?? -1);
+      return (aResult?.rank ?? Number.MAX_SAFE_INTEGER) - (bResult?.rank ?? Number.MAX_SAFE_INTEGER);
+    });
+  }, [alphabeticalPicks, contestResults.length, contestResultsByMemberId]);
+
+  const completedPicksCount = sortedPicks.filter(
+    (pick) => pick.winner !== null && pick.loser !== null && pick.score !== null,
+  ).length;
+  const pendingPicksCount = Math.max(sortedPicks.length - completedPicksCount, 0);
+  const playoffTeamIds = useMemo(() => {
+    if (!bracketData) {
+      return new Set<number>();
+    }
+    return new Set(Object.keys(bracketData.seeds).map(Number));
+  }, [bracketData]);
+  const remainingTeamIds = useMemo(() => {
+    if (!bracketData) {
+      return new Set<number>();
+    }
+    const eliminated = new Set<number>();
+    allBracketGames.forEach((game) => {
+      if (!game.winner || !game.home_team || !game.away_team) {
+        return;
+      }
+      const losingTeamId = game.winner === game.home_team ? game.away_team : game.home_team;
+      if (losingTeamId) {
+        eliminated.add(losingTeamId);
+      }
+    });
+    const remaining = new Set<number>();
+    playoffTeamIds.forEach((teamId) => {
+      if (!eliminated.has(teamId)) {
+        remaining.add(teamId);
+      }
+    });
+    return remaining;
+  }, [allBracketGames, bracketData, playoffTeamIds]);
+  const isTeamEliminated = useCallback(
+    (teamId: number | null) => {
+      if (!teamId) {
+        return false;
+      }
+      if (!playoffTeamIds.has(teamId)) {
+        return false;
+      }
+      return !remainingTeamIds.has(teamId);
+    },
+    [playoffTeamIds, remainingTeamIds],
+  );
+
+  const bracketSummary = useMemo(() => {
+    if (!bracketData) {
+      return null;
+    }
+
+    const totalGames = allBracketGames.length;
+    const completedGames = allBracketGames.filter((game) => Boolean(game.done)).length;
     const remainingGames = Math.max(totalGames - completedGames, 0);
     const totalSeededTeams =
       (bracketData.seedsByConference.AFC?.length ?? 0) +
@@ -197,8 +377,27 @@ export function LeagueSuperbowlBoard({ leagueId }: Props) {
         bracketData.conference.AFC.filter((game) => game.done).length +
         bracketData.conference.NFC.filter((game) => game.done).length,
       superBowlDone: bracketData.super_bowl.some((game) => Boolean(game.done)),
+      rounds: [
+        {
+          title: "Wild Card",
+          games: [...bracketData.wild_card.AFC, ...bracketData.wild_card.NFC],
+        },
+        {
+          title: "Divisional",
+          games: [...bracketData.divisional.AFC, ...bracketData.divisional.NFC],
+        },
+        {
+          title: "Conference",
+          games: [...bracketData.conference.AFC, ...bracketData.conference.NFC],
+        },
+        {
+          title: "Super Bowl",
+          games: [...bracketData.super_bowl],
+        },
+      ],
     };
-  }, [bracketData]);
+  }, [allBracketGames, bracketData]);
+  const contestComplete = contestResults.length > 0;
 
   const onSavePick = async () => {
     if (!viewerMembership) {
@@ -290,6 +489,105 @@ export function LeagueSuperbowlBoard({ leagueId }: Props) {
             </Text>
           )}
         </View>
+
+        {bracketSummary?.hasData ? (
+          <View className="gap-3 rounded-xl border border-gray-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-800">
+            <Text className="text-app-fg-light dark:text-app-fg-dark text-base font-semibold">
+              Playoff Bracket
+            </Text>
+            {bracketSummary.rounds.map((round) => (
+              <View key={`bracket_round_${round.title}`} className="gap-2">
+                <Text className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                  {round.title}
+                </Text>
+                {round.games.length === 0 ? (
+                  <Text className="text-xs text-gray-500 dark:text-gray-400">
+                    No games published.
+                  </Text>
+                ) : (
+                  round.games.map((game) => {
+                    const awayTeam = game.away_team ? teamById.get(game.away_team) : null;
+                    const homeTeam = game.home_team ? teamById.get(game.home_team) : null;
+                    const winnerId = game.winner;
+                    const awayIsWinner = winnerId !== null && winnerId === game.away_team;
+                    const homeIsWinner = winnerId !== null && winnerId === game.home_team;
+                    const awayEliminated =
+                      !awayIsWinner && isTeamEliminated(game.away_team);
+                    const homeEliminated =
+                      !homeIsWinner && isTeamEliminated(game.home_team);
+                    return (
+                      <View
+                        key={`bracket_game_${round.title}_${game.game_id}`}
+                        className="rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 dark:border-zinc-700 dark:bg-zinc-900"
+                      >
+                        <View className="flex-row items-center justify-between">
+                          <View className="flex-row items-center gap-2">
+                            {awayTeam ? (
+                              <TeamLogo
+                                abbrev={awayTeam.abbrev ?? ""}
+                                width={14}
+                                height={14}
+                              />
+                            ) : null}
+                            <Text
+                              className={cn(
+                                "text-xs font-semibold",
+                                awayIsWinner
+                                  ? "text-emerald-700 dark:text-emerald-300"
+                                  : "text-gray-700 dark:text-gray-300",
+                                awayEliminated ? "line-through text-red-500 dark:text-red-400" : "",
+                              )}
+                            >
+                              {awayTeam?.abbrev ?? "TBD"}
+                            </Text>
+                          </View>
+                          <View className="flex-row items-center gap-2">
+                            {typeof game.away_score === "number" ? (
+                              <Text className="text-xs text-gray-600 dark:text-gray-300">
+                                {game.away_score}
+                              </Text>
+                            ) : null}
+                            <Text className="text-[10px] uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                              @
+                            </Text>
+                            {typeof game.home_score === "number" ? (
+                              <Text className="text-xs text-gray-600 dark:text-gray-300">
+                                {game.home_score}
+                              </Text>
+                            ) : null}
+                          </View>
+                          <View className="flex-row items-center gap-2">
+                            <Text
+                              className={cn(
+                                "text-xs font-semibold",
+                                homeIsWinner
+                                  ? "text-emerald-700 dark:text-emerald-300"
+                                  : "text-gray-700 dark:text-gray-300",
+                                homeEliminated ? "line-through text-red-500 dark:text-red-400" : "",
+                              )}
+                            >
+                              {homeTeam?.abbrev ?? "TBD"}
+                            </Text>
+                            {homeTeam ? (
+                              <TeamLogo
+                                abbrev={homeTeam.abbrev ?? ""}
+                                width={14}
+                                height={14}
+                              />
+                            ) : null}
+                          </View>
+                        </View>
+                        <Text className="mt-1 text-[10px] text-gray-500 dark:text-gray-400">
+                          {game.done ? "Final" : "Pending"}
+                        </Text>
+                      </View>
+                    );
+                  })
+                )}
+              </View>
+            ))}
+          </View>
+        ) : null}
 
         <View className="gap-4 rounded-xl border border-gray-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-800">
           <View>
@@ -491,6 +789,21 @@ export function LeagueSuperbowlBoard({ leagueId }: Props) {
             </View>
           </View>
 
+          {contestComplete ? (
+            <View className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 dark:border-emerald-800 dark:bg-emerald-950">
+              <Text className="text-xs font-semibold text-emerald-800 dark:text-emerald-200">
+                Contest Finalized
+              </Text>
+              <Text className="mt-1 text-xs text-emerald-700 dark:text-emerald-300">
+                Super Bowl: {teamById.get(finalSuperBowlWinner ?? 0)?.abbrev ?? "--"} over{" "}
+                {teamById.get(finalSuperBowlLoser ?? 0)?.abbrev ?? "--"}{" "}
+                {typeof finalSuperBowlTotalScore === "number"
+                  ? `(${finalSuperBowlTotalScore})`
+                  : ""}
+              </Text>
+            </View>
+          ) : null}
+
           {sortedPicks.length === 0 ? (
             <Text className="text-sm text-gray-600 dark:text-gray-400">
               No picks have been submitted.
@@ -498,6 +811,13 @@ export function LeagueSuperbowlBoard({ leagueId }: Props) {
           ) : (
             <View className="overflow-hidden rounded-lg border border-gray-200 dark:border-zinc-700">
               <View className="flex-row items-center bg-gray-50 px-2.5 py-2 dark:bg-zinc-900">
+                {contestComplete ? (
+                  <View style={{ width: 36 }}>
+                    <Text className="text-[10px] font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                      #
+                    </Text>
+                  </View>
+                ) : null}
                 <View style={{ flex: 1.6 }}>
                   <Text className="text-[10px] font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
                     Member
@@ -528,12 +848,18 @@ export function LeagueSuperbowlBoard({ leagueId }: Props) {
                 const username = pick.leaguemembers?.people.username ?? "member";
                 const isViewerPick =
                   pick.member_id === viewerMembership?.membership_id;
+                const contestResult = contestResultsByMemberId.get(pick.member_id ?? -1);
+                const winnerEliminated = isTeamEliminated(pick.winner);
+                const loserEliminated = isTeamEliminated(pick.loser);
 
                 return (
                   <View
                     key={`sb_pick_${pick.pickid}`}
                     className={cn(
                       "flex-row items-center px-2.5 py-2",
+                      contestResult?.isWinner
+                        ? "bg-emerald-50 dark:bg-emerald-950/30"
+                        : "",
                       isViewerPick
                         ? "bg-blue-50 dark:bg-blue-950/20"
                         : "",
@@ -542,6 +868,21 @@ export function LeagueSuperbowlBoard({ leagueId }: Props) {
                         : "",
                     )}
                   >
+                    {contestComplete ? (
+                      <View style={{ width: 36 }}>
+                        <Text
+                          className={cn(
+                            "text-xs font-semibold",
+                            contestResult?.isWinner
+                              ? "text-emerald-700 dark:text-emerald-300"
+                              : "text-gray-600 dark:text-gray-300",
+                          )}
+                        >
+                          {contestResult?.rank ?? "--"}
+                        </Text>
+                      </View>
+                    ) : null}
+
                     <View style={{ flex: 1.6, paddingRight: 6 }}>
                       <Text
                         className="text-app-fg-light dark:text-app-fg-dark text-xs font-semibold"
@@ -566,7 +907,15 @@ export function LeagueSuperbowlBoard({ leagueId }: Props) {
                                 height={12}
                               />
                             ) : null}
-                            <Text className="text-[10px] font-semibold text-gray-700 dark:text-gray-200">
+                            <Text
+                              className={cn(
+                                "text-[10px] font-semibold text-gray-700 dark:text-gray-200",
+                                winnerEliminated ? "line-through text-red-500 dark:text-red-400" : "",
+                                contestResult?.winnerCorrect
+                                  ? "text-emerald-700 dark:text-emerald-300"
+                                  : "",
+                              )}
+                            >
                               {winner?.abbrev ?? "--"}
                             </Text>
                           </View>
@@ -589,7 +938,15 @@ export function LeagueSuperbowlBoard({ leagueId }: Props) {
                                 height={12}
                               />
                             ) : null}
-                            <Text className="text-[10px] font-semibold text-gray-700 dark:text-gray-200">
+                            <Text
+                              className={cn(
+                                "text-[10px] font-semibold text-gray-700 dark:text-gray-200",
+                                loserEliminated ? "line-through text-red-500 dark:text-red-400" : "",
+                                contestResult?.loserCorrect
+                                  ? "text-emerald-700 dark:text-emerald-300"
+                                  : "",
+                              )}
+                            >
                               {loser?.abbrev ?? "--"}
                             </Text>
                           </View>
@@ -598,7 +955,14 @@ export function LeagueSuperbowlBoard({ leagueId }: Props) {
                     </View>
 
                     <View style={{ width: 42 }}>
-                      <Text className="text-right text-xs text-gray-700 dark:text-gray-300">
+                      <Text
+                        className={cn(
+                          "text-right text-xs text-gray-700 dark:text-gray-300",
+                          contestResult?.scoreDiff === 0
+                            ? "text-emerald-700 dark:text-emerald-300"
+                            : "",
+                        )}
+                      >
                         {hidden ? "--" : pick.score}
                       </Text>
                     </View>
