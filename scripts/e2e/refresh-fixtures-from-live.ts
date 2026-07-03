@@ -9,10 +9,16 @@ import {
   ensureDir,
   parseSeason,
   writeSeedSqlFromFixture,
-} from "./lib.mjs";
+} from "./lib.ts";
 
-const repoRoot = path.resolve(path.dirname(new URL(import.meta.url).pathname), "../..");
-const season = parseSeason(process.env.FUNTIME_CURRENT_SEASON, DEFAULT_CURRENT_SEASON);
+const repoRoot = path.resolve(
+  path.dirname(new URL(import.meta.url).pathname),
+  "../..",
+);
+const season = parseSeason(
+  process.env.FUNTIME_CURRENT_SEASON,
+  DEFAULT_CURRENT_SEASON,
+);
 const anchorUtc = process.env.E2E_SCHEDULE_ANCHOR_UTC ?? DEFAULT_ANCHOR_UTC;
 const liveDatabaseUrl = process.env.LIVE_DATABASE_URL;
 
@@ -87,17 +93,23 @@ const teams = runPsqlJson(teamsQuery) ?? [];
 const sourceGames = runPsqlJson(gamesQuery) ?? [];
 
 if (!Array.isArray(teams) || teams.length === 0) {
-  throw new Error(`Live dump returned no teams. Check LIVE_DATABASE_URL access.`);
+  throw new Error(
+    `Live dump returned no teams. Check LIVE_DATABASE_URL access.`,
+  );
 }
 if (!Array.isArray(sourceGames) || sourceGames.length === 0) {
   throw new Error(`Live dump returned no games for season ${season}.`);
 }
 
-const { transformedGames, offsetMs, minSourceTimestamp, anchorUtc: normalizedAnchorUtc } =
-  applyFutureScheduleTransform({
-    games: sourceGames,
-    anchorUtc,
-  });
+const {
+  transformedGames,
+  offsetMs,
+  minSourceTimestamp,
+  anchorUtc: normalizedAnchorUtc,
+} = applyFutureScheduleTransform({
+  games: sourceGames,
+  anchorUtc,
+});
 
 const fixture = {
   metadata: {
@@ -115,8 +127,18 @@ const fixture = {
   games: transformedGames,
 };
 
-const fixturePath = path.join(repoRoot, "supabase", "fixtures", `season-${season}.json`);
-const defaultFixturePath = path.join(repoRoot, "supabase", "fixtures", "season-2025.json");
+const fixturePath = path.join(
+  repoRoot,
+  "supabase",
+  "fixtures",
+  `season-${season}.json`,
+);
+const defaultFixturePath = path.join(
+  repoRoot,
+  "supabase",
+  "fixtures",
+  `season-${DEFAULT_CURRENT_SEASON}.json`,
+);
 const rawSnapshotPath = path.join(
   repoRoot,
   "supabase",
@@ -152,8 +174,11 @@ if (season === DEFAULT_CURRENT_SEASON && fixturePath !== defaultFixturePath) {
   fs.copyFileSync(fixturePath, defaultFixturePath);
 }
 
+const seedFixturePath =
+  season === DEFAULT_CURRENT_SEASON ? defaultFixturePath : fixturePath;
+
 const seedResult = writeSeedSqlFromFixture({
-  fixturePath: defaultFixturePath,
+  fixturePath: seedFixturePath,
   outputPath: path.join(repoRoot, "supabase", "seed.sql"),
 });
 

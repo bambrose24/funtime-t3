@@ -28,7 +28,7 @@ export const env = createEnv({
       .enum(["development", "preview", "production"])
       .default("development"),
     REDIS_URL: z.string().url().optional(),
-    FUNTIME_CURRENT_SEASON: z.coerce.number().int().optional().default(2025),
+    FUNTIME_CURRENT_SEASON: z.coerce.number().int().optional().default(2026),
   },
 
   /**

@@ -1,10 +1,13 @@
 import fs from "node:fs";
 import path from "node:path";
 
-export const DEFAULT_CURRENT_SEASON = 2025;
+export const DEFAULT_CURRENT_SEASON = 2026;
 export const DEFAULT_ANCHOR_UTC = "2026-09-11T00:00:00Z";
 
-export function parseSeason(rawSeason, fallbackSeason = DEFAULT_CURRENT_SEASON) {
+export function parseSeason(
+  rawSeason,
+  fallbackSeason = DEFAULT_CURRENT_SEASON,
+) {
   const parsed = Number.parseInt(String(rawSeason ?? ""), 10);
   if (Number.isFinite(parsed) && parsed >= 2000 && parsed <= 3000) {
     return parsed;
@@ -44,7 +47,9 @@ function sqlLiteral(value, options = {}) {
   if (type === "timestamp") {
     const date = new Date(value);
     if (Number.isNaN(date.getTime())) {
-      throw new Error(`Expected valid timestamp SQL literal, received: ${value}`);
+      throw new Error(
+        `Expected valid timestamp SQL literal, received: ${value}`,
+      );
     }
     return `'${date.toISOString()}'::timestamptz`;
   }
@@ -112,7 +117,10 @@ function normalizeFixture(fixture) {
           game.current_quarter === null || game.current_quarter === undefined
             ? null
             : Number(game.current_quarter),
-        msf_id: game.msf_id === null || game.msf_id === undefined ? null : Number(game.msf_id),
+        msf_id:
+          game.msf_id === null || game.msf_id === undefined
+            ? null
+            : Number(game.msf_id),
         espn_id:
           game.espn_id === null || game.espn_id === undefined
             ? null

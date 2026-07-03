@@ -1,10 +1,41 @@
 import { groupBy, orderBy } from "lodash";
-import { db } from "../server/db";
-import { espn } from "../server/services/espn";
 import { Defined } from "../utils/defined";
 
+process.env.SKIP_ENV_VALIDATION ??= "1";
+
+const DEFAULT_SEASON = 2026;
+
+function parseSeason(rawSeason: string | undefined) {
+  if (!rawSeason) {
+    return DEFAULT_SEASON;
+  }
+
+  const parsed = Number.parseInt(rawSeason, 10);
+  if (Number.isFinite(parsed) && parsed >= 2000 && parsed <= 3000) {
+    return parsed;
+  }
+
+  throw new Error(`Invalid season value: ${rawSeason}`);
+}
+
+function getArgs() {
+  const args = process.argv.slice(2);
+  const dryRun = args.includes("--dry-run");
+  const seasonArg = args.find((arg) => !arg.startsWith("--"));
+
+  return {
+    dryRun,
+    season: parseSeason(seasonArg ?? process.env.FUNTIME_CURRENT_SEASON),
+  };
+}
+
 async function run() {
-  const season = 2025;
+  const { dryRun, season } = getArgs();
+  const [{ db }, { espn }] = await Promise.all([
+    import("../server/db"),
+    import("../server/services/espn"),
+  ]);
+
   const existingGames = await db.games.findMany({
     where: {
       season,
@@ -38,7 +69,11 @@ async function run() {
     // });
   }
 
-  console.log("can make games!");
+  console.log(
+    dryRun
+      ? `Running dry-run import for season ${season}...`
+      : `Importing season ${season}...`,
+  );
 
   // Get games from ESPN instead of MySportsFeeds
   const espnGamesResponse = await espn.getGamesBySeason({ season });
@@ -118,6 +153,32 @@ async function run() {
   }
 
   console.log(`going to create ${creates.length} regular season games...`);
+
+  if (dryRun) {
+    const byWeek = Object.entries(
+      groupBy(creates, (create) => create.data.week),
+    )
+      .map(([week, weekCreates]) => ({
+        week: Number(week),
+        count: weekCreates.length,
+        firstKickoff: orderBy(
+          weekCreates,
+          (create) => create.data.ts,
+          "asc",
+        ).at(0)?.data.ts,
+        tiebreakerEspnId: weekCreates.find(
+          (create) => create.data.is_tiebreaker,
+        )?.data.espn_id,
+      }))
+      .sort((a, b) => a.week - b.week);
+
+    console.log(
+      JSON.stringify({ season, totalGames: creates.length, byWeek }, null, 2),
+    );
+    console.log("dry-run complete; no games were inserted.");
+    return;
+  }
+
   let i = 1;
   for (const create of creates) {
     console.log(

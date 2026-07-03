@@ -2,7 +2,7 @@ import { db, espn } from "../server/db";
 
 async function run() {
   const week = 17;
-  const season = 2025;
+  const season = 2026;
   const espnGamesSeason = await espn.getGamesBySeason({ season });
 
   const dbGames = await db.games.findMany({

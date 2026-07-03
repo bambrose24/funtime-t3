@@ -98,7 +98,7 @@ Minimum required coverage set:
 - Canonical infra plan: `docs/E2E_INFRA_PLAN.md`.
 - Execution/work tracking log: `E2E_INFRA_WORKLOG.md`.
 - Deterministic seeded E2E baseline:
-  - committed fixture: `supabase/fixtures/season-2025.json`
+  - committed fixture: `supabase/fixtures/season-2026.json`
   - generated seed SQL: `supabase/seed.sql`
   - dev-build install command: `pnpm e2e:mobile:install-dev-client`
   - bootstrap command: `pnpm e2e:backend:up`

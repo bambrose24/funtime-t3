@@ -5,7 +5,7 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$ROOT_DIR"
 
 SUPABASE_DB_URL="${SUPABASE_DB_URL:-postgresql://postgres:postgres@127.0.0.1:55422/postgres}"
-SEASON="${FUNTIME_CURRENT_SEASON:-2025}"
+SEASON="${FUNTIME_CURRENT_SEASON:-2026}"
 START_WEB=0
 
 if [[ "${1:-}" == "--start-web" ]]; then

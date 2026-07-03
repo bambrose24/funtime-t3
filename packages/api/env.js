@@ -22,7 +22,7 @@ export const env = createEnv({
         "You forgot to change the default DIRECT_URL",
       ),
     REDIS_URL: z.string().url().optional().default("redis://localhost:6379"),
-    FUNTIME_CURRENT_SEASON: z.coerce.number().int().optional().default(2025),
+    FUNTIME_CURRENT_SEASON: z.coerce.number().int().optional().default(2026),
     NODE_ENV: z
       .enum(["development", "test", "production"])
       .default("development"),

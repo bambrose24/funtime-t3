@@ -13,7 +13,7 @@ if [[ -d "/opt/homebrew/opt/openjdk@17/bin" ]]; then
 fi
 
 SUPABASE_DB_URL="${SUPABASE_DB_URL:-postgresql://postgres:postgres@127.0.0.1:55422/postgres}"
-SEASON="${FUNTIME_CURRENT_SEASON:-2025}"
+SEASON="${FUNTIME_CURRENT_SEASON:-2026}"
 REQUESTED_WEB_PORT="${E2E_WEB_PORT:-3000}"
 REQUESTED_EXPO_PORT="${E2E_EXPO_PORT:-8081}"
 FLOW_PATH="${E2E_MAESTRO_FLOW:-apps/mobile/e2e/flows/smoke-signup-create-pick.yaml}"

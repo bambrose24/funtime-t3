@@ -1,4 +1,4 @@
-const FALLBACK_CURRENT_SEASON = 2025;
+const FALLBACK_CURRENT_SEASON = 2026;
 
 function parseSeason(rawSeason: string | undefined) {
   if (!rawSeason) {
@@ -14,8 +14,7 @@ function parseSeason(rawSeason: string | undefined) {
 }
 
 export const CURRENT_SEASON = parseSeason(
-  process.env.NEXT_PUBLIC_CURRENT_SEASON ??
-    process.env.FUNTIME_CURRENT_SEASON,
+  process.env.NEXT_PUBLIC_CURRENT_SEASON ?? process.env.FUNTIME_CURRENT_SEASON,
 );
 
 // Keep DEFAULT_SEASON as a compatibility alias while moving callers to CURRENT_SEASON.

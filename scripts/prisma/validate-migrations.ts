@@ -190,7 +190,9 @@ async function main() {
   const environment = { ...fileEnv, ...process.env };
 
   console.log("[prisma-check] Starting Prisma migration validation");
-  console.log(`[prisma-check] Env file: ${envFile}${existsSync(envFile) ? "" : " (missing)"}`);
+  console.log(
+    `[prisma-check] Env file: ${envFile}${existsSync(envFile) ? "" : " (missing)"}`,
+  );
   console.log(
     `[prisma-check] DATABASE_URL: ${environment.DATABASE_URL ? redactUrl(environment.DATABASE_URL) : "(not set)"}`,
   );
@@ -212,7 +214,9 @@ async function main() {
   }
 
   if (!applyMigrations) {
-    console.log("[prisma-check] Migration status succeeded. Skipping deploy (use --apply to run deploy).");
+    console.log(
+      "[prisma-check] Migration status succeeded. Skipping deploy (use --apply to run deploy).",
+    );
     return;
   }
 

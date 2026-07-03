@@ -1,9 +1,17 @@
 #!/usr/bin/env node
 import path from "node:path";
-import { writeSeedSqlFromFixture } from "./lib.mjs";
+import { DEFAULT_CURRENT_SEASON, writeSeedSqlFromFixture } from "./lib.ts";
 
-const repoRoot = path.resolve(path.dirname(new URL(import.meta.url).pathname), "../..");
-const defaultFixturePath = path.join(repoRoot, "supabase", "fixtures", "season-2025.json");
+const repoRoot = path.resolve(
+  path.dirname(new URL(import.meta.url).pathname),
+  "../..",
+);
+const defaultFixturePath = path.join(
+  repoRoot,
+  "supabase",
+  "fixtures",
+  `season-${DEFAULT_CURRENT_SEASON}.json`,
+);
 const defaultOutputPath = path.join(repoRoot, "supabase", "seed.sql");
 
 const fixturePathArg = process.argv[2];

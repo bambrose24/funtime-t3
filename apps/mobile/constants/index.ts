@@ -1,4 +1,4 @@
-const FALLBACK_CURRENT_SEASON = 2025;
+const FALLBACK_CURRENT_SEASON = 2026;
 
 function parseSeason(rawSeason: string | undefined) {
   if (!rawSeason) {
