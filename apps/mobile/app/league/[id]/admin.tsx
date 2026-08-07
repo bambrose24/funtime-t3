@@ -20,6 +20,8 @@ import { clientApi } from "@/lib/trpc/react";
 import { Input } from "@/components/ui/input";
 import { useColorScheme } from "@/lib/useColorScheme";
 import { cn } from "@/lib/utils";
+import { DEFAULT_SEASON } from "@/constants";
+import { getBaseUrl } from "@/utils/getBaseUrl";
 
 type EditableRole = "admin" | "player";
 const LEAGUE_NAME_MIN_LENGTH = 5;
@@ -41,8 +43,11 @@ export default function LeagueAdminScreen() {
   const [sheetPaidDraft, setSheetPaidDraft] = useState(false);
 
   const utils = clientApi.useUtils();
-  const { data: session, isLoading: sessionLoading, refetch: refetchSession } =
-    clientApi.session.current.useQuery();
+  const {
+    data: session,
+    isLoading: sessionLoading,
+    refetch: refetchSession,
+  } = clientApi.session.current.useQuery();
   const {
     data: isSuperAdmin,
     isLoading: superAdminLoading,
@@ -68,10 +73,27 @@ export default function LeagueAdminScreen() {
       enabled: Number.isFinite(leagueIdNumber) && canManageLeague,
     },
   );
-  const { data: leagueData, refetch: refetchLeague } = clientApi.league.get.useQuery(
-    { leagueId: leagueIdNumber },
-    { enabled: Number.isFinite(leagueIdNumber) && canManageLeague },
+  const { data: leagueData, refetch: refetchLeague } =
+    clientApi.league.get.useQuery(
+      { leagueId: leagueIdNumber },
+      { enabled: Number.isFinite(leagueIdNumber) && canManageLeague },
+    );
+  const { data: renewalStatus } = clientApi.league.renewalStatus.useQuery(
+    undefined,
+    { enabled: canManageLeague },
   );
+  const { data: renewalPreview, refetch: refetchRenewalPreview } =
+    clientApi.league.renewalPreview.useQuery(
+      { priorLeagueId: leagueIdNumber },
+      {
+        enabled:
+          Number.isFinite(leagueIdNumber) &&
+          canManageLeague &&
+          renewalStatus?.isOpen === true &&
+          leagueData?.status === "completed" &&
+          (leagueData?.season ?? DEFAULT_SEASON) < DEFAULT_SEASON,
+      },
+    );
   const { data: canSendBroadcastData, refetch: refetchBroadcastStatus } =
     clientApi.league.admin.canSendLeagueBroadcast.useQuery(
       { leagueId: leagueIdNumber },
@@ -86,7 +108,8 @@ export default function LeagueAdminScreen() {
   const leagueNameCharsRemaining =
     LEAGUE_NAME_MAX_LENGTH - leagueNameDraft.length;
   const leagueNameChanged =
-    trimmedLeagueName.length > 0 && trimmedLeagueName !== (leagueData?.name ?? "");
+    trimmedLeagueName.length > 0 &&
+    trimmedLeagueName !== (leagueData?.name ?? "");
   const canSaveLeagueName =
     leagueNameChanged &&
     trimmedLeagueName.length >= LEAGUE_NAME_MIN_LENGTH &&
@@ -104,8 +127,11 @@ export default function LeagueAdminScreen() {
       return;
     }
 
-    const escapeCsvValue = (value: string | number | boolean | null | undefined) => {
-      const normalized = value === null || value === undefined ? "" : String(value);
+    const escapeCsvValue = (
+      value: string | number | boolean | null | undefined,
+    ) => {
+      const normalized =
+        value === null || value === undefined ? "" : String(value);
       if (!/[",\n]/.test(normalized)) {
         return normalized;
       }
@@ -123,9 +149,9 @@ export default function LeagueAdminScreen() {
       "Missed Picks",
     ];
     const rows = members.map((member) => {
-      const weekWins = member.WeekWinners.map((weekWinner) => weekWinner.week).sort(
-        (a, b) => a - b,
-      );
+      const weekWins = member.WeekWinners.map(
+        (weekWinner) => weekWinner.week,
+      ).sort((a, b) => a - b);
       return [
         member.people.username,
         member.people.email,
@@ -179,6 +205,7 @@ export default function LeagueAdminScreen() {
           refetchMembers(),
           refetchLeague(),
           refetchBroadcastStatus(),
+          refetchRenewalPreview(),
         ]);
       }
       setLastRefreshedAt(new Date());
@@ -191,6 +218,8 @@ export default function LeagueAdminScreen() {
     refetchBroadcastStatus,
     refetchLeague,
     refetchMembers,
+    refetchRenewalPreview,
+    renewalStatus?.isOpen,
     refetchSession,
     refetchSuperAdmin,
   ]);
@@ -268,7 +297,8 @@ export default function LeagueAdminScreen() {
     const memberId = selectedMember.membership_id;
     const currentRole = selectedMember.role === "admin" ? "admin" : "player";
     const currentPaid = Boolean(selectedMember.paid);
-    const roleChanged = !selectedMemberIsViewer && sheetRoleDraft !== currentRole;
+    const roleChanged =
+      !selectedMemberIsViewer && sheetRoleDraft !== currentRole;
     const paidChanged = sheetPaidDraft !== currentPaid;
 
     if (!roleChanged && !paidChanged) {
@@ -307,38 +337,38 @@ export default function LeagueAdminScreen() {
     }
   };
 
-  const onRemoveMember = (memberId: number, username: string, closeSheet = false) => {
-    Alert.alert(
-      "Remove Member",
-      `Remove @${username} from this league?`,
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Remove",
-          style: "destructive",
-          onPress: async () => {
-            const actionKey = `remove-${memberId}`;
-            try {
-              setBusyKey(actionKey);
-              await removeMember({
-                leagueId: leagueIdNumber,
-                memberId,
-              });
-              await invalidateMembers();
-              await refetchMembers();
-              if (closeSheet) {
-                closeMemberSheet();
-              }
-            } catch (error) {
-              console.error("Failed to remove member", error);
-              Alert.alert("Remove Failed", "Unable to remove member.");
-            } finally {
-              setBusyKey(null);
+  const onRemoveMember = (
+    memberId: number,
+    username: string,
+    closeSheet = false,
+  ) => {
+    Alert.alert("Remove Member", `Remove @${username} from this league?`, [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Remove",
+        style: "destructive",
+        onPress: async () => {
+          const actionKey = `remove-${memberId}`;
+          try {
+            setBusyKey(actionKey);
+            await removeMember({
+              leagueId: leagueIdNumber,
+              memberId,
+            });
+            await invalidateMembers();
+            await refetchMembers();
+            if (closeSheet) {
+              closeMemberSheet();
             }
-          },
+          } catch (error) {
+            console.error("Failed to remove member", error);
+            Alert.alert("Remove Failed", "Unable to remove member.");
+          } finally {
+            setBusyKey(null);
+          }
         },
-      ],
-    );
+      },
+    ]);
   };
 
   const onChangeLeagueName = async () => {
@@ -417,7 +447,11 @@ export default function LeagueAdminScreen() {
     );
   }
 
-  if (sessionLoading || superAdminLoading || (canManageLeague && membersLoading)) {
+  if (
+    sessionLoading ||
+    superAdminLoading ||
+    (canManageLeague && membersLoading)
+  ) {
     return (
       <SafeAreaView className="bg-app-bg-light dark:bg-app-bg-dark flex-1">
         <View className="flex-1 items-center justify-center">
@@ -432,7 +466,7 @@ export default function LeagueAdminScreen() {
   if (!canManageLeague) {
     return (
       <SafeAreaView className="bg-app-bg-light dark:bg-app-bg-dark flex-1">
-        <View className="flex-1 items-center justify-center px-6 gap-3">
+        <View className="flex-1 items-center justify-center gap-3 px-6">
           <Text className="text-app-fg-light dark:text-app-fg-dark text-center text-2xl font-bold">
             Admin Access Required
           </Text>
@@ -459,7 +493,7 @@ export default function LeagueAdminScreen() {
           <View className="flex-row items-start gap-3 px-1">
             <Pressable
               onPress={() => router.back()}
-              className="mt-1 rounded-lg bg-app-card-light p-2 dark:bg-app-card-dark"
+              className="bg-app-card-light dark:bg-app-card-dark mt-1 rounded-lg p-2"
             >
               <Ionicons
                 name="chevron-back"
@@ -510,7 +544,79 @@ export default function LeagueAdminScreen() {
             </View>
           </View>
 
-          <View className="rounded-xl border border-gray-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-800 gap-3">
+          {renewalPreview ? (
+            <View className="gap-3 rounded-xl border border-blue-200 bg-blue-50 p-4 dark:border-blue-900 dark:bg-blue-950">
+              <View className="flex-row items-center gap-2">
+                <Ionicons
+                  name="refresh-outline"
+                  size={18}
+                  color={isDarkColorScheme ? "#93c5fd" : "#1d4ed8"}
+                />
+                <Text className="text-base font-semibold text-blue-900 dark:text-blue-100">
+                  Next Season
+                </Text>
+              </View>
+              <Text className="text-sm text-blue-700 dark:text-blue-300">
+                {renewalPreview.nextLeague
+                  ? `${renewalPreview.nextLeague.name} is linked to this prior league.`
+                  : `Create ${renewalPreview.suggestedName} for ${DEFAULT_SEASON}.`}
+              </Text>
+              {renewalPreview.nextLeague ? (
+                <View className="gap-2">
+                  <Button
+                    size="sm"
+                    onPress={() =>
+                      router.push(
+                        `/league/${renewalPreview.nextLeague?.league_id}` as any,
+                      )
+                    }
+                  >
+                    Open League
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onPress={() =>
+                      router.push(
+                        `/league/${renewalPreview.nextLeague?.league_id}/renewal-invites?priorLeagueId=${leagueIdNumber}` as any,
+                      )
+                    }
+                  >
+                    Manage Invites
+                  </Button>
+                  {renewalPreview.nextLeague.share_code ? (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onPress={async () => {
+                        const joinLink = `${getBaseUrl()}/join-league/${renewalPreview.nextLeague?.share_code}`;
+                        await Share.share({
+                          title: "League Invite",
+                          message: `Join ${renewalPreview.nextLeague?.name} on Funtime: ${joinLink}`,
+                          url: joinLink,
+                        });
+                      }}
+                    >
+                      Share Join Link
+                    </Button>
+                  ) : null}
+                </View>
+              ) : (
+                <Button
+                  size="sm"
+                  onPress={() =>
+                    router.push(
+                      `/league/create?priorLeagueId=${leagueIdNumber}` as any,
+                    )
+                  }
+                >
+                  Run It Back
+                </Button>
+              )}
+            </View>
+          ) : null}
+
+          <View className="gap-3 rounded-xl border border-gray-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-800">
             <Text className="text-app-fg-light dark:text-app-fg-dark text-base font-semibold">
               League Name
             </Text>
@@ -542,7 +648,7 @@ export default function LeagueAdminScreen() {
             </Button>
           </View>
 
-          <View className="rounded-xl border border-gray-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-800 gap-3">
+          <View className="gap-3 rounded-xl border border-gray-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-800">
             <Text className="text-app-fg-light dark:text-app-fg-dark text-base font-semibold">
               League Broadcast
             </Text>
@@ -596,35 +702,62 @@ export default function LeagueAdminScreen() {
             </Text>
           </View>
 
-          <View className="rounded-xl border border-gray-200 bg-white dark:border-zinc-700 dark:bg-zinc-800 overflow-hidden">
+          <View className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-zinc-700 dark:bg-zinc-800">
             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
               <View style={{ minWidth: 930 }}>
                 <View className="flex-row items-center border-b border-gray-200 bg-gray-50 px-3 py-2 dark:border-zinc-700 dark:bg-zinc-900">
-                  <Text className="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400" style={{ width: 220 }}>
+                  <Text
+                    className="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400"
+                    style={{ width: 220 }}
+                  >
                     Member
                   </Text>
-                  <Text className="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400" style={{ width: 80 }}>
+                  <Text
+                    className="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400"
+                    style={{ width: 80 }}
+                  >
                     Role
                   </Text>
-                  <Text className="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400" style={{ width: 110 }}>
+                  <Text
+                    className="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400"
+                    style={{ width: 110 }}
+                  >
                     Week Wins
                   </Text>
-                  <Text className="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400" style={{ width: 70 }}>
+                  <Text
+                    className="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400"
+                    style={{ width: 70 }}
+                  >
                     Correct
                   </Text>
-                  <Text className="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400" style={{ width: 70 }}>
+                  <Text
+                    className="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400"
+                    style={{ width: 70 }}
+                  >
                     Wrong
                   </Text>
-                  <Text className="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400" style={{ width: 70 }}>
+                  <Text
+                    className="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400"
+                    style={{ width: 70 }}
+                  >
                     Missed
                   </Text>
-                  <Text className="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400" style={{ width: 70 }}>
+                  <Text
+                    className="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400"
+                    style={{ width: 70 }}
+                  >
                     Paid
                   </Text>
-                  <Text className="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400" style={{ width: 130 }}>
+                  <Text
+                    className="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400"
+                    style={{ width: 130 }}
+                  >
                     Email Logs
                   </Text>
-                  <Text className="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400" style={{ width: 90 }}>
+                  <Text
+                    className="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400"
+                    style={{ width: 90 }}
+                  >
                     Edit
                   </Text>
                 </View>
@@ -674,7 +807,9 @@ export default function LeagueAdminScreen() {
                       >
                         {member.WeekWinners.length === 0
                           ? "--"
-                          : member.WeekWinners.map((weekWinner) => `W${weekWinner.week}`)
+                          : member.WeekWinners.map(
+                              (weekWinner) => `W${weekWinner.week}`,
+                            )
                               .sort((a, b) => a.localeCompare(b))
                               .join(", ")}
                       </Text>
@@ -755,13 +890,19 @@ export default function LeagueAdminScreen() {
                       @{selectedMember.people.username}
                     </Text>
                   </View>
-                  <Button variant="outline" size="sm" onPress={closeMemberSheet}>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onPress={closeMemberSheet}
+                  >
                     Close
                   </Button>
                 </View>
 
                 <View className="gap-2">
-                  <Text className="text-sm text-gray-600 dark:text-gray-400">Role</Text>
+                  <Text className="text-sm text-gray-600 dark:text-gray-400">
+                    Role
+                  </Text>
                   <View className="flex-row gap-2">
                     <Pressable
                       disabled={selectedMemberIsViewer}
@@ -800,7 +941,9 @@ export default function LeagueAdminScreen() {
                 </View>
 
                 <View className="gap-2">
-                  <Text className="text-sm text-gray-600 dark:text-gray-400">Paid Status</Text>
+                  <Text className="text-sm text-gray-600 dark:text-gray-400">
+                    Paid Status
+                  </Text>
                   <View className="flex-row gap-2">
                     <Pressable
                       onPress={() => setSheetPaidDraft(true)}
@@ -858,7 +1001,9 @@ export default function LeagueAdminScreen() {
 
                 <View className="gap-2">
                   <Button
-                    disabled={busyKey === `edit-${selectedMember.membership_id}`}
+                    disabled={
+                      busyKey === `edit-${selectedMember.membership_id}`
+                    }
                     onPress={onSaveMemberSettings}
                   >
                     Save Changes

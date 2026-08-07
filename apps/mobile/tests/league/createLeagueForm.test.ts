@@ -3,6 +3,7 @@ import {
   coerceLatePolicy,
   coerceReminderPolicy,
   getCreateLeagueNameError,
+  getSuggestedRenewalLeagueName,
 } from "@/lib/league/createLeagueForm";
 
 describe("createLeagueForm helpers", () => {
@@ -25,7 +26,9 @@ describe("createLeagueForm helpers", () => {
 
   describe("policy coercion", () => {
     it("coerces known late policy values and falls back safely", () => {
-      expect(coerceLatePolicy("allow_late_whole_week")).toBe("allow_late_whole_week");
+      expect(coerceLatePolicy("allow_late_whole_week")).toBe(
+        "allow_late_whole_week",
+      );
       expect(coerceLatePolicy("close_at_first_game_start")).toBe(
         "close_at_first_game_start",
       );
@@ -36,7 +39,9 @@ describe("createLeagueForm helpers", () => {
     });
 
     it("coerces reminder policy to explicit mobile values", () => {
-      expect(coerceReminderPolicy("three_hours_before")).toBe("three_hours_before");
+      expect(coerceReminderPolicy("three_hours_before")).toBe(
+        "three_hours_before",
+      );
       expect(coerceReminderPolicy(null)).toBe("none");
     });
   });
@@ -56,6 +61,26 @@ describe("createLeagueForm helpers", () => {
         reminderPolicy: "three_hours_before",
         superbowlCompetition: true,
       });
+    });
+  });
+
+  describe("getSuggestedRenewalLeagueName", () => {
+    it("appends the target season to normal names", () => {
+      expect(getSuggestedRenewalLeagueName("Sunday Legends", 2026)).toBe(
+        "Sunday Legends 2026",
+      );
+    });
+
+    it("replaces a trailing year when the prior name already ends in one", () => {
+      expect(getSuggestedRenewalLeagueName("Sunday Legends 2025", 2026)).toBe(
+        "Sunday Legends 2026",
+      );
+    });
+
+    it("keeps long suggested names inside the league name limit", () => {
+      expect(getSuggestedRenewalLeagueName("A".repeat(99), 2026)).toHaveLength(
+        100,
+      );
     });
   });
 });

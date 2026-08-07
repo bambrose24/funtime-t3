@@ -35,7 +35,7 @@ export default async function LeaguePage(props: Props) {
   ]);
 
   if (league.status === "completed") {
-    return <SeasonOverLeaguePage league={league} />;
+    return <SeasonOverLeaguePage league={league} member={member} />;
   }
 
   const [picks] = await Promise.all([

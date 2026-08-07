@@ -23,7 +23,6 @@ import { Input } from "~/components/ui/input";
 import { Text } from "~/components/ui/text";
 import { Alert, AlertTitle } from "~/components/ui/alert";
 import { type RouterOutputs } from "~/trpc/types";
-import { AlertCircleIcon } from "lucide-react";
 import Link from "next/link";
 import {
   Select,
@@ -37,15 +36,20 @@ import { clientApi } from "~/trpc/react";
 import { DEFAULT_SEASON } from "~/utils/const";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { Badge } from "~/components/ui/badge";
+import { Separator } from "~/components/ui/separator";
+import { RefreshCw, Users } from "lucide-react";
 
 type Props = {
   priorLeague: RouterOutputs["league"]["get"] | undefined;
+  renewalPreview: RouterOutputs["league"]["renewalPreview"] | undefined;
   createLeagueForm: RouterOutputs["league"]["createForm"];
   navInitialData: RouterOutputs["home"]["nav"];
 };
 
 export function CreateLeagueClientPage({
   priorLeague,
+  renewalPreview,
   createLeagueForm,
   navInitialData,
 }: Props) {
@@ -56,8 +60,9 @@ export function CreateLeagueClientPage({
   const router = useRouter();
   const form = useForm<z.infer<typeof createLeagueFormSchema>>({
     resolver: zodResolver(createLeagueFormSchema),
+    mode: "onChange",
     defaultValues: {
-      name: "",
+      name: renewalPreview?.suggestedName ?? "",
       priorLeagueId: priorLeague?.league_id?.toString() ?? "none",
       latePolicy: priorLeague?.late_policy ?? "allow_late_and_lock_after_start",
       pickPolicy: priorLeague?.pick_policy ?? "choose_winner",
@@ -66,6 +71,7 @@ export function CreateLeagueClientPage({
       superbowlCompetition: priorLeague?.superbowl_competition ?? true,
     },
   });
+  const isRenewalMode = Boolean(priorLeague && renewalPreview);
 
   const trpcUtils = clientApi.useUtils();
   const { mutateAsync: createLeague } = clientApi.league.create.useMutation({
@@ -75,21 +81,35 @@ export function CreateLeagueClientPage({
   });
 
   const onSubmit: Parameters<typeof form.handleSubmit>[0] = async (data) => {
-    const newLeague = await createLeague({
-      latePolicy: data.latePolicy,
-      name: data.name,
-      ...(data.pickPolicy && { pickPolicy: data.pickPolicy }),
-      ...(data.reminderPolicy &&
-        data.reminderPolicy !== "none" && {
-          reminderPolicy: data.reminderPolicy,
-        }),
-      superbowlCompetition: data.superbowlCompetition,
-      priorLeagueId:
-        data.priorLeagueId !== "none" ? Number(data.priorLeagueId) : undefined,
-    });
+    try {
+      const newLeague = await createLeague({
+        latePolicy: data.latePolicy,
+        name: data.name,
+        ...(data.pickPolicy && { pickPolicy: data.pickPolicy }),
+        ...(data.reminderPolicy &&
+          data.reminderPolicy !== "none" && {
+            reminderPolicy: data.reminderPolicy,
+          }),
+        superbowlCompetition: data.superbowlCompetition,
+        priorLeagueId:
+          data.priorLeagueId !== "none"
+            ? Number(data.priorLeagueId)
+            : undefined,
+      });
 
-    toast.success(`The league ${newLeague.name} was created.`);
-    router.push(`/league/${newLeague.league_id}`);
+      toast.success(`The league ${newLeague.name} was created.`);
+      if (data.priorLeagueId && data.priorLeagueId !== "none") {
+        router.push(
+          `/league/${newLeague.league_id}/renewal-invites?priorLeagueId=${data.priorLeagueId}`,
+        );
+        return;
+      }
+      router.push(`/league/${newLeague.league_id}`);
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Unable to create league",
+      );
+    }
   };
 
   return (
@@ -99,52 +119,86 @@ export function CreateLeagueClientPage({
           <Card>
             <CardHeader className="flex w-full justify-center">
               <div className="flex flex-col ">
-                <Text.H3 className="text-center">Create a League</Text.H3>
+                <Text.H3 className="text-center">
+                  {isRenewalMode
+                    ? `Run it back for ${DEFAULT_SEASON}`
+                    : "Create a League"}
+                </Text.H3>
                 <Text.Small className="mt-4">
-                  Creating a league means you&apos;ll manage a pick &apos;em
-                  league weekly. The game runs itself; all you have to do is
-                  invite people to the league, and all of these rules are
-                  enforced for you.
-                  <br />
-                  <br />
-                  As the admin, you&apos;ll have access to tools to manage the
-                  league, including sending out messages to the league and
-                  picking on people&apos;s behalf when needed.
+                  {isRenewalMode
+                    ? "Renew your prior league, keep the rules that worked, and invite last year's players after creation."
+                    : "Creating a league means you'll manage a pick 'em league weekly. The game runs itself; invite people and the rules are enforced for you."}
                 </Text.Small>
               </div>
             </CardHeader>
             <CardContent>
               <div className="flex flex-col gap-3">
-                <FormField
-                  control={form.control}
-                  name="priorLeagueId"
-                  render={({ field }) => {
-                    if (!field.value || !priorLeague) {
-                      return <></>;
-                    }
-                    return (
-                      <Alert>
-                        <AlertTitle className="flex w-full  flex-row items-center justify-between">
-                          <div className="flex flex-row gap-2">
-                            <AlertCircleIcon className="h-4 w-4" />
-                            <div>
-                              You are creating a league based on{" "}
-                              <span>
-                                <Link
-                                  className="underline"
-                                  href={`/league/${priorLeague.league_id}`}
-                                >
-                                  {priorLeague.name}
-                                </Link>
-                              </span>
-                              .
-                            </div>
-                          </div>
-                        </AlertTitle>
-                      </Alert>
-                    );
-                  }}
-                />
+                {isRenewalMode && renewalPreview && priorLeague ? (
+                  <Alert className="border-primary/30 bg-primary/5">
+                    <AlertTitle className="flex flex-col gap-3">
+                      <div className="flex items-center gap-2">
+                        <RefreshCw className="h-4 w-4" />
+                        Renewing{" "}
+                        <Link
+                          className="underline"
+                          href={`/league/${priorLeague.league_id}`}
+                        >
+                          {priorLeague.name}
+                        </Link>
+                      </div>
+                      <div className="flex flex-wrap gap-2 text-xs font-normal">
+                        <Badge variant="secondary">{priorLeague.season}</Badge>
+                        <Badge variant="outline" className="gap-1">
+                          <Users className="h-3 w-3" />
+                          {renewalPreview.memberCount} players
+                        </Badge>
+                        <Badge variant="outline">
+                          {renewalPreview.adminCount} admins
+                        </Badge>
+                      </div>
+                    </AlertTitle>
+                  </Alert>
+                ) : null}
+                {isRenewalMode && renewalPreview ? (
+                  <div className="rounded-md border bg-muted/30 p-3">
+                    <Text.Small className="font-medium">
+                      Copied settings
+                    </Text.Small>
+                    <Separator className="my-2" />
+                    <div className="grid gap-2 text-sm sm:grid-cols-2">
+                      <div>
+                        <span className="text-muted-foreground">
+                          Late policy
+                        </span>
+                        <div className="font-medium">
+                          {form.watch("latePolicy")}
+                        </div>
+                      </div>
+                      <div>
+                        <span className="text-muted-foreground">Reminders</span>
+                        <div className="font-medium">
+                          {form.watch("reminderPolicy") === "none"
+                            ? "Disabled"
+                            : "3 hours before"}
+                        </div>
+                      </div>
+                      <div>
+                        <span className="text-muted-foreground">Scoring</span>
+                        <div className="font-medium">Game winner</div>
+                      </div>
+                      <div>
+                        <span className="text-muted-foreground">
+                          Super Bowl
+                        </span>
+                        <div className="font-medium">
+                          {form.watch("superbowlCompetition")
+                            ? "Enabled"
+                            : "Disabled"}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ) : null}
                 <FormField
                   control={form.control}
                   name="name"
@@ -162,39 +216,59 @@ export function CreateLeagueClientPage({
                 <FormField
                   control={form.control}
                   name="priorLeagueId"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Prior League?</FormLabel>
-                      <FormControl>
-                        <Select {...field} onValueChange={field.onChange}>
-                          <SelectTrigger className="w-full ring-2 ring-input focus:ring-2">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value={"none"}>None</SelectItem>
-                            {nav?.leagues
-                              .filter((l) => l.season < DEFAULT_SEASON)
-                              .map((league, idx) => {
-                                return (
-                                  <SelectItem
-                                    key={idx}
-                                    value={league.league_id.toString()}
-                                  >
-                                    {league.name}
-                                  </SelectItem>
-                                );
-                              })}
-                          </SelectContent>
-                        </Select>
-                      </FormControl>
-                      <FormDescription>
-                        If you&apos;re making a league from a prior league, mark
-                        it here. You&apos;ll be able to invite folks from the
-                        prior league easily.
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+                  render={({ field }) =>
+                    isRenewalMode && priorLeague ? (
+                      <FormItem>
+                        <FormLabel>Prior League</FormLabel>
+                        <FormControl>
+                          <Input
+                            value={`${priorLeague.name} (${priorLeague.season})`}
+                            disabled
+                          />
+                        </FormControl>
+                        <FormDescription>
+                          This renewal will stay linked to the prior league.
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    ) : (
+                      <FormItem>
+                        <FormLabel>Prior League?</FormLabel>
+                        <FormControl>
+                          <Select {...field} onValueChange={field.onChange}>
+                            <SelectTrigger className="w-full ring-2 ring-input focus:ring-2">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value={"none"}>None</SelectItem>
+                              {nav?.leagues
+                                .filter(
+                                  (league) =>
+                                    league.season < DEFAULT_SEASON &&
+                                    league.status === "completed",
+                                )
+                                .map((league, idx) => {
+                                  return (
+                                    <SelectItem
+                                      key={idx}
+                                      value={league.league_id.toString()}
+                                    >
+                                      {league.name}
+                                    </SelectItem>
+                                  );
+                                })}
+                            </SelectContent>
+                          </Select>
+                        </FormControl>
+                        <FormDescription>
+                          If you&apos;re making a league from a prior league,
+                          mark it here. You&apos;ll be able to invite folks from
+                          the prior league easily.
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )
+                  }
                 />
                 <FormField
                   control={form.control}
@@ -321,7 +395,7 @@ export function CreateLeagueClientPage({
                 }
                 loading={form.formState.isSubmitting}
               >
-                Create League
+                {isRenewalMode ? "Create and Invite Players" : "Create League"}
               </Button>
             </CardFooter>
           </Card>

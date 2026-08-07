@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import {
   ScrollView,
   View,
@@ -29,20 +35,34 @@ export default function HomeScreen() {
   const [isAutoOpeningLeague, setIsAutoOpeningLeague] = useState(false);
   const [leagueSearchQuery, setLeagueSearchQuery] = useState("");
   const hasAutoOpenedLeagueRef = useRef(false);
-  
+
   // Debug data availability (remove in production)
   if (__DEV__) {
     useDataAvailabilityTracker();
   }
-  
+
   // Fetch session and home summary data
-  const { data: session, isLoading: sessionLoading, refetch: refetchSession } =
-    clientApi.session.current.useQuery();
-  const { data: homeData, isLoading: homeLoading, refetch: refetchHomeData } =
-    clientApi.home.summary.useQuery(
-      undefined,
-      { enabled: !!session?.dbUser }, // Only fetch if user is authenticated
-    );
+  const {
+    data: session,
+    isLoading: sessionLoading,
+    refetch: refetchSession,
+  } = clientApi.session.current.useQuery();
+  const {
+    data: homeData,
+    isLoading: homeLoading,
+    refetch: refetchHomeData,
+  } = clientApi.home.summary.useQuery(
+    undefined,
+    { enabled: !!session?.dbUser }, // Only fetch if user is authenticated
+  );
+  const {
+    data: renewalCandidatesData,
+    isLoading: renewalCandidatesLoading,
+    refetch: refetchRenewalCandidates,
+  } = clientApi.league.renewalCandidates.useQuery(undefined, {
+    enabled: !!session?.dbUser,
+  });
+  const renewalCandidates = renewalCandidatesData ?? [];
 
   const onRefresh = useCallback(async () => {
     setIsRefreshing(true);
@@ -52,11 +72,11 @@ export default function HomeScreen() {
 
     try {
       await refetchSession();
-      await refetchHomeData();
+      await Promise.all([refetchHomeData(), refetchRenewalCandidates()]);
     } finally {
       setIsRefreshing(false);
     }
-  }, [refetchHomeData, refetchSession]);
+  }, [refetchHomeData, refetchRenewalCandidates, refetchSession]);
 
   // Prefetch active season leagues for faster transitions.
   const prefetchLeagueIds = useMemo(() => {
@@ -75,24 +95,23 @@ export default function HomeScreen() {
   // Sort all leagues by season first (descending), then by member count (descending)
   // These must be called before any early returns to maintain hook order
   const sortedLeagues = useMemo(() => {
-    return [...(homeData ?? [])]
-      .sort((a, b) => {
-        // First sort by season (descending - newer seasons first)
-        if (a.season !== b.season) {
-          return b.season - a.season;
-        }
-        // Then sort by member count (descending - more members first)
-        const aCount = (a as any)._count?.leaguemembers ?? 0;
-        const bCount = (b as any)._count?.leaguemembers ?? 0;
-        return bCount - aCount;
-      });
+    return [...(homeData ?? [])].sort((a, b) => {
+      // First sort by season (descending - newer seasons first)
+      if (a.season !== b.season) {
+        return b.season - a.season;
+      }
+      // Then sort by member count (descending - more members first)
+      const aCount = (a as any)._count?.leaguemembers ?? 0;
+      const bCount = (b as any)._count?.leaguemembers ?? 0;
+      return bCount - aCount;
+    });
   }, [homeData]);
 
   // Filter the sorted leagues by season
   const activeLeagues = useMemo(() => {
     return sortedLeagues.filter((l) => l.season === DEFAULT_SEASON);
   }, [sortedLeagues]);
-  
+
   const priorLeagues = useMemo(() => {
     return sortedLeagues.filter((l) => l.season !== DEFAULT_SEASON);
   }, [sortedLeagues]);
@@ -118,10 +137,18 @@ export default function HomeScreen() {
     if (hasAutoOpenedLeagueRef.current) {
       return;
     }
-    if (sessionLoading || homeLoading || isRefreshing) {
+    if (
+      sessionLoading ||
+      homeLoading ||
+      renewalCandidatesLoading ||
+      isRefreshing
+    ) {
       return;
     }
     if (!session?.dbUser || !singleActiveLeague) {
+      return;
+    }
+    if (renewalCandidates.length > 0) {
       return;
     }
 
@@ -131,6 +158,8 @@ export default function HomeScreen() {
   }, [
     homeLoading,
     isRefreshing,
+    renewalCandidates.length,
+    renewalCandidatesLoading,
     session?.dbUser,
     sessionLoading,
     singleActiveLeague,
@@ -204,7 +233,7 @@ export default function HomeScreen() {
         }
       >
         {/* Header with Account button */}
-        <View className="flex-row justify-between items-center px-6 pt-6 pb-4">
+        <View className="flex-row items-center justify-between px-6 pb-4 pt-6">
           <Text className="text-app-fg-light dark:text-app-fg-dark text-2xl font-bold">
             My Leagues
           </Text>
@@ -236,9 +265,50 @@ export default function HomeScreen() {
               </Button>
             </View>
           </View>
+          {renewalCandidates.length > 0 ? (
+            <Pressable
+              onPress={() =>
+                router.push(
+                  `/league/create?priorLeagueId=${renewalCandidates[0]?.priorLeagueId}` as any,
+                )
+              }
+              className="mt-3 rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 dark:border-blue-900 dark:bg-blue-950"
+            >
+              <View className="flex-row items-start gap-3">
+                <View className="rounded-full border border-blue-200 bg-white p-2 dark:border-blue-800 dark:bg-blue-900">
+                  <Ionicons
+                    name="refresh-outline"
+                    size={18}
+                    color={isDarkColorScheme ? "#93c5fd" : "#1d4ed8"}
+                  />
+                </View>
+                <View className="flex-1">
+                  <Text className="text-[11px] uppercase tracking-wide text-blue-700 dark:text-blue-300">
+                    Run it back for {DEFAULT_SEASON}
+                  </Text>
+                  <Text
+                    className="mt-1 text-sm font-semibold text-blue-900 dark:text-blue-100"
+                    numberOfLines={1}
+                  >
+                    {renewalCandidates[0]?.name}
+                  </Text>
+                  <Text className="mt-1 text-xs text-blue-700 dark:text-blue-300">
+                    Renew a prior league and invite last year&apos;s players.
+                  </Text>
+                </View>
+                <Ionicons
+                  name="chevron-forward"
+                  size={18}
+                  color={isDarkColorScheme ? "#93c5fd" : "#1d4ed8"}
+                />
+              </View>
+            </Pressable>
+          ) : null}
           {singleActiveLeague && !homeLoading ? (
             <Pressable
-              onPress={() => router.push(`/league/${singleActiveLeague.league_id}` as any)}
+              onPress={() =>
+                router.push(`/league/${singleActiveLeague.league_id}` as any)
+              }
               className="mt-3 flex-row items-center justify-between rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 dark:border-blue-900 dark:bg-blue-950"
             >
               <View className="flex-1 pr-3">
@@ -283,7 +353,7 @@ export default function HomeScreen() {
 
         <View className="px-4">
           {!homeLoading ? (
-            <View className="mb-4 mx-2 rounded-xl border border-gray-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-800">
+            <View className="mx-2 mb-4 rounded-xl border border-gray-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-800">
               <View className="flex-row items-center justify-between">
                 <View className="items-center">
                   <Text className="text-[11px] uppercase tracking-wide text-gray-500 dark:text-gray-400">
@@ -365,7 +435,7 @@ export default function HomeScreen() {
         {/* Prior Leagues Section */}
         {filteredPriorLeagues.length > 0 && (
           <>
-            <View className="px-6 pb-4 pt-8 flex-row items-center justify-between">
+            <View className="flex-row items-center justify-between px-6 pb-4 pt-8">
               <View>
                 <Text className="text-app-fg-light dark:text-app-fg-dark text-2xl font-bold">
                   Prior Leagues

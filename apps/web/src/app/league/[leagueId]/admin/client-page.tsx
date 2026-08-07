@@ -1,16 +1,19 @@
 "use client";
 
+import Link from "next/link";
 import { Card, CardContent, CardTitle } from "~/components/ui/card";
 import { type RouterOutputs } from "~/trpc/types";
 import { Button } from "~/components/ui/button";
 import { toast } from "sonner";
 import { Input } from "~/components/ui/input";
-import { CopyIcon } from "lucide-react";
+import { ArrowRight, CopyIcon, RefreshCw } from "lucide-react";
 import { Text } from "~/components/ui/text";
 import { Separator } from "~/components/ui/separator";
 import { LeagueAdminChangeNameSetting } from "./LeagueAdminChangeNameSetting";
 import { LeagueAdminBroadcastSetting } from "./LeagueAdminBroadcastSetting";
 import { clientApi } from "~/trpc/react";
+import { CopyJoinLinkButton } from "~/components/league/CopyJoinLinkButton";
+import { DEFAULT_SEASON } from "~/utils/const";
 
 type Props = {
   league: NonNullable<RouterOutputs["league"]["get"]>;
@@ -30,8 +33,19 @@ export function LeagueAdminClientPage({
     { leagueId: leagueProp.league_id },
     { initialData: membersProp },
   );
+  const { data: renewalStatus } = clientApi.league.renewalStatus.useQuery();
+  const { data: renewalPreview } = clientApi.league.renewalPreview.useQuery(
+    { priorLeagueId: league.league_id },
+    {
+      enabled:
+        renewalStatus?.isOpen === true &&
+        league.status === "completed" &&
+        league.season < DEFAULT_SEASON,
+    },
+  );
 
   const shareLink = `${window.location?.origin}/join-league/${league.share_code}`;
+  const nextLeague = renewalPreview?.nextLeague ?? null;
 
   return (
     <Card className="w-full">
@@ -40,6 +54,53 @@ export function LeagueAdminClientPage({
           <CardTitle className="py-2 text-2xl">
             General Admin Settings
           </CardTitle>
+          {renewalPreview ? (
+            <>
+              <div className="flex w-full flex-col gap-3 rounded-md border bg-muted/30 p-4">
+                <div className="flex items-center gap-2">
+                  <RefreshCw className="h-4 w-4 text-primary" />
+                  <Text.H4>Next Season</Text.H4>
+                </div>
+                <Text.Small className="text-muted-foreground">
+                  {nextLeague
+                    ? `${nextLeague.name} is linked to this prior league.`
+                    : `Create ${renewalPreview.suggestedName} for ${DEFAULT_SEASON}.`}
+                </Text.Small>
+                <div className="flex flex-col gap-2 sm:flex-row">
+                  {nextLeague ? (
+                    <>
+                      <Button asChild size="sm" className="gap-2">
+                        <Link href={`/league/${nextLeague.league_id}`}>
+                          Open League
+                          <ArrowRight className="h-4 w-4" />
+                        </Link>
+                      </Button>
+                      <Button asChild size="sm" variant="outline">
+                        <Link
+                          href={`/league/${nextLeague.league_id}/renewal-invites?priorLeagueId=${league.league_id}`}
+                        >
+                          Manage Invites
+                        </Link>
+                      </Button>
+                      {nextLeague.share_code ? (
+                        <CopyJoinLinkButton shareCode={nextLeague.share_code} />
+                      ) : null}
+                    </>
+                  ) : (
+                    <Button asChild size="sm" className="gap-2">
+                      <Link
+                        href={`/league/create?priorLeagueId=${league.league_id}`}
+                      >
+                        Run It Back
+                        <ArrowRight className="h-4 w-4" />
+                      </Link>
+                    </Button>
+                  )}
+                </div>
+              </div>
+              <Separator />
+            </>
+          ) : null}
           {league && <LeagueAdminChangeNameSetting league={league} />}
           <Separator />
           <div className="flex w-full flex-col gap-4">

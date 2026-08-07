@@ -1,5 +1,18 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Alert, Pressable, SafeAreaView, ScrollView, Text, View } from "react-native";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import {
+  Alert,
+  Pressable,
+  SafeAreaView,
+  ScrollView,
+  Text,
+  View,
+} from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { Button } from "@/components/ui/button";
@@ -11,6 +24,7 @@ import { useColorScheme } from "@/lib/useColorScheme";
 import {
   buildPrefillFromPriorLeague,
   getCreateLeagueNameError,
+  getSuggestedRenewalLeagueName,
   MOBILE_LATE_POLICY_LABELS,
   type MobileLatePolicy,
   type MobileReminderPolicy,
@@ -25,8 +39,9 @@ export default function CreateLeagueScreen() {
   const [name, setName] = useState("");
   const [priorLeagueId, setPriorLeagueId] = useState<string>("none");
   const [priorLeaguePickerOpen, setPriorLeaguePickerOpen] = useState(false);
-  const [latePolicy, setLatePolicy] =
-    useState<MobileLatePolicy>("allow_late_and_lock_after_start");
+  const [latePolicy, setLatePolicy] = useState<MobileLatePolicy>(
+    "allow_late_and_lock_after_start",
+  );
   const [reminderPolicy, setReminderPolicy] =
     useState<MobileReminderPolicy>("three_hours_before");
   const [superbowlCompetition, setSuperbowlCompetition] = useState(true);
@@ -39,6 +54,11 @@ export default function CreateLeagueScreen() {
     clientApi.league.canCreate.useQuery(undefined, {
       enabled: !!session?.dbUser,
     });
+  const { data: renewalStatus, isLoading: renewalStatusLoading } =
+    clientApi.league.renewalStatus.useQuery(undefined, {
+      enabled: !!session?.dbUser,
+    });
+  const canRenewLeagues = renewalStatus?.isOpen === true;
   const { data: createForm, isLoading: createFormLoading } =
     clientApi.league.createForm.useQuery(undefined, {
       enabled: !!session?.dbUser && canCreate === true,
@@ -51,10 +71,6 @@ export default function CreateLeagueScreen() {
   );
 
   const { mutateAsync: createLeague } = clientApi.league.create.useMutation();
-
-  const priorLeagues = useMemo(() => {
-    return (navData?.leagues ?? []).filter((l) => l.season < DEFAULT_SEASON);
-  }, [navData]);
   const parsedRoutePriorLeagueId = useMemo(() => {
     if (typeof routePriorLeagueIdParam !== "string") {
       return null;
@@ -62,13 +78,43 @@ export default function CreateLeagueScreen() {
     const parsed = Number(routePriorLeagueIdParam);
     return Number.isInteger(parsed) && parsed > 0 ? parsed : null;
   }, [routePriorLeagueIdParam]);
+  const { data: renewalPreview, isLoading: renewalPreviewLoading } =
+    clientApi.league.renewalPreview.useQuery(
+      { priorLeagueId: parsedRoutePriorLeagueId ?? 0 },
+      {
+        enabled:
+          !!session?.dbUser &&
+          canCreate === true &&
+          canRenewLeagues &&
+          parsedRoutePriorLeagueId !== null,
+      },
+    );
+  const priorLeagues = useMemo(() => {
+    if (!canRenewLeagues) {
+      return [];
+    }
+    return (navData?.leagues ?? []).filter(
+      (league) =>
+        league.season < DEFAULT_SEASON && league.status === "completed",
+    );
+  }, [canRenewLeagues, navData]);
   const applyPriorLeagueTemplate = useCallback(
-    (league: (typeof priorLeagues)[number]) => {
+    (
+      league: (typeof priorLeagues)[number],
+      options: { suggestName?: boolean } = {},
+    ) => {
       const prefill = buildPrefillFromPriorLeague(league);
       setPriorLeagueId(prefill.priorLeagueId);
       setLatePolicy(prefill.latePolicy);
       setReminderPolicy(prefill.reminderPolicy);
       setSuperbowlCompetition(prefill.superbowlCompetition);
+      if (options.suggestName) {
+        setName((currentName) =>
+          currentName.trim().length > 0
+            ? currentName
+            : getSuggestedRenewalLeagueName(league.name, DEFAULT_SEASON),
+        );
+      }
     },
     [],
   );
@@ -78,6 +124,20 @@ export default function CreateLeagueScreen() {
       return;
     }
     if (parsedRoutePriorLeagueId === null) {
+      return;
+    }
+    if (renewalPreview?.priorLeague.league_id === parsedRoutePriorLeagueId) {
+      const prefill = buildPrefillFromPriorLeague(renewalPreview.priorLeague);
+      setPriorLeagueId(prefill.priorLeagueId);
+      setLatePolicy(prefill.latePolicy);
+      setReminderPolicy(prefill.reminderPolicy);
+      setSuperbowlCompetition(prefill.superbowlCompetition);
+      setName((currentName) =>
+        currentName.trim().length > 0
+          ? currentName
+          : renewalPreview.suggestedName,
+      );
+      hasAppliedRoutePrefillRef.current = true;
       return;
     }
     if (priorLeagues.length === 0) {
@@ -90,32 +150,50 @@ export default function CreateLeagueScreen() {
       hasAppliedRoutePrefillRef.current = true;
       return;
     }
-    applyPriorLeagueTemplate(matchedLeague);
+    applyPriorLeagueTemplate(matchedLeague, { suggestName: true });
     hasAppliedRoutePrefillRef.current = true;
-  }, [applyPriorLeagueTemplate, parsedRoutePriorLeagueId, priorLeagues]);
+  }, [
+    applyPriorLeagueTemplate,
+    parsedRoutePriorLeagueId,
+    priorLeagues,
+    renewalPreview,
+  ]);
 
-  const selectedPriorLeague = useMemo(
-    () =>
-      priorLeagueId === "none"
-        ? null
-        : priorLeagues.find((league) => league.league_id.toString() === priorLeagueId) ??
-          null,
-    [priorLeagueId, priorLeagues],
-  );
+  const selectedPriorLeague = useMemo(() => {
+    if (priorLeagueId === "none") {
+      return null;
+    }
+    return (
+      priorLeagues.find(
+        (league) => league.league_id.toString() === priorLeagueId,
+      ) ??
+      (renewalPreview?.priorLeague.league_id.toString() === priorLeagueId
+        ? renewalPreview.priorLeague
+        : null)
+    );
+  }, [priorLeagueId, priorLeagues, renewalPreview]);
   const availableLatePolicies = useMemo(() => {
     const basePolicies = (createForm?.latePolicy ?? [
       "allow_late_and_lock_after_start",
       "close_at_first_game_start",
     ]) as MobileLatePolicy[];
     return Array.from(new Set([...basePolicies, latePolicy])).filter(
-      (policy): policy is MobileLatePolicy => policy in MOBILE_LATE_POLICY_LABELS,
+      (policy): policy is MobileLatePolicy =>
+        policy in MOBILE_LATE_POLICY_LABELS,
     );
   }, [createForm?.latePolicy, latePolicy]);
   const trimmedName = name.trim();
   const nameError = getCreateLeagueNameError(name);
+  const isRenewalMode =
+    parsedRoutePriorLeagueId !== null && priorLeagueId !== "none";
   const canSubmit = trimmedName.length > 0 && nameError === null && !submitting;
-  const createButtonText =
-    submitting ? "Creating..." : canSubmit ? "Create League" : "Name must be 5-100 chars";
+  const createButtonText = submitting
+    ? "Creating..."
+    : canSubmit
+      ? isRenewalMode
+        ? "Create & Invite"
+        : "Create League"
+      : "Name must be 5-100 chars";
 
   const onSubmit = async () => {
     if (nameError) {
@@ -137,17 +215,31 @@ export default function CreateLeagueScreen() {
         ...(reminderPolicy === "none" ? {} : { reminderPolicy }),
       });
       await utils.invalidate();
+      if (priorLeagueId !== "none") {
+        router.replace(
+          `/league/${createdLeague.league_id}/renewal-invites?priorLeagueId=${priorLeagueId}` as any,
+        );
+        return;
+      }
       router.replace(`/league/${createdLeague.league_id}` as any);
     } catch (error) {
       console.error("Failed to create league", error);
-      Alert.alert("Create Failed", "Unable to create league. Please try again.");
+      Alert.alert(
+        "Create Failed",
+        "Unable to create league. Please try again.",
+      );
     } finally {
       setSubmitting(false);
     }
   };
 
   const loading =
-    sessionLoading || canCreateLoading || createFormLoading || navLoading;
+    sessionLoading ||
+    canCreateLoading ||
+    renewalStatusLoading ||
+    createFormLoading ||
+    navLoading ||
+    renewalPreviewLoading;
 
   if (loading) {
     return (
@@ -197,6 +289,25 @@ export default function CreateLeagueScreen() {
     );
   }
 
+  if (parsedRoutePriorLeagueId !== null && !canRenewLeagues) {
+    return (
+      <SafeAreaView className="bg-app-bg-light dark:bg-app-bg-dark flex-1">
+        <View className="flex-1 items-center justify-center px-6">
+          <Text className="text-app-fg-light dark:text-app-fg-dark mb-2 text-center text-2xl font-bold">
+            League Renewal Is Not Open
+          </Text>
+          <Text className="text-center text-base text-gray-600 dark:text-gray-400">
+            Renewals open closer to the next season. You can still create a new
+            league without copying a prior one.
+          </Text>
+          <Button className="mt-5" onPress={() => router.replace("/" as any)}>
+            Back to My Leagues
+          </Button>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
   return (
     <SafeAreaView className="bg-app-bg-light dark:bg-app-bg-dark flex-1">
       <ScrollView
@@ -208,7 +319,7 @@ export default function CreateLeagueScreen() {
           <View className="flex-row items-start gap-3">
             <Pressable
               onPress={() => router.back()}
-              className="mt-1 rounded-lg bg-app-card-light p-2 dark:bg-app-card-dark"
+              className="bg-app-card-light dark:bg-app-card-dark mt-1 rounded-lg p-2"
             >
               <Ionicons
                 name="chevron-back"
@@ -218,10 +329,14 @@ export default function CreateLeagueScreen() {
             </Pressable>
             <View className="flex-1 gap-2">
               <Text className="text-app-fg-light dark:text-app-fg-dark text-3xl font-bold">
-                Create League
+                {isRenewalMode
+                  ? `Run it back for ${DEFAULT_SEASON}`
+                  : "Create League"}
               </Text>
               <Text className="text-base text-gray-600 dark:text-gray-400">
-                Configure your league and invite friends to play.
+                {isRenewalMode
+                  ? "Renew your prior league and invite last year's players."
+                  : "Configure your league and invite friends to play."}
               </Text>
             </View>
           </View>
@@ -235,71 +350,104 @@ export default function CreateLeagueScreen() {
               onChangeText={setName}
               placeholder="My Funtime League"
             />
-            {nameError ? <Text className="text-xs text-red-500">{nameError}</Text> : null}
+            {nameError ? (
+              <Text className="text-xs text-red-500">{nameError}</Text>
+            ) : null}
           </View>
 
           <View className="gap-3">
             <Text className="text-app-fg-light dark:text-app-fg-dark text-base font-semibold">
               Prior League
             </Text>
-            <Pressable
-              onPress={() => setPriorLeaguePickerOpen((open) => !open)}
-              className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 dark:border-zinc-700 dark:bg-zinc-900"
-            >
-              <Text className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
-                Selected
-              </Text>
-              <Text className="text-app-fg-light dark:text-app-fg-dark mt-1 text-sm font-semibold">
-                {selectedPriorLeague
-                  ? `${selectedPriorLeague.name} (${selectedPriorLeague.season})`
-                  : "None"}
-              </Text>
-              <Text className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                {priorLeaguePickerOpen ? "Hide prior leagues" : "Choose prior league"}
-              </Text>
-            </Pressable>
-            {priorLeaguePickerOpen ? (
-              <View
-                className="gap-2 rounded-xl border border-gray-200 bg-white p-3 dark:border-zinc-700 dark:bg-zinc-800"
-                style={{ maxHeight: 220 }}
-              >
-                <ScrollView
-                  nestedScrollEnabled
-                  showsVerticalScrollIndicator={false}
-                  contentContainerStyle={{ gap: 8 }}
-                >
-                  <SelectOption
-                    selected={priorLeagueId === "none"}
-                    onPress={() => {
-                      setPriorLeagueId("none");
-                      setPriorLeaguePickerOpen(false);
-                    }}
-                    className="justify-start px-4 py-3"
-                  >
-                    <Text className="text-app-fg-light dark:text-app-fg-dark text-sm">
-                      None
+            {isRenewalMode && selectedPriorLeague ? (
+              <View className="rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 dark:border-blue-900 dark:bg-blue-950">
+                <Text className="text-xs uppercase tracking-wide text-blue-700 dark:text-blue-300">
+                  Renewal Source
+                </Text>
+                <Text className="mt-1 text-sm font-semibold text-blue-900 dark:text-blue-100">
+                  {selectedPriorLeague.name} ({selectedPriorLeague.season})
+                </Text>
+                <View className="mt-3 flex-row flex-wrap gap-2">
+                  <View className="rounded-full border border-blue-200 bg-white px-2.5 py-1 dark:border-blue-800 dark:bg-blue-900">
+                    <Text className="text-[10px] font-semibold uppercase text-blue-700 dark:text-blue-200">
+                      {renewalPreview?.memberCount ?? 0} players
                     </Text>
-                  </SelectOption>
-                  {priorLeagues.map((league) => (
-                    <SelectOption
-                      key={league.league_id}
-                      selected={priorLeagueId === league.league_id.toString()}
-                      onPress={() => {
-                        applyPriorLeagueTemplate(league);
-                        setPriorLeaguePickerOpen(false);
-                      }}
-                      className="justify-start px-4 py-3"
-                    >
-                      <Text className="text-app-fg-light dark:text-app-fg-dark text-sm">
-                        {league.name} ({league.season})
-                      </Text>
-                    </SelectOption>
-                  ))}
-                </ScrollView>
+                  </View>
+                  <View className="rounded-full border border-blue-200 bg-white px-2.5 py-1 dark:border-blue-800 dark:bg-blue-900">
+                    <Text className="text-[10px] font-semibold uppercase text-blue-700 dark:text-blue-200">
+                      {renewalPreview?.adminCount ?? 0} admins
+                    </Text>
+                  </View>
+                </View>
               </View>
-            ) : null}
+            ) : (
+              <>
+                <Pressable
+                  onPress={() => setPriorLeaguePickerOpen((open) => !open)}
+                  className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 dark:border-zinc-700 dark:bg-zinc-900"
+                >
+                  <Text className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                    Selected
+                  </Text>
+                  <Text className="text-app-fg-light dark:text-app-fg-dark mt-1 text-sm font-semibold">
+                    {selectedPriorLeague
+                      ? `${selectedPriorLeague.name} (${selectedPriorLeague.season})`
+                      : "None"}
+                  </Text>
+                  <Text className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                    {priorLeaguePickerOpen
+                      ? "Hide prior leagues"
+                      : "Choose prior league"}
+                  </Text>
+                </Pressable>
+                {priorLeaguePickerOpen ? (
+                  <View
+                    className="gap-2 rounded-xl border border-gray-200 bg-white p-3 dark:border-zinc-700 dark:bg-zinc-800"
+                    style={{ maxHeight: 220 }}
+                  >
+                    <ScrollView
+                      nestedScrollEnabled
+                      showsVerticalScrollIndicator={false}
+                      contentContainerStyle={{ gap: 8 }}
+                    >
+                      <SelectOption
+                        selected={priorLeagueId === "none"}
+                        onPress={() => {
+                          setPriorLeagueId("none");
+                          setPriorLeaguePickerOpen(false);
+                        }}
+                        className="justify-start px-4 py-3"
+                      >
+                        <Text className="text-app-fg-light dark:text-app-fg-dark text-sm">
+                          None
+                        </Text>
+                      </SelectOption>
+                      {priorLeagues.map((league) => (
+                        <SelectOption
+                          key={league.league_id}
+                          selected={
+                            priorLeagueId === league.league_id.toString()
+                          }
+                          onPress={() => {
+                            applyPriorLeagueTemplate(league);
+                            setPriorLeaguePickerOpen(false);
+                          }}
+                          className="justify-start px-4 py-3"
+                        >
+                          <Text className="text-app-fg-light dark:text-app-fg-dark text-sm">
+                            {league.name} ({league.season})
+                          </Text>
+                        </SelectOption>
+                      ))}
+                    </ScrollView>
+                  </View>
+                ) : null}
+              </>
+            )}
             <Text className="text-xs text-gray-500 dark:text-gray-400">
-              Reuse a prior league to simplify member re-invites.
+              {canRenewLeagues
+                ? "Reuse a completed prior league to simplify member re-invites."
+                : "League renewals open closer to the next season."}
             </Text>
           </View>
 
@@ -309,8 +457,8 @@ export default function CreateLeagueScreen() {
                 Using {selectedPriorLeague.name} as a template
               </Text>
               <Text className="text-xs text-blue-700 dark:text-blue-300">
-                Late policy, reminder policy, and Super Bowl settings were prefilled.
-                You can still edit any of them below.
+                Late policy, reminder policy, and Super Bowl settings were
+                prefilled. You can still edit any of them below.
               </Text>
             </View>
           ) : null}
@@ -320,8 +468,8 @@ export default function CreateLeagueScreen() {
               Late Policy
             </Text>
             <Text className="text-xs text-gray-500 dark:text-gray-400">
-              Controls whether members can still pick games that have not started after
-              missing early kickoff.
+              Controls whether members can still pick games that have not
+              started after missing early kickoff.
             </Text>
             {availableLatePolicies.map((policy) => {
               return (
@@ -344,7 +492,8 @@ export default function CreateLeagueScreen() {
               Reminder Policy
             </Text>
             <Text className="text-xs text-gray-500 dark:text-gray-400">
-              Reminders notify members without picks roughly three hours before kickoff.
+              Reminders notify members without picks roughly three hours before
+              kickoff.
             </Text>
             <SelectOption
               selected={reminderPolicy === "three_hours_before"}
@@ -371,7 +520,8 @@ export default function CreateLeagueScreen() {
               Super Bowl Competition
             </Text>
             <Text className="text-xs text-gray-500 dark:text-gray-400">
-              Adds a season-end winner/loser/score competition after regular weekly picks.
+              Adds a season-end winner/loser/score competition after regular
+              weekly picks.
             </Text>
             <View className="flex-row gap-3">
               <View className="flex-1">

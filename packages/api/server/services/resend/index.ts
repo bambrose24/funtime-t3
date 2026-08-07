@@ -2,6 +2,7 @@ import { render } from "@react-email/render";
 import { chunk } from "lodash";
 import { Resend } from "resend";
 import LeagueBroadcastEmail from "../../../emails/league-broadcast";
+import LeagueRenewalInvite from "../../../emails/league-renewal-invite";
 import LeagueWelcome from "../../../emails/league-welcome";
 import PicksConfirmationEmail from "../../../emails/picks-confirmation";
 import PickReminderEmail from "../../../emails/picks-reminder";
@@ -124,19 +125,19 @@ export const resendApi = {
     );
     const { data, error } = await sendEmail(
       {
-      from: FROM,
-      to: [email],
-      subject: `Welcome to ${league.name}!`,
-      react: LeagueWelcome({
-        admin: {
-          email: admin?.people.email ?? "",
-          username: admin?.people.username ?? "",
-        },
-        leagueHomeHref: `https://www.play-funtime.com/league/${league.league_id}`,
-        leagueName: league.name,
-        season: league.season,
-        username: member.people.username,
-      }),
+        from: FROM,
+        to: [email],
+        subject: `Welcome to ${league.name}!`,
+        react: LeagueWelcome({
+          admin: {
+            email: admin?.people.email ?? "",
+            username: admin?.people.username ?? "",
+          },
+          leagueHomeHref: `https://www.play-funtime.com/league/${league.league_id}`,
+          leagueName: league.name,
+          season: league.season,
+          username: member.people.username,
+        }),
       },
       `league_registration:${league.league_id}:${memberId}`,
     );
@@ -163,6 +164,105 @@ export const resendApi = {
         },
       });
     }
+  },
+
+  sendLeagueRenewalInvites: async ({
+    adminName,
+    joinHref,
+    nextLeagueName,
+    nextLeagueId,
+    priorLeagueId,
+    priorLeagueName,
+    season,
+    to,
+  }: {
+    adminName: string;
+    joinHref: string;
+    nextLeagueName: string;
+    nextLeagueId: number;
+    priorLeagueId: number;
+    priorLeagueName: string;
+    season: number;
+    to: { email: string; memberId: number; username: string }[];
+  }) => {
+    getLogger().info(
+      `${LOG_PREFIX} Going to send renewal invites for prior league ${priorLeagueId}`,
+    );
+
+    let sentCount = 0;
+    let failedCount = 0;
+    const chunks = chunk(to, 90);
+
+    for (const emailChunk of chunks) {
+      const { data, error } = await sendBatchEmail(
+        emailChunk.map((recipient) => {
+          return {
+            from: FROM,
+            to: recipient.email,
+            subject: `Run it back: ${nextLeagueName} is open`,
+            react: LeagueRenewalInvite({
+              adminName,
+              joinHref,
+              nextLeagueName,
+              priorLeagueName,
+              season,
+              username: recipient.username,
+            }),
+          };
+        }),
+        `renewal_invite:${priorLeagueId}`,
+      );
+
+      if (error) {
+        failedCount += emailChunk.length;
+        getLogger().error(
+          `${LOG_PREFIX} Error sending renewal invites for prior league ${priorLeagueId}`,
+          { error },
+        );
+        continue;
+      }
+
+      if (!data?.data || data.data.length === 0) {
+        continue;
+      }
+
+      sentCount += data.data.length;
+      const resendEmails = await Promise.all(
+        data.data.map(async (email) => {
+          return await resend.emails.get(email.id);
+        }),
+      );
+
+      const logsToCreate = data.data
+        .map((email) => {
+          const resendEmail = resendEmails.find((e) => e.data?.id === email.id);
+          const memberAndEmail = emailChunk.find((recipient) =>
+            resendEmail?.data?.to.includes(recipient.email),
+          );
+          if (!memberAndEmail) {
+            getLogger().error(
+              `${LOG_PREFIX} Unable to find member for renewal invite email ${email.id} for prior league ${priorLeagueId}`,
+            );
+            return null;
+          }
+
+          return {
+            resend_id: email.id,
+            email_type: "renewal_invite",
+            league_id: nextLeagueId,
+            member_id: memberAndEmail.memberId,
+          } as const;
+        })
+        .filter(Defined);
+
+      if (logsToCreate.length > 0) {
+        await db.emailLogs.createMany({
+          data: logsToCreate,
+        });
+      }
+    }
+
+    return { sentCount, failedCount };
   },
 
   sendWeekPicksEmail: async ({
@@ -248,10 +348,10 @@ export const resendApi = {
 
       const { data, error } = await sendEmail(
         {
-        from: FROM,
-        to: [email],
-        subject: `Your ${leagues.length === 1 ? (leagues.at(0)?.name ?? "") : "Funtime"} picks for Week ${week}!`,
-        html: emailHtml,
+          from: FROM,
+          to: [email],
+          subject: `Your ${leagues.length === 1 ? (leagues.at(0)?.name ?? "") : "Funtime"} picks for Week ${week}!`,
+          html: emailHtml,
         },
         `week_picks:${userId}:${week}`,
       );
@@ -314,14 +414,14 @@ export const resendApi = {
 
     const { data, error } = await sendEmail(
       {
-      from: FROM,
-      to: [user.email],
-      subject: `Reminder: Make Your Picks for ${league.name}!`,
-      react: PickReminderEmail({
-        username: user.username,
-        leagueName: league.name,
-        leagueHomeHref: `https://www.play-funtime.com/league/${league.league_id}`,
-      }),
+        from: FROM,
+        to: [user.email],
+        subject: `Reminder: Make Your Picks for ${league.name}!`,
+        react: PickReminderEmail({
+          username: user.username,
+          leagueName: league.name,
+          leagueHomeHref: `https://www.play-funtime.com/league/${league.league_id}`,
+        }),
       },
       `pick_reminder:${league.league_id}:${member.membership_id}:${week}`,
     );
@@ -473,10 +573,10 @@ export const resendApi = {
 
       const { data, error } = await sendEmail(
         {
-        from: FROM,
-        to: [recipient.email],
-        subject: `${leagueName} - Week ${week} Summary`,
-        html,
+          from: FROM,
+          to: [recipient.email],
+          subject: `${leagueName} - Week ${week} Summary`,
+          html,
         },
         `week_summary:${leagueId}:${recipient.memberId}:${week}`,
       );

@@ -24,7 +24,10 @@ export default async function CreateLeaguePage({
     redirect(`/login?${params.toString()}`);
   }
 
-  const canCreate = await serverApi.league.canCreate();
+  const [canCreate, renewalStatus] = await Promise.all([
+    serverApi.league.canCreate(),
+    serverApi.league.renewalStatus(),
+  ]);
 
   if (!canCreate) {
     redirect("/league");
@@ -32,8 +35,18 @@ export default async function CreateLeaguePage({
   const params = paramsSchema.safeParse(resolvedSearchParams);
   const priorLeagueId = params.data?.priorLeagueId;
 
+  if (priorLeagueId && !renewalStatus.isOpen) {
+    redirect(`/league/${priorLeagueId}`);
+  }
+
   const priorLeague = priorLeagueId
     ? await serverApi.league.get({ leagueId: priorLeagueId })
+    : undefined;
+  if (priorLeagueId && priorLeague?.status !== "completed") {
+    redirect(`/league/${priorLeagueId}`);
+  }
+  const renewalPreview = priorLeagueId
+    ? await serverApi.league.renewalPreview({ priorLeagueId })
     : undefined;
 
   const createLeagueForm = await serverApi.league.createForm();
@@ -41,6 +54,7 @@ export default async function CreateLeaguePage({
   return (
     <CreateLeagueClientPage
       priorLeague={priorLeague}
+      renewalPreview={renewalPreview}
       createLeagueForm={createLeagueForm}
       navInitialData={nav}
     />

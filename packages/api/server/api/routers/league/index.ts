@@ -4,11 +4,15 @@ import { z } from "zod";
 import {
   LatePolicy,
   LeagueStatus,
+  MemberRole,
   PickPolicy,
   ReminderPolicy,
   ScoringType,
 } from "../../../../src/generated/prisma-client";
-import { DEFAULT_SEASON } from "../../../../utils/const";
+import {
+  CAN_CREATE_NEXT_SEASON_LEAGUES,
+  DEFAULT_SEASON,
+} from "../../../../utils/const";
 import { Defined } from "../../../../utils/defined";
 import { authorizedCacheMiddleware } from "../../../cache";
 import { resendApi } from "../../../services/resend";
@@ -20,6 +24,11 @@ import {
   publicProcedure,
 } from "../../trpc";
 import { leagueAdminRouter } from "./admin";
+import {
+  getRenewalIneligibilityReason,
+  isLeagueAdmin,
+  suggestRenewalLeagueName,
+} from "./renewal";
 
 const SUPER_ADMIN_EMAIL = "bambrose24@gmail.com";
 
@@ -38,6 +47,9 @@ const leagueIdSchema = z.object({
 
 export const leagueRouter = createTRPCRouter({
   admin: leagueAdminRouter,
+  renewalStatus: authorizedProcedure.query(() => {
+    return { isOpen: CAN_CREATE_NEXT_SEASON_LEAGUES };
+  }),
   canCreate: publicProcedure.query(async ({ ctx }) => {
     if (!ctx.dbUser) {
       return false;
@@ -65,6 +77,155 @@ export const leagueRouter = createTRPCRouter({
     // }
     // return true;
   }),
+  renewalCandidates: authorizedProcedure.query(async ({ ctx }) => {
+    const { db, dbUser } = ctx;
+    if (!dbUser) {
+      throw new TRPCError({ code: "UNAUTHORIZED" });
+    }
+
+    if (!CAN_CREATE_NEXT_SEASON_LEAGUES) {
+      return [];
+    }
+
+    const priorAdminLeagues = await db.leagues.findMany({
+      where: {
+        season: {
+          lt: DEFAULT_SEASON,
+        },
+        status: LeagueStatus.completed,
+        leaguemembers: {
+          some: {
+            user_id: dbUser.uid,
+            role: MemberRole.admin,
+          },
+        },
+      },
+      include: {
+        _count: {
+          select: {
+            leaguemembers: true,
+          },
+        },
+        leaguemembers: {
+          select: {
+            role: true,
+          },
+        },
+        future_leagues: {
+          where: {
+            season: DEFAULT_SEASON,
+          },
+          take: 1,
+        },
+      },
+      orderBy: [
+        {
+          season: "desc",
+        },
+        {
+          created_time: "asc",
+        },
+      ],
+    });
+
+    return priorAdminLeagues
+      .filter((league) => league.future_leagues.length === 0)
+      .map((league) => {
+        const adminCount = league.leaguemembers.filter(
+          (member) => member.role === MemberRole.admin,
+        ).length;
+
+        return {
+          priorLeagueId: league.league_id,
+          name: league.name,
+          season: league.season,
+          status: league.status,
+          memberCount: league._count.leaguemembers,
+          adminCount,
+          suggestedName: suggestRenewalLeagueName(league.name),
+          nextLeague: league.future_leagues.at(0) ?? null,
+        };
+      })
+      .sort((a, b) => {
+        if (a.season !== b.season) {
+          return b.season - a.season;
+        }
+        return b.memberCount - a.memberCount;
+      });
+  }),
+  renewalPreview: authorizedProcedure
+    .input(
+      z.object({
+        priorLeagueId: z.number().int(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const { db, dbUser } = ctx;
+      if (!dbUser) {
+        throw new TRPCError({ code: "UNAUTHORIZED" });
+      }
+
+      const priorLeague = await db.leagues.findFirstOrThrow({
+        where: {
+          league_id: input.priorLeagueId,
+        },
+        include: {
+          _count: {
+            select: {
+              leaguemembers: true,
+            },
+          },
+          leaguemembers: {
+            select: {
+              role: true,
+            },
+          },
+          future_leagues: {
+            where: {
+              season: DEFAULT_SEASON,
+            },
+            take: 1,
+          },
+        },
+      });
+
+      if (!isLeagueAdmin(dbUser.leaguemembers, priorLeague.league_id)) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "You are not an admin of the prior league",
+        });
+      }
+
+      const ineligibilityReason = getRenewalIneligibilityReason(priorLeague);
+      if (ineligibilityReason) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: ineligibilityReason,
+        });
+      }
+
+      const adminCount = priorLeague.leaguemembers.filter(
+        (member) => member.role === MemberRole.admin,
+      ).length;
+
+      return {
+        priorLeague: {
+          league_id: priorLeague.league_id,
+          name: priorLeague.name,
+          season: priorLeague.season,
+          status: priorLeague.status,
+          late_policy: priorLeague.late_policy,
+          pick_policy: priorLeague.pick_policy,
+          reminder_policy: priorLeague.reminder_policy,
+          scoring_type: priorLeague.scoring_type,
+          superbowl_competition: priorLeague.superbowl_competition,
+        },
+        suggestedName: suggestRenewalLeagueName(priorLeague.name),
+        memberCount: priorLeague._count.leaguemembers,
+        adminCount,
+        nextLeague: priorLeague.future_leagues.at(0) ?? null,
+      };
+    }),
   fromJoinCode: publicProcedure
     .input(
       z.object({
@@ -184,7 +345,7 @@ export const leagueRouter = createTRPCRouter({
   create: authorizedProcedure
     .input(
       z.object({
-        name: z.string(),
+        name: z.string().min(5).max(100),
         priorLeagueId: z.number().optional(),
         latePolicy: z
           .nativeEnum(LatePolicy)
@@ -202,26 +363,108 @@ export const leagueRouter = createTRPCRouter({
       if (!dbUser) {
         throw new TRPCError({ code: "UNAUTHORIZED" });
       }
-      const response = await ctx.db.leagues.create({
-        data: {
-          name: input.name,
-          season: DEFAULT_SEASON,
-          prior_league_id: input.priorLeagueId ?? null,
-          late_policy: input.latePolicy,
-          pick_policy: input.pickPolicy,
-          reminder_policy: input.reminderPolicy,
-          superbowl_competition: input.superbowlCompetition,
-          created_by_user_id: dbUser.uid,
-          created_time: new Date(),
-          leaguemembers: {
-            create: {
-              user_id: dbUser.uid,
-              role: "admin",
+
+      try {
+        const response = await ctx.db.$transaction(async (tx) => {
+          if (input.priorLeagueId) {
+            const priorLeague = await tx.leagues.findFirst({
+              where: {
+                league_id: input.priorLeagueId,
+              },
+              include: {
+                leaguemembers: {
+                  select: {
+                    user_id: true,
+                    role: true,
+                  },
+                },
+              },
+            });
+
+            if (!priorLeague) {
+              throw new TRPCError({
+                code: "NOT_FOUND",
+                message: "Prior league not found",
+              });
+            }
+
+            const ineligibilityReason =
+              getRenewalIneligibilityReason(priorLeague);
+            if (ineligibilityReason) {
+              throw new TRPCError({
+                code: "BAD_REQUEST",
+                message: ineligibilityReason,
+              });
+            }
+
+            const isPriorLeagueAdmin = priorLeague.leaguemembers.some(
+              (member) =>
+                member.user_id === dbUser.uid &&
+                member.role === MemberRole.admin,
+            );
+            if (!isPriorLeagueAdmin) {
+              throw new TRPCError({
+                code: "FORBIDDEN",
+                message: "You are not an admin of the prior league",
+              });
+            }
+
+            const existingRenewal = await tx.leagues.findFirst({
+              where: {
+                prior_league_id: input.priorLeagueId,
+                season: DEFAULT_SEASON,
+              },
+            });
+            if (existingRenewal) {
+              throw new TRPCError({
+                code: "BAD_REQUEST",
+                message:
+                  "This league has already been renewed for the current season",
+              });
+            }
+          }
+
+          return await tx.leagues.create({
+            data: {
+              name: input.name,
+              season: DEFAULT_SEASON,
+              prior_league_id: input.priorLeagueId ?? null,
+              late_policy: input.latePolicy,
+              pick_policy: input.pickPolicy,
+              reminder_policy: input.reminderPolicy,
+              scoring_type: input.scoringType,
+              superbowl_competition: input.superbowlCompetition,
+              created_by_user_id: dbUser.uid,
+              created_time: new Date(),
+              leaguemembers: {
+                create: {
+                  user_id: dbUser.uid,
+                  role: "admin",
+                },
+              },
             },
-          },
-        },
-      });
-      return response;
+          });
+        });
+
+        return response;
+      } catch (error) {
+        if (error instanceof TRPCError) {
+          throw error;
+        }
+        if (
+          error &&
+          typeof error === "object" &&
+          "code" in error &&
+          error.code === "P2002"
+        ) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message:
+              "This league has already been renewed for the current season",
+          });
+        }
+        throw error;
+      }
     }),
   hasStarted: authorizedProcedure
     .input(leagueIdSchema)
@@ -640,7 +883,9 @@ export const leagueRouter = createTRPCRouter({
     .use(async (opts) => {
       return authorizedCacheMiddleware({
         by: "params",
-        cacheTimeSeconds: 60 * 60 * 24,
+        // A renewal can be created while a member is viewing the prior league.
+        // Keep this short so the next-season upsell appears promptly.
+        cacheTimeSeconds: 60 * 5,
         ...opts,
       });
     })
@@ -657,7 +902,9 @@ export const leagueRouter = createTRPCRouter({
       const nextLeague = await db.leagues.findFirst({
         where: {
           prior_league_id: leagueId,
+          season: DEFAULT_SEASON,
         },
+        orderBy: { created_time: "desc" },
       });
 
       return { nextLeague };

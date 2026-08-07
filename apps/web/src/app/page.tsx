@@ -5,6 +5,7 @@ import { DEFAULT_SEASON } from "~/utils/const";
 import { redirect } from "next/navigation";
 import { Text } from "~/components/ui/text";
 import { FuntimeLanding } from "./_components/FuntimeLanding";
+import { RunItBackRenewalSection } from "./RunItBackRenewalSection";
 
 // Almost all of the Funtime pages will need this
 export const dynamic = "force-dynamic";
@@ -33,7 +34,9 @@ export default async function Home() {
       (m) => m.leagues.season === DEFAULT_SEASON,
     ) ?? [];
 
-  if (activeLeagues.length === 1) {
+  const renewalCandidates = await serverApi.league.renewalCandidates();
+
+  if (activeLeagues.length === 1 && renewalCandidates.length === 0) {
     const activeLeague = activeLeagues.at(0);
     if (activeLeague) {
       redirect(`/league/${activeLeague.league_id}`);
@@ -46,6 +49,7 @@ export default async function Home() {
   return (
     <>
       {!data?.length ? <JoinOrCreateALeague /> : <></>}
+      <RunItBackRenewalSection candidates={renewalCandidates} />
       <div className="col-span-12 flex justify-center pt-2">
         <Text.H2>Active Leagues</Text.H2>
       </div>

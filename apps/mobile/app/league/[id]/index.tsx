@@ -1,4 +1,10 @@
-import React, { useState, useEffect, Suspense, useMemo, useCallback } from "react";
+import React, {
+  useState,
+  useEffect,
+  Suspense,
+  useMemo,
+  useCallback,
+} from "react";
 import {
   View,
   Text,
@@ -29,8 +35,10 @@ import { TeamLogo } from "@/components/shared/TeamLogo";
 import { usePrefetchForLeague } from "@/hooks/usePrefetchForLeague";
 import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
 import { createComponentLogger } from "@/lib/logging";
 import { getShareLeagueInvite } from "@/lib/league/getShareLeagueInvite";
+import { DEFAULT_SEASON } from "@/constants";
 
 type TabType =
   | "overview"
@@ -206,10 +214,7 @@ export default function LeagueScreen() {
         leagueId: leagueIdNumber,
         error: error instanceof Error ? error.message : String(error),
       });
-      Alert.alert(
-        "Unable to share invite",
-        "Please try again in a moment.",
-      );
+      Alert.alert("Unable to share invite", "Please try again in a moment.");
     }
   }, [leagueIdNumber, logger, shareInvite]);
 
@@ -268,6 +273,7 @@ export default function LeagueScreen() {
             onSwitchToPicks={() => switchToTab("picks")}
             isPicksModalVisible={isPicksModalVisible}
             setIsPicksModalVisible={setIsPicksModalVisible}
+            isLeagueAdmin={isLeagueAdmin}
           />
         );
       case "picks":
@@ -385,7 +391,9 @@ export default function LeagueScreen() {
                     <View
                       className={cn(
                         "absolute -bottom-px left-0 right-0 h-0.5 rounded-full",
-                        isActive ? "bg-gray-900 dark:bg-gray-100" : "bg-transparent",
+                        isActive
+                          ? "bg-gray-900 dark:bg-gray-100"
+                          : "bg-transparent",
                       )}
                     />
                   </Pressable>
@@ -407,10 +415,7 @@ export default function LeagueScreen() {
 }
 
 // Custom hook for prefetching and persisting league overview data
-function useLeagueOverviewData(
-  leagueId: string,
-  selectedWeekParam?: number,
-) {
+function useLeagueOverviewData(leagueId: string, selectedWeekParam?: number) {
   const leagueIdNumber = parseInt(leagueId, 10);
   const utils = clientApi.useUtils();
 
@@ -632,6 +637,7 @@ function LeagueOverview({
   onSwitchToPicks,
   isPicksModalVisible,
   setIsPicksModalVisible,
+  isLeagueAdmin,
 }: {
   leagueId: string;
   selectedWeekParam?: number;
@@ -639,6 +645,7 @@ function LeagueOverview({
   onSwitchToPicks: () => void;
   isPicksModalVisible: boolean;
   setIsPicksModalVisible: (visible: boolean) => void;
+  isLeagueAdmin: boolean;
 }) {
   const { isDarkColorScheme } = useColorScheme();
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -658,6 +665,21 @@ function LeagueOverview({
     isError,
     refetchAll,
   } = useLeagueOverviewData(leagueId, selectedWeekParam);
+  const leagueIdNumber = Number(leagueId);
+  const { data: renewalStatus } = clientApi.league.renewalStatus.useQuery(
+    undefined,
+    { enabled: isLeagueAdmin },
+  );
+  const { data: renewalPreview } = clientApi.league.renewalPreview.useQuery(
+    { priorLeagueId: leagueIdNumber },
+    {
+      enabled:
+        isLeagueAdmin &&
+        renewalStatus?.isOpen === true &&
+        leagueData?.status === "completed" &&
+        (leagueData?.season ?? DEFAULT_SEASON) < DEFAULT_SEASON,
+    },
+  );
 
   const weekOptions = useMemo(() => {
     const options = new Set<number>();
@@ -799,6 +821,56 @@ function LeagueOverview({
               Thanks for playing this year. Kick back for now, and we'll see you
               next season.
             </Text>
+            {isLeagueAdmin && renewalPreview ? (
+              <View className="mt-5 w-full gap-3 rounded-xl border border-blue-200 bg-white p-4 dark:border-blue-800 dark:bg-blue-900">
+                <Text className="text-center text-sm font-semibold text-blue-900 dark:text-blue-100">
+                  {renewalPreview.nextLeague
+                    ? "Next season league is ready"
+                    : `Run it back for ${DEFAULT_SEASON}`}
+                </Text>
+                <Text className="text-center text-xs text-blue-700 dark:text-blue-300">
+                  {renewalPreview.nextLeague
+                    ? `${renewalPreview.nextLeague.name} is linked to this league.`
+                    : `Create ${renewalPreview.suggestedName} and invite last year's players.`}
+                </Text>
+                {renewalPreview.nextLeague ? (
+                  <View className="gap-2">
+                    <Button
+                      size="sm"
+                      onPress={() =>
+                        router.push(
+                          `/league/${renewalPreview.nextLeague?.league_id}` as any,
+                        )
+                      }
+                    >
+                      Open League
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onPress={() =>
+                        router.push(
+                          `/league/${renewalPreview.nextLeague?.league_id}/renewal-invites?priorLeagueId=${leagueIdNumber}` as any,
+                        )
+                      }
+                    >
+                      Manage Invites
+                    </Button>
+                  </View>
+                ) : (
+                  <Button
+                    size="sm"
+                    onPress={() =>
+                      router.push(
+                        `/league/create?priorLeagueId=${leagueIdNumber}` as any,
+                      )
+                    }
+                  >
+                    Create {DEFAULT_SEASON} League
+                  </Button>
+                )}
+              </View>
+            ) : null}
           </View>
         </View>
       </ScrollView>
@@ -845,7 +917,10 @@ function LeagueOverview({
                   <ScrollView
                     horizontal
                     showsHorizontalScrollIndicator={false}
-                    contentContainerStyle={{ paddingHorizontal: 4, paddingTop: 12 }}
+                    contentContainerStyle={{
+                      paddingHorizontal: 4,
+                      paddingTop: 12,
+                    }}
                   >
                     <View className="flex-row gap-2">
                       {weekOptions.map((weekOption) => {
@@ -885,7 +960,8 @@ function LeagueOverview({
         {weekWinnerEntries.length > 0 && (
           <View className="mx-4 mb-4 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 dark:border-emerald-800 dark:bg-emerald-950">
             <Text className="text-xs uppercase tracking-wide text-emerald-700 dark:text-emerald-300">
-              Week {displayWeek} {weekWinnerEntries.length > 1 ? "Winners" : "Winner"}
+              Week {displayWeek}{" "}
+              {weekWinnerEntries.length > 1 ? "Winners" : "Winner"}
             </Text>
             <View className="mt-2 flex-row flex-wrap gap-2">
               {weekWinnerEntries.map((winner) => (
@@ -1049,9 +1125,7 @@ function LeagueOverview({
                     {openGamesCount} open
                   </Text>
                 </View>
-                <Pressable
-                  className="rounded-full border border-gray-200 bg-white px-2 py-1 dark:border-zinc-700 dark:bg-zinc-800"
-                >
+                <Pressable className="rounded-full border border-gray-200 bg-white px-2 py-1 dark:border-zinc-700 dark:bg-zinc-800">
                   <Text className="text-[10px] font-semibold text-gray-600 dark:text-gray-300">
                     {lockedGamesCount} locked
                   </Text>
@@ -1084,16 +1158,19 @@ function LeagueOverview({
           </View>
         )}
 
-        {!isLoading && !isUserPicksLoading && (!games || games.length === 0) && (
-          <View className="mx-4 mb-6 rounded-xl border border-gray-200 bg-gray-50 px-4 py-5 dark:border-zinc-700 dark:bg-zinc-800">
-            <Text className="text-app-fg-light dark:text-app-fg-dark text-base font-semibold">
-              No Games Posted Yet
-            </Text>
-            <Text className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-              Week {displayWeek} matchups will appear here once the schedule is available.
-            </Text>
-          </View>
-        )}
+        {!isLoading &&
+          !isUserPicksLoading &&
+          (!games || games.length === 0) && (
+            <View className="mx-4 mb-6 rounded-xl border border-gray-200 bg-gray-50 px-4 py-5 dark:border-zinc-700 dark:bg-zinc-800">
+              <Text className="text-app-fg-light dark:text-app-fg-dark text-base font-semibold">
+                No Games Posted Yet
+              </Text>
+              <Text className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                Week {displayWeek} matchups will appear here once the schedule
+                is available.
+              </Text>
+            </View>
+          )}
 
         {/* Picks Table */}
         {picksSummary && picksSummary.length > 0 && games && (
@@ -1165,7 +1242,9 @@ function LeagueOverview({
                   </Pressable>
                 </View>
                 <Text className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                  {pickOutcomeSummary.correct} correct / {pickOutcomeSummary.wrong} wrong / {pickOutcomeSummary.pending} pending
+                  {pickOutcomeSummary.correct} correct /{" "}
+                  {pickOutcomeSummary.wrong} wrong /{" "}
+                  {pickOutcomeSummary.pending} pending
                 </Text>
               </View>
 
@@ -1202,7 +1281,9 @@ function LeagueOverview({
 
                         const homeTeam = teamById.get(game.home);
                         const awayTeam = teamById.get(game.away);
-                        const pickedTeam = pick.winner ? teamById.get(pick.winner) : null;
+                        const pickedTeam = pick.winner
+                          ? teamById.get(pick.winner)
+                          : null;
 
                         if (!homeTeam || !awayTeam) return null;
 
@@ -1225,12 +1306,15 @@ function LeagueOverview({
                               : gameStarted && !gameEnded
                                 ? "Live"
                                 : "Pending";
-                        const kickoffLabel = new Date(game.ts).toLocaleString("en-US", {
-                          month: "short",
-                          day: "numeric",
-                          hour: "numeric",
-                          minute: "2-digit",
-                        });
+                        const kickoffLabel = new Date(game.ts).toLocaleString(
+                          "en-US",
+                          {
+                            month: "short",
+                            day: "numeric",
+                            hour: "numeric",
+                            minute: "2-digit",
+                          },
+                        );
 
                         return (
                           <View
@@ -1561,18 +1645,19 @@ function MobilePicksTable({
       return;
     }
 
-    const sameCorrectPicks = previousMember.correctPicks === member.correctPicks;
+    const sameCorrectPicks =
+      previousMember.correctPicks === member.correctPicks;
     const sameTiebreakerDiff =
       actualTiebreakerScore === null || !tiebreakerGame
         ? true
-        : Math.abs((previousMember.tiebreakerScore ?? 0) - actualTiebreakerScore) ===
-          Math.abs((member.tiebreakerScore ?? 0) - actualTiebreakerScore);
+        : Math.abs(
+            (previousMember.tiebreakerScore ?? 0) - actualTiebreakerScore,
+          ) === Math.abs((member.tiebreakerScore ?? 0) - actualTiebreakerScore);
     const previousRank = rankedPicksSummary[index - 1]?.rank ?? index;
 
     rankedPicksSummary.push({
       member,
-      rank:
-        sameCorrectPicks && sameTiebreakerDiff ? previousRank : index + 1,
+      rank: sameCorrectPicks && sameTiebreakerDiff ? previousRank : index + 1,
     });
   });
   const submittedMembersCount = rankedPicksSummary.filter(
@@ -1605,7 +1690,8 @@ function MobilePicksTable({
           </View>
         </View>
         <Text className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-          {submittedMembersCount}/{rankedPicksSummary.length} members submitted at least one pick.
+          {submittedMembersCount}/{rankedPicksSummary.length} members submitted
+          at least one pick.
         </Text>
       </View>
 
@@ -1701,7 +1787,9 @@ function MobilePicksTable({
                 {/* Game Picks */}
                 {games.map((game) => {
                   const pick = member.picks.find((p) => p.gid === game.gid);
-                  const pickedTeam = pick?.winner ? teams.get(pick.winner) : null;
+                  const pickedTeam = pick?.winner
+                    ? teams.get(pick.winner)
+                    : null;
                   const gameState = gameStateById.get(game.gid);
 
                   let bgColor = "bg-blue-50 dark:bg-blue-950/40";

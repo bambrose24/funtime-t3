@@ -281,6 +281,7 @@ enum EmailType {
   week_picks
   league_registration
   league_broadcast
+  renewal_invite
 }
 
 enum LatePolicy {

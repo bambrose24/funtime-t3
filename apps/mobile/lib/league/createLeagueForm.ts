@@ -12,6 +12,7 @@ export const MOBILE_LATE_POLICY_LABELS: Record<MobileLatePolicy, string> = {
 };
 
 const DEFAULT_LATE_POLICY: MobileLatePolicy = "allow_late_and_lock_after_start";
+const MAX_LEAGUE_NAME_LENGTH = 100;
 
 type PriorLeagueTemplate = {
   league_id: number;
@@ -59,4 +60,25 @@ export function buildPrefillFromPriorLeague(league: PriorLeagueTemplate) {
     reminderPolicy: coerceReminderPolicy(league.reminder_policy),
     superbowlCompetition: Boolean(league.superbowl_competition),
   };
+}
+
+export function getSuggestedRenewalLeagueName(rawName: string, season: number) {
+  const trimmed = rawName.trim();
+  const withoutTrailingYear = trimmed
+    .replace(/\s*(?:-\s*)?\(?20\d{2}\)?\s*$/, "")
+    .trim();
+  const baseName = withoutTrailingYear || trimmed || "Funtime League";
+  const seasonSuffix = ` ${season}`;
+  const maxBaseLength = MAX_LEAGUE_NAME_LENGTH - seasonSuffix.length;
+  const trimmedBaseName =
+    baseName.length > maxBaseLength
+      ? baseName.slice(0, maxBaseLength).trim()
+      : baseName;
+  const suggestedName = `${trimmedBaseName || "Funtime League"}${seasonSuffix}`;
+
+  if (suggestedName.length <= MAX_LEAGUE_NAME_LENGTH) {
+    return suggestedName;
+  }
+
+  return suggestedName.slice(0, MAX_LEAGUE_NAME_LENGTH);
 }
