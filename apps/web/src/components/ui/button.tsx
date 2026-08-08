@@ -36,7 +36,8 @@ const buttonVariants = cva(
 );
 
 export interface ButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
+  extends
+    React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof buttonVariants> {
   asChild?: boolean;
   loading?: boolean;
@@ -45,25 +46,44 @@ export interface ButtonProps
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   (
-    { className, variant, size, asChild = false, loading, children, disablePressEffect = false, ...props },
+    {
+      className,
+      variant,
+      size,
+      asChild = false,
+      loading,
+      children,
+      disablePressEffect = false,
+      ...props
+    },
     ref,
   ) => {
     const Comp = asChild ? Slot : "button";
-    return (
-      <Comp
-        className={cn(
-          buttonVariants({ variant, size, className }),
-          disablePressEffect && "active:scale-100"
-        )}
-        ref={ref}
-        {...props}
-      >
+    // Radix Slot requires exactly one child. Keep the loader out of the
+    // slotted path so links and other `asChild` targets remain a single element.
+    const content = asChild ? (
+      children
+    ) : (
+      <>
         {loading === true ? (
           <>
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />{" "}
           </>
         ) : null}
         {children}
+      </>
+    );
+
+    return (
+      <Comp
+        className={cn(
+          buttonVariants({ variant, size, className }),
+          disablePressEffect && "active:scale-100",
+        )}
+        ref={ref}
+        {...props}
+      >
+        {content}
       </Comp>
     );
   },
