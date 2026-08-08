@@ -4,7 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 import {
   DEFAULT_ANCHOR_UTC,
-  DEFAULT_CURRENT_SEASON,
+  DEFAULT_FIXTURE_SEASON,
   applyFutureScheduleTransform,
   ensureDir,
   parseSeason,
@@ -15,10 +15,7 @@ const repoRoot = path.resolve(
   path.dirname(new URL(import.meta.url).pathname),
   "../..",
 );
-const season = parseSeason(
-  process.env.FUNTIME_CURRENT_SEASON,
-  DEFAULT_CURRENT_SEASON,
-);
+const season = parseSeason(process.argv[2], DEFAULT_FIXTURE_SEASON);
 const anchorUtc = process.env.E2E_SCHEDULE_ANCHOR_UTC ?? DEFAULT_ANCHOR_UTC;
 const liveDatabaseUrl = process.env.LIVE_DATABASE_URL;
 
@@ -137,7 +134,7 @@ const defaultFixturePath = path.join(
   repoRoot,
   "supabase",
   "fixtures",
-  `season-${DEFAULT_CURRENT_SEASON}.json`,
+  `season-${DEFAULT_FIXTURE_SEASON}.json`,
 );
 const rawSnapshotPath = path.join(
   repoRoot,
@@ -170,12 +167,12 @@ fs.writeFileSync(
 
 fs.writeFileSync(fixturePath, JSON.stringify(fixture, null, 2) + "\n", "utf8");
 
-if (season === DEFAULT_CURRENT_SEASON && fixturePath !== defaultFixturePath) {
+if (season === DEFAULT_FIXTURE_SEASON && fixturePath !== defaultFixturePath) {
   fs.copyFileSync(fixturePath, defaultFixturePath);
 }
 
 const seedFixturePath =
-  season === DEFAULT_CURRENT_SEASON ? defaultFixturePath : fixturePath;
+  season === DEFAULT_FIXTURE_SEASON ? defaultFixturePath : fixturePath;
 
 const seedResult = writeSeedSqlFromFixture({
   fixturePath: seedFixturePath,

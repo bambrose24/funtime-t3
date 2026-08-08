@@ -1,13 +1,12 @@
 import { groupBy, orderBy } from "lodash";
+import { CURRENT_SEASON } from "../utils/const";
 import { Defined } from "../utils/defined";
 
 process.env.SKIP_ENV_VALIDATION ??= "1";
 
-const DEFAULT_SEASON = 2026;
-
 function parseSeason(rawSeason: string | undefined) {
   if (!rawSeason) {
-    return DEFAULT_SEASON;
+    return CURRENT_SEASON;
   }
 
   const parsed = Number.parseInt(rawSeason, 10);
@@ -25,7 +24,7 @@ function getArgs() {
 
   return {
     dryRun,
-    season: parseSeason(seasonArg ?? process.env.FUNTIME_CURRENT_SEASON),
+    season: parseSeason(seasonArg),
   };
 }
 

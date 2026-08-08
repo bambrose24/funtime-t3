@@ -1,14 +1,14 @@
 import { groupBy, orderBy } from "lodash";
+import { CURRENT_SEASON } from "../utils/const";
 
 process.env.SKIP_ENV_VALIDATION ??= "1";
 
-const DEFAULT_SEASON = 2026;
 const EXPECTED_REGULAR_SEASON_GAMES = 272;
 const EXPECTED_REGULAR_SEASON_WEEKS = 18;
 
 function parseSeason(rawSeason: string | undefined) {
   if (!rawSeason) {
-    return DEFAULT_SEASON;
+    return CURRENT_SEASON;
   }
 
   const parsed = Number.parseInt(rawSeason, 10);
@@ -24,7 +24,7 @@ function getArgs() {
   const seasonArg = args.find((arg) => !arg.startsWith("--"));
 
   return {
-    season: parseSeason(seasonArg ?? process.env.FUNTIME_CURRENT_SEASON),
+    season: parseSeason(seasonArg),
   };
 }
 

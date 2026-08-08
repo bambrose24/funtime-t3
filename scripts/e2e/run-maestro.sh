@@ -13,7 +13,6 @@ if [[ -d "/opt/homebrew/opt/openjdk@17/bin" ]]; then
 fi
 
 SUPABASE_DB_URL="${SUPABASE_DB_URL:-postgresql://postgres:postgres@127.0.0.1:55422/postgres}"
-SEASON="${FUNTIME_CURRENT_SEASON:-2026}"
 REQUESTED_WEB_PORT="${E2E_WEB_PORT:-3000}"
 REQUESTED_EXPO_PORT="${E2E_EXPO_PORT:-8081}"
 FLOW_PATH="${E2E_MAESTRO_FLOW:-apps/mobile/e2e/flows/smoke-signup-create-pick.yaml}"
@@ -229,10 +228,8 @@ E2E_USERNAME="${E2E_USERNAME:-maestrouser${E2E_UNIQUE}}"
 echo "[e2e] Starting @funtime/web dev server for tRPC API access..."
 DATABASE_URL="$SUPABASE_DB_URL" \
 DIRECT_URL="$SUPABASE_DB_URL" \
-FUNTIME_CURRENT_SEASON="$SEASON" \
 E2E_MODE="${E2E_MODE:-1}" \
 FUNTIME_DISABLE_EMAILS="${FUNTIME_DISABLE_EMAILS:-1}" \
-NEXT_PUBLIC_CURRENT_SEASON="$SEASON" \
 NEXT_PUBLIC_E2E_MODE="${NEXT_PUBLIC_E2E_MODE:-1}" \
 NEXT_PUBLIC_SUPABASE_URL="$API_URL" \
 NEXT_PUBLIC_SUPABASE_ANON_KEY="$ANON_KEY" \
@@ -259,7 +256,6 @@ echo "[e2e] Starting Expo mobile app..."
 EXPO_PUBLIC_SUPABASE_URL="$MOBILE_SUPABASE_URL" \
 EXPO_PUBLIC_SUPABASE_ANON_KEY="$ANON_KEY" \
 EXPO_PUBLIC_API_URL="$MOBILE_API_URL" \
-EXPO_PUBLIC_CURRENT_SEASON="$SEASON" \
 EXPO_PUBLIC_E2E_MODE="${EXPO_PUBLIC_E2E_MODE:-1}" \
 pnpm --filter @funtime/mobile start --dev-client --port "$EXPO_PORT" >/tmp/funtime-e2e-expo.log 2>&1 &
 EXPO_PID="$!"

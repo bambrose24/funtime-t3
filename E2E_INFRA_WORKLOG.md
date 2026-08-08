@@ -1,14 +1,17 @@
 # E2E Infrastructure Worklog
 
 ## Program Status
+
 - Program: Portable Supabase-backed mobile E2E infrastructure.
 - Branch: `codex/mobile-core-features`.
 - Status: `PAUSED` (handoff-ready; resume pending local host E2E validation).
 
 ## Current Phase
+
 - Phase: Android dev-build E2E stabilization + final pass validation.
 
 ## Pause Snapshot (UTC `2026-02-27T21:36:04Z`)
+
 - User requested a pause on finishing the testing plan so work can be resumed later with a clear handoff state.
 - Last validated:
   - `pnpm --filter @funtime/mobile test -- --runInBand` passed (`3/3` suites, `7/7` tests).
@@ -23,6 +26,7 @@
   4. If failure: collect `/tmp/funtime-e2e-web.log`, `/tmp/funtime-e2e-expo.log`, `/tmp/funtime-e2e-open-link.log`, `/tmp/funtime-e2e-emulator.log` and rerun with same env.
 
 ## Completed Tasks
+
 - Task ID: `E2E-INFRA-011`
   - Short title: Capture paused handoff snapshot with exact validation and restart instructions.
   - Scope touched: `E2E_INFRA_WORKLOG.md`, `docs/E2E_INFRA_PLAN.md`, `WORKLOG.md`.
@@ -66,9 +70,9 @@
   - Timestamp (UTC): `2026-02-26T21:59:38Z`.
 
 - Task ID: `E2E-INFRA-001`
-  - Short title: Introduce env-backed season abstraction across API/mobile/web.
+  - Short title: Introduce shared season abstraction across API/mobile/web.
   - Scope touched: `packages/api/utils/const.ts`, `apps/mobile/constants/index.ts`, `apps/web/src/utils/const.ts`, `packages/api/env.js`, `apps/web/src/env.js`, `.env.example`, `turbo.json`.
-  - Outcome: Replaced hardcoded season constants with env-backed `CURRENT_SEASON` helpers and added shared env declarations.
+  - Outcome: Replaced hardcoded season constants with shared `CURRENT_SEASON` helpers.
   - Validation run: Static code review + typecheck step pending with broader infra run.
   - Timestamp (UTC): `2026-02-26T00:00:00Z`.
 
@@ -94,27 +98,32 @@
   - Timestamp (UTC): `2026-02-26T00:00:00Z`.
 
 ## In Progress
+
 - `E2E-INFRA-008`: Harden Maestro selectors (`testID` coverage) and stabilize join-league second-user flow in CI.
 - `E2E-INFRA-012` (next on resume): Execute full host-side `pnpm e2e:mobile:maestro` and record definitive pass/fail with artifacts.
 
 ## Next Up
+
 1. Run host-side full E2E and log definitive result in this worklog (`E2E-INFRA-012`).
 2. If E2E fails: patch selectors/flow boot logic, rerun, and record failure class + fix.
 3. Validate CI workflow runtime and adjust emulator/app boot timing once local pass is stable.
 4. Refresh committed fixture from live DB when credentials/network are available and verify no schema drift.
 
 ## Decisions & Rationale
+
 - Keep deterministic in-repo fixture as default for portability.
 - Use season `2025` with future timestamp shifting to keep backend pick logic open for week 1.
 - Seed only `teams` + `games`; create leagues/members/picks through tests.
 
 ## Risks / Blockers
+
 - This Codex sandbox cannot start `adb` daemon (`Operation not permitted`), so emulator/device validation must run in a normal host terminal.
 - Maestro selector stability may vary without additional `testID` instrumentation.
 - Full CI emulator flow may need retries/timeouts tuned for Expo startup variability.
 - Local machine execution requires extra tooling (`maestro`, `adb`, running emulator/device) that may not be present by default.
 
 ## Validation Evidence
+
 - `pnpm e2e:fixtures:build-seed` completed successfully and regenerated `supabase/seed.sql`.
 - `pnpm e2e:backend:up` completed successfully on local Docker with deterministic seed verification (`weekToPick=1`, persisted picks).
 - `pnpm e2e:mobile:maestro -- --skip-backend-up` now reaches device preflight and fails only due missing connected emulator/device.
@@ -122,4 +131,5 @@
 - `pnpm --filter @funtime/api typecheck` and `pnpm --filter @funtime/web typecheck` passed at `2026-02-27T21:36:04Z`.
 
 ## Notes
+
 - This is a dedicated worklog for E2E infra. Mobile parity feature work remains tracked in `WORKLOG.md`.

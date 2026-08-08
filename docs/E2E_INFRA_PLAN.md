@@ -25,17 +25,14 @@ Stand up a portable local E2E environment for Expo mobile that:
 
 - runs against local Supabase in Docker,
 - uses deterministic seeded schedule data,
-- keeps season logic aligned (`CURRENT_SEASON=2026`), and
+- keeps season logic aligned (`CURRENT_SEASON=2027`), and
 - validates that pick submission persists in local Postgres.
 
 ## 2. Scope
 
-- Backend/runtime season abstraction:
-  - `FUNTIME_CURRENT_SEASON` (API/server)
-  - `NEXT_PUBLIC_CURRENT_SEASON` (web)
-  - `EXPO_PUBLIC_CURRENT_SEASON` (mobile)
+- Source-controlled season constants in the API, web, and mobile projects.
 - Deterministic fixture pipeline:
-  - committed fixture: `supabase/fixtures/season-2026.json`
+  - committed fixture: `supabase/fixtures/season-2027.json`
   - generated seed SQL: `supabase/seed.sql`
   - optional live refresh: `pnpm e2e:fixtures:refresh`
 - Local Supabase orchestration:
@@ -54,7 +51,7 @@ Stand up a portable local E2E environment for Expo mobile that:
 
 ### 3.1 Canonical committed fixture
 
-- File: `supabase/fixtures/season-2026.json`
+- File: `supabase/fixtures/season-2027.json`
 - Contents: `teams` + `games` only.
 - Leagues/members/picks are created by E2E flows.
 
@@ -64,22 +61,21 @@ Run manually when schedule fixtures need to be updated:
 
 ```bash
 LIVE_DATABASE_URL='postgresql://...'
-FUNTIME_CURRENT_SEASON=2026
-E2E_SCHEDULE_ANCHOR_UTC='2026-09-11T00:00:00Z'
-pnpm e2e:fixtures:refresh
+E2E_SCHEDULE_ANCHOR_UTC='2027-09-11T00:00:00Z'
+pnpm e2e:fixtures:refresh 2027
 ```
 
 What refresh does:
 
-1. Dumps `teams` + `games where season=2026` from live DB.
-2. Writes raw snapshot to `supabase/.temp/live-season-2026.raw.json`.
+1. Dumps `teams` + `games where season=2027` from live DB.
+2. Writes raw snapshot to `supabase/.temp/live-season-2027.raw.json`.
 3. Shifts all game `ts` to a future anchor (deterministic offset).
 4. Resets game completion state (`done=false`, scores/winner reset).
 5. Writes committed fixture and regenerates `supabase/seed.sql`.
 
 ## 4. Season and Pickability Safeguards
 
-- Season constants now resolve from env-backed `CURRENT_SEASON` with fallback `2026`.
+- Season constants are source-controlled at `2027` in each application.
 - Seed verification (`pnpm e2e:seed:verify`) checks:
   - games exist for season,
   - first game is in the future,

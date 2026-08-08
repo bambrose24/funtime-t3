@@ -5,7 +5,6 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$ROOT_DIR"
 
 SUPABASE_DB_URL="${SUPABASE_DB_URL:-postgresql://postgres:postgres@127.0.0.1:55422/postgres}"
-SEASON="${FUNTIME_CURRENT_SEASON:-2026}"
 START_WEB=0
 
 if [[ "${1:-}" == "--start-web" ]]; then
@@ -50,7 +49,7 @@ echo "[e2e] Applying deterministic schedule seed..."
 psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1 -f supabase/seed.sql >/dev/null
 
 echo "[e2e] Running seed/pickability verification..."
-DATABASE_URL="$SUPABASE_DB_URL" FUNTIME_CURRENT_SEASON="$SEASON" pnpm e2e:seed:verify
+DATABASE_URL="$SUPABASE_DB_URL" pnpm e2e:seed:verify
 
 echo "[e2e] Local backend is ready."
 
@@ -61,14 +60,12 @@ source /dev/stdin <<<"$auth_env"
 echo "[e2e] API_URL=$API_URL"
 
 echo "[e2e] To start web/API against this stack:"
-echo "[e2e] DATABASE_URL=$SUPABASE_DB_URL DIRECT_URL=$SUPABASE_DB_URL NEXT_PUBLIC_SUPABASE_URL=$API_URL NEXT_PUBLIC_SUPABASE_ANON_KEY=<anon-key> FUNTIME_CURRENT_SEASON=$SEASON NEXT_PUBLIC_CURRENT_SEASON=$SEASON pnpm --filter @funtime/web dev"
+echo "[e2e] DATABASE_URL=$SUPABASE_DB_URL DIRECT_URL=$SUPABASE_DB_URL NEXT_PUBLIC_SUPABASE_URL=$API_URL NEXT_PUBLIC_SUPABASE_ANON_KEY=<anon-key> pnpm --filter @funtime/web dev"
 
 if [[ "$START_WEB" -eq 1 ]]; then
   echo "[e2e] Starting @funtime/web dev server..."
   DATABASE_URL="$SUPABASE_DB_URL" \
   DIRECT_URL="$SUPABASE_DB_URL" \
-  FUNTIME_CURRENT_SEASON="$SEASON" \
-  NEXT_PUBLIC_CURRENT_SEASON="$SEASON" \
   NEXT_PUBLIC_SUPABASE_URL="$API_URL" \
   NEXT_PUBLIC_SUPABASE_ANON_KEY="$ANON_KEY" \
   pnpm --filter @funtime/web dev

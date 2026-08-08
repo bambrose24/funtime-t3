@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import path from "node:path";
-import { DEFAULT_CURRENT_SEASON, writeSeedSqlFromFixture } from "./lib.ts";
+import { DEFAULT_FIXTURE_SEASON, writeSeedSqlFromFixture } from "./lib.ts";
 
 const repoRoot = path.resolve(
   path.dirname(new URL(import.meta.url).pathname),
@@ -10,7 +10,7 @@ const defaultFixturePath = path.join(
   repoRoot,
   "supabase",
   "fixtures",
-  `season-${DEFAULT_CURRENT_SEASON}.json`,
+  `season-${DEFAULT_FIXTURE_SEASON}.json`,
 );
 const defaultOutputPath = path.join(repoRoot, "supabase", "seed.sql");
 

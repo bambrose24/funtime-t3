@@ -1,12 +1,12 @@
 import fs from "node:fs";
 import path from "node:path";
 
-export const DEFAULT_CURRENT_SEASON = 2026;
-export const DEFAULT_ANCHOR_UTC = "2026-09-11T00:00:00Z";
+export const DEFAULT_FIXTURE_SEASON = 2027;
+export const DEFAULT_ANCHOR_UTC = "2027-09-11T00:00:00Z";
 
 export function parseSeason(
   rawSeason,
-  fallbackSeason = DEFAULT_CURRENT_SEASON,
+  fallbackSeason = DEFAULT_FIXTURE_SEASON,
 ) {
   const parsed = Number.parseInt(String(rawSeason ?? ""), 10);
   if (Number.isFinite(parsed) && parsed >= 2000 && parsed <= 3000) {

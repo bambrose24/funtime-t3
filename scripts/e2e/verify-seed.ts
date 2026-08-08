@@ -1,11 +1,8 @@
 #!/usr/bin/env node
 import { execFileSync } from "node:child_process";
-import { DEFAULT_CURRENT_SEASON, parseSeason } from "./lib.ts";
+import { DEFAULT_FIXTURE_SEASON } from "./lib.ts";
 
-const season = parseSeason(
-  process.env.FUNTIME_CURRENT_SEASON,
-  DEFAULT_CURRENT_SEASON,
-);
+const season = DEFAULT_FIXTURE_SEASON;
 const databaseUrl =
   process.env.DATABASE_URL ??
   "postgresql://postgres:postgres@127.0.0.1:55422/postgres";

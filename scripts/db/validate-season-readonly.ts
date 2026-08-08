@@ -2,7 +2,7 @@
 
 import { execFileSync } from "node:child_process";
 
-const DEFAULT_SEASON = 2026;
+const DEFAULT_SEASON = 2027;
 
 function parseSeason(rawSeason) {
   if (!rawSeason) {
@@ -33,7 +33,7 @@ function hasFlag(name) {
 }
 
 const args = process.argv.slice(2).filter((arg) => !arg.startsWith("--"));
-const season = parseSeason(args[0] ?? process.env.FUNTIME_CURRENT_SEASON);
+const season = parseSeason(args[0]);
 const databaseUrl =
   process.env.READONLY_DATABASE_URL ??
   process.env.VALIDATION_DATABASE_URL ??

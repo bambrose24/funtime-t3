@@ -11,9 +11,6 @@ jobs:
     timeout-minutes: 90
 
     env:
-      FUNTIME_CURRENT_SEASON: "2025"
-      NEXT_PUBLIC_CURRENT_SEASON: "2025"
-      EXPO_PUBLIC_CURRENT_SEASON: "2025"
       SUPABASE_DB_URL: "postgresql://postgres:postgres@127.0.0.1:55422/postgres"
 
     steps:
@@ -64,9 +61,6 @@ jobs:
             export E2E_FORCE_REINSTALL_DEV_CLIENT=0
             export E2E_CLEAR_DEV_CLIENT_DATA=1
             export E2E_EMULATOR_WAIT_SECONDS=300
-            export FUNTIME_CURRENT_SEASON="$FUNTIME_CURRENT_SEASON"
-            export EXPO_PUBLIC_CURRENT_SEASON="$EXPO_PUBLIC_CURRENT_SEASON"
-
             pnpm e2e:mobile:maestro -- --skip-backend-up
 
       - name: Upload logs
