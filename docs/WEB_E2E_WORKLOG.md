@@ -28,7 +28,8 @@ user-facing behavior change.
   here and the relevant automated suite passes.
 
 Current validated baseline: **21 Playwright tests in 18 files, all passing on a
-fresh local-Supabase reset (2026-08-08).**
+fresh local-Supabase reset and on GitHub Actions with an ephemeral Supabase
+stack (2026-08-08).**
 
 ## Safety Contract
 
@@ -398,3 +399,9 @@ passed`). All planned web PRD coverage paths are now checked.
   attempt in 2.7 minutes against another fresh Supabase reset, with Redis still
   unreachable. Session, browser league creation, and linked renewal all passed
   without retries before the rest of the regression matrix completed cleanly.
+- 2026-08-08: The fifth GitHub-hosted run passed the complete lifecycle on the
+  standard `ubuntu-24.04` runner: tool installation, local Supabase startup,
+  reset, all three migrations, deterministic seed verification, 21/21 browser
+  tests in 6.6 minutes, evidence upload, and no-backup teardown. The complete
+  `chromium-e2e` job passed in 11m27s; this is the first green hosted baseline
+  for [PR #9](https://github.com/bambrose24/funtime-t3/pull/9).
