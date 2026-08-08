@@ -1,12 +1,18 @@
 import { E2E_LEAGUES, E2E_USERS } from "../fixtures/constants";
 import { expect, test } from "../fixtures/test";
 import { login } from "../helpers/auth";
-import { getLeagueId, queryScalar } from "../helpers/db";
+import { executeSql, getLeagueId, queryScalar } from "../helpers/db";
 
 test("admin creates one linked renewal and exercises isolated member invites", async ({
   page,
 }) => {
   const priorLeagueId = getLeagueId(E2E_LEAGUES.completed.shareCode);
+  // A timed-out navigation can happen after the create mutation commits.
+  // Restore this journey's isolated starting state before every retry.
+  executeSql(`
+    DELETE FROM "leagues"
+    WHERE "prior_league_id" = ${priorLeagueId}
+  `);
   await login(page, E2E_USERS.admin);
 
   await page.goto(`/league/${priorLeagueId}/admin`);

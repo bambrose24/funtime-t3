@@ -16,6 +16,16 @@ export function queryScalar(sql: string) {
   ).trim();
 }
 
+export function executeSql(sql: string) {
+  execFileSync(
+    "psql",
+    [databaseUrl, "-v", "ON_ERROR_STOP=1", "-q", "-c", sql],
+    {
+      stdio: "pipe",
+    },
+  );
+}
+
 export function getLeagueId(shareCode: string) {
   if (!/^E2E[A-Z]+$/.test(shareCode)) {
     throw new Error(`Unexpected E2E share code: ${shareCode}`);

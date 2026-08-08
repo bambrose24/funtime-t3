@@ -1,15 +1,17 @@
 import { defineConfig, devices } from "@playwright/test";
 
 const port = Number(process.env.E2E_WEB_PORT ?? 3100);
+const isCI = Boolean(process.env.CI);
 
 export default defineConfig({
   testDir: "./apps/web/e2e",
   fullyParallel: false,
   workers: 1,
-  forbidOnly: Boolean(process.env.CI),
-  retries: process.env.CI ? 2 : 0,
-  expect: { timeout: 15_000 },
-  reporter: process.env.CI
+  forbidOnly: isCI,
+  retries: isCI ? 2 : 0,
+  timeout: isCI ? 90_000 : 30_000,
+  expect: { timeout: isCI ? 45_000 : 15_000 },
+  reporter: isCI
     ? [["line"], ["html", { open: "never" }]]
     : [["list"], ["html", { open: "never" }]],
   use: {

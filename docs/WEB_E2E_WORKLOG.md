@@ -387,3 +387,14 @@ passed`). All planned web PRD coverage paths are now checked.
   attempt in 2.7 minutes. This revalidated the entire coverage matrix after the
   cache isolation and authorization fix, including both previously failing
   admin workflows, with `REDIS_URL` deliberately pointed at a dead local port.
+- 2026-08-08: The fourth hosted run proved the Redis and super-admin fixes, then
+  finished with 18 passed, two flaky recoveries, and one renewal failure. The
+  Next.js log showed successful create mutations followed by first-time route
+  compilations of 12.9-13.9 seconds; completed navigations landed 0.6 seconds
+  beyond the 15-second assertion budget. Added CI-specific cold-run budgets and
+  made renewal retries restore their own isolated database precondition before
+  exercising the browser creation flow again.
+- 2026-08-08: The resulting exact-CI-mode local gate passed 21/21 on the first
+  attempt in 2.7 minutes against another fresh Supabase reset, with Redis still
+  unreachable. Session, browser league creation, and linked renewal all passed
+  without retries before the rest of the regression matrix completed cleanly.
