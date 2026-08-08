@@ -27,7 +27,7 @@ user-facing behavior change.
 - Do not mark PRD functionality complete until its test impact is represented
   here and the relevant automated suite passes.
 
-Current validated baseline: **18 Playwright tests in 18 files, all passing on a
+Current validated baseline: **21 Playwright tests in 18 files, all passing on a
 fresh local-Supabase reset (2026-08-08).**
 
 ## Safety Contract
@@ -359,3 +359,14 @@ passed`). All planned web PRD coverage paths are now checked.
   during module import before the E2E no-send guard runs. Added a fake E2E-only
   key to the isolated Next.js process; outbound email remains disabled and no
   repository secret is required.
+- 2026-08-08: The second hosted run cleared readiness and exercised the complete
+  suite: 15 passed, the results journey recovered on retry, and two failed.
+  Hosted timing exposed a cross-session race in the combined admin workflow and
+  retries exposed a non-unique league-creation fixture. Split the role changes
+  into isolated tests, made retry-created leagues unique, and assigned explicit
+  cold-compilation budgets to the affected journeys.
+- 2026-08-08: The isolated 21-test suite passed locally on a fresh Supabase
+  reset in 2.7 minutes after the hosted reliability fixes. This run re-proved
+  startup, all three migrations, deterministic seed verification, role-isolated
+  browser contexts, retry-safe fixture naming, persistence assertions, and all
+  previously covered journeys.

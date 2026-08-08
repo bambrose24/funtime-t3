@@ -6,6 +6,7 @@ import { getLeagueId } from "../helpers/db";
 test("completed results render weekly winners, tied ranks, chart, and profile totals", async ({
   page,
 }) => {
+  test.setTimeout(60_000);
   const leagueId = getLeagueId(E2E_LEAGUES.results.shareCode);
   await login(page, E2E_USERS.player);
 

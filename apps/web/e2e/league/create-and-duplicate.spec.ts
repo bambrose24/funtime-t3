@@ -3,10 +3,9 @@ import { expect, test } from "../fixtures/test";
 import { login } from "../helpers/auth";
 import { queryScalar } from "../helpers/db";
 
-test("admin creates a configured league and an existing member cannot join twice", async ({
-  page,
-}) => {
-  const createdName = "E2E Browser Created League";
+test("admin creates a configured league", async ({ page }, testInfo) => {
+  test.setTimeout(60_000);
+  const createdName = `E2E Browser Created League retry ${testInfo.retry}`;
   await login(page, E2E_USERS.admin);
 
   await page.goto("/league/create");
@@ -36,8 +35,11 @@ test("admin creates a configured league and an existing member cannot join twice
   expect(createdLeague).toBe(
     "allow_late_and_lock_after_start|choose_winner|three_hours_before|game_winner|true|admin",
   );
+});
 
-  await page.context().clearCookies();
+test("an existing member cannot join the same league twice", async ({
+  page,
+}) => {
   await login(page, E2E_USERS.player);
   await page.goto(`/join-league/${E2E_LEAGUES.active.shareCode}`);
   await expect(

@@ -3,11 +3,11 @@ import { expect, test } from "../fixtures/test";
 import { login } from "../helpers/auth";
 import { getLeagueId, queryScalar } from "../helpers/db";
 
-test("admin pick locks, super-admin override, email history, throttling, and removal work", async ({
+test("league admin cannot edit a pick after kickoff", async ({
   browserErrorGuard,
   page,
 }) => {
-  test.setTimeout(120_000);
+  test.setTimeout(60_000);
   browserErrorGuard.allow(
     /Failed to load resource: the server responded with a status of 400/,
   );
@@ -15,7 +15,6 @@ test("admin pick locks, super-admin override, email history, throttling, and rem
     /league\.admin\.setPick[\s\S]*League admins cannot edit picks after kickoff/,
   );
   const overrideLeagueId = getLeagueId(E2E_LEAGUES.override.shareCode);
-  const adminOpsLeagueId = getLeagueId(E2E_LEAGUES.adminOps.shareCode);
   await login(page, E2E_USERS.admin);
 
   await page.goto(`/league/${overrideLeagueId}/admin/members`);
@@ -23,7 +22,7 @@ test("admin pick locks, super-admin override, email history, throttling, and rem
     .getByRole("row")
     .filter({ hasText: E2E_USERS.player.email });
   await overridePlayerRow.getByRole("button", { name: "Edit Picks" }).click();
-  let dialog = page.getByRole("dialog");
+  const dialog = page.getByRole("dialog");
   await dialog
     .getByRole("combobox", { name: "Pick for BUF at KC, game 2028001" })
     .click();
@@ -43,15 +42,18 @@ test("admin pick locks, super-admin override, email history, throttling, and rem
     `),
   ).toBe("0");
   await dialog.getByRole("button", { name: "Close" }).click();
+});
 
-  await page.context().clearCookies();
+test("super admin can override a pick after kickoff", async ({ page }) => {
+  test.setTimeout(60_000);
+  const overrideLeagueId = getLeagueId(E2E_LEAGUES.override.shareCode);
   await login(page, E2E_USERS.superAdmin);
   await page.goto(`/league/${overrideLeagueId}/admin/members`);
   const superAdminPlayerRow = page
     .getByRole("row")
     .filter({ hasText: E2E_USERS.player.email });
   await superAdminPlayerRow.getByRole("button", { name: "Edit Picks" }).click();
-  dialog = page.getByRole("dialog");
+  const dialog = page.getByRole("dialog");
   await dialog
     .getByRole("combobox", { name: "Pick for BUF at KC, game 2028001" })
     .click();
@@ -71,8 +73,13 @@ test("admin pick locks, super-admin override, email history, throttling, and rem
     )
     .toBe("2");
   await dialog.getByRole("button", { name: "Close" }).click();
+});
 
-  await page.context().clearCookies();
+test("league admin handles member picks, email history, throttling, and removal", async ({
+  page,
+}) => {
+  test.setTimeout(90_000);
+  const adminOpsLeagueId = getLeagueId(E2E_LEAGUES.adminOps.shareCode);
   await login(page, E2E_USERS.admin);
 
   await page.goto(`/league/${adminOpsLeagueId}/admin/members`);
@@ -80,7 +87,7 @@ test("admin pick locks, super-admin override, email history, throttling, and rem
     .getByRole("row")
     .filter({ hasText: E2E_USERS.outsider.email });
   await outsiderRow.getByRole("button", { name: "Edit Picks" }).click();
-  dialog = page.getByRole("dialog");
+  let dialog = page.getByRole("dialog");
   await dialog
     .getByRole("combobox", { name: "Pick for BUF at KC, game 2027001" })
     .click();
