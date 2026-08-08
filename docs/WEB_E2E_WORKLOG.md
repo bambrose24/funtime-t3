@@ -354,3 +354,8 @@ passed`). All planned web PRD coverage paths are now checked.
   no ruleset and confirmed `main` is currently unprotected; requiring the new
   check remains an external repository-setting step after the workflow is
   pushed and produces its first check run.
+- 2026-08-08: The first GitHub-hosted run passed tool setup and the complete
+  Supabase bootstrap, then failed readiness because Resend validates its API key
+  during module import before the E2E no-send guard runs. Added a fake E2E-only
+  key to the isolated Next.js process; outbound email remains disabled and no
+  repository secret is required.

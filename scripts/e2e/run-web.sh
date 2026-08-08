@@ -69,6 +69,7 @@ cleanup() {
 trap cleanup EXIT
 
 echo "[web-e2e] Starting Next.js on http://127.0.0.1:${WEB_PORT}..."
+# Resend validates its key at module import, before the no-send guard runs.
 DATABASE_URL="$SUPABASE_DB_URL" \
 DIRECT_URL="$SUPABASE_DB_URL" \
 E2E_MODE=1 \
@@ -76,6 +77,7 @@ FUNTIME_DISABLE_EMAILS=1 \
 NEXT_PUBLIC_E2E_MODE=1 \
 NEXT_PUBLIC_SUPABASE_URL="$API_URL" \
 NEXT_PUBLIC_SUPABASE_ANON_KEY="$ANON_KEY" \
+RESEND_API_KEY="re_e2e_disabled" \
 PORT="$WEB_PORT" \
 pnpm --filter @funtime/web dev >/tmp/funtime-web-e2e.log 2>&1 &
 WEB_PID="$!"
