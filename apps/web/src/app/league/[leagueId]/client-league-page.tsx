@@ -97,7 +97,8 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
     return [...weeksWithPicks.weeks].sort((a, b) => b - a);
   }, [weeksWithPicks.weeks]);
 
-  const [chatSheetOpen, setChatSheetOpen] = useState(false);
+  const [desktopChatSheetOpen, setDesktopChatSheetOpen] = useState(false);
+  const [mobileChatSheetOpen, setMobileChatSheetOpen] = useState(false);
 
   const firstGame = games.at(0);
   const week = firstGame?.week;
@@ -112,7 +113,7 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
     leagueId: props.leagueId,
     week: 0,
     messages: messagesData ?? [],
-    isChatOpen: chatSheetOpen,
+    isChatOpen: desktopChatSheetOpen || mobileChatSheetOpen,
   });
 
   const router = useRouter();
@@ -265,9 +266,9 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
           )}
           {week !== undefined && (
             <Sheet
-              open={chatSheetOpen}
+              open={desktopChatSheetOpen}
               onOpenChange={(open) => {
-                setChatSheetOpen(open);
+                setDesktopChatSheetOpen(open);
               }}
             >
               <SheetTrigger asChild>
@@ -292,7 +293,7 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
                 week={week}
                 leagueId={league.league_id}
                 closeSheet={() => {
-                  setChatSheetOpen(false);
+                  setDesktopChatSheetOpen(false);
                 }}
               />
             </Sheet>
@@ -337,8 +338,8 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
             {week !== undefined && (
               <div className="w-full">
                 <Sheet
-                  open={chatSheetOpen}
-                  onOpenChange={(open) => setChatSheetOpen(open)}
+                  open={mobileChatSheetOpen}
+                  onOpenChange={(open) => setMobileChatSheetOpen(open)}
                 >
                   <SheetTrigger asChild>
                     <Button
@@ -362,7 +363,7 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
                     week={week}
                     leagueId={league.league_id}
                     closeSheet={() => {
-                      setChatSheetOpen(false);
+                      setMobileChatSheetOpen(false);
                     }}
                   />
                 </Sheet>

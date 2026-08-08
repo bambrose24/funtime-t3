@@ -188,7 +188,10 @@ export function JoinLeagueClientPage({ data, session, teams }: Props) {
                                 onValueChange={field.onChange}
                                 defaultValue={field.value}
                               >
-                                <SelectTrigger className="w-full">
+                                <SelectTrigger
+                                  className="w-full"
+                                  aria-label="AFC Team"
+                                >
                                   <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -221,7 +224,10 @@ export function JoinLeagueClientPage({ data, session, teams }: Props) {
                                 onValueChange={field.onChange}
                                 defaultValue={field.value}
                               >
-                                <SelectTrigger className="w-full">
+                                <SelectTrigger
+                                  className="w-full"
+                                  aria-label="NFC Team"
+                                >
                                   <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -271,6 +277,11 @@ export function JoinLeagueClientPage({ data, session, teams }: Props) {
                               )}
                               <RadioGroupItem
                                 value={afcTeam?.teamid.toString() ?? ""}
+                                aria-label={
+                                  afcTeam
+                                    ? `Pick ${afcTeam.loc} ${afcTeam.name} to win`
+                                    : "Pick AFC team to win"
+                                }
                               />
                             </RadioGroup>
                             <Text.Small
@@ -307,6 +318,11 @@ export function JoinLeagueClientPage({ data, session, teams }: Props) {
                               )}
                               <RadioGroupItem
                                 value={nfcTeam?.teamid.toString() ?? ""}
+                                aria-label={
+                                  nfcTeam
+                                    ? `Pick ${nfcTeam.loc} ${nfcTeam.name} to win`
+                                    : "Pick NFC team to win"
+                                }
                               />
                             </RadioGroup>
                           </>
@@ -322,8 +338,14 @@ export function JoinLeagueClientPage({ data, session, teams }: Props) {
                               "h-0 opacity-0": !afcTeam || !nfcTeam,
                             })}
                           >
-                            <FormLabel>Total Score</FormLabel>
-                            <Input {...field} type="number" />
+                            <FormLabel htmlFor="superbowlTotalScore">
+                              Total Score
+                            </FormLabel>
+                            <Input
+                              {...field}
+                              id="superbowlTotalScore"
+                              type="number"
+                            />
                           </FormItem>
                         )}
                       />

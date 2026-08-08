@@ -14,6 +14,7 @@ import { LeagueAdminBroadcastSetting } from "./LeagueAdminBroadcastSetting";
 import { clientApi } from "~/trpc/react";
 import { CopyJoinLinkButton } from "~/components/league/CopyJoinLinkButton";
 import { DEFAULT_SEASON } from "~/utils/const";
+import { useEffect, useState } from "react";
 
 type Props = {
   league: NonNullable<RouterOutputs["league"]["get"]>;
@@ -44,7 +45,10 @@ export function LeagueAdminClientPage({
     },
   );
 
-  const shareLink = `${window.location?.origin}/join-league/${league.share_code}`;
+  const [shareLink, setShareLink] = useState("");
+  useEffect(() => {
+    setShareLink(`${window.location.origin}/join-league/${league.share_code}`);
+  }, [league.share_code]);
   const nextLeague = renewalPreview?.nextLeague ?? null;
 
   return (

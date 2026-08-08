@@ -6,8 +6,6 @@ import { toast } from "sonner";
 import { z } from "zod";
 import {
   Form,
-  FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -55,25 +53,25 @@ export function LeagueAdminChangeNameSetting({ league }: Props) {
             name="leagueName"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-xl">League Name</FormLabel>
-                <FormControl>
-                  <div className="flex items-center gap-2">
-                    <Input {...field} required />
-                    <Button
-                      variant="secondary"
-                      type="submit"
-                      disabled={
-                        form.formState.isSubmitting || !form.formState.isDirty
-                      }
-                    >
-                      Save
-                    </Button>
-                  </div>
-                </FormControl>
-                <FormDescription>
+                <FormLabel className="text-xl" htmlFor="leagueName">
+                  League Name
+                </FormLabel>
+                <div className="flex items-center gap-2">
+                  <Input {...field} id="leagueName" required />
+                  <Button
+                    variant="secondary"
+                    type="submit"
+                    disabled={
+                      form.formState.isSubmitting || !form.formState.isDirty
+                    }
+                  >
+                    Save
+                  </Button>
+                </div>
+                <p className="text-[0.8rem] text-muted-foreground">
                   Update the league name. This will take effect immediately for
                   all members in the league.
-                </FormDescription>
+                </p>
                 <FormMessage />
               </FormItem>
             )}

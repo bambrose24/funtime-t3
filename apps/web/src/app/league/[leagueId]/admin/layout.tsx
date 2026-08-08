@@ -18,12 +18,16 @@ export default async function LeagueAdminPage(props: Props) {
     serverApi.session.current(),
     serverApi.league.get({ leagueId }),
   ]);
+  const requestorIsSuperAdmin =
+    session.dbUser?.email?.toLowerCase() === "bambrose24@gmail.com";
 
   if (
     !session.dbUser ||
     !league ||
-    session.dbUser.leaguemembers.find((m) => m.league_id === league.league_id)
-      ?.role !== "admin"
+    (!requestorIsSuperAdmin &&
+      session.dbUser.leaguemembers.find(
+        (membership) => membership.league_id === league.league_id,
+      )?.role !== "admin")
   ) {
     notFound();
   }

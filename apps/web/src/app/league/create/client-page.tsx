@@ -121,7 +121,7 @@ export function CreateLeagueClientPage({
               <div className="flex flex-col ">
                 <Text.H3 className="text-center">
                   {isRenewalMode
-                    ? `Run it back for ${DEFAULT_SEASON}`
+                    ? `Set Up the ${DEFAULT_SEASON} Season`
                     : "Create a League"}
                 </Text.H3>
                 <Text.Small className="mt-4">

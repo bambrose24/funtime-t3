@@ -634,11 +634,11 @@ export const leagueRouter = createTRPCRouter({
         nextWeekGames.some((game) => game.gid === pick.gid),
       );
 
-      const weekToReturn =
-        mostRecentStartedWeekPicks.length > 0 ||
-        (nextGameToStart && nextGameToStart.week === week + 1)
-          ? week + 1
-          : week;
+      // Keep the current week editable while it still has an upcoming game.
+      // A submitted pick is not a reason to advance: players may update any
+      // game that has not started yet. Move forward only when the next game on
+      // the schedule belongs to the following week.
+      const weekToReturn = nextGameToStart?.week === week + 1 ? week + 1 : week;
 
       const picksToReturn =
         weekToReturn === week ? mostRecentStartedWeekPicks : nextWeekPicks;
@@ -710,8 +710,8 @@ export const leagueRouter = createTRPCRouter({
         (mp) => mp.membership_id === viewerMember.membership_id,
       );
       const viewerHasPicks = Boolean(viewerMemberPicks?.picks?.length);
-      const firstGameTs = orderBy(games, (g) => g.ts, "asc").at(0)?.ts;
-      const weekStarted = firstGameTs && firstGameTs < new Date();
+      const now = new Date();
+      const gameById = new Map(games.map((game) => [game.gid, game]));
 
       const gidToIndex = games.reduce((prev, curr, idx) => {
         prev.set(curr.gid, idx);
@@ -727,8 +727,10 @@ export const leagueRouter = createTRPCRouter({
         );
 
         mp.picks = mp.picks.map((p) => {
+          const gameTs = gameById.get(p.gid)?.ts;
+          const gameHasStarted = gameTs !== undefined && gameTs < now;
           if (
-            (!viewerHasPicks || !weekStarted) &&
+            (!viewerHasPicks || !gameHasStarted) &&
             mp.membership_id !== viewerMember.membership_id
           ) {
             return { ...p, winner: null, correct: null, score: null };

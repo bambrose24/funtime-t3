@@ -1,0 +1,101 @@
+name: Web E2E (Supabase Local)
+
+on:
+  workflow_dispatch:
+  pull_request:
+  merge_group:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: web-e2e-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  chromium-e2e:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+
+    env:
+      CI: "true"
+      NEXT_TELEMETRY_DISABLED: "1"
+      SUPABASE_DB_URL: "postgresql://postgres:postgres@127.0.0.1:55422/postgres"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22.23.1"
+          cache: "pnpm"
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.2.21"
+
+      - name: Install runner prerequisites
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes lsof postgresql-client
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v2
+        with:
+          version: 2.113.0
+
+      - name: Install Chromium
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Verify runner tools
+        run: |
+          node --version
+          pnpm --version
+          bun --version
+          supabase --version
+          psql --version
+          docker version
+
+      - name: Start, reset, migrate, and seed temporary Supabase
+        run: pnpm e2e:backend:up
+
+      - name: Seed web fixtures and run E2E suite
+        run: pnpm e2e:web -- --skip-backend-up
+
+      - name: Collect E2E diagnostics
+        if: always()
+        run: |
+          mkdir -p e2e-artifacts
+          cp /tmp/funtime-web-e2e.log e2e-artifacts/nextjs.log 2>/dev/null || true
+          supabase status 2>&1 | sed -E '/(key|secret):/Id' >e2e-artifacts/supabase-status.txt || true
+          docker ps --all >e2e-artifacts/docker-containers.txt 2>&1 || true
+
+      - name: Upload Playwright evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-e2e-artifacts
+          path: |
+            playwright-report
+            test-results
+            e2e-artifacts
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Stop temporary Supabase stack
+        if: always()
+        run: supabase stop --no-backup || true

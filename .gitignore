@@ -10,6 +10,10 @@
 
 # testing
 /coverage
+/playwright-report/
+/test-results/
+/e2e-artifacts/
+/apps/web/e2e/.auth/
 
 # database
 /prisma/db.sqlite

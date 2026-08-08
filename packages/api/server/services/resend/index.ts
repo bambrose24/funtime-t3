@@ -64,6 +64,12 @@ const escapeHtml = (input: string) => {
 
 export const resendApi = {
   getMany: async (ids: string[]) => {
+    if (EMAILS_DISABLED) {
+      getLogger().info(
+        `${LOG_PREFIX} Skipping ${ids.length} email reads because FUNTIME_DISABLE_EMAILS is enabled.`,
+      );
+      return [];
+    }
     const emails = await Promise.all(
       ids.map(async (id) => {
         try {
@@ -80,6 +86,12 @@ export const resendApi = {
     return emails.filter(Defined);
   },
   get: async (id: string) => {
+    if (EMAILS_DISABLED) {
+      getLogger().info(
+        `${LOG_PREFIX} Skipping email read (${id}) because FUNTIME_DISABLE_EMAILS is enabled.`,
+      );
+      return null;
+    }
     try {
       return await resend.emails.get(id);
     } catch (error) {
@@ -199,7 +211,7 @@ export const resendApi = {
           return {
             from: FROM,
             to: recipient.email,
-            subject: `Run it back: ${nextLeagueName} is open`,
+            subject: `Next season: ${nextLeagueName} is open`,
             react: LeagueRenewalInvite({
               adminName,
               joinHref,

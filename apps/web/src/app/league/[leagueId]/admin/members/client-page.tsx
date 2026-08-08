@@ -217,6 +217,7 @@ export function LeagueAdminMembersClientPage({
                   </TableCell>
                   <TableCell className="pl-6">
                     <Switch
+                      aria-label={`Donated status for ${member.people.username}`}
                       defaultChecked={member.paid ?? false}
                       onCheckedChange={async (checked) => {
                         setMembersPaid({
@@ -251,6 +252,7 @@ type MemberProps = {
 
 function MemberActions({ member, league }: MemberProps) {
   const [open, setOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const utils = clientApi.useUtils();
   const removeMember = clientApi.league.admin.removeMember.useMutation({
     onSettled: async () => {
@@ -259,9 +261,13 @@ function MemberActions({ member, league }: MemberProps) {
   });
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DropdownMenu>
+      <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
         <DropdownMenuTrigger asChild>
-          <Button size="icon" variant="ghost">
+          <Button
+            size="icon"
+            variant="ghost"
+            aria-label={`Actions for ${member.people.username}`}
+          >
             <Ellipsis className="h-4 w-4" />
           </Button>
         </DropdownMenuTrigger>
@@ -277,79 +283,80 @@ function MemberActions({ member, league }: MemberProps) {
             </Link>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DialogTrigger asChild>
-            <DropdownMenuItem
-              onSelect={(e) => {
-                e.preventDefault();
-              }}
-            >
-              <div className="flex items-center gap-2">
-                <Pencil className="h-4 w-4" /> Edit Player
-              </div>
-            </DropdownMenuItem>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Edit {member.people.username}</DialogTitle>
-              <DialogDescription>
-                Make changes to {member.people.username}&apos;s membership in
-                this league.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="flex flex-col gap-3">
-              <RoleChangeRow member={member} league={league} />
-              <Separator />
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button variant="destructive">
-                    Remove {member.people.username} from {league.name}
-                  </Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>Are you sure?</DialogHeader>
-                  <DialogDescription>
-                    This action cannot be undone. By confirming, you are
-                    removing {member.people.username} from the league.
-                  </DialogDescription>
-                  <DialogFooter>
-                    <Button
-                      variant="destructive"
-                      type="button"
-                      className="w-full"
-                      loading={removeMember.isPending}
-                      disabled={removeMember.isPending}
-                      onClick={async () => {
-                        await removeMember.mutateAsync({
-                          memberId: member.membership_id,
-                          leagueId: member.league_id,
-                        });
-                        toast.success(
-                          `Successfully removed ${member.people.username} from ${league.name}.`,
-                        );
-                        setOpen(false);
-                      }}
-                    >
-                      Yes, remove {member.people.username} from {league.name}
-                    </Button>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
+          <DropdownMenuItem
+            onSelect={() => {
+              setMenuOpen(false);
+              setOpen(true);
+            }}
+          >
+            <div className="flex items-center gap-2">
+              <Pencil className="h-4 w-4" /> Edit Player
             </div>
-            <DialogFooter className="flex w-full">
-              <Button
-                variant="secondary"
-                className="w-full"
-                type="button"
-                onClick={() => {
-                  setOpen(false);
-                }}
-              >
-                Close
-              </Button>
-            </DialogFooter>
-          </DialogContent>
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Edit {member.people.username}</DialogTitle>
+          <DialogDescription>
+            Make changes to {member.people.username}&apos;s membership in this
+            league.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="flex flex-col gap-3">
+          <RoleChangeRow member={member} league={league} />
+          <Separator />
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button variant="destructive">
+                Remove {member.people.username} from {league.name}
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Are you sure?</DialogTitle>
+              </DialogHeader>
+              <DialogDescription>
+                This action cannot be undone. By confirming, you are removing{" "}
+                {member.people.username} from the league.
+              </DialogDescription>
+              <DialogFooter>
+                <Button
+                  variant="destructive"
+                  type="button"
+                  className="w-full"
+                  loading={removeMember.isPending}
+                  disabled={removeMember.isPending}
+                  onClick={async () => {
+                    await removeMember.mutateAsync({
+                      memberId: member.membership_id,
+                      leagueId: member.league_id,
+                    });
+                    toast.success(
+                      `Successfully removed ${member.people.username} from ${league.name}.`,
+                    );
+                    setOpen(false);
+                  }}
+                >
+                  Yes, remove {member.people.username} from {league.name}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        </div>
+        <DialogFooter className="flex w-full">
+          <Button
+            variant="secondary"
+            className="w-full"
+            type="button"
+            onClick={() => {
+              setOpen(false);
+            }}
+          >
+            Close
+          </Button>
+        </DialogFooter>
+      </DialogContent>
     </Dialog>
   );
 }
@@ -406,7 +413,9 @@ function RoleChangeRow({ member, league }: MemberProps) {
                   defaultValue={field.value}
                 >
                   <FormControl>
-                    <SelectTrigger>
+                    <SelectTrigger
+                      aria-label={`Role for ${member.people.username}`}
+                    >
                       <SelectValue placeholder="Role" />
                     </SelectTrigger>
                   </FormControl>

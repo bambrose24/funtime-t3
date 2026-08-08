@@ -195,11 +195,12 @@ export function SignupClientPage() {
                     name="password1"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Password</FormLabel>
+                        <FormLabel htmlFor="password1">Password</FormLabel>
                         <FormControl>
                           <div className="relative">
                             <Input
                               {...field}
+                              id="password1"
                               type={showPassword1 ? "text" : "password"}
                               required
                               className="pr-10"
@@ -210,7 +211,9 @@ export function SignupClientPage() {
                               className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                               onClick={() => setShowPassword1(!showPassword1)}
                               aria-label={
-                                showPassword1 ? "Hide password" : "Show password"
+                                showPassword1
+                                  ? "Hide password"
+                                  : "Show password"
                               }
                             >
                               {showPassword1 ? (
@@ -233,11 +236,14 @@ export function SignupClientPage() {
                     name="password2"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Confirm Password</FormLabel>
+                        <FormLabel htmlFor="password2">
+                          Confirm Password
+                        </FormLabel>
                         <FormControl>
                           <div className="relative">
                             <Input
                               {...field}
+                              id="password2"
                               type={showPassword2 ? "text" : "password"}
                               required
                               className="pr-10"

@@ -125,7 +125,10 @@ export function MemberPicksEdit({ league, memberId }: Props) {
                       handlePickChange(game.gid, Number(value))
                     }
                   >
-                    <SelectTrigger className="w-[180px]">
+                    <SelectTrigger
+                      className="w-[180px]"
+                      aria-label={`Pick for ${awayTeam.abbrev} at ${homeTeam.abbrev}, game ${game.gid}`}
+                    >
                       <SelectValue placeholder="Select winner" />
                     </SelectTrigger>
                     <SelectContent>
@@ -145,6 +148,7 @@ export function MemberPicksEdit({ league, memberId }: Props) {
                       min="1"
                       max="200"
                       placeholder="Score"
+                      aria-label={`Score for game ${game.gid}`}
                       defaultValue={pick?.score?.toString() ?? ""}
                       onBlur={(e) => {
                         const value = e.target.value.trim();
