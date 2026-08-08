@@ -1,6 +1,7 @@
 import { TRPCError } from "@trpc/server";
 import stringify from "json-stable-stringify";
 import superjson from "superjson";
+import { isE2EMode } from "../utils/e2e";
 import { getLogger } from "../utils/logging";
 import type { authorizedProcedure, publicProcedure } from "./api/trpc";
 import { redis } from "./redis";
@@ -82,8 +83,9 @@ export const authorizedCacheMiddleware = async (
 ): Promise<MiddlewareReturn> => {
   const { ctx, next, path, type, input, by, cacheTimeSeconds } = opts;
 
-  // Only cache queries, not mutations
-  if (type !== "query") {
+  // E2E runs must be self-contained and never require an external Redis service.
+  // Only cache queries, not mutations.
+  if (isE2EMode || type !== "query") {
     return next();
   }
 
@@ -146,8 +148,9 @@ export const publicCacheMiddleware = async (
 ): Promise<MiddlewareReturn> => {
   const { ctx, next, path, type, input, by, cacheTimeSeconds } = opts;
 
-  // Only cache queries, not mutations
-  if (type !== "query") {
+  // E2E runs must be self-contained and never require an external Redis service.
+  // Only cache queries, not mutations.
+  if (isE2EMode || type !== "query") {
     return next();
   }
 

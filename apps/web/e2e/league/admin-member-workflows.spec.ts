@@ -140,13 +140,15 @@ test("league admin handles member picks, email history, throttling, and removal"
     })
     .click();
   await expect(removableRow).toHaveCount(0);
-  expect(
-    queryScalar(`
-      SELECT COUNT(*)
-      FROM "leaguemembers" m
-      JOIN "people" person ON person."uid" = m."user_id"
-      WHERE m."league_id" = ${adminOpsLeagueId}
-        AND person."email" = '${E2E_USERS.outsider.email}'
-    `),
-  ).toBe("0");
+  await expect
+    .poll(() =>
+      queryScalar(`
+        SELECT COUNT(*)
+        FROM "leaguemembers" m
+        JOIN "people" person ON person."uid" = m."user_id"
+        WHERE m."league_id" = ${adminOpsLeagueId}
+          AND person."email" = '${E2E_USERS.outsider.email}'
+      `),
+    )
+    .toBe("0");
 });

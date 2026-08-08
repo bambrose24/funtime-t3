@@ -370,3 +370,20 @@ passed`). All planned web PRD coverage paths are now checked.
   startup, all three migrations, deterministic seed verification, role-isolated
   browser contexts, retry-safe fixture naming, persistence assertions, and all
   previously covered journeys.
+- 2026-08-08: The third GitHub-hosted run completed 19 tests and isolated two
+  admin failures. Artifacts showed every cached request retrying a nonexistent
+  Redis service, which is intentionally outside this self-contained test stack.
+  E2E mode now bypasses cache I/O entirely, login waits for the Supabase auth
+  cookie before protected navigation, and the removal check polls PostgreSQL
+  until the mutation commits. These changes keep the suite independent of Redis
+  and make the affected workflows safe under Playwright retries.
+- 2026-08-08: A deliberately Redis-less local run then cleanly isolated the
+  remaining super-admin failure. The protected admin route allowed the global
+  override, but its shared league layout also called `league.nextLeague`, which
+  still required ordinary membership and failed the whole React server render.
+  Aligned that query with the existing super-admin policy; the browser test
+  continues to require an error-free render and a persisted post-kickoff pick.
+- 2026-08-08: The final Redis-less local gate passed all 21 tests on the first
+  attempt in 2.7 minutes. This revalidated the entire coverage matrix after the
+  cache isolation and authorization fix, including both previously failing
+  admin workflows, with `REDIS_URL` deliberately pointed at a dead local port.

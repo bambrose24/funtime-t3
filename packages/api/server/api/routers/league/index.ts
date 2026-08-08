@@ -894,10 +894,11 @@ export const leagueRouter = createTRPCRouter({
     .query(async ({ ctx, input }) => {
       const { leagueId } = input;
       const { db } = ctx;
+      const requestorIsSuperAdmin = isSuperAdminUser(ctx.dbUser?.email);
       const usersLeagueIds = (
         ctx.dbUser?.leaguemembers.map((m) => m.league_id) ?? []
       ).filter(Defined);
-      if (!usersLeagueIds.includes(leagueId)) {
+      if (!requestorIsSuperAdmin && !usersLeagueIds.includes(leagueId)) {
         throw UnauthorizedError;
       }
 
