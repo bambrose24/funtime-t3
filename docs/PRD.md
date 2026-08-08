@@ -230,3 +230,28 @@ Funtime solves this by combining:
    year-round, or be season-gated separately from renewals?
 4. What offseason experience should non-admin members see before their admin
    opens a completed league for renewal?
+
+## 12. Test Coverage Governance
+
+The product requirements and automated coverage must evolve together.
+`docs/WEB_E2E_WORKLOG.md` is the living source of truth for current web E2E
+coverage, owning specs, the latest validated baseline, and explicit gaps.
+`docs/TESTING_STRATEGY.md` defines how the suite runs locally and in CI.
+
+A user-facing feature or behavior change is not complete until the same change:
+
+1. Updates this PRD when product behavior changes.
+2. Adds or updates the corresponding row/checklist item in the web E2E worklog.
+3. Adds or updates deterministic E2E coverage against local Supabase.
+4. Runs the relevant tests and records the full-suite result.
+
+Add new coverage items as unchecked before or during implementation so missing
+coverage remains visible. If browser E2E is not the correct test layer, record
+the behavior in the worklog's explicit gaps register, name the owning test
+layer, and track the follow-up. Manual verification alone is not sufficient to
+mark a behavior covered.
+
+This policy applies to new features, behavior changes, bug fixes, authorization
+rules, persistence changes, and regressions discovered in production. Every
+production regression should receive an automated test that fails without the
+fix whenever the behavior can be reproduced safely and deterministically.

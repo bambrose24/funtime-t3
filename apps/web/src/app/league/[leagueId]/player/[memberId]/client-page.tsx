@@ -328,7 +328,7 @@ function EditSuperbowlForm({
                       field.onChange(val);
                     }}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger aria-label="AFC Team">
                       <SelectValue placeholder="AFC Team" />
                     </SelectTrigger>
                     <SelectContent>
@@ -364,7 +364,7 @@ function EditSuperbowlForm({
                       field.onChange(val);
                     }}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger aria-label="NFC Team">
                       <SelectValue placeholder="NFC Team" />
                     </SelectTrigger>
                     <SelectContent>
@@ -394,7 +394,7 @@ function EditSuperbowlForm({
                 <FormLabel>Winner</FormLabel>
                 <FormControl>
                   <Select value={field.value} onValueChange={field.onChange}>
-                    <SelectTrigger>
+                    <SelectTrigger aria-label="Winner">
                       <SelectValue placeholder="Winner" />
                     </SelectTrigger>
                     <SelectContent>
@@ -423,9 +423,15 @@ function EditSuperbowlForm({
             name="score"
             render={({ field }) => (
               <FormItem className="col-span-2">
-                <FormLabel>Total Score</FormLabel>
+                <FormLabel htmlFor="profileSuperbowlTotalScore">
+                  Total Score
+                </FormLabel>
                 <FormControl>
-                  <Input type="number" {...field} />
+                  <Input
+                    id="profileSuperbowlTotalScore"
+                    type="number"
+                    {...field}
+                  />
                 </FormControl>
               </FormItem>
             )}

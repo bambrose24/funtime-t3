@@ -18,7 +18,9 @@ export const playerProfileRouter = createTRPCRouter({
       if (!dbUser) {
         throw UnauthorizedError;
       }
-      const viewerMember = ctx.dbUser?.leaguemembers.find((m) => m.league_id);
+      const viewerMember = dbUser.leaguemembers.find(
+        (membership) => membership.league_id === leagueId,
+      );
       if (!viewerMember) {
         throw UnauthorizedError;
       }

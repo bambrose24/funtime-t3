@@ -453,7 +453,8 @@ export function ClientPickPage({
                                     <div className="flex items-center gap-2">
                                       <RadioGroupItem
                                         value={away.teamid.toString()}
-                                        id={`pick_option_${away.teamid.toString()}`}
+                                        id={`pick_option_${game.gid}_${away.teamid.toString()}`}
+                                        aria-label={`${away.loc} ${away.name} for game ${game.gid}`}
                                         onClick={() => {
                                           onTeamPick({
                                             idx,
@@ -488,7 +489,8 @@ export function ClientPickPage({
                                       <div className="flex items-center justify-center">
                                         <RadioGroupItem
                                           value={home.teamid.toString()}
-                                          id={`pick_option_${home.teamid.toString()}`}
+                                          id={`pick_option_${game.gid}_${home.teamid.toString()}`}
+                                          aria-label={`${home.loc} ${home.name} for game ${game.gid}`}
                                           onClick={() => {
                                             onTeamPick({
                                               idx,

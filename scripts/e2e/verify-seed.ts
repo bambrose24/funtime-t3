@@ -16,11 +16,10 @@ function runSql(query) {
 }
 
 function runJsonQuery(query) {
-  const output = runSql(`
-BEGIN READ ONLY;
-${query}
-ROLLBACK;
-`);
+  // Every caller supplies a SELECT. Passing BEGIN/SELECT/ROLLBACK as one
+  // `psql -c` command causes psql to report only the final command's output on
+  // some versions, leaving the JSON result empty.
+  const output = runSql(query);
   if (!output) {
     return null;
   }

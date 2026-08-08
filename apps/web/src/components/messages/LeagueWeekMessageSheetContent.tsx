@@ -53,11 +53,10 @@ export function LeagueWeekMessageSheetContent({
       leagueId,
     });
   };
-  const { mutateAsync: sendMessage } = clientApi.messages.writeMessage.useMutation(
-    {
+  const { mutateAsync: sendMessage } =
+    clientApi.messages.writeMessage.useMutation({
       onSuccess,
-    },
-  );
+    });
 
   const messages = messagesData ?? [];
 
@@ -74,7 +73,20 @@ export function LeagueWeekMessageSheetContent({
   }, [lastMessageIdx]);
 
   if (!league || !session) {
-    return null;
+    return (
+      <SheetContent
+        className={cn(
+          "w-[600px] p-4 lg:p-3",
+          className,
+          "grid grid-rows-[70px_1fr_130px] gap-1",
+        )}
+      >
+        <SheetHeader>
+          <SheetTitle>League Message Board</SheetTitle>
+        </SheetHeader>
+        <div className="text-sm text-muted-foreground">Loading messages…</div>
+      </SheetContent>
+    );
   }
 
   const formatDate = (date: Date) => {
@@ -127,10 +139,7 @@ export function LeagueWeekMessageSheetContent({
                     {message.content}
                   </div>
 
-                  <DeleteMessageButton
-                    message={message}
-                    leagueId={leagueId}
-                  />
+                  <DeleteMessageButton message={message} leagueId={leagueId} />
                 </div>
                 <div
                   className={cn("mx-1 mt-px text-xs text-muted-foreground", {
@@ -211,7 +220,13 @@ function DeleteMessageButton({
       }}
     >
       <DialogTrigger asChild>
-        <Button size="sm" type="button" variant="outline" className="px-2 py-1">
+        <Button
+          size="sm"
+          type="button"
+          variant="outline"
+          className="px-2 py-1"
+          aria-label={`Delete message from ${isViewers ? "you" : message.leaguemembers.people.username}`}
+        >
           <Trash2 className="h-4 w-4 text-muted-foreground" />
         </Button>
       </DialogTrigger>

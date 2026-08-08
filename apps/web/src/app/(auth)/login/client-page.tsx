@@ -17,7 +17,6 @@ import { Input } from "~/components/ui/input";
 import { Button } from "~/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
 import Link from "next/link";
-import { Label } from "~/components/ui/label";
 import {
   Form,
   FormControl,
@@ -41,6 +40,10 @@ export function LoginClientPage() {
   const form = useForm<LoginFormType>({
     resolver: zodResolver(loginSchema),
     reValidateMode: "onChange",
+    defaultValues: {
+      email: "",
+      password: "",
+    },
   });
 
   const redirectTo = useRedirectToParam();
@@ -119,9 +122,9 @@ export function LoginClientPage() {
                     name="password"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>
+                        <FormLabel htmlFor="password">
                           <div className="flex items-center">
-                            <Label htmlFor="password">Password</Label>
+                            <span>Password</span>
                             <Link
                               href="/forgot-password"
                               className="ml-auto inline-block text-sm underline"
@@ -135,6 +138,7 @@ export function LoginClientPage() {
                           <div className="relative">
                             <Input
                               {...field}
+                              id="password"
                               type={showPassword ? "text" : "password"}
                               required
                               tabIndex={2}

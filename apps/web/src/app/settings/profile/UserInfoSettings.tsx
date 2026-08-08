@@ -44,6 +44,7 @@ function UsernameForm({ data }: Props) {
       username: data.dbUser?.username ?? "",
     },
     shouldUseNativeValidation: false,
+    mode: "onChange",
     reValidateMode: "onChange",
   });
 
@@ -63,7 +64,11 @@ function UsernameForm({ data }: Props) {
     });
 
   const onSubmit = async (data: UsernameFormType) => {
-    await updateUsername(data);
+    try {
+      await updateUsername(data);
+    } catch {
+      // The mutation's onError handler presents the server validation message.
+    }
   };
 
   return (
