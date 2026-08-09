@@ -1,3 +1,5 @@
+appId: com.funtime.mobile
+---
 - runFlow:
     file: boot-and-login.yaml
     env:
