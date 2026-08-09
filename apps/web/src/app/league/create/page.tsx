@@ -12,6 +12,8 @@ export default async function CreateLeaguePage({
 }: {
   searchParams?: Promise<Record<string, string>>;
 }) {
+  throw new Error("E2E canary: React Server Component render failure");
+
   const resolvedSearchParams = await searchParams;
   const [session, nav] = await Promise.all([
     serverApi.session.current(),
