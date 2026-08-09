@@ -53,6 +53,8 @@ export function CreateLeagueClientPage({
   createLeagueForm,
   navInitialData,
 }: Props) {
+  throw new Error("E2E canary: Client Component render failure");
+
   const { data: nav } = clientApi.home.nav.useQuery(undefined, {
     initialData: navInitialData,
   });
