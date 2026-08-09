@@ -5,6 +5,7 @@ import { executeSql, getLeagueId, queryScalar } from "../helpers/db";
 
 test("admin creates one linked renewal and exercises isolated member invites", async ({
   page,
+  browser,
 }) => {
   const priorLeagueId = getLeagueId(E2E_LEAGUES.completed.shareCode);
   // A timed-out navigation can happen after the create mutation commits.
@@ -32,6 +33,10 @@ test("admin creates one linked renewal and exercises isolated member invites", a
   await expect(
     page.getByRole("checkbox", { name: "Invite webplayer" }),
   ).toBeChecked();
+  await expect(page.getByText("Last season")).toBeVisible();
+  await expect(
+    page.getByText(/Missed \d+ picks?|Picked every game/),
+  ).toBeVisible();
   await page
     .getByRole("button", { name: "Create league and send 1 invite" })
     .click();
@@ -56,6 +61,50 @@ test("admin creates one linked renewal and exercises isolated member invites", a
     GROUP BY next."season", next."prior_league_id"
   `);
   expect(renewalState).toBe(`2027|${priorLeagueId}|1`);
+
+  const renewalLeagueId = Number(
+    queryScalar(`
+      SELECT "league_id"
+      FROM "leagues"
+      WHERE "prior_league_id" = ${priorLeagueId}
+    `),
+  );
+  const renewalShareCode = queryScalar(`
+    SELECT "share_code"
+    FROM "leagues"
+    WHERE "league_id" = ${renewalLeagueId}
+  `);
+
+  // An invite link is safe to open in a separate browser session. The
+  // receiving player signs in, sees their account username, and joins.
+  const playerPage = await browser.newPage();
+  await login(playerPage, E2E_USERS.player);
+  await playerPage.goto(`/join-league/${renewalShareCode}`);
+  await expect(
+    playerPage.getByRole("heading", { name: /Join / }),
+  ).toBeVisible();
+  await expect(
+    playerPage.getByText("webplayer", { exact: true }),
+  ).toBeVisible();
+
+  await playerPage.getByLabel("AFC Team").click();
+  await playerPage.getByRole("option").first().click();
+  await playerPage.getByLabel("NFC Team").click();
+  await playerPage.getByRole("option").first().click();
+  await playerPage.getByRole("radio").first().check();
+  await playerPage.getByLabel("Total Score").fill("42");
+  await playerPage.getByRole("button", { name: "Register" }).click();
+  await expect(playerPage).toHaveURL(new RegExp(`/league/${renewalLeagueId}$`));
+
+  const joinedUsername = queryScalar(`
+    SELECT p."username"
+    FROM "leaguemembers" m
+    JOIN "people" p ON p."uid" = m."user_id"
+    WHERE m."league_id" = ${renewalLeagueId}
+      AND p."email" = '${E2E_USERS.player.email}'
+  `);
+  expect(joinedUsername).toBe("webplayer");
+  await playerPage.close();
 
   await page.goto(`/league/${priorLeagueId}/admin`);
   await expect(
