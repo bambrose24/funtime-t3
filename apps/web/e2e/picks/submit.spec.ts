@@ -1,13 +1,40 @@
 import { E2E_LEAGUES, E2E_USERS } from "../fixtures/constants";
 import { expect, test } from "../fixtures/test";
 import { login } from "../helpers/auth";
-import { getLeagueId, queryScalar } from "../helpers/db";
+import { executeSql, getLeagueId, queryScalar } from "../helpers/db";
 
 test("player submits, applies, and idempotently updates weekly picks", async ({
   page,
 }) => {
   const activeLeagueId = getLeagueId(E2E_LEAGUES.active.shareCode);
-  const competitionLeagueId = getLeagueId(E2E_LEAGUES.competition.shareCode);
+  const sameSeasonLeagueCount = Number(
+    queryScalar(`
+      SELECT COUNT(*)
+      FROM "leaguemembers" m
+      JOIN "leagues" l ON l."league_id" = m."league_id"
+      JOIN "people" person ON person."uid" = m."user_id"
+      WHERE person."email" = '${E2E_USERS.player.email}'
+        AND l."season" = (
+          SELECT "season" FROM "leagues" WHERE "league_id" = ${activeLeagueId}
+        )
+    `),
+  );
+  // Keep the journey independent of prior tests and Playwright retries. The
+  // renewal flow can legitimately add another membership in the same season.
+  executeSql(`
+    DELETE FROM "picks"
+    WHERE "week" = 1
+      AND "member_id" IN (
+        SELECT m."membership_id"
+        FROM "leaguemembers" m
+        JOIN "leagues" l ON l."league_id" = m."league_id"
+        JOIN "people" person ON person."uid" = m."user_id"
+        WHERE person."email" = '${E2E_USERS.player.email}'
+          AND l."season" = (
+            SELECT "season" FROM "leagues" WHERE "league_id" = ${activeLeagueId}
+          )
+      )
+  `);
   await login(page, E2E_USERS.player);
 
   await page.goto(`/league/${activeLeagueId}/pick`);
@@ -27,7 +54,9 @@ test("player submits, applies, and idempotently updates weekly picks", async ({
     page.getByRole("heading", { name: "Your picks are in for week 1" }),
   ).toBeVisible();
   await expect(
-    page.getByText("These picks apply to all 2 of your leagues"),
+    page.getByText(
+      `These picks apply to all ${sameSeasonLeagueCount} of your leagues`,
+    ),
   ).toBeVisible();
 
   await expect
@@ -36,13 +65,16 @@ test("player submits, applies, and idempotently updates weekly picks", async ({
         SELECT COUNT(*)
         FROM "picks" p
         JOIN "leaguemembers" m ON m."membership_id" = p."member_id"
+        JOIN "leagues" l ON l."league_id" = m."league_id"
         JOIN "people" person ON person."uid" = m."user_id"
         WHERE person."email" = '${E2E_USERS.player.email}'
-          AND m."league_id" IN (${activeLeagueId}, ${competitionLeagueId})
+          AND l."season" = (
+            SELECT "season" FROM "leagues" WHERE "league_id" = ${activeLeagueId}
+          )
           AND p."week" = 1
       `),
     )
-    .toBe("8");
+    .toBe(String(sameSeasonLeagueCount * 4));
 
   await page
     .getByRole("dialog")

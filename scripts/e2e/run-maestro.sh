@@ -66,7 +66,9 @@ has_online_device() {
 }
 
 app_installed() {
-  adb shell pm list packages | tr -d '\r' | grep -q "^package:${ANDROID_APP_ID}$"
+  local package_path
+  package_path="$(adb shell pm path "$ANDROID_APP_ID" 2>/dev/null | tr -d '\r' || true)"
+  [[ "$package_path" == package:* ]]
 }
 
 wait_for_android_ready() {

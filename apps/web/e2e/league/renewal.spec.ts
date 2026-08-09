@@ -103,9 +103,7 @@ test("admin creates one linked renewal and exercises isolated member invites", a
   await playerPage.getByRole("combobox", { name: "AFC Team" }).click();
   await playerPage.getByRole("option", { name: "Buffalo Bills" }).click();
   await playerPage.getByRole("combobox", { name: "NFC Team" }).click();
-  await playerPage
-    .getByRole("option", { name: "Philadelphia Eagles" })
-    .click();
+  await playerPage.getByRole("option", { name: "Philadelphia Eagles" }).click();
   await playerPage
     .getByRole("radio", { name: "Pick Buffalo Bills to win" })
     .click();
