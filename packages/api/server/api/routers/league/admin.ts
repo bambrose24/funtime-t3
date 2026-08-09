@@ -157,6 +157,47 @@ const buildRenewalInvitePreview = async ({
     });
   }
 
+  const priorMemberIds = priorMembers.map((member) => member.membership_id);
+  const [seasonGames, pickCounts] = await Promise.all([
+    db.games.findMany({
+      where: {
+        season: priorLeague.season,
+      },
+      select: {
+        ts: true,
+      },
+    }),
+    db.picks.groupBy({
+      by: ["member_id"],
+      where: {
+        member_id: {
+          in: priorMemberIds,
+        },
+        season: priorLeague.season,
+      },
+      _count: {
+        pickid: true,
+      },
+    }),
+  ]);
+  const pickCountByMemberId = new Map(
+    pickCounts.map((count) => [count.member_id, count._count.pickid]),
+  );
+  const missedPicksByMemberId = new Map(
+    priorMembers.map((member) => {
+      const eligibleGameCount = seasonGames.filter(
+        (game) => game.ts >= member.ts,
+      ).length;
+      const submittedPickCount =
+        pickCountByMemberId.get(member.membership_id) ?? 0;
+
+      return [
+        member.membership_id,
+        Math.max(eligibleGameCount - submittedPickCount, 0),
+      ];
+    }),
+  );
+
   const nextLeagueUserIds = new Set(
     nextMembers.map((member) => member.user_id),
   );
@@ -170,6 +211,7 @@ const buildRenewalInvitePreview = async ({
         username: member.people.username,
         email: member.people.email,
         role: member.role ?? MemberRole.player,
+        missedPickCount: missedPicksByMemberId.get(member.membership_id) ?? 0,
       };
     });
   const alreadyInvited = await db.emailLogs.findMany({

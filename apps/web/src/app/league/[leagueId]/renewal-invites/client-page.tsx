@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { ArrowRight, Mail, Users } from "lucide-react";
+import { AlertTriangle, ArrowRight, Mail, Users } from "lucide-react";
 import { toast } from "sonner";
 import { CopyJoinLinkButton } from "~/components/league/CopyJoinLinkButton";
 import { Badge } from "~/components/ui/badge";
@@ -185,8 +185,23 @@ export function RenewalInvitesClientPage({
                         aria-label={`Invite ${member.username}`}
                       />
                       <div className="min-w-0 flex-1">
-                        <div className="truncate text-sm font-medium">
-                          {member.username}
+                        <div className="flex min-w-0 items-center gap-2">
+                          <div className="truncate text-sm font-medium">
+                            {member.username}
+                          </div>
+                          {member.missedPickCount > 0 ? (
+                            <span
+                              className="inline-flex shrink-0 items-center gap-1 text-xs font-medium text-warning"
+                              title={`Missed ${member.missedPickCount} game ${member.missedPickCount === 1 ? "pick" : "picks"} last season`}
+                            >
+                              <AlertTriangle
+                                aria-hidden="true"
+                                className="h-3.5 w-3.5"
+                              />
+                              Missed {member.missedPickCount}{" "}
+                              {member.missedPickCount === 1 ? "pick" : "picks"}
+                            </span>
+                          ) : null}
                         </div>
                         <div className="truncate text-xs text-muted-foreground">
                           {member.email}
