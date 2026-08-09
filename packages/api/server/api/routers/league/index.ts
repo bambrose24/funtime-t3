@@ -25,6 +25,7 @@ import {
 } from "../../trpc";
 import { leagueAdminRouter } from "./admin";
 import {
+  getMissedPickCounts,
   getRenewalIneligibilityReason,
   isLeagueAdmin,
   suggestRenewalLeagueName,
@@ -274,6 +275,12 @@ export const leagueRouter = createTRPCRouter({
         });
       }
 
+      const missedPicksByMemberId = await getMissedPickCounts(
+        db,
+        priorLeague.season,
+        priorLeague.leaguemembers,
+      );
+
       const eligibleMembers = priorLeague.leaguemembers
         .filter((member) => member.user_id !== dbUser.uid)
         .filter((member) => Boolean(member.people.email))
@@ -282,6 +289,7 @@ export const leagueRouter = createTRPCRouter({
           username: member.people.username,
           email: member.people.email,
           role: member.role ?? MemberRole.player,
+          missedPickCount: missedPicksByMemberId.get(member.membership_id) ?? 0,
         }));
 
       return {

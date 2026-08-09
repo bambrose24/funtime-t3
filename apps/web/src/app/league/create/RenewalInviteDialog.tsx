@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Mail, ShieldCheck, Users } from "lucide-react";
+import { AlertTriangle, Mail, ShieldCheck, Users } from "lucide-react";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { Checkbox } from "~/components/ui/checkbox";
@@ -15,6 +15,11 @@ import {
 } from "~/components/ui/dialog";
 import { Text } from "~/components/ui/text";
 import type { RouterOutputs } from "~/trpc/types";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "~/components/ui/tooltip";
 
 type RenewalInvitees = RouterOutputs["league"]["renewalInvitees"];
 
@@ -106,6 +111,7 @@ export function RenewalInviteDialog({
             {invitees.eligibleMembers.map((member) => {
               const checked = selectedMemberIds.has(member.membershipId);
               const isAdmin = member.role === "admin";
+              const missedPicks = member.missedPickCount;
 
               return (
                 <div
@@ -133,20 +139,43 @@ export function RenewalInviteDialog({
                         {member.username}
                       </span>
                       {isAdmin ? (
-                        <Badge className="gap-1" variant="secondary">
-                          <ShieldCheck className="h-3 w-3" />
-                          Admin
-                        </Badge>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Badge
+                              className="cursor-help gap-1"
+                              variant="secondary"
+                            >
+                              <ShieldCheck className="h-3 w-3" />
+                              Admin
+                            </Badge>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            This player will be an admin in the new league when
+                            they join.
+                          </TooltipContent>
+                        </Tooltip>
                       ) : null}
                     </div>
                     <div className="truncate text-xs text-muted-foreground">
                       {member.email}
                     </div>
-                    {isAdmin ? (
-                      <div className="mt-1 text-xs text-muted-foreground">
-                        Will be an admin when they join.
-                      </div>
-                    ) : null}
+                    <div className="mt-2 flex flex-wrap items-center gap-2">
+                      {missedPicks > 0 ? (
+                        <Badge
+                          className="gap-1 border-amber-500/40 bg-amber-500/10 text-amber-700 dark:text-amber-300"
+                          variant="outline"
+                        >
+                          <AlertTriangle className="h-3 w-3" />
+                          Missed {missedPicks}{" "}
+                          {missedPicks === 1 ? "pick" : "picks"}
+                        </Badge>
+                      ) : (
+                        <Badge variant="outline">Picked every game</Badge>
+                      )}
+                      <span className="text-xs text-muted-foreground">
+                        Last season
+                      </span>
+                    </div>
                   </div>
                 </div>
               );
