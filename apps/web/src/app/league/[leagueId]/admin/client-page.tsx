@@ -91,7 +91,7 @@ export function LeagueAdminClientPage({
                       <Link
                         href={`/league/create?priorLeagueId=${league.league_id}`}
                       >
-                        Run It Back
+                        Set Up Next Season
                         <ArrowRight className="h-4 w-4" />
                       </Link>
                     </Button>

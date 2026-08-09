@@ -199,7 +199,7 @@ export const resendApi = {
           return {
             from: FROM,
             to: recipient.email,
-            subject: `Run it back: ${nextLeagueName} is open`,
+            subject: `Next season: ${nextLeagueName} is open`,
             react: LeagueRenewalInvite({
               adminName,
               joinHref,

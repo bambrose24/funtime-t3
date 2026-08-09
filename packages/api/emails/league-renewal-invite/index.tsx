@@ -29,7 +29,7 @@ export default function LeagueRenewalInvite({
           {nextLeagueName} is open for {seasonLabel}
         </Preview>
         <Container className="flex flex-col items-center">
-          <EmailH1>Run it back for {seasonLabel}</EmailH1>
+          <EmailH1>Join the {seasonLabel} season</EmailH1>
         </Container>
         <Container className="flex flex-col">
           <EmailText>
@@ -38,7 +38,7 @@ export default function LeagueRenewalInvite({
           </EmailText>
           <EmailText>
             Join {nextLeagueName} before week 1 starts to play with last
-            year&apos;s crew again.
+            year&apos;s players again.
           </EmailText>
         </Container>
         <Container className="flex justify-center">

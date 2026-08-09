@@ -330,7 +330,7 @@ export default function CreateLeagueScreen() {
             <View className="flex-1 gap-2">
               <Text className="text-app-fg-light dark:text-app-fg-dark text-3xl font-bold">
                 {isRenewalMode
-                  ? `Run it back for ${DEFAULT_SEASON}`
+                  ? `Set Up the ${DEFAULT_SEASON} Season`
                   : "Create League"}
               </Text>
               <Text className="text-base text-gray-600 dark:text-gray-400">

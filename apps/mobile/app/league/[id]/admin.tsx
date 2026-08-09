@@ -610,7 +610,7 @@ export default function LeagueAdminScreen() {
                     )
                   }
                 >
-                  Run It Back
+                  Set Up Next Season
                 </Button>
               )}
             </View>

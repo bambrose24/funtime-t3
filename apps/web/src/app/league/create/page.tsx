@@ -48,6 +48,9 @@ export default async function CreateLeaguePage({
   const renewalPreview = priorLeagueId
     ? await serverApi.league.renewalPreview({ priorLeagueId })
     : undefined;
+  const renewalInvitees = priorLeagueId
+    ? await serverApi.league.renewalInvitees({ priorLeagueId })
+    : undefined;
 
   const createLeagueForm = await serverApi.league.createForm();
 
@@ -55,6 +58,7 @@ export default async function CreateLeaguePage({
     <CreateLeagueClientPage
       priorLeague={priorLeague}
       renewalPreview={renewalPreview}
+      renewalInvitees={renewalInvitees}
       createLeagueForm={createLeagueForm}
       navInitialData={nav}
     />
