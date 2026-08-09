@@ -110,5 +110,6 @@ jobs:
             /tmp/funtime-e2e-dev-client-build.log
             /tmp/funtime-e2e-dev-client-adb-install.log
             /tmp/funtime-e2e-dev-client-prebuild.log
+            /home/runner/.maestro/tests
             apps/mobile/e2e/flows
           if-no-files-found: warn

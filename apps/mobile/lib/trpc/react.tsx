@@ -38,7 +38,10 @@ focusManager.setEventListener((handleFocus) => {
 
 onlineManager.setEventListener((setOnline) => {
   return NetInfo.addEventListener((state) => {
-    setOnline(Boolean(state.isConnected && state.isInternetReachable));
+    // A reachable app API does not require Android's public-internet probe to
+    // succeed (for example, local development and emulator E2E use 10.0.2.2).
+    // Only pause queries when the device explicitly reports no connection.
+    setOnline(state.isConnected !== false);
   });
 });
 
@@ -95,7 +98,9 @@ export function TRPCReactProvider({ children }: { children: React.ReactNode }) {
                   console.warn(
                     "[tRPC] Invalid refresh token while building auth headers; clearing local auth state.",
                   );
-                  await clearPersistedSupabaseSession("trpc:headers:getSession");
+                  await clearPersistedSupabaseSession(
+                    "trpc:headers:getSession",
+                  );
                 } else {
                   console.error(
                     "[tRPC] Failed to read Supabase session while building auth headers.",
