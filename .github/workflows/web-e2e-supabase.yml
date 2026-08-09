@@ -82,7 +82,7 @@ jobs:
         run: pnpm e2e:backend:up
 
       - name: Seed web fixtures and run E2E suite
-        run: pnpm e2e:web -- --skip-backend-up --project=${{ matrix.project }}
+        run: bash scripts/e2e/run-web.sh --skip-backend-up --project=${{ matrix.project }}
 
       - name: Collect E2E diagnostics
         if: always()

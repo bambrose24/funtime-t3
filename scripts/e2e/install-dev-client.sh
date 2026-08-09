@@ -188,9 +188,17 @@ if ! CI=1 pnpm --filter @funtime/mobile exec expo run:android --variant "$BUILD_
 fi
 
 if ! is_installed; then
-  echo "[e2e] Dev client install command finished, but package '${ANDROID_APP_ID}' is not on the device." >&2
-  echo "[e2e] Tail of /tmp/funtime-e2e-dev-client-build.log:" >&2
-  tail -n 120 /tmp/funtime-e2e-dev-client-build.log >&2 || true
+  echo "[e2e] Expo finished without leaving package '${ANDROID_APP_ID}' installed; retrying the built APK directly..."
+  if ! grep -q "BUILD SUCCESSFUL" /tmp/funtime-e2e-dev-client-build.log || ! install_built_apk; then
+    echo "[e2e] Dev client install command finished, but package '${ANDROID_APP_ID}' is not on the device." >&2
+    echo "[e2e] Tail of /tmp/funtime-e2e-dev-client-build.log:" >&2
+    tail -n 120 /tmp/funtime-e2e-dev-client-build.log >&2 || true
+    exit 1
+  fi
+fi
+
+if ! is_installed; then
+  echo "[e2e] Direct APK install completed, but package '${ANDROID_APP_ID}' is still missing." >&2
   exit 1
 fi
 

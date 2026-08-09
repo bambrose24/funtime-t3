@@ -100,11 +100,15 @@ test("admin creates one linked renewal and exercises isolated member invites", a
     playerPage.getByText("webplayer", { exact: true }),
   ).toBeVisible();
 
-  await playerPage.getByLabel("AFC Team").click();
-  await playerPage.getByRole("option").first().click();
-  await playerPage.getByLabel("NFC Team").click();
-  await playerPage.getByRole("option").first().click();
-  await playerPage.getByRole("radio").first().check();
+  await playerPage.getByRole("combobox", { name: "AFC Team" }).click();
+  await playerPage.getByRole("option", { name: "Buffalo Bills" }).click();
+  await playerPage.getByRole("combobox", { name: "NFC Team" }).click();
+  await playerPage
+    .getByRole("option", { name: "Philadelphia Eagles" })
+    .click();
+  await playerPage
+    .getByRole("radio", { name: "Pick Buffalo Bills to win" })
+    .click();
   await playerPage.getByLabel("Total Score").fill("42");
   await playerPage.getByRole("button", { name: "Register" }).click();
   await expect(playerPage).toHaveURL(new RegExp(`/league/${renewalLeagueId}$`));

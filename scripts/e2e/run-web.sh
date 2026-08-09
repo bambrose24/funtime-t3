@@ -12,6 +12,10 @@ PLAYWRIGHT_ARGS=()
 
 for arg in "$@"; do
   case "$arg" in
+    --)
+      # pnpm forwards its own separator to shell scripts; Playwright treats a
+      # forwarded separator as the end of options and ignores --project.
+      ;;
     --skip-backend-up)
       SKIP_BACKEND=1
       ;;

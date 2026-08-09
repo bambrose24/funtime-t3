@@ -44,8 +44,15 @@ test("player can join by share code with a required Super Bowl pick", async ({
 });
 
 test("a player cannot register after the season has started", async ({
+  browserErrorGuard,
   page,
 }, testInfo) => {
+  browserErrorGuard.allow(
+    /Failed to load resource: the server responded with a status of 400/,
+  );
+  browserErrorGuard.allow(
+    /league\.register[\s\S]*Registration is closed because the season has started/,
+  );
   const lateJoinCode = `E2ELATEJOIN${testInfo.retry}`;
   executeSql(`
     DELETE FROM "leagues" WHERE "share_code" = '${lateJoinCode}';
