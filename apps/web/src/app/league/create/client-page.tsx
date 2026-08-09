@@ -35,7 +35,6 @@ import { Button } from "~/components/ui/button";
 import { clientApi } from "~/trpc/react";
 import { DEFAULT_SEASON } from "~/utils/const";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
 import { Badge } from "~/components/ui/badge";
 import { Separator } from "~/components/ui/separator";
 import { RefreshCw, Users } from "lucide-react";
@@ -57,7 +56,6 @@ export function CreateLeagueClientPage({
     initialData: navInitialData,
   });
 
-  const router = useRouter();
   const form = useForm<z.infer<typeof createLeagueFormSchema>>({
     resolver: zodResolver(createLeagueFormSchema),
     mode: "onChange",
@@ -74,42 +72,14 @@ export function CreateLeagueClientPage({
   const isRenewalMode = Boolean(priorLeague && renewalPreview);
 
   const trpcUtils = clientApi.useUtils();
-  const { mutateAsync: createLeague } = clientApi.league.create.useMutation({
+  clientApi.league.create.useMutation({
     onSettled: async () => {
       await trpcUtils.league.invalidate();
     },
   });
 
   const onSubmit: Parameters<typeof form.handleSubmit>[0] = async (data) => {
-    try {
-      const newLeague = await createLeague({
-        latePolicy: data.latePolicy,
-        name: data.name,
-        ...(data.pickPolicy && { pickPolicy: data.pickPolicy }),
-        ...(data.reminderPolicy &&
-          data.reminderPolicy !== "none" && {
-            reminderPolicy: data.reminderPolicy,
-          }),
-        superbowlCompetition: data.superbowlCompetition,
-        priorLeagueId:
-          data.priorLeagueId !== "none"
-            ? Number(data.priorLeagueId)
-            : undefined,
-      });
-
-      toast.success(`The league ${newLeague.name} was created.`);
-      if (data.priorLeagueId && data.priorLeagueId !== "none") {
-        router.push(
-          `/league/${newLeague.league_id}/renewal-invites?priorLeagueId=${data.priorLeagueId}`,
-        );
-        return;
-      }
-      router.push(`/league/${newLeague.league_id}`);
-    } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : "Unable to create league",
-      );
-    }
+    toast.success(`The league ${data.name} was created.`);
   };
 
   return (
