@@ -9,7 +9,7 @@ import type { RouterOutputs } from "~/trpc/types";
 
 type RenewalCandidate = RouterOutputs["league"]["renewalCandidates"][number];
 
-export function RunItBackRenewalSection({
+export function NextSeasonRenewalSection({
   candidates,
 }: {
   candidates: RenewalCandidate[];
@@ -24,7 +24,7 @@ export function RunItBackRenewalSection({
         <div className="flex flex-col items-center gap-1 text-center">
           <div className="flex items-center gap-2">
             <RefreshCw className="h-5 w-5 text-primary" />
-            <Text.H2>Run It Back for {DEFAULT_SEASON}</Text.H2>
+            <Text.H2>Next Season</Text.H2>
           </div>
           <Text.Muted>
             Renew a prior league and invite last year&apos;s players.
@@ -62,7 +62,7 @@ export function RunItBackRenewalSection({
                 <Link
                   href={`/league/create?priorLeagueId=${candidate.priorLeagueId}`}
                 >
-                  Run It Back
+                  Set Up Next Season
                   <ArrowRight className="h-4 w-4" />
                 </Link>
               </Button>

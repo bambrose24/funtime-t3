@@ -103,7 +103,22 @@ Funtime solves this by combining:
 - Self-service renewal is available only when the next-season window is open
   (`CURRENT_SEASON > 2026`) and the prior league is `completed`.
 - A renewal creates one linked league for the target season; the prior admin
-  can invite eligible members who have not already joined.
+  reviews and selects eligible members before invitations are sent. The
+  creating admin is added automatically, and prior admins keep admin access
+  when they join the renewed league.
+
+### 7.2.1 Content Design Principles
+
+- Lead with the action and its outcome. Buttons should say what will happen
+  next, such as **Set Up Next Season**, not use insider phrasing.
+- Use familiar, age-inclusive language. Write for every football fan, not a
+  particular generation or group chat.
+- Keep the energy warm and game-day friendly, but let clarity do the work.
+  A little personality belongs in supporting copy, never in place of meaning.
+- Set expectations before a commitment. When an action opens a setup step,
+  say so; when it sends invitations, make the recipients and timing clear.
+- Be consistent about the nouns that matter: use **league**, **season**,
+  **players**, and **invites** throughout the renewal journey.
 
 ### 7.3 Weekly Picks
 

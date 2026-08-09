@@ -818,15 +818,14 @@ function LeagueOverview({
               The Season Is Over
             </Text>
             <Text className="mt-2 text-center text-sm text-gray-600 dark:text-gray-300">
-              Thanks for playing this year. Kick back for now, and we'll see you
-              next season.
+              Thanks for playing this year. We'll see you next season.
             </Text>
             {isLeagueAdmin && renewalPreview ? (
               <View className="mt-5 w-full gap-3 rounded-xl border border-blue-200 bg-white p-4 dark:border-blue-800 dark:bg-blue-900">
                 <Text className="text-center text-sm font-semibold text-blue-900 dark:text-blue-100">
                   {renewalPreview.nextLeague
                     ? "Next season league is ready"
-                    : `Run it back for ${DEFAULT_SEASON}`}
+                    : `Set Up the ${DEFAULT_SEASON} Season`}
                 </Text>
                 <Text className="text-center text-xs text-blue-700 dark:text-blue-300">
                   {renewalPreview.nextLeague

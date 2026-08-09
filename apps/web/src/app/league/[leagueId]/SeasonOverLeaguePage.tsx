@@ -48,8 +48,7 @@ export async function SeasonOverLeaguePage({
           </CardHeader>
           <CardContent>
             <Text.Muted>
-              Thanks for playing this year. Kick back for now, and we&apos;ll
-              see you next season.
+              Thanks for playing this year. We&apos;ll see you next season.
             </Text.Muted>
           </CardContent>
         </Card>
@@ -63,7 +62,7 @@ export async function SeasonOverLeaguePage({
                 <CardTitle>
                   {nextLeague
                     ? "Next Season League Is Ready"
-                    : `Run it back for ${DEFAULT_SEASON}`}
+                    : `Set Up the ${DEFAULT_SEASON} Season`}
                 </CardTitle>
               </div>
               <Text.Muted>

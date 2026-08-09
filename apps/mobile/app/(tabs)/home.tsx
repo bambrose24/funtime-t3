@@ -284,7 +284,7 @@ export default function HomeScreen() {
                 </View>
                 <View className="flex-1">
                   <Text className="text-[11px] uppercase tracking-wide text-blue-700 dark:text-blue-300">
-                    Run it back for {DEFAULT_SEASON}
+                    Set up the {DEFAULT_SEASON} season
                   </Text>
                   <Text
                     className="mt-1 text-sm font-semibold text-blue-900 dark:text-blue-100"

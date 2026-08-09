@@ -16,18 +16,25 @@ test("admin creates one linked renewal and exercises isolated member invites", a
   await login(page, E2E_USERS.admin);
 
   await page.goto(`/league/${priorLeagueId}/admin`);
-  await page
-    .getByRole("link", { name: /Run It Back|Set Up Next Season/ })
-    .click();
+  await page.getByRole("link", { name: "Set Up Next Season" }).click();
   await expect(
     page.getByRole("heading", {
-      name: /Run it back for 2027|Set Up the 2027 Season/,
+      name: "Set Up the 2027 Season",
     }),
   ).toBeVisible();
   await expect(page.getByLabel("League Name")).toHaveValue(
     "E2E Completed League 2027",
   );
-  await page.getByRole("button", { name: "Create and Invite Players" }).click();
+  await page.getByRole("button", { name: "Review Invites" }).click();
+  await expect(
+    page.getByRole("heading", { name: "Review next-season invites" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("checkbox", { name: "Invite webplayer" }),
+  ).toBeChecked();
+  await page
+    .getByRole("button", { name: "Create league and send 1 invite" })
+    .click();
 
   await expect(page).toHaveURL(
     /\/league\/\d+\/renewal-invites\?priorLeagueId=\d+$/,
@@ -36,11 +43,6 @@ test("admin creates one linked renewal and exercises isolated member invites", a
     page.getByRole("heading", { name: "Invite last year's players" }),
   ).toBeVisible();
   await expect(page.getByText("1 eligible players")).toBeVisible();
-  await expect(
-    page.getByRole("checkbox", { name: "Invite webplayer" }),
-  ).toBeChecked();
-  await page.getByRole("button", { name: "Send Invites" }).click();
-  await expect(page.getByText("Sent 0, skipped 1.")).toBeVisible();
 
   const renewalState = queryScalar(`
     SELECT CONCAT(
@@ -60,6 +62,6 @@ test("admin creates one linked renewal and exercises isolated member invites", a
     page.getByRole("link", { name: "Manage Invites" }),
   ).toBeVisible();
   await expect(
-    page.getByRole("link", { name: /Run It Back|Set Up Next Season/ }),
+    page.getByRole("link", { name: "Set Up Next Season" }),
   ).toHaveCount(0);
 });

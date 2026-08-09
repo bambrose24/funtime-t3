@@ -20,9 +20,9 @@ test("completed-league admin page renders renewal controls", async ({
     page.getByRole("heading", { name: "General Admin Settings" }),
   ).toBeVisible();
   await expect(
-    page.getByRole("heading", { name: /Next Season|Run It Back/ }),
+    page.getByRole("heading", { name: "Next Season" }),
   ).toBeVisible();
   await expect(
-    page.getByRole("link", { name: /Run It Back|Set Up Next Season/ }),
+    page.getByRole("link", { name: "Set Up Next Season" }),
   ).toBeVisible();
 });

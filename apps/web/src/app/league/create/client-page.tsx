@@ -38,11 +38,20 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { Badge } from "~/components/ui/badge";
 import { Separator } from "~/components/ui/separator";
-import { RefreshCw, Users } from "lucide-react";
+import { Info, RefreshCw, Users } from "lucide-react";
+import { useState } from "react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "~/components/ui/tooltip";
+import { RenewalInviteDialog } from "./RenewalInviteDialog";
 
 type Props = {
   priorLeague: RouterOutputs["league"]["get"] | undefined;
   renewalPreview: RouterOutputs["league"]["renewalPreview"] | undefined;
+  renewalInvitees: RouterOutputs["league"]["renewalInvitees"] | undefined;
   createLeagueForm: RouterOutputs["league"]["createForm"];
   navInitialData: RouterOutputs["home"]["nav"];
 };
@@ -50,6 +59,7 @@ type Props = {
 export function CreateLeagueClientPage({
   priorLeague,
   renewalPreview,
+  renewalInvitees,
   createLeagueForm,
   navInitialData,
 }: Props) {
@@ -72,6 +82,11 @@ export function CreateLeagueClientPage({
     },
   });
   const isRenewalMode = Boolean(priorLeague && renewalPreview);
+  const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
+  const [pendingRenewalData, setPendingRenewalData] = useState<
+    z.infer<typeof createLeagueFormSchema> | undefined
+  >();
+  const [isRenewalCreating, setIsRenewalCreating] = useState(false);
 
   const trpcUtils = clientApi.useUtils();
   const { mutateAsync: createLeague } = clientApi.league.create.useMutation({
@@ -79,8 +94,13 @@ export function CreateLeagueClientPage({
       await trpcUtils.league.invalidate();
     },
   });
+  const { mutateAsync: sendRenewalInvites } =
+    clientApi.league.admin.sendRenewalInvites.useMutation();
 
-  const onSubmit: Parameters<typeof form.handleSubmit>[0] = async (data) => {
+  const createLeagueFromData = async (
+    data: z.infer<typeof createLeagueFormSchema>,
+    selectedMemberIds?: number[],
+  ) => {
     try {
       const newLeague = await createLeague({
         latePolicy: data.latePolicy,
@@ -99,6 +119,22 @@ export function CreateLeagueClientPage({
 
       toast.success(`The league ${newLeague.name} was created.`);
       if (data.priorLeagueId && data.priorLeagueId !== "none") {
+        if (selectedMemberIds) {
+          try {
+            const inviteResult = await sendRenewalInvites({
+              leagueId: newLeague.league_id,
+              priorLeagueId: Number(data.priorLeagueId),
+              memberIds: selectedMemberIds,
+            });
+            toast.success(
+              `Sent ${inviteResult.sentCount} ${inviteResult.sentCount === 1 ? "invite" : "invites"}.`,
+            );
+          } catch (error) {
+            toast.error(
+              "The league was created, but invitations were not sent. You can send them from the next page.",
+            );
+          }
+        }
         router.push(
           `/league/${newLeague.league_id}/renewal-invites?priorLeagueId=${data.priorLeagueId}`,
         );
@@ -111,296 +147,370 @@ export function CreateLeagueClientPage({
       );
     }
   };
+  const onSubmit: Parameters<typeof form.handleSubmit>[0] = async (data) => {
+    if (isRenewalMode && renewalInvitees) {
+      setPendingRenewalData(data);
+      setInviteDialogOpen(true);
+      return;
+    }
+
+    await createLeagueFromData(data);
+  };
 
   return (
-    <div className="col-span-12 flex flex-col gap-3 md:col-span-8 md:col-start-3 lg:col-span-6 lg:col-start-4">
-      <form onSubmit={form.handleSubmit(onSubmit)}>
-        <Form {...form}>
-          <Card>
-            <CardHeader className="flex w-full justify-center">
-              <div className="flex flex-col ">
-                <Text.H3 className="text-center">
-                  {isRenewalMode
-                    ? `Set Up the ${DEFAULT_SEASON} Season`
-                    : "Create a League"}
-                </Text.H3>
-                <Text.Small className="mt-4">
-                  {isRenewalMode
-                    ? "Renew your prior league, keep the rules that worked, and invite last year's players after creation."
-                    : "Creating a league means you'll manage a pick 'em league weekly. The game runs itself; invite people and the rules are enforced for you."}
-                </Text.Small>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-col gap-3">
-                {isRenewalMode && renewalPreview && priorLeague ? (
-                  <Alert className="border-primary/30 bg-primary/5">
-                    <AlertTitle className="flex flex-col gap-3">
-                      <div className="flex items-center gap-2">
-                        <RefreshCw className="h-4 w-4" />
-                        Renewing{" "}
-                        <Link
-                          className="underline"
-                          href={`/league/${priorLeague.league_id}`}
-                        >
-                          {priorLeague.name}
-                        </Link>
-                      </div>
-                      <div className="flex flex-wrap gap-2 text-xs font-normal">
-                        <Badge variant="secondary">{priorLeague.season}</Badge>
-                        <Badge variant="outline" className="gap-1">
-                          <Users className="h-3 w-3" />
-                          {renewalPreview.memberCount} players
-                        </Badge>
-                        <Badge variant="outline">
-                          {renewalPreview.adminCount} admins
-                        </Badge>
-                      </div>
-                    </AlertTitle>
-                  </Alert>
-                ) : null}
-                {isRenewalMode && renewalPreview ? (
-                  <div className="rounded-md border bg-muted/30 p-3">
-                    <Text.Small className="font-medium">
-                      Copied settings
-                    </Text.Small>
-                    <Separator className="my-2" />
-                    <div className="grid gap-2 text-sm sm:grid-cols-2">
-                      <div>
-                        <span className="text-muted-foreground">
-                          Late policy
-                        </span>
-                        <div className="font-medium">
-                          {form.watch("latePolicy")}
+    <TooltipProvider>
+      <div className="col-span-12 flex flex-col gap-3 md:col-span-8 md:col-start-3 lg:col-span-6 lg:col-start-4">
+        <form onSubmit={form.handleSubmit(onSubmit)}>
+          <Form {...form}>
+            <Card>
+              <CardHeader className="flex w-full justify-center">
+                <div className="flex flex-col ">
+                  <Text.H3 className="text-center">
+                    {isRenewalMode
+                      ? `Set Up the ${DEFAULT_SEASON} Season`
+                      : "Create a League"}
+                  </Text.H3>
+                  <Text.Small className="mt-4">
+                    {isRenewalMode
+                      ? "Renew your prior league, keep the rules that worked, and choose who to invite before you create it."
+                      : "Creating a league means you'll manage a pick 'em league weekly. The game runs itself; invite people and the rules are enforced for you."}
+                  </Text.Small>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-col gap-3">
+                  {isRenewalMode && renewalPreview && priorLeague ? (
+                    <Alert className="border-primary/30 bg-primary/5">
+                      <AlertTitle className="flex flex-col gap-3">
+                        <div className="flex items-center gap-2">
+                          <RefreshCw className="h-4 w-4" />
+                          Renewing{" "}
+                          <Link
+                            className="underline"
+                            href={`/league/${priorLeague.league_id}`}
+                          >
+                            {priorLeague.name}
+                          </Link>
                         </div>
-                      </div>
-                      <div>
-                        <span className="text-muted-foreground">Reminders</span>
-                        <div className="font-medium">
-                          {form.watch("reminderPolicy") === "none"
-                            ? "Disabled"
-                            : "3 hours before"}
+                        <div className="flex flex-wrap gap-2 text-xs font-normal">
+                          <Badge variant="secondary">
+                            {priorLeague.season}
+                          </Badge>
+                          <Badge variant="outline" className="gap-1">
+                            <Users className="h-3 w-3" />
+                            {renewalPreview.memberCount} players
+                          </Badge>
+                          <Badge variant="outline">
+                            {renewalPreview.adminCount} admins
+                          </Badge>
                         </div>
-                      </div>
-                      <div>
-                        <span className="text-muted-foreground">Scoring</span>
-                        <div className="font-medium">Game winner</div>
-                      </div>
-                      <div>
-                        <span className="text-muted-foreground">
-                          Super Bowl
-                        </span>
-                        <div className="font-medium">
-                          {form.watch("superbowlCompetition")
-                            ? "Enabled"
-                            : "Disabled"}
+                      </AlertTitle>
+                    </Alert>
+                  ) : null}
+                  {isRenewalMode && renewalPreview ? (
+                    <div className="rounded-md border bg-muted/30 p-3">
+                      <Text.Small className="font-medium">
+                        Copied settings
+                      </Text.Small>
+                      <Separator className="my-2" />
+                      <div className="grid gap-4 text-sm sm:grid-cols-2">
+                        <div>
+                          <div className="flex items-center gap-1 text-muted-foreground">
+                            <span>Late picks</span>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <button
+                                  type="button"
+                                  aria-label="About late-pick rules"
+                                >
+                                  <Info className="h-3.5 w-3.5" />
+                                </button>
+                              </TooltipTrigger>
+                              <TooltipContent className="max-w-xs">
+                                These rules apply to every weekly pick. You can
+                                change the policy below before creating the
+                                league.
+                              </TooltipContent>
+                            </Tooltip>
+                          </div>
+                          {form.watch("latePolicy") ===
+                          "allow_late_and_lock_after_start" ? (
+                            <ul className="mt-1 list-disc space-y-1 pl-4 text-sm">
+                              <li>
+                                Players can pick games that have not started.
+                              </li>
+                              <li>
+                                They cannot view other picks until they submit.
+                              </li>
+                            </ul>
+                          ) : (
+                            <ul className="mt-1 list-disc space-y-1 pl-4 text-sm">
+                              <li>
+                                All weekly picks close at the first kickoff.
+                              </li>
+                              <li>Players cannot submit after that time.</li>
+                            </ul>
+                          )}
+                        </div>
+                        <div>
+                          <span className="text-muted-foreground">
+                            Reminders
+                          </span>
+                          <div className="font-medium">
+                            {form.watch("reminderPolicy") === "none"
+                              ? "Disabled"
+                              : "3 hours before"}
+                          </div>
+                        </div>
+                        <div>
+                          <span className="text-muted-foreground">Scoring</span>
+                          <div className="font-medium">Game winner</div>
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-1 text-muted-foreground">
+                            <span>Super Bowl Contest</span>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <button
+                                  type="button"
+                                  aria-label="About the Super Bowl Contest"
+                                >
+                                  <Info className="h-3.5 w-3.5" />
+                                </button>
+                              </TooltipTrigger>
+                              <TooltipContent className="max-w-xs">
+                                Players predict the winner, loser, and total
+                                score. The most accurate prediction wins the
+                                contest.
+                              </TooltipContent>
+                            </Tooltip>
+                          </div>
+                          <div className="mt-1 font-medium">
+                            {form.watch("superbowlCompetition")
+                              ? "Included — winner, loser, and total score"
+                              : "Not included"}
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                ) : null}
-                <FormField
-                  control={form.control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>League Name</FormLabel>
-                      <FormControl>
-                        <Input {...field} />
-                      </FormControl>
-                      <FormDescription />
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="priorLeagueId"
-                  render={({ field }) =>
-                    isRenewalMode && priorLeague ? (
+                  ) : null}
+                  <FormField
+                    control={form.control}
+                    name="name"
+                    render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Prior League</FormLabel>
+                        <FormLabel>League Name</FormLabel>
                         <FormControl>
-                          <Input
-                            value={`${priorLeague.name} (${priorLeague.season})`}
-                            disabled
-                          />
+                          <Input {...field} />
                         </FormControl>
-                        <FormDescription>
-                          This renewal will stay linked to the prior league.
-                        </FormDescription>
+                        <FormDescription />
                         <FormMessage />
                       </FormItem>
-                    ) : (
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="priorLeagueId"
+                    render={({ field }) =>
+                      isRenewalMode && priorLeague ? (
+                        <FormItem>
+                          <FormLabel>Prior League</FormLabel>
+                          <FormControl>
+                            <Input
+                              value={`${priorLeague.name} (${priorLeague.season})`}
+                              disabled
+                            />
+                          </FormControl>
+                          <FormDescription>
+                            This renewal will stay linked to the prior league.
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      ) : (
+                        <FormItem>
+                          <FormLabel>Prior League?</FormLabel>
+                          <FormControl>
+                            <Select {...field} onValueChange={field.onChange}>
+                              <SelectTrigger className="w-full ring-2 ring-input focus:ring-2">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value={"none"}>None</SelectItem>
+                                {nav?.leagues
+                                  .filter(
+                                    (league) =>
+                                      league.season < DEFAULT_SEASON &&
+                                      league.status === "completed",
+                                  )
+                                  .map((league, idx) => {
+                                    return (
+                                      <SelectItem
+                                        key={idx}
+                                        value={league.league_id.toString()}
+                                      >
+                                        {league.name}
+                                      </SelectItem>
+                                    );
+                                  })}
+                              </SelectContent>
+                            </Select>
+                          </FormControl>
+                          <FormDescription>
+                            If you&apos;re making a league from a prior league,
+                            mark it here. You&apos;ll be able to invite folks
+                            from the prior league easily.
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )
+                    }
+                  />
+                  <FormField
+                    control={form.control}
+                    name="latePolicy"
+                    render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Prior League?</FormLabel>
+                        <FormLabel>Late Policy</FormLabel>
+                        <FormDescription>
+                          Whether or not to allow late picks. This is a helpful
+                          setting to allow people to forget the Thursday game,
+                          but still make picks for games that haven&apos;t
+                          started. If you enable it, people who are late cannot
+                          see the league&apos;s picks until they submit theirs.
+                        </FormDescription>
                         <FormControl>
                           <Select {...field} onValueChange={field.onChange}>
                             <SelectTrigger className="w-full ring-2 ring-input focus:ring-2">
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value={"none"}>None</SelectItem>
-                              {nav?.leagues
-                                .filter(
-                                  (league) =>
-                                    league.season < DEFAULT_SEASON &&
-                                    league.status === "completed",
-                                )
-                                .map((league, idx) => {
+                              {Object.values(createLeagueForm.latePolicy).map(
+                                (policy, idx) => {
+                                  const display =
+                                    policy === "allow_late_and_lock_after_start"
+                                      ? "Allow Late"
+                                      : policy === "close_at_first_game_start"
+                                        ? "Close at First Game Start"
+                                        : null;
                                   return (
                                     <SelectItem
-                                      key={idx}
-                                      value={league.league_id.toString()}
+                                      key={`${policy}_${idx}`}
+                                      value={policy}
                                     >
-                                      {league.name}
+                                      {display}
                                     </SelectItem>
                                   );
-                                })}
+                                },
+                              )}
                             </SelectContent>
                           </Select>
                         </FormControl>
-                        <FormDescription>
-                          If you&apos;re making a league from a prior league,
-                          mark it here. You&apos;ll be able to invite folks from
-                          the prior league easily.
-                        </FormDescription>
+                        <FormDescription />
                         <FormMessage />
                       </FormItem>
-                    )
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="reminderPolicy"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Pick Reminders</FormLabel>
+                        <FormDescription>
+                          Whether or not you want to remind players when they
+                          have not made picks yet. Reminders go out
+                          approximately 3 hours before the start of the first
+                          game each week, and only goes to players who have not
+                          picked.
+                        </FormDescription>
+                        <FormControl>
+                          <Select {...field} onValueChange={field.onChange}>
+                            <SelectTrigger className="w-full ring-2 ring-input focus:ring-2">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="three_hours_before">
+                                Yes
+                              </SelectItem>
+                              <SelectItem value="none">No</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </FormControl>
+                        <FormDescription />
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="superbowlCompetition"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Super Bowl Contest</FormLabel>
+                        <FormDescription>
+                          Players predict the winner, loser, and total score.
+                          The most accurate prediction wins after the regular
+                          season ends.
+                        </FormDescription>
+                        <FormControl>
+                          <Select
+                            {...field}
+                            value={field.value ? "yes" : "no"}
+                            onValueChange={(val) => {
+                              form.setValue(
+                                "superbowlCompetition",
+                                val === "yes",
+                              );
+                            }}
+                          >
+                            <SelectTrigger className="w-full ring-2 ring-input focus:ring-2">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="yes">Yes</SelectItem>
+                              <SelectItem value="no">No</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </FormControl>
+                        <FormDescription />
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </CardContent>
+              <CardFooter>
+                <Button
+                  type="submit"
+                  className="w-full"
+                  disabled={
+                    !form.formState.isValid || form.formState.isSubmitting
                   }
-                />
-                <FormField
-                  control={form.control}
-                  name="latePolicy"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Late Policy</FormLabel>
-                      <FormDescription>
-                        Whether or not to allow late picks. This is a helpful
-                        setting to allow people to forget the Thursday game, but
-                        still make picks for games that haven&apos;t started. If
-                        you enable it, people who are late cannot see the
-                        league&apos;s picks until they submit theirs.
-                      </FormDescription>
-                      <FormControl>
-                        <Select {...field} onValueChange={field.onChange}>
-                          <SelectTrigger className="w-full ring-2 ring-input focus:ring-2">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {Object.values(createLeagueForm.latePolicy).map(
-                              (policy, idx) => {
-                                const display =
-                                  policy === "allow_late_and_lock_after_start"
-                                    ? "Allow Late"
-                                    : policy === "close_at_first_game_start"
-                                      ? "Close at First Game Start"
-                                      : null;
-                                return (
-                                  <SelectItem
-                                    key={`${policy}_${idx}`}
-                                    value={policy}
-                                  >
-                                    {display}
-                                  </SelectItem>
-                                );
-                              },
-                            )}
-                          </SelectContent>
-                        </Select>
-                      </FormControl>
-                      <FormDescription />
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="reminderPolicy"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Pick Reminders</FormLabel>
-                      <FormDescription>
-                        Whether or not you want to remind players when they have
-                        not made picks yet. Reminders go out approximately 3
-                        hours before the start of the first game each week, and
-                        only goes to players who have not picked.
-                      </FormDescription>
-                      <FormControl>
-                        <Select {...field} onValueChange={field.onChange}>
-                          <SelectTrigger className="w-full ring-2 ring-input focus:ring-2">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="three_hours_before">
-                              Yes
-                            </SelectItem>
-                            <SelectItem value="none">No</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </FormControl>
-                      <FormDescription />
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="superbowlCompetition"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Super Bowl Competition</FormLabel>
-                      <FormDescription>
-                        The Super Bowl compeitition is a way to keep playing
-                        after the regular season is over. It works by asking
-                        each player to pick a Super Bowl winner and loser, as
-                        well as a total game score. The player who gets the
-                        winner, or the loser, or the closest score (in that
-                        priority order) will win the Super Bowl compeition.
-                      </FormDescription>
-                      <FormControl>
-                        <Select
-                          {...field}
-                          value={field.value ? "yes" : "no"}
-                          onValueChange={(val) => {
-                            form.setValue(
-                              "superbowlCompetition",
-                              val === "yes",
-                            );
-                          }}
-                        >
-                          <SelectTrigger className="w-full ring-2 ring-input focus:ring-2">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="yes">Yes</SelectItem>
-                            <SelectItem value="no">No</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </FormControl>
-                      <FormDescription />
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-            </CardContent>
-            <CardFooter>
-              <Button
-                type="submit"
-                className="w-full"
-                disabled={
-                  !form.formState.isValid || form.formState.isSubmitting
-                }
-                loading={form.formState.isSubmitting}
-              >
-                {isRenewalMode ? "Create and Invite Players" : "Create League"}
-              </Button>
-            </CardFooter>
-          </Card>
-        </Form>
-      </form>
-    </div>
+                  loading={form.formState.isSubmitting}
+                >
+                  {isRenewalMode ? "Review Invites" : "Create League"}
+                </Button>
+              </CardFooter>
+            </Card>
+          </Form>
+        </form>
+        {renewalInvitees ? (
+          <RenewalInviteDialog
+            invitees={renewalInvitees}
+            open={inviteDialogOpen}
+            onOpenChange={setInviteDialogOpen}
+            onConfirm={async (memberIds) => {
+              if (!pendingRenewalData) {
+                return;
+              }
+              setIsRenewalCreating(true);
+              await createLeagueFromData(pendingRenewalData, memberIds);
+              setIsRenewalCreating(false);
+            }}
+            isCreating={isRenewalCreating}
+          />
+        ) : null}
+      </div>
+    </TooltipProvider>
   );
 }
