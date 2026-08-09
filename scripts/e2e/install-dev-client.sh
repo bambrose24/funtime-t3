@@ -7,6 +7,7 @@ cd "$ROOT_DIR"
 ANDROID_APP_ID="${E2E_ANDROID_APP_ID:-com.funtime.mobile}"
 BUILD_VARIANT="${E2E_ANDROID_BUILD_VARIANT:-debug}"
 FORCE_REINSTALL="${E2E_FORCE_REINSTALL_DEV_CLIENT:-0}"
+ANDROID_READY_WAIT_SECONDS="${E2E_ANDROID_READY_WAIT_SECONDS:-300}"
 ANDROID_SDK_ROOT_DEFAULT="${HOME}/Library/Android/sdk"
 ANDROID_SDK_ROOT="${ANDROID_SDK_ROOT:-${ANDROID_HOME:-$ANDROID_SDK_ROOT_DEFAULT}}"
 export ANDROID_SDK_ROOT
@@ -102,10 +103,53 @@ is_installed() {
   adb shell pm list packages | tr -d '\r' | grep -q "^package:${ANDROID_APP_ID}$"
 }
 
+wait_for_package_manager() {
+  for _ in $(seq 1 "$ANDROID_READY_WAIT_SECONDS"); do
+    if [[ "$(adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r' || true)" == "1" ]] && \
+      adb shell cmd package list packages >/dev/null 2>&1; then
+      return 0
+    fi
+    sleep 1
+  done
+
+  echo "[e2e] Android package manager did not become ready within ${ANDROID_READY_WAIT_SECONDS}s." >&2
+  adb devices -l >&2 || true
+  adb shell service check package >&2 || true
+  return 1
+}
+
+install_built_apk() {
+  local apk_path
+  local install_log="/tmp/funtime-e2e-dev-client-adb-install.log"
+  apk_path="$(find apps/mobile/android/app/build/outputs/apk -type f -name '*.apk' 2>/dev/null | sort | tail -n 1 || true)"
+
+  if [[ -z "$apk_path" ]]; then
+    echo "[e2e] Android build completed, but no APK was found for a direct install retry." >&2
+    return 1
+  fi
+
+  echo "[e2e] Retrying the completed APK install after Android services become ready..."
+  wait_for_package_manager
+
+  for attempt in $(seq 1 6); do
+    if adb install -r -d "$apk_path" >"$install_log" 2>&1; then
+      return 0
+    fi
+    echo "[e2e] APK install attempt ${attempt}/6 failed; waiting before retry..." >&2
+    sleep 10
+  done
+
+  echo "[e2e] Direct APK install retries failed. Tail of ${install_log}:" >&2
+  tail -n 80 "$install_log" >&2 || true
+  return 1
+}
+
 if ! has_online_device; then
   echo "[e2e] No running Android device detected. Start an emulator before installing the dev client." >&2
   exit 1
 fi
+
+wait_for_package_manager
 
 if is_installed; then
   if [[ "$FORCE_REINSTALL" == "1" ]]; then
@@ -132,12 +176,16 @@ configure_local_properties
 
 echo "[e2e] Installing Android dev client (${ANDROID_APP_ID})..."
 echo "[e2e] This may take several minutes the first time."
-CI=1 pnpm --filter @funtime/mobile exec expo run:android --variant "$BUILD_VARIANT" --app-id "$ANDROID_APP_ID" --no-bundler --no-install \
-  >/tmp/funtime-e2e-dev-client-build.log 2>&1 || {
-  echo "[e2e] Dev client install failed. Tail of /tmp/funtime-e2e-dev-client-build.log:" >&2
-  tail -n 120 /tmp/funtime-e2e-dev-client-build.log >&2 || true
-  exit 1
-}
+if ! CI=1 pnpm --filter @funtime/mobile exec expo run:android --variant "$BUILD_VARIANT" --app-id "$ANDROID_APP_ID" --no-bundler --no-install \
+  >/tmp/funtime-e2e-dev-client-build.log 2>&1; then
+  if grep -q "BUILD SUCCESSFUL" /tmp/funtime-e2e-dev-client-build.log && install_built_apk; then
+    echo "[e2e] Installed the built dev client with adb after Expo's initial install attempt failed."
+  else
+    echo "[e2e] Dev client install failed. Tail of /tmp/funtime-e2e-dev-client-build.log:" >&2
+    tail -n 120 /tmp/funtime-e2e-dev-client-build.log >&2 || true
+    exit 1
+  fi
+fi
 
 if ! is_installed; then
   echo "[e2e] Dev client install command finished, but package '${ANDROID_APP_ID}' is not on the device." >&2

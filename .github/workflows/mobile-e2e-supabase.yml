@@ -72,6 +72,12 @@ jobs:
       - name: Start backend + seed + verify
         run: pnpm e2e:backend:up
 
+      - name: Enable Android hardware acceleration
+        run: |
+          if [[ -e /dev/kvm ]]; then
+            sudo chmod 666 /dev/kvm
+          fi
+
       - name: Run Android emulator + Maestro flow
         uses: reactivecircus/android-emulator-runner@v2
         with:
@@ -87,6 +93,7 @@ jobs:
             export E2E_CLEAR_DEV_CLIENT_DATA=1
             export E2E_SEED_TEST_FIXTURES=1
             export E2E_EMULATOR_WAIT_SECONDS=300
+            export E2E_ANDROID_READY_WAIT_SECONDS=300
             pnpm e2e:mobile:maestro -- --skip-backend-up
 
       - name: Upload logs
@@ -101,6 +108,7 @@ jobs:
             /tmp/funtime-e2e-expo.log
             /tmp/funtime-e2e-open-link.log
             /tmp/funtime-e2e-dev-client-build.log
+            /tmp/funtime-e2e-dev-client-adb-install.log
             /tmp/funtime-e2e-dev-client-prebuild.log
             apps/mobile/e2e/flows
           if-no-files-found: warn

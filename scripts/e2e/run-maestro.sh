@@ -18,6 +18,7 @@ REQUESTED_EXPO_PORT="${E2E_EXPO_PORT:-8081}"
 FLOW_PATH="${E2E_MAESTRO_FLOW:-apps/mobile/e2e/suites/ci.yaml}"
 DESIRED_AVD="${E2E_ANDROID_AVD:-Pixel 9a}"
 EMULATOR_WAIT_SECONDS="${E2E_EMULATOR_WAIT_SECONDS:-240}"
+ANDROID_READY_WAIT_SECONDS="${E2E_ANDROID_READY_WAIT_SECONDS:-300}"
 ANDROID_APP_ID="${E2E_ANDROID_APP_ID:-com.funtime.mobile}"
 INSTALL_DEV_CLIENT="${E2E_INSTALL_DEV_CLIENT:-1}"
 CLEAR_DEV_CLIENT_DATA="${E2E_CLEAR_DEV_CLIENT_DATA:-1}"
@@ -66,6 +67,32 @@ has_online_device() {
 
 app_installed() {
   adb shell pm list packages | tr -d '\r' | grep -q "^package:${ANDROID_APP_ID}$"
+}
+
+wait_for_android_ready() {
+  echo "[e2e] Waiting for Android boot and package manager readiness..."
+  adb wait-for-device >/dev/null 2>&1 || true
+
+  for _ in $(seq 1 "$ANDROID_READY_WAIT_SECONDS"); do
+    local boot_completed
+    local package_service
+    boot_completed="$(adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r' || true)"
+    package_service="$(adb shell service check package 2>/dev/null | tr -d '\r' || true)"
+
+    if [[ "$boot_completed" == "1" ]] && [[ "$package_service" == *"found"* ]] && \
+      adb shell cmd package list packages >/dev/null 2>&1; then
+      echo "[e2e] Android package manager is ready."
+      return 0
+    fi
+
+    sleep 1
+  done
+
+  echo "[e2e] Android package manager did not become ready within ${ANDROID_READY_WAIT_SECONDS}s." >&2
+  adb devices -l >&2 || true
+  adb shell getprop sys.boot_completed >&2 || true
+  adb shell service check package >&2 || true
+  return 1
 }
 
 port_in_use() {
@@ -145,14 +172,12 @@ if ! has_online_device; then
     exit 1
   fi
 
-  adb wait-for-device >/dev/null 2>&1 || true
-  for _ in $(seq 1 120); do
-    if [[ "$(adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')" == "1" ]]; then
-      break
-    fi
-    sleep 1
-  done
 fi
+
+# An adb device can be reported as online before Android's framework services are
+# usable, especially on software-emulated CI runners. Do not build or install the
+# dev client until the package manager can answer commands successfully.
+wait_for_android_ready
 
 if ! app_installed || [[ "$FORCE_REINSTALL_DEV_CLIENT" == "1" ]]; then
   if [[ "$INSTALL_DEV_CLIENT" == "1" ]]; then
