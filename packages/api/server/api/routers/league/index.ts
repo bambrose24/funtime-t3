@@ -376,6 +376,27 @@ export const leagueRouter = createTRPCRouter({
         },
       });
 
+      const firstGame = await ctx.db.games.findFirst({
+        where: {
+          season: league.season,
+        },
+        orderBy: {
+          ts: "asc",
+        },
+        select: {
+          ts: true,
+        },
+      });
+      if (
+        league.status !== LeagueStatus.not_started ||
+        (firstGame && firstGame.ts <= new Date())
+      ) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Registration is closed because the season has started",
+        });
+      }
+
       const isInLeague = dbUser.leaguemembers.find(
         (m) => m.league_id === league.league_id,
       );

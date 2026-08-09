@@ -95,17 +95,23 @@ export function JoinLeagueClientPage({ data, session, teams }: Props) {
         ? formData.superbowlNfcTeamId
         : formData.superbowlAfcTeamId,
     );
-    await register({
-      code: data.share_code!,
-      superbowl: {
-        loserTeamId,
-        winnerTeamId,
-        score: Number(formData.superbowlTotalScore),
-      },
-    });
-    toast.success(`Successfully registered for ${data.name}`);
-    await trpcUtils.invalidate();
-    window.location.href = `/league/${data.league_id}`;
+    try {
+      await register({
+        code: data.share_code!,
+        superbowl: {
+          loserTeamId,
+          winnerTeamId,
+          score: Number(formData.superbowlTotalScore),
+        },
+      });
+      toast.success(`Successfully registered for ${data.name}`);
+      await trpcUtils.invalidate();
+      window.location.href = `/league/${data.league_id}`;
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Unable to join this league",
+      );
+    }
   };
 
   const afcTeam = teams.find((t) => t.teamid.toString() === afcTeamId);
