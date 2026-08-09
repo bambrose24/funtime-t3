@@ -32,6 +32,7 @@ appId: com.funtime.mobile
 - inputText: ${E2E_PASSWORD}
 - tapOn: "Confirm your password"
 - inputText: ${E2E_PASSWORD}
+- hideKeyboard
 - tapOn: "Create Account"
 - tapOn: "Create an account"
 - tapOn:
@@ -42,6 +43,7 @@ appId: com.funtime.mobile
 - inputText: ${E2E_EMAIL}
 - tapOn: "Enter your password"
 - inputText: ${E2E_PASSWORD}
+- hideKeyboard
 - tapOn: "Sign In"
 - extendedWaitUntil:
     visible: "First Name"
@@ -52,11 +54,13 @@ appId: com.funtime.mobile
 - inputText: "Tester"
 - tapOn: "Username"
 - inputText: ${E2E_USERNAME}
+- hideKeyboard
 - tapOn: "Finish Signup"
 - tapOn: "Continue"
 - tapOn: "Create League"
 - tapOn: "My Funtime League"
 - inputText: "E2E Native Created League"
+- hideKeyboard
 - tapOn: "Disabled"
 - tapOn: "Create League"
 - extendedWaitUntil:

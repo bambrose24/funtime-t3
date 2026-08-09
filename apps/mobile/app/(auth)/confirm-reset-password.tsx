@@ -41,9 +41,10 @@ export default function ConfirmResetPasswordScreen() {
   const utils = clientApi.useUtils();
   const [password1, setPassword1] = useState("");
   const [password2, setPassword2] = useState("");
-  const [errors, setErrors] = useState<{ password1?: string; password2?: string }>(
-    {},
-  );
+  const [errors, setErrors] = useState<{
+    password1?: string;
+    password2?: string;
+  }>({});
   const [preparingSession, setPreparingSession] = useState(true);
   const [sessionReady, setSessionReady] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -212,6 +213,7 @@ export default function ConfirmResetPasswordScreen() {
         <ScrollView
           className="flex-1"
           showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
           contentContainerStyle={{
             flexGrow: 1,
             justifyContent: "center",
@@ -246,7 +248,9 @@ export default function ConfirmResetPasswordScreen() {
                 className={errors.password1 ? "border-red-500" : ""}
               />
               {errors.password1 ? (
-                <Text className="mt-1 text-sm text-red-500">{errors.password1}</Text>
+                <Text className="mt-1 text-sm text-red-500">
+                  {errors.password1}
+                </Text>
               ) : null}
             </View>
 
@@ -268,7 +272,9 @@ export default function ConfirmResetPasswordScreen() {
                 className={errors.password2 ? "border-red-500" : ""}
               />
               {errors.password2 ? (
-                <Text className="mt-1 text-sm text-red-500">{errors.password2}</Text>
+                <Text className="mt-1 text-sm text-red-500">
+                  {errors.password2}
+                </Text>
               ) : null}
             </View>
 

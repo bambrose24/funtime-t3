@@ -21,6 +21,7 @@ appId: com.funtime.mobile
     direction: DOWN
 - tapOn: "e.g. 47"
 - inputText: "48"
+- hideKeyboard
 - tapOn: "Register for League"
 - extendedWaitUntil:
     visible: "Registration Failed"

@@ -234,13 +234,14 @@ export default function JoinLeagueCodeScreen() {
       <ScrollView
         className="flex-1"
         showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
         contentContainerStyle={{ padding: 24, paddingBottom: 40 }}
       >
         <View className="mx-auto w-full max-w-3xl gap-6">
           <View className="flex-row items-start gap-3">
             <Pressable
               onPress={() => router.back()}
-              className="mt-1 rounded-lg bg-app-card-light p-2 dark:bg-app-card-dark"
+              className="bg-app-card-light dark:bg-app-card-dark mt-1 rounded-lg p-2"
             >
               <Ionicons
                 name="chevron-back"

@@ -68,29 +68,25 @@ export default function ConfirmSignupScreen() {
 
       await funtimeSignup({ firstName, lastName, username });
 
-      Alert.alert(
-        "Success!",
-        "Your account has been created successfully!",
-        [
-          {
-            text: "Continue",
-            onPress: () => {
-              // Redirect to the specified page or home
-              if (redirectTo) {
-                router.replace((normalizedRedirectTo ?? redirectTo) as any);
-              } else {
-                router.replace("/home" as any);
-              }
-            },
+      Alert.alert("Success!", "Your account has been created successfully!", [
+        {
+          text: "Continue",
+          onPress: () => {
+            // Redirect to the specified page or home
+            if (redirectTo) {
+              router.replace((normalizedRedirectTo ?? redirectTo) as any);
+            } else {
+              router.replace("/home" as any);
+            }
           },
-        ]
-      );
+        },
+      ]);
     } catch (error) {
       console.error("Signup error:", error);
       Alert.alert(
         "Error",
         "There was an error completing your signup. Please try again.",
-        [{ text: "OK" }]
+        [{ text: "OK" }],
       );
     } finally {
       setSubmitting(false);
@@ -106,6 +102,7 @@ export default function ConfirmSignupScreen() {
         <ScrollView
           className="flex-1"
           showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
           contentContainerStyle={{ flexGrow: 1 }}
         >
           <View className="flex-1 justify-center px-6 py-8">

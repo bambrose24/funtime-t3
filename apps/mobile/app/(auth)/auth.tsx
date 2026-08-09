@@ -92,6 +92,7 @@ export default function LoginScreen() {
       <ScrollView
         className="flex-1"
         showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
         contentContainerStyle={{
           flexGrow: 1,
           justifyContent: "center",
@@ -143,7 +144,9 @@ export default function LoginScreen() {
                   Password
                 </Text>
                 <Pressable
-                  onPress={() => router.push(withRedirectTo("/forgot-password") as any)}
+                  onPress={() =>
+                    router.push(withRedirectTo("/forgot-password") as any)
+                  }
                 >
                   <Text className="text-sm text-blue-600 dark:text-blue-400">
                     Forgot password?
@@ -181,7 +184,9 @@ export default function LoginScreen() {
 
           {/* Footer Links */}
           <View className="mt-6">
-            <Pressable onPress={() => router.push(withRedirectTo("/signup") as any)}>
+            <Pressable
+              onPress={() => router.push(withRedirectTo("/signup") as any)}
+            >
               <Text className="text-center text-blue-600 dark:text-blue-400">
                 Don't have an account? Sign up
               </Text>

@@ -26,6 +26,7 @@ appId: com.funtime.mobile
 - inputText: ${LOGIN_EMAIL}
 - tapOn: "Enter your password"
 - inputText: ${E2E_PASSWORD}
+- hideKeyboard
 - tapOn: "Sign In"
 - extendedWaitUntil:
     visible: "My Leagues"

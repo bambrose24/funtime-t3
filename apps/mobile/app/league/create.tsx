@@ -357,6 +357,7 @@ export default function CreateLeagueScreen() {
       <ScrollView
         className="flex-1"
         showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
         contentContainerStyle={{ padding: 24, paddingBottom: 40 }}
       >
         <View className="mx-auto w-full max-w-2xl gap-6">

@@ -63,7 +63,7 @@ export default function SignupScreen() {
   const handleSignup = async () => {
     // Clear previous errors
     setErrors({});
-    
+
     // Validate form
     const validation = signupSchema.safeParse({ email, password1, password2 });
     if (!validation.success) {
@@ -74,8 +74,10 @@ export default function SignupScreen() {
       } = {};
       validation.error.errors.forEach((error) => {
         if (error.path[0] === "email") fieldErrors.email = error.message;
-        if (error.path[0] === "password1") fieldErrors.password1 = error.message;
-        if (error.path[0] === "password2") fieldErrors.password2 = error.message;
+        if (error.path[0] === "password1")
+          fieldErrors.password1 = error.message;
+        if (error.path[0] === "password2")
+          fieldErrors.password2 = error.message;
       });
       setErrors(fieldErrors);
       return;
@@ -89,7 +91,7 @@ export default function SignupScreen() {
         ? `/auth/callback?redirectTo=${encodeURIComponent(normalizedRedirectTo)}`
         : "/auth/callback";
       const redirectUrl = Linking.createURL(callbackPath);
-      
+
       const { error, data } = await supabase.auth.signUp({
         email: email.trim(),
         password: password1,
@@ -106,7 +108,7 @@ export default function SignupScreen() {
       if (!data.user?.id) {
         Alert.alert(
           "Signup Failed",
-          "Error signing up. That email might be taken already."
+          "Error signing up. That email might be taken already.",
         );
         return;
       }
@@ -121,7 +123,7 @@ export default function SignupScreen() {
             text: "Go to Login",
             onPress: () => router.replace(withRedirectTo("/auth") as any),
           },
-        ]
+        ],
       );
     } catch (error) {
       console.error("Signup error:", error);
@@ -134,16 +136,18 @@ export default function SignupScreen() {
   if (success) {
     return (
       <SafeAreaView className="bg-app-bg-light dark:bg-app-bg-dark flex-1">
-        <View className="flex-1 justify-center items-center px-6">
+        <View className="flex-1 items-center justify-center px-6">
           <View className="w-full max-w-sm">
-            <Text className="text-app-fg-light dark:text-app-fg-dark text-center text-2xl font-bold mb-4">
+            <Text className="text-app-fg-light dark:text-app-fg-dark mb-4 text-center text-2xl font-bold">
               Check Your Email
             </Text>
-            <Text className="text-center text-gray-600 dark:text-gray-400 mb-8">
-              We've sent you a confirmation email. Click the link in your email to
-              verify your account and complete your profile setup.
+            <Text className="mb-8 text-center text-gray-600 dark:text-gray-400">
+              We've sent you a confirmation email. Click the link in your email
+              to verify your account and complete your profile setup.
             </Text>
-            <Button onPress={() => router.replace(withRedirectTo("/auth") as any)}>
+            <Button
+              onPress={() => router.replace(withRedirectTo("/auth") as any)}
+            >
               Go to Login
             </Button>
           </View>
@@ -154,28 +158,34 @@ export default function SignupScreen() {
 
   return (
     <SafeAreaView className="bg-app-bg-light dark:bg-app-bg-dark flex-1">
-      <ScrollView 
-        className="flex-1" 
+      <ScrollView
+        className="flex-1"
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ flexGrow: 1, justifyContent: 'center', padding: 24 }}
+        keyboardShouldPersistTaps="handled"
+        contentContainerStyle={{
+          flexGrow: 1,
+          justifyContent: "center",
+          padding: 24,
+        }}
       >
-        <View className="w-full max-w-sm mx-auto">
+        <View className="mx-auto w-full max-w-sm">
           {/* Header */}
           <View className="mb-8">
-            <Text className="text-app-fg-light dark:text-app-fg-dark text-center text-3xl font-bold mb-2">
+            <Text className="text-app-fg-light dark:text-app-fg-dark mb-2 text-center text-3xl font-bold">
               Create Account
             </Text>
             <Text className="text-center text-gray-600 dark:text-gray-400">
-              Enter your information to create an account. You'll need to confirm your email.
+              Enter your information to create an account. You'll need to
+              confirm your email.
             </Text>
-            <Text className="text-center text-gray-600 dark:text-gray-400 mt-2">
+            <Text className="mt-2 text-center text-gray-600 dark:text-gray-400">
               If you have played before, you can{" "}
-                <Text 
-                  className="text-blue-600 dark:text-blue-400" 
-                  onPress={() => router.replace(withRedirectTo("/auth") as any)}
-                >
-                  sign in with your existing account
-                </Text>
+              <Text
+                className="text-blue-600 dark:text-blue-400"
+                onPress={() => router.replace(withRedirectTo("/auth") as any)}
+              >
+                sign in with your existing account
+              </Text>
               .
             </Text>
           </View>
@@ -184,14 +194,15 @@ export default function SignupScreen() {
           <View>
             {/* Email Field */}
             <View className="mb-6">
-              <Text className="text-app-fg-light dark:text-app-fg-dark text-base font-medium mb-2">
+              <Text className="text-app-fg-light dark:text-app-fg-dark mb-2 text-base font-medium">
                 Email
               </Text>
               <Input
                 value={email}
                 onChangeText={(text) => {
                   setEmail(text);
-                  if (errors.email) setErrors(prev => ({...prev, email: undefined}));
+                  if (errors.email)
+                    setErrors((prev) => ({ ...prev, email: undefined }));
                 }}
                 placeholder="example@gmail.com"
                 autoCapitalize="none"
@@ -200,20 +211,23 @@ export default function SignupScreen() {
                 className={errors.email ? "border-red-500" : ""}
               />
               {errors.email && (
-                <Text className="text-red-500 text-sm mt-1">{errors.email}</Text>
+                <Text className="mt-1 text-sm text-red-500">
+                  {errors.email}
+                </Text>
               )}
             </View>
 
             {/* Password Field */}
             <View className="mb-6">
-              <Text className="text-app-fg-light dark:text-app-fg-dark text-base font-medium mb-2">
+              <Text className="text-app-fg-light dark:text-app-fg-dark mb-2 text-base font-medium">
                 Password
               </Text>
               <Input
                 value={password1}
                 onChangeText={(text) => {
                   setPassword1(text);
-                  if (errors.password1) setErrors(prev => ({...prev, password1: undefined}));
+                  if (errors.password1)
+                    setErrors((prev) => ({ ...prev, password1: undefined }));
                 }}
                 placeholder="Enter your password"
                 secureTextEntry
@@ -221,20 +235,23 @@ export default function SignupScreen() {
                 className={errors.password1 ? "border-red-500" : ""}
               />
               {errors.password1 && (
-                <Text className="text-red-500 text-sm mt-1">{errors.password1}</Text>
+                <Text className="mt-1 text-sm text-red-500">
+                  {errors.password1}
+                </Text>
               )}
             </View>
 
             {/* Confirm Password Field */}
             <View className="mb-6">
-              <Text className="text-app-fg-light dark:text-app-fg-dark text-base font-medium mb-2">
+              <Text className="text-app-fg-light dark:text-app-fg-dark mb-2 text-base font-medium">
                 Confirm Password
               </Text>
               <Input
                 value={password2}
                 onChangeText={(text) => {
                   setPassword2(text);
-                  if (errors.password2) setErrors(prev => ({...prev, password2: undefined}));
+                  if (errors.password2)
+                    setErrors((prev) => ({ ...prev, password2: undefined }));
                 }}
                 placeholder="Confirm your password"
                 secureTextEntry
@@ -242,23 +259,23 @@ export default function SignupScreen() {
                 className={errors.password2 ? "border-red-500" : ""}
               />
               {errors.password2 && (
-                <Text className="text-red-500 text-sm mt-1">{errors.password2}</Text>
+                <Text className="mt-1 text-sm text-red-500">
+                  {errors.password2}
+                </Text>
               )}
             </View>
 
             {/* Signup Button */}
-            <Button
-              onPress={handleSignup}
-              disabled={loading}
-              className="mt-2"
-            >
+            <Button onPress={handleSignup} disabled={loading} className="mt-2">
               {loading ? "Creating account..." : "Create an account"}
             </Button>
           </View>
 
           {/* Footer Links */}
           <View className="mt-6">
-            <Pressable onPress={() => router.replace(withRedirectTo("/auth") as any)}>
+            <Pressable
+              onPress={() => router.replace(withRedirectTo("/auth") as any)}
+            >
               <Text className="text-center text-blue-600 dark:text-blue-400">
                 Already have an account? Sign in
               </Text>
