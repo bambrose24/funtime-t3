@@ -226,6 +226,74 @@ export const leagueRouter = createTRPCRouter({
         nextLeague: priorLeague.future_leagues.at(0) ?? null,
       };
     }),
+  renewalInvitees: authorizedProcedure
+    .input(
+      z.object({
+        priorLeagueId: z.number().int(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const { db, dbUser } = ctx;
+      if (!dbUser) {
+        throw new TRPCError({ code: "UNAUTHORIZED" });
+      }
+
+      const priorLeague = await db.leagues.findFirstOrThrow({
+        where: {
+          league_id: input.priorLeagueId,
+        },
+        include: {
+          leaguemembers: {
+            include: {
+              people: true,
+            },
+            orderBy: [
+              { role: "asc" },
+              {
+                people: {
+                  username: "asc",
+                },
+              },
+            ],
+          },
+        },
+      });
+
+      if (!isLeagueAdmin(dbUser.leaguemembers, priorLeague.league_id)) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "You are not an admin of the prior league",
+        });
+      }
+
+      const ineligibilityReason = getRenewalIneligibilityReason(priorLeague);
+      if (ineligibilityReason) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: ineligibilityReason,
+        });
+      }
+
+      const eligibleMembers = priorLeague.leaguemembers
+        .filter((member) => member.user_id !== dbUser.uid)
+        .filter((member) => Boolean(member.people.email))
+        .map((member) => ({
+          membershipId: member.membership_id,
+          username: member.people.username,
+          email: member.people.email,
+          role: member.role ?? MemberRole.player,
+        }));
+
+      return {
+        eligibleMembers,
+        defaultSelectedMemberIds: eligibleMembers.map(
+          (member) => member.membershipId,
+        ),
+        missingEmailCount: priorLeague.leaguemembers.filter(
+          (member) => member.user_id !== dbUser.uid && !member.people.email,
+        ).length,
+      };
+    }),
   fromJoinCode: publicProcedure
     .input(
       z.object({
@@ -317,11 +385,21 @@ export const leagueRouter = createTRPCRouter({
         });
       }
 
+      const role =
+        league.prior_league_id &&
+        dbUser.leaguemembers.some(
+          (member) =>
+            member.league_id === league.prior_league_id &&
+            member.role === MemberRole.admin,
+        )
+          ? MemberRole.admin
+          : MemberRole.player;
+
       const leagueMember = await ctx.db.leaguemembers.create({
         data: {
           league_id: league.league_id,
           user_id: dbUser.uid,
-          role: "player",
+          role,
         },
       });
 
