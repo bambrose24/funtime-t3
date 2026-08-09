@@ -364,6 +364,11 @@ export const leagueRouter = createTRPCRouter({
         throw new TRPCError({ code: "UNAUTHORIZED" });
       }
 
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "E2E canary: create mutation failure",
+      });
+
       try {
         const response = await ctx.db.$transaction(async (tx) => {
           if (input.priorLeagueId) {
