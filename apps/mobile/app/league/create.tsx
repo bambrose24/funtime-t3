@@ -18,6 +18,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { SelectOption } from "@/components/ui/select-option";
+import { RenewalInviteReviewModal } from "@/components/league/RenewalInviteReviewModal";
 import { clientApi } from "@/lib/trpc/react";
 import { DEFAULT_SEASON } from "@/constants";
 import { useColorScheme } from "@/lib/useColorScheme";
@@ -46,6 +47,7 @@ export default function CreateLeagueScreen() {
     useState<MobileReminderPolicy>("three_hours_before");
   const [superbowlCompetition, setSuperbowlCompetition] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [inviteReviewOpen, setInviteReviewOpen] = useState(false);
 
   const utils = clientApi.useUtils();
   const { data: session, isLoading: sessionLoading } =
@@ -71,6 +73,8 @@ export default function CreateLeagueScreen() {
   );
 
   const { mutateAsync: createLeague } = clientApi.league.create.useMutation();
+  const { mutateAsync: sendRenewalInvites } =
+    clientApi.league.admin.sendRenewalInvites.useMutation();
   const parsedRoutePriorLeagueId = useMemo(() => {
     if (typeof routePriorLeagueIdParam !== "string") {
       return null;
@@ -78,15 +82,28 @@ export default function CreateLeagueScreen() {
     const parsed = Number(routePriorLeagueIdParam);
     return Number.isInteger(parsed) && parsed > 0 ? parsed : null;
   }, [routePriorLeagueIdParam]);
+  const selectedPriorLeagueId =
+    priorLeagueId === "none" ? null : Number(priorLeagueId);
   const { data: renewalPreview, isLoading: renewalPreviewLoading } =
     clientApi.league.renewalPreview.useQuery(
-      { priorLeagueId: parsedRoutePriorLeagueId ?? 0 },
+      { priorLeagueId: selectedPriorLeagueId ?? 0 },
       {
         enabled:
           !!session?.dbUser &&
           canCreate === true &&
           canRenewLeagues &&
-          parsedRoutePriorLeagueId !== null,
+          selectedPriorLeagueId !== null,
+      },
+    );
+  const { data: renewalInvitees, isLoading: renewalInviteesLoading } =
+    clientApi.league.renewalInvitees.useQuery(
+      { priorLeagueId: selectedPriorLeagueId ?? 0 },
+      {
+        enabled:
+          !!session?.dbUser &&
+          canCreate === true &&
+          canRenewLeagues &&
+          selectedPriorLeagueId !== null,
       },
     );
   const priorLeagues = useMemo(() => {
@@ -184,18 +201,17 @@ export default function CreateLeagueScreen() {
   }, [createForm?.latePolicy, latePolicy]);
   const trimmedName = name.trim();
   const nameError = getCreateLeagueNameError(name);
-  const isRenewalMode =
-    parsedRoutePriorLeagueId !== null && priorLeagueId !== "none";
+  const isRenewalMode = priorLeagueId !== "none";
   const canSubmit = trimmedName.length > 0 && nameError === null && !submitting;
   const createButtonText = submitting
     ? "Creating..."
     : canSubmit
       ? isRenewalMode
-        ? "Create & Invite"
+        ? "Review Invites"
         : "Create League"
       : "Name must be 5-100 chars";
 
-  const onSubmit = async () => {
+  const createLeagueFromSelection = async (selectedMemberIds?: number[]) => {
     if (nameError) {
       Alert.alert("Invalid League Name", nameError);
       return;
@@ -216,6 +232,21 @@ export default function CreateLeagueScreen() {
       });
       await utils.invalidate();
       if (priorLeagueId !== "none") {
+        if (selectedMemberIds) {
+          try {
+            await sendRenewalInvites({
+              leagueId: createdLeague.league_id,
+              priorLeagueId: Number(priorLeagueId),
+              memberIds: selectedMemberIds,
+            });
+          } catch (error) {
+            console.error("Failed to send renewal invites", error);
+            Alert.alert(
+              "League Created",
+              "The league was created, but invitations were not sent. You can send them from the next screen.",
+            );
+          }
+        }
         router.replace(
           `/league/${createdLeague.league_id}/renewal-invites?priorLeagueId=${priorLeagueId}` as any,
         );
@@ -233,13 +264,26 @@ export default function CreateLeagueScreen() {
     }
   };
 
+  const onSubmit = async () => {
+    if (nameError) {
+      Alert.alert("Invalid League Name", nameError);
+      return;
+    }
+    if (isRenewalMode && renewalInvitees) {
+      setInviteReviewOpen(true);
+      return;
+    }
+    await createLeagueFromSelection();
+  };
+
   const loading =
     sessionLoading ||
     canCreateLoading ||
     renewalStatusLoading ||
     createFormLoading ||
     navLoading ||
-    renewalPreviewLoading;
+    renewalPreviewLoading ||
+    renewalInviteesLoading;
 
   if (loading) {
     return (
@@ -335,7 +379,7 @@ export default function CreateLeagueScreen() {
               </Text>
               <Text className="text-base text-gray-600 dark:text-gray-400">
                 {isRenewalMode
-                  ? "Renew your prior league and invite last year's players."
+                  ? "Review the copied settings and choose who to invite before you create the league."
                   : "Configure your league and invite friends to play."}
               </Text>
             </View>
@@ -563,6 +607,15 @@ export default function CreateLeagueScreen() {
           </View>
         </View>
       </ScrollView>
+      {renewalInvitees ? (
+        <RenewalInviteReviewModal
+          invitees={renewalInvitees}
+          visible={inviteReviewOpen}
+          isCreating={submitting}
+          onClose={() => setInviteReviewOpen(false)}
+          onConfirm={createLeagueFromSelection}
+        />
+      ) : null}
     </SafeAreaView>
   );
 }

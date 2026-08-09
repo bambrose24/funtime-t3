@@ -1,0 +1,70 @@
+- launchApp:
+    clearState: true
+- repeat:
+    times: 8
+    commands:
+      - openLink: ${E2E_APP_BOOT_URL}
+      - tapOn:
+          text: ${E2E_DEV_SERVER_URL}
+          optional: true
+      - tapOn:
+          text: "Continue"
+          optional: true
+      - tapOn:
+          text: "Reload"
+          optional: true
+      - tapOn:
+          text: "Go home"
+          optional: true
+      - waitForAnimationToEnd
+- extendedWaitUntil:
+    visible: "Enter your email"
+    timeout: 180000
+- tapOn: "Don't have an account? Sign up"
+- extendedWaitUntil:
+    visible: "Create an account"
+    timeout: 30000
+- tapOn: "example@gmail.com"
+- inputText: ${E2E_EMAIL}
+- tapOn: "Enter your password"
+- inputText: ${E2E_PASSWORD}
+- tapOn: "Confirm your password"
+- inputText: ${E2E_PASSWORD}
+- tapOn: "Create Account"
+- tapOn: "Create an account"
+- tapOn:
+    text: "GO TO LOGIN"
+    optional: true
+- tapOn: "Go to Login"
+- tapOn: "Enter your email"
+- inputText: ${E2E_EMAIL}
+- tapOn: "Enter your password"
+- inputText: ${E2E_PASSWORD}
+- tapOn: "Sign In"
+- extendedWaitUntil:
+    visible: "First Name"
+    timeout: 30000
+- tapOn: "First Name"
+- inputText: "Maestro"
+- tapOn: "Last Name"
+- inputText: "Tester"
+- tapOn: "Username"
+- inputText: ${E2E_USERNAME}
+- tapOn: "Finish Signup"
+- tapOn: "Continue"
+- tapOn: "Create League"
+- tapOn: "My Funtime League"
+- inputText: "E2E Native Created League"
+- tapOn: "Disabled"
+- tapOn: "Create League"
+- extendedWaitUntil:
+    visible: "E2E Native Created League"
+    timeout: 60000
+- tapOn: "Pick"
+- scrollUntilVisible:
+    element:
+      text: "Randomize Open Picks"
+    direction: DOWN
+- tapOn: "Randomize Open Picks"
+- tapOn: "Submit Picks"
+- assertVisible: "Update Picks"

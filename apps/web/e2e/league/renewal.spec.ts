@@ -6,7 +6,7 @@ import { executeSql, getLeagueId, queryScalar } from "../helpers/db";
 test("admin creates one linked renewal and exercises isolated member invites", async ({
   page,
   browser,
-}) => {
+}, testInfo) => {
   const priorLeagueId = getLeagueId(E2E_LEAGUES.completed.shareCode);
   // A timed-out navigation can happen after the create mutation commits.
   // Restore this journey's isolated starting state before every retry.
@@ -30,6 +30,19 @@ test("admin creates one linked renewal and exercises isolated member invites", a
   await expect(
     page.getByRole("heading", { name: "Review next-season invites" }),
   ).toBeVisible();
+  if (testInfo.project.name === "mobile-web-chromium") {
+    const dialogBox = await page.getByRole("dialog").boundingBox();
+    expect(dialogBox).not.toBeNull();
+    expect(dialogBox?.x ?? -1).toBeGreaterThanOrEqual(0);
+    expect((dialogBox?.x ?? 0) + (dialogBox?.width ?? 0)).toBeLessThanOrEqual(
+      page.viewportSize()?.width ?? 0,
+    );
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= window.innerWidth,
+      ),
+    ).toBe(true);
+  }
   await expect(
     page.getByRole("checkbox", { name: "Invite webplayer" }),
   ).toBeChecked();

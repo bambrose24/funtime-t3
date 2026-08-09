@@ -1,0 +1,14 @@
+- runFlow:
+    file: boot-and-login.yaml
+    env:
+      LOGIN_EMAIL: ${E2E_OUTSIDER_EMAIL}
+- tapOn: "Account"
+- extendedWaitUntil:
+    visible: "Sign Out"
+    timeout: 30000
+- tapOn: "Sign Out"
+- assertVisible: "Sign out?"
+- tapOn: "Sign Out"
+- extendedWaitUntil:
+    visible: "Welcome Back"
+    timeout: 30000

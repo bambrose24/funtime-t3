@@ -1,0 +1,22 @@
+- runFlow:
+    file: boot-and-login.yaml
+    env:
+      LOGIN_EMAIL: ${E2E_PLAYER_EMAIL}
+- openLink: ${E2E_EXPO_ROUTE_URL}/league/${E2E_COMPETITION_LEAGUE_ID}?tab=leaderboard
+- extendedWaitUntil:
+    visible: "Leaderboard"
+    timeout: 30000
+- assertVisible: "E2E Competition League Standings"
+- openLink: ${E2E_EXPO_ROUTE_URL}/league/${E2E_COMPETITION_LEAGUE_ID}?tab=messages
+- extendedWaitUntil:
+    visible: "League Chat"
+    timeout: 30000
+- assertVisible: "Fixture player message"
+- openLink: ${E2E_EXPO_ROUTE_URL}/league/${E2E_COMPETITION_LEAGUE_ID}?tab=superbowl
+- extendedWaitUntil:
+    visible: "Your Super Bowl pick"
+    timeout: 30000
+- openLink: ${E2E_EXPO_ROUTE_URL}/league/${E2E_COMPETITION_LEAGUE_ID}?tab=profile
+- extendedWaitUntil:
+    visible: "My Profile"
+    timeout: 30000

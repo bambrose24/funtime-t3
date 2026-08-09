@@ -18,6 +18,10 @@ export const E2E_LEAGUES = {
   },
   competition: { shareCode: "E2ECOMPETE", name: "E2E Competition League" },
   integrity: { shareCode: "E2EINTEGRITY", name: "E2E Integrity League" },
+  lateJoin: {
+    shareCode: "E2ELATEJOIN",
+    name: "E2E Late Registration League",
+  },
   override: { shareCode: "E2EOVERRIDE", name: "E2E Override League" },
   results: { shareCode: "E2ERESULTS", name: "E2E Results League" },
   waiting: { shareCode: "E2EWAITING", name: "E2E Waiting League" },

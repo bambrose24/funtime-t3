@@ -11,7 +11,7 @@ pnpm e2e:web
 It starts and resets the repository's local Supabase stack, applies Prisma
 migrations and the deterministic schedule seed, creates isolated browser-test
 users and leagues, starts Next.js on `127.0.0.1:3100`, and runs Playwright in
-Chromium. Docker, the Supabase CLI, PostgreSQL's `psql`, pnpm, Bun, and the
+desktop Chromium and mobile-web Chromium. Docker, the Supabase CLI, PostgreSQL's `psql`, pnpm, Bun, and the
 Playwright Chromium browser must be installed. Install the browser once with:
 
 ```bash
@@ -44,6 +44,13 @@ pnpm exec playwright show-report
 `.github/workflows/web-e2e-supabase.yml` runs on every pull request, merge-queue
 group, push to `main`, and manual dispatch. It uses a fresh `ubuntu-24.04`
 runner and requires no hosted Supabase project or repository secrets.
+
+The workflow has two isolated matrix dimensions: `desktop-chromium` and
+`mobile-web-chromium` (a touch-enabled Pixel viewport and mobile user agent).
+Each dimension gets its own local Supabase stack and deterministic fixture set,
+so mutations from one viewport cannot affect the other. Both projects execute
+the same 22 behavioral scenarios; responsive-only assertions are added where a
+layout has narrow-screen constraints.
 
 The CI job performs these gates in order:
 
@@ -133,7 +140,7 @@ Mandatory policy:
 
 3. End-to-end tests (smallest layer):
 
-- Tooling: Maestro flows executed in EAS Workflows/device cloud.
+- Tooling: Maestro flows executed on an Android emulator in GitHub Actions.
 - Runtime target: Expo dev build (`com.funtime.mobile`) rather than Expo Go for stable startup behavior.
 - Scope: mission-critical happy paths and highest-risk failures across real app runtime boundaries.
 
@@ -206,7 +213,10 @@ Minimum required coverage set:
 
 2. `P6-TEST-E2E-001`:
 
-- Add Maestro critical-flow smoke suite and wire it to EAS workflow execution.
+- Add the Maestro critical-flow suite and wire it to the GitHub Actions Android
+  emulator. Status: complete; the suite covers auth/session, league tabs,
+  duplicate and late registration, admin tools, renewal invite review, league
+  creation, and pick submission.
 
 3. `P6-TEST-COVERAGE-002`:
 

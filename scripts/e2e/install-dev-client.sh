@@ -31,7 +31,9 @@ fi
 
 configure_java17() {
   local java_home_17=""
-  if [[ -d "/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home" ]]; then
+  if [[ -n "${JAVA_HOME:-}" ]] && [[ -x "${JAVA_HOME}/bin/java" ]]; then
+    java_home_17="$JAVA_HOME"
+  elif [[ -d "/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home" ]]; then
     java_home_17="/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home"
   elif [[ -d "/opt/homebrew/opt/openjdk@17" ]]; then
     java_home_17="/opt/homebrew/opt/openjdk@17"

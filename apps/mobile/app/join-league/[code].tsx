@@ -1,5 +1,12 @@
 import React, { useMemo, useState } from "react";
-import { Alert, Pressable, SafeAreaView, ScrollView, Text, View } from "react-native";
+import {
+  Alert,
+  Pressable,
+  SafeAreaView,
+  ScrollView,
+  Text,
+  View,
+} from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { clientApi } from "@/lib/trpc/react";
@@ -32,10 +39,10 @@ export default function JoinLeagueCodeScreen() {
       { code: leagueCode },
       { enabled: leagueCode.length > 0 },
     );
-  const { data: teams, isLoading: teamsLoading } = clientApi.teams.getTeams.useQuery(
-    undefined,
-    { enabled: Boolean(leagueData?.superbowl_competition) },
-  );
+  const { data: teams, isLoading: teamsLoading } =
+    clientApi.teams.getTeams.useQuery(undefined, {
+      enabled: Boolean(leagueData?.superbowl_competition),
+    });
   const { mutateAsync: register } = clientApi.league.register.useMutation();
 
   const isInLeague = useMemo(() => {
@@ -51,14 +58,18 @@ export default function JoinLeagueCodeScreen() {
     () =>
       (teams ?? [])
         .filter((team) => team.conference === "AFC")
-        .sort((a, b) => `${a.loc} ${a.name}`.localeCompare(`${b.loc} ${b.name}`)),
+        .sort((a, b) =>
+          `${a.loc} ${a.name}`.localeCompare(`${b.loc} ${b.name}`),
+        ),
     [teams],
   );
   const nfcTeams = useMemo(
     () =>
       (teams ?? [])
         .filter((team) => team.conference === "NFC")
-        .sort((a, b) => `${a.loc} ${a.name}`.localeCompare(`${b.loc} ${b.name}`)),
+        .sort((a, b) =>
+          `${a.loc} ${a.name}`.localeCompare(`${b.loc} ${b.name}`),
+        ),
     [teams],
   );
 
@@ -99,7 +110,8 @@ export default function JoinLeagueCodeScreen() {
     try {
       setSubmitting(true);
       const winner = Number(winnerTeamId);
-      const loser = winner === Number(afcTeamId) ? Number(nfcTeamId) : Number(afcTeamId);
+      const loser =
+        winner === Number(afcTeamId) ? Number(nfcTeamId) : Number(afcTeamId);
 
       await register({
         code: leagueData.share_code ?? leagueCode,
@@ -117,7 +129,9 @@ export default function JoinLeagueCodeScreen() {
       console.error("League registration failed", error);
       Alert.alert(
         "Registration Failed",
-        "Unable to register for this league. Please try again.",
+        error instanceof Error
+          ? error.message
+          : "Unable to register for this league. Please try again.",
       );
     } finally {
       setSubmitting(false);
@@ -203,7 +217,11 @@ export default function JoinLeagueCodeScreen() {
           <Text className="mb-4 text-center text-base text-gray-600 dark:text-gray-400">
             You are already registered for {leagueData.name}.
           </Text>
-          <Button onPress={() => router.replace(`/league/${leagueData.league_id}` as any)}>
+          <Button
+            onPress={() =>
+              router.replace(`/league/${leagueData.league_id}` as any)
+            }
+          >
             Go to League
           </Button>
         </View>
@@ -318,7 +336,11 @@ export default function JoinLeagueCodeScreen() {
                             }
                           >
                             <View className="flex-row items-center gap-1.5">
-                              <TeamLogo abbrev={team.abbrev ?? ""} width={14} height={14} />
+                              <TeamLogo
+                                abbrev={team.abbrev ?? ""}
+                                width={14}
+                                height={14}
+                              />
                               <Text
                                 className={
                                   selected
@@ -387,7 +409,11 @@ export default function JoinLeagueCodeScreen() {
                             }
                           >
                             <View className="flex-row items-center gap-1.5">
-                              <TeamLogo abbrev={team.abbrev ?? ""} width={14} height={14} />
+                              <TeamLogo
+                                abbrev={team.abbrev ?? ""}
+                                width={14}
+                                height={14}
+                              />
                               <Text
                                 className={
                                   selected
@@ -414,8 +440,12 @@ export default function JoinLeagueCodeScreen() {
                   <View className="flex-row gap-3">
                     <View className="flex-1">
                       <SelectOption
-                        selected={winnerTeamId === selectedAfcTeam.teamid.toString()}
-                        onPress={() => setWinnerTeamId(selectedAfcTeam.teamid.toString())}
+                        selected={
+                          winnerTeamId === selectedAfcTeam.teamid.toString()
+                        }
+                        onPress={() =>
+                          setWinnerTeamId(selectedAfcTeam.teamid.toString())
+                        }
                         className="justify-start px-3 py-2"
                       >
                         <View className="flex-row items-center gap-2">
@@ -432,8 +462,12 @@ export default function JoinLeagueCodeScreen() {
                     </View>
                     <View className="flex-1">
                       <SelectOption
-                        selected={winnerTeamId === selectedNfcTeam.teamid.toString()}
-                        onPress={() => setWinnerTeamId(selectedNfcTeam.teamid.toString())}
+                        selected={
+                          winnerTeamId === selectedNfcTeam.teamid.toString()
+                        }
+                        onPress={() =>
+                          setWinnerTeamId(selectedNfcTeam.teamid.toString())
+                        }
                         className="justify-start px-3 py-2"
                       >
                         <View className="flex-row items-center gap-2">
@@ -472,10 +506,17 @@ export default function JoinLeagueCodeScreen() {
           )}
 
           <View className="gap-3">
-            <Button onPress={onRegister} disabled={submitting || !superbowlReady}>
+            <Button
+              onPress={onRegister}
+              disabled={submitting || !superbowlReady}
+            >
               {submitting ? "Registering..." : registerButtonText}
             </Button>
-            <Button variant="outline" onPress={() => router.back()} disabled={submitting}>
+            <Button
+              variant="outline"
+              onPress={() => router.back()}
+              disabled={submitting}
+            >
               Back
             </Button>
           </View>

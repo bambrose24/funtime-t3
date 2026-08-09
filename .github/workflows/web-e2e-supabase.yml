@@ -16,9 +16,17 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  chromium-e2e:
+  browser-e2e:
+    name: ${{ matrix.project == 'desktop-chromium' && 'chromium-e2e' || 'mobile-web-e2e' }}
     runs-on: ubuntu-24.04
     timeout-minutes: 45
+
+    strategy:
+      fail-fast: false
+      matrix:
+        project:
+          - desktop-chromium
+          - mobile-web-chromium
 
     env:
       CI: "true"
@@ -74,7 +82,7 @@ jobs:
         run: pnpm e2e:backend:up
 
       - name: Seed web fixtures and run E2E suite
-        run: pnpm e2e:web -- --skip-backend-up
+        run: pnpm e2e:web -- --skip-backend-up --project=${{ matrix.project }}
 
       - name: Collect E2E diagnostics
         if: always()
@@ -88,7 +96,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: web-e2e-artifacts
+          name: web-e2e-artifacts-${{ matrix.project }}
           path: |
             playwright-report
             test-results
