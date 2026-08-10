@@ -12,9 +12,7 @@ appId: com.funtime.mobile
 - tapOn: "BUF"
 - tapOn: "Select NFC team"
 - tapOn: "PHI"
-- tapOn:
-    text: "BUF"
-    index: 1
+- tapOn: "BUF"
 - scrollUntilVisible:
     element:
       text: "e.g. 47"
