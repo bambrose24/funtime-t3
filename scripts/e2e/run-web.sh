@@ -8,11 +8,19 @@ LOCAL_API_URL="http://127.0.0.1:55421"
 LOCAL_DB_URL="postgresql://postgres:postgres@127.0.0.1:55422/postgres"
 WEB_PORT="${E2E_WEB_PORT:-3100}"
 SKIP_BACKEND=0
+PLAYWRIGHT_ARGS=()
 
 for arg in "$@"; do
   case "$arg" in
+    --)
+      # pnpm forwards its own separator to shell scripts; Playwright treats a
+      # forwarded separator as the end of options and ignores --project.
+      ;;
     --skip-backend-up)
       SKIP_BACKEND=1
+      ;;
+    *)
+      PLAYWRIGHT_ARGS+=("$arg")
       ;;
   esac
 done
@@ -99,4 +107,4 @@ if ! curl -sf "http://127.0.0.1:${WEB_PORT}" >/dev/null; then
 fi
 
 echo "[web-e2e] Running Playwright..."
-E2E_WEB_PORT="$WEB_PORT" pnpm e2e:web:test
+E2E_WEB_PORT="$WEB_PORT" pnpm e2e:web:test "${PLAYWRIGHT_ARGS[@]}"

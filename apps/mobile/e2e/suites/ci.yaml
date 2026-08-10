@@ -1,0 +1,16 @@
+appId: com.funtime.mobile
+---
+- runFlow:
+    file: ../subflows/auth-session.yaml
+- runFlow:
+    file: ../subflows/league-navigation.yaml
+- runFlow:
+    file: ../subflows/duplicate-join.yaml
+- runFlow:
+    file: ../subflows/late-registration.yaml
+- runFlow:
+    file: ../subflows/admin-tools.yaml
+- runFlow:
+    file: ../subflows/renewal.yaml
+- runFlow:
+    file: ../subflows/create-and-pick.yaml

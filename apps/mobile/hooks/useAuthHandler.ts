@@ -142,10 +142,8 @@ export function useAuthHandler() {
           return;
         }
 
-        const nextPathname = target.href.split("?")[0] ?? target.href;
         const currentPath = pathnameRef.current ?? "/";
-        const currentPathname = currentPath.split("?")[0] ?? currentPath;
-        if (nextPathname === currentPathname) {
+        if (target.href === currentPath) {
           return;
         }
 

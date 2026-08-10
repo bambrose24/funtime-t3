@@ -31,6 +31,10 @@ Current validated baseline: **21 Playwright tests in 18 files, all passing on a
 fresh local-Supabase reset and on GitHub Actions with an ephemeral Supabase
 stack (2026-08-08).**
 
+Pending baseline on this branch: **22 scenarios in 18 files**, executed once as
+desktop Chromium and once as touch-enabled mobile-web Chromium in isolated CI
+matrix jobs.
+
 ## Safety Contract
 
 - [x] Refuse to run unless the Supabase API is local (`127.0.0.1:55421`).
@@ -52,6 +56,8 @@ stack (2026-08-08).**
 - [x] Add required PR smoke suite.
 - [x] Add broader PRD regression suite.
 - [x] Add a GitHub Actions web E2E job and artifact upload.
+- [x] Run the full behavioral suite as separate desktop and mobile-web CI
+      dimensions.
 - [x] Document local and CI runbooks.
 
 ## Coverage Index
@@ -85,6 +91,7 @@ stack (2026-08-08).**
 - [x] Admin can create a league with supported policy settings.
 - [x] Player can join by share code.
 - [x] Duplicate membership is prevented.
+- [x] Registration is rejected after the season's first kickoff.
 - [x] Not-started league state renders correctly.
 - [x] Completed-league admin page renders renewal controls without page errors.
 - [x] Admin can create one linked renewal league and invite eligible members.
@@ -137,7 +144,7 @@ stack (2026-08-08).**
 - [x] Authorized super admin can open aggregate admin dashboard.
 - [x] Ordinary users cannot open the aggregate admin dashboard.
 - [x] Critical pages fail the test on `pageerror` or unexpected console errors.
-- [x] Responsive smoke checks cover desktop and mobile browser viewports.
+- [x] Every web scenario runs in desktop and mobile-web Chromium projects.
 
 ## Explicit Gaps and Suite Boundaries
 
@@ -146,7 +153,7 @@ stack (2026-08-08).**
 | Real Resend email, push notification, analytics, ESPN, cron, and postseason-sync delivery | External side effects are intentionally disabled in E2E mode; browser tests verify UI and local database outcomes | Cover provider adapters and scheduled jobs with isolated integration/contract tests; keep one no-send browser assertion for triggering UI |
 | Planned week-summary and near-real-time message notifications                             | PRD functionality is not implemented                                                                              | Add checklist rows, deterministic fixtures, and E2E/integration coverage with the implementation                                          |
 | Target persistent league-wide message thread                                              | Current product remains week-scoped                                                                               | Replace/extend the current messaging spec when the target model ships                                                                     |
-| Firefox, WebKit, and device-browser matrices                                              | CI currently gates Chromium only                                                                                  | Add projects and document any browser-specific exclusions before claiming cross-browser support                                           |
+| Firefox, WebKit, and physical-device browser matrices                                     | CI gates desktop and mobile-web Chromium; it does not claim cross-browser or physical-device coverage             | Add projects and document any browser-specific exclusions before claiming broader browser support                                        |
 | Full visual-regression, accessibility, and performance auditing                           | The suite uses semantic locators and fails on runtime errors but is not a comprehensive non-functional audit      | Add dedicated visual, axe/accessibility, and performance budgets if these become release gates                                            |
 | Hosted Supabase or production data                                                        | Intentionally prohibited to avoid pollution and unsafe resets                                                     | Keep local-stack guards; validate hosted infrastructure through non-destructive deployment checks                                         |
 | Mobile application journeys                                                               | Owned by the mobile Jest/Maestro strategy                                                                         | Maintain the mobile coverage sections in `docs/TESTING_STRATEGY.md`                                                                       |

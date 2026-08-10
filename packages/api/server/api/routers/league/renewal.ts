@@ -1,4 +1,7 @@
-import { MemberRole } from "../../../../src/generated/prisma-client";
+import {
+  MemberRole,
+  type PrismaClient,
+} from "../../../../src/generated/prisma-client";
 import {
   CAN_CREATE_NEXT_SEASON_LEAGUES,
   DEFAULT_SEASON,
@@ -58,4 +61,43 @@ export function getRenewalIneligibilityReason(
     targetSeason: DEFAULT_SEASON,
     renewalsOpen: CAN_CREATE_NEXT_SEASON_LEAGUES,
   });
+}
+
+export async function getMissedPickCounts(
+  db: PrismaClient,
+  season: number,
+  members: { membership_id: number; ts: Date }[],
+) {
+  const memberIds = members.map((member) => member.membership_id);
+  const [seasonGames, pickCounts] = await Promise.all([
+    db.games.findMany({
+      where: { season },
+      select: { ts: true },
+    }),
+    db.picks.groupBy({
+      by: ["member_id"],
+      where: {
+        member_id: { in: memberIds },
+        season,
+      },
+      _count: { pickid: true },
+    }),
+  ]);
+  const pickCountByMemberId = new Map(
+    pickCounts.map((count) => [count.member_id, count._count.pickid]),
+  );
+
+  return new Map(
+    members.map((member) => {
+      const gamesSinceJoining = seasonGames.filter(
+        (game) => game.ts >= member.ts,
+      ).length;
+      const submittedPicks = pickCountByMemberId.get(member.membership_id) ?? 0;
+
+      return [
+        member.membership_id,
+        Math.max(gamesSinceJoining - submittedPicks, 0),
+      ];
+    }),
+  );
 }

@@ -44,7 +44,7 @@ Stand up a portable local E2E environment for Expo mobile that:
   - `pnpm e2e:mobile:maestro`
 - Outbound provider guardrails in E2E:
   - `E2E_MODE=1` disables side-effect providers (email/push/telemetry/sports pulls) during test runs.
-- CI workflow (manual + nightly):
+- CI workflow (pull request + manual + nightly):
   - `.github/workflows/mobile-e2e-supabase.yml`
 
 ## 3. Data Strategy
@@ -123,7 +123,7 @@ pnpm e2e:backend:up
 pnpm e2e:backend:up -- --start-web
 ```
 
-### 5.3 Run Maestro smoke flow
+### 5.3 Run the Maestro CI suite
 
 ```bash
 pnpm e2e:mobile:maestro
@@ -178,6 +178,7 @@ Workflow: `.github/workflows/mobile-e2e-supabase.yml`
 
 Triggers:
 
+- pull requests that change mobile, API, or E2E infrastructure
 - `workflow_dispatch` (manual)
 - nightly schedule
 
@@ -187,8 +188,9 @@ Stages:
 2. generate deterministic seed
 3. start Supabase + reset + Prisma migrate + seed + verify
 4. run web API server
-5. run Android emulator + Expo dev client + Maestro flow
-6. upload logs/artifacts
+5. seed deterministic Auth users and league-role fixtures
+6. run Android emulator + Expo dev client + Maestro suite
+7. upload logs/artifacts
 
 ## 7. Troubleshooting
 

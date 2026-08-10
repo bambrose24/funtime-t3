@@ -170,6 +170,12 @@ FROM "people" WHERE "email" = 'web.e2e.admin@example.com';
 INSERT INTO "leagues" ("created_by_user_id", "name", "season", "late_policy", "pick_policy", "reminder_policy", "scoring_type", "share_code", "superbowl_competition", "status")
 SELECT "uid", 'E2E Waiting League', 2027, 'allow_late_and_lock_after_start', 'choose_winner', 'three_hours_before', 'game_winner', 'E2EWAITING', FALSE, 'not_started'
 FROM "people" WHERE "email" = 'web.e2e.admin@example.com';
+INSERT INTO "leagues" ("created_by_user_id", "name", "season", "late_policy", "pick_policy", "reminder_policy", "scoring_type", "share_code", "superbowl_competition", "status")
+SELECT "uid", 'E2E Late Registration League', 2028, 'allow_late_and_lock_after_start', 'choose_winner', 'three_hours_before', 'game_winner', 'E2ELATEJOIN', TRUE, 'not_started'
+FROM "people" WHERE "email" = 'web.e2e.admin@example.com';
+INSERT INTO "leagues" ("created_by_user_id", "name", "season", "late_policy", "pick_policy", "reminder_policy", "scoring_type", "share_code", "superbowl_competition", "status")
+SELECT "uid", 'E2E Mobile Renewal League', 2026, 'allow_late_and_lock_after_start', 'choose_winner', 'three_hours_before', 'game_winner', 'E2EMOBILERENEW', TRUE, 'completed'
+FROM "people" WHERE "email" = 'web.e2e.admin@example.com';
 
 INSERT INTO "leaguemembers" ("league_id", "user_id", "role", "paid")
 SELECT l."league_id", p."uid", 'admin', TRUE FROM "leagues" l CROSS JOIN "people" p
@@ -184,6 +190,9 @@ WHERE l."share_code" = 'E2EWAITING' AND p."email" = 'web.e2e.outsider@example.co
 INSERT INTO "leaguemembers" ("league_id", "user_id", "role", "paid")
 SELECT l."league_id", p."uid", 'player', FALSE FROM "leagues" l CROSS JOIN "people" p
 WHERE l."share_code" = 'E2EADMINOPS' AND p."email" = 'web.e2e.outsider@example.com';
+INSERT INTO "leaguemembers" ("league_id", "user_id", "role", "paid")
+SELECT l."league_id", p."uid", 'admin', TRUE FROM "leagues" l CROSS JOIN "people" p
+WHERE l."share_code" = 'E2EMOBILERENEW' AND p."email" = 'bambrose24@gmail.com';
 
 INSERT INTO "EmailLogs" ("email_log_id", "league_id", "member_id", "email_type", "ts", "resend_id")
 SELECT 'e2e-admin-ops-email-1', m."league_id", m."membership_id", 'league_broadcast', NOW() - INTERVAL '1 day', 'e2e-resend-1'

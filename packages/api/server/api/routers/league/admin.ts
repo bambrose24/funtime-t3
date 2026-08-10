@@ -9,7 +9,11 @@ import {
 import { resendApi } from "../../../services/resend";
 import { getBaseUrl } from "../../../../utils/getBaseUrl";
 import { authorizedProcedure, createTRPCRouter } from "../../trpc";
-import { getRenewalIneligibilityReason, isLeagueAdmin } from "./renewal";
+import {
+  getMissedPickCounts,
+  getRenewalIneligibilityReason,
+  isLeagueAdmin,
+} from "./renewal";
 
 const SUPER_ADMIN_EMAIL = "bambrose24@gmail.com";
 
@@ -157,45 +161,10 @@ const buildRenewalInvitePreview = async ({
     });
   }
 
-  const priorMemberIds = priorMembers.map((member) => member.membership_id);
-  const [seasonGames, pickCounts] = await Promise.all([
-    db.games.findMany({
-      where: {
-        season: priorLeague.season,
-      },
-      select: {
-        ts: true,
-      },
-    }),
-    db.picks.groupBy({
-      by: ["member_id"],
-      where: {
-        member_id: {
-          in: priorMemberIds,
-        },
-        season: priorLeague.season,
-      },
-      _count: {
-        pickid: true,
-      },
-    }),
-  ]);
-  const pickCountByMemberId = new Map(
-    pickCounts.map((count) => [count.member_id, count._count.pickid]),
-  );
-  const missedPicksByMemberId = new Map(
-    priorMembers.map((member) => {
-      const eligibleGameCount = seasonGames.filter(
-        (game) => game.ts >= member.ts,
-      ).length;
-      const submittedPickCount =
-        pickCountByMemberId.get(member.membership_id) ?? 0;
-
-      return [
-        member.membership_id,
-        Math.max(eligibleGameCount - submittedPickCount, 0),
-      ];
-    }),
+  const missedPicksByMemberId = await getMissedPickCounts(
+    db,
+    priorLeague.season,
+    priorMembers,
   );
 
   const nextLeagueUserIds = new Set(

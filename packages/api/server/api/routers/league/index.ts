@@ -25,6 +25,7 @@ import {
 } from "../../trpc";
 import { leagueAdminRouter } from "./admin";
 import {
+  getMissedPickCounts,
   getRenewalIneligibilityReason,
   isLeagueAdmin,
   suggestRenewalLeagueName,
@@ -274,6 +275,12 @@ export const leagueRouter = createTRPCRouter({
         });
       }
 
+      const missedPicksByMemberId = await getMissedPickCounts(
+        db,
+        priorLeague.season,
+        priorLeague.leaguemembers,
+      );
+
       const eligibleMembers = priorLeague.leaguemembers
         .filter((member) => member.user_id !== dbUser.uid)
         .filter((member) => Boolean(member.people.email))
@@ -282,6 +289,7 @@ export const leagueRouter = createTRPCRouter({
           username: member.people.username,
           email: member.people.email,
           role: member.role ?? MemberRole.player,
+          missedPickCount: missedPicksByMemberId.get(member.membership_id) ?? 0,
         }));
 
       return {
@@ -367,6 +375,27 @@ export const leagueRouter = createTRPCRouter({
           share_code: code,
         },
       });
+
+      const firstGame = await ctx.db.games.findFirst({
+        where: {
+          season: league.season,
+        },
+        orderBy: {
+          ts: "asc",
+        },
+        select: {
+          ts: true,
+        },
+      });
+      if (
+        league.status !== LeagueStatus.not_started ||
+        (firstGame && firstGame.ts <= new Date())
+      ) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Registration is closed because the season has started",
+        });
+      }
 
       const isInLeague = dbUser.leaguemembers.find(
         (m) => m.league_id === league.league_id,

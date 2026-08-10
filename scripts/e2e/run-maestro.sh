@@ -15,13 +15,15 @@ fi
 SUPABASE_DB_URL="${SUPABASE_DB_URL:-postgresql://postgres:postgres@127.0.0.1:55422/postgres}"
 REQUESTED_WEB_PORT="${E2E_WEB_PORT:-3000}"
 REQUESTED_EXPO_PORT="${E2E_EXPO_PORT:-8081}"
-FLOW_PATH="${E2E_MAESTRO_FLOW:-apps/mobile/e2e/flows/smoke-signup-create-pick.yaml}"
+FLOW_PATH="${E2E_MAESTRO_FLOW:-apps/mobile/e2e/suites/ci.yaml}"
 DESIRED_AVD="${E2E_ANDROID_AVD:-Pixel 9a}"
 EMULATOR_WAIT_SECONDS="${E2E_EMULATOR_WAIT_SECONDS:-240}"
+ANDROID_READY_WAIT_SECONDS="${E2E_ANDROID_READY_WAIT_SECONDS:-300}"
 ANDROID_APP_ID="${E2E_ANDROID_APP_ID:-com.funtime.mobile}"
 INSTALL_DEV_CLIENT="${E2E_INSTALL_DEV_CLIENT:-1}"
 CLEAR_DEV_CLIENT_DATA="${E2E_CLEAR_DEV_CLIENT_DATA:-1}"
 FORCE_REINSTALL_DEV_CLIENT="${E2E_FORCE_REINSTALL_DEV_CLIENT:-0}"
+SEED_TEST_FIXTURES="${E2E_SEED_TEST_FIXTURES:-1}"
 SKIP_BACKEND=0
 
 for arg in "$@"; do
@@ -46,6 +48,9 @@ require_cmd curl
 require_cmd pnpm
 require_cmd lsof
 require_cmd node
+if [[ "$SEED_TEST_FIXTURES" == "1" ]]; then
+  require_cmd psql
+fi
 if ! java -version 2>&1 | head -n 1 | grep -Eq 'version "1[7-9]|version "[2-9][0-9]'; then
   echo "[e2e] Java 17+ is required by Maestro. Current: $(java -version 2>&1 | head -n 1)" >&2
   exit 1
@@ -61,7 +66,35 @@ has_online_device() {
 }
 
 app_installed() {
-  adb shell pm list packages | tr -d '\r' | grep -q "^package:${ANDROID_APP_ID}$"
+  local package_path
+  package_path="$(adb shell pm path "$ANDROID_APP_ID" 2>/dev/null | tr -d '\r' || true)"
+  [[ "$package_path" == package:* ]]
+}
+
+wait_for_android_ready() {
+  echo "[e2e] Waiting for Android boot and package manager readiness..."
+  adb wait-for-device >/dev/null 2>&1 || true
+
+  for _ in $(seq 1 "$ANDROID_READY_WAIT_SECONDS"); do
+    local boot_completed
+    local package_service
+    boot_completed="$(adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r' || true)"
+    package_service="$(adb shell service check package 2>/dev/null | tr -d '\r' || true)"
+
+    if [[ "$boot_completed" == "1" ]] && [[ "$package_service" == *"found"* ]] && \
+      adb shell cmd package list packages >/dev/null 2>&1; then
+      echo "[e2e] Android package manager is ready."
+      return 0
+    fi
+
+    sleep 1
+  done
+
+  echo "[e2e] Android package manager did not become ready within ${ANDROID_READY_WAIT_SECONDS}s." >&2
+  adb devices -l >&2 || true
+  adb shell getprop sys.boot_completed >&2 || true
+  adb shell service check package >&2 || true
+  return 1
 }
 
 port_in_use() {
@@ -141,14 +174,12 @@ if ! has_online_device; then
     exit 1
   fi
 
-  adb wait-for-device >/dev/null 2>&1 || true
-  for _ in $(seq 1 120); do
-    if [[ "$(adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')" == "1" ]]; then
-      break
-    fi
-    sleep 1
-  done
 fi
+
+# An adb device can be reported as online before Android's framework services are
+# usable, especially on software-emulated CI runners. Do not build or install the
+# dev client until the package manager can answer commands successfully.
+wait_for_android_ready
 
 if ! app_installed || [[ "$FORCE_REINSTALL_DEV_CLIENT" == "1" ]]; then
   if [[ "$INSTALL_DEV_CLIENT" == "1" ]]; then
@@ -185,6 +216,25 @@ auth_env="$(supabase status -o env)"
 # shellcheck disable=SC1090
 source /dev/stdin <<<"$auth_env"
 
+if [[ "$SEED_TEST_FIXTURES" == "1" ]]; then
+  echo "[e2e] Seeding deterministic users and leagues for native flows..."
+  SUPABASE_URL="$API_URL" \
+  SUPABASE_SERVICE_ROLE_KEY="$SERVICE_ROLE_KEY" \
+  DATABASE_URL="$SUPABASE_DB_URL" \
+  pnpm e2e:web:seed
+fi
+
+league_id_for_code() {
+  psql "$SUPABASE_DB_URL" -qAt -v ON_ERROR_STOP=1 -c \
+    "SELECT league_id FROM leagues WHERE share_code = '$1'"
+}
+
+E2E_ACTIVE_LEAGUE_ID="$(league_id_for_code E2EACTIVE)"
+E2E_ADMIN_OPS_LEAGUE_ID="$(league_id_for_code E2EADMINOPS)"
+E2E_COMPLETED_LEAGUE_ID="$(league_id_for_code E2ECOMPLETE)"
+E2E_COMPETITION_LEAGUE_ID="$(league_id_for_code E2ECOMPETE)"
+E2E_MOBILE_RENEWAL_LEAGUE_ID="$(league_id_for_code E2EMOBILERENEW)"
+
 WEB_PORT="$(resolve_open_port "$REQUESTED_WEB_PORT")" || {
   echo "[e2e] Could not find an available web port starting from ${REQUESTED_WEB_PORT}." >&2
   exit 1
@@ -220,6 +270,7 @@ MOBILE_EXPO_URL="exp://10.0.2.2:${EXPO_PORT}"
 MOBILE_EXPO_BOOT_URL="${MOBILE_EXPO_URL}"
 MOBILE_EXPO_AUTH_URL="${MOBILE_EXPO_URL}/--/auth"
 DEV_CLIENT_SCHEME="${E2E_DEV_CLIENT_SCHEME:-funtime}"
+MOBILE_EXPO_ROUTE_URL="${DEV_CLIENT_SCHEME}://--"
 MOBILE_DEVCLIENT_URL="${DEV_CLIENT_SCHEME}://expo-development-client/?url=$(node -e 'console.log(encodeURIComponent(process.argv[1]))' "$MOBILE_EXPO_BOOT_URL")"
 E2E_UNIQUE="$(date +%s)"
 E2E_EMAIL="${E2E_EMAIL:-maestro.e2e+${E2E_UNIQUE}@example.com}"
@@ -230,6 +281,7 @@ DATABASE_URL="$SUPABASE_DB_URL" \
 DIRECT_URL="$SUPABASE_DB_URL" \
 E2E_MODE="${E2E_MODE:-1}" \
 FUNTIME_DISABLE_EMAILS="${FUNTIME_DISABLE_EMAILS:-1}" \
+RESEND_API_KEY="${RESEND_API_KEY:-re_e2e_disabled}" \
 NEXT_PUBLIC_E2E_MODE="${NEXT_PUBLIC_E2E_MODE:-1}" \
 NEXT_PUBLIC_SUPABASE_URL="$API_URL" \
 NEXT_PUBLIC_SUPABASE_ANON_KEY="$ANON_KEY" \
@@ -329,7 +381,17 @@ maestro test "$FLOW_PATH" \
   -e E2E_USERNAME="$E2E_USERNAME" \
   -e E2E_APP_BOOT_URL="$MOBILE_DEVCLIENT_URL" \
   -e E2E_EXPO_AUTH_URL="$MOBILE_EXPO_AUTH_URL" \
+  -e E2E_EXPO_ROUTE_URL="$MOBILE_EXPO_ROUTE_URL" \
   -e E2E_DEV_SERVER_URL="http://10.0.2.2:${EXPO_PORT}" \
-  -e E2E_ANDROID_APP_ID="$ANDROID_APP_ID"
+  -e E2E_ANDROID_APP_ID="$ANDROID_APP_ID" \
+  -e E2E_ACTIVE_LEAGUE_ID="$E2E_ACTIVE_LEAGUE_ID" \
+  -e E2E_ADMIN_OPS_LEAGUE_ID="$E2E_ADMIN_OPS_LEAGUE_ID" \
+  -e E2E_COMPLETED_LEAGUE_ID="$E2E_COMPLETED_LEAGUE_ID" \
+  -e E2E_COMPETITION_LEAGUE_ID="$E2E_COMPETITION_LEAGUE_ID" \
+  -e E2E_MOBILE_RENEWAL_LEAGUE_ID="$E2E_MOBILE_RENEWAL_LEAGUE_ID" \
+  -e E2E_ADMIN_EMAIL="web.e2e.admin@example.com" \
+  -e E2E_PLAYER_EMAIL="web.e2e.player@example.com" \
+  -e E2E_OUTSIDER_EMAIL="web.e2e.outsider@example.com" \
+  -e E2E_PASSWORD="Password123!"
 
 echo "[e2e] Maestro flow completed."
