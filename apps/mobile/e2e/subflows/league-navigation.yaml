@@ -20,5 +20,6 @@ appId: com.funtime.mobile
     timeout: 30000
 - openLink: ${E2E_EXPO_ROUTE_URL}/league/${E2E_COMPETITION_LEAGUE_ID}?tab=profile
 - extendedWaitUntil:
-    visible: "My Profile"
+    visible: "Season Summary"
     timeout: 30000
+- assertVisible: "@webplayer"
