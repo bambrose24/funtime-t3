@@ -6,7 +6,7 @@ appId: com.funtime.mobile
       LOGIN_EMAIL: ${E2E_OUTSIDER_EMAIL}
 - tapOn: "Account"
 - extendedWaitUntil:
-    visible: "Settings"
+    visible: "Username"
     timeout: 30000
 - scrollUntilVisible:
     element:
