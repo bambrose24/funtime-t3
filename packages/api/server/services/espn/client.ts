@@ -3,6 +3,56 @@ import { isE2EMode } from "../../../utils/e2e";
 
 const BASE_URL = "https://site.api.espn.com/apis/site/v2/sports/football/nfl";
 
+export class ESPNResponseError extends Error {
+  constructor({
+    url,
+    status,
+    statusText,
+    contentType,
+    bodyPreview,
+  }: {
+    url: string;
+    status: number;
+    statusText: string;
+    contentType: string | null;
+    bodyPreview: string;
+  }) {
+    super(
+      `ESPN returned an invalid response for ${url}: ${status} ${statusText}; content-type=${contentType ?? "(missing)"}; body=${JSON.stringify(bodyPreview)}`,
+    );
+    this.name = "ESPNResponseError";
+  }
+}
+
+async function fetchEspnJson(url: string): Promise<unknown> {
+  const response = await fetch(url);
+  const contentType = response.headers.get("content-type");
+  const body = await response.text();
+  const bodyPreview = body.slice(0, 500);
+
+  if (!response.ok || !contentType?.includes("application/json")) {
+    throw new ESPNResponseError({
+      url,
+      status: response.status,
+      statusText: response.statusText,
+      contentType,
+      bodyPreview,
+    });
+  }
+
+  try {
+    return JSON.parse(body) as unknown;
+  } catch {
+    throw new ESPNResponseError({
+      url,
+      status: response.status,
+      statusText: response.statusText,
+      contentType,
+      bodyPreview,
+    });
+  }
+}
+
 const LeagueSchema = z.object({
   id: z.string(),
   uid: z.string(),
@@ -168,8 +218,7 @@ export class ESPNClient {
     const startDate = `${season}0901`; // September 1st of the season year
     const endDate = `${season + 1}0301`; // March 1st of the following year
     const url = `${BASE_URL}/scoreboard?limit=1000&dates=${startDate}-${endDate}&seasontype=2`;
-    const response = await fetch(url);
-    const data = (await response.json()) as unknown;
+    const data = await fetchEspnJson(url);
     const parsedData = EventsResponseSchema.parse(data);
     return parsedData.events;
   }
@@ -185,8 +234,7 @@ export class ESPNClient {
       return [];
     }
     const url = `${BASE_URL}/scoreboard?limit=100&seasontype=2&week=${week}&season=${season}`;
-    const response = await fetch(url);
-    const data = (await response.json()) as unknown;
+    const data = await fetchEspnJson(url);
     const parsedData = EventsResponseSchema.parse(data);
     return parsedData.events;
   }
@@ -204,8 +252,7 @@ export class ESPNClient {
     const startDate = `${season + 1}0101`; // January 1st
     const endDate = `${season + 1}0220`; // February 20th (after Super Bowl)
     const url = `${BASE_URL}/scoreboard?limit=100&dates=${startDate}-${endDate}`;
-    const response = await fetch(url);
-    const data = (await response.json()) as unknown;
+    const data = await fetchEspnJson(url);
     const parsedData = EventsResponseSchema.parse(data);
     
     // Filter to only postseason games (season.type === 3) and exclude Pro Bowl (week 4)

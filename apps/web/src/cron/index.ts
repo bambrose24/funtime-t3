@@ -30,7 +30,16 @@ export async function run() {
   // Fetch ESPN games
   // ========================================
   console.log(`${LOG_PREFIX} Fetching ESPN games...`);
-  const allEspnGames = await espn.getGamesBySeason({ season });
+  let allEspnGames: Awaited<ReturnType<typeof espn.getGamesBySeason>>;
+  try {
+    allEspnGames = await espn.getGamesBySeason({ season });
+  } catch (error) {
+    console.error(
+      `${LOG_PREFIX} Unable to fetch ESPN games; skipping this run so no data is changed.`,
+      error,
+    );
+    return;
+  }
   const espnGames = allEspnGames.filter((g) => g.season.type === 2);
   console.log(
     `${LOG_PREFIX} ✓ Found ${espnGames.length} regular season games (${allEspnGames.length - espnGames.length} postseason filtered out)`,
