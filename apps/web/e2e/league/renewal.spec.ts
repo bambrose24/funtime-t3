@@ -79,4 +79,44 @@ test("admin creates one linked renewal and exercises isolated member invites", a
   await expect(
     page.getByRole("link", { name: "Set Up Next Season" }),
   ).toHaveCount(0);
+
+  const nextLeague = queryScalar(`
+    SELECT CONCAT(next."league_id", '|', next."share_code")
+    FROM "leagues" next
+    WHERE next."prior_league_id" = ${priorLeagueId}
+  `);
+  const [nextLeagueId, nextLeagueShareCode] = nextLeague.split("|");
+  expect(nextLeagueId).toMatch(/^\d+$/);
+  expect(nextLeagueShareCode).toBeTruthy();
+
+  await page.getByRole("button", { name: "User menu" }).click();
+  await page.getByRole("menuitem", { name: "Log out" }).click();
+  await expect(page).toHaveURL(/\/login(?:\?|$)/);
+  await login(page, E2E_USERS.player);
+
+  await page.goto(`/join-league/${nextLeagueShareCode}`);
+  await expect(
+    page.getByRole("heading", { name: "Join E2E Completed League 2027" }),
+  ).toBeVisible();
+
+  await page.getByRole("combobox", { name: "AFC Team" }).click();
+  await page.getByRole("option", { name: "Buffalo Bills" }).click();
+  await page.getByRole("combobox", { name: "NFC Team" }).click();
+  await page.getByRole("option", { name: "Philadelphia Eagles" }).click();
+  await page.getByRole("radio", { name: "Pick Buffalo Bills to win" }).click();
+  await page.getByLabel("Total Score").fill("48");
+  await page.getByRole("button", { name: "Register" }).click();
+
+  await expect(page).toHaveURL(new RegExp(`/league/${nextLeagueId}$`));
+  await expect
+    .poll(() =>
+      queryScalar(`
+        SELECT m."role"
+        FROM "leaguemembers" m
+        JOIN "people" p ON p."uid" = m."user_id"
+        WHERE m."league_id" = ${nextLeagueId}
+          AND p."email" = '${E2E_USERS.player.email}'
+      `),
+    )
+    .toBe("admin");
 });

@@ -163,7 +163,7 @@ export function ClientNav({ data: initialData, canCreateLeague }: NavData) {
               <LoginButton />
             ) : (
               <DropdownMenu>
-                <DropdownMenuTrigger>
+                <DropdownMenuTrigger aria-label="User menu">
                   <Avatar className="border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground">
                     <FuntimeAvatarFallback username={user.username} />
                   </Avatar>
