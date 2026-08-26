@@ -27,11 +27,11 @@ test("admin creates one linked renewal and exercises isolated member invites", a
   await page.getByRole("link", { name: "Set Up Next Season" }).click();
   await expect(
     page.getByRole("heading", {
-      name: "Set Up the 2027 Season",
+      name: "Set Up the 2026 Season",
     }),
   ).toBeVisible();
   await expect(page.getByLabel("League Name")).toHaveValue(
-    "E2E Completed League 2027",
+    "E2E Completed League 2026",
   );
   await page.getByRole("button", { name: "Review Invites" }).click();
   await expect(
@@ -68,7 +68,7 @@ test("admin creates one linked renewal and exercises isolated member invites", a
     WHERE next."prior_league_id" = ${priorLeagueId}
     GROUP BY next."season", next."prior_league_id"
   `);
-  expect(renewalState).toBe(`2027|${priorLeagueId}|1`);
+  expect(renewalState).toBe(`2026|${priorLeagueId}|1`);
 
   const renewalAdminRole = queryScalar(`
     SELECT r."role"
@@ -104,7 +104,7 @@ test("admin creates one linked renewal and exercises isolated member invites", a
 
   await page.goto(`/join-league/${nextLeagueShareCode}`);
   await expect(
-    page.getByRole("heading", { name: "Join E2E Completed League 2027" }),
+    page.getByRole("heading", { name: "Join E2E Completed League 2026" }),
   ).toBeVisible();
 
   await page.getByRole("combobox", { name: "AFC Team" }).click();
