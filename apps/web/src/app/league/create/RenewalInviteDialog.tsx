@@ -14,6 +14,7 @@ import {
   DialogTitle,
 } from "~/components/ui/dialog";
 import { Text } from "~/components/ui/text";
+import { Switch } from "~/components/ui/switch";
 import type { RouterOutputs } from "~/trpc/types";
 
 type RenewalInvitees = RouterOutputs["league"]["renewalInvitees"];
@@ -28,18 +29,22 @@ export function RenewalInviteDialog({
   invitees: RenewalInvitees;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onConfirm: (memberIds: number[]) => void;
+  onConfirm: (memberIds: number[], adminMemberIds: number[]) => void;
   isCreating: boolean;
 }) {
   const [selectedMemberIds, setSelectedMemberIds] = useState<Set<number>>(
     () => new Set(invitees.defaultSelectedMemberIds),
   );
+  const [adminMemberIds, setAdminMemberIds] = useState<Set<number>>(
+    () => new Set(invitees.defaultAdminMemberIds),
+  );
 
   useEffect(() => {
     if (open) {
       setSelectedMemberIds(new Set(invitees.defaultSelectedMemberIds));
+      setAdminMemberIds(new Set(invitees.defaultAdminMemberIds));
     }
-  }, [invitees.defaultSelectedMemberIds, open]);
+  }, [invitees.defaultAdminMemberIds, invitees.defaultSelectedMemberIds, open]);
 
   const selectedMemberIdList = useMemo(
     () => Array.from(selectedMemberIds),
@@ -62,21 +67,35 @@ export function RenewalInviteDialog({
     });
   };
 
+  const toggleAdmin = (memberId: number) => {
+    setAdminMemberIds((current) => {
+      const next = new Set(current);
+      if (next.has(memberId)) {
+        next.delete(memberId);
+      } else {
+        next.add(memberId);
+      }
+      return next;
+    });
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-h-[min(720px,calc(100vh-2rem))] max-w-2xl overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>Review next-season invites</DialogTitle>
-          <DialogDescription>
-            Choose who should receive an invitation after the league is created.
-            You&apos;ll be added as an admin automatically.
+        <DialogHeader className="gap-2">
+          <DialogTitle className="text-xl leading-7">
+            Review next-season invites
+          </DialogTitle>
+          <DialogDescription className="max-w-xl text-sm leading-6 text-muted-foreground">
+            Choose who to invite back. Returning admins keep admin access, and
+            you can make other invited players admins for the new season.
           </DialogDescription>
         </DialogHeader>
 
         <div className="flex flex-wrap items-center justify-between gap-3 rounded-md border bg-muted/30 p-3">
           <div className="flex items-center gap-2">
             <Users className="h-4 w-4 text-primary" />
-            <Text.Small className="font-medium">
+            <Text.Small className="font-semibold leading-5">
               {selectedCount} of {invitees.eligibleMembers.length} players
               selected
             </Text.Small>
@@ -129,25 +148,47 @@ export function RenewalInviteDialog({
                   />
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
-                      <span className="truncate text-sm font-medium">
+                      <span className="truncate text-base font-semibold leading-5">
                         {member.username}
                       </span>
                       {isAdmin ? (
                         <Badge className="gap-1" variant="secondary">
                           <ShieldCheck className="h-3 w-3" />
-                          Admin
+                          Returning admin
                         </Badge>
                       ) : null}
                     </div>
-                    <div className="truncate text-xs text-muted-foreground">
+                    <div className="mt-1 truncate text-sm leading-5 text-muted-foreground">
                       {member.email}
                     </div>
                     {isAdmin ? (
-                      <div className="mt-1 text-xs text-muted-foreground">
-                        Will be an admin when they join.
+                      <div className="mt-1 text-sm leading-5 text-muted-foreground">
+                        Keeps admin access next season.
                       </div>
                     ) : null}
                   </div>
+                  {!isAdmin ? (
+                    <div
+                      className="flex shrink-0 items-center gap-2"
+                      onClick={(event) => event.stopPropagation()}
+                    >
+                      <label
+                        className={`hidden text-right text-sm font-medium sm:block ${
+                          checked ? "" : "text-muted-foreground"
+                        }`}
+                        htmlFor={`renewal-admin-${member.membershipId}`}
+                      >
+                        Admin next season
+                      </label>
+                      <Switch
+                        id={`renewal-admin-${member.membershipId}`}
+                        checked={adminMemberIds.has(member.membershipId)}
+                        disabled={!checked}
+                        onCheckedChange={() => toggleAdmin(member.membershipId)}
+                        aria-label={`Make ${member.username} an admin next season`}
+                      />
+                    </div>
+                  ) : null}
                 </div>
               );
             })}
@@ -179,7 +220,14 @@ export function RenewalInviteDialog({
           <Button
             type="button"
             className="gap-2"
-            onClick={() => onConfirm(selectedMemberIdList)}
+            onClick={() =>
+              onConfirm(
+                selectedMemberIdList,
+                selectedMemberIdList.filter((memberId) =>
+                  adminMemberIds.has(memberId),
+                ),
+              )
+            }
             loading={isCreating}
             disabled={isCreating}
           >

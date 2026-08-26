@@ -289,6 +289,9 @@ export const leagueRouter = createTRPCRouter({
         defaultSelectedMemberIds: eligibleMembers.map(
           (member) => member.membershipId,
         ),
+        defaultAdminMemberIds: eligibleMembers
+          .filter((member) => member.role === MemberRole.admin)
+          .map((member) => member.membershipId),
         missingEmailCount: priorLeague.leaguemembers.filter(
           (member) => member.user_id !== dbUser.uid && !member.people.email,
         ).length,
@@ -385,13 +388,26 @@ export const leagueRouter = createTRPCRouter({
         });
       }
 
-      const role =
+      const renewalRole = league.prior_league_id
+        ? await ctx.db.league_renewal_member_roles.findUnique({
+            where: {
+              league_id_user_id: {
+                league_id: league.league_id,
+                user_id: dbUser.uid,
+              },
+            },
+            select: { role: true },
+          })
+        : null;
+      const wasPriorLeagueAdmin =
         league.prior_league_id &&
         dbUser.leaguemembers.some(
           (member) =>
             member.league_id === league.prior_league_id &&
             member.role === MemberRole.admin,
-        )
+        );
+      const role =
+        renewalRole?.role === MemberRole.admin || wasPriorLeagueAdmin
           ? MemberRole.admin
           : MemberRole.player;
 

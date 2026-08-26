@@ -44,6 +44,11 @@ export type leaguemessages = $Result.DefaultSelection<Prisma.$leaguemessagesPayl
  */
 export type leagues = $Result.DefaultSelection<Prisma.$leaguesPayload>
 /**
+ * Model league_renewal_member_roles
+ * 
+ */
+export type league_renewal_member_roles = $Result.DefaultSelection<Prisma.$league_renewal_member_rolesPayload>
+/**
  * Model people
  * 
  */
@@ -403,6 +408,16 @@ export class PrismaClient<
     * ```
     */
   get leagues(): Prisma.leaguesDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.league_renewal_member_roles`: Exposes CRUD operations for the **league_renewal_member_roles** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more League_renewal_member_roles
+    * const league_renewal_member_roles = await prisma.league_renewal_member_roles.findMany()
+    * ```
+    */
+  get league_renewal_member_roles(): Prisma.league_renewal_member_rolesDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.people`: Exposes CRUD operations for the **people** model.
@@ -930,6 +945,7 @@ export namespace Prisma {
     leaguemembers: 'leaguemembers',
     leaguemessages: 'leaguemessages',
     leagues: 'leagues',
+    league_renewal_member_roles: 'league_renewal_member_roles',
     people: 'people',
     pushNotificationTokens: 'pushNotificationTokens',
     picks: 'picks',
@@ -956,7 +972,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "emailLogs" | "weekWinners" | "games" | "leaguemembers" | "leaguemessages" | "leagues" | "people" | "pushNotificationTokens" | "picks" | "superbowl" | "superbowlsquares" | "teams" | "postseason_games" | "postseason_team_seeds"
+      modelProps: "emailLogs" | "weekWinners" | "games" | "leaguemembers" | "leaguemessages" | "leagues" | "league_renewal_member_roles" | "people" | "pushNotificationTokens" | "picks" | "superbowl" | "superbowlsquares" | "teams" | "postseason_games" | "postseason_team_seeds"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1401,6 +1417,80 @@ export namespace Prisma {
           count: {
             args: Prisma.leaguesCountArgs<ExtArgs>
             result: $Utils.Optional<LeaguesCountAggregateOutputType> | number
+          }
+        }
+      }
+      league_renewal_member_roles: {
+        payload: Prisma.$league_renewal_member_rolesPayload<ExtArgs>
+        fields: Prisma.league_renewal_member_rolesFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.league_renewal_member_rolesFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$league_renewal_member_rolesPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.league_renewal_member_rolesFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$league_renewal_member_rolesPayload>
+          }
+          findFirst: {
+            args: Prisma.league_renewal_member_rolesFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$league_renewal_member_rolesPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.league_renewal_member_rolesFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$league_renewal_member_rolesPayload>
+          }
+          findMany: {
+            args: Prisma.league_renewal_member_rolesFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$league_renewal_member_rolesPayload>[]
+          }
+          create: {
+            args: Prisma.league_renewal_member_rolesCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$league_renewal_member_rolesPayload>
+          }
+          createMany: {
+            args: Prisma.league_renewal_member_rolesCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.league_renewal_member_rolesCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$league_renewal_member_rolesPayload>[]
+          }
+          delete: {
+            args: Prisma.league_renewal_member_rolesDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$league_renewal_member_rolesPayload>
+          }
+          update: {
+            args: Prisma.league_renewal_member_rolesUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$league_renewal_member_rolesPayload>
+          }
+          deleteMany: {
+            args: Prisma.league_renewal_member_rolesDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.league_renewal_member_rolesUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.league_renewal_member_rolesUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$league_renewal_member_rolesPayload>[]
+          }
+          upsert: {
+            args: Prisma.league_renewal_member_rolesUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$league_renewal_member_rolesPayload>
+          }
+          aggregate: {
+            args: Prisma.League_renewal_member_rolesAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateLeague_renewal_member_roles>
+          }
+          groupBy: {
+            args: Prisma.league_renewal_member_rolesGroupByArgs<ExtArgs>
+            result: $Utils.Optional<League_renewal_member_rolesGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.league_renewal_member_rolesCountArgs<ExtArgs>
+            result: $Utils.Optional<League_renewal_member_rolesCountAggregateOutputType> | number
           }
         }
       }
@@ -2098,6 +2188,7 @@ export namespace Prisma {
     leaguemembers?: leaguemembersOmit
     leaguemessages?: leaguemessagesOmit
     leagues?: leaguesOmit
+    league_renewal_member_roles?: league_renewal_member_rolesOmit
     people?: peopleOmit
     pushNotificationTokens?: pushNotificationTokensOmit
     picks?: picksOmit
@@ -2288,6 +2379,7 @@ export namespace Prisma {
     WeekWinners: number
     leaguemembers: number
     leaguemessages: number
+    league_renewal_member_roles: number
     future_leagues: number
   }
 
@@ -2296,6 +2388,7 @@ export namespace Prisma {
     WeekWinners?: boolean | LeaguesCountOutputTypeCountWeekWinnersArgs
     leaguemembers?: boolean | LeaguesCountOutputTypeCountLeaguemembersArgs
     leaguemessages?: boolean | LeaguesCountOutputTypeCountLeaguemessagesArgs
+    league_renewal_member_roles?: boolean | LeaguesCountOutputTypeCountLeague_renewal_member_rolesArgs
     future_leagues?: boolean | LeaguesCountOutputTypeCountFuture_leaguesArgs
   }
 
@@ -2341,6 +2434,13 @@ export namespace Prisma {
   /**
    * LeaguesCountOutputType without action
    */
+  export type LeaguesCountOutputTypeCountLeague_renewal_member_rolesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: league_renewal_member_rolesWhereInput
+  }
+
+  /**
+   * LeaguesCountOutputType without action
+   */
   export type LeaguesCountOutputTypeCountFuture_leaguesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: leaguesWhereInput
   }
@@ -2352,6 +2452,7 @@ export namespace Prisma {
 
   export type PeopleCountOutputType = {
     leaguemembers: number
+    league_renewal_member_roles: number
     leagues: number
     picks: number
     pushNotificationTokens: number
@@ -2359,6 +2460,7 @@ export namespace Prisma {
 
   export type PeopleCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     leaguemembers?: boolean | PeopleCountOutputTypeCountLeaguemembersArgs
+    league_renewal_member_roles?: boolean | PeopleCountOutputTypeCountLeague_renewal_member_rolesArgs
     leagues?: boolean | PeopleCountOutputTypeCountLeaguesArgs
     picks?: boolean | PeopleCountOutputTypeCountPicksArgs
     pushNotificationTokens?: boolean | PeopleCountOutputTypeCountPushNotificationTokensArgs
@@ -2380,6 +2482,13 @@ export namespace Prisma {
    */
   export type PeopleCountOutputTypeCountLeaguemembersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: leaguemembersWhereInput
+  }
+
+  /**
+   * PeopleCountOutputType without action
+   */
+  export type PeopleCountOutputTypeCountLeague_renewal_member_rolesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: league_renewal_member_rolesWhereInput
   }
 
   /**
@@ -8915,6 +9024,7 @@ export namespace Prisma {
     WeekWinners?: boolean | leagues$WeekWinnersArgs<ExtArgs>
     leaguemembers?: boolean | leagues$leaguemembersArgs<ExtArgs>
     leaguemessages?: boolean | leagues$leaguemessagesArgs<ExtArgs>
+    league_renewal_member_roles?: boolean | leagues$league_renewal_member_rolesArgs<ExtArgs>
     people?: boolean | peopleDefaultArgs<ExtArgs>
     prior_league?: boolean | leagues$prior_leagueArgs<ExtArgs>
     future_leagues?: boolean | leagues$future_leaguesArgs<ExtArgs>
@@ -8979,6 +9089,7 @@ export namespace Prisma {
     WeekWinners?: boolean | leagues$WeekWinnersArgs<ExtArgs>
     leaguemembers?: boolean | leagues$leaguemembersArgs<ExtArgs>
     leaguemessages?: boolean | leagues$leaguemessagesArgs<ExtArgs>
+    league_renewal_member_roles?: boolean | leagues$league_renewal_member_rolesArgs<ExtArgs>
     people?: boolean | peopleDefaultArgs<ExtArgs>
     prior_league?: boolean | leagues$prior_leagueArgs<ExtArgs>
     future_leagues?: boolean | leagues$future_leaguesArgs<ExtArgs>
@@ -9000,6 +9111,7 @@ export namespace Prisma {
       WeekWinners: Prisma.$WeekWinnersPayload<ExtArgs>[]
       leaguemembers: Prisma.$leaguemembersPayload<ExtArgs>[]
       leaguemessages: Prisma.$leaguemessagesPayload<ExtArgs>[]
+      league_renewal_member_roles: Prisma.$league_renewal_member_rolesPayload<ExtArgs>[]
       people: Prisma.$peoplePayload<ExtArgs>
       prior_league: Prisma.$leaguesPayload<ExtArgs> | null
       future_leagues: Prisma.$leaguesPayload<ExtArgs>[]
@@ -9416,6 +9528,7 @@ export namespace Prisma {
     WeekWinners<T extends leagues$WeekWinnersArgs<ExtArgs> = {}>(args?: Subset<T, leagues$WeekWinnersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$WeekWinnersPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     leaguemembers<T extends leagues$leaguemembersArgs<ExtArgs> = {}>(args?: Subset<T, leagues$leaguemembersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$leaguemembersPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     leaguemessages<T extends leagues$leaguemessagesArgs<ExtArgs> = {}>(args?: Subset<T, leagues$leaguemessagesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$leaguemessagesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    league_renewal_member_roles<T extends leagues$league_renewal_member_rolesArgs<ExtArgs> = {}>(args?: Subset<T, leagues$league_renewal_member_rolesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$league_renewal_member_rolesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     people<T extends peopleDefaultArgs<ExtArgs> = {}>(args?: Subset<T, peopleDefaultArgs<ExtArgs>>): Prisma__peopleClient<$Result.GetResult<Prisma.$peoplePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     prior_league<T extends leagues$prior_leagueArgs<ExtArgs> = {}>(args?: Subset<T, leagues$prior_leagueArgs<ExtArgs>>): Prisma__leaguesClient<$Result.GetResult<Prisma.$leaguesPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     future_leagues<T extends leagues$future_leaguesArgs<ExtArgs> = {}>(args?: Subset<T, leagues$future_leaguesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$leaguesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -9962,6 +10075,30 @@ export namespace Prisma {
   }
 
   /**
+   * leagues.league_renewal_member_roles
+   */
+  export type leagues$league_renewal_member_rolesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the league_renewal_member_roles
+     */
+    select?: league_renewal_member_rolesSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the league_renewal_member_roles
+     */
+    omit?: league_renewal_member_rolesOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: league_renewal_member_rolesInclude<ExtArgs> | null
+    where?: league_renewal_member_rolesWhereInput
+    orderBy?: league_renewal_member_rolesOrderByWithRelationInput | league_renewal_member_rolesOrderByWithRelationInput[]
+    cursor?: league_renewal_member_rolesWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: League_renewal_member_rolesScalarFieldEnum | League_renewal_member_rolesScalarFieldEnum[]
+  }
+
+  /**
    * leagues.prior_league
    */
   export type leagues$prior_leagueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -10020,6 +10157,1132 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: leaguesInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model league_renewal_member_roles
+   */
+
+  export type AggregateLeague_renewal_member_roles = {
+    _count: League_renewal_member_rolesCountAggregateOutputType | null
+    _avg: League_renewal_member_rolesAvgAggregateOutputType | null
+    _sum: League_renewal_member_rolesSumAggregateOutputType | null
+    _min: League_renewal_member_rolesMinAggregateOutputType | null
+    _max: League_renewal_member_rolesMaxAggregateOutputType | null
+  }
+
+  export type League_renewal_member_rolesAvgAggregateOutputType = {
+    league_id: number | null
+    user_id: number | null
+  }
+
+  export type League_renewal_member_rolesSumAggregateOutputType = {
+    league_id: number | null
+    user_id: number | null
+  }
+
+  export type League_renewal_member_rolesMinAggregateOutputType = {
+    renewal_member_role_id: string | null
+    league_id: number | null
+    user_id: number | null
+    role: $Enums.MemberRole | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type League_renewal_member_rolesMaxAggregateOutputType = {
+    renewal_member_role_id: string | null
+    league_id: number | null
+    user_id: number | null
+    role: $Enums.MemberRole | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type League_renewal_member_rolesCountAggregateOutputType = {
+    renewal_member_role_id: number
+    league_id: number
+    user_id: number
+    role: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type League_renewal_member_rolesAvgAggregateInputType = {
+    league_id?: true
+    user_id?: true
+  }
+
+  export type League_renewal_member_rolesSumAggregateInputType = {
+    league_id?: true
+    user_id?: true
+  }
+
+  export type League_renewal_member_rolesMinAggregateInputType = {
+    renewal_member_role_id?: true
+    league_id?: true
+    user_id?: true
+    role?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type League_renewal_member_rolesMaxAggregateInputType = {
+    renewal_member_role_id?: true
+    league_id?: true
+    user_id?: true
+    role?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type League_renewal_member_rolesCountAggregateInputType = {
+    renewal_member_role_id?: true
+    league_id?: true
+    user_id?: true
+    role?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type League_renewal_member_rolesAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which league_renewal_member_roles to aggregate.
+     */
+    where?: league_renewal_member_rolesWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of league_renewal_member_roles to fetch.
+     */
+    orderBy?: league_renewal_member_rolesOrderByWithRelationInput | league_renewal_member_rolesOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: league_renewal_member_rolesWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` league_renewal_member_roles from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` league_renewal_member_roles.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned league_renewal_member_roles
+    **/
+    _count?: true | League_renewal_member_rolesCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: League_renewal_member_rolesAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: League_renewal_member_rolesSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: League_renewal_member_rolesMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: League_renewal_member_rolesMaxAggregateInputType
+  }
+
+  export type GetLeague_renewal_member_rolesAggregateType<T extends League_renewal_member_rolesAggregateArgs> = {
+        [P in keyof T & keyof AggregateLeague_renewal_member_roles]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateLeague_renewal_member_roles[P]>
+      : GetScalarType<T[P], AggregateLeague_renewal_member_roles[P]>
+  }
+
+
+
+
+  export type league_renewal_member_rolesGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: league_renewal_member_rolesWhereInput
+    orderBy?: league_renewal_member_rolesOrderByWithAggregationInput | league_renewal_member_rolesOrderByWithAggregationInput[]
+    by: League_renewal_member_rolesScalarFieldEnum[] | League_renewal_member_rolesScalarFieldEnum
+    having?: league_renewal_member_rolesScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: League_renewal_member_rolesCountAggregateInputType | true
+    _avg?: League_renewal_member_rolesAvgAggregateInputType
+    _sum?: League_renewal_member_rolesSumAggregateInputType
+    _min?: League_renewal_member_rolesMinAggregateInputType
+    _max?: League_renewal_member_rolesMaxAggregateInputType
+  }
+
+  export type League_renewal_member_rolesGroupByOutputType = {
+    renewal_member_role_id: string
+    league_id: number
+    user_id: number
+    role: $Enums.MemberRole
+    createdAt: Date
+    updatedAt: Date
+    _count: League_renewal_member_rolesCountAggregateOutputType | null
+    _avg: League_renewal_member_rolesAvgAggregateOutputType | null
+    _sum: League_renewal_member_rolesSumAggregateOutputType | null
+    _min: League_renewal_member_rolesMinAggregateOutputType | null
+    _max: League_renewal_member_rolesMaxAggregateOutputType | null
+  }
+
+  type GetLeague_renewal_member_rolesGroupByPayload<T extends league_renewal_member_rolesGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<League_renewal_member_rolesGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof League_renewal_member_rolesGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], League_renewal_member_rolesGroupByOutputType[P]>
+            : GetScalarType<T[P], League_renewal_member_rolesGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type league_renewal_member_rolesSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    renewal_member_role_id?: boolean
+    league_id?: boolean
+    user_id?: boolean
+    role?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    leagues?: boolean | leaguesDefaultArgs<ExtArgs>
+    people?: boolean | peopleDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["league_renewal_member_roles"]>
+
+  export type league_renewal_member_rolesSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    renewal_member_role_id?: boolean
+    league_id?: boolean
+    user_id?: boolean
+    role?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    leagues?: boolean | leaguesDefaultArgs<ExtArgs>
+    people?: boolean | peopleDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["league_renewal_member_roles"]>
+
+  export type league_renewal_member_rolesSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    renewal_member_role_id?: boolean
+    league_id?: boolean
+    user_id?: boolean
+    role?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    leagues?: boolean | leaguesDefaultArgs<ExtArgs>
+    people?: boolean | peopleDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["league_renewal_member_roles"]>
+
+  export type league_renewal_member_rolesSelectScalar = {
+    renewal_member_role_id?: boolean
+    league_id?: boolean
+    user_id?: boolean
+    role?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type league_renewal_member_rolesOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"renewal_member_role_id" | "league_id" | "user_id" | "role" | "createdAt" | "updatedAt", ExtArgs["result"]["league_renewal_member_roles"]>
+  export type league_renewal_member_rolesInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    leagues?: boolean | leaguesDefaultArgs<ExtArgs>
+    people?: boolean | peopleDefaultArgs<ExtArgs>
+  }
+  export type league_renewal_member_rolesIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    leagues?: boolean | leaguesDefaultArgs<ExtArgs>
+    people?: boolean | peopleDefaultArgs<ExtArgs>
+  }
+  export type league_renewal_member_rolesIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    leagues?: boolean | leaguesDefaultArgs<ExtArgs>
+    people?: boolean | peopleDefaultArgs<ExtArgs>
+  }
+
+  export type $league_renewal_member_rolesPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "league_renewal_member_roles"
+    objects: {
+      leagues: Prisma.$leaguesPayload<ExtArgs>
+      people: Prisma.$peoplePayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      renewal_member_role_id: string
+      league_id: number
+      user_id: number
+      role: $Enums.MemberRole
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["league_renewal_member_roles"]>
+    composites: {}
+  }
+
+  type league_renewal_member_rolesGetPayload<S extends boolean | null | undefined | league_renewal_member_rolesDefaultArgs> = $Result.GetResult<Prisma.$league_renewal_member_rolesPayload, S>
+
+  type league_renewal_member_rolesCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<league_renewal_member_rolesFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
+      select?: League_renewal_member_rolesCountAggregateInputType | true
+    }
+
+  export interface league_renewal_member_rolesDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['league_renewal_member_roles'], meta: { name: 'league_renewal_member_roles' } }
+    /**
+     * Find zero or one League_renewal_member_roles that matches the filter.
+     * @param {league_renewal_member_rolesFindUniqueArgs} args - Arguments to find a League_renewal_member_roles
+     * @example
+     * // Get one League_renewal_member_roles
+     * const league_renewal_member_roles = await prisma.league_renewal_member_roles.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends league_renewal_member_rolesFindUniqueArgs>(args: SelectSubset<T, league_renewal_member_rolesFindUniqueArgs<ExtArgs>>): Prisma__league_renewal_member_rolesClient<$Result.GetResult<Prisma.$league_renewal_member_rolesPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one League_renewal_member_roles that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {league_renewal_member_rolesFindUniqueOrThrowArgs} args - Arguments to find a League_renewal_member_roles
+     * @example
+     * // Get one League_renewal_member_roles
+     * const league_renewal_member_roles = await prisma.league_renewal_member_roles.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends league_renewal_member_rolesFindUniqueOrThrowArgs>(args: SelectSubset<T, league_renewal_member_rolesFindUniqueOrThrowArgs<ExtArgs>>): Prisma__league_renewal_member_rolesClient<$Result.GetResult<Prisma.$league_renewal_member_rolesPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first League_renewal_member_roles that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {league_renewal_member_rolesFindFirstArgs} args - Arguments to find a League_renewal_member_roles
+     * @example
+     * // Get one League_renewal_member_roles
+     * const league_renewal_member_roles = await prisma.league_renewal_member_roles.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends league_renewal_member_rolesFindFirstArgs>(args?: SelectSubset<T, league_renewal_member_rolesFindFirstArgs<ExtArgs>>): Prisma__league_renewal_member_rolesClient<$Result.GetResult<Prisma.$league_renewal_member_rolesPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first League_renewal_member_roles that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {league_renewal_member_rolesFindFirstOrThrowArgs} args - Arguments to find a League_renewal_member_roles
+     * @example
+     * // Get one League_renewal_member_roles
+     * const league_renewal_member_roles = await prisma.league_renewal_member_roles.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends league_renewal_member_rolesFindFirstOrThrowArgs>(args?: SelectSubset<T, league_renewal_member_rolesFindFirstOrThrowArgs<ExtArgs>>): Prisma__league_renewal_member_rolesClient<$Result.GetResult<Prisma.$league_renewal_member_rolesPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more League_renewal_member_roles that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {league_renewal_member_rolesFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all League_renewal_member_roles
+     * const league_renewal_member_roles = await prisma.league_renewal_member_roles.findMany()
+     * 
+     * // Get first 10 League_renewal_member_roles
+     * const league_renewal_member_roles = await prisma.league_renewal_member_roles.findMany({ take: 10 })
+     * 
+     * // Only select the `renewal_member_role_id`
+     * const league_renewal_member_rolesWithRenewal_member_role_idOnly = await prisma.league_renewal_member_roles.findMany({ select: { renewal_member_role_id: true } })
+     * 
+     */
+    findMany<T extends league_renewal_member_rolesFindManyArgs>(args?: SelectSubset<T, league_renewal_member_rolesFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$league_renewal_member_rolesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a League_renewal_member_roles.
+     * @param {league_renewal_member_rolesCreateArgs} args - Arguments to create a League_renewal_member_roles.
+     * @example
+     * // Create one League_renewal_member_roles
+     * const League_renewal_member_roles = await prisma.league_renewal_member_roles.create({
+     *   data: {
+     *     // ... data to create a League_renewal_member_roles
+     *   }
+     * })
+     * 
+     */
+    create<T extends league_renewal_member_rolesCreateArgs>(args: SelectSubset<T, league_renewal_member_rolesCreateArgs<ExtArgs>>): Prisma__league_renewal_member_rolesClient<$Result.GetResult<Prisma.$league_renewal_member_rolesPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many League_renewal_member_roles.
+     * @param {league_renewal_member_rolesCreateManyArgs} args - Arguments to create many League_renewal_member_roles.
+     * @example
+     * // Create many League_renewal_member_roles
+     * const league_renewal_member_roles = await prisma.league_renewal_member_roles.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends league_renewal_member_rolesCreateManyArgs>(args?: SelectSubset<T, league_renewal_member_rolesCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many League_renewal_member_roles and returns the data saved in the database.
+     * @param {league_renewal_member_rolesCreateManyAndReturnArgs} args - Arguments to create many League_renewal_member_roles.
+     * @example
+     * // Create many League_renewal_member_roles
+     * const league_renewal_member_roles = await prisma.league_renewal_member_roles.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many League_renewal_member_roles and only return the `renewal_member_role_id`
+     * const league_renewal_member_rolesWithRenewal_member_role_idOnly = await prisma.league_renewal_member_roles.createManyAndReturn({
+     *   select: { renewal_member_role_id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends league_renewal_member_rolesCreateManyAndReturnArgs>(args?: SelectSubset<T, league_renewal_member_rolesCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$league_renewal_member_rolesPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a League_renewal_member_roles.
+     * @param {league_renewal_member_rolesDeleteArgs} args - Arguments to delete one League_renewal_member_roles.
+     * @example
+     * // Delete one League_renewal_member_roles
+     * const League_renewal_member_roles = await prisma.league_renewal_member_roles.delete({
+     *   where: {
+     *     // ... filter to delete one League_renewal_member_roles
+     *   }
+     * })
+     * 
+     */
+    delete<T extends league_renewal_member_rolesDeleteArgs>(args: SelectSubset<T, league_renewal_member_rolesDeleteArgs<ExtArgs>>): Prisma__league_renewal_member_rolesClient<$Result.GetResult<Prisma.$league_renewal_member_rolesPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one League_renewal_member_roles.
+     * @param {league_renewal_member_rolesUpdateArgs} args - Arguments to update one League_renewal_member_roles.
+     * @example
+     * // Update one League_renewal_member_roles
+     * const league_renewal_member_roles = await prisma.league_renewal_member_roles.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends league_renewal_member_rolesUpdateArgs>(args: SelectSubset<T, league_renewal_member_rolesUpdateArgs<ExtArgs>>): Prisma__league_renewal_member_rolesClient<$Result.GetResult<Prisma.$league_renewal_member_rolesPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more League_renewal_member_roles.
+     * @param {league_renewal_member_rolesDeleteManyArgs} args - Arguments to filter League_renewal_member_roles to delete.
+     * @example
+     * // Delete a few League_renewal_member_roles
+     * const { count } = await prisma.league_renewal_member_roles.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends league_renewal_member_rolesDeleteManyArgs>(args?: SelectSubset<T, league_renewal_member_rolesDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more League_renewal_member_roles.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {league_renewal_member_rolesUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many League_renewal_member_roles
+     * const league_renewal_member_roles = await prisma.league_renewal_member_roles.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends league_renewal_member_rolesUpdateManyArgs>(args: SelectSubset<T, league_renewal_member_rolesUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more League_renewal_member_roles and returns the data updated in the database.
+     * @param {league_renewal_member_rolesUpdateManyAndReturnArgs} args - Arguments to update many League_renewal_member_roles.
+     * @example
+     * // Update many League_renewal_member_roles
+     * const league_renewal_member_roles = await prisma.league_renewal_member_roles.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more League_renewal_member_roles and only return the `renewal_member_role_id`
+     * const league_renewal_member_rolesWithRenewal_member_role_idOnly = await prisma.league_renewal_member_roles.updateManyAndReturn({
+     *   select: { renewal_member_role_id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends league_renewal_member_rolesUpdateManyAndReturnArgs>(args: SelectSubset<T, league_renewal_member_rolesUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$league_renewal_member_rolesPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one League_renewal_member_roles.
+     * @param {league_renewal_member_rolesUpsertArgs} args - Arguments to update or create a League_renewal_member_roles.
+     * @example
+     * // Update or create a League_renewal_member_roles
+     * const league_renewal_member_roles = await prisma.league_renewal_member_roles.upsert({
+     *   create: {
+     *     // ... data to create a League_renewal_member_roles
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the League_renewal_member_roles we want to update
+     *   }
+     * })
+     */
+    upsert<T extends league_renewal_member_rolesUpsertArgs>(args: SelectSubset<T, league_renewal_member_rolesUpsertArgs<ExtArgs>>): Prisma__league_renewal_member_rolesClient<$Result.GetResult<Prisma.$league_renewal_member_rolesPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of League_renewal_member_roles.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {league_renewal_member_rolesCountArgs} args - Arguments to filter League_renewal_member_roles to count.
+     * @example
+     * // Count the number of League_renewal_member_roles
+     * const count = await prisma.league_renewal_member_roles.count({
+     *   where: {
+     *     // ... the filter for the League_renewal_member_roles we want to count
+     *   }
+     * })
+    **/
+    count<T extends league_renewal_member_rolesCountArgs>(
+      args?: Subset<T, league_renewal_member_rolesCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], League_renewal_member_rolesCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a League_renewal_member_roles.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {League_renewal_member_rolesAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends League_renewal_member_rolesAggregateArgs>(args: Subset<T, League_renewal_member_rolesAggregateArgs>): Prisma.PrismaPromise<GetLeague_renewal_member_rolesAggregateType<T>>
+
+    /**
+     * Group by League_renewal_member_roles.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {league_renewal_member_rolesGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends league_renewal_member_rolesGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: league_renewal_member_rolesGroupByArgs['orderBy'] }
+        : { orderBy?: league_renewal_member_rolesGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, league_renewal_member_rolesGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetLeague_renewal_member_rolesGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the league_renewal_member_roles model
+   */
+  readonly fields: league_renewal_member_rolesFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for league_renewal_member_roles.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__league_renewal_member_rolesClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    leagues<T extends leaguesDefaultArgs<ExtArgs> = {}>(args?: Subset<T, leaguesDefaultArgs<ExtArgs>>): Prisma__leaguesClient<$Result.GetResult<Prisma.$leaguesPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    people<T extends peopleDefaultArgs<ExtArgs> = {}>(args?: Subset<T, peopleDefaultArgs<ExtArgs>>): Prisma__peopleClient<$Result.GetResult<Prisma.$peoplePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the league_renewal_member_roles model
+   */
+  interface league_renewal_member_rolesFieldRefs {
+    readonly renewal_member_role_id: FieldRef<"league_renewal_member_roles", 'String'>
+    readonly league_id: FieldRef<"league_renewal_member_roles", 'Int'>
+    readonly user_id: FieldRef<"league_renewal_member_roles", 'Int'>
+    readonly role: FieldRef<"league_renewal_member_roles", 'MemberRole'>
+    readonly createdAt: FieldRef<"league_renewal_member_roles", 'DateTime'>
+    readonly updatedAt: FieldRef<"league_renewal_member_roles", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * league_renewal_member_roles findUnique
+   */
+  export type league_renewal_member_rolesFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the league_renewal_member_roles
+     */
+    select?: league_renewal_member_rolesSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the league_renewal_member_roles
+     */
+    omit?: league_renewal_member_rolesOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: league_renewal_member_rolesInclude<ExtArgs> | null
+    /**
+     * Filter, which league_renewal_member_roles to fetch.
+     */
+    where: league_renewal_member_rolesWhereUniqueInput
+    relationLoadStrategy?: RelationLoadStrategy
+  }
+
+  /**
+   * league_renewal_member_roles findUniqueOrThrow
+   */
+  export type league_renewal_member_rolesFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the league_renewal_member_roles
+     */
+    select?: league_renewal_member_rolesSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the league_renewal_member_roles
+     */
+    omit?: league_renewal_member_rolesOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: league_renewal_member_rolesInclude<ExtArgs> | null
+    /**
+     * Filter, which league_renewal_member_roles to fetch.
+     */
+    where: league_renewal_member_rolesWhereUniqueInput
+    relationLoadStrategy?: RelationLoadStrategy
+  }
+
+  /**
+   * league_renewal_member_roles findFirst
+   */
+  export type league_renewal_member_rolesFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the league_renewal_member_roles
+     */
+    select?: league_renewal_member_rolesSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the league_renewal_member_roles
+     */
+    omit?: league_renewal_member_rolesOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: league_renewal_member_rolesInclude<ExtArgs> | null
+    /**
+     * Filter, which league_renewal_member_roles to fetch.
+     */
+    where?: league_renewal_member_rolesWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of league_renewal_member_roles to fetch.
+     */
+    orderBy?: league_renewal_member_rolesOrderByWithRelationInput | league_renewal_member_rolesOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for league_renewal_member_roles.
+     */
+    cursor?: league_renewal_member_rolesWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` league_renewal_member_roles from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` league_renewal_member_roles.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of league_renewal_member_roles.
+     */
+    distinct?: League_renewal_member_rolesScalarFieldEnum | League_renewal_member_rolesScalarFieldEnum[]
+    relationLoadStrategy?: RelationLoadStrategy
+  }
+
+  /**
+   * league_renewal_member_roles findFirstOrThrow
+   */
+  export type league_renewal_member_rolesFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the league_renewal_member_roles
+     */
+    select?: league_renewal_member_rolesSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the league_renewal_member_roles
+     */
+    omit?: league_renewal_member_rolesOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: league_renewal_member_rolesInclude<ExtArgs> | null
+    /**
+     * Filter, which league_renewal_member_roles to fetch.
+     */
+    where?: league_renewal_member_rolesWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of league_renewal_member_roles to fetch.
+     */
+    orderBy?: league_renewal_member_rolesOrderByWithRelationInput | league_renewal_member_rolesOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for league_renewal_member_roles.
+     */
+    cursor?: league_renewal_member_rolesWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` league_renewal_member_roles from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` league_renewal_member_roles.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of league_renewal_member_roles.
+     */
+    distinct?: League_renewal_member_rolesScalarFieldEnum | League_renewal_member_rolesScalarFieldEnum[]
+    relationLoadStrategy?: RelationLoadStrategy
+  }
+
+  /**
+   * league_renewal_member_roles findMany
+   */
+  export type league_renewal_member_rolesFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the league_renewal_member_roles
+     */
+    select?: league_renewal_member_rolesSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the league_renewal_member_roles
+     */
+    omit?: league_renewal_member_rolesOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: league_renewal_member_rolesInclude<ExtArgs> | null
+    /**
+     * Filter, which league_renewal_member_roles to fetch.
+     */
+    where?: league_renewal_member_rolesWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of league_renewal_member_roles to fetch.
+     */
+    orderBy?: league_renewal_member_rolesOrderByWithRelationInput | league_renewal_member_rolesOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing league_renewal_member_roles.
+     */
+    cursor?: league_renewal_member_rolesWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` league_renewal_member_roles from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` league_renewal_member_roles.
+     */
+    skip?: number
+    distinct?: League_renewal_member_rolesScalarFieldEnum | League_renewal_member_rolesScalarFieldEnum[]
+    relationLoadStrategy?: RelationLoadStrategy
+  }
+
+  /**
+   * league_renewal_member_roles create
+   */
+  export type league_renewal_member_rolesCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the league_renewal_member_roles
+     */
+    select?: league_renewal_member_rolesSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the league_renewal_member_roles
+     */
+    omit?: league_renewal_member_rolesOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: league_renewal_member_rolesInclude<ExtArgs> | null
+    /**
+     * The data needed to create a league_renewal_member_roles.
+     */
+    data: XOR<league_renewal_member_rolesCreateInput, league_renewal_member_rolesUncheckedCreateInput>
+    relationLoadStrategy?: RelationLoadStrategy
+  }
+
+  /**
+   * league_renewal_member_roles createMany
+   */
+  export type league_renewal_member_rolesCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many league_renewal_member_roles.
+     */
+    data: league_renewal_member_rolesCreateManyInput | league_renewal_member_rolesCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * league_renewal_member_roles createManyAndReturn
+   */
+  export type league_renewal_member_rolesCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the league_renewal_member_roles
+     */
+    select?: league_renewal_member_rolesSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the league_renewal_member_roles
+     */
+    omit?: league_renewal_member_rolesOmit<ExtArgs> | null
+    /**
+     * The data used to create many league_renewal_member_roles.
+     */
+    data: league_renewal_member_rolesCreateManyInput | league_renewal_member_rolesCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: league_renewal_member_rolesIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * league_renewal_member_roles update
+   */
+  export type league_renewal_member_rolesUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the league_renewal_member_roles
+     */
+    select?: league_renewal_member_rolesSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the league_renewal_member_roles
+     */
+    omit?: league_renewal_member_rolesOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: league_renewal_member_rolesInclude<ExtArgs> | null
+    /**
+     * The data needed to update a league_renewal_member_roles.
+     */
+    data: XOR<league_renewal_member_rolesUpdateInput, league_renewal_member_rolesUncheckedUpdateInput>
+    /**
+     * Choose, which league_renewal_member_roles to update.
+     */
+    where: league_renewal_member_rolesWhereUniqueInput
+    relationLoadStrategy?: RelationLoadStrategy
+  }
+
+  /**
+   * league_renewal_member_roles updateMany
+   */
+  export type league_renewal_member_rolesUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update league_renewal_member_roles.
+     */
+    data: XOR<league_renewal_member_rolesUpdateManyMutationInput, league_renewal_member_rolesUncheckedUpdateManyInput>
+    /**
+     * Filter which league_renewal_member_roles to update
+     */
+    where?: league_renewal_member_rolesWhereInput
+    /**
+     * Limit how many league_renewal_member_roles to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * league_renewal_member_roles updateManyAndReturn
+   */
+  export type league_renewal_member_rolesUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the league_renewal_member_roles
+     */
+    select?: league_renewal_member_rolesSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the league_renewal_member_roles
+     */
+    omit?: league_renewal_member_rolesOmit<ExtArgs> | null
+    /**
+     * The data used to update league_renewal_member_roles.
+     */
+    data: XOR<league_renewal_member_rolesUpdateManyMutationInput, league_renewal_member_rolesUncheckedUpdateManyInput>
+    /**
+     * Filter which league_renewal_member_roles to update
+     */
+    where?: league_renewal_member_rolesWhereInput
+    /**
+     * Limit how many league_renewal_member_roles to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: league_renewal_member_rolesIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * league_renewal_member_roles upsert
+   */
+  export type league_renewal_member_rolesUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the league_renewal_member_roles
+     */
+    select?: league_renewal_member_rolesSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the league_renewal_member_roles
+     */
+    omit?: league_renewal_member_rolesOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: league_renewal_member_rolesInclude<ExtArgs> | null
+    /**
+     * The filter to search for the league_renewal_member_roles to update in case it exists.
+     */
+    where: league_renewal_member_rolesWhereUniqueInput
+    /**
+     * In case the league_renewal_member_roles found by the `where` argument doesn't exist, create a new league_renewal_member_roles with this data.
+     */
+    create: XOR<league_renewal_member_rolesCreateInput, league_renewal_member_rolesUncheckedCreateInput>
+    /**
+     * In case the league_renewal_member_roles was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<league_renewal_member_rolesUpdateInput, league_renewal_member_rolesUncheckedUpdateInput>
+    relationLoadStrategy?: RelationLoadStrategy
+  }
+
+  /**
+   * league_renewal_member_roles delete
+   */
+  export type league_renewal_member_rolesDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the league_renewal_member_roles
+     */
+    select?: league_renewal_member_rolesSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the league_renewal_member_roles
+     */
+    omit?: league_renewal_member_rolesOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: league_renewal_member_rolesInclude<ExtArgs> | null
+    /**
+     * Filter which league_renewal_member_roles to delete.
+     */
+    where: league_renewal_member_rolesWhereUniqueInput
+    relationLoadStrategy?: RelationLoadStrategy
+  }
+
+  /**
+   * league_renewal_member_roles deleteMany
+   */
+  export type league_renewal_member_rolesDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which league_renewal_member_roles to delete
+     */
+    where?: league_renewal_member_rolesWhereInput
+    /**
+     * Limit how many league_renewal_member_roles to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * league_renewal_member_roles without action
+   */
+  export type league_renewal_member_rolesDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the league_renewal_member_roles
+     */
+    select?: league_renewal_member_rolesSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the league_renewal_member_roles
+     */
+    omit?: league_renewal_member_rolesOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: league_renewal_member_rolesInclude<ExtArgs> | null
   }
 
 
@@ -10274,6 +11537,7 @@ export namespace Prisma {
     google_userid?: boolean
     supabase_id?: boolean
     leaguemembers?: boolean | people$leaguemembersArgs<ExtArgs>
+    league_renewal_member_roles?: boolean | people$league_renewal_member_rolesArgs<ExtArgs>
     leagues?: boolean | people$leaguesArgs<ExtArgs>
     picks?: boolean | people$picksArgs<ExtArgs>
     pushNotificationTokens?: boolean | people$pushNotificationTokensArgs<ExtArgs>
@@ -10325,6 +11589,7 @@ export namespace Prisma {
   export type peopleOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"uid" | "username" | "fname" | "lname" | "email" | "season" | "email2" | "google_photo_url" | "google_email" | "google_userid" | "supabase_id", ExtArgs["result"]["people"]>
   export type peopleInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     leaguemembers?: boolean | people$leaguemembersArgs<ExtArgs>
+    league_renewal_member_roles?: boolean | people$league_renewal_member_rolesArgs<ExtArgs>
     leagues?: boolean | people$leaguesArgs<ExtArgs>
     picks?: boolean | people$picksArgs<ExtArgs>
     pushNotificationTokens?: boolean | people$pushNotificationTokensArgs<ExtArgs>
@@ -10337,6 +11602,7 @@ export namespace Prisma {
     name: "people"
     objects: {
       leaguemembers: Prisma.$leaguemembersPayload<ExtArgs>[]
+      league_renewal_member_roles: Prisma.$league_renewal_member_rolesPayload<ExtArgs>[]
       leagues: Prisma.$leaguesPayload<ExtArgs>[]
       picks: Prisma.$picksPayload<ExtArgs>[]
       pushNotificationTokens: Prisma.$pushNotificationTokensPayload<ExtArgs>[]
@@ -10748,6 +12014,7 @@ export namespace Prisma {
   export interface Prisma__peopleClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     leaguemembers<T extends people$leaguemembersArgs<ExtArgs> = {}>(args?: Subset<T, people$leaguemembersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$leaguemembersPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    league_renewal_member_roles<T extends people$league_renewal_member_rolesArgs<ExtArgs> = {}>(args?: Subset<T, people$league_renewal_member_rolesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$league_renewal_member_rolesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     leagues<T extends people$leaguesArgs<ExtArgs> = {}>(args?: Subset<T, people$leaguesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$leaguesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     picks<T extends people$picksArgs<ExtArgs> = {}>(args?: Subset<T, people$picksArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$picksPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     pushNotificationTokens<T extends people$pushNotificationTokensArgs<ExtArgs> = {}>(args?: Subset<T, people$pushNotificationTokensArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$pushNotificationTokensPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -11209,6 +12476,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: LeaguemembersScalarFieldEnum | LeaguemembersScalarFieldEnum[]
+  }
+
+  /**
+   * people.league_renewal_member_roles
+   */
+  export type people$league_renewal_member_rolesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the league_renewal_member_roles
+     */
+    select?: league_renewal_member_rolesSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the league_renewal_member_roles
+     */
+    omit?: league_renewal_member_rolesOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: league_renewal_member_rolesInclude<ExtArgs> | null
+    where?: league_renewal_member_rolesWhereInput
+    orderBy?: league_renewal_member_rolesOrderByWithRelationInput | league_renewal_member_rolesOrderByWithRelationInput[]
+    cursor?: league_renewal_member_rolesWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: League_renewal_member_rolesScalarFieldEnum | League_renewal_member_rolesScalarFieldEnum[]
   }
 
   /**
@@ -20007,6 +21298,18 @@ export namespace Prisma {
   export type LeaguesScalarFieldEnum = (typeof LeaguesScalarFieldEnum)[keyof typeof LeaguesScalarFieldEnum]
 
 
+  export const League_renewal_member_rolesScalarFieldEnum: {
+    renewal_member_role_id: 'renewal_member_role_id',
+    league_id: 'league_id',
+    user_id: 'user_id',
+    role: 'role',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type League_renewal_member_rolesScalarFieldEnum = (typeof League_renewal_member_rolesScalarFieldEnum)[keyof typeof League_renewal_member_rolesScalarFieldEnum]
+
+
   export const PeopleScalarFieldEnum: {
     uid: 'uid',
     username: 'username',
@@ -20827,6 +22130,7 @@ export namespace Prisma {
     WeekWinners?: WeekWinnersListRelationFilter
     leaguemembers?: LeaguemembersListRelationFilter
     leaguemessages?: LeaguemessagesListRelationFilter
+    league_renewal_member_roles?: League_renewal_member_rolesListRelationFilter
     people?: XOR<PeopleScalarRelationFilter, peopleWhereInput>
     prior_league?: XOR<LeaguesNullableScalarRelationFilter, leaguesWhereInput> | null
     future_leagues?: LeaguesListRelationFilter
@@ -20850,6 +22154,7 @@ export namespace Prisma {
     WeekWinners?: WeekWinnersOrderByRelationAggregateInput
     leaguemembers?: leaguemembersOrderByRelationAggregateInput
     leaguemessages?: leaguemessagesOrderByRelationAggregateInput
+    league_renewal_member_roles?: league_renewal_member_rolesOrderByRelationAggregateInput
     people?: peopleOrderByWithRelationInput
     prior_league?: leaguesOrderByWithRelationInput
     future_leagues?: leaguesOrderByRelationAggregateInput
@@ -20876,6 +22181,7 @@ export namespace Prisma {
     WeekWinners?: WeekWinnersListRelationFilter
     leaguemembers?: LeaguemembersListRelationFilter
     leaguemessages?: LeaguemessagesListRelationFilter
+    league_renewal_member_roles?: League_renewal_member_rolesListRelationFilter
     people?: XOR<PeopleScalarRelationFilter, peopleWhereInput>
     prior_league?: XOR<LeaguesNullableScalarRelationFilter, leaguesWhereInput> | null
     future_leagues?: LeaguesListRelationFilter
@@ -20921,6 +22227,72 @@ export namespace Prisma {
     status?: EnumLeagueStatusWithAggregatesFilter<"leagues"> | $Enums.LeagueStatus
   }
 
+  export type league_renewal_member_rolesWhereInput = {
+    AND?: league_renewal_member_rolesWhereInput | league_renewal_member_rolesWhereInput[]
+    OR?: league_renewal_member_rolesWhereInput[]
+    NOT?: league_renewal_member_rolesWhereInput | league_renewal_member_rolesWhereInput[]
+    renewal_member_role_id?: StringFilter<"league_renewal_member_roles"> | string
+    league_id?: IntFilter<"league_renewal_member_roles"> | number
+    user_id?: IntFilter<"league_renewal_member_roles"> | number
+    role?: EnumMemberRoleFilter<"league_renewal_member_roles"> | $Enums.MemberRole
+    createdAt?: DateTimeFilter<"league_renewal_member_roles"> | Date | string
+    updatedAt?: DateTimeFilter<"league_renewal_member_roles"> | Date | string
+    leagues?: XOR<LeaguesScalarRelationFilter, leaguesWhereInput>
+    people?: XOR<PeopleScalarRelationFilter, peopleWhereInput>
+  }
+
+  export type league_renewal_member_rolesOrderByWithRelationInput = {
+    renewal_member_role_id?: SortOrder
+    league_id?: SortOrder
+    user_id?: SortOrder
+    role?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    leagues?: leaguesOrderByWithRelationInput
+    people?: peopleOrderByWithRelationInput
+  }
+
+  export type league_renewal_member_rolesWhereUniqueInput = Prisma.AtLeast<{
+    renewal_member_role_id?: string
+    league_id_user_id?: league_renewal_member_rolesLeague_idUser_idCompoundUniqueInput
+    AND?: league_renewal_member_rolesWhereInput | league_renewal_member_rolesWhereInput[]
+    OR?: league_renewal_member_rolesWhereInput[]
+    NOT?: league_renewal_member_rolesWhereInput | league_renewal_member_rolesWhereInput[]
+    league_id?: IntFilter<"league_renewal_member_roles"> | number
+    user_id?: IntFilter<"league_renewal_member_roles"> | number
+    role?: EnumMemberRoleFilter<"league_renewal_member_roles"> | $Enums.MemberRole
+    createdAt?: DateTimeFilter<"league_renewal_member_roles"> | Date | string
+    updatedAt?: DateTimeFilter<"league_renewal_member_roles"> | Date | string
+    leagues?: XOR<LeaguesScalarRelationFilter, leaguesWhereInput>
+    people?: XOR<PeopleScalarRelationFilter, peopleWhereInput>
+  }, "renewal_member_role_id" | "league_id_user_id">
+
+  export type league_renewal_member_rolesOrderByWithAggregationInput = {
+    renewal_member_role_id?: SortOrder
+    league_id?: SortOrder
+    user_id?: SortOrder
+    role?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: league_renewal_member_rolesCountOrderByAggregateInput
+    _avg?: league_renewal_member_rolesAvgOrderByAggregateInput
+    _max?: league_renewal_member_rolesMaxOrderByAggregateInput
+    _min?: league_renewal_member_rolesMinOrderByAggregateInput
+    _sum?: league_renewal_member_rolesSumOrderByAggregateInput
+  }
+
+  export type league_renewal_member_rolesScalarWhereWithAggregatesInput = {
+    AND?: league_renewal_member_rolesScalarWhereWithAggregatesInput | league_renewal_member_rolesScalarWhereWithAggregatesInput[]
+    OR?: league_renewal_member_rolesScalarWhereWithAggregatesInput[]
+    NOT?: league_renewal_member_rolesScalarWhereWithAggregatesInput | league_renewal_member_rolesScalarWhereWithAggregatesInput[]
+    renewal_member_role_id?: StringWithAggregatesFilter<"league_renewal_member_roles"> | string
+    league_id?: IntWithAggregatesFilter<"league_renewal_member_roles"> | number
+    user_id?: IntWithAggregatesFilter<"league_renewal_member_roles"> | number
+    role?: EnumMemberRoleWithAggregatesFilter<"league_renewal_member_roles"> | $Enums.MemberRole
+    createdAt?: DateTimeWithAggregatesFilter<"league_renewal_member_roles"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"league_renewal_member_roles"> | Date | string
+  }
+
   export type peopleWhereInput = {
     AND?: peopleWhereInput | peopleWhereInput[]
     OR?: peopleWhereInput[]
@@ -20937,6 +22309,7 @@ export namespace Prisma {
     google_userid?: StringNullableFilter<"people"> | string | null
     supabase_id?: StringNullableFilter<"people"> | string | null
     leaguemembers?: LeaguemembersListRelationFilter
+    league_renewal_member_roles?: League_renewal_member_rolesListRelationFilter
     leagues?: LeaguesListRelationFilter
     picks?: PicksListRelationFilter
     pushNotificationTokens?: PushNotificationTokensListRelationFilter
@@ -20955,6 +22328,7 @@ export namespace Prisma {
     google_userid?: SortOrderInput | SortOrder
     supabase_id?: SortOrderInput | SortOrder
     leaguemembers?: leaguemembersOrderByRelationAggregateInput
+    league_renewal_member_roles?: league_renewal_member_rolesOrderByRelationAggregateInput
     leagues?: leaguesOrderByRelationAggregateInput
     picks?: picksOrderByRelationAggregateInput
     pushNotificationTokens?: pushNotificationTokensOrderByRelationAggregateInput
@@ -20976,6 +22350,7 @@ export namespace Prisma {
     google_email?: StringNullableFilter<"people"> | string | null
     google_userid?: StringNullableFilter<"people"> | string | null
     leaguemembers?: LeaguemembersListRelationFilter
+    league_renewal_member_roles?: League_renewal_member_rolesListRelationFilter
     leagues?: LeaguesListRelationFilter
     picks?: PicksListRelationFilter
     pushNotificationTokens?: PushNotificationTokensListRelationFilter
@@ -22059,6 +23434,7 @@ export namespace Prisma {
     WeekWinners?: WeekWinnersCreateNestedManyWithoutLeaguesInput
     leaguemembers?: leaguemembersCreateNestedManyWithoutLeaguesInput
     leaguemessages?: leaguemessagesCreateNestedManyWithoutLeaguesInput
+    league_renewal_member_roles?: league_renewal_member_rolesCreateNestedManyWithoutLeaguesInput
     people: peopleCreateNestedOneWithoutLeaguesInput
     prior_league?: leaguesCreateNestedOneWithoutFuture_leaguesInput
     future_leagues?: leaguesCreateNestedManyWithoutPrior_leagueInput
@@ -22082,6 +23458,7 @@ export namespace Prisma {
     WeekWinners?: WeekWinnersUncheckedCreateNestedManyWithoutLeaguesInput
     leaguemembers?: leaguemembersUncheckedCreateNestedManyWithoutLeaguesInput
     leaguemessages?: leaguemessagesUncheckedCreateNestedManyWithoutLeaguesInput
+    league_renewal_member_roles?: league_renewal_member_rolesUncheckedCreateNestedManyWithoutLeaguesInput
     future_leagues?: leaguesUncheckedCreateNestedManyWithoutPrior_leagueInput
   }
 
@@ -22100,6 +23477,7 @@ export namespace Prisma {
     WeekWinners?: WeekWinnersUpdateManyWithoutLeaguesNestedInput
     leaguemembers?: leaguemembersUpdateManyWithoutLeaguesNestedInput
     leaguemessages?: leaguemessagesUpdateManyWithoutLeaguesNestedInput
+    league_renewal_member_roles?: league_renewal_member_rolesUpdateManyWithoutLeaguesNestedInput
     people?: peopleUpdateOneRequiredWithoutLeaguesNestedInput
     prior_league?: leaguesUpdateOneWithoutFuture_leaguesNestedInput
     future_leagues?: leaguesUpdateManyWithoutPrior_leagueNestedInput
@@ -22123,6 +23501,7 @@ export namespace Prisma {
     WeekWinners?: WeekWinnersUncheckedUpdateManyWithoutLeaguesNestedInput
     leaguemembers?: leaguemembersUncheckedUpdateManyWithoutLeaguesNestedInput
     leaguemessages?: leaguemessagesUncheckedUpdateManyWithoutLeaguesNestedInput
+    league_renewal_member_roles?: league_renewal_member_rolesUncheckedUpdateManyWithoutLeaguesNestedInput
     future_leagues?: leaguesUncheckedUpdateManyWithoutPrior_leagueNestedInput
   }
 
@@ -22171,6 +23550,67 @@ export namespace Prisma {
     status?: EnumLeagueStatusFieldUpdateOperationsInput | $Enums.LeagueStatus
   }
 
+  export type league_renewal_member_rolesCreateInput = {
+    renewal_member_role_id?: string
+    role?: $Enums.MemberRole
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    leagues: leaguesCreateNestedOneWithoutLeague_renewal_member_rolesInput
+    people: peopleCreateNestedOneWithoutLeague_renewal_member_rolesInput
+  }
+
+  export type league_renewal_member_rolesUncheckedCreateInput = {
+    renewal_member_role_id?: string
+    league_id: number
+    user_id: number
+    role?: $Enums.MemberRole
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type league_renewal_member_rolesUpdateInput = {
+    renewal_member_role_id?: StringFieldUpdateOperationsInput | string
+    role?: EnumMemberRoleFieldUpdateOperationsInput | $Enums.MemberRole
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    leagues?: leaguesUpdateOneRequiredWithoutLeague_renewal_member_rolesNestedInput
+    people?: peopleUpdateOneRequiredWithoutLeague_renewal_member_rolesNestedInput
+  }
+
+  export type league_renewal_member_rolesUncheckedUpdateInput = {
+    renewal_member_role_id?: StringFieldUpdateOperationsInput | string
+    league_id?: IntFieldUpdateOperationsInput | number
+    user_id?: IntFieldUpdateOperationsInput | number
+    role?: EnumMemberRoleFieldUpdateOperationsInput | $Enums.MemberRole
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type league_renewal_member_rolesCreateManyInput = {
+    renewal_member_role_id?: string
+    league_id: number
+    user_id: number
+    role?: $Enums.MemberRole
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type league_renewal_member_rolesUpdateManyMutationInput = {
+    renewal_member_role_id?: StringFieldUpdateOperationsInput | string
+    role?: EnumMemberRoleFieldUpdateOperationsInput | $Enums.MemberRole
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type league_renewal_member_rolesUncheckedUpdateManyInput = {
+    renewal_member_role_id?: StringFieldUpdateOperationsInput | string
+    league_id?: IntFieldUpdateOperationsInput | number
+    user_id?: IntFieldUpdateOperationsInput | number
+    role?: EnumMemberRoleFieldUpdateOperationsInput | $Enums.MemberRole
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type peopleCreateInput = {
     username: string
     fname: string
@@ -22183,6 +23623,7 @@ export namespace Prisma {
     google_userid?: string | null
     supabase_id?: string | null
     leaguemembers?: leaguemembersCreateNestedManyWithoutPeopleInput
+    league_renewal_member_roles?: league_renewal_member_rolesCreateNestedManyWithoutPeopleInput
     leagues?: leaguesCreateNestedManyWithoutPeopleInput
     picks?: picksCreateNestedManyWithoutPeopleInput
     pushNotificationTokens?: pushNotificationTokensCreateNestedManyWithoutPeopleInput
@@ -22201,6 +23642,7 @@ export namespace Prisma {
     google_userid?: string | null
     supabase_id?: string | null
     leaguemembers?: leaguemembersUncheckedCreateNestedManyWithoutPeopleInput
+    league_renewal_member_roles?: league_renewal_member_rolesUncheckedCreateNestedManyWithoutPeopleInput
     leagues?: leaguesUncheckedCreateNestedManyWithoutPeopleInput
     picks?: picksUncheckedCreateNestedManyWithoutPeopleInput
     pushNotificationTokens?: pushNotificationTokensUncheckedCreateNestedManyWithoutPeopleInput
@@ -22218,6 +23660,7 @@ export namespace Prisma {
     google_userid?: NullableStringFieldUpdateOperationsInput | string | null
     supabase_id?: NullableStringFieldUpdateOperationsInput | string | null
     leaguemembers?: leaguemembersUpdateManyWithoutPeopleNestedInput
+    league_renewal_member_roles?: league_renewal_member_rolesUpdateManyWithoutPeopleNestedInput
     leagues?: leaguesUpdateManyWithoutPeopleNestedInput
     picks?: picksUpdateManyWithoutPeopleNestedInput
     pushNotificationTokens?: pushNotificationTokensUpdateManyWithoutPeopleNestedInput
@@ -22236,6 +23679,7 @@ export namespace Prisma {
     google_userid?: NullableStringFieldUpdateOperationsInput | string | null
     supabase_id?: NullableStringFieldUpdateOperationsInput | string | null
     leaguemembers?: leaguemembersUncheckedUpdateManyWithoutPeopleNestedInput
+    league_renewal_member_roles?: league_renewal_member_rolesUncheckedUpdateManyWithoutPeopleNestedInput
     leagues?: leaguesUncheckedUpdateManyWithoutPeopleNestedInput
     picks?: picksUncheckedUpdateManyWithoutPeopleNestedInput
     pushNotificationTokens?: pushNotificationTokensUncheckedUpdateManyWithoutPeopleNestedInput
@@ -23499,6 +24943,12 @@ export namespace Prisma {
     none?: leaguemembersWhereInput
   }
 
+  export type League_renewal_member_rolesListRelationFilter = {
+    every?: league_renewal_member_rolesWhereInput
+    some?: league_renewal_member_rolesWhereInput
+    none?: league_renewal_member_rolesWhereInput
+  }
+
   export type LeaguesNullableScalarRelationFilter = {
     is?: leaguesWhereInput | null
     isNot?: leaguesWhereInput | null
@@ -23511,6 +24961,10 @@ export namespace Prisma {
   }
 
   export type leaguemembersOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type league_renewal_member_rolesOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -23628,6 +25082,65 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumLeagueStatusFilter<$PrismaModel>
     _max?: NestedEnumLeagueStatusFilter<$PrismaModel>
+  }
+
+  export type EnumMemberRoleFilter<$PrismaModel = never> = {
+    equals?: $Enums.MemberRole | EnumMemberRoleFieldRefInput<$PrismaModel>
+    in?: $Enums.MemberRole[] | ListEnumMemberRoleFieldRefInput<$PrismaModel>
+    notIn?: $Enums.MemberRole[] | ListEnumMemberRoleFieldRefInput<$PrismaModel>
+    not?: NestedEnumMemberRoleFilter<$PrismaModel> | $Enums.MemberRole
+  }
+
+  export type league_renewal_member_rolesLeague_idUser_idCompoundUniqueInput = {
+    league_id: number
+    user_id: number
+  }
+
+  export type league_renewal_member_rolesCountOrderByAggregateInput = {
+    renewal_member_role_id?: SortOrder
+    league_id?: SortOrder
+    user_id?: SortOrder
+    role?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type league_renewal_member_rolesAvgOrderByAggregateInput = {
+    league_id?: SortOrder
+    user_id?: SortOrder
+  }
+
+  export type league_renewal_member_rolesMaxOrderByAggregateInput = {
+    renewal_member_role_id?: SortOrder
+    league_id?: SortOrder
+    user_id?: SortOrder
+    role?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type league_renewal_member_rolesMinOrderByAggregateInput = {
+    renewal_member_role_id?: SortOrder
+    league_id?: SortOrder
+    user_id?: SortOrder
+    role?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type league_renewal_member_rolesSumOrderByAggregateInput = {
+    league_id?: SortOrder
+    user_id?: SortOrder
+  }
+
+  export type EnumMemberRoleWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.MemberRole | EnumMemberRoleFieldRefInput<$PrismaModel>
+    in?: $Enums.MemberRole[] | ListEnumMemberRoleFieldRefInput<$PrismaModel>
+    notIn?: $Enums.MemberRole[] | ListEnumMemberRoleFieldRefInput<$PrismaModel>
+    not?: NestedEnumMemberRoleWithAggregatesFilter<$PrismaModel> | $Enums.MemberRole
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumMemberRoleFilter<$PrismaModel>
+    _max?: NestedEnumMemberRoleFilter<$PrismaModel>
   }
 
   export type PushNotificationTokensListRelationFilter = {
@@ -24670,6 +26183,13 @@ export namespace Prisma {
     connect?: leaguemessagesWhereUniqueInput | leaguemessagesWhereUniqueInput[]
   }
 
+  export type league_renewal_member_rolesCreateNestedManyWithoutLeaguesInput = {
+    create?: XOR<league_renewal_member_rolesCreateWithoutLeaguesInput, league_renewal_member_rolesUncheckedCreateWithoutLeaguesInput> | league_renewal_member_rolesCreateWithoutLeaguesInput[] | league_renewal_member_rolesUncheckedCreateWithoutLeaguesInput[]
+    connectOrCreate?: league_renewal_member_rolesCreateOrConnectWithoutLeaguesInput | league_renewal_member_rolesCreateOrConnectWithoutLeaguesInput[]
+    createMany?: league_renewal_member_rolesCreateManyLeaguesInputEnvelope
+    connect?: league_renewal_member_rolesWhereUniqueInput | league_renewal_member_rolesWhereUniqueInput[]
+  }
+
   export type peopleCreateNestedOneWithoutLeaguesInput = {
     create?: XOR<peopleCreateWithoutLeaguesInput, peopleUncheckedCreateWithoutLeaguesInput>
     connectOrCreate?: peopleCreateOrConnectWithoutLeaguesInput
@@ -24715,6 +26235,13 @@ export namespace Prisma {
     connectOrCreate?: leaguemessagesCreateOrConnectWithoutLeaguesInput | leaguemessagesCreateOrConnectWithoutLeaguesInput[]
     createMany?: leaguemessagesCreateManyLeaguesInputEnvelope
     connect?: leaguemessagesWhereUniqueInput | leaguemessagesWhereUniqueInput[]
+  }
+
+  export type league_renewal_member_rolesUncheckedCreateNestedManyWithoutLeaguesInput = {
+    create?: XOR<league_renewal_member_rolesCreateWithoutLeaguesInput, league_renewal_member_rolesUncheckedCreateWithoutLeaguesInput> | league_renewal_member_rolesCreateWithoutLeaguesInput[] | league_renewal_member_rolesUncheckedCreateWithoutLeaguesInput[]
+    connectOrCreate?: league_renewal_member_rolesCreateOrConnectWithoutLeaguesInput | league_renewal_member_rolesCreateOrConnectWithoutLeaguesInput[]
+    createMany?: league_renewal_member_rolesCreateManyLeaguesInputEnvelope
+    connect?: league_renewal_member_rolesWhereUniqueInput | league_renewal_member_rolesWhereUniqueInput[]
   }
 
   export type leaguesUncheckedCreateNestedManyWithoutPrior_leagueInput = {
@@ -24798,6 +26325,20 @@ export namespace Prisma {
     update?: leaguemessagesUpdateWithWhereUniqueWithoutLeaguesInput | leaguemessagesUpdateWithWhereUniqueWithoutLeaguesInput[]
     updateMany?: leaguemessagesUpdateManyWithWhereWithoutLeaguesInput | leaguemessagesUpdateManyWithWhereWithoutLeaguesInput[]
     deleteMany?: leaguemessagesScalarWhereInput | leaguemessagesScalarWhereInput[]
+  }
+
+  export type league_renewal_member_rolesUpdateManyWithoutLeaguesNestedInput = {
+    create?: XOR<league_renewal_member_rolesCreateWithoutLeaguesInput, league_renewal_member_rolesUncheckedCreateWithoutLeaguesInput> | league_renewal_member_rolesCreateWithoutLeaguesInput[] | league_renewal_member_rolesUncheckedCreateWithoutLeaguesInput[]
+    connectOrCreate?: league_renewal_member_rolesCreateOrConnectWithoutLeaguesInput | league_renewal_member_rolesCreateOrConnectWithoutLeaguesInput[]
+    upsert?: league_renewal_member_rolesUpsertWithWhereUniqueWithoutLeaguesInput | league_renewal_member_rolesUpsertWithWhereUniqueWithoutLeaguesInput[]
+    createMany?: league_renewal_member_rolesCreateManyLeaguesInputEnvelope
+    set?: league_renewal_member_rolesWhereUniqueInput | league_renewal_member_rolesWhereUniqueInput[]
+    disconnect?: league_renewal_member_rolesWhereUniqueInput | league_renewal_member_rolesWhereUniqueInput[]
+    delete?: league_renewal_member_rolesWhereUniqueInput | league_renewal_member_rolesWhereUniqueInput[]
+    connect?: league_renewal_member_rolesWhereUniqueInput | league_renewal_member_rolesWhereUniqueInput[]
+    update?: league_renewal_member_rolesUpdateWithWhereUniqueWithoutLeaguesInput | league_renewal_member_rolesUpdateWithWhereUniqueWithoutLeaguesInput[]
+    updateMany?: league_renewal_member_rolesUpdateManyWithWhereWithoutLeaguesInput | league_renewal_member_rolesUpdateManyWithWhereWithoutLeaguesInput[]
+    deleteMany?: league_renewal_member_rolesScalarWhereInput | league_renewal_member_rolesScalarWhereInput[]
   }
 
   export type peopleUpdateOneRequiredWithoutLeaguesNestedInput = {
@@ -24888,6 +26429,20 @@ export namespace Prisma {
     deleteMany?: leaguemessagesScalarWhereInput | leaguemessagesScalarWhereInput[]
   }
 
+  export type league_renewal_member_rolesUncheckedUpdateManyWithoutLeaguesNestedInput = {
+    create?: XOR<league_renewal_member_rolesCreateWithoutLeaguesInput, league_renewal_member_rolesUncheckedCreateWithoutLeaguesInput> | league_renewal_member_rolesCreateWithoutLeaguesInput[] | league_renewal_member_rolesUncheckedCreateWithoutLeaguesInput[]
+    connectOrCreate?: league_renewal_member_rolesCreateOrConnectWithoutLeaguesInput | league_renewal_member_rolesCreateOrConnectWithoutLeaguesInput[]
+    upsert?: league_renewal_member_rolesUpsertWithWhereUniqueWithoutLeaguesInput | league_renewal_member_rolesUpsertWithWhereUniqueWithoutLeaguesInput[]
+    createMany?: league_renewal_member_rolesCreateManyLeaguesInputEnvelope
+    set?: league_renewal_member_rolesWhereUniqueInput | league_renewal_member_rolesWhereUniqueInput[]
+    disconnect?: league_renewal_member_rolesWhereUniqueInput | league_renewal_member_rolesWhereUniqueInput[]
+    delete?: league_renewal_member_rolesWhereUniqueInput | league_renewal_member_rolesWhereUniqueInput[]
+    connect?: league_renewal_member_rolesWhereUniqueInput | league_renewal_member_rolesWhereUniqueInput[]
+    update?: league_renewal_member_rolesUpdateWithWhereUniqueWithoutLeaguesInput | league_renewal_member_rolesUpdateWithWhereUniqueWithoutLeaguesInput[]
+    updateMany?: league_renewal_member_rolesUpdateManyWithWhereWithoutLeaguesInput | league_renewal_member_rolesUpdateManyWithWhereWithoutLeaguesInput[]
+    deleteMany?: league_renewal_member_rolesScalarWhereInput | league_renewal_member_rolesScalarWhereInput[]
+  }
+
   export type leaguesUncheckedUpdateManyWithoutPrior_leagueNestedInput = {
     create?: XOR<leaguesCreateWithoutPrior_leagueInput, leaguesUncheckedCreateWithoutPrior_leagueInput> | leaguesCreateWithoutPrior_leagueInput[] | leaguesUncheckedCreateWithoutPrior_leagueInput[]
     connectOrCreate?: leaguesCreateOrConnectWithoutPrior_leagueInput | leaguesCreateOrConnectWithoutPrior_leagueInput[]
@@ -24902,11 +26457,50 @@ export namespace Prisma {
     deleteMany?: leaguesScalarWhereInput | leaguesScalarWhereInput[]
   }
 
+  export type leaguesCreateNestedOneWithoutLeague_renewal_member_rolesInput = {
+    create?: XOR<leaguesCreateWithoutLeague_renewal_member_rolesInput, leaguesUncheckedCreateWithoutLeague_renewal_member_rolesInput>
+    connectOrCreate?: leaguesCreateOrConnectWithoutLeague_renewal_member_rolesInput
+    connect?: leaguesWhereUniqueInput
+  }
+
+  export type peopleCreateNestedOneWithoutLeague_renewal_member_rolesInput = {
+    create?: XOR<peopleCreateWithoutLeague_renewal_member_rolesInput, peopleUncheckedCreateWithoutLeague_renewal_member_rolesInput>
+    connectOrCreate?: peopleCreateOrConnectWithoutLeague_renewal_member_rolesInput
+    connect?: peopleWhereUniqueInput
+  }
+
+  export type EnumMemberRoleFieldUpdateOperationsInput = {
+    set?: $Enums.MemberRole
+  }
+
+  export type leaguesUpdateOneRequiredWithoutLeague_renewal_member_rolesNestedInput = {
+    create?: XOR<leaguesCreateWithoutLeague_renewal_member_rolesInput, leaguesUncheckedCreateWithoutLeague_renewal_member_rolesInput>
+    connectOrCreate?: leaguesCreateOrConnectWithoutLeague_renewal_member_rolesInput
+    upsert?: leaguesUpsertWithoutLeague_renewal_member_rolesInput
+    connect?: leaguesWhereUniqueInput
+    update?: XOR<XOR<leaguesUpdateToOneWithWhereWithoutLeague_renewal_member_rolesInput, leaguesUpdateWithoutLeague_renewal_member_rolesInput>, leaguesUncheckedUpdateWithoutLeague_renewal_member_rolesInput>
+  }
+
+  export type peopleUpdateOneRequiredWithoutLeague_renewal_member_rolesNestedInput = {
+    create?: XOR<peopleCreateWithoutLeague_renewal_member_rolesInput, peopleUncheckedCreateWithoutLeague_renewal_member_rolesInput>
+    connectOrCreate?: peopleCreateOrConnectWithoutLeague_renewal_member_rolesInput
+    upsert?: peopleUpsertWithoutLeague_renewal_member_rolesInput
+    connect?: peopleWhereUniqueInput
+    update?: XOR<XOR<peopleUpdateToOneWithWhereWithoutLeague_renewal_member_rolesInput, peopleUpdateWithoutLeague_renewal_member_rolesInput>, peopleUncheckedUpdateWithoutLeague_renewal_member_rolesInput>
+  }
+
   export type leaguemembersCreateNestedManyWithoutPeopleInput = {
     create?: XOR<leaguemembersCreateWithoutPeopleInput, leaguemembersUncheckedCreateWithoutPeopleInput> | leaguemembersCreateWithoutPeopleInput[] | leaguemembersUncheckedCreateWithoutPeopleInput[]
     connectOrCreate?: leaguemembersCreateOrConnectWithoutPeopleInput | leaguemembersCreateOrConnectWithoutPeopleInput[]
     createMany?: leaguemembersCreateManyPeopleInputEnvelope
     connect?: leaguemembersWhereUniqueInput | leaguemembersWhereUniqueInput[]
+  }
+
+  export type league_renewal_member_rolesCreateNestedManyWithoutPeopleInput = {
+    create?: XOR<league_renewal_member_rolesCreateWithoutPeopleInput, league_renewal_member_rolesUncheckedCreateWithoutPeopleInput> | league_renewal_member_rolesCreateWithoutPeopleInput[] | league_renewal_member_rolesUncheckedCreateWithoutPeopleInput[]
+    connectOrCreate?: league_renewal_member_rolesCreateOrConnectWithoutPeopleInput | league_renewal_member_rolesCreateOrConnectWithoutPeopleInput[]
+    createMany?: league_renewal_member_rolesCreateManyPeopleInputEnvelope
+    connect?: league_renewal_member_rolesWhereUniqueInput | league_renewal_member_rolesWhereUniqueInput[]
   }
 
   export type leaguesCreateNestedManyWithoutPeopleInput = {
@@ -24935,6 +26529,13 @@ export namespace Prisma {
     connectOrCreate?: leaguemembersCreateOrConnectWithoutPeopleInput | leaguemembersCreateOrConnectWithoutPeopleInput[]
     createMany?: leaguemembersCreateManyPeopleInputEnvelope
     connect?: leaguemembersWhereUniqueInput | leaguemembersWhereUniqueInput[]
+  }
+
+  export type league_renewal_member_rolesUncheckedCreateNestedManyWithoutPeopleInput = {
+    create?: XOR<league_renewal_member_rolesCreateWithoutPeopleInput, league_renewal_member_rolesUncheckedCreateWithoutPeopleInput> | league_renewal_member_rolesCreateWithoutPeopleInput[] | league_renewal_member_rolesUncheckedCreateWithoutPeopleInput[]
+    connectOrCreate?: league_renewal_member_rolesCreateOrConnectWithoutPeopleInput | league_renewal_member_rolesCreateOrConnectWithoutPeopleInput[]
+    createMany?: league_renewal_member_rolesCreateManyPeopleInputEnvelope
+    connect?: league_renewal_member_rolesWhereUniqueInput | league_renewal_member_rolesWhereUniqueInput[]
   }
 
   export type leaguesUncheckedCreateNestedManyWithoutPeopleInput = {
@@ -24970,6 +26571,20 @@ export namespace Prisma {
     update?: leaguemembersUpdateWithWhereUniqueWithoutPeopleInput | leaguemembersUpdateWithWhereUniqueWithoutPeopleInput[]
     updateMany?: leaguemembersUpdateManyWithWhereWithoutPeopleInput | leaguemembersUpdateManyWithWhereWithoutPeopleInput[]
     deleteMany?: leaguemembersScalarWhereInput | leaguemembersScalarWhereInput[]
+  }
+
+  export type league_renewal_member_rolesUpdateManyWithoutPeopleNestedInput = {
+    create?: XOR<league_renewal_member_rolesCreateWithoutPeopleInput, league_renewal_member_rolesUncheckedCreateWithoutPeopleInput> | league_renewal_member_rolesCreateWithoutPeopleInput[] | league_renewal_member_rolesUncheckedCreateWithoutPeopleInput[]
+    connectOrCreate?: league_renewal_member_rolesCreateOrConnectWithoutPeopleInput | league_renewal_member_rolesCreateOrConnectWithoutPeopleInput[]
+    upsert?: league_renewal_member_rolesUpsertWithWhereUniqueWithoutPeopleInput | league_renewal_member_rolesUpsertWithWhereUniqueWithoutPeopleInput[]
+    createMany?: league_renewal_member_rolesCreateManyPeopleInputEnvelope
+    set?: league_renewal_member_rolesWhereUniqueInput | league_renewal_member_rolesWhereUniqueInput[]
+    disconnect?: league_renewal_member_rolesWhereUniqueInput | league_renewal_member_rolesWhereUniqueInput[]
+    delete?: league_renewal_member_rolesWhereUniqueInput | league_renewal_member_rolesWhereUniqueInput[]
+    connect?: league_renewal_member_rolesWhereUniqueInput | league_renewal_member_rolesWhereUniqueInput[]
+    update?: league_renewal_member_rolesUpdateWithWhereUniqueWithoutPeopleInput | league_renewal_member_rolesUpdateWithWhereUniqueWithoutPeopleInput[]
+    updateMany?: league_renewal_member_rolesUpdateManyWithWhereWithoutPeopleInput | league_renewal_member_rolesUpdateManyWithWhereWithoutPeopleInput[]
+    deleteMany?: league_renewal_member_rolesScalarWhereInput | league_renewal_member_rolesScalarWhereInput[]
   }
 
   export type leaguesUpdateManyWithoutPeopleNestedInput = {
@@ -25026,6 +26641,20 @@ export namespace Prisma {
     update?: leaguemembersUpdateWithWhereUniqueWithoutPeopleInput | leaguemembersUpdateWithWhereUniqueWithoutPeopleInput[]
     updateMany?: leaguemembersUpdateManyWithWhereWithoutPeopleInput | leaguemembersUpdateManyWithWhereWithoutPeopleInput[]
     deleteMany?: leaguemembersScalarWhereInput | leaguemembersScalarWhereInput[]
+  }
+
+  export type league_renewal_member_rolesUncheckedUpdateManyWithoutPeopleNestedInput = {
+    create?: XOR<league_renewal_member_rolesCreateWithoutPeopleInput, league_renewal_member_rolesUncheckedCreateWithoutPeopleInput> | league_renewal_member_rolesCreateWithoutPeopleInput[] | league_renewal_member_rolesUncheckedCreateWithoutPeopleInput[]
+    connectOrCreate?: league_renewal_member_rolesCreateOrConnectWithoutPeopleInput | league_renewal_member_rolesCreateOrConnectWithoutPeopleInput[]
+    upsert?: league_renewal_member_rolesUpsertWithWhereUniqueWithoutPeopleInput | league_renewal_member_rolesUpsertWithWhereUniqueWithoutPeopleInput[]
+    createMany?: league_renewal_member_rolesCreateManyPeopleInputEnvelope
+    set?: league_renewal_member_rolesWhereUniqueInput | league_renewal_member_rolesWhereUniqueInput[]
+    disconnect?: league_renewal_member_rolesWhereUniqueInput | league_renewal_member_rolesWhereUniqueInput[]
+    delete?: league_renewal_member_rolesWhereUniqueInput | league_renewal_member_rolesWhereUniqueInput[]
+    connect?: league_renewal_member_rolesWhereUniqueInput | league_renewal_member_rolesWhereUniqueInput[]
+    update?: league_renewal_member_rolesUpdateWithWhereUniqueWithoutPeopleInput | league_renewal_member_rolesUpdateWithWhereUniqueWithoutPeopleInput[]
+    updateMany?: league_renewal_member_rolesUpdateManyWithWhereWithoutPeopleInput | league_renewal_member_rolesUpdateManyWithWhereWithoutPeopleInput[]
+    deleteMany?: league_renewal_member_rolesScalarWhereInput | league_renewal_member_rolesScalarWhereInput[]
   }
 
   export type leaguesUncheckedUpdateManyWithoutPeopleNestedInput = {
@@ -26035,6 +27664,23 @@ export namespace Prisma {
     _max?: NestedEnumLeagueStatusFilter<$PrismaModel>
   }
 
+  export type NestedEnumMemberRoleFilter<$PrismaModel = never> = {
+    equals?: $Enums.MemberRole | EnumMemberRoleFieldRefInput<$PrismaModel>
+    in?: $Enums.MemberRole[] | ListEnumMemberRoleFieldRefInput<$PrismaModel>
+    notIn?: $Enums.MemberRole[] | ListEnumMemberRoleFieldRefInput<$PrismaModel>
+    not?: NestedEnumMemberRoleFilter<$PrismaModel> | $Enums.MemberRole
+  }
+
+  export type NestedEnumMemberRoleWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.MemberRole | EnumMemberRoleFieldRefInput<$PrismaModel>
+    in?: $Enums.MemberRole[] | ListEnumMemberRoleFieldRefInput<$PrismaModel>
+    notIn?: $Enums.MemberRole[] | ListEnumMemberRoleFieldRefInput<$PrismaModel>
+    not?: NestedEnumMemberRoleWithAggregatesFilter<$PrismaModel> | $Enums.MemberRole
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumMemberRoleFilter<$PrismaModel>
+    _max?: NestedEnumMemberRoleFilter<$PrismaModel>
+  }
+
   export type NestedBoolFilter<$PrismaModel = never> = {
     equals?: boolean | BooleanFieldRefInput<$PrismaModel>
     not?: NestedBoolFilter<$PrismaModel> | boolean
@@ -26138,6 +27784,7 @@ export namespace Prisma {
     WeekWinners?: WeekWinnersCreateNestedManyWithoutLeaguesInput
     leaguemembers?: leaguemembersCreateNestedManyWithoutLeaguesInput
     leaguemessages?: leaguemessagesCreateNestedManyWithoutLeaguesInput
+    league_renewal_member_roles?: league_renewal_member_rolesCreateNestedManyWithoutLeaguesInput
     people: peopleCreateNestedOneWithoutLeaguesInput
     prior_league?: leaguesCreateNestedOneWithoutFuture_leaguesInput
     future_leagues?: leaguesCreateNestedManyWithoutPrior_leagueInput
@@ -26160,6 +27807,7 @@ export namespace Prisma {
     WeekWinners?: WeekWinnersUncheckedCreateNestedManyWithoutLeaguesInput
     leaguemembers?: leaguemembersUncheckedCreateNestedManyWithoutLeaguesInput
     leaguemessages?: leaguemessagesUncheckedCreateNestedManyWithoutLeaguesInput
+    league_renewal_member_roles?: league_renewal_member_rolesUncheckedCreateNestedManyWithoutLeaguesInput
     future_leagues?: leaguesUncheckedCreateNestedManyWithoutPrior_leagueInput
   }
 
@@ -26223,6 +27871,7 @@ export namespace Prisma {
     WeekWinners?: WeekWinnersUpdateManyWithoutLeaguesNestedInput
     leaguemembers?: leaguemembersUpdateManyWithoutLeaguesNestedInput
     leaguemessages?: leaguemessagesUpdateManyWithoutLeaguesNestedInput
+    league_renewal_member_roles?: league_renewal_member_rolesUpdateManyWithoutLeaguesNestedInput
     people?: peopleUpdateOneRequiredWithoutLeaguesNestedInput
     prior_league?: leaguesUpdateOneWithoutFuture_leaguesNestedInput
     future_leagues?: leaguesUpdateManyWithoutPrior_leagueNestedInput
@@ -26245,6 +27894,7 @@ export namespace Prisma {
     WeekWinners?: WeekWinnersUncheckedUpdateManyWithoutLeaguesNestedInput
     leaguemembers?: leaguemembersUncheckedUpdateManyWithoutLeaguesNestedInput
     leaguemessages?: leaguemessagesUncheckedUpdateManyWithoutLeaguesNestedInput
+    league_renewal_member_roles?: league_renewal_member_rolesUncheckedUpdateManyWithoutLeaguesNestedInput
     future_leagues?: leaguesUncheckedUpdateManyWithoutPrior_leagueNestedInput
   }
 
@@ -26298,6 +27948,7 @@ export namespace Prisma {
     EmailLogs?: EmailLogsCreateNestedManyWithoutLeaguesInput
     leaguemembers?: leaguemembersCreateNestedManyWithoutLeaguesInput
     leaguemessages?: leaguemessagesCreateNestedManyWithoutLeaguesInput
+    league_renewal_member_roles?: league_renewal_member_rolesCreateNestedManyWithoutLeaguesInput
     people: peopleCreateNestedOneWithoutLeaguesInput
     prior_league?: leaguesCreateNestedOneWithoutFuture_leaguesInput
     future_leagues?: leaguesCreateNestedManyWithoutPrior_leagueInput
@@ -26320,6 +27971,7 @@ export namespace Prisma {
     EmailLogs?: EmailLogsUncheckedCreateNestedManyWithoutLeaguesInput
     leaguemembers?: leaguemembersUncheckedCreateNestedManyWithoutLeaguesInput
     leaguemessages?: leaguemessagesUncheckedCreateNestedManyWithoutLeaguesInput
+    league_renewal_member_roles?: league_renewal_member_rolesUncheckedCreateNestedManyWithoutLeaguesInput
     future_leagues?: leaguesUncheckedCreateNestedManyWithoutPrior_leagueInput
   }
 
@@ -26383,6 +28035,7 @@ export namespace Prisma {
     EmailLogs?: EmailLogsUpdateManyWithoutLeaguesNestedInput
     leaguemembers?: leaguemembersUpdateManyWithoutLeaguesNestedInput
     leaguemessages?: leaguemessagesUpdateManyWithoutLeaguesNestedInput
+    league_renewal_member_roles?: league_renewal_member_rolesUpdateManyWithoutLeaguesNestedInput
     people?: peopleUpdateOneRequiredWithoutLeaguesNestedInput
     prior_league?: leaguesUpdateOneWithoutFuture_leaguesNestedInput
     future_leagues?: leaguesUpdateManyWithoutPrior_leagueNestedInput
@@ -26405,6 +28058,7 @@ export namespace Prisma {
     EmailLogs?: EmailLogsUncheckedUpdateManyWithoutLeaguesNestedInput
     leaguemembers?: leaguemembersUncheckedUpdateManyWithoutLeaguesNestedInput
     leaguemessages?: leaguemessagesUncheckedUpdateManyWithoutLeaguesNestedInput
+    league_renewal_member_roles?: league_renewal_member_rolesUncheckedUpdateManyWithoutLeaguesNestedInput
     future_leagues?: leaguesUncheckedUpdateManyWithoutPrior_leagueNestedInput
   }
 
@@ -26762,6 +28416,7 @@ export namespace Prisma {
     google_email?: string | null
     google_userid?: string | null
     supabase_id?: string | null
+    league_renewal_member_roles?: league_renewal_member_rolesCreateNestedManyWithoutPeopleInput
     leagues?: leaguesCreateNestedManyWithoutPeopleInput
     picks?: picksCreateNestedManyWithoutPeopleInput
     pushNotificationTokens?: pushNotificationTokensCreateNestedManyWithoutPeopleInput
@@ -26779,6 +28434,7 @@ export namespace Prisma {
     google_email?: string | null
     google_userid?: string | null
     supabase_id?: string | null
+    league_renewal_member_roles?: league_renewal_member_rolesUncheckedCreateNestedManyWithoutPeopleInput
     leagues?: leaguesUncheckedCreateNestedManyWithoutPeopleInput
     picks?: picksUncheckedCreateNestedManyWithoutPeopleInput
     pushNotificationTokens?: pushNotificationTokensUncheckedCreateNestedManyWithoutPeopleInput
@@ -26803,6 +28459,7 @@ export namespace Prisma {
     EmailLogs?: EmailLogsCreateNestedManyWithoutLeaguesInput
     WeekWinners?: WeekWinnersCreateNestedManyWithoutLeaguesInput
     leaguemessages?: leaguemessagesCreateNestedManyWithoutLeaguesInput
+    league_renewal_member_roles?: league_renewal_member_rolesCreateNestedManyWithoutLeaguesInput
     people: peopleCreateNestedOneWithoutLeaguesInput
     prior_league?: leaguesCreateNestedOneWithoutFuture_leaguesInput
     future_leagues?: leaguesCreateNestedManyWithoutPrior_leagueInput
@@ -26825,6 +28482,7 @@ export namespace Prisma {
     EmailLogs?: EmailLogsUncheckedCreateNestedManyWithoutLeaguesInput
     WeekWinners?: WeekWinnersUncheckedCreateNestedManyWithoutLeaguesInput
     leaguemessages?: leaguemessagesUncheckedCreateNestedManyWithoutLeaguesInput
+    league_renewal_member_roles?: league_renewal_member_rolesUncheckedCreateNestedManyWithoutLeaguesInput
     future_leagues?: leaguesUncheckedCreateNestedManyWithoutPrior_leagueInput
   }
 
@@ -27010,6 +28668,7 @@ export namespace Prisma {
     google_email?: NullableStringFieldUpdateOperationsInput | string | null
     google_userid?: NullableStringFieldUpdateOperationsInput | string | null
     supabase_id?: NullableStringFieldUpdateOperationsInput | string | null
+    league_renewal_member_roles?: league_renewal_member_rolesUpdateManyWithoutPeopleNestedInput
     leagues?: leaguesUpdateManyWithoutPeopleNestedInput
     picks?: picksUpdateManyWithoutPeopleNestedInput
     pushNotificationTokens?: pushNotificationTokensUpdateManyWithoutPeopleNestedInput
@@ -27027,6 +28686,7 @@ export namespace Prisma {
     google_email?: NullableStringFieldUpdateOperationsInput | string | null
     google_userid?: NullableStringFieldUpdateOperationsInput | string | null
     supabase_id?: NullableStringFieldUpdateOperationsInput | string | null
+    league_renewal_member_roles?: league_renewal_member_rolesUncheckedUpdateManyWithoutPeopleNestedInput
     leagues?: leaguesUncheckedUpdateManyWithoutPeopleNestedInput
     picks?: picksUncheckedUpdateManyWithoutPeopleNestedInput
     pushNotificationTokens?: pushNotificationTokensUncheckedUpdateManyWithoutPeopleNestedInput
@@ -27057,6 +28717,7 @@ export namespace Prisma {
     EmailLogs?: EmailLogsUpdateManyWithoutLeaguesNestedInput
     WeekWinners?: WeekWinnersUpdateManyWithoutLeaguesNestedInput
     leaguemessages?: leaguemessagesUpdateManyWithoutLeaguesNestedInput
+    league_renewal_member_roles?: league_renewal_member_rolesUpdateManyWithoutLeaguesNestedInput
     people?: peopleUpdateOneRequiredWithoutLeaguesNestedInput
     prior_league?: leaguesUpdateOneWithoutFuture_leaguesNestedInput
     future_leagues?: leaguesUpdateManyWithoutPrior_leagueNestedInput
@@ -27079,6 +28740,7 @@ export namespace Prisma {
     EmailLogs?: EmailLogsUncheckedUpdateManyWithoutLeaguesNestedInput
     WeekWinners?: WeekWinnersUncheckedUpdateManyWithoutLeaguesNestedInput
     leaguemessages?: leaguemessagesUncheckedUpdateManyWithoutLeaguesNestedInput
+    league_renewal_member_roles?: league_renewal_member_rolesUncheckedUpdateManyWithoutLeaguesNestedInput
     future_leagues?: leaguesUncheckedUpdateManyWithoutPrior_leagueNestedInput
   }
 
@@ -27172,6 +28834,7 @@ export namespace Prisma {
     EmailLogs?: EmailLogsCreateNestedManyWithoutLeaguesInput
     WeekWinners?: WeekWinnersCreateNestedManyWithoutLeaguesInput
     leaguemembers?: leaguemembersCreateNestedManyWithoutLeaguesInput
+    league_renewal_member_roles?: league_renewal_member_rolesCreateNestedManyWithoutLeaguesInput
     people: peopleCreateNestedOneWithoutLeaguesInput
     prior_league?: leaguesCreateNestedOneWithoutFuture_leaguesInput
     future_leagues?: leaguesCreateNestedManyWithoutPrior_leagueInput
@@ -27194,6 +28857,7 @@ export namespace Prisma {
     EmailLogs?: EmailLogsUncheckedCreateNestedManyWithoutLeaguesInput
     WeekWinners?: WeekWinnersUncheckedCreateNestedManyWithoutLeaguesInput
     leaguemembers?: leaguemembersUncheckedCreateNestedManyWithoutLeaguesInput
+    league_renewal_member_roles?: league_renewal_member_rolesUncheckedCreateNestedManyWithoutLeaguesInput
     future_leagues?: leaguesUncheckedCreateNestedManyWithoutPrior_leagueInput
   }
 
@@ -27257,6 +28921,7 @@ export namespace Prisma {
     EmailLogs?: EmailLogsUpdateManyWithoutLeaguesNestedInput
     WeekWinners?: WeekWinnersUpdateManyWithoutLeaguesNestedInput
     leaguemembers?: leaguemembersUpdateManyWithoutLeaguesNestedInput
+    league_renewal_member_roles?: league_renewal_member_rolesUpdateManyWithoutLeaguesNestedInput
     people?: peopleUpdateOneRequiredWithoutLeaguesNestedInput
     prior_league?: leaguesUpdateOneWithoutFuture_leaguesNestedInput
     future_leagues?: leaguesUpdateManyWithoutPrior_leagueNestedInput
@@ -27279,6 +28944,7 @@ export namespace Prisma {
     EmailLogs?: EmailLogsUncheckedUpdateManyWithoutLeaguesNestedInput
     WeekWinners?: WeekWinnersUncheckedUpdateManyWithoutLeaguesNestedInput
     leaguemembers?: leaguemembersUncheckedUpdateManyWithoutLeaguesNestedInput
+    league_renewal_member_roles?: league_renewal_member_rolesUncheckedUpdateManyWithoutLeaguesNestedInput
     future_leagues?: leaguesUncheckedUpdateManyWithoutPrior_leagueNestedInput
   }
 
@@ -27436,6 +29102,32 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type league_renewal_member_rolesCreateWithoutLeaguesInput = {
+    renewal_member_role_id?: string
+    role?: $Enums.MemberRole
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    people: peopleCreateNestedOneWithoutLeague_renewal_member_rolesInput
+  }
+
+  export type league_renewal_member_rolesUncheckedCreateWithoutLeaguesInput = {
+    renewal_member_role_id?: string
+    user_id: number
+    role?: $Enums.MemberRole
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type league_renewal_member_rolesCreateOrConnectWithoutLeaguesInput = {
+    where: league_renewal_member_rolesWhereUniqueInput
+    create: XOR<league_renewal_member_rolesCreateWithoutLeaguesInput, league_renewal_member_rolesUncheckedCreateWithoutLeaguesInput>
+  }
+
+  export type league_renewal_member_rolesCreateManyLeaguesInputEnvelope = {
+    data: league_renewal_member_rolesCreateManyLeaguesInput | league_renewal_member_rolesCreateManyLeaguesInput[]
+    skipDuplicates?: boolean
+  }
+
   export type peopleCreateWithoutLeaguesInput = {
     username: string
     fname: string
@@ -27448,6 +29140,7 @@ export namespace Prisma {
     google_userid?: string | null
     supabase_id?: string | null
     leaguemembers?: leaguemembersCreateNestedManyWithoutPeopleInput
+    league_renewal_member_roles?: league_renewal_member_rolesCreateNestedManyWithoutPeopleInput
     picks?: picksCreateNestedManyWithoutPeopleInput
     pushNotificationTokens?: pushNotificationTokensCreateNestedManyWithoutPeopleInput
   }
@@ -27465,6 +29158,7 @@ export namespace Prisma {
     google_userid?: string | null
     supabase_id?: string | null
     leaguemembers?: leaguemembersUncheckedCreateNestedManyWithoutPeopleInput
+    league_renewal_member_roles?: league_renewal_member_rolesUncheckedCreateNestedManyWithoutPeopleInput
     picks?: picksUncheckedCreateNestedManyWithoutPeopleInput
     pushNotificationTokens?: pushNotificationTokensUncheckedCreateNestedManyWithoutPeopleInput
   }
@@ -27489,6 +29183,7 @@ export namespace Prisma {
     WeekWinners?: WeekWinnersCreateNestedManyWithoutLeaguesInput
     leaguemembers?: leaguemembersCreateNestedManyWithoutLeaguesInput
     leaguemessages?: leaguemessagesCreateNestedManyWithoutLeaguesInput
+    league_renewal_member_roles?: league_renewal_member_rolesCreateNestedManyWithoutLeaguesInput
     people: peopleCreateNestedOneWithoutLeaguesInput
     prior_league?: leaguesCreateNestedOneWithoutFuture_leaguesInput
   }
@@ -27511,6 +29206,7 @@ export namespace Prisma {
     WeekWinners?: WeekWinnersUncheckedCreateNestedManyWithoutLeaguesInput
     leaguemembers?: leaguemembersUncheckedCreateNestedManyWithoutLeaguesInput
     leaguemessages?: leaguemessagesUncheckedCreateNestedManyWithoutLeaguesInput
+    league_renewal_member_roles?: league_renewal_member_rolesUncheckedCreateNestedManyWithoutLeaguesInput
   }
 
   export type leaguesCreateOrConnectWithoutFuture_leaguesInput = {
@@ -27533,6 +29229,7 @@ export namespace Prisma {
     WeekWinners?: WeekWinnersCreateNestedManyWithoutLeaguesInput
     leaguemembers?: leaguemembersCreateNestedManyWithoutLeaguesInput
     leaguemessages?: leaguemessagesCreateNestedManyWithoutLeaguesInput
+    league_renewal_member_roles?: league_renewal_member_rolesCreateNestedManyWithoutLeaguesInput
     people: peopleCreateNestedOneWithoutLeaguesInput
     future_leagues?: leaguesCreateNestedManyWithoutPrior_leagueInput
   }
@@ -27554,6 +29251,7 @@ export namespace Prisma {
     WeekWinners?: WeekWinnersUncheckedCreateNestedManyWithoutLeaguesInput
     leaguemembers?: leaguemembersUncheckedCreateNestedManyWithoutLeaguesInput
     leaguemessages?: leaguemessagesUncheckedCreateNestedManyWithoutLeaguesInput
+    league_renewal_member_roles?: league_renewal_member_rolesUncheckedCreateNestedManyWithoutLeaguesInput
     future_leagues?: leaguesUncheckedCreateNestedManyWithoutPrior_leagueInput
   }
 
@@ -27643,6 +29341,34 @@ export namespace Prisma {
     data: XOR<leaguemessagesUpdateManyMutationInput, leaguemessagesUncheckedUpdateManyWithoutLeaguesInput>
   }
 
+  export type league_renewal_member_rolesUpsertWithWhereUniqueWithoutLeaguesInput = {
+    where: league_renewal_member_rolesWhereUniqueInput
+    update: XOR<league_renewal_member_rolesUpdateWithoutLeaguesInput, league_renewal_member_rolesUncheckedUpdateWithoutLeaguesInput>
+    create: XOR<league_renewal_member_rolesCreateWithoutLeaguesInput, league_renewal_member_rolesUncheckedCreateWithoutLeaguesInput>
+  }
+
+  export type league_renewal_member_rolesUpdateWithWhereUniqueWithoutLeaguesInput = {
+    where: league_renewal_member_rolesWhereUniqueInput
+    data: XOR<league_renewal_member_rolesUpdateWithoutLeaguesInput, league_renewal_member_rolesUncheckedUpdateWithoutLeaguesInput>
+  }
+
+  export type league_renewal_member_rolesUpdateManyWithWhereWithoutLeaguesInput = {
+    where: league_renewal_member_rolesScalarWhereInput
+    data: XOR<league_renewal_member_rolesUpdateManyMutationInput, league_renewal_member_rolesUncheckedUpdateManyWithoutLeaguesInput>
+  }
+
+  export type league_renewal_member_rolesScalarWhereInput = {
+    AND?: league_renewal_member_rolesScalarWhereInput | league_renewal_member_rolesScalarWhereInput[]
+    OR?: league_renewal_member_rolesScalarWhereInput[]
+    NOT?: league_renewal_member_rolesScalarWhereInput | league_renewal_member_rolesScalarWhereInput[]
+    renewal_member_role_id?: StringFilter<"league_renewal_member_roles"> | string
+    league_id?: IntFilter<"league_renewal_member_roles"> | number
+    user_id?: IntFilter<"league_renewal_member_roles"> | number
+    role?: EnumMemberRoleFilter<"league_renewal_member_roles"> | $Enums.MemberRole
+    createdAt?: DateTimeFilter<"league_renewal_member_roles"> | Date | string
+    updatedAt?: DateTimeFilter<"league_renewal_member_roles"> | Date | string
+  }
+
   export type peopleUpsertWithoutLeaguesInput = {
     update: XOR<peopleUpdateWithoutLeaguesInput, peopleUncheckedUpdateWithoutLeaguesInput>
     create: XOR<peopleCreateWithoutLeaguesInput, peopleUncheckedCreateWithoutLeaguesInput>
@@ -27666,6 +29392,7 @@ export namespace Prisma {
     google_userid?: NullableStringFieldUpdateOperationsInput | string | null
     supabase_id?: NullableStringFieldUpdateOperationsInput | string | null
     leaguemembers?: leaguemembersUpdateManyWithoutPeopleNestedInput
+    league_renewal_member_roles?: league_renewal_member_rolesUpdateManyWithoutPeopleNestedInput
     picks?: picksUpdateManyWithoutPeopleNestedInput
     pushNotificationTokens?: pushNotificationTokensUpdateManyWithoutPeopleNestedInput
   }
@@ -27683,6 +29410,7 @@ export namespace Prisma {
     google_userid?: NullableStringFieldUpdateOperationsInput | string | null
     supabase_id?: NullableStringFieldUpdateOperationsInput | string | null
     leaguemembers?: leaguemembersUncheckedUpdateManyWithoutPeopleNestedInput
+    league_renewal_member_roles?: league_renewal_member_rolesUncheckedUpdateManyWithoutPeopleNestedInput
     picks?: picksUncheckedUpdateManyWithoutPeopleNestedInput
     pushNotificationTokens?: pushNotificationTokensUncheckedUpdateManyWithoutPeopleNestedInput
   }
@@ -27713,6 +29441,7 @@ export namespace Prisma {
     WeekWinners?: WeekWinnersUpdateManyWithoutLeaguesNestedInput
     leaguemembers?: leaguemembersUpdateManyWithoutLeaguesNestedInput
     leaguemessages?: leaguemessagesUpdateManyWithoutLeaguesNestedInput
+    league_renewal_member_roles?: league_renewal_member_rolesUpdateManyWithoutLeaguesNestedInput
     people?: peopleUpdateOneRequiredWithoutLeaguesNestedInput
     prior_league?: leaguesUpdateOneWithoutFuture_leaguesNestedInput
   }
@@ -27735,6 +29464,7 @@ export namespace Prisma {
     WeekWinners?: WeekWinnersUncheckedUpdateManyWithoutLeaguesNestedInput
     leaguemembers?: leaguemembersUncheckedUpdateManyWithoutLeaguesNestedInput
     leaguemessages?: leaguemessagesUncheckedUpdateManyWithoutLeaguesNestedInput
+    league_renewal_member_roles?: league_renewal_member_rolesUncheckedUpdateManyWithoutLeaguesNestedInput
   }
 
   export type leaguesUpsertWithWhereUniqueWithoutPrior_leagueInput = {
@@ -27772,6 +29502,190 @@ export namespace Prisma {
     status?: EnumLeagueStatusFilter<"leagues"> | $Enums.LeagueStatus
   }
 
+  export type leaguesCreateWithoutLeague_renewal_member_rolesInput = {
+    name: string
+    created_time?: Date | string
+    season: number
+    late_policy?: $Enums.LatePolicy | null
+    pick_policy?: $Enums.PickPolicy | null
+    reminder_policy?: $Enums.ReminderPolicy | null
+    scoring_type?: $Enums.ScoringType | null
+    share_code?: string | null
+    superbowl_competition?: boolean | null
+    status?: $Enums.LeagueStatus
+    EmailLogs?: EmailLogsCreateNestedManyWithoutLeaguesInput
+    WeekWinners?: WeekWinnersCreateNestedManyWithoutLeaguesInput
+    leaguemembers?: leaguemembersCreateNestedManyWithoutLeaguesInput
+    leaguemessages?: leaguemessagesCreateNestedManyWithoutLeaguesInput
+    people: peopleCreateNestedOneWithoutLeaguesInput
+    prior_league?: leaguesCreateNestedOneWithoutFuture_leaguesInput
+    future_leagues?: leaguesCreateNestedManyWithoutPrior_leagueInput
+  }
+
+  export type leaguesUncheckedCreateWithoutLeague_renewal_member_rolesInput = {
+    league_id?: number
+    created_by_user_id: number
+    name: string
+    created_time?: Date | string
+    season: number
+    late_policy?: $Enums.LatePolicy | null
+    pick_policy?: $Enums.PickPolicy | null
+    reminder_policy?: $Enums.ReminderPolicy | null
+    scoring_type?: $Enums.ScoringType | null
+    share_code?: string | null
+    superbowl_competition?: boolean | null
+    prior_league_id?: number | null
+    status?: $Enums.LeagueStatus
+    EmailLogs?: EmailLogsUncheckedCreateNestedManyWithoutLeaguesInput
+    WeekWinners?: WeekWinnersUncheckedCreateNestedManyWithoutLeaguesInput
+    leaguemembers?: leaguemembersUncheckedCreateNestedManyWithoutLeaguesInput
+    leaguemessages?: leaguemessagesUncheckedCreateNestedManyWithoutLeaguesInput
+    future_leagues?: leaguesUncheckedCreateNestedManyWithoutPrior_leagueInput
+  }
+
+  export type leaguesCreateOrConnectWithoutLeague_renewal_member_rolesInput = {
+    where: leaguesWhereUniqueInput
+    create: XOR<leaguesCreateWithoutLeague_renewal_member_rolesInput, leaguesUncheckedCreateWithoutLeague_renewal_member_rolesInput>
+  }
+
+  export type peopleCreateWithoutLeague_renewal_member_rolesInput = {
+    username: string
+    fname: string
+    lname: string
+    email: string
+    season: number
+    email2?: string | null
+    google_photo_url?: string | null
+    google_email?: string | null
+    google_userid?: string | null
+    supabase_id?: string | null
+    leaguemembers?: leaguemembersCreateNestedManyWithoutPeopleInput
+    leagues?: leaguesCreateNestedManyWithoutPeopleInput
+    picks?: picksCreateNestedManyWithoutPeopleInput
+    pushNotificationTokens?: pushNotificationTokensCreateNestedManyWithoutPeopleInput
+  }
+
+  export type peopleUncheckedCreateWithoutLeague_renewal_member_rolesInput = {
+    uid?: number
+    username: string
+    fname: string
+    lname: string
+    email: string
+    season: number
+    email2?: string | null
+    google_photo_url?: string | null
+    google_email?: string | null
+    google_userid?: string | null
+    supabase_id?: string | null
+    leaguemembers?: leaguemembersUncheckedCreateNestedManyWithoutPeopleInput
+    leagues?: leaguesUncheckedCreateNestedManyWithoutPeopleInput
+    picks?: picksUncheckedCreateNestedManyWithoutPeopleInput
+    pushNotificationTokens?: pushNotificationTokensUncheckedCreateNestedManyWithoutPeopleInput
+  }
+
+  export type peopleCreateOrConnectWithoutLeague_renewal_member_rolesInput = {
+    where: peopleWhereUniqueInput
+    create: XOR<peopleCreateWithoutLeague_renewal_member_rolesInput, peopleUncheckedCreateWithoutLeague_renewal_member_rolesInput>
+  }
+
+  export type leaguesUpsertWithoutLeague_renewal_member_rolesInput = {
+    update: XOR<leaguesUpdateWithoutLeague_renewal_member_rolesInput, leaguesUncheckedUpdateWithoutLeague_renewal_member_rolesInput>
+    create: XOR<leaguesCreateWithoutLeague_renewal_member_rolesInput, leaguesUncheckedCreateWithoutLeague_renewal_member_rolesInput>
+    where?: leaguesWhereInput
+  }
+
+  export type leaguesUpdateToOneWithWhereWithoutLeague_renewal_member_rolesInput = {
+    where?: leaguesWhereInput
+    data: XOR<leaguesUpdateWithoutLeague_renewal_member_rolesInput, leaguesUncheckedUpdateWithoutLeague_renewal_member_rolesInput>
+  }
+
+  export type leaguesUpdateWithoutLeague_renewal_member_rolesInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    created_time?: DateTimeFieldUpdateOperationsInput | Date | string
+    season?: IntFieldUpdateOperationsInput | number
+    late_policy?: NullableEnumLatePolicyFieldUpdateOperationsInput | $Enums.LatePolicy | null
+    pick_policy?: NullableEnumPickPolicyFieldUpdateOperationsInput | $Enums.PickPolicy | null
+    reminder_policy?: NullableEnumReminderPolicyFieldUpdateOperationsInput | $Enums.ReminderPolicy | null
+    scoring_type?: NullableEnumScoringTypeFieldUpdateOperationsInput | $Enums.ScoringType | null
+    share_code?: NullableStringFieldUpdateOperationsInput | string | null
+    superbowl_competition?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    status?: EnumLeagueStatusFieldUpdateOperationsInput | $Enums.LeagueStatus
+    EmailLogs?: EmailLogsUpdateManyWithoutLeaguesNestedInput
+    WeekWinners?: WeekWinnersUpdateManyWithoutLeaguesNestedInput
+    leaguemembers?: leaguemembersUpdateManyWithoutLeaguesNestedInput
+    leaguemessages?: leaguemessagesUpdateManyWithoutLeaguesNestedInput
+    people?: peopleUpdateOneRequiredWithoutLeaguesNestedInput
+    prior_league?: leaguesUpdateOneWithoutFuture_leaguesNestedInput
+    future_leagues?: leaguesUpdateManyWithoutPrior_leagueNestedInput
+  }
+
+  export type leaguesUncheckedUpdateWithoutLeague_renewal_member_rolesInput = {
+    league_id?: IntFieldUpdateOperationsInput | number
+    created_by_user_id?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    created_time?: DateTimeFieldUpdateOperationsInput | Date | string
+    season?: IntFieldUpdateOperationsInput | number
+    late_policy?: NullableEnumLatePolicyFieldUpdateOperationsInput | $Enums.LatePolicy | null
+    pick_policy?: NullableEnumPickPolicyFieldUpdateOperationsInput | $Enums.PickPolicy | null
+    reminder_policy?: NullableEnumReminderPolicyFieldUpdateOperationsInput | $Enums.ReminderPolicy | null
+    scoring_type?: NullableEnumScoringTypeFieldUpdateOperationsInput | $Enums.ScoringType | null
+    share_code?: NullableStringFieldUpdateOperationsInput | string | null
+    superbowl_competition?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    prior_league_id?: NullableIntFieldUpdateOperationsInput | number | null
+    status?: EnumLeagueStatusFieldUpdateOperationsInput | $Enums.LeagueStatus
+    EmailLogs?: EmailLogsUncheckedUpdateManyWithoutLeaguesNestedInput
+    WeekWinners?: WeekWinnersUncheckedUpdateManyWithoutLeaguesNestedInput
+    leaguemembers?: leaguemembersUncheckedUpdateManyWithoutLeaguesNestedInput
+    leaguemessages?: leaguemessagesUncheckedUpdateManyWithoutLeaguesNestedInput
+    future_leagues?: leaguesUncheckedUpdateManyWithoutPrior_leagueNestedInput
+  }
+
+  export type peopleUpsertWithoutLeague_renewal_member_rolesInput = {
+    update: XOR<peopleUpdateWithoutLeague_renewal_member_rolesInput, peopleUncheckedUpdateWithoutLeague_renewal_member_rolesInput>
+    create: XOR<peopleCreateWithoutLeague_renewal_member_rolesInput, peopleUncheckedCreateWithoutLeague_renewal_member_rolesInput>
+    where?: peopleWhereInput
+  }
+
+  export type peopleUpdateToOneWithWhereWithoutLeague_renewal_member_rolesInput = {
+    where?: peopleWhereInput
+    data: XOR<peopleUpdateWithoutLeague_renewal_member_rolesInput, peopleUncheckedUpdateWithoutLeague_renewal_member_rolesInput>
+  }
+
+  export type peopleUpdateWithoutLeague_renewal_member_rolesInput = {
+    username?: StringFieldUpdateOperationsInput | string
+    fname?: StringFieldUpdateOperationsInput | string
+    lname?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    season?: IntFieldUpdateOperationsInput | number
+    email2?: NullableStringFieldUpdateOperationsInput | string | null
+    google_photo_url?: NullableStringFieldUpdateOperationsInput | string | null
+    google_email?: NullableStringFieldUpdateOperationsInput | string | null
+    google_userid?: NullableStringFieldUpdateOperationsInput | string | null
+    supabase_id?: NullableStringFieldUpdateOperationsInput | string | null
+    leaguemembers?: leaguemembersUpdateManyWithoutPeopleNestedInput
+    leagues?: leaguesUpdateManyWithoutPeopleNestedInput
+    picks?: picksUpdateManyWithoutPeopleNestedInput
+    pushNotificationTokens?: pushNotificationTokensUpdateManyWithoutPeopleNestedInput
+  }
+
+  export type peopleUncheckedUpdateWithoutLeague_renewal_member_rolesInput = {
+    uid?: IntFieldUpdateOperationsInput | number
+    username?: StringFieldUpdateOperationsInput | string
+    fname?: StringFieldUpdateOperationsInput | string
+    lname?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    season?: IntFieldUpdateOperationsInput | number
+    email2?: NullableStringFieldUpdateOperationsInput | string | null
+    google_photo_url?: NullableStringFieldUpdateOperationsInput | string | null
+    google_email?: NullableStringFieldUpdateOperationsInput | string | null
+    google_userid?: NullableStringFieldUpdateOperationsInput | string | null
+    supabase_id?: NullableStringFieldUpdateOperationsInput | string | null
+    leaguemembers?: leaguemembersUncheckedUpdateManyWithoutPeopleNestedInput
+    leagues?: leaguesUncheckedUpdateManyWithoutPeopleNestedInput
+    picks?: picksUncheckedUpdateManyWithoutPeopleNestedInput
+    pushNotificationTokens?: pushNotificationTokensUncheckedUpdateManyWithoutPeopleNestedInput
+  }
+
   export type leaguemembersCreateWithoutPeopleInput = {
     ts?: Date | string
     role?: $Enums.MemberRole | null
@@ -27807,6 +29721,32 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type league_renewal_member_rolesCreateWithoutPeopleInput = {
+    renewal_member_role_id?: string
+    role?: $Enums.MemberRole
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    leagues: leaguesCreateNestedOneWithoutLeague_renewal_member_rolesInput
+  }
+
+  export type league_renewal_member_rolesUncheckedCreateWithoutPeopleInput = {
+    renewal_member_role_id?: string
+    league_id: number
+    role?: $Enums.MemberRole
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type league_renewal_member_rolesCreateOrConnectWithoutPeopleInput = {
+    where: league_renewal_member_rolesWhereUniqueInput
+    create: XOR<league_renewal_member_rolesCreateWithoutPeopleInput, league_renewal_member_rolesUncheckedCreateWithoutPeopleInput>
+  }
+
+  export type league_renewal_member_rolesCreateManyPeopleInputEnvelope = {
+    data: league_renewal_member_rolesCreateManyPeopleInput | league_renewal_member_rolesCreateManyPeopleInput[]
+    skipDuplicates?: boolean
+  }
+
   export type leaguesCreateWithoutPeopleInput = {
     name: string
     created_time?: Date | string
@@ -27822,6 +29762,7 @@ export namespace Prisma {
     WeekWinners?: WeekWinnersCreateNestedManyWithoutLeaguesInput
     leaguemembers?: leaguemembersCreateNestedManyWithoutLeaguesInput
     leaguemessages?: leaguemessagesCreateNestedManyWithoutLeaguesInput
+    league_renewal_member_roles?: league_renewal_member_rolesCreateNestedManyWithoutLeaguesInput
     prior_league?: leaguesCreateNestedOneWithoutFuture_leaguesInput
     future_leagues?: leaguesCreateNestedManyWithoutPrior_leagueInput
   }
@@ -27843,6 +29784,7 @@ export namespace Prisma {
     WeekWinners?: WeekWinnersUncheckedCreateNestedManyWithoutLeaguesInput
     leaguemembers?: leaguemembersUncheckedCreateNestedManyWithoutLeaguesInput
     leaguemessages?: leaguemessagesUncheckedCreateNestedManyWithoutLeaguesInput
+    league_renewal_member_roles?: league_renewal_member_rolesUncheckedCreateNestedManyWithoutLeaguesInput
     future_leagues?: leaguesUncheckedCreateNestedManyWithoutPrior_leagueInput
   }
 
@@ -27941,6 +29883,22 @@ export namespace Prisma {
     data: XOR<leaguemembersUpdateManyMutationInput, leaguemembersUncheckedUpdateManyWithoutPeopleInput>
   }
 
+  export type league_renewal_member_rolesUpsertWithWhereUniqueWithoutPeopleInput = {
+    where: league_renewal_member_rolesWhereUniqueInput
+    update: XOR<league_renewal_member_rolesUpdateWithoutPeopleInput, league_renewal_member_rolesUncheckedUpdateWithoutPeopleInput>
+    create: XOR<league_renewal_member_rolesCreateWithoutPeopleInput, league_renewal_member_rolesUncheckedCreateWithoutPeopleInput>
+  }
+
+  export type league_renewal_member_rolesUpdateWithWhereUniqueWithoutPeopleInput = {
+    where: league_renewal_member_rolesWhereUniqueInput
+    data: XOR<league_renewal_member_rolesUpdateWithoutPeopleInput, league_renewal_member_rolesUncheckedUpdateWithoutPeopleInput>
+  }
+
+  export type league_renewal_member_rolesUpdateManyWithWhereWithoutPeopleInput = {
+    where: league_renewal_member_rolesScalarWhereInput
+    data: XOR<league_renewal_member_rolesUpdateManyMutationInput, league_renewal_member_rolesUncheckedUpdateManyWithoutPeopleInput>
+  }
+
   export type leaguesUpsertWithWhereUniqueWithoutPeopleInput = {
     where: leaguesWhereUniqueInput
     update: XOR<leaguesUpdateWithoutPeopleInput, leaguesUncheckedUpdateWithoutPeopleInput>
@@ -28015,6 +29973,7 @@ export namespace Prisma {
     google_userid?: string | null
     supabase_id?: string | null
     leaguemembers?: leaguemembersCreateNestedManyWithoutPeopleInput
+    league_renewal_member_roles?: league_renewal_member_rolesCreateNestedManyWithoutPeopleInput
     leagues?: leaguesCreateNestedManyWithoutPeopleInput
     picks?: picksCreateNestedManyWithoutPeopleInput
   }
@@ -28032,6 +29991,7 @@ export namespace Prisma {
     google_userid?: string | null
     supabase_id?: string | null
     leaguemembers?: leaguemembersUncheckedCreateNestedManyWithoutPeopleInput
+    league_renewal_member_roles?: league_renewal_member_rolesUncheckedCreateNestedManyWithoutPeopleInput
     leagues?: leaguesUncheckedCreateNestedManyWithoutPeopleInput
     picks?: picksUncheckedCreateNestedManyWithoutPeopleInput
   }
@@ -28064,6 +30024,7 @@ export namespace Prisma {
     google_userid?: NullableStringFieldUpdateOperationsInput | string | null
     supabase_id?: NullableStringFieldUpdateOperationsInput | string | null
     leaguemembers?: leaguemembersUpdateManyWithoutPeopleNestedInput
+    league_renewal_member_roles?: league_renewal_member_rolesUpdateManyWithoutPeopleNestedInput
     leagues?: leaguesUpdateManyWithoutPeopleNestedInput
     picks?: picksUpdateManyWithoutPeopleNestedInput
   }
@@ -28081,6 +30042,7 @@ export namespace Prisma {
     google_userid?: NullableStringFieldUpdateOperationsInput | string | null
     supabase_id?: NullableStringFieldUpdateOperationsInput | string | null
     leaguemembers?: leaguemembersUncheckedUpdateManyWithoutPeopleNestedInput
+    league_renewal_member_roles?: league_renewal_member_rolesUncheckedUpdateManyWithoutPeopleNestedInput
     leagues?: leaguesUncheckedUpdateManyWithoutPeopleNestedInput
     picks?: picksUncheckedUpdateManyWithoutPeopleNestedInput
   }
@@ -28147,6 +30109,7 @@ export namespace Prisma {
     google_userid?: string | null
     supabase_id?: string | null
     leaguemembers?: leaguemembersCreateNestedManyWithoutPeopleInput
+    league_renewal_member_roles?: league_renewal_member_rolesCreateNestedManyWithoutPeopleInput
     leagues?: leaguesCreateNestedManyWithoutPeopleInput
     pushNotificationTokens?: pushNotificationTokensCreateNestedManyWithoutPeopleInput
   }
@@ -28164,6 +30127,7 @@ export namespace Prisma {
     google_userid?: string | null
     supabase_id?: string | null
     leaguemembers?: leaguemembersUncheckedCreateNestedManyWithoutPeopleInput
+    league_renewal_member_roles?: league_renewal_member_rolesUncheckedCreateNestedManyWithoutPeopleInput
     leagues?: leaguesUncheckedCreateNestedManyWithoutPeopleInput
     pushNotificationTokens?: pushNotificationTokensUncheckedCreateNestedManyWithoutPeopleInput
   }
@@ -28324,6 +30288,7 @@ export namespace Prisma {
     google_userid?: NullableStringFieldUpdateOperationsInput | string | null
     supabase_id?: NullableStringFieldUpdateOperationsInput | string | null
     leaguemembers?: leaguemembersUpdateManyWithoutPeopleNestedInput
+    league_renewal_member_roles?: league_renewal_member_rolesUpdateManyWithoutPeopleNestedInput
     leagues?: leaguesUpdateManyWithoutPeopleNestedInput
     pushNotificationTokens?: pushNotificationTokensUpdateManyWithoutPeopleNestedInput
   }
@@ -28341,6 +30306,7 @@ export namespace Prisma {
     google_userid?: NullableStringFieldUpdateOperationsInput | string | null
     supabase_id?: NullableStringFieldUpdateOperationsInput | string | null
     leaguemembers?: leaguemembersUncheckedUpdateManyWithoutPeopleNestedInput
+    league_renewal_member_roles?: league_renewal_member_rolesUncheckedUpdateManyWithoutPeopleNestedInput
     leagues?: leaguesUncheckedUpdateManyWithoutPeopleNestedInput
     pushNotificationTokens?: pushNotificationTokensUncheckedUpdateManyWithoutPeopleNestedInput
   }
@@ -30042,6 +32008,14 @@ export namespace Prisma {
     status?: $Enums.MessageStatus
   }
 
+  export type league_renewal_member_rolesCreateManyLeaguesInput = {
+    renewal_member_role_id?: string
+    user_id: number
+    role?: $Enums.MemberRole
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
   export type leaguesCreateManyPrior_leagueInput = {
     league_id?: number
     created_by_user_id: number
@@ -30170,6 +32144,30 @@ export namespace Prisma {
     status?: EnumMessageStatusFieldUpdateOperationsInput | $Enums.MessageStatus
   }
 
+  export type league_renewal_member_rolesUpdateWithoutLeaguesInput = {
+    renewal_member_role_id?: StringFieldUpdateOperationsInput | string
+    role?: EnumMemberRoleFieldUpdateOperationsInput | $Enums.MemberRole
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    people?: peopleUpdateOneRequiredWithoutLeague_renewal_member_rolesNestedInput
+  }
+
+  export type league_renewal_member_rolesUncheckedUpdateWithoutLeaguesInput = {
+    renewal_member_role_id?: StringFieldUpdateOperationsInput | string
+    user_id?: IntFieldUpdateOperationsInput | number
+    role?: EnumMemberRoleFieldUpdateOperationsInput | $Enums.MemberRole
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type league_renewal_member_rolesUncheckedUpdateManyWithoutLeaguesInput = {
+    renewal_member_role_id?: StringFieldUpdateOperationsInput | string
+    user_id?: IntFieldUpdateOperationsInput | number
+    role?: EnumMemberRoleFieldUpdateOperationsInput | $Enums.MemberRole
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type leaguesUpdateWithoutPrior_leagueInput = {
     name?: StringFieldUpdateOperationsInput | string
     created_time?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -30185,6 +32183,7 @@ export namespace Prisma {
     WeekWinners?: WeekWinnersUpdateManyWithoutLeaguesNestedInput
     leaguemembers?: leaguemembersUpdateManyWithoutLeaguesNestedInput
     leaguemessages?: leaguemessagesUpdateManyWithoutLeaguesNestedInput
+    league_renewal_member_roles?: league_renewal_member_rolesUpdateManyWithoutLeaguesNestedInput
     people?: peopleUpdateOneRequiredWithoutLeaguesNestedInput
     future_leagues?: leaguesUpdateManyWithoutPrior_leagueNestedInput
   }
@@ -30206,6 +32205,7 @@ export namespace Prisma {
     WeekWinners?: WeekWinnersUncheckedUpdateManyWithoutLeaguesNestedInput
     leaguemembers?: leaguemembersUncheckedUpdateManyWithoutLeaguesNestedInput
     leaguemessages?: leaguemessagesUncheckedUpdateManyWithoutLeaguesNestedInput
+    league_renewal_member_roles?: league_renewal_member_rolesUncheckedUpdateManyWithoutLeaguesNestedInput
     future_leagues?: leaguesUncheckedUpdateManyWithoutPrior_leagueNestedInput
   }
 
@@ -30230,6 +32230,14 @@ export namespace Prisma {
     ts?: Date | string
     role?: $Enums.MemberRole | null
     paid?: boolean | null
+  }
+
+  export type league_renewal_member_rolesCreateManyPeopleInput = {
+    renewal_member_role_id?: string
+    league_id: number
+    role?: $Enums.MemberRole
+    createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
   export type leaguesCreateManyPeopleInput = {
@@ -30305,6 +32313,30 @@ export namespace Prisma {
     paid?: NullableBoolFieldUpdateOperationsInput | boolean | null
   }
 
+  export type league_renewal_member_rolesUpdateWithoutPeopleInput = {
+    renewal_member_role_id?: StringFieldUpdateOperationsInput | string
+    role?: EnumMemberRoleFieldUpdateOperationsInput | $Enums.MemberRole
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    leagues?: leaguesUpdateOneRequiredWithoutLeague_renewal_member_rolesNestedInput
+  }
+
+  export type league_renewal_member_rolesUncheckedUpdateWithoutPeopleInput = {
+    renewal_member_role_id?: StringFieldUpdateOperationsInput | string
+    league_id?: IntFieldUpdateOperationsInput | number
+    role?: EnumMemberRoleFieldUpdateOperationsInput | $Enums.MemberRole
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type league_renewal_member_rolesUncheckedUpdateManyWithoutPeopleInput = {
+    renewal_member_role_id?: StringFieldUpdateOperationsInput | string
+    league_id?: IntFieldUpdateOperationsInput | number
+    role?: EnumMemberRoleFieldUpdateOperationsInput | $Enums.MemberRole
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type leaguesUpdateWithoutPeopleInput = {
     name?: StringFieldUpdateOperationsInput | string
     created_time?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -30320,6 +32352,7 @@ export namespace Prisma {
     WeekWinners?: WeekWinnersUpdateManyWithoutLeaguesNestedInput
     leaguemembers?: leaguemembersUpdateManyWithoutLeaguesNestedInput
     leaguemessages?: leaguemessagesUpdateManyWithoutLeaguesNestedInput
+    league_renewal_member_roles?: league_renewal_member_rolesUpdateManyWithoutLeaguesNestedInput
     prior_league?: leaguesUpdateOneWithoutFuture_leaguesNestedInput
     future_leagues?: leaguesUpdateManyWithoutPrior_leagueNestedInput
   }
@@ -30341,6 +32374,7 @@ export namespace Prisma {
     WeekWinners?: WeekWinnersUncheckedUpdateManyWithoutLeaguesNestedInput
     leaguemembers?: leaguemembersUncheckedUpdateManyWithoutLeaguesNestedInput
     leaguemessages?: leaguemessagesUncheckedUpdateManyWithoutLeaguesNestedInput
+    league_renewal_member_roles?: league_renewal_member_rolesUncheckedUpdateManyWithoutLeaguesNestedInput
     future_leagues?: leaguesUncheckedUpdateManyWithoutPrior_leagueNestedInput
   }
 
