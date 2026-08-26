@@ -17,6 +17,7 @@ import { Defined } from "../../../utils/defined";
 import { isE2EMode } from "../../../utils/e2e";
 import { getLogger } from "../../../utils/logging";
 import { db } from "../../db";
+import { reconcileEmailDeliveryState } from "./webhooks";
 
 const FROM = "Funtime System <no-reply@play-funtime.com>";
 
@@ -202,7 +203,9 @@ export const resendApi = {
           league_id: league.league_id,
           member_id: member.membership_id,
         },
+        select: { email_log_id: true },
       });
+      await reconcileEmailDeliveryState(data.id);
     }
   },
 
@@ -307,6 +310,9 @@ export const resendApi = {
         await db.emailLogs.createMany({
           data: logsToCreate,
         });
+        await Promise.all(
+          logsToCreate.map((log) => reconcileEmailDeliveryState(log.resend_id)),
+        );
       }
     }
 
@@ -441,9 +447,11 @@ export const resendApi = {
                 league_id: m.league_id,
                 member_id: m.membership_id,
               },
+              select: { email_log_id: true },
             });
           }),
         );
+        await reconcileEmailDeliveryState(data.id);
       }
     } catch (err) {
       getLogger().error(
@@ -514,7 +522,9 @@ export const resendApi = {
           member_id: member.membership_id,
           week,
         },
+        select: { email_log_id: true },
       });
+      await reconcileEmailDeliveryState(data.id);
     }
   },
   sendWeekSummaryEmail: async ({
@@ -609,7 +619,9 @@ export const resendApi = {
             member_id: recipient.memberId,
             week,
           },
+          select: { email_log_id: true },
         });
+        await reconcileEmailDeliveryState(data.id);
       }
     }
 
@@ -712,6 +724,9 @@ export const resendApi = {
         await db.emailLogs.createMany({
           data: toCreate,
         });
+        await Promise.all(
+          toCreate.map((log) => reconcileEmailDeliveryState(log.resend_id)),
+        );
       }
     }
   },

@@ -28,6 +28,7 @@ export const env = createEnv({
       .enum(["development", "preview", "production"])
       .default("development"),
     REDIS_URL: z.string().url().optional(),
+    RESEND_WEBHOOK_SECRET: z.string().startsWith("whsec_").optional(),
   },
 
   /**
@@ -53,6 +54,7 @@ export const env = createEnv({
     NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
     VERCEL_ENV: process.env.VERCEL_ENV,
     REDIS_URL: process.env.REDIS_URL ?? "redis://localhost:6379",
+    RESEND_WEBHOOK_SECRET: process.env.RESEND_WEBHOOK_SECRET,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially

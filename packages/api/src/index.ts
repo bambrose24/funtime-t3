@@ -19,6 +19,11 @@ export { espn } from "../server/services/espn";
 export * as config from "../utils/config";
 
 export { resendApi } from "../server/services/resend";
+export {
+  processResendWebhookEvent,
+  reconcileEmailDeliveryState,
+  verifyResendWebhook,
+} from "../server/services/resend/webhooks";
 export { expoPushApi } from "../server/services/expo-push";
 
 export { msf } from "../server/services/mysportsfeeds";
