@@ -9,7 +9,9 @@ import {
   type TrackedResendWebhookEvent,
 } from "./webhook-events";
 
-const resendWebhookVerifier = new Resend();
+// Resend's webhook verification is local and does not use the email API key,
+// but the SDK still requires a non-empty key when constructing the client.
+const resendWebhookVerifier = new Resend("webhook-verification-only");
 
 export const verifyResendWebhook = ({
   payload,
