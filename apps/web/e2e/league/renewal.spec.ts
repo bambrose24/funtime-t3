@@ -3,6 +3,14 @@ import { expect, test } from "../fixtures/test";
 import { login } from "../helpers/auth";
 import { executeSql, getLeagueId, queryScalar } from "../helpers/db";
 
+test.afterEach(() => {
+  const priorLeagueId = getLeagueId(E2E_LEAGUES.completed.shareCode);
+  executeSql(`
+    DELETE FROM "leagues"
+    WHERE "prior_league_id" = ${priorLeagueId}
+  `);
+});
+
 test("admin creates one linked renewal and exercises isolated member invites", async ({
   page,
 }) => {
