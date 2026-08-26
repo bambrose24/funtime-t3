@@ -124,26 +124,27 @@ model leaguemessages {
 }
 
 model leagues {
-  league_id             Int              @id(map: "idx_18422_primary") @default(autoincrement())
-  created_by_user_id    Int
-  name                  String
-  created_time          DateTime         @default(now()) @db.Timestamptz(6)
-  season                Int
-  late_policy           LatePolicy?      @default(allow_late_whole_week)
-  pick_policy           PickPolicy?      @default(choose_winner)
-  reminder_policy       ReminderPolicy?  @default(three_hours_before)
-  scoring_type          ScoringType?     @default(game_winner)
-  share_code            String?          @unique @default(cuid())
-  superbowl_competition Boolean?         @default(true)
-  prior_league_id       Int?
-  status                LeagueStatus     @default(not_started)
-  EmailLogs             EmailLogs[]
-  WeekWinners           WeekWinners[]
-  leaguemembers         leaguemembers[]
-  leaguemessages        leaguemessages[]
-  people                people           @relation(fields: [created_by_user_id], references: [uid], onUpdate: Restrict, map: "leagues_ibfk_1")
-  prior_league          leagues?         @relation("leaguesToleagues", fields: [prior_league_id], references: [league_id])
-  future_leagues        leagues[]        @relation("leaguesToleagues")
+  league_id                   Int                           @id(map: "idx_18422_primary") @default(autoincrement())
+  created_by_user_id          Int
+  name                        String
+  created_time                DateTime                      @default(now()) @db.Timestamptz(6)
+  season                      Int
+  late_policy                 LatePolicy?                   @default(allow_late_whole_week)
+  pick_policy                 PickPolicy?                   @default(choose_winner)
+  reminder_policy             ReminderPolicy?               @default(three_hours_before)
+  scoring_type                ScoringType?                  @default(game_winner)
+  share_code                  String?                       @unique @default(cuid())
+  superbowl_competition       Boolean?                      @default(true)
+  prior_league_id             Int?
+  status                      LeagueStatus                  @default(not_started)
+  EmailLogs                   EmailLogs[]
+  WeekWinners                 WeekWinners[]
+  leaguemembers               leaguemembers[]
+  leaguemessages              leaguemessages[]
+  league_renewal_member_roles league_renewal_member_roles[]
+  people                      people                        @relation(fields: [created_by_user_id], references: [uid], onUpdate: Restrict, map: "leagues_ibfk_1")
+  prior_league                leagues?                      @relation("leaguesToleagues", fields: [prior_league_id], references: [league_id])
+  future_leagues              leagues[]                     @relation("leaguesToleagues")
 
   @@index([created_by_user_id], map: "idx_18422_created_by_user_id")
   @@index([prior_league_id])
@@ -153,22 +154,37 @@ model leagues {
   @@index([share_code], map: "idx_share_code")
 }
 
+model league_renewal_member_roles {
+  renewal_member_role_id String     @id @default(cuid())
+  league_id              Int
+  user_id                Int
+  role                   MemberRole @default(player)
+  createdAt              DateTime   @default(now())
+  updatedAt              DateTime   @updatedAt
+  leagues                leagues    @relation(fields: [league_id], references: [league_id], onDelete: Cascade)
+  people                 people     @relation(fields: [user_id], references: [uid], onDelete: Cascade)
+
+  @@unique([league_id, user_id])
+  @@index([user_id])
+}
+
 model people {
-  uid                    Int                      @id(map: "idx_18430_primary") @default(autoincrement())
-  username               String                   @db.VarChar(255)
-  fname                  String                   @db.VarChar(255)
-  lname                  String                   @db.VarChar(255)
-  email                  String                   @unique @db.VarChar(255)
-  season                 Int
-  email2                 String?                  @db.VarChar(255)
-  google_photo_url       String?
-  google_email           String?
-  google_userid          String?
-  supabase_id            String?                  @unique @db.VarChar(255)
-  leaguemembers          leaguemembers[]
-  leagues                leagues[]
-  picks                  picks[]
-  pushNotificationTokens pushNotificationTokens[]
+  uid                         Int                           @id(map: "idx_18430_primary") @default(autoincrement())
+  username                    String                        @db.VarChar(255)
+  fname                       String                        @db.VarChar(255)
+  lname                       String                        @db.VarChar(255)
+  email                       String                        @unique @db.VarChar(255)
+  season                      Int
+  email2                      String?                       @db.VarChar(255)
+  google_photo_url            String?
+  google_email                String?
+  google_userid               String?
+  supabase_id                 String?                       @unique @db.VarChar(255)
+  leaguemembers               leaguemembers[]
+  league_renewal_member_roles league_renewal_member_roles[]
+  leagues                     leagues[]
+  picks                       picks[]
+  pushNotificationTokens      pushNotificationTokens[]
 
   @@index([email], map: "idx_18430_email_index")
   @@index([season], map: "idx_18430_season")

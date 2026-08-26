@@ -2,7 +2,13 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { AlertTriangle, ArrowRight, Mail, Users } from "lucide-react";
+import {
+  AlertTriangle,
+  ArrowRight,
+  Mail,
+  ShieldCheck,
+  Users,
+} from "lucide-react";
 import { toast } from "sonner";
 import { CopyJoinLinkButton } from "~/components/league/CopyJoinLinkButton";
 import { Badge } from "~/components/ui/badge";
@@ -12,6 +18,7 @@ import { Checkbox } from "~/components/ui/checkbox";
 import { Input } from "~/components/ui/input";
 import { Separator } from "~/components/ui/separator";
 import { Text } from "~/components/ui/text";
+import { Switch } from "~/components/ui/switch";
 import { clientApi } from "~/trpc/react";
 import type { RouterOutputs } from "~/trpc/types";
 import { getBaseUrl } from "~/utils/getBaseUrl";
@@ -37,6 +44,9 @@ export function RenewalInvitesClientPage({
   const [selectedMemberIds, setSelectedMemberIds] = useState<Set<number>>(
     () => new Set(initialPreview.defaultSelectedMemberIds),
   );
+  const [adminMemberIds, setAdminMemberIds] = useState<Set<number>>(
+    () => new Set(initialPreview.defaultAdminMemberIds),
+  );
   const [sendResult, setSendResult] = useState<{
     failedCount: number;
     sentCount: number;
@@ -47,7 +57,8 @@ export function RenewalInvitesClientPage({
 
   useEffect(() => {
     setSelectedMemberIds(new Set(preview.defaultSelectedMemberIds));
-  }, [preview.defaultSelectedMemberIds]);
+    setAdminMemberIds(new Set(preview.defaultAdminMemberIds));
+  }, [preview.defaultAdminMemberIds, preview.defaultSelectedMemberIds]);
 
   const selectedCount = selectedMemberIds.size;
   const allSelected =
@@ -74,12 +85,27 @@ export function RenewalInvitesClientPage({
     });
   };
 
+  const toggleAdmin = (memberId: number) => {
+    setAdminMemberIds((current) => {
+      const next = new Set(current);
+      if (next.has(memberId)) {
+        next.delete(memberId);
+      } else {
+        next.add(memberId);
+      }
+      return next;
+    });
+  };
+
   const onSendInvites = async () => {
     try {
       const result = await sendRenewalInvites({
         leagueId,
         priorLeagueId,
         memberIds: selectedMemberIdList,
+        adminMemberIds: selectedMemberIdList.filter((memberId) =>
+          adminMemberIds.has(memberId),
+        ),
       });
       setSendResult(result);
       toast.success(`Sent ${result.sentCount} renewal invites`);
@@ -107,14 +133,20 @@ export function RenewalInvitesClientPage({
             <ArrowRight className="h-4 w-4 text-muted-foreground" />
             <Badge>{preview.nextLeague.season}</Badge>
           </div>
-          <CardTitle>Invite last year&apos;s players</CardTitle>
-          <Text.Muted>
+          <CardTitle className="text-2xl leading-8">
+            Invite last year&apos;s players
+          </CardTitle>
+          <Text.Muted className="max-w-2xl leading-6">
             {preview.priorLeague.name} is renewed as {preview.nextLeague.name}.
+            Returning admins keep access. Turn on admin access for any other
+            player before you send their invite.
           </Text.Muted>
         </CardHeader>
         <CardContent className="flex flex-col gap-5">
           <div className="flex flex-col gap-2">
-            <Text.Small className="font-medium">Join link</Text.Small>
+            <Text.Small className="font-semibold leading-5">
+              Join link
+            </Text.Small>
             <div className="flex gap-2">
               <Input value={joinLink} disabled />
               {preview.nextLeague.share_code ? (
@@ -128,7 +160,7 @@ export function RenewalInvitesClientPage({
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-2">
               <Users className="h-4 w-4 text-primary" />
-              <Text.Small className="font-medium">
+              <Text.Small className="font-semibold leading-5">
                 {preview.eligibleMembers.length} eligible players
               </Text.Small>
             </div>
@@ -185,10 +217,16 @@ export function RenewalInvitesClientPage({
                         aria-label={`Invite ${member.username}`}
                       />
                       <div className="min-w-0 flex-1">
-                        <div className="flex min-w-0 items-center gap-2">
-                          <div className="truncate text-sm font-medium">
+                        <div className="flex min-w-0 flex-wrap items-center gap-2">
+                          <div className="truncate text-base font-semibold leading-5">
                             {member.username}
                           </div>
+                          {member.role === "admin" ? (
+                            <Badge className="gap-1" variant="secondary">
+                              <ShieldCheck className="h-3 w-3" />
+                              Returning admin
+                            </Badge>
+                          ) : null}
                           {member.missedPickCount > 0 ? (
                             <span
                               className="inline-flex shrink-0 items-center gap-1 text-xs font-medium text-warning"
@@ -203,11 +241,38 @@ export function RenewalInvitesClientPage({
                             </span>
                           ) : null}
                         </div>
-                        <div className="truncate text-xs text-muted-foreground">
+                        <div className="mt-1 truncate text-sm leading-5 text-muted-foreground">
                           {member.email}
                         </div>
                       </div>
-                      <Badge variant="outline">{member.role}</Badge>
+                      {member.role === "admin" ? (
+                        <div className="shrink-0 text-right text-sm text-muted-foreground">
+                          Keeps admin access
+                        </div>
+                      ) : (
+                        <div
+                          className="flex shrink-0 items-center gap-2"
+                          onClick={(event) => event.stopPropagation()}
+                        >
+                          <label
+                            className={`hidden text-right text-sm font-medium sm:block ${
+                              checked ? "" : "text-muted-foreground"
+                            }`}
+                            htmlFor={`renewal-admin-${member.membershipId}`}
+                          >
+                            Admin next season
+                          </label>
+                          <Switch
+                            id={`renewal-admin-${member.membershipId}`}
+                            checked={adminMemberIds.has(member.membershipId)}
+                            disabled={!checked}
+                            onCheckedChange={() =>
+                              toggleAdmin(member.membershipId)
+                            }
+                            aria-label={`Make ${member.username} an admin next season`}
+                          />
+                        </div>
+                      )}
                     </div>
                   );
                 })}

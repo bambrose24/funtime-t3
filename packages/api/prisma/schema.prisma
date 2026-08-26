@@ -141,6 +141,7 @@ model leagues {
   WeekWinners           WeekWinners[]
   leaguemembers         leaguemembers[]
   leaguemessages        leaguemessages[]
+  league_renewal_member_roles league_renewal_member_roles[]
   people                people           @relation(fields: [created_by_user_id], references: [uid], onUpdate: Restrict, map: "leagues_ibfk_1")
   prior_league          leagues?         @relation("leaguesToleagues", fields: [prior_league_id], references: [league_id])
   future_leagues        leagues[]        @relation("leaguesToleagues")
@@ -151,6 +152,20 @@ model leagues {
   @@index([name], map: "idx_18422_name")
   @@index([season], map: "idx_18422_season")
   @@index([share_code], map: "idx_share_code")
+}
+
+model league_renewal_member_roles {
+  renewal_member_role_id String     @id @default(cuid())
+  league_id              Int
+  user_id                Int
+  role                   MemberRole @default(player)
+  createdAt              DateTime   @default(now())
+  updatedAt              DateTime   @updatedAt
+  leagues                leagues    @relation(fields: [league_id], references: [league_id], onDelete: Cascade)
+  people                 people     @relation(fields: [user_id], references: [uid], onDelete: Cascade)
+
+  @@unique([league_id, user_id])
+  @@index([user_id])
 }
 
 model people {
@@ -166,6 +181,7 @@ model people {
   google_userid          String?
   supabase_id            String?                  @unique @db.VarChar(255)
   leaguemembers          leaguemembers[]
+  league_renewal_member_roles league_renewal_member_roles[]
   leagues                leagues[]
   picks                  picks[]
   pushNotificationTokens pushNotificationTokens[]

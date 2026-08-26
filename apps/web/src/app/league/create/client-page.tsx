@@ -100,6 +100,7 @@ export function CreateLeagueClientPage({
   const createLeagueFromData = async (
     data: z.infer<typeof createLeagueFormSchema>,
     selectedMemberIds?: number[],
+    adminMemberIds?: number[],
   ) => {
     try {
       const newLeague = await createLeague({
@@ -125,6 +126,7 @@ export function CreateLeagueClientPage({
               leagueId: newLeague.league_id,
               priorLeagueId: Number(data.priorLeagueId),
               memberIds: selectedMemberIds,
+              adminMemberIds,
             });
             toast.success(
               `Sent ${inviteResult.sentCount} ${inviteResult.sentCount === 1 ? "invite" : "invites"}.`,
@@ -499,12 +501,16 @@ export function CreateLeagueClientPage({
             invitees={renewalInvitees}
             open={inviteDialogOpen}
             onOpenChange={setInviteDialogOpen}
-            onConfirm={async (memberIds) => {
+            onConfirm={async (memberIds, adminMemberIds) => {
               if (!pendingRenewalData) {
                 return;
               }
               setIsRenewalCreating(true);
-              await createLeagueFromData(pendingRenewalData, memberIds);
+              await createLeagueFromData(
+                pendingRenewalData,
+                memberIds,
+                adminMemberIds,
+              );
               setIsRenewalCreating(false);
             }}
             isCreating={isRenewalCreating}

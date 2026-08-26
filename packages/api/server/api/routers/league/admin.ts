@@ -102,7 +102,7 @@ const buildRenewalInvitePreview = async ({
     });
   }
 
-  const [priorLeague, nextLeague, priorMembers, nextMembers] =
+  const [priorLeague, nextLeague, priorMembers, nextMembers, renewalRoles] =
     await Promise.all([
       db.leagues.findFirstOrThrow({
         where: {
@@ -138,6 +138,15 @@ const buildRenewalInvitePreview = async ({
         },
         select: {
           user_id: true,
+        },
+      }),
+      db.league_renewal_member_roles.findMany({
+        where: {
+          league_id: nextLeagueId,
+        },
+        select: {
+          user_id: true,
+          role: true,
         },
       }),
     ]);
@@ -201,6 +210,9 @@ const buildRenewalInvitePreview = async ({
   const nextLeagueUserIds = new Set(
     nextMembers.map((member) => member.user_id),
   );
+  const renewalRoleByUserId = new Map(
+    renewalRoles.map((member) => [member.user_id, member.role]),
+  );
   const eligibleMembersBeforeInviteCheck = priorMembers
     .filter((member) => !nextLeagueUserIds.has(member.user_id))
     .filter((member) => Boolean(member.people.email))
@@ -211,6 +223,11 @@ const buildRenewalInvitePreview = async ({
         username: member.people.username,
         email: member.people.email,
         role: member.role ?? MemberRole.player,
+        nextSeasonRole:
+          member.role === MemberRole.admin ||
+          renewalRoleByUserId.get(member.user_id) === MemberRole.admin
+            ? MemberRole.admin
+            : MemberRole.player,
         missedPickCount: missedPicksByMemberId.get(member.membership_id) ?? 0,
       };
     });
@@ -258,6 +275,9 @@ const buildRenewalInvitePreview = async ({
     defaultSelectedMemberIds: eligibleMembers.map(
       (member) => member.membershipId,
     ),
+    defaultAdminMemberIds: eligibleMembers
+      .filter((member) => member.nextSeasonRole === MemberRole.admin)
+      .map((member) => member.membershipId),
     alreadyJoinedCount,
     alreadyInvitedCount:
       eligibleMembersBeforeInviteCheck.length - eligibleMembers.length,
@@ -459,6 +479,7 @@ export const leagueAdminRouter = createTRPCRouter({
       z.object({
         priorLeagueId: z.number().int(),
         memberIds: z.array(z.number().int()).default([]),
+        adminMemberIds: z.array(z.number().int()).default([]),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -476,6 +497,7 @@ export const leagueAdminRouter = createTRPCRouter({
       });
 
       const selectedMemberIds = new Set(input.memberIds);
+      const selectedAdminMemberIds = new Set(input.adminMemberIds);
       const eligibleMemberIds = new Set(
         preview.eligibleMembers.map((member) => member.membershipId),
       );
@@ -485,6 +507,40 @@ export const leagueAdminRouter = createTRPCRouter({
       const selectedRecipients = preview.eligibleMembers.filter((member) =>
         selectedMemberIds.has(member.membershipId),
       );
+
+      const selectedPlayerUserIds = selectedRecipients
+        .filter((member) => !selectedAdminMemberIds.has(member.membershipId))
+        .map((member) => member.userId);
+      const selectedAdminUserIds = selectedRecipients
+        .filter((member) => selectedAdminMemberIds.has(member.membershipId))
+        .map((member) => member.userId);
+
+      await db.$transaction([
+        db.league_renewal_member_roles.deleteMany({
+          where: {
+            league_id: leagueId,
+            user_id: { in: selectedPlayerUserIds },
+          },
+        }),
+        ...selectedAdminUserIds.map((userId) =>
+          db.league_renewal_member_roles.upsert({
+            where: {
+              league_id_user_id: {
+                league_id: leagueId,
+                user_id: userId,
+              },
+            },
+            create: {
+              league_id: leagueId,
+              user_id: userId,
+              role: MemberRole.admin,
+            },
+            update: {
+              role: MemberRole.admin,
+            },
+          }),
+        ),
+      ]);
 
       const previouslyInvited = await db.emailLogs.findMany({
         where: {

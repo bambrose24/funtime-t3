@@ -33,6 +33,11 @@ test("admin creates one linked renewal and exercises isolated member invites", a
     page.getByRole("checkbox", { name: "Invite webplayer" }),
   ).toBeChecked();
   await page
+    .getByRole("switch", {
+      name: "Make webplayer an admin next season",
+    })
+    .click();
+  await page
     .getByRole("button", { name: "Create league and send 1 invite" })
     .click();
 
@@ -56,6 +61,16 @@ test("admin creates one linked renewal and exercises isolated member invites", a
     GROUP BY next."season", next."prior_league_id"
   `);
   expect(renewalState).toBe(`2027|${priorLeagueId}|1`);
+
+  const renewalAdminRole = queryScalar(`
+    SELECT r."role"
+    FROM "league_renewal_member_roles" r
+    JOIN "leagues" next ON next."league_id" = r."league_id"
+    JOIN "people" p ON p."uid" = r."user_id"
+    WHERE next."prior_league_id" = ${priorLeagueId}
+      AND p."email" = '${E2E_USERS.player.email}'
+  `);
+  expect(renewalAdminRole).toBe("admin");
 
   await page.goto(`/league/${priorLeagueId}/admin`);
   await expect(
