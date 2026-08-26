@@ -217,7 +217,7 @@ export default function CreateLeagueScreen() {
       await utils.invalidate();
       if (priorLeagueId !== "none") {
         router.replace(
-          `/league/${createdLeague.league_id}/renewal-invites?priorLeagueId=${priorLeagueId}` as any,
+          `/league/${createdLeague.league_id}/renewal-invites` as any,
         );
         return;
       }

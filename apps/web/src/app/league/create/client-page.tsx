@@ -124,7 +124,6 @@ export function CreateLeagueClientPage({
           try {
             const inviteResult = await sendRenewalInvites({
               leagueId: newLeague.league_id,
-              priorLeagueId: Number(data.priorLeagueId),
               memberIds: selectedMemberIds,
               adminMemberIds,
             });
@@ -137,9 +136,7 @@ export function CreateLeagueClientPage({
             );
           }
         }
-        router.push(
-          `/league/${newLeague.league_id}/renewal-invites?priorLeagueId=${data.priorLeagueId}`,
-        );
+        router.push(`/league/${newLeague.league_id}/renewal-invites`);
         return;
       }
       router.push(`/league/${newLeague.league_id}`);

@@ -35,21 +35,32 @@ export function LeagueAdminClientPage({
     { initialData: membersProp },
   );
   const { data: renewalStatus } = clientApi.league.renewalStatus.useQuery();
-  const { data: renewalPreview } = clientApi.league.renewalPreview.useQuery(
-    { priorLeagueId: league.league_id },
-    {
-      enabled:
-        renewalStatus?.isOpen === true &&
-        league.status === "completed" &&
-        league.season < DEFAULT_SEASON,
-    },
-  );
+  const { data: priorLeagueRenewalPreview } =
+    clientApi.league.renewalPreview.useQuery(
+      { priorLeagueId: league.league_id },
+      {
+        enabled:
+          renewalStatus?.isOpen === true &&
+          league.status === "completed" &&
+          league.season < DEFAULT_SEASON,
+      },
+    );
+  const { data: renewalInvitePreview } =
+    clientApi.league.admin.renewalInvitePreview.useQuery(
+      { leagueId: league.league_id },
+      {
+        enabled:
+          renewalStatus?.isOpen === true &&
+          league.status === "not_started" &&
+          league.prior_league_id !== null,
+      },
+    );
 
   const [shareLink, setShareLink] = useState("");
   useEffect(() => {
     setShareLink(`${window.location.origin}/join-league/${league.share_code}`);
   }, [league.share_code]);
-  const nextLeague = renewalPreview?.nextLeague ?? null;
+  const nextLeague = priorLeagueRenewalPreview?.nextLeague ?? null;
 
   return (
     <Card className="w-full">
@@ -58,7 +69,7 @@ export function LeagueAdminClientPage({
           <CardTitle className="py-2 text-2xl">
             General Admin Settings
           </CardTitle>
-          {renewalPreview ? (
+          {priorLeagueRenewalPreview ? (
             <>
               <div className="flex w-full flex-col gap-3 rounded-md border bg-muted/30 p-4">
                 <div className="flex items-center gap-2">
@@ -68,7 +79,7 @@ export function LeagueAdminClientPage({
                 <Text.Small className="text-muted-foreground">
                   {nextLeague
                     ? `${nextLeague.name} is linked to this prior league.`
-                    : `Create ${renewalPreview.suggestedName} for ${DEFAULT_SEASON}.`}
+                    : `Create ${priorLeagueRenewalPreview.suggestedName} for ${DEFAULT_SEASON}.`}
                 </Text.Small>
                 <div className="flex flex-col gap-2 sm:flex-row">
                   {nextLeague ? (
@@ -81,7 +92,7 @@ export function LeagueAdminClientPage({
                       </Button>
                       <Button asChild size="sm" variant="outline">
                         <Link
-                          href={`/league/${nextLeague.league_id}/renewal-invites?priorLeagueId=${league.league_id}`}
+                          href={`/league/${nextLeague.league_id}/renewal-invites`}
                         >
                           Manage Invites
                         </Link>
@@ -100,6 +111,53 @@ export function LeagueAdminClientPage({
                       </Link>
                     </Button>
                   )}
+                </div>
+              </div>
+              <Separator />
+            </>
+          ) : null}
+          {renewalInvitePreview ? (
+            <>
+              <div className="flex w-full flex-col gap-3 rounded-md border bg-muted/30 p-4">
+                <div className="flex items-center gap-2">
+                  <RefreshCw className="h-4 w-4 text-primary" />
+                  <Text.H4>Renewal Invites</Text.H4>
+                </div>
+                <Text.Small className="text-muted-foreground">
+                  This league was renewed from{" "}
+                  {renewalInvitePreview.priorLeague.name}. Invite last
+                  season&apos;s players or share the join link.
+                </Text.Small>
+                <div className="flex flex-wrap gap-x-4 gap-y-2 text-sm">
+                  <span>
+                    <strong>
+                      {renewalInvitePreview.eligibleMembers.length}
+                    </strong>{" "}
+                    ready to invite
+                  </span>
+                  <span>
+                    <strong>{renewalInvitePreview.alreadyJoinedCount}</strong>{" "}
+                    joined
+                  </span>
+                  <span>
+                    <strong>{renewalInvitePreview.alreadyInvitedCount}</strong>{" "}
+                    invited
+                  </span>
+                  {renewalInvitePreview.missingEmailCount > 0 ? (
+                    <span className="text-muted-foreground">
+                      {renewalInvitePreview.missingEmailCount} missing email
+                    </span>
+                  ) : null}
+                </div>
+                <div className="flex flex-col gap-2 sm:flex-row">
+                  <Button asChild size="sm">
+                    <Link href={`/league/${league.league_id}/renewal-invites`}>
+                      Manage Renewal Invites
+                    </Link>
+                  </Button>
+                  {league.share_code ? (
+                    <CopyJoinLinkButton shareCode={league.share_code} />
+                  ) : null}
                 </div>
               </div>
               <Separator />
