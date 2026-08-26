@@ -49,9 +49,7 @@ test("admin creates one linked renewal and exercises isolated member invites", a
     .getByRole("button", { name: "Create league and send 1 invite" })
     .click();
 
-  await expect(page).toHaveURL(
-    /\/league\/\d+\/renewal-invites\?priorLeagueId=\d+$/,
-  );
+  await expect(page).toHaveURL(/\/league\/\d+\/renewal-invites$/);
   await expect(
     page.getByRole("heading", { name: "Invite last year's players" }),
   ).toBeVisible();
@@ -96,6 +94,18 @@ test("admin creates one linked renewal and exercises isolated member invites", a
   const [nextLeagueId, nextLeagueShareCode] = nextLeague.split("|");
   expect(nextLeagueId).toMatch(/^\d+$/);
   expect(nextLeagueShareCode).toBeTruthy();
+
+  await page.goto(`/league/${nextLeagueId}/admin`);
+  await expect(
+    page.getByRole("heading", { name: "Renewal Invites" }),
+  ).toBeVisible();
+  await page.getByRole("link", { name: "Manage Renewal Invites" }).click();
+  await expect(page).toHaveURL(
+    new RegExp(`/league/${nextLeagueId}/renewal-invites$`),
+  );
+  await expect(
+    page.getByRole("heading", { name: "Invite last year's players" }),
+  ).toBeVisible();
 
   await page.getByRole("button", { name: "User menu" }).click();
   await page.getByRole("menuitem", { name: "Log out" }).click();

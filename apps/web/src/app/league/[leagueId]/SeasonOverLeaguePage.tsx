@@ -95,7 +95,7 @@ export async function SeasonOverLeaguePage({
                   </Button>
                   <Button asChild variant="outline">
                     <Link
-                      href={`/league/${nextLeague.league_id}/renewal-invites?priorLeagueId=${league.league_id}`}
+                      href={`/league/${nextLeague.league_id}/renewal-invites`}
                     >
                       Manage Invites
                     </Link>

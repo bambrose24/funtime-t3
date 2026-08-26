@@ -849,7 +849,7 @@ function LeagueOverview({
                       variant="outline"
                       onPress={() =>
                         router.push(
-                          `/league/${renewalPreview.nextLeague?.league_id}/renewal-invites?priorLeagueId=${leagueIdNumber}` as any,
+                          `/league/${renewalPreview.nextLeague?.league_id}/renewal-invites` as any,
                         )
                       }
                     >

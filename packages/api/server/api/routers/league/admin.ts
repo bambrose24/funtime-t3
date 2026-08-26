@@ -9,7 +9,7 @@ import {
 import { resendApi } from "../../../services/resend";
 import { getBaseUrl } from "../../../../utils/getBaseUrl";
 import { authorizedProcedure, createTRPCRouter } from "../../trpc";
-import { getRenewalIneligibilityReason, isLeagueAdmin } from "./renewal";
+import { getRenewalIneligibilityReason } from "./renewal";
 
 const SUPER_ADMIN_EMAIL = "bambrose24@gmail.com";
 
@@ -70,48 +70,31 @@ const canSendBroadcastThisWeek = async (db: PrismaClient, leagueId: number) => {
   }
 };
 
-type RenewalDbUser = {
-  email?: string | null;
-  uid: number;
-  username: string;
-  leaguemembers: {
-    league_id: number;
-    role: string | null;
-  }[];
-};
-
 const buildRenewalInvitePreview = async ({
   db,
-  dbUser,
   nextLeagueId,
-  priorLeagueId,
 }: {
   db: PrismaClient;
-  dbUser: RenewalDbUser;
   nextLeagueId: number;
-  priorLeagueId: number;
 }) => {
-  const requestorIsSuperAdmin = isSuperAdminUser(dbUser.email);
-  if (
-    !requestorIsSuperAdmin &&
-    !isLeagueAdmin(dbUser.leaguemembers, priorLeagueId)
-  ) {
+  const nextLeague = await db.leagues.findFirstOrThrow({
+    where: {
+      league_id: nextLeagueId,
+    },
+  });
+  const priorLeagueId = nextLeague.prior_league_id;
+  if (!priorLeagueId) {
     throw new TRPCError({
-      code: "FORBIDDEN",
-      message: "You are not an admin of the prior league",
+      code: "BAD_REQUEST",
+      message: "This league is not linked to a prior league",
     });
   }
 
-  const [priorLeague, nextLeague, priorMembers, nextMembers, renewalRoles] =
+  const [priorLeague, priorMembers, nextMembers, renewalRoles] =
     await Promise.all([
       db.leagues.findFirstOrThrow({
         where: {
           league_id: priorLeagueId,
-        },
-      }),
-      db.leagues.findFirstOrThrow({
-        where: {
-          league_id: nextLeagueId,
         },
       }),
       db.leaguemembers.findMany({
@@ -150,13 +133,6 @@ const buildRenewalInvitePreview = async ({
         },
       }),
     ]);
-
-  if (nextLeague.prior_league_id !== priorLeagueId) {
-    throw new TRPCError({
-      code: "BAD_REQUEST",
-      message: "The renewed league does not belong to the prior league",
-    });
-  }
 
   const ineligibilityReason = getRenewalIneligibilityReason(priorLeague);
   if (ineligibilityReason) {
@@ -454,46 +430,35 @@ export const leagueAdminRouter = createTRPCRouter({
 
     return { members };
   }),
-  renewalInvitePreview: leagueAdminProcedure
-    .input(
-      z.object({
-        priorLeagueId: z.number().int(),
-      }),
-    )
-    .query(async ({ ctx, input }) => {
-      const { db, dbUser } = ctx;
-      const { leagueId, priorLeagueId } = input;
-      if (!dbUser) {
-        throw new TRPCError({ code: "UNAUTHORIZED" });
-      }
+  renewalInvitePreview: leagueAdminProcedure.query(async ({ ctx, input }) => {
+    const { db, dbUser } = ctx;
+    const { leagueId } = input;
+    if (!dbUser) {
+      throw new TRPCError({ code: "UNAUTHORIZED" });
+    }
 
-      return await buildRenewalInvitePreview({
-        db,
-        dbUser,
-        nextLeagueId: leagueId,
-        priorLeagueId,
-      });
-    }),
+    return await buildRenewalInvitePreview({
+      db,
+      nextLeagueId: leagueId,
+    });
+  }),
   sendRenewalInvites: leagueAdminProcedure
     .input(
       z.object({
-        priorLeagueId: z.number().int(),
         memberIds: z.array(z.number().int()).default([]),
         adminMemberIds: z.array(z.number().int()).default([]),
       }),
     )
     .mutation(async ({ ctx, input }) => {
       const { db, dbUser } = ctx;
-      const { leagueId, priorLeagueId } = input;
+      const { leagueId } = input;
       if (!dbUser) {
         throw new TRPCError({ code: "UNAUTHORIZED" });
       }
 
       const preview = await buildRenewalInvitePreview({
         db,
-        dbUser,
         nextLeagueId: leagueId,
-        priorLeagueId,
       });
 
       const selectedMemberIds = new Set(input.memberIds);

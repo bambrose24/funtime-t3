@@ -16,19 +16,13 @@ import { useColorScheme } from "@/lib/useColorScheme";
 import { getBaseUrl } from "@/utils/getBaseUrl";
 
 export default function RenewalInvitesScreen() {
-  const { id, priorLeagueId: priorLeagueIdParam } = useLocalSearchParams<{
+  const { id } = useLocalSearchParams<{
     id?: string;
-    priorLeagueId?: string;
   }>();
   const { isDarkColorScheme } = useColorScheme();
   const utils = clientApi.useUtils();
   const leagueId = Number(id);
-  const priorLeagueId = Number(priorLeagueIdParam);
-  const validParams =
-    Number.isInteger(leagueId) &&
-    leagueId > 0 &&
-    Number.isInteger(priorLeagueId) &&
-    priorLeagueId > 0;
+  const validParams = Number.isInteger(leagueId) && leagueId > 0;
   const { data: renewalStatus, isLoading: renewalStatusLoading } =
     clientApi.league.renewalStatus.useQuery(undefined, {
       enabled: validParams,
@@ -38,7 +32,7 @@ export default function RenewalInvitesScreen() {
     isLoading,
     refetch,
   } = clientApi.league.admin.renewalInvitePreview.useQuery(
-    { leagueId, priorLeagueId },
+    { leagueId },
     { enabled: validParams && renewalStatus?.isOpen === true },
   );
   const { mutateAsync: sendRenewalInvites } =
@@ -90,7 +84,6 @@ export default function RenewalInvitesScreen() {
       setSubmitting(true);
       const result = await sendRenewalInvites({
         leagueId,
-        priorLeagueId,
         memberIds: selectedMemberIdList,
       });
       setSendResult(result);

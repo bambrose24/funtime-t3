@@ -29,16 +29,14 @@ type RenewalInvitePreview =
 export function RenewalInvitesClientPage({
   initialPreview,
   leagueId,
-  priorLeagueId,
 }: {
   initialPreview: RenewalInvitePreview;
   leagueId: number;
-  priorLeagueId: number;
 }) {
   const utils = clientApi.useUtils();
   const { data: preview } =
     clientApi.league.admin.renewalInvitePreview.useQuery(
-      { leagueId, priorLeagueId },
+      { leagueId },
       { initialData: initialPreview },
     );
   const [selectedMemberIds, setSelectedMemberIds] = useState<Set<number>>(
@@ -101,7 +99,6 @@ export function RenewalInvitesClientPage({
     try {
       const result = await sendRenewalInvites({
         leagueId,
-        priorLeagueId,
         memberIds: selectedMemberIdList,
         adminMemberIds: selectedMemberIdList.filter((memberId) =>
           adminMemberIds.has(memberId),
@@ -114,7 +111,6 @@ export function RenewalInvitesClientPage({
         utils.league.invalidate(),
         utils.league.admin.renewalInvitePreview.invalidate({
           leagueId,
-          priorLeagueId,
         }),
       ]);
     } catch (error) {
