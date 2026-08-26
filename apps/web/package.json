@@ -9,7 +9,7 @@
   "scripts": {
     "build": "next build",
     "dev": "next dev",
-    "email-dev": "email dev --port 3001",
+    "email-dev": "pnpm --filter @funtime/api email:dev",
     "lint": "next lint",
     "start": "next start",
     "cron": "bun run src/cron/index.ts",

@@ -872,6 +872,7 @@ export const leagueAdminRouter = createTRPCRouter({
         await resendApi.sendLeagueBroadcast({
           leagueName: league.name,
           adminName: dbUser.username,
+          adminEmail: dbUser.email ?? undefined,
           markdownMessage: markdownString,
           to,
           leagueId,

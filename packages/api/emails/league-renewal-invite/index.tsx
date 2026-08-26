@@ -1,4 +1,4 @@
-import { Container, Html, Preview } from "@react-email/components";
+import { Body, Container, Head, Html, Preview } from "react-email";
 import { EmailButton } from "../components/email-button";
 import { EmailH1, EmailText } from "../components/email-text";
 import { Provider } from "../provider";
@@ -23,28 +23,31 @@ export default function LeagueRenewalInvite({
   const seasonLabel = String(season);
 
   return (
-    <Provider>
-      <Html>
-        <Preview>
-          {nextLeagueName} is open for {seasonLabel}
-        </Preview>
-        <Container className="flex flex-col items-center">
-          <EmailH1>Join the {seasonLabel} season</EmailH1>
-        </Container>
-        <Container className="flex flex-col">
-          <EmailText>
-            Hi {username}, {adminName} renewed {priorLeagueName} for the new
-            season.
-          </EmailText>
-          <EmailText>
-            Join {nextLeagueName} before week 1 starts to play with last
-            year&apos;s players again.
-          </EmailText>
-        </Container>
-        <Container className="flex justify-center">
-          <EmailButton href={joinHref}>Join Next Season League</EmailButton>
-        </Container>
-      </Html>
-    </Provider>
+    <Html lang="en">
+      <Head />
+      <Preview>
+        {nextLeagueName} is open for {seasonLabel}
+      </Preview>
+      <Provider>
+        <Body className="bg-white font-sans">
+          <Container className="flex flex-col items-center">
+            <EmailH1>Join the {seasonLabel} season</EmailH1>
+          </Container>
+          <Container className="flex flex-col">
+            <EmailText>
+              Hi {username}, {adminName} renewed {priorLeagueName} for the new
+              season.
+            </EmailText>
+            <EmailText>
+              Join {nextLeagueName} before week 1 starts to play with last
+              year&apos;s players again.
+            </EmailText>
+          </Container>
+          <Container className="flex justify-center">
+            <EmailButton href={joinHref}>Join Next Season League</EmailButton>
+          </Container>
+        </Body>
+      </Provider>
+    </Html>
   );
 }

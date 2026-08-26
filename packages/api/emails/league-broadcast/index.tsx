@@ -6,8 +6,8 @@ import {
   Hr,
   Html,
   Section,
-} from "@react-email/components";
-import { Markdown } from "@react-email/markdown";
+  Markdown,
+} from "react-email";
 import { Provider } from "../provider";
 
 export default function LeagueBroadcastEmail({
@@ -34,9 +34,9 @@ export default function LeagueBroadcastEmail({
   markdownMessage: string;
 }) {
   return (
-    <Provider>
-      <Html>
-        <Head />
+    <Html lang="en">
+      <Head />
+      <Provider>
         <Body className="bg-white font-sans">
           <Container className="mx-auto py-8">
             <Heading className="mb-4 text-lg">
@@ -54,7 +54,7 @@ export default function LeagueBroadcastEmail({
             </Section>
           </Container>
         </Body>
-      </Html>
-    </Provider>
+      </Provider>
+    </Html>
   );
 }
