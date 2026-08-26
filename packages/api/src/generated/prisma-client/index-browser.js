@@ -128,12 +128,27 @@ exports.Prisma.EmailLogsScalarFieldEnum = {
   email_type: 'email_type',
   ts: 'ts',
   week: 'week',
-  resend_id: 'resend_id'
+  resend_id: 'resend_id',
+  delivery_status: 'delivery_status',
+  last_event_at: 'last_event_at',
+  delivered_at: 'delivered_at',
+  failed_at: 'failed_at',
+  failure_reason: 'failure_reason'
 };
 
 exports.Prisma.RelationLoadStrategy = {
   query: 'query',
   join: 'join'
+};
+
+exports.Prisma.EmailDeliveryEventsScalarFieldEnum = {
+  id: 'id',
+  svix_id: 'svix_id',
+  resend_id: 'resend_id',
+  event_type: 'event_type',
+  occurred_at: 'occurred_at',
+  received_at: 'received_at',
+  payload: 'payload'
 };
 
 exports.Prisma.WeekWinnersScalarFieldEnum = {
@@ -316,6 +331,10 @@ exports.Prisma.SortOrder = {
   desc: 'desc'
 };
 
+exports.Prisma.JsonNullValueInput = {
+  JsonNull: Prisma.JsonNull
+};
+
 exports.Prisma.QueryMode = {
   default: 'default',
   insensitive: 'insensitive'
@@ -325,6 +344,12 @@ exports.Prisma.NullsOrder = {
   first: 'first',
   last: 'last'
 };
+
+exports.Prisma.JsonNullValueFilter = {
+  DbNull: Prisma.DbNull,
+  JsonNull: Prisma.JsonNull,
+  AnyNull: Prisma.AnyNull
+};
 exports.EmailType = exports.$Enums.EmailType = {
   week_reminder: 'week_reminder',
   week_summary: 'week_summary',
@@ -332,6 +357,16 @@ exports.EmailType = exports.$Enums.EmailType = {
   league_registration: 'league_registration',
   league_broadcast: 'league_broadcast',
   renewal_invite: 'renewal_invite'
+};
+
+exports.EmailDeliveryStatus = exports.$Enums.EmailDeliveryStatus = {
+  queued: 'queued',
+  delivered: 'delivered',
+  delayed: 'delayed',
+  failed: 'failed',
+  bounced: 'bounced',
+  complained: 'complained',
+  suppressed: 'suppressed'
 };
 
 exports.MemberRole = exports.$Enums.MemberRole = {
@@ -387,6 +422,7 @@ exports.Conference = exports.$Enums.Conference = {
 
 exports.Prisma.ModelName = {
   EmailLogs: 'EmailLogs',
+  EmailDeliveryEvents: 'EmailDeliveryEvents',
   WeekWinners: 'WeekWinners',
   games: 'games',
   leaguemembers: 'leaguemembers',
