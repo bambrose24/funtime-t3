@@ -43,6 +43,8 @@ export default function RenewalInvitesScreen() {
   const [submitting, setSubmitting] = useState(false);
   const [sendResult, setSendResult] = useState<{
     failedCount: number;
+    initiatorCopyFailed: boolean;
+    initiatorCopySent: boolean;
     sentCount: number;
     skippedCount: number;
   } | null>(null);
@@ -89,7 +91,12 @@ export default function RenewalInvitesScreen() {
       setSendResult(result);
       await utils.invalidate();
       await refetch();
-      Alert.alert("Invites Sent", `Sent ${result.sentCount} renewal invites.`);
+      Alert.alert(
+        result.initiatorCopyFailed
+          ? "Invites Sent, Copy Failed"
+          : "Invites Sent",
+        `Sent ${result.sentCount} renewal invites.${result.initiatorCopySent ? " A confirmation copy was sent to you." : ""}${result.initiatorCopyFailed ? " Your confirmation copy could not be delivered." : ""}`,
+      );
     } catch (error) {
       Alert.alert(
         "Invite Failed",
@@ -289,6 +296,7 @@ export default function RenewalInvitesScreen() {
                   ? `, failed ${sendResult.failedCount}`
                   : ""}
                 .
+                {sendResult.initiatorCopySent ? " A copy was sent to you." : ""}
               </Text>
             </View>
           ) : null}

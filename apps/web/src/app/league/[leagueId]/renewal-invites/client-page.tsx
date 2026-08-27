@@ -47,6 +47,8 @@ export function RenewalInvitesClientPage({
   );
   const [sendResult, setSendResult] = useState<{
     failedCount: number;
+    initiatorCopyFailed: boolean;
+    initiatorCopySent: boolean;
     sentCount: number;
     skippedCount: number;
   } | null>(null);
@@ -105,7 +107,15 @@ export function RenewalInvitesClientPage({
         ),
       });
       setSendResult(result);
-      toast.success(`Sent ${result.sentCount} renewal invites`);
+      if (result.initiatorCopyFailed) {
+        toast.error(
+          `Sent ${result.sentCount} renewal invites, but your confirmation copy could not be delivered.`,
+        );
+      } else {
+        toast.success(
+          `Sent ${result.sentCount} renewal invites.${result.initiatorCopySent ? " A confirmation copy was sent to you." : ""}`,
+        );
+      }
       await Promise.all([
         utils.home.invalidate(),
         utils.league.invalidate(),
@@ -288,7 +298,7 @@ export function RenewalInvitesClientPage({
               {sendResult.failedCount > 0
                 ? `, failed ${sendResult.failedCount}`
                 : ""}
-              .
+              .{sendResult.initiatorCopySent ? " A copy was sent to you." : ""}
             </div>
           ) : null}
 
