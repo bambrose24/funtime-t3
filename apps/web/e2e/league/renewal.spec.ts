@@ -138,3 +138,53 @@ test("admin creates one linked renewal and exercises isolated member invites", a
     )
     .toBe("admin");
 });
+
+test("admin can create a renewal without sending invitations", async ({
+  page,
+}) => {
+  const priorLeagueId = getLeagueId(E2E_LEAGUES.completed.shareCode);
+  executeSql(`
+    DELETE FROM "leagues"
+    WHERE "prior_league_id" = ${priorLeagueId}
+  `);
+  await login(page, E2E_USERS.admin);
+
+  await page.goto(`/league/${priorLeagueId}/admin`);
+  await page.getByRole("link", { name: "Set Up Next Season" }).click();
+  await page.getByRole("button", { name: "Review Invites" }).click();
+
+  await expect(
+    page.getByRole("button", { name: "Create League and Send 1 Invite" }),
+  ).toBeVisible();
+  await page
+    .getByRole("button", { name: "Create League Without Sending" })
+    .click();
+
+  await expect(page).toHaveURL(/\/league\/\d+\/renewal-invites$/);
+
+  const renewalState = queryScalar(`
+    SELECT CONCAT(
+      next."league_id", '|',
+      next."season", '|',
+      COUNT(m."membership_id"), '|',
+      COUNT(e."email_log_id")
+    )
+    FROM "leagues" next
+    JOIN "leaguemembers" m ON m."league_id" = next."league_id"
+    LEFT JOIN "EmailLogs" e
+      ON e."league_id" = next."league_id"
+      AND e."email_type" = 'renewal_invite'
+    WHERE next."prior_league_id" = ${priorLeagueId}
+    GROUP BY next."league_id", next."season"
+  `);
+  const [nextLeagueId] = renewalState.split("|");
+  expect(renewalState).toBe(`${nextLeagueId}|2026|1|0`);
+
+  await expect(
+    page.getByRole("button", { name: "Send Invites" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: "Back to Admin Settings" }),
+  ).toHaveAttribute("href", `/league/${nextLeagueId}/admin`);
+  await expect(page.getByRole("link", { name: "Open League" })).toHaveCount(0);
+});

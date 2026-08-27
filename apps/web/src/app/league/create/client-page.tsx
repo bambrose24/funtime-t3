@@ -504,17 +504,31 @@ export function CreateLeagueClientPage({
             invitees={renewalInvitees}
             open={inviteDialogOpen}
             onOpenChange={setInviteDialogOpen}
+            onCreateWithoutInvites={async () => {
+              if (!pendingRenewalData) {
+                return;
+              }
+              setIsRenewalCreating(true);
+              try {
+                await createLeagueFromData(pendingRenewalData);
+              } finally {
+                setIsRenewalCreating(false);
+              }
+            }}
             onConfirm={async (memberIds, adminMemberIds) => {
               if (!pendingRenewalData) {
                 return;
               }
               setIsRenewalCreating(true);
-              await createLeagueFromData(
-                pendingRenewalData,
-                memberIds,
-                adminMemberIds,
-              );
-              setIsRenewalCreating(false);
+              try {
+                await createLeagueFromData(
+                  pendingRenewalData,
+                  memberIds,
+                  adminMemberIds,
+                );
+              } finally {
+                setIsRenewalCreating(false);
+              }
             }}
             isCreating={isRenewalCreating}
           />
