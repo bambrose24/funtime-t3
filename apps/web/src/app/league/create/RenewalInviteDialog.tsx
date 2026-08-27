@@ -24,12 +24,14 @@ export function RenewalInviteDialog({
   open,
   onOpenChange,
   onConfirm,
+  onCreateWithoutInvites,
   isCreating,
 }: {
   invitees: RenewalInvitees;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onConfirm: (memberIds: number[], adminMemberIds: number[]) => void;
+  onCreateWithoutInvites: () => void;
   isCreating: boolean;
 }) {
   const [selectedMemberIds, setSelectedMemberIds] = useState<Set<number>>(
@@ -88,7 +90,8 @@ export function RenewalInviteDialog({
           </DialogTitle>
           <DialogDescription className="max-w-xl text-sm leading-6 text-muted-foreground">
             Choose who to invite back. Returning admins keep admin access, and
-            you can make other invited players admins for the new season.
+            you can make other invited players admins for the new season. You
+            can also create the league now and send invitations later.
           </DialogDescription>
         </DialogHeader>
 
@@ -208,7 +211,7 @@ export function RenewalInviteDialog({
           </div>
         ) : null}
 
-        <DialogFooter>
+        <DialogFooter className="gap-2 sm:justify-between sm:space-x-0">
           <Button
             type="button"
             variant="outline"
@@ -217,24 +220,41 @@ export function RenewalInviteDialog({
           >
             Back to setup
           </Button>
-          <Button
-            type="button"
-            className="gap-2"
-            onClick={() =>
-              onConfirm(
-                selectedMemberIdList,
-                selectedMemberIdList.filter((memberId) =>
-                  adminMemberIds.has(memberId),
-                ),
-              )
-            }
-            loading={isCreating}
-            disabled={isCreating}
-          >
-            <Mail className="h-4 w-4" />
-            Create league and send {selectedCount}{" "}
-            {selectedCount === 1 ? "invite" : "invites"}
-          </Button>
+          <div className="flex flex-col-reverse gap-2 sm:flex-row">
+            {selectedCount > 0 ? (
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={onCreateWithoutInvites}
+                disabled={isCreating}
+              >
+                Create League Without Sending
+              </Button>
+            ) : null}
+            <Button
+              type="button"
+              className="gap-2"
+              onClick={() => {
+                if (selectedCount === 0) {
+                  onCreateWithoutInvites();
+                  return;
+                }
+                onConfirm(
+                  selectedMemberIdList,
+                  selectedMemberIdList.filter((memberId) =>
+                    adminMemberIds.has(memberId),
+                  ),
+                );
+              }}
+              loading={isCreating}
+              disabled={isCreating}
+            >
+              {selectedCount > 0 ? <Mail className="h-4 w-4" /> : null}
+              {selectedCount > 0
+                ? `Create League and Send ${selectedCount} ${selectedCount === 1 ? "Invite" : "Invites"}`
+                : "Create League"}
+            </Button>
+          </div>
         </DialogFooter>
       </DialogContent>
     </Dialog>
