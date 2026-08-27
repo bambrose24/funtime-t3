@@ -49,7 +49,6 @@ export default async function Home() {
   return (
     <>
       {!data?.length ? <JoinOrCreateALeague /> : <></>}
-      <NextSeasonRenewalSection candidates={renewalCandidates} />
       <div className="col-span-12 flex justify-center pt-2">
         <Text.H2>Active Leagues</Text.H2>
       </div>
@@ -68,6 +67,8 @@ export default async function Home() {
           return <HomeLeagueCard key={d.league_id} data={d} />;
         })}
       </div>
+
+      <NextSeasonRenewalSection candidates={renewalCandidates} />
 
       {priorLeagues?.length ? (
         <>
