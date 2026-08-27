@@ -211,6 +211,7 @@ export const resendApi = {
 
   sendLeagueRenewalInvites: async ({
     adminName,
+    initiatorCopy,
     joinHref,
     nextLeagueName,
     nextLeagueId,
@@ -220,6 +221,12 @@ export const resendApi = {
     to,
   }: {
     adminName: string;
+    initiatorCopy?: {
+      email: string;
+      leagueHref: string;
+      memberId: number;
+      username: string;
+    };
     joinHref: string;
     nextLeagueName: string;
     nextLeagueId: number;
@@ -234,6 +241,8 @@ export const resendApi = {
 
     let sentCount = 0;
     let failedCount = 0;
+    let initiatorCopySent = false;
+    let initiatorCopyFailed = false;
     const chunks = chunk(to, 90);
 
     for (const [chunkIndex, emailChunk] of chunks.entries()) {
@@ -316,7 +325,69 @@ export const resendApi = {
       }
     }
 
-    return { sentCount, failedCount };
+    if (initiatorCopy) {
+      const { data, error } = await sendEmail(
+        {
+          from: FROM,
+          to: [initiatorCopy.email],
+          subject: `Your copy: ${nextLeagueName} is open`,
+          react: LeagueRenewalInvite({
+            adminName,
+            isInitiatorCopy: true,
+            joinHref: initiatorCopy.leagueHref,
+            nextLeagueName,
+            priorLeagueName,
+            recipientCount: sentCount,
+            season,
+            username: initiatorCopy.username,
+          }),
+          tags: createTags("renewal_invite", nextLeagueId),
+        },
+        `renewal_initiator_copy:${priorLeagueId}:${initiatorCopy.memberId}`,
+        createIdempotencyKey(
+          "renewal-initiator-copy",
+          `${nextLeagueId}:${initiatorCopy.memberId}:${
+            to
+              .map((recipient) => recipient.memberId)
+              .sort((a, b) => a - b)
+              .join(",") || "none"
+          }`,
+        ),
+      );
+
+      if (error) {
+        initiatorCopyFailed = true;
+        getLogger().error(
+          `${LOG_PREFIX} Error sending renewal confirmation copy for league ${nextLeagueId}`,
+          { error },
+        );
+      } else if (data?.id) {
+        initiatorCopySent = true;
+        const existingLog = await db.emailLogs.findFirst({
+          where: { resend_id: data.id },
+          select: { email_log_id: true },
+        });
+        if (!existingLog) {
+          await db.emailLogs.create({
+            data: {
+              resend_id: data.id,
+              email_type: "renewal_invite",
+              league_id: nextLeagueId,
+              member_id: initiatorCopy.memberId,
+            },
+            select: { email_log_id: true },
+          });
+        }
+        await reconcileEmailDeliveryState(data.id);
+      }
+    }
+
+    return {
+      sentCount,
+      failedCount,
+      initiatorCopySent,
+      initiatorCopyFailed,
+    };
   },
 
   sendWeekPicksEmail: async ({

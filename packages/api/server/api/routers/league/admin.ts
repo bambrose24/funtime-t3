@@ -533,23 +533,36 @@ export const leagueAdminRouter = createTRPCRouter({
         });
       }
 
-      if (recipients.length === 0) {
-        return {
-          success: true,
-          sentCount: 0,
-          failedCount: 0,
-          skippedCount:
-            preview.eligibleMembers.length +
-            preview.alreadyJoinedCount +
-            preview.alreadyInvitedCount +
-            preview.missingEmailCount +
-            invalidSelectedCount,
-        };
-      }
-
       const joinHref = `${getBaseUrl()}/join-league/${preview.nextLeague.share_code}`;
+      const initiatingMember = await db.leaguemembers.findFirstOrThrow({
+        where: {
+          league_id: preview.nextLeague.league_id,
+          user_id: dbUser.uid,
+        },
+        include: {
+          people: true,
+        },
+      });
+      const existingInitiatorCopy = await db.emailLogs.findFirst({
+        where: {
+          league_id: preview.nextLeague.league_id,
+          member_id: initiatingMember.membership_id,
+          email_type: "renewal_invite",
+        },
+        select: { email_log_id: true },
+      });
+      const shouldSendInitiatorCopy =
+        recipients.length > 0 || !existingInitiatorCopy;
       const result = await resendApi.sendLeagueRenewalInvites({
         adminName: dbUser.username,
+        initiatorCopy: shouldSendInitiatorCopy
+          ? {
+              email: initiatingMember.people.email,
+              leagueHref: `${getBaseUrl()}/league/${preview.nextLeague.league_id}`,
+              memberId: initiatingMember.membership_id,
+              username: initiatingMember.people.username,
+            }
+          : undefined,
         joinHref,
         nextLeagueId: preview.nextLeague.league_id,
         nextLeagueName: preview.nextLeague.name,
@@ -566,9 +579,11 @@ export const leagueAdminRouter = createTRPCRouter({
       });
 
       return {
-        success: result.failedCount === 0,
+        success: result.failedCount === 0 && !result.initiatorCopyFailed,
         sentCount: result.sentCount,
         failedCount: result.failedCount,
+        initiatorCopySent: result.initiatorCopySent,
+        initiatorCopyFailed: result.initiatorCopyFailed,
         skippedCount:
           preview.eligibleMembers.length -
           recipients.length +

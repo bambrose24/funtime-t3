@@ -127,9 +127,15 @@ export function CreateLeagueClientPage({
               memberIds: selectedMemberIds,
               adminMemberIds,
             });
-            toast.success(
-              `Sent ${inviteResult.sentCount} ${inviteResult.sentCount === 1 ? "invite" : "invites"}.`,
-            );
+            if (inviteResult.initiatorCopyFailed) {
+              toast.error(
+                `Sent ${inviteResult.sentCount} ${inviteResult.sentCount === 1 ? "invite" : "invites"}, but your confirmation copy could not be delivered.`,
+              );
+            } else {
+              toast.success(
+                `Sent ${inviteResult.sentCount} ${inviteResult.sentCount === 1 ? "invite" : "invites"}.${inviteResult.initiatorCopySent ? " A confirmation copy was sent to you." : ""}`,
+              );
+            }
           } catch (error) {
             toast.error(
               "The league was created, but invitations were not sent. You can send them from the next page.",
