@@ -304,7 +304,9 @@ export function RenewalInvitesClientPage({
 
           <div className="flex flex-col gap-2 sm:flex-row sm:justify-end">
             <Button asChild variant="outline">
-              <Link href={`/league/${leagueId}`}>Skip for Now</Link>
+              <Link href={`/league/${leagueId}/admin`}>
+                Back to Admin Settings
+              </Link>
             </Button>
             <Button
               type="button"
@@ -315,9 +317,6 @@ export function RenewalInvitesClientPage({
             >
               <Mail className="h-4 w-4" />
               Send Invites
-            </Button>
-            <Button asChild variant="secondary">
-              <Link href={`/league/${leagueId}`}>Open League</Link>
             </Button>
           </div>
         </CardContent>
