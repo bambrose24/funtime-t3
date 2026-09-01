@@ -262,6 +262,7 @@ function EditSuperbowlForm({
   const initialScore = playerProfile.member.superbowl.at(0)?.score;
   const form = useForm<z.infer<typeof superbowlFormSchema>>({
     resolver: zodResolver(superbowlFormSchema),
+    mode: "onChange",
     defaultValues: {
       winnerTeamId: initialWinnerTeamId?.toString() ?? "",
       afcTeamId: initialAfcTeamId?.toString() ?? "",

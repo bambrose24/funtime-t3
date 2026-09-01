@@ -369,6 +369,7 @@ const roleChangeSchema = z.object({
 function RoleChangeRow({ member, league }: MemberProps) {
   const form = useForm<z.infer<typeof roleChangeSchema>>({
     resolver: zodResolver(roleChangeSchema),
+    mode: "onChange",
     defaultValues: {
       role: member.role ?? "player",
     },
