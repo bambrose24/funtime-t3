@@ -57,8 +57,8 @@ export const settingsRouter = createTRPCRouter({
         },
       });
 
-      revalidateTag(getCoreUserTag(dbUser.uid));
-      revalidateTag(getCoreUserTag(dbUser.email));
+      revalidateTag(getCoreUserTag(dbUser.uid), "max");
+      revalidateTag(getCoreUserTag(dbUser.email), "max");
     }),
   registerPushToken: publicProcedure
     .input(
