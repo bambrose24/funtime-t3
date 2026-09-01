@@ -15,9 +15,19 @@ test("player can join by share code with a required Super Bowl pick", async ({
   ).toBeVisible();
 
   const submit = page.getByRole("button", {
-    name: "Finish Super Bowl pick",
+    name: "Register with Super Bowl pick",
   });
-  await expect(submit).toBeDisabled();
+  await expect(submit).toBeEnabled();
+  await submit.click();
+  await expect(
+    page.getByRole("alert", { name: "Finish your Super Bowl pick" }),
+  ).toBeVisible();
+  await expect(page.getByText("Choose an AFC team.")).toBeVisible();
+  await expect(page.getByText("Choose an NFC team.")).toBeVisible();
+  await expect(
+    page.getByText("Choose the team you think will win."),
+  ).toBeVisible();
+  await expect(page.getByText("Enter the combined final score.")).toBeVisible();
 
   await page.getByRole("combobox", { name: "AFC Team" }).click();
   await page.getByRole("option", { name: "Buffalo Bills" }).click();
@@ -26,7 +36,9 @@ test("player can join by share code with a required Super Bowl pick", async ({
   await page.getByRole("radio", { name: "Pick Buffalo Bills to win" }).click();
   await page.getByLabel("Total Score").fill("48");
 
-  await page.getByRole("button", { name: "Register" }).click();
+  await page
+    .getByRole("button", { name: "Register with Super Bowl pick" })
+    .click();
   await expect(page).toHaveURL(new RegExp(`/league/${leagueId}$`));
 
   await expect
