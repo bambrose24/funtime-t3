@@ -11,7 +11,6 @@ module.exports = function (api) {
           importSource: "react-native-css-interop",
         },
       ],
-      "react-native-reanimated/plugin",
     ],
   };
 };

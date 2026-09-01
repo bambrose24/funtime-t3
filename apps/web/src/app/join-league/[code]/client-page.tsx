@@ -69,6 +69,7 @@ export function JoinLeagueClientPage({ data, session, teams }: Props) {
 
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
+    mode: "onChange",
     defaultValues: {
       superbowlAfcTeamId: "",
       superbowlNfcTeamId: "",

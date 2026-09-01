@@ -7,12 +7,9 @@
     "icon": "./assets/images/icon.png",
     "scheme": "funtime",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
       "associatedDomains": [
-        "applinks:play-funtime.com",
-        "applinks:www.play-funtime.com",
         "applinks:play-funtime.com",
         "applinks:www.play-funtime.com"
       ],
@@ -26,26 +23,7 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true,
       "intentFilters": [
-        {
-          "action": "VIEW",
-          "autoVerify": true,
-          "category": [
-            "BROWSABLE",
-            "DEFAULT"
-          ],
-          "data": [
-            {
-              "scheme": "https",
-              "host": "play-funtime.com"
-            },
-            {
-              "scheme": "https",
-              "host": "www.play-funtime.com"
-            }
-          ]
-        },
         {
           "action": "VIEW",
           "autoVerify": true,
@@ -85,7 +63,9 @@
         }
       ],
       "expo-font",
-      "expo-notifications"
+      "expo-notifications",
+      "expo-localization",
+      "expo-web-browser"
     ],
     "experiments": {
       "typedRoutes": true

@@ -37,6 +37,7 @@ const signupFormSchema = z.object({
 export function ConfirmSignupClientPage() {
   const form = useForm<z.infer<typeof signupFormSchema>>({
     resolver: zodResolver(signupFormSchema),
+    mode: "onChange",
     defaultValues: {
       username: "",
       firstName: "",

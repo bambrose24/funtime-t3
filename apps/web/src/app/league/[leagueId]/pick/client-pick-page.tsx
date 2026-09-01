@@ -57,7 +57,7 @@ type Props = {
 };
 
 const picksSchema = z.object({
-  applyToAllSeasonLeagues: z.boolean().default(false),
+  applyToAllSeasonLeagues: z.boolean(),
   picks: z
     .array(
       z.union([
@@ -65,7 +65,7 @@ const picksSchema = z.object({
           type: z.literal("toPick"),
           gid: z.number().int(),
           winner: z.number().int().nullable(),
-          isRandom: z.boolean().default(false),
+          isRandom: z.boolean(),
         }),
         z.object({
           type: z.literal("alreadyStarted"),

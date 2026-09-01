@@ -57,6 +57,7 @@ export function SignupClientPage() {
   const searchParams = useSearchParams();
   const form = useForm<z.infer<typeof signupFormSchema>>({
     resolver: zodResolver(signupFormSchema),
+    mode: "onChange",
     defaultValues: {
       email: "",
       password1: "",
