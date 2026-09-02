@@ -13,6 +13,16 @@ const writeMessageInput = z.object({
   content: z.string().min(1).max(500),
 });
 
+const messageReadInput = z.object({
+  leagueId: z.number().int(),
+  messageId: z.string(),
+});
+
+const legacyReadStateInput = z.object({
+  leagueId: z.number().int(),
+  lastSeenAt: z.date(),
+});
+
 function getLeagueMember(
   dbUser: {
     leaguemembers: {
@@ -24,6 +34,20 @@ function getLeagueMember(
   leagueId: number,
 ) {
   return dbUser?.leaguemembers.find((m) => m.league_id === leagueId);
+}
+
+function isCursorAfterOrEqual(
+  current: { last_read_at: Date; last_read_message_id: string },
+  candidate: { createdAt: Date; message_id: string },
+) {
+  const timestampDifference =
+    current.last_read_at.getTime() - candidate.createdAt.getTime();
+
+  return (
+    timestampDifference > 0 ||
+    (timestampDifference === 0 &&
+      current.last_read_message_id >= candidate.message_id)
+  );
 }
 
 export const messagesRouter = createTRPCRouter({
@@ -45,9 +69,7 @@ export const messagesRouter = createTRPCRouter({
           league_id: leagueId,
           status: "PUBLISHED",
         },
-        orderBy: {
-          createdAt: "asc",
-        },
+        orderBy: [{ createdAt: "asc" }, { message_id: "asc" }],
         include: {
           leaguemembers: {
             include: {
@@ -79,9 +101,7 @@ export const messagesRouter = createTRPCRouter({
           league_id: input.leagueId,
           status: "PUBLISHED",
         },
-        orderBy: {
-          createdAt: "asc",
-        },
+        orderBy: [{ createdAt: "asc" }, { message_id: "asc" }],
         include: {
           leaguemembers: {
             include: {
@@ -90,6 +110,185 @@ export const messagesRouter = createTRPCRouter({
           },
         },
       });
+    }),
+  unreadCounts: authorizedProcedure.query(async ({ ctx }) => {
+    const memberships = ctx.dbUser?.leaguemembers ?? [];
+    if (memberships.length === 0) {
+      return {};
+    }
+
+    const readStates = await ctx.db.league_message_read_state.findMany({
+      where: {
+        membership_id: {
+          in: memberships.map((membership) => membership.membership_id),
+        },
+      },
+    });
+    const readStateByMembershipId = new Map(
+      readStates.map((readState) => [readState.membership_id, readState]),
+    );
+
+    const unreadCounts = await Promise.all(
+      memberships.map(async (membership) => {
+        const readState = readStateByMembershipId.get(membership.membership_id);
+        const count = await ctx.db.leaguemessages.count({
+          where: {
+            league_id: membership.league_id,
+            status: "PUBLISHED",
+            ...(readState
+              ? {
+                  OR: [
+                    { createdAt: { gt: readState.last_read_at } },
+                    {
+                      createdAt: readState.last_read_at,
+                      message_id: { gt: readState.last_read_message_id },
+                    },
+                  ],
+                }
+              : {}),
+          },
+        });
+
+        return [membership.league_id, count] as const;
+      }),
+    );
+
+    return Object.fromEntries(unreadCounts);
+  }),
+  markRead: authorizedProcedure
+    .input(messageReadInput)
+    .mutation(async ({ ctx, input }) => {
+      const member = getLeagueMember(ctx.dbUser, input.leagueId);
+      if (!member) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "You are not a part of that league",
+        });
+      }
+
+      const message = await ctx.db.leaguemessages.findFirst({
+        where: {
+          message_id: input.messageId,
+          league_id: input.leagueId,
+          status: "PUBLISHED",
+        },
+        select: {
+          createdAt: true,
+          message_id: true,
+        },
+      });
+      if (!message) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Message not found in that league",
+        });
+      }
+
+      const existing = await ctx.db.league_message_read_state.findUnique({
+        where: { membership_id: member.membership_id },
+      });
+      if (existing && isCursorAfterOrEqual(existing, message)) {
+        return { advanced: false };
+      }
+
+      if (existing) {
+        const updated = await ctx.db.league_message_read_state.updateMany({
+          where: {
+            membership_id: member.membership_id,
+            OR: [
+              { last_read_at: { lt: message.createdAt } },
+              {
+                last_read_at: message.createdAt,
+                last_read_message_id: { lt: message.message_id },
+              },
+            ],
+          },
+          data: {
+            last_read_at: message.createdAt,
+            last_read_message_id: message.message_id,
+          },
+        });
+        return { advanced: updated.count > 0 };
+      } else {
+        const state = await ctx.db.league_message_read_state.upsert({
+          where: { membership_id: member.membership_id },
+          update: {},
+          create: {
+            membership_id: member.membership_id,
+            last_read_at: message.createdAt,
+            last_read_message_id: message.message_id,
+          },
+        });
+
+        if (!isCursorAfterOrEqual(state, message)) {
+          const updated = await ctx.db.league_message_read_state.updateMany({
+            where: {
+              membership_id: member.membership_id,
+              OR: [
+                { last_read_at: { lt: message.createdAt } },
+                {
+                  last_read_at: message.createdAt,
+                  last_read_message_id: { lt: message.message_id },
+                },
+              ],
+            },
+            data: {
+              last_read_at: message.createdAt,
+              last_read_message_id: message.message_id,
+            },
+          });
+
+          return { advanced: updated.count > 0 };
+        }
+      }
+
+      return { advanced: true };
+    }),
+  importLegacyReadState: authorizedProcedure
+    .input(legacyReadStateInput)
+    .mutation(async ({ ctx, input }) => {
+      const member = getLeagueMember(ctx.dbUser, input.leagueId);
+      if (!member) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "You are not a part of that league",
+        });
+      }
+
+      const existing = await ctx.db.league_message_read_state.findUnique({
+        where: { membership_id: member.membership_id },
+      });
+      if (existing) {
+        return { imported: false };
+      }
+
+      const latestSeenMessage = await ctx.db.leaguemessages.findFirst({
+        where: {
+          league_id: input.leagueId,
+          status: "PUBLISHED",
+          createdAt: { lte: input.lastSeenAt },
+        },
+        orderBy: [{ createdAt: "desc" }, { message_id: "desc" }],
+        select: {
+          createdAt: true,
+          message_id: true,
+        },
+      });
+      if (!latestSeenMessage) {
+        return { imported: false };
+      }
+
+      await ctx.db.league_message_read_state.upsert({
+        where: { membership_id: member.membership_id },
+        update: {},
+        create: {
+          membership_id: member.membership_id,
+          last_read_at: latestSeenMessage.createdAt,
+          last_read_message_id: latestSeenMessage.message_id,
+        },
+      });
+
+      return { imported: true };
     }),
   writeMessage: authorizedProcedure
     .input(writeMessageInput)

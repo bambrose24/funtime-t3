@@ -32,6 +32,7 @@ import {
   HomeIcon,
   InfoIcon,
   MedalIcon,
+  MessagesSquare,
   PenIcon,
   PlusIcon,
   SettingsIcon,
@@ -45,6 +46,8 @@ import { type RouterOutputs } from "~/trpc/types";
 import { clientApi } from "~/trpc/react";
 import { useEffect } from "react";
 import { PrefetchKind } from "next/dist/client/components/router-reducer/router-reducer-types";
+import { Badge } from "~/components/ui/badge";
+import { useLeagueUnreadMessages } from "~/hooks/useLeagueUnreadMessages";
 
 type NavData = {
   data: RouterOutputs["home"]["nav"];
@@ -309,6 +312,7 @@ type ChosenLeague = NonNullable<
 type TabOption =
   | "home"
   | "make-picks"
+  | "chat"
   | "leaderboard"
   | "admin"
   | "my-profile"
@@ -319,6 +323,9 @@ function useActiveLeagueSubPath(): TabOption {
   const pathname = usePathname();
   if (pathname.includes("/leaderboard")) {
     return "leaderboard";
+  }
+  if (pathname.includes("/chat")) {
+    return "chat";
   }
   if (pathname.includes("/superbowl")) {
     return "superbowl";
@@ -357,6 +364,8 @@ function TabLabel() {
           <div className="lg:hidden">Pick</div>
         </>
       );
+    case "chat":
+      return <div>Chat</div>;
     case "admin":
       return (
         <>
@@ -391,12 +400,14 @@ function TabLabel() {
 function LeagueDropdownMenu({ chosenLeague }: { chosenLeague: ChosenLeague }) {
   const leaderboardHref = `/league/${chosenLeague.league_id}/leaderboard`;
   const pickHref = `/league/${chosenLeague.league_id}/pick`;
+  const chatHref = `/league/${chosenLeague.league_id}/chat`;
   const adminHref = `/league/${chosenLeague.league_id}/admin`;
   const myProfileHref = `/league/${chosenLeague.league_id}/my-profile`;
   const infoHref = `/league/${chosenLeague.league_id}/info`;
   const superbowlHref = `/league/${chosenLeague.league_id}/superbowl`;
 
   const { data: session } = clientApi.session.current.useQuery();
+  const { unreadCount } = useLeagueUnreadMessages(chosenLeague.league_id);
   const isAdmin =
     session?.dbUser?.leaguemembers?.find(
       (m) => m.league_id === chosenLeague.league_id,
@@ -437,6 +448,24 @@ function LeagueDropdownMenu({ chosenLeague }: { chosenLeague: ChosenLeague }) {
               <div className="flex flex-row items-center gap-3">
                 <MedalIcon className="h-4 w-4" />
                 <>Leaderboard</>
+              </div>
+            </DropdownMenuItem>
+          </Link>
+          <Link href={chatHref} prefetch>
+            <DropdownMenuItem>
+              <div className="flex w-full flex-row items-center justify-between gap-3">
+                <div className="flex flex-row items-center gap-3">
+                  <MessagesSquare className="h-4 w-4" />
+                  <>Chat</>
+                </div>
+                {unreadCount > 0 ? (
+                  <Badge
+                    variant="destructive"
+                    className="h-5 min-w-5 justify-center rounded-full px-1 text-[10px]"
+                  >
+                    {unreadCount > 99 ? "99+" : unreadCount}
+                  </Badge>
+                ) : null}
               </div>
             </DropdownMenuItem>
           </Link>

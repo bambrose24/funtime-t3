@@ -132,6 +132,8 @@ baseline has not yet been recorded in this worklog.
 - [x] Member can post and delete their own message.
 - [x] League admin can delete another member's message.
 - [x] Non-members cannot access the league message board.
+- [ ] League Chat is reachable from league navigation in not-started, active, and completed league states.
+- [ ] League unread badges are scoped to the league, clear after viewing the latest message, and increment for a new message.
 
 ### League administration
 

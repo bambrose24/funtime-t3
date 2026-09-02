@@ -15,6 +15,7 @@ const schema = z.object({ message: z.string().min(1) });
 type Props = {
   onSubmit: (data: z.infer<typeof schema>) => Promise<void>;
   closeSheet?: () => void;
+  showClose?: boolean;
   className?: string;
 };
 
@@ -22,6 +23,7 @@ export default function MessageComposer({
   onSubmit,
   className,
   closeSheet,
+  showClose = true,
 }: Props) {
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
@@ -77,22 +79,22 @@ export default function MessageComposer({
           )}
         />
         <div className="flex justify-between gap-2 pb-2">
-          <Button
-            className="w-full"
-            variant="secondary"
-            type="button"
-            onClick={(e) => {
-              e.preventDefault();
-              if (closeSheet) {
-                closeSheet();
-              }
-            }}
-          >
-            Close
-          </Button>
+          {showClose ? (
+            <Button
+              className="w-full"
+              variant="secondary"
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                closeSheet?.();
+              }}
+            >
+              Close
+            </Button>
+          ) : null}
           <Button
             type="submit"
-            className="w-full"
+            className={showClose ? "w-full" : "ml-auto"}
             disabled={form.formState.isSubmitting}
           >
             {form.formState.isSubmitting && (

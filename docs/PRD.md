@@ -237,6 +237,8 @@ Unless a requirement is explicitly labeled **Target** or **Planned**, it describ
 - Persistent league-wide message board (Sleeper-style continuous thread).
 - No week-based partitioning. Legacy week-named API aliases return the same league-wide thread while clients migrate.
 - Messages accept 1-500 characters and are ordered ascending by creation time.
+- Chat is available from league-level navigation in not-started, active, and completed league states; the weekly page may offer a shortcut but is not the owner of the thread.
+- Each membership has one read cursor for its league. Unread badges are league-specific, follow the signed-in player across web and mobile, clear through the newest message actually viewed, and are capped visually at `99+`.
 - Players can post and delete own messages.
 - League admins can delete any message in their league.
 - League-member-only access.
