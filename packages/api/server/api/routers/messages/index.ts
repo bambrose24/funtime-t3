@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { authorizedProcedure, createTRPCRouter } from "../../trpc";
 import { TRPCError } from "@trpc/server";
-import { MemberRole } from "../../../../src/generated/prisma-client";
+import { MemberRole, Prisma } from "../../../../src/generated/prisma-client";
 import { expoPushApi } from "../../../services/expo-push";
 
 const leagueMessageInput = z.object({
@@ -117,43 +117,38 @@ export const messagesRouter = createTRPCRouter({
       return {};
     }
 
-    const readStates = await ctx.db.league_message_read_state.findMany({
-      where: {
-        membership_id: {
-          in: memberships.map((membership) => membership.membership_id),
-        },
-      },
-    });
-    const readStateByMembershipId = new Map(
-      readStates.map((readState) => [readState.membership_id, readState]),
+    const unreadCounts = await ctx.db.$queryRaw<
+      Array<{ league_id: number; unread_count: bigint }>
+    >(Prisma.sql`
+      SELECT
+        membership."league_id",
+        COUNT(message."message_id") AS "unread_count"
+      FROM "leaguemembers" AS membership
+      LEFT JOIN "league_message_read_state" AS read_state
+        ON read_state."membership_id" = membership."membership_id"
+      LEFT JOIN "leaguemessages" AS message
+        ON message."league_id" = membership."league_id"
+        AND message."status" = 'PUBLISHED'::"MessageStatus"
+        AND (
+          read_state."membership_id" IS NULL
+          OR message."createdAt" > read_state."last_read_at"
+          OR (
+            message."createdAt" = read_state."last_read_at"
+            AND message."message_id" > read_state."last_read_message_id"
+          )
+        )
+      WHERE membership."membership_id" IN (${Prisma.join(
+        memberships.map((membership) => membership.membership_id),
+      )})
+      GROUP BY membership."membership_id", membership."league_id"
+    `);
+
+    return Object.fromEntries(
+      unreadCounts.map(({ league_id, unread_count }) => [
+        league_id,
+        Number(unread_count),
+      ]),
     );
-
-    const unreadCounts = await Promise.all(
-      memberships.map(async (membership) => {
-        const readState = readStateByMembershipId.get(membership.membership_id);
-        const count = await ctx.db.leaguemessages.count({
-          where: {
-            league_id: membership.league_id,
-            status: "PUBLISHED",
-            ...(readState
-              ? {
-                  OR: [
-                    { createdAt: { gt: readState.last_read_at } },
-                    {
-                      createdAt: readState.last_read_at,
-                      message_id: { gt: readState.last_read_message_id },
-                    },
-                  ],
-                }
-              : {}),
-          },
-        });
-
-        return [membership.league_id, count] as const;
-      }),
-    );
-
-    return Object.fromEntries(unreadCounts);
   }),
   markRead: authorizedProcedure
     .input(messageReadInput)
