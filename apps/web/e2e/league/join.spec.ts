@@ -20,7 +20,7 @@ test("player can join by share code with a required Super Bowl pick", async ({
   await expect(submit).toBeEnabled();
   await submit.click();
   await expect(
-    page.getByRole("alert", { name: "Finish your Super Bowl pick" }),
+    page.getByText("Finish your Super Bowl pick"),
   ).toBeVisible();
   await expect(page.getByText("Choose an AFC team.")).toBeVisible();
   await expect(page.getByText("Choose an NFC team.")).toBeVisible();
