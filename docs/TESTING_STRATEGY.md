@@ -178,6 +178,7 @@ Minimum required coverage set:
 
 - Notification-tap de-dup behavior.
 - Deep-link parse and route resolution for supported paths.
+- League Chat badge, read-cursor, and new-message behavior across tab entry and notification entry.
 
 6. Admin critical paths:
 

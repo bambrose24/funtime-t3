@@ -110,6 +110,7 @@ model leaguemembers {
   people         people           @relation(fields: [user_id], references: [uid], onDelete: Cascade, onUpdate: Restrict, map: "leaguemembers_ibfk_1")
   leagues        leagues          @relation(fields: [league_id], references: [league_id], onUpdate: Restrict, onDelete: Cascade, map: "leaguemembers_ibfk_2")
   leaguemessages leaguemessages[]
+  league_message_read_state league_message_read_state?
   picks          picks[]
   superbowl      superbowl[]
 
@@ -137,8 +138,19 @@ model leaguemessages {
   @@index([league_id, member_id])
   @@index([league_id, message_type])
   @@index([league_id, message_type, status])
+  @@index([league_id, status, createdAt, message_id])
   @@index([member_id])
   @@index([message_type])
+}
+
+model league_message_read_state {
+  membership_id        Int            @id
+  last_read_at         DateTime       @db.Timestamp(3)
+  last_read_message_id String
+  updatedAt            DateTime       @updatedAt @db.Timestamp(3)
+  leaguemembers        leaguemembers  @relation(fields: [membership_id], references: [membership_id], onDelete: Cascade)
+
+  @@index([last_read_at])
 }
 
 model leagues {

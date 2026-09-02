@@ -203,6 +203,13 @@ exports.Prisma.LeaguemessagesScalarFieldEnum = {
   status: 'status'
 };
 
+exports.Prisma.League_message_read_stateScalarFieldEnum = {
+  membership_id: 'membership_id',
+  last_read_at: 'last_read_at',
+  last_read_message_id: 'last_read_message_id',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.LeaguesScalarFieldEnum = {
   league_id: 'league_id',
   created_by_user_id: 'created_by_user_id',
@@ -427,6 +434,7 @@ exports.Prisma.ModelName = {
   games: 'games',
   leaguemembers: 'leaguemembers',
   leaguemessages: 'leaguemessages',
+  league_message_read_state: 'league_message_read_state',
   leagues: 'leagues',
   league_renewal_member_roles: 'league_renewal_member_roles',
   people: 'people',

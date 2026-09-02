@@ -1,14 +1,17 @@
 # Funtime Architecture (Web-First, Mobile-Ready)
 
 ## 1. Scope
+
 This document describes the current architecture of the Funtime monorepo with emphasis on the **Next.js web app** as the primary product surface.
 
 It is intended to support:
+
 - Faster onboarding for contributors
 - Shared understanding of system boundaries
 - Mobile companion planning against existing backend contracts
 
 ## 2. Monorepo Structure
+
 - `apps/web`: Next.js web app (App Router), current primary client.
 - `apps/mobile`: Expo React Native app (in-progress companion client).
 - `packages/api`: Shared backend package:
@@ -20,10 +23,13 @@ It is intended to support:
 The root workspace uses Turbo + pnpm for orchestration.
 
 ## 3. High-Level System Design
+
 1. User interacts with Next.js UI (`apps/web`).
 2. Web app calls tRPC via:
-  - Server Components (`serverApi` direct caller)
-  - Client Components (`/api/trpc` route + `clientApi`)
+
+- Server Components (`serverApi` direct caller)
+- Client Components (`/api/trpc` route + `clientApi`)
+
 3. tRPC procedures in `packages/api` resolve auth context, validate input, and execute business logic.
 4. Prisma reads/writes PostgreSQL data.
 5. Background cron jobs sync NFL data and compute derived outcomes.
@@ -32,6 +38,7 @@ The root workspace uses Turbo + pnpm for orchestration.
 ## 4. Web Request + Data Flow
 
 ### 4.1 App Layer
+
 - Next.js App Router in `apps/web/src/app`.
 - Most primary pages are league-centric:
   - Home
@@ -43,6 +50,7 @@ The root workspace uses Turbo + pnpm for orchestration.
   - Settings/auth flows
 
 ### 4.2 API Access Patterns
+
 - `serverApi` (`apps/web/src/trpc/server.ts`):
   - Used from Server Components.
   - Creates request-scoped tRPC context.
@@ -52,6 +60,7 @@ The root workspace uses Turbo + pnpm for orchestration.
   - Calls `apps/web/src/app/api/trpc/[trpc]/route.ts`.
 
 ### 4.3 Authentication
+
 - Supabase auth is the source of user identity.
 - Middleware (`apps/web/src/middleware.ts`) refreshes session using Supabase SSR helpers.
 - tRPC context (`packages/api/server/api/trpc.ts`) loads:
@@ -60,6 +69,7 @@ The root workspace uses Turbo + pnpm for orchestration.
   - league memberships/roles
 
 ### 4.4 Authorization Model
+
 - `publicProcedure`: open to anonymous or authenticated calls.
 - `authorizedProcedure`: requires authenticated app user (`dbUser`).
 - Many procedures enforce additional league membership/admin checks in-router.
@@ -68,7 +78,9 @@ The root workspace uses Turbo + pnpm for orchestration.
 ## 5. Backend API Architecture (`packages/api`)
 
 ### 5.1 Router Composition
+
 Primary app router (`server/api/root.ts`) composes domain routers:
+
 - `auth`, `session`, `settings`
 - `home`, `league`, `member`, `picks`
 - `games`, `teams`, `time`
@@ -76,21 +88,25 @@ Primary app router (`server/api/root.ts`) composes domain routers:
 - `generalAdmin`, `postseason`
 
 ### 5.2 Domain Responsibilities
+
 - `league`: lifecycle, join/create, week selection, pick summaries, winners, Super Bowl picks.
 - `picks`: pick submission and week coverage.
 - `member`: user-member-specific operations (weekly picks, Super Bowl update).
 - `leaderboard`: season standings aggregation/ranking + chart datasets.
-- `messages`: league messaging (currently week-scoped).
+- `messages`: league-wide messaging with per-membership unread cursors.
 - `postseason`: bracket/seeding data for playoff context.
 - `league.admin`: commissioner workflows (roles, member management, pick edits, broadcasts).
 
 ### 5.3 Caching + Performance
+
 - Select procedures use custom middleware (`publicCacheMiddleware` / `authorizedCacheMiddleware`) with tag/parameter-based revalidation windows.
 - Some server-side data is cached for short intervals (e.g. leaderboard, games, teams).
 - Context and query clients are request-stable in server-side tRPC helpers.
 
 ## 6. Data Model (Prisma)
+
 Core entities (from `packages/api/prisma/schema.prisma`):
+
 - `people`: app users
 - `leagues`: league configuration and season linkage
 - `leaguemembers`: membership, role, donated/paid tracking
@@ -103,6 +119,7 @@ Core entities (from `packages/api/prisma/schema.prisma`):
 - `postseason_games`, `postseason_team_seeds`: playoff bracket model
 
 Enums encode policies/statuses:
+
 - late policy
 - reminder policy
 - league status
@@ -111,7 +128,9 @@ Enums encode policies/statuses:
 ## 7. Background Jobs and Automation
 
 ### 7.1 Regular Season Cron (`apps/web/src/cron/index.ts`)
+
 Runs data maintenance and automation:
+
 - Syncs regular-season games from ESPN
 - Updates scores, winners, and pick correctness
 - Creates weekly winners using tiebreak logic
@@ -120,26 +139,29 @@ Runs data maintenance and automation:
 - Triggers postseason sync
 
 ### 7.2 Postseason Sync (`apps/web/src/cron/postseason.ts`)
+
 - Syncs playoff seeds and postseason games from ESPN
 - Upserts bracket structure and game outcomes
 - Supports Super Bowl bracket UI data
 
-## 8. Messaging Architecture (Current vs Target)
+## 8. Messaging Architecture
 
-### Current
-- Messages are scoped to `leagueId + week`.
-- Message board fetch/write/delete procedures operate on week context.
-
-### Target Direction (Product Decision)
-- Persistent league-wide message board (not week-partitioned, week removed).
-- League admins can delete any message in their league.
-- Requires schema/API/UI updates across:
-  - `leaguemessages` usage patterns
-  - tRPC message procedures
-  - league page composition
-  - notification fanout logic (near real-time message pushes)
+- `leaguemessages` is a persistent league-wide thread. New messages use
+  `LEAGUE_MESSAGE` and have no week assignment; historical records are read in
+  the same chronological thread.
+- `league_message_read_state` stores the latest message cursor a membership has
+  viewed. This makes unread counts league-specific and portable between web and
+  mobile without coupling them to a selected week.
+- `messages.leagueMessageBoard`, `writeMessage`, and `deleteMessage` are the
+  primary procedures. Week-named aliases remain a temporary compatibility
+  layer until all released clients have passed the migration window.
+- The web canonical route is `/league/:leagueId/chat`; mobile presents the
+  same thread in its league Chat tab. Push taps continue to open that tab.
+- League admins may delete any message in their league; players may delete only
+  their own. Push fanout remains best-effort and never blocks message writes.
 
 ## 9. Mobile Companion Integration
+
 - Mobile app should consume the same tRPC API surface from `packages/api`.
 - `createTRPCContext` already supports bearer-token auth header paths for React Native.
 - Strategy:
@@ -148,6 +170,7 @@ Runs data maintenance and automation:
   3. Drive parity by mapping mobile screens to existing web-backed procedures.
 
 ## 10. Operational Notes
+
 - Primary dependencies:
   - Next.js 15 + React 19 (web)
   - tRPC v11
@@ -160,7 +183,9 @@ Runs data maintenance and automation:
   - middleware request logging
 
 ## 11. Known Gaps / Planned Evolution
-- Messaging model migration to persistent board.
+
+- Messaging compatibility cleanup: retire week-named aliases and obsolete client
+  read-state keys after the release migration window.
 - Mobile admin parity rollout after core player loop.
 - Notification expansion:
   - week summary push with personal-result payload and deep-link to week page

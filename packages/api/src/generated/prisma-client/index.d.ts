@@ -44,6 +44,11 @@ export type leaguemembers = $Result.DefaultSelection<Prisma.$leaguemembersPayloa
  */
 export type leaguemessages = $Result.DefaultSelection<Prisma.$leaguemessagesPayload>
 /**
+ * Model league_message_read_state
+ * 
+ */
+export type league_message_read_state = $Result.DefaultSelection<Prisma.$league_message_read_statePayload>
+/**
  * Model leagues
  * 
  */
@@ -430,6 +435,16 @@ export class PrismaClient<
     * ```
     */
   get leaguemessages(): Prisma.leaguemessagesDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.league_message_read_state`: Exposes CRUD operations for the **league_message_read_state** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more League_message_read_states
+    * const league_message_read_states = await prisma.league_message_read_state.findMany()
+    * ```
+    */
+  get league_message_read_state(): Prisma.league_message_read_stateDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.leagues`: Exposes CRUD operations for the **leagues** model.
@@ -977,6 +992,7 @@ export namespace Prisma {
     games: 'games',
     leaguemembers: 'leaguemembers',
     leaguemessages: 'leaguemessages',
+    league_message_read_state: 'league_message_read_state',
     leagues: 'leagues',
     league_renewal_member_roles: 'league_renewal_member_roles',
     people: 'people',
@@ -1005,7 +1021,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "emailLogs" | "emailDeliveryEvents" | "weekWinners" | "games" | "leaguemembers" | "leaguemessages" | "leagues" | "league_renewal_member_roles" | "people" | "pushNotificationTokens" | "picks" | "superbowl" | "superbowlsquares" | "teams" | "postseason_games" | "postseason_team_seeds"
+      modelProps: "emailLogs" | "emailDeliveryEvents" | "weekWinners" | "games" | "leaguemembers" | "leaguemessages" | "league_message_read_state" | "leagues" | "league_renewal_member_roles" | "people" | "pushNotificationTokens" | "picks" | "superbowl" | "superbowlsquares" | "teams" | "postseason_games" | "postseason_team_seeds"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1450,6 +1466,80 @@ export namespace Prisma {
           count: {
             args: Prisma.leaguemessagesCountArgs<ExtArgs>
             result: $Utils.Optional<LeaguemessagesCountAggregateOutputType> | number
+          }
+        }
+      }
+      league_message_read_state: {
+        payload: Prisma.$league_message_read_statePayload<ExtArgs>
+        fields: Prisma.league_message_read_stateFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.league_message_read_stateFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$league_message_read_statePayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.league_message_read_stateFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$league_message_read_statePayload>
+          }
+          findFirst: {
+            args: Prisma.league_message_read_stateFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$league_message_read_statePayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.league_message_read_stateFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$league_message_read_statePayload>
+          }
+          findMany: {
+            args: Prisma.league_message_read_stateFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$league_message_read_statePayload>[]
+          }
+          create: {
+            args: Prisma.league_message_read_stateCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$league_message_read_statePayload>
+          }
+          createMany: {
+            args: Prisma.league_message_read_stateCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.league_message_read_stateCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$league_message_read_statePayload>[]
+          }
+          delete: {
+            args: Prisma.league_message_read_stateDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$league_message_read_statePayload>
+          }
+          update: {
+            args: Prisma.league_message_read_stateUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$league_message_read_statePayload>
+          }
+          deleteMany: {
+            args: Prisma.league_message_read_stateDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.league_message_read_stateUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.league_message_read_stateUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$league_message_read_statePayload>[]
+          }
+          upsert: {
+            args: Prisma.league_message_read_stateUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$league_message_read_statePayload>
+          }
+          aggregate: {
+            args: Prisma.League_message_read_stateAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateLeague_message_read_state>
+          }
+          groupBy: {
+            args: Prisma.league_message_read_stateGroupByArgs<ExtArgs>
+            result: $Utils.Optional<League_message_read_stateGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.league_message_read_stateCountArgs<ExtArgs>
+            result: $Utils.Optional<League_message_read_stateCountAggregateOutputType> | number
           }
         }
       }
@@ -2295,6 +2385,7 @@ export namespace Prisma {
     games?: gamesOmit
     leaguemembers?: leaguemembersOmit
     leaguemessages?: leaguemessagesOmit
+    league_message_read_state?: league_message_read_stateOmit
     leagues?: leaguesOmit
     league_renewal_member_roles?: league_renewal_member_rolesOmit
     people?: peopleOmit
@@ -7736,6 +7827,7 @@ export namespace Prisma {
     people?: boolean | peopleDefaultArgs<ExtArgs>
     leagues?: boolean | leaguesDefaultArgs<ExtArgs>
     leaguemessages?: boolean | leaguemembers$leaguemessagesArgs<ExtArgs>
+    league_message_read_state?: boolean | leaguemembers$league_message_read_stateArgs<ExtArgs>
     picks?: boolean | leaguemembers$picksArgs<ExtArgs>
     superbowl?: boolean | leaguemembers$superbowlArgs<ExtArgs>
     _count?: boolean | LeaguemembersCountOutputTypeDefaultArgs<ExtArgs>
@@ -7779,6 +7871,7 @@ export namespace Prisma {
     people?: boolean | peopleDefaultArgs<ExtArgs>
     leagues?: boolean | leaguesDefaultArgs<ExtArgs>
     leaguemessages?: boolean | leaguemembers$leaguemessagesArgs<ExtArgs>
+    league_message_read_state?: boolean | leaguemembers$league_message_read_stateArgs<ExtArgs>
     picks?: boolean | leaguemembers$picksArgs<ExtArgs>
     superbowl?: boolean | leaguemembers$superbowlArgs<ExtArgs>
     _count?: boolean | LeaguemembersCountOutputTypeDefaultArgs<ExtArgs>
@@ -7800,6 +7893,7 @@ export namespace Prisma {
       people: Prisma.$peoplePayload<ExtArgs>
       leagues: Prisma.$leaguesPayload<ExtArgs>
       leaguemessages: Prisma.$leaguemessagesPayload<ExtArgs>[]
+      league_message_read_state: Prisma.$league_message_read_statePayload<ExtArgs> | null
       picks: Prisma.$picksPayload<ExtArgs>[]
       superbowl: Prisma.$superbowlPayload<ExtArgs>[]
     }
@@ -8209,6 +8303,7 @@ export namespace Prisma {
     people<T extends peopleDefaultArgs<ExtArgs> = {}>(args?: Subset<T, peopleDefaultArgs<ExtArgs>>): Prisma__peopleClient<$Result.GetResult<Prisma.$peoplePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     leagues<T extends leaguesDefaultArgs<ExtArgs> = {}>(args?: Subset<T, leaguesDefaultArgs<ExtArgs>>): Prisma__leaguesClient<$Result.GetResult<Prisma.$leaguesPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     leaguemessages<T extends leaguemembers$leaguemessagesArgs<ExtArgs> = {}>(args?: Subset<T, leaguemembers$leaguemessagesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$leaguemessagesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    league_message_read_state<T extends leaguemembers$league_message_read_stateArgs<ExtArgs> = {}>(args?: Subset<T, leaguemembers$league_message_read_stateArgs<ExtArgs>>): Prisma__league_message_read_stateClient<$Result.GetResult<Prisma.$league_message_read_statePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     picks<T extends leaguemembers$picksArgs<ExtArgs> = {}>(args?: Subset<T, leaguemembers$picksArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$picksPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     superbowl<T extends leaguemembers$superbowlArgs<ExtArgs> = {}>(args?: Subset<T, leaguemembers$superbowlArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$superbowlPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
@@ -8720,6 +8815,25 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: LeaguemessagesScalarFieldEnum | LeaguemessagesScalarFieldEnum[]
+  }
+
+  /**
+   * leaguemembers.league_message_read_state
+   */
+  export type leaguemembers$league_message_read_stateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the league_message_read_state
+     */
+    select?: league_message_read_stateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the league_message_read_state
+     */
+    omit?: league_message_read_stateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: league_message_read_stateInclude<ExtArgs> | null
+    where?: league_message_read_stateWhereInput
   }
 
   /**
@@ -9942,6 +10056,1094 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: leaguemessagesInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model league_message_read_state
+   */
+
+  export type AggregateLeague_message_read_state = {
+    _count: League_message_read_stateCountAggregateOutputType | null
+    _avg: League_message_read_stateAvgAggregateOutputType | null
+    _sum: League_message_read_stateSumAggregateOutputType | null
+    _min: League_message_read_stateMinAggregateOutputType | null
+    _max: League_message_read_stateMaxAggregateOutputType | null
+  }
+
+  export type League_message_read_stateAvgAggregateOutputType = {
+    membership_id: number | null
+  }
+
+  export type League_message_read_stateSumAggregateOutputType = {
+    membership_id: number | null
+  }
+
+  export type League_message_read_stateMinAggregateOutputType = {
+    membership_id: number | null
+    last_read_at: Date | null
+    last_read_message_id: string | null
+    updatedAt: Date | null
+  }
+
+  export type League_message_read_stateMaxAggregateOutputType = {
+    membership_id: number | null
+    last_read_at: Date | null
+    last_read_message_id: string | null
+    updatedAt: Date | null
+  }
+
+  export type League_message_read_stateCountAggregateOutputType = {
+    membership_id: number
+    last_read_at: number
+    last_read_message_id: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type League_message_read_stateAvgAggregateInputType = {
+    membership_id?: true
+  }
+
+  export type League_message_read_stateSumAggregateInputType = {
+    membership_id?: true
+  }
+
+  export type League_message_read_stateMinAggregateInputType = {
+    membership_id?: true
+    last_read_at?: true
+    last_read_message_id?: true
+    updatedAt?: true
+  }
+
+  export type League_message_read_stateMaxAggregateInputType = {
+    membership_id?: true
+    last_read_at?: true
+    last_read_message_id?: true
+    updatedAt?: true
+  }
+
+  export type League_message_read_stateCountAggregateInputType = {
+    membership_id?: true
+    last_read_at?: true
+    last_read_message_id?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type League_message_read_stateAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which league_message_read_state to aggregate.
+     */
+    where?: league_message_read_stateWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of league_message_read_states to fetch.
+     */
+    orderBy?: league_message_read_stateOrderByWithRelationInput | league_message_read_stateOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: league_message_read_stateWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` league_message_read_states from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` league_message_read_states.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned league_message_read_states
+    **/
+    _count?: true | League_message_read_stateCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: League_message_read_stateAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: League_message_read_stateSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: League_message_read_stateMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: League_message_read_stateMaxAggregateInputType
+  }
+
+  export type GetLeague_message_read_stateAggregateType<T extends League_message_read_stateAggregateArgs> = {
+        [P in keyof T & keyof AggregateLeague_message_read_state]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateLeague_message_read_state[P]>
+      : GetScalarType<T[P], AggregateLeague_message_read_state[P]>
+  }
+
+
+
+
+  export type league_message_read_stateGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: league_message_read_stateWhereInput
+    orderBy?: league_message_read_stateOrderByWithAggregationInput | league_message_read_stateOrderByWithAggregationInput[]
+    by: League_message_read_stateScalarFieldEnum[] | League_message_read_stateScalarFieldEnum
+    having?: league_message_read_stateScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: League_message_read_stateCountAggregateInputType | true
+    _avg?: League_message_read_stateAvgAggregateInputType
+    _sum?: League_message_read_stateSumAggregateInputType
+    _min?: League_message_read_stateMinAggregateInputType
+    _max?: League_message_read_stateMaxAggregateInputType
+  }
+
+  export type League_message_read_stateGroupByOutputType = {
+    membership_id: number
+    last_read_at: Date
+    last_read_message_id: string
+    updatedAt: Date
+    _count: League_message_read_stateCountAggregateOutputType | null
+    _avg: League_message_read_stateAvgAggregateOutputType | null
+    _sum: League_message_read_stateSumAggregateOutputType | null
+    _min: League_message_read_stateMinAggregateOutputType | null
+    _max: League_message_read_stateMaxAggregateOutputType | null
+  }
+
+  type GetLeague_message_read_stateGroupByPayload<T extends league_message_read_stateGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<League_message_read_stateGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof League_message_read_stateGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], League_message_read_stateGroupByOutputType[P]>
+            : GetScalarType<T[P], League_message_read_stateGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type league_message_read_stateSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    membership_id?: boolean
+    last_read_at?: boolean
+    last_read_message_id?: boolean
+    updatedAt?: boolean
+    leaguemembers?: boolean | leaguemembersDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["league_message_read_state"]>
+
+  export type league_message_read_stateSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    membership_id?: boolean
+    last_read_at?: boolean
+    last_read_message_id?: boolean
+    updatedAt?: boolean
+    leaguemembers?: boolean | leaguemembersDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["league_message_read_state"]>
+
+  export type league_message_read_stateSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    membership_id?: boolean
+    last_read_at?: boolean
+    last_read_message_id?: boolean
+    updatedAt?: boolean
+    leaguemembers?: boolean | leaguemembersDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["league_message_read_state"]>
+
+  export type league_message_read_stateSelectScalar = {
+    membership_id?: boolean
+    last_read_at?: boolean
+    last_read_message_id?: boolean
+    updatedAt?: boolean
+  }
+
+  export type league_message_read_stateOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"membership_id" | "last_read_at" | "last_read_message_id" | "updatedAt", ExtArgs["result"]["league_message_read_state"]>
+  export type league_message_read_stateInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    leaguemembers?: boolean | leaguemembersDefaultArgs<ExtArgs>
+  }
+  export type league_message_read_stateIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    leaguemembers?: boolean | leaguemembersDefaultArgs<ExtArgs>
+  }
+  export type league_message_read_stateIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    leaguemembers?: boolean | leaguemembersDefaultArgs<ExtArgs>
+  }
+
+  export type $league_message_read_statePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "league_message_read_state"
+    objects: {
+      leaguemembers: Prisma.$leaguemembersPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      membership_id: number
+      last_read_at: Date
+      last_read_message_id: string
+      updatedAt: Date
+    }, ExtArgs["result"]["league_message_read_state"]>
+    composites: {}
+  }
+
+  type league_message_read_stateGetPayload<S extends boolean | null | undefined | league_message_read_stateDefaultArgs> = $Result.GetResult<Prisma.$league_message_read_statePayload, S>
+
+  type league_message_read_stateCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<league_message_read_stateFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
+      select?: League_message_read_stateCountAggregateInputType | true
+    }
+
+  export interface league_message_read_stateDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['league_message_read_state'], meta: { name: 'league_message_read_state' } }
+    /**
+     * Find zero or one League_message_read_state that matches the filter.
+     * @param {league_message_read_stateFindUniqueArgs} args - Arguments to find a League_message_read_state
+     * @example
+     * // Get one League_message_read_state
+     * const league_message_read_state = await prisma.league_message_read_state.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends league_message_read_stateFindUniqueArgs>(args: SelectSubset<T, league_message_read_stateFindUniqueArgs<ExtArgs>>): Prisma__league_message_read_stateClient<$Result.GetResult<Prisma.$league_message_read_statePayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one League_message_read_state that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {league_message_read_stateFindUniqueOrThrowArgs} args - Arguments to find a League_message_read_state
+     * @example
+     * // Get one League_message_read_state
+     * const league_message_read_state = await prisma.league_message_read_state.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends league_message_read_stateFindUniqueOrThrowArgs>(args: SelectSubset<T, league_message_read_stateFindUniqueOrThrowArgs<ExtArgs>>): Prisma__league_message_read_stateClient<$Result.GetResult<Prisma.$league_message_read_statePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first League_message_read_state that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {league_message_read_stateFindFirstArgs} args - Arguments to find a League_message_read_state
+     * @example
+     * // Get one League_message_read_state
+     * const league_message_read_state = await prisma.league_message_read_state.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends league_message_read_stateFindFirstArgs>(args?: SelectSubset<T, league_message_read_stateFindFirstArgs<ExtArgs>>): Prisma__league_message_read_stateClient<$Result.GetResult<Prisma.$league_message_read_statePayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first League_message_read_state that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {league_message_read_stateFindFirstOrThrowArgs} args - Arguments to find a League_message_read_state
+     * @example
+     * // Get one League_message_read_state
+     * const league_message_read_state = await prisma.league_message_read_state.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends league_message_read_stateFindFirstOrThrowArgs>(args?: SelectSubset<T, league_message_read_stateFindFirstOrThrowArgs<ExtArgs>>): Prisma__league_message_read_stateClient<$Result.GetResult<Prisma.$league_message_read_statePayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more League_message_read_states that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {league_message_read_stateFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all League_message_read_states
+     * const league_message_read_states = await prisma.league_message_read_state.findMany()
+     * 
+     * // Get first 10 League_message_read_states
+     * const league_message_read_states = await prisma.league_message_read_state.findMany({ take: 10 })
+     * 
+     * // Only select the `membership_id`
+     * const league_message_read_stateWithMembership_idOnly = await prisma.league_message_read_state.findMany({ select: { membership_id: true } })
+     * 
+     */
+    findMany<T extends league_message_read_stateFindManyArgs>(args?: SelectSubset<T, league_message_read_stateFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$league_message_read_statePayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a League_message_read_state.
+     * @param {league_message_read_stateCreateArgs} args - Arguments to create a League_message_read_state.
+     * @example
+     * // Create one League_message_read_state
+     * const League_message_read_state = await prisma.league_message_read_state.create({
+     *   data: {
+     *     // ... data to create a League_message_read_state
+     *   }
+     * })
+     * 
+     */
+    create<T extends league_message_read_stateCreateArgs>(args: SelectSubset<T, league_message_read_stateCreateArgs<ExtArgs>>): Prisma__league_message_read_stateClient<$Result.GetResult<Prisma.$league_message_read_statePayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many League_message_read_states.
+     * @param {league_message_read_stateCreateManyArgs} args - Arguments to create many League_message_read_states.
+     * @example
+     * // Create many League_message_read_states
+     * const league_message_read_state = await prisma.league_message_read_state.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends league_message_read_stateCreateManyArgs>(args?: SelectSubset<T, league_message_read_stateCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many League_message_read_states and returns the data saved in the database.
+     * @param {league_message_read_stateCreateManyAndReturnArgs} args - Arguments to create many League_message_read_states.
+     * @example
+     * // Create many League_message_read_states
+     * const league_message_read_state = await prisma.league_message_read_state.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many League_message_read_states and only return the `membership_id`
+     * const league_message_read_stateWithMembership_idOnly = await prisma.league_message_read_state.createManyAndReturn({
+     *   select: { membership_id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends league_message_read_stateCreateManyAndReturnArgs>(args?: SelectSubset<T, league_message_read_stateCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$league_message_read_statePayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a League_message_read_state.
+     * @param {league_message_read_stateDeleteArgs} args - Arguments to delete one League_message_read_state.
+     * @example
+     * // Delete one League_message_read_state
+     * const League_message_read_state = await prisma.league_message_read_state.delete({
+     *   where: {
+     *     // ... filter to delete one League_message_read_state
+     *   }
+     * })
+     * 
+     */
+    delete<T extends league_message_read_stateDeleteArgs>(args: SelectSubset<T, league_message_read_stateDeleteArgs<ExtArgs>>): Prisma__league_message_read_stateClient<$Result.GetResult<Prisma.$league_message_read_statePayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one League_message_read_state.
+     * @param {league_message_read_stateUpdateArgs} args - Arguments to update one League_message_read_state.
+     * @example
+     * // Update one League_message_read_state
+     * const league_message_read_state = await prisma.league_message_read_state.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends league_message_read_stateUpdateArgs>(args: SelectSubset<T, league_message_read_stateUpdateArgs<ExtArgs>>): Prisma__league_message_read_stateClient<$Result.GetResult<Prisma.$league_message_read_statePayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more League_message_read_states.
+     * @param {league_message_read_stateDeleteManyArgs} args - Arguments to filter League_message_read_states to delete.
+     * @example
+     * // Delete a few League_message_read_states
+     * const { count } = await prisma.league_message_read_state.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends league_message_read_stateDeleteManyArgs>(args?: SelectSubset<T, league_message_read_stateDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more League_message_read_states.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {league_message_read_stateUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many League_message_read_states
+     * const league_message_read_state = await prisma.league_message_read_state.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends league_message_read_stateUpdateManyArgs>(args: SelectSubset<T, league_message_read_stateUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more League_message_read_states and returns the data updated in the database.
+     * @param {league_message_read_stateUpdateManyAndReturnArgs} args - Arguments to update many League_message_read_states.
+     * @example
+     * // Update many League_message_read_states
+     * const league_message_read_state = await prisma.league_message_read_state.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more League_message_read_states and only return the `membership_id`
+     * const league_message_read_stateWithMembership_idOnly = await prisma.league_message_read_state.updateManyAndReturn({
+     *   select: { membership_id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends league_message_read_stateUpdateManyAndReturnArgs>(args: SelectSubset<T, league_message_read_stateUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$league_message_read_statePayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one League_message_read_state.
+     * @param {league_message_read_stateUpsertArgs} args - Arguments to update or create a League_message_read_state.
+     * @example
+     * // Update or create a League_message_read_state
+     * const league_message_read_state = await prisma.league_message_read_state.upsert({
+     *   create: {
+     *     // ... data to create a League_message_read_state
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the League_message_read_state we want to update
+     *   }
+     * })
+     */
+    upsert<T extends league_message_read_stateUpsertArgs>(args: SelectSubset<T, league_message_read_stateUpsertArgs<ExtArgs>>): Prisma__league_message_read_stateClient<$Result.GetResult<Prisma.$league_message_read_statePayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of League_message_read_states.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {league_message_read_stateCountArgs} args - Arguments to filter League_message_read_states to count.
+     * @example
+     * // Count the number of League_message_read_states
+     * const count = await prisma.league_message_read_state.count({
+     *   where: {
+     *     // ... the filter for the League_message_read_states we want to count
+     *   }
+     * })
+    **/
+    count<T extends league_message_read_stateCountArgs>(
+      args?: Subset<T, league_message_read_stateCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], League_message_read_stateCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a League_message_read_state.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {League_message_read_stateAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends League_message_read_stateAggregateArgs>(args: Subset<T, League_message_read_stateAggregateArgs>): Prisma.PrismaPromise<GetLeague_message_read_stateAggregateType<T>>
+
+    /**
+     * Group by League_message_read_state.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {league_message_read_stateGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends league_message_read_stateGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: league_message_read_stateGroupByArgs['orderBy'] }
+        : { orderBy?: league_message_read_stateGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, league_message_read_stateGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetLeague_message_read_stateGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the league_message_read_state model
+   */
+  readonly fields: league_message_read_stateFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for league_message_read_state.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__league_message_read_stateClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    leaguemembers<T extends leaguemembersDefaultArgs<ExtArgs> = {}>(args?: Subset<T, leaguemembersDefaultArgs<ExtArgs>>): Prisma__leaguemembersClient<$Result.GetResult<Prisma.$leaguemembersPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the league_message_read_state model
+   */
+  interface league_message_read_stateFieldRefs {
+    readonly membership_id: FieldRef<"league_message_read_state", 'Int'>
+    readonly last_read_at: FieldRef<"league_message_read_state", 'DateTime'>
+    readonly last_read_message_id: FieldRef<"league_message_read_state", 'String'>
+    readonly updatedAt: FieldRef<"league_message_read_state", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * league_message_read_state findUnique
+   */
+  export type league_message_read_stateFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the league_message_read_state
+     */
+    select?: league_message_read_stateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the league_message_read_state
+     */
+    omit?: league_message_read_stateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: league_message_read_stateInclude<ExtArgs> | null
+    /**
+     * Filter, which league_message_read_state to fetch.
+     */
+    where: league_message_read_stateWhereUniqueInput
+    relationLoadStrategy?: RelationLoadStrategy
+  }
+
+  /**
+   * league_message_read_state findUniqueOrThrow
+   */
+  export type league_message_read_stateFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the league_message_read_state
+     */
+    select?: league_message_read_stateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the league_message_read_state
+     */
+    omit?: league_message_read_stateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: league_message_read_stateInclude<ExtArgs> | null
+    /**
+     * Filter, which league_message_read_state to fetch.
+     */
+    where: league_message_read_stateWhereUniqueInput
+    relationLoadStrategy?: RelationLoadStrategy
+  }
+
+  /**
+   * league_message_read_state findFirst
+   */
+  export type league_message_read_stateFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the league_message_read_state
+     */
+    select?: league_message_read_stateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the league_message_read_state
+     */
+    omit?: league_message_read_stateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: league_message_read_stateInclude<ExtArgs> | null
+    /**
+     * Filter, which league_message_read_state to fetch.
+     */
+    where?: league_message_read_stateWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of league_message_read_states to fetch.
+     */
+    orderBy?: league_message_read_stateOrderByWithRelationInput | league_message_read_stateOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for league_message_read_states.
+     */
+    cursor?: league_message_read_stateWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` league_message_read_states from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` league_message_read_states.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of league_message_read_states.
+     */
+    distinct?: League_message_read_stateScalarFieldEnum | League_message_read_stateScalarFieldEnum[]
+    relationLoadStrategy?: RelationLoadStrategy
+  }
+
+  /**
+   * league_message_read_state findFirstOrThrow
+   */
+  export type league_message_read_stateFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the league_message_read_state
+     */
+    select?: league_message_read_stateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the league_message_read_state
+     */
+    omit?: league_message_read_stateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: league_message_read_stateInclude<ExtArgs> | null
+    /**
+     * Filter, which league_message_read_state to fetch.
+     */
+    where?: league_message_read_stateWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of league_message_read_states to fetch.
+     */
+    orderBy?: league_message_read_stateOrderByWithRelationInput | league_message_read_stateOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for league_message_read_states.
+     */
+    cursor?: league_message_read_stateWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` league_message_read_states from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` league_message_read_states.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of league_message_read_states.
+     */
+    distinct?: League_message_read_stateScalarFieldEnum | League_message_read_stateScalarFieldEnum[]
+    relationLoadStrategy?: RelationLoadStrategy
+  }
+
+  /**
+   * league_message_read_state findMany
+   */
+  export type league_message_read_stateFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the league_message_read_state
+     */
+    select?: league_message_read_stateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the league_message_read_state
+     */
+    omit?: league_message_read_stateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: league_message_read_stateInclude<ExtArgs> | null
+    /**
+     * Filter, which league_message_read_states to fetch.
+     */
+    where?: league_message_read_stateWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of league_message_read_states to fetch.
+     */
+    orderBy?: league_message_read_stateOrderByWithRelationInput | league_message_read_stateOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing league_message_read_states.
+     */
+    cursor?: league_message_read_stateWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` league_message_read_states from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` league_message_read_states.
+     */
+    skip?: number
+    distinct?: League_message_read_stateScalarFieldEnum | League_message_read_stateScalarFieldEnum[]
+    relationLoadStrategy?: RelationLoadStrategy
+  }
+
+  /**
+   * league_message_read_state create
+   */
+  export type league_message_read_stateCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the league_message_read_state
+     */
+    select?: league_message_read_stateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the league_message_read_state
+     */
+    omit?: league_message_read_stateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: league_message_read_stateInclude<ExtArgs> | null
+    /**
+     * The data needed to create a league_message_read_state.
+     */
+    data: XOR<league_message_read_stateCreateInput, league_message_read_stateUncheckedCreateInput>
+    relationLoadStrategy?: RelationLoadStrategy
+  }
+
+  /**
+   * league_message_read_state createMany
+   */
+  export type league_message_read_stateCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many league_message_read_states.
+     */
+    data: league_message_read_stateCreateManyInput | league_message_read_stateCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * league_message_read_state createManyAndReturn
+   */
+  export type league_message_read_stateCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the league_message_read_state
+     */
+    select?: league_message_read_stateSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the league_message_read_state
+     */
+    omit?: league_message_read_stateOmit<ExtArgs> | null
+    /**
+     * The data used to create many league_message_read_states.
+     */
+    data: league_message_read_stateCreateManyInput | league_message_read_stateCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: league_message_read_stateIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * league_message_read_state update
+   */
+  export type league_message_read_stateUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the league_message_read_state
+     */
+    select?: league_message_read_stateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the league_message_read_state
+     */
+    omit?: league_message_read_stateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: league_message_read_stateInclude<ExtArgs> | null
+    /**
+     * The data needed to update a league_message_read_state.
+     */
+    data: XOR<league_message_read_stateUpdateInput, league_message_read_stateUncheckedUpdateInput>
+    /**
+     * Choose, which league_message_read_state to update.
+     */
+    where: league_message_read_stateWhereUniqueInput
+    relationLoadStrategy?: RelationLoadStrategy
+  }
+
+  /**
+   * league_message_read_state updateMany
+   */
+  export type league_message_read_stateUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update league_message_read_states.
+     */
+    data: XOR<league_message_read_stateUpdateManyMutationInput, league_message_read_stateUncheckedUpdateManyInput>
+    /**
+     * Filter which league_message_read_states to update
+     */
+    where?: league_message_read_stateWhereInput
+    /**
+     * Limit how many league_message_read_states to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * league_message_read_state updateManyAndReturn
+   */
+  export type league_message_read_stateUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the league_message_read_state
+     */
+    select?: league_message_read_stateSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the league_message_read_state
+     */
+    omit?: league_message_read_stateOmit<ExtArgs> | null
+    /**
+     * The data used to update league_message_read_states.
+     */
+    data: XOR<league_message_read_stateUpdateManyMutationInput, league_message_read_stateUncheckedUpdateManyInput>
+    /**
+     * Filter which league_message_read_states to update
+     */
+    where?: league_message_read_stateWhereInput
+    /**
+     * Limit how many league_message_read_states to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: league_message_read_stateIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * league_message_read_state upsert
+   */
+  export type league_message_read_stateUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the league_message_read_state
+     */
+    select?: league_message_read_stateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the league_message_read_state
+     */
+    omit?: league_message_read_stateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: league_message_read_stateInclude<ExtArgs> | null
+    /**
+     * The filter to search for the league_message_read_state to update in case it exists.
+     */
+    where: league_message_read_stateWhereUniqueInput
+    /**
+     * In case the league_message_read_state found by the `where` argument doesn't exist, create a new league_message_read_state with this data.
+     */
+    create: XOR<league_message_read_stateCreateInput, league_message_read_stateUncheckedCreateInput>
+    /**
+     * In case the league_message_read_state was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<league_message_read_stateUpdateInput, league_message_read_stateUncheckedUpdateInput>
+    relationLoadStrategy?: RelationLoadStrategy
+  }
+
+  /**
+   * league_message_read_state delete
+   */
+  export type league_message_read_stateDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the league_message_read_state
+     */
+    select?: league_message_read_stateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the league_message_read_state
+     */
+    omit?: league_message_read_stateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: league_message_read_stateInclude<ExtArgs> | null
+    /**
+     * Filter which league_message_read_state to delete.
+     */
+    where: league_message_read_stateWhereUniqueInput
+    relationLoadStrategy?: RelationLoadStrategy
+  }
+
+  /**
+   * league_message_read_state deleteMany
+   */
+  export type league_message_read_stateDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which league_message_read_states to delete
+     */
+    where?: league_message_read_stateWhereInput
+    /**
+     * Limit how many league_message_read_states to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * league_message_read_state without action
+   */
+  export type league_message_read_stateDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the league_message_read_state
+     */
+    select?: league_message_read_stateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the league_message_read_state
+     */
+    omit?: league_message_read_stateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: league_message_read_stateInclude<ExtArgs> | null
   }
 
 
@@ -22496,6 +23698,16 @@ export namespace Prisma {
   export type LeaguemessagesScalarFieldEnum = (typeof LeaguemessagesScalarFieldEnum)[keyof typeof LeaguemessagesScalarFieldEnum]
 
 
+  export const League_message_read_stateScalarFieldEnum: {
+    membership_id: 'membership_id',
+    last_read_at: 'last_read_at',
+    last_read_message_id: 'last_read_message_id',
+    updatedAt: 'updatedAt'
+  };
+
+  export type League_message_read_stateScalarFieldEnum = (typeof League_message_read_stateScalarFieldEnum)[keyof typeof League_message_read_stateScalarFieldEnum]
+
+
   export const LeaguesScalarFieldEnum: {
     league_id: 'league_id',
     created_by_user_id: 'created_by_user_id',
@@ -23317,6 +24529,7 @@ export namespace Prisma {
     people?: XOR<PeopleScalarRelationFilter, peopleWhereInput>
     leagues?: XOR<LeaguesScalarRelationFilter, leaguesWhereInput>
     leaguemessages?: LeaguemessagesListRelationFilter
+    league_message_read_state?: XOR<League_message_read_stateNullableScalarRelationFilter, league_message_read_stateWhereInput> | null
     picks?: PicksListRelationFilter
     superbowl?: SuperbowlListRelationFilter
   }
@@ -23333,6 +24546,7 @@ export namespace Prisma {
     people?: peopleOrderByWithRelationInput
     leagues?: leaguesOrderByWithRelationInput
     leaguemessages?: leaguemessagesOrderByRelationAggregateInput
+    league_message_read_state?: league_message_read_stateOrderByWithRelationInput
     picks?: picksOrderByRelationAggregateInput
     superbowl?: superbowlOrderByRelationAggregateInput
   }
@@ -23352,6 +24566,7 @@ export namespace Prisma {
     people?: XOR<PeopleScalarRelationFilter, peopleWhereInput>
     leagues?: XOR<LeaguesScalarRelationFilter, leaguesWhereInput>
     leaguemessages?: LeaguemessagesListRelationFilter
+    league_message_read_state?: XOR<League_message_read_stateNullableScalarRelationFilter, league_message_read_stateWhereInput> | null
     picks?: PicksListRelationFilter
     superbowl?: SuperbowlListRelationFilter
   }, "membership_id">
@@ -23455,6 +24670,58 @@ export namespace Prisma {
     message_type?: EnumMessageTypeWithAggregatesFilter<"leaguemessages"> | $Enums.MessageType
     createdAt?: DateTimeWithAggregatesFilter<"leaguemessages"> | Date | string
     status?: EnumMessageStatusWithAggregatesFilter<"leaguemessages"> | $Enums.MessageStatus
+  }
+
+  export type league_message_read_stateWhereInput = {
+    AND?: league_message_read_stateWhereInput | league_message_read_stateWhereInput[]
+    OR?: league_message_read_stateWhereInput[]
+    NOT?: league_message_read_stateWhereInput | league_message_read_stateWhereInput[]
+    membership_id?: IntFilter<"league_message_read_state"> | number
+    last_read_at?: DateTimeFilter<"league_message_read_state"> | Date | string
+    last_read_message_id?: StringFilter<"league_message_read_state"> | string
+    updatedAt?: DateTimeFilter<"league_message_read_state"> | Date | string
+    leaguemembers?: XOR<LeaguemembersScalarRelationFilter, leaguemembersWhereInput>
+  }
+
+  export type league_message_read_stateOrderByWithRelationInput = {
+    membership_id?: SortOrder
+    last_read_at?: SortOrder
+    last_read_message_id?: SortOrder
+    updatedAt?: SortOrder
+    leaguemembers?: leaguemembersOrderByWithRelationInput
+  }
+
+  export type league_message_read_stateWhereUniqueInput = Prisma.AtLeast<{
+    membership_id?: number
+    AND?: league_message_read_stateWhereInput | league_message_read_stateWhereInput[]
+    OR?: league_message_read_stateWhereInput[]
+    NOT?: league_message_read_stateWhereInput | league_message_read_stateWhereInput[]
+    last_read_at?: DateTimeFilter<"league_message_read_state"> | Date | string
+    last_read_message_id?: StringFilter<"league_message_read_state"> | string
+    updatedAt?: DateTimeFilter<"league_message_read_state"> | Date | string
+    leaguemembers?: XOR<LeaguemembersScalarRelationFilter, leaguemembersWhereInput>
+  }, "membership_id">
+
+  export type league_message_read_stateOrderByWithAggregationInput = {
+    membership_id?: SortOrder
+    last_read_at?: SortOrder
+    last_read_message_id?: SortOrder
+    updatedAt?: SortOrder
+    _count?: league_message_read_stateCountOrderByAggregateInput
+    _avg?: league_message_read_stateAvgOrderByAggregateInput
+    _max?: league_message_read_stateMaxOrderByAggregateInput
+    _min?: league_message_read_stateMinOrderByAggregateInput
+    _sum?: league_message_read_stateSumOrderByAggregateInput
+  }
+
+  export type league_message_read_stateScalarWhereWithAggregatesInput = {
+    AND?: league_message_read_stateScalarWhereWithAggregatesInput | league_message_read_stateScalarWhereWithAggregatesInput[]
+    OR?: league_message_read_stateScalarWhereWithAggregatesInput[]
+    NOT?: league_message_read_stateScalarWhereWithAggregatesInput | league_message_read_stateScalarWhereWithAggregatesInput[]
+    membership_id?: IntWithAggregatesFilter<"league_message_read_state"> | number
+    last_read_at?: DateTimeWithAggregatesFilter<"league_message_read_state"> | Date | string
+    last_read_message_id?: StringWithAggregatesFilter<"league_message_read_state"> | string
+    updatedAt?: DateTimeWithAggregatesFilter<"league_message_read_state"> | Date | string
   }
 
   export type leaguesWhereInput = {
@@ -24728,6 +25995,7 @@ export namespace Prisma {
     people: peopleCreateNestedOneWithoutLeaguemembersInput
     leagues: leaguesCreateNestedOneWithoutLeaguemembersInput
     leaguemessages?: leaguemessagesCreateNestedManyWithoutLeaguemembersInput
+    league_message_read_state?: league_message_read_stateCreateNestedOneWithoutLeaguemembersInput
     picks?: picksCreateNestedManyWithoutLeaguemembersInput
     superbowl?: superbowlCreateNestedManyWithoutLeaguemembersInput
   }
@@ -24742,6 +26010,7 @@ export namespace Prisma {
     EmailLogs?: EmailLogsUncheckedCreateNestedManyWithoutLeaguemembersInput
     WeekWinners?: WeekWinnersUncheckedCreateNestedManyWithoutLeaguemembersInput
     leaguemessages?: leaguemessagesUncheckedCreateNestedManyWithoutLeaguemembersInput
+    league_message_read_state?: league_message_read_stateUncheckedCreateNestedOneWithoutLeaguemembersInput
     picks?: picksUncheckedCreateNestedManyWithoutLeaguemembersInput
     superbowl?: superbowlUncheckedCreateNestedManyWithoutLeaguemembersInput
   }
@@ -24755,6 +26024,7 @@ export namespace Prisma {
     people?: peopleUpdateOneRequiredWithoutLeaguemembersNestedInput
     leagues?: leaguesUpdateOneRequiredWithoutLeaguemembersNestedInput
     leaguemessages?: leaguemessagesUpdateManyWithoutLeaguemembersNestedInput
+    league_message_read_state?: league_message_read_stateUpdateOneWithoutLeaguemembersNestedInput
     picks?: picksUpdateManyWithoutLeaguemembersNestedInput
     superbowl?: superbowlUpdateManyWithoutLeaguemembersNestedInput
   }
@@ -24769,6 +26039,7 @@ export namespace Prisma {
     EmailLogs?: EmailLogsUncheckedUpdateManyWithoutLeaguemembersNestedInput
     WeekWinners?: WeekWinnersUncheckedUpdateManyWithoutLeaguemembersNestedInput
     leaguemessages?: leaguemessagesUncheckedUpdateManyWithoutLeaguemembersNestedInput
+    league_message_read_state?: league_message_read_stateUncheckedUpdateOneWithoutLeaguemembersNestedInput
     picks?: picksUncheckedUpdateManyWithoutLeaguemembersNestedInput
     superbowl?: superbowlUncheckedUpdateManyWithoutLeaguemembersNestedInput
   }
@@ -24870,6 +26141,54 @@ export namespace Prisma {
     message_type?: EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumMessageStatusFieldUpdateOperationsInput | $Enums.MessageStatus
+  }
+
+  export type league_message_read_stateCreateInput = {
+    last_read_at: Date | string
+    last_read_message_id: string
+    updatedAt?: Date | string
+    leaguemembers: leaguemembersCreateNestedOneWithoutLeague_message_read_stateInput
+  }
+
+  export type league_message_read_stateUncheckedCreateInput = {
+    membership_id: number
+    last_read_at: Date | string
+    last_read_message_id: string
+    updatedAt?: Date | string
+  }
+
+  export type league_message_read_stateUpdateInput = {
+    last_read_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    last_read_message_id?: StringFieldUpdateOperationsInput | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    leaguemembers?: leaguemembersUpdateOneRequiredWithoutLeague_message_read_stateNestedInput
+  }
+
+  export type league_message_read_stateUncheckedUpdateInput = {
+    membership_id?: IntFieldUpdateOperationsInput | number
+    last_read_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    last_read_message_id?: StringFieldUpdateOperationsInput | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type league_message_read_stateCreateManyInput = {
+    membership_id: number
+    last_read_at: Date | string
+    last_read_message_id: string
+    updatedAt?: Date | string
+  }
+
+  export type league_message_read_stateUpdateManyMutationInput = {
+    last_read_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    last_read_message_id?: StringFieldUpdateOperationsInput | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type league_message_read_stateUncheckedUpdateManyInput = {
+    membership_id?: IntFieldUpdateOperationsInput | number
+    last_read_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    last_read_message_id?: StringFieldUpdateOperationsInput | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type leaguesCreateInput = {
@@ -26339,6 +27658,11 @@ export namespace Prisma {
     none?: leaguemessagesWhereInput
   }
 
+  export type League_message_read_stateNullableScalarRelationFilter = {
+    is?: league_message_read_stateWhereInput | null
+    isNot?: league_message_read_stateWhereInput | null
+  }
+
   export type SuperbowlListRelationFilter = {
     every?: superbowlWhereInput
     some?: superbowlWhereInput
@@ -26487,6 +27811,35 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumMessageStatusFilter<$PrismaModel>
     _max?: NestedEnumMessageStatusFilter<$PrismaModel>
+  }
+
+  export type league_message_read_stateCountOrderByAggregateInput = {
+    membership_id?: SortOrder
+    last_read_at?: SortOrder
+    last_read_message_id?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type league_message_read_stateAvgOrderByAggregateInput = {
+    membership_id?: SortOrder
+  }
+
+  export type league_message_read_stateMaxOrderByAggregateInput = {
+    membership_id?: SortOrder
+    last_read_at?: SortOrder
+    last_read_message_id?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type league_message_read_stateMinOrderByAggregateInput = {
+    membership_id?: SortOrder
+    last_read_at?: SortOrder
+    last_read_message_id?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type league_message_read_stateSumOrderByAggregateInput = {
+    membership_id?: SortOrder
   }
 
   export type EnumLatePolicyNullableFilter<$PrismaModel = never> = {
@@ -27480,6 +28833,12 @@ export namespace Prisma {
     connect?: leaguemessagesWhereUniqueInput | leaguemessagesWhereUniqueInput[]
   }
 
+  export type league_message_read_stateCreateNestedOneWithoutLeaguemembersInput = {
+    create?: XOR<league_message_read_stateCreateWithoutLeaguemembersInput, league_message_read_stateUncheckedCreateWithoutLeaguemembersInput>
+    connectOrCreate?: league_message_read_stateCreateOrConnectWithoutLeaguemembersInput
+    connect?: league_message_read_stateWhereUniqueInput
+  }
+
   export type picksCreateNestedManyWithoutLeaguemembersInput = {
     create?: XOR<picksCreateWithoutLeaguemembersInput, picksUncheckedCreateWithoutLeaguemembersInput> | picksCreateWithoutLeaguemembersInput[] | picksUncheckedCreateWithoutLeaguemembersInput[]
     connectOrCreate?: picksCreateOrConnectWithoutLeaguemembersInput | picksCreateOrConnectWithoutLeaguemembersInput[]
@@ -27513,6 +28872,12 @@ export namespace Prisma {
     connectOrCreate?: leaguemessagesCreateOrConnectWithoutLeaguemembersInput | leaguemessagesCreateOrConnectWithoutLeaguemembersInput[]
     createMany?: leaguemessagesCreateManyLeaguemembersInputEnvelope
     connect?: leaguemessagesWhereUniqueInput | leaguemessagesWhereUniqueInput[]
+  }
+
+  export type league_message_read_stateUncheckedCreateNestedOneWithoutLeaguemembersInput = {
+    create?: XOR<league_message_read_stateCreateWithoutLeaguemembersInput, league_message_read_stateUncheckedCreateWithoutLeaguemembersInput>
+    connectOrCreate?: league_message_read_stateCreateOrConnectWithoutLeaguemembersInput
+    connect?: league_message_read_stateWhereUniqueInput
   }
 
   export type picksUncheckedCreateNestedManyWithoutLeaguemembersInput = {
@@ -27591,6 +28956,16 @@ export namespace Prisma {
     deleteMany?: leaguemessagesScalarWhereInput | leaguemessagesScalarWhereInput[]
   }
 
+  export type league_message_read_stateUpdateOneWithoutLeaguemembersNestedInput = {
+    create?: XOR<league_message_read_stateCreateWithoutLeaguemembersInput, league_message_read_stateUncheckedCreateWithoutLeaguemembersInput>
+    connectOrCreate?: league_message_read_stateCreateOrConnectWithoutLeaguemembersInput
+    upsert?: league_message_read_stateUpsertWithoutLeaguemembersInput
+    disconnect?: league_message_read_stateWhereInput | boolean
+    delete?: league_message_read_stateWhereInput | boolean
+    connect?: league_message_read_stateWhereUniqueInput
+    update?: XOR<XOR<league_message_read_stateUpdateToOneWithWhereWithoutLeaguemembersInput, league_message_read_stateUpdateWithoutLeaguemembersInput>, league_message_read_stateUncheckedUpdateWithoutLeaguemembersInput>
+  }
+
   export type picksUpdateManyWithoutLeaguemembersNestedInput = {
     create?: XOR<picksCreateWithoutLeaguemembersInput, picksUncheckedCreateWithoutLeaguemembersInput> | picksCreateWithoutLeaguemembersInput[] | picksUncheckedCreateWithoutLeaguemembersInput[]
     connectOrCreate?: picksCreateOrConnectWithoutLeaguemembersInput | picksCreateOrConnectWithoutLeaguemembersInput[]
@@ -27661,6 +29036,16 @@ export namespace Prisma {
     deleteMany?: leaguemessagesScalarWhereInput | leaguemessagesScalarWhereInput[]
   }
 
+  export type league_message_read_stateUncheckedUpdateOneWithoutLeaguemembersNestedInput = {
+    create?: XOR<league_message_read_stateCreateWithoutLeaguemembersInput, league_message_read_stateUncheckedCreateWithoutLeaguemembersInput>
+    connectOrCreate?: league_message_read_stateCreateOrConnectWithoutLeaguemembersInput
+    upsert?: league_message_read_stateUpsertWithoutLeaguemembersInput
+    disconnect?: league_message_read_stateWhereInput | boolean
+    delete?: league_message_read_stateWhereInput | boolean
+    connect?: league_message_read_stateWhereUniqueInput
+    update?: XOR<XOR<league_message_read_stateUpdateToOneWithWhereWithoutLeaguemembersInput, league_message_read_stateUpdateWithoutLeaguemembersInput>, league_message_read_stateUncheckedUpdateWithoutLeaguemembersInput>
+  }
+
   export type picksUncheckedUpdateManyWithoutLeaguemembersNestedInput = {
     create?: XOR<picksCreateWithoutLeaguemembersInput, picksUncheckedCreateWithoutLeaguemembersInput> | picksCreateWithoutLeaguemembersInput[] | picksUncheckedCreateWithoutLeaguemembersInput[]
     connectOrCreate?: picksCreateOrConnectWithoutLeaguemembersInput | picksCreateOrConnectWithoutLeaguemembersInput[]
@@ -27723,6 +29108,20 @@ export namespace Prisma {
     upsert?: leaguemembersUpsertWithoutLeaguemessagesInput
     connect?: leaguemembersWhereUniqueInput
     update?: XOR<XOR<leaguemembersUpdateToOneWithWhereWithoutLeaguemessagesInput, leaguemembersUpdateWithoutLeaguemessagesInput>, leaguemembersUncheckedUpdateWithoutLeaguemessagesInput>
+  }
+
+  export type leaguemembersCreateNestedOneWithoutLeague_message_read_stateInput = {
+    create?: XOR<leaguemembersCreateWithoutLeague_message_read_stateInput, leaguemembersUncheckedCreateWithoutLeague_message_read_stateInput>
+    connectOrCreate?: leaguemembersCreateOrConnectWithoutLeague_message_read_stateInput
+    connect?: leaguemembersWhereUniqueInput
+  }
+
+  export type leaguemembersUpdateOneRequiredWithoutLeague_message_read_stateNestedInput = {
+    create?: XOR<leaguemembersCreateWithoutLeague_message_read_stateInput, leaguemembersUncheckedCreateWithoutLeague_message_read_stateInput>
+    connectOrCreate?: leaguemembersCreateOrConnectWithoutLeague_message_read_stateInput
+    upsert?: leaguemembersUpsertWithoutLeague_message_read_stateInput
+    connect?: leaguemembersWhereUniqueInput
+    update?: XOR<XOR<leaguemembersUpdateToOneWithWhereWithoutLeague_message_read_stateInput, leaguemembersUpdateWithoutLeague_message_read_stateInput>, leaguemembersUncheckedUpdateWithoutLeague_message_read_stateInput>
   }
 
   export type EmailLogsCreateNestedManyWithoutLeaguesInput = {
@@ -29430,6 +30829,7 @@ export namespace Prisma {
     people: peopleCreateNestedOneWithoutLeaguemembersInput
     leagues: leaguesCreateNestedOneWithoutLeaguemembersInput
     leaguemessages?: leaguemessagesCreateNestedManyWithoutLeaguemembersInput
+    league_message_read_state?: league_message_read_stateCreateNestedOneWithoutLeaguemembersInput
     picks?: picksCreateNestedManyWithoutLeaguemembersInput
     superbowl?: superbowlCreateNestedManyWithoutLeaguemembersInput
   }
@@ -29443,6 +30843,7 @@ export namespace Prisma {
     paid?: boolean | null
     WeekWinners?: WeekWinnersUncheckedCreateNestedManyWithoutLeaguemembersInput
     leaguemessages?: leaguemessagesUncheckedCreateNestedManyWithoutLeaguemembersInput
+    league_message_read_state?: league_message_read_stateUncheckedCreateNestedOneWithoutLeaguemembersInput
     picks?: picksUncheckedCreateNestedManyWithoutLeaguemembersInput
     superbowl?: superbowlUncheckedCreateNestedManyWithoutLeaguemembersInput
   }
@@ -29523,6 +30924,7 @@ export namespace Prisma {
     people?: peopleUpdateOneRequiredWithoutLeaguemembersNestedInput
     leagues?: leaguesUpdateOneRequiredWithoutLeaguemembersNestedInput
     leaguemessages?: leaguemessagesUpdateManyWithoutLeaguemembersNestedInput
+    league_message_read_state?: league_message_read_stateUpdateOneWithoutLeaguemembersNestedInput
     picks?: picksUpdateManyWithoutLeaguemembersNestedInput
     superbowl?: superbowlUpdateManyWithoutLeaguemembersNestedInput
   }
@@ -29536,6 +30938,7 @@ export namespace Prisma {
     paid?: NullableBoolFieldUpdateOperationsInput | boolean | null
     WeekWinners?: WeekWinnersUncheckedUpdateManyWithoutLeaguemembersNestedInput
     leaguemessages?: leaguemessagesUncheckedUpdateManyWithoutLeaguemembersNestedInput
+    league_message_read_state?: league_message_read_stateUncheckedUpdateOneWithoutLeaguemembersNestedInput
     picks?: picksUncheckedUpdateManyWithoutLeaguemembersNestedInput
     superbowl?: superbowlUncheckedUpdateManyWithoutLeaguemembersNestedInput
   }
@@ -29594,6 +30997,7 @@ export namespace Prisma {
     people: peopleCreateNestedOneWithoutLeaguemembersInput
     leagues: leaguesCreateNestedOneWithoutLeaguemembersInput
     leaguemessages?: leaguemessagesCreateNestedManyWithoutLeaguemembersInput
+    league_message_read_state?: league_message_read_stateCreateNestedOneWithoutLeaguemembersInput
     picks?: picksCreateNestedManyWithoutLeaguemembersInput
     superbowl?: superbowlCreateNestedManyWithoutLeaguemembersInput
   }
@@ -29607,6 +31011,7 @@ export namespace Prisma {
     paid?: boolean | null
     EmailLogs?: EmailLogsUncheckedCreateNestedManyWithoutLeaguemembersInput
     leaguemessages?: leaguemessagesUncheckedCreateNestedManyWithoutLeaguemembersInput
+    league_message_read_state?: league_message_read_stateUncheckedCreateNestedOneWithoutLeaguemembersInput
     picks?: picksUncheckedCreateNestedManyWithoutLeaguemembersInput
     superbowl?: superbowlUncheckedCreateNestedManyWithoutLeaguemembersInput
   }
@@ -29687,6 +31092,7 @@ export namespace Prisma {
     people?: peopleUpdateOneRequiredWithoutLeaguemembersNestedInput
     leagues?: leaguesUpdateOneRequiredWithoutLeaguemembersNestedInput
     leaguemessages?: leaguemessagesUpdateManyWithoutLeaguemembersNestedInput
+    league_message_read_state?: league_message_read_stateUpdateOneWithoutLeaguemembersNestedInput
     picks?: picksUpdateManyWithoutLeaguemembersNestedInput
     superbowl?: superbowlUpdateManyWithoutLeaguemembersNestedInput
   }
@@ -29700,6 +31106,7 @@ export namespace Prisma {
     paid?: NullableBoolFieldUpdateOperationsInput | boolean | null
     EmailLogs?: EmailLogsUncheckedUpdateManyWithoutLeaguemembersNestedInput
     leaguemessages?: leaguemessagesUncheckedUpdateManyWithoutLeaguemembersNestedInput
+    league_message_read_state?: league_message_read_stateUncheckedUpdateOneWithoutLeaguemembersNestedInput
     picks?: picksUncheckedUpdateManyWithoutLeaguemembersNestedInput
     superbowl?: superbowlUncheckedUpdateManyWithoutLeaguemembersNestedInput
   }
@@ -30137,6 +31544,23 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type league_message_read_stateCreateWithoutLeaguemembersInput = {
+    last_read_at: Date | string
+    last_read_message_id: string
+    updatedAt?: Date | string
+  }
+
+  export type league_message_read_stateUncheckedCreateWithoutLeaguemembersInput = {
+    last_read_at: Date | string
+    last_read_message_id: string
+    updatedAt?: Date | string
+  }
+
+  export type league_message_read_stateCreateOrConnectWithoutLeaguemembersInput = {
+    where: league_message_read_stateWhereUniqueInput
+    create: XOR<league_message_read_stateCreateWithoutLeaguemembersInput, league_message_read_stateUncheckedCreateWithoutLeaguemembersInput>
+  }
+
   export type picksCreateWithoutLeaguemembersInput = {
     season: number
     week: number
@@ -30395,6 +31819,29 @@ export namespace Prisma {
     status?: EnumMessageStatusFilter<"leaguemessages"> | $Enums.MessageStatus
   }
 
+  export type league_message_read_stateUpsertWithoutLeaguemembersInput = {
+    update: XOR<league_message_read_stateUpdateWithoutLeaguemembersInput, league_message_read_stateUncheckedUpdateWithoutLeaguemembersInput>
+    create: XOR<league_message_read_stateCreateWithoutLeaguemembersInput, league_message_read_stateUncheckedCreateWithoutLeaguemembersInput>
+    where?: league_message_read_stateWhereInput
+  }
+
+  export type league_message_read_stateUpdateToOneWithWhereWithoutLeaguemembersInput = {
+    where?: league_message_read_stateWhereInput
+    data: XOR<league_message_read_stateUpdateWithoutLeaguemembersInput, league_message_read_stateUncheckedUpdateWithoutLeaguemembersInput>
+  }
+
+  export type league_message_read_stateUpdateWithoutLeaguemembersInput = {
+    last_read_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    last_read_message_id?: StringFieldUpdateOperationsInput | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type league_message_read_stateUncheckedUpdateWithoutLeaguemembersInput = {
+    last_read_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    last_read_message_id?: StringFieldUpdateOperationsInput | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type picksUpsertWithWhereUniqueWithoutLeaguemembersInput = {
     where: picksWhereUniqueInput
     update: XOR<picksUpdateWithoutLeaguemembersInput, picksUncheckedUpdateWithoutLeaguemembersInput>
@@ -30495,6 +31942,7 @@ export namespace Prisma {
     WeekWinners?: WeekWinnersCreateNestedManyWithoutLeaguemembersInput
     people: peopleCreateNestedOneWithoutLeaguemembersInput
     leagues: leaguesCreateNestedOneWithoutLeaguemembersInput
+    league_message_read_state?: league_message_read_stateCreateNestedOneWithoutLeaguemembersInput
     picks?: picksCreateNestedManyWithoutLeaguemembersInput
     superbowl?: superbowlCreateNestedManyWithoutLeaguemembersInput
   }
@@ -30508,6 +31956,7 @@ export namespace Prisma {
     paid?: boolean | null
     EmailLogs?: EmailLogsUncheckedCreateNestedManyWithoutLeaguemembersInput
     WeekWinners?: WeekWinnersUncheckedCreateNestedManyWithoutLeaguemembersInput
+    league_message_read_state?: league_message_read_stateUncheckedCreateNestedOneWithoutLeaguemembersInput
     picks?: picksUncheckedCreateNestedManyWithoutLeaguemembersInput
     superbowl?: superbowlUncheckedCreateNestedManyWithoutLeaguemembersInput
   }
@@ -30588,6 +32037,7 @@ export namespace Prisma {
     WeekWinners?: WeekWinnersUpdateManyWithoutLeaguemembersNestedInput
     people?: peopleUpdateOneRequiredWithoutLeaguemembersNestedInput
     leagues?: leaguesUpdateOneRequiredWithoutLeaguemembersNestedInput
+    league_message_read_state?: league_message_read_stateUpdateOneWithoutLeaguemembersNestedInput
     picks?: picksUpdateManyWithoutLeaguemembersNestedInput
     superbowl?: superbowlUpdateManyWithoutLeaguemembersNestedInput
   }
@@ -30601,6 +32051,77 @@ export namespace Prisma {
     paid?: NullableBoolFieldUpdateOperationsInput | boolean | null
     EmailLogs?: EmailLogsUncheckedUpdateManyWithoutLeaguemembersNestedInput
     WeekWinners?: WeekWinnersUncheckedUpdateManyWithoutLeaguemembersNestedInput
+    league_message_read_state?: league_message_read_stateUncheckedUpdateOneWithoutLeaguemembersNestedInput
+    picks?: picksUncheckedUpdateManyWithoutLeaguemembersNestedInput
+    superbowl?: superbowlUncheckedUpdateManyWithoutLeaguemembersNestedInput
+  }
+
+  export type leaguemembersCreateWithoutLeague_message_read_stateInput = {
+    ts?: Date | string
+    role?: $Enums.MemberRole | null
+    paid?: boolean | null
+    EmailLogs?: EmailLogsCreateNestedManyWithoutLeaguemembersInput
+    WeekWinners?: WeekWinnersCreateNestedManyWithoutLeaguemembersInput
+    people: peopleCreateNestedOneWithoutLeaguemembersInput
+    leagues: leaguesCreateNestedOneWithoutLeaguemembersInput
+    leaguemessages?: leaguemessagesCreateNestedManyWithoutLeaguemembersInput
+    picks?: picksCreateNestedManyWithoutLeaguemembersInput
+    superbowl?: superbowlCreateNestedManyWithoutLeaguemembersInput
+  }
+
+  export type leaguemembersUncheckedCreateWithoutLeague_message_read_stateInput = {
+    membership_id?: number
+    league_id: number
+    user_id: number
+    ts?: Date | string
+    role?: $Enums.MemberRole | null
+    paid?: boolean | null
+    EmailLogs?: EmailLogsUncheckedCreateNestedManyWithoutLeaguemembersInput
+    WeekWinners?: WeekWinnersUncheckedCreateNestedManyWithoutLeaguemembersInput
+    leaguemessages?: leaguemessagesUncheckedCreateNestedManyWithoutLeaguemembersInput
+    picks?: picksUncheckedCreateNestedManyWithoutLeaguemembersInput
+    superbowl?: superbowlUncheckedCreateNestedManyWithoutLeaguemembersInput
+  }
+
+  export type leaguemembersCreateOrConnectWithoutLeague_message_read_stateInput = {
+    where: leaguemembersWhereUniqueInput
+    create: XOR<leaguemembersCreateWithoutLeague_message_read_stateInput, leaguemembersUncheckedCreateWithoutLeague_message_read_stateInput>
+  }
+
+  export type leaguemembersUpsertWithoutLeague_message_read_stateInput = {
+    update: XOR<leaguemembersUpdateWithoutLeague_message_read_stateInput, leaguemembersUncheckedUpdateWithoutLeague_message_read_stateInput>
+    create: XOR<leaguemembersCreateWithoutLeague_message_read_stateInput, leaguemembersUncheckedCreateWithoutLeague_message_read_stateInput>
+    where?: leaguemembersWhereInput
+  }
+
+  export type leaguemembersUpdateToOneWithWhereWithoutLeague_message_read_stateInput = {
+    where?: leaguemembersWhereInput
+    data: XOR<leaguemembersUpdateWithoutLeague_message_read_stateInput, leaguemembersUncheckedUpdateWithoutLeague_message_read_stateInput>
+  }
+
+  export type leaguemembersUpdateWithoutLeague_message_read_stateInput = {
+    ts?: DateTimeFieldUpdateOperationsInput | Date | string
+    role?: NullableEnumMemberRoleFieldUpdateOperationsInput | $Enums.MemberRole | null
+    paid?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    EmailLogs?: EmailLogsUpdateManyWithoutLeaguemembersNestedInput
+    WeekWinners?: WeekWinnersUpdateManyWithoutLeaguemembersNestedInput
+    people?: peopleUpdateOneRequiredWithoutLeaguemembersNestedInput
+    leagues?: leaguesUpdateOneRequiredWithoutLeaguemembersNestedInput
+    leaguemessages?: leaguemessagesUpdateManyWithoutLeaguemembersNestedInput
+    picks?: picksUpdateManyWithoutLeaguemembersNestedInput
+    superbowl?: superbowlUpdateManyWithoutLeaguemembersNestedInput
+  }
+
+  export type leaguemembersUncheckedUpdateWithoutLeague_message_read_stateInput = {
+    membership_id?: IntFieldUpdateOperationsInput | number
+    league_id?: IntFieldUpdateOperationsInput | number
+    user_id?: IntFieldUpdateOperationsInput | number
+    ts?: DateTimeFieldUpdateOperationsInput | Date | string
+    role?: NullableEnumMemberRoleFieldUpdateOperationsInput | $Enums.MemberRole | null
+    paid?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    EmailLogs?: EmailLogsUncheckedUpdateManyWithoutLeaguemembersNestedInput
+    WeekWinners?: WeekWinnersUncheckedUpdateManyWithoutLeaguemembersNestedInput
+    leaguemessages?: leaguemessagesUncheckedUpdateManyWithoutLeaguemembersNestedInput
     picks?: picksUncheckedUpdateManyWithoutLeaguemembersNestedInput
     superbowl?: superbowlUncheckedUpdateManyWithoutLeaguemembersNestedInput
   }
@@ -30676,6 +32197,7 @@ export namespace Prisma {
     WeekWinners?: WeekWinnersCreateNestedManyWithoutLeaguemembersInput
     people: peopleCreateNestedOneWithoutLeaguemembersInput
     leaguemessages?: leaguemessagesCreateNestedManyWithoutLeaguemembersInput
+    league_message_read_state?: league_message_read_stateCreateNestedOneWithoutLeaguemembersInput
     picks?: picksCreateNestedManyWithoutLeaguemembersInput
     superbowl?: superbowlCreateNestedManyWithoutLeaguemembersInput
   }
@@ -30689,6 +32211,7 @@ export namespace Prisma {
     EmailLogs?: EmailLogsUncheckedCreateNestedManyWithoutLeaguemembersInput
     WeekWinners?: WeekWinnersUncheckedCreateNestedManyWithoutLeaguemembersInput
     leaguemessages?: leaguemessagesUncheckedCreateNestedManyWithoutLeaguemembersInput
+    league_message_read_state?: league_message_read_stateUncheckedCreateNestedOneWithoutLeaguemembersInput
     picks?: picksUncheckedCreateNestedManyWithoutLeaguemembersInput
     superbowl?: superbowlUncheckedCreateNestedManyWithoutLeaguemembersInput
   }
@@ -31325,6 +32848,7 @@ export namespace Prisma {
     WeekWinners?: WeekWinnersCreateNestedManyWithoutLeaguemembersInput
     leagues: leaguesCreateNestedOneWithoutLeaguemembersInput
     leaguemessages?: leaguemessagesCreateNestedManyWithoutLeaguemembersInput
+    league_message_read_state?: league_message_read_stateCreateNestedOneWithoutLeaguemembersInput
     picks?: picksCreateNestedManyWithoutLeaguemembersInput
     superbowl?: superbowlCreateNestedManyWithoutLeaguemembersInput
   }
@@ -31338,6 +32862,7 @@ export namespace Prisma {
     EmailLogs?: EmailLogsUncheckedCreateNestedManyWithoutLeaguemembersInput
     WeekWinners?: WeekWinnersUncheckedCreateNestedManyWithoutLeaguemembersInput
     leaguemessages?: leaguemessagesUncheckedCreateNestedManyWithoutLeaguemembersInput
+    league_message_read_state?: league_message_read_stateUncheckedCreateNestedOneWithoutLeaguemembersInput
     picks?: picksUncheckedCreateNestedManyWithoutLeaguemembersInput
     superbowl?: superbowlUncheckedCreateNestedManyWithoutLeaguemembersInput
   }
@@ -31777,6 +33302,7 @@ export namespace Prisma {
     people: peopleCreateNestedOneWithoutLeaguemembersInput
     leagues: leaguesCreateNestedOneWithoutLeaguemembersInput
     leaguemessages?: leaguemessagesCreateNestedManyWithoutLeaguemembersInput
+    league_message_read_state?: league_message_read_stateCreateNestedOneWithoutLeaguemembersInput
     superbowl?: superbowlCreateNestedManyWithoutLeaguemembersInput
   }
 
@@ -31790,6 +33316,7 @@ export namespace Prisma {
     EmailLogs?: EmailLogsUncheckedCreateNestedManyWithoutLeaguemembersInput
     WeekWinners?: WeekWinnersUncheckedCreateNestedManyWithoutLeaguemembersInput
     leaguemessages?: leaguemessagesUncheckedCreateNestedManyWithoutLeaguemembersInput
+    league_message_read_state?: league_message_read_stateUncheckedCreateNestedOneWithoutLeaguemembersInput
     superbowl?: superbowlUncheckedCreateNestedManyWithoutLeaguemembersInput
   }
 
@@ -31962,6 +33489,7 @@ export namespace Prisma {
     people?: peopleUpdateOneRequiredWithoutLeaguemembersNestedInput
     leagues?: leaguesUpdateOneRequiredWithoutLeaguemembersNestedInput
     leaguemessages?: leaguemessagesUpdateManyWithoutLeaguemembersNestedInput
+    league_message_read_state?: league_message_read_stateUpdateOneWithoutLeaguemembersNestedInput
     superbowl?: superbowlUpdateManyWithoutLeaguemembersNestedInput
   }
 
@@ -31975,6 +33503,7 @@ export namespace Prisma {
     EmailLogs?: EmailLogsUncheckedUpdateManyWithoutLeaguemembersNestedInput
     WeekWinners?: WeekWinnersUncheckedUpdateManyWithoutLeaguemembersNestedInput
     leaguemessages?: leaguemessagesUncheckedUpdateManyWithoutLeaguemembersNestedInput
+    league_message_read_state?: league_message_read_stateUncheckedUpdateOneWithoutLeaguemembersNestedInput
     superbowl?: superbowlUncheckedUpdateManyWithoutLeaguemembersNestedInput
   }
 
@@ -32077,6 +33606,7 @@ export namespace Prisma {
     people: peopleCreateNestedOneWithoutLeaguemembersInput
     leagues: leaguesCreateNestedOneWithoutLeaguemembersInput
     leaguemessages?: leaguemessagesCreateNestedManyWithoutLeaguemembersInput
+    league_message_read_state?: league_message_read_stateCreateNestedOneWithoutLeaguemembersInput
     picks?: picksCreateNestedManyWithoutLeaguemembersInput
   }
 
@@ -32090,6 +33620,7 @@ export namespace Prisma {
     EmailLogs?: EmailLogsUncheckedCreateNestedManyWithoutLeaguemembersInput
     WeekWinners?: WeekWinnersUncheckedCreateNestedManyWithoutLeaguemembersInput
     leaguemessages?: leaguemessagesUncheckedCreateNestedManyWithoutLeaguemembersInput
+    league_message_read_state?: league_message_read_stateUncheckedCreateNestedOneWithoutLeaguemembersInput
     picks?: picksUncheckedCreateNestedManyWithoutLeaguemembersInput
   }
 
@@ -32208,6 +33739,7 @@ export namespace Prisma {
     people?: peopleUpdateOneRequiredWithoutLeaguemembersNestedInput
     leagues?: leaguesUpdateOneRequiredWithoutLeaguemembersNestedInput
     leaguemessages?: leaguemessagesUpdateManyWithoutLeaguemembersNestedInput
+    league_message_read_state?: league_message_read_stateUpdateOneWithoutLeaguemembersNestedInput
     picks?: picksUpdateManyWithoutLeaguemembersNestedInput
   }
 
@@ -32221,6 +33753,7 @@ export namespace Prisma {
     EmailLogs?: EmailLogsUncheckedUpdateManyWithoutLeaguemembersNestedInput
     WeekWinners?: WeekWinnersUncheckedUpdateManyWithoutLeaguemembersNestedInput
     leaguemessages?: leaguemessagesUncheckedUpdateManyWithoutLeaguemembersNestedInput
+    league_message_read_state?: league_message_read_stateUncheckedUpdateOneWithoutLeaguemembersNestedInput
     picks?: picksUncheckedUpdateManyWithoutLeaguemembersNestedInput
   }
 
@@ -33760,6 +35293,7 @@ export namespace Prisma {
     WeekWinners?: WeekWinnersUpdateManyWithoutLeaguemembersNestedInput
     people?: peopleUpdateOneRequiredWithoutLeaguemembersNestedInput
     leaguemessages?: leaguemessagesUpdateManyWithoutLeaguemembersNestedInput
+    league_message_read_state?: league_message_read_stateUpdateOneWithoutLeaguemembersNestedInput
     picks?: picksUpdateManyWithoutLeaguemembersNestedInput
     superbowl?: superbowlUpdateManyWithoutLeaguemembersNestedInput
   }
@@ -33773,6 +35307,7 @@ export namespace Prisma {
     EmailLogs?: EmailLogsUncheckedUpdateManyWithoutLeaguemembersNestedInput
     WeekWinners?: WeekWinnersUncheckedUpdateManyWithoutLeaguemembersNestedInput
     leaguemessages?: leaguemessagesUncheckedUpdateManyWithoutLeaguemembersNestedInput
+    league_message_read_state?: league_message_read_stateUncheckedUpdateOneWithoutLeaguemembersNestedInput
     picks?: picksUncheckedUpdateManyWithoutLeaguemembersNestedInput
     superbowl?: superbowlUncheckedUpdateManyWithoutLeaguemembersNestedInput
   }
@@ -33959,6 +35494,7 @@ export namespace Prisma {
     WeekWinners?: WeekWinnersUpdateManyWithoutLeaguemembersNestedInput
     leagues?: leaguesUpdateOneRequiredWithoutLeaguemembersNestedInput
     leaguemessages?: leaguemessagesUpdateManyWithoutLeaguemembersNestedInput
+    league_message_read_state?: league_message_read_stateUpdateOneWithoutLeaguemembersNestedInput
     picks?: picksUpdateManyWithoutLeaguemembersNestedInput
     superbowl?: superbowlUpdateManyWithoutLeaguemembersNestedInput
   }
@@ -33972,6 +35508,7 @@ export namespace Prisma {
     EmailLogs?: EmailLogsUncheckedUpdateManyWithoutLeaguemembersNestedInput
     WeekWinners?: WeekWinnersUncheckedUpdateManyWithoutLeaguemembersNestedInput
     leaguemessages?: leaguemessagesUncheckedUpdateManyWithoutLeaguemembersNestedInput
+    league_message_read_state?: league_message_read_stateUncheckedUpdateOneWithoutLeaguemembersNestedInput
     picks?: picksUncheckedUpdateManyWithoutLeaguemembersNestedInput
     superbowl?: superbowlUncheckedUpdateManyWithoutLeaguemembersNestedInput
   }
