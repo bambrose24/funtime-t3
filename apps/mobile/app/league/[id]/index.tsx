@@ -39,6 +39,8 @@ import { Button } from "@/components/ui/button";
 import { createComponentLogger } from "@/lib/logging";
 import { getShareLeagueInvite } from "@/lib/league/getShareLeagueInvite";
 import { DEFAULT_SEASON } from "@/constants";
+import { useLeagueUnreadMessages } from "@/hooks/useLeagueUnreadMessages";
+import { getUnreadBadgeLabel } from "@/lib/messages/unreadBadge";
 
 type TabType =
   | "overview"
@@ -105,6 +107,8 @@ export default function LeagueScreen() {
 
   // Parse league ID and set up comprehensive prefetching
   const leagueIdNumber = id ? parseInt(id, 10) : undefined;
+  const { unreadCount } = useLeagueUnreadMessages(leagueIdNumber);
+  const unreadBadgeLabel = getUnreadBadgeLabel(unreadCount);
   const selectedWeekFromParams = useMemo(() => {
     if (typeof week !== "string" || week.length === 0) {
       return undefined;
@@ -230,7 +234,7 @@ export default function LeagueScreen() {
 
   if (!id) {
     return (
-      <SafeAreaView className="bg-app-bg-light dark:bg-app-bg-dark flex-1">
+      <SafeAreaView className="flex-1 bg-app-bg-light dark:bg-app-bg-dark">
         <View className="flex-1 items-center justify-center">
           <Text className="text-base text-gray-500 dark:text-gray-400">
             League not found
@@ -247,7 +251,7 @@ export default function LeagueScreen() {
     { key: "overview", label: "Overview" },
     { key: "picks", label: "Pick" },
     { key: "leaderboard", label: "Leaderboard" },
-    { key: "messages", label: "Messages" },
+    { key: "messages", label: "Chat" },
     { key: "info", label: "Info" },
     ...(showSuperbowlTab
       ? [{ key: "superbowl" as TabType, label: "Super Bowl" }]
@@ -294,7 +298,7 @@ export default function LeagueScreen() {
   };
 
   return (
-    <SafeAreaView className="bg-app-bg-light dark:bg-app-bg-dark flex-1">
+    <SafeAreaView className="flex-1 bg-app-bg-light dark:bg-app-bg-dark">
       <Animated.View
         className="flex-1"
         style={{
@@ -316,7 +320,7 @@ export default function LeagueScreen() {
             </Pressable>
             <View className="mx-4 flex-1">
               <Text
-                className="text-app-fg-light dark:text-app-fg-dark text-center text-xl font-bold"
+                className="text-center text-xl font-bold text-app-fg-light dark:text-app-fg-dark"
                 numberOfLines={1}
               >
                 {leagueLoading ? "Loading..." : (leagueData?.name ?? "League")}
@@ -378,16 +382,25 @@ export default function LeagueScreen() {
                     className="relative mr-6 pb-3 pt-2"
                     hitSlop={8}
                   >
-                    <Text
-                      className={cn(
-                        "text-sm font-semibold tracking-tight",
-                        isActive
-                          ? "text-gray-900 dark:text-gray-100"
-                          : "text-gray-500 dark:text-gray-400",
-                      )}
-                    >
-                      {tab.label}
-                    </Text>
+                    <View className="flex-row items-center gap-1.5">
+                      <Text
+                        className={cn(
+                          "text-sm font-semibold tracking-tight",
+                          isActive
+                            ? "text-gray-900 dark:text-gray-100"
+                            : "text-gray-500 dark:text-gray-400",
+                        )}
+                      >
+                        {tab.label}
+                      </Text>
+                      {tab.key === "messages" && unreadBadgeLabel ? (
+                        <View className="min-w-5 items-center rounded-full bg-red-600 px-1.5 py-0.5">
+                          <Text className="text-[10px] font-bold text-white">
+                            {unreadBadgeLabel}
+                          </Text>
+                        </View>
+                      ) : null}
+                    </View>
                     <View
                       className={cn(
                         "absolute -bottom-px left-0 right-0 h-0.5 rounded-full",
@@ -814,7 +827,7 @@ function LeagueOverview({
                 color={isDarkColorScheme ? "#93c5fd" : "#2563eb"}
               />
             </View>
-            <Text className="text-app-fg-light dark:text-app-fg-dark text-center text-lg font-semibold">
+            <Text className="text-center text-lg font-semibold text-app-fg-light dark:text-app-fg-dark">
               The Season Is Over
             </Text>
             <Text className="mt-2 text-center text-sm text-gray-600 dark:text-gray-300">
@@ -849,7 +862,7 @@ function LeagueOverview({
                       variant="outline"
                       onPress={() =>
                         router.push(
-                          `/league/${renewalPreview.nextLeague?.league_id}/renewal-invites?priorLeagueId=${leagueIdNumber}` as any,
+                          `/league/${renewalPreview.nextLeague?.league_id}/renewal-invites` as any,
                         )
                       }
                     >
@@ -909,7 +922,7 @@ function LeagueOverview({
           ) : (
             displayWeek && (
               <>
-                <Text className="text-app-fg-light dark:text-app-fg-dark text-center text-lg font-semibold">
+                <Text className="text-center text-lg font-semibold text-app-fg-light dark:text-app-fg-dark">
                   Week {displayWeek}, {leagueData?.season}
                 </Text>
                 {weekOptions.length > 1 ? (
@@ -986,7 +999,7 @@ function LeagueOverview({
         {!isLoading && !isUserPicksLoading && (
           <View className="mx-4 mb-5 rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3 dark:border-zinc-700 dark:bg-zinc-900">
             <View className="flex-row items-center justify-between">
-              <Text className="text-app-fg-light dark:text-app-fg-dark text-sm font-semibold">
+              <Text className="text-sm font-semibold text-app-fg-light dark:text-app-fg-dark">
                 Week Snapshot
               </Text>
               <Text className="text-xs text-gray-500 dark:text-gray-400">
@@ -1072,7 +1085,7 @@ function LeagueOverview({
         {/* Your Picks - Only show after loading is complete */}
         {!isLoading && !isUserPicksLoading && displayWeek && (
           <View className="mx-4 mb-6 rounded-2xl border border-gray-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-800">
-            <Text className="text-app-fg-light dark:text-app-fg-dark text-base font-semibold">
+            <Text className="text-base font-semibold text-app-fg-light dark:text-app-fg-dark">
               Your Week Picks
             </Text>
             <Text className="mt-1 text-sm text-gray-600 dark:text-gray-400">
@@ -1115,7 +1128,7 @@ function LeagueOverview({
         {games && games.length > 0 && (
           <View className="mb-6">
             <View className="mb-3 flex-row items-center justify-between px-4">
-              <Text className="text-app-fg-light dark:text-app-fg-dark text-lg font-semibold">
+              <Text className="text-lg font-semibold text-app-fg-light dark:text-app-fg-dark">
                 This Week's Games
               </Text>
               <View className="flex-row items-center gap-1.5">
@@ -1161,7 +1174,7 @@ function LeagueOverview({
           !isUserPicksLoading &&
           (!games || games.length === 0) && (
             <View className="mx-4 mb-6 rounded-xl border border-gray-200 bg-gray-50 px-4 py-5 dark:border-zinc-700 dark:bg-zinc-800">
-              <Text className="text-app-fg-light dark:text-app-fg-dark text-base font-semibold">
+              <Text className="text-base font-semibold text-app-fg-light dark:text-app-fg-dark">
                 No Games Posted Yet
               </Text>
               <Text className="mt-1 text-sm text-gray-600 dark:text-gray-400">
@@ -1174,7 +1187,7 @@ function LeagueOverview({
         {/* Picks Table */}
         {picksSummary && picksSummary.length > 0 && games && (
           <View className="mb-6">
-            <Text className="text-app-fg-light dark:text-app-fg-dark mb-3 px-4 text-lg font-semibold">
+            <Text className="mb-3 px-4 text-lg font-semibold text-app-fg-light dark:text-app-fg-dark">
               League Picks
             </Text>
             {games.length > 5 ? (
@@ -1196,7 +1209,7 @@ function LeagueOverview({
           games.length > 0 &&
           (!picksSummary || picksSummary.length === 0) && (
             <View className="mx-4 mb-6 rounded-xl border border-gray-200 bg-gray-50 px-4 py-5 dark:border-zinc-700 dark:bg-zinc-800">
-              <Text className="text-app-fg-light dark:text-app-fg-dark text-base font-semibold">
+              <Text className="text-base font-semibold text-app-fg-light dark:text-app-fg-dark">
                 No League Picks Yet
               </Text>
               <Text className="mt-1 text-sm text-gray-600 dark:text-gray-400">
@@ -1221,12 +1234,12 @@ function LeagueOverview({
             className="flex-1"
             onPress={() => setIsPicksModalVisible(false)}
           />
-          <View className="bg-app-bg-light dark:bg-app-bg-dark rounded-t-3xl">
+          <View className="rounded-t-3xl bg-app-bg-light dark:bg-app-bg-dark">
             <SafeAreaView>
               {/* Modal Header */}
               <View className="border-b border-gray-200 px-4 py-3 dark:border-zinc-700">
                 <View className="flex-row items-center justify-between">
-                  <Text className="text-app-fg-light dark:text-app-fg-dark text-lg font-semibold">
+                  <Text className="text-lg font-semibold text-app-fg-light dark:text-app-fg-dark">
                     Your Week {displayWeek}, {leagueData?.season} Picks
                   </Text>
                   <Pressable
@@ -1377,7 +1390,7 @@ function LeagueOverview({
                                   width={16}
                                   height={16}
                                 />
-                                <Text className="text-app-fg-light dark:text-app-fg-dark text-xs font-medium">
+                                <Text className="text-xs font-medium text-app-fg-light dark:text-app-fg-dark">
                                   {awayTeam.abbrev}
                                 </Text>
                               </View>
@@ -1404,7 +1417,7 @@ function LeagueOverview({
                                   width={16}
                                   height={16}
                                 />
-                                <Text className="text-app-fg-light dark:text-app-fg-dark text-xs font-medium">
+                                <Text className="text-xs font-medium text-app-fg-light dark:text-app-fg-dark">
                                   {homeTeam.abbrev}
                                 </Text>
                               </View>

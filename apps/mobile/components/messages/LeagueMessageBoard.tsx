@@ -17,6 +17,7 @@ import { Input } from "@/components/ui/input";
 import { LeagueTabLoadingSkeleton } from "@/components/league/LeagueTabLoadingSkeleton";
 import { clientApi } from "@/lib/trpc/react";
 import { useColorScheme } from "@/lib/useColorScheme";
+import { useLeagueUnreadMessages } from "@/hooks/useLeagueUnreadMessages";
 import { type RouterOutputs } from "~/trpc/types";
 
 const MESSAGES_REFETCH_INTERVAL_MS = 10 * 1000;
@@ -33,6 +34,9 @@ type LeagueMessage = RouterOutputs["messages"]["leagueMessageBoard"][number];
 export function LeagueMessageBoard({ leagueId }: Props) {
   const leagueIdNumber = Number(leagueId);
   const { isDarkColorScheme } = useColorScheme();
+  const { markRead } = useLeagueUnreadMessages(
+    Number.isFinite(leagueIdNumber) ? leagueIdNumber : undefined,
+  );
   const utils = clientApi.useUtils();
   const listRef = useRef<FlatList<LeagueMessage>>(null);
   const previousTotalMessagesRef = useRef(0);
@@ -58,11 +62,15 @@ export function LeagueMessageBoard({ leagueId }: Props) {
     },
   );
 
-  const { mutateAsync: writeMessage } = clientApi.messages.writeMessage.useMutation();
-  const { mutateAsync: deleteMessage } = clientApi.messages.deleteMessage.useMutation();
+  const { mutateAsync: writeMessage } =
+    clientApi.messages.writeMessage.useMutation();
+  const { mutateAsync: deleteMessage } =
+    clientApi.messages.deleteMessage.useMutation();
 
   const viewerLeagueMember = useMemo(() => {
-    return session?.dbUser?.leaguemembers.find((member) => member.league_id === leagueIdNumber);
+    return session?.dbUser?.leaguemembers.find(
+      (member) => member.league_id === leagueIdNumber,
+    );
   }, [leagueIdNumber, session?.dbUser?.leaguemembers]);
 
   const pagedMessages = useMemo(() => {
@@ -108,6 +116,17 @@ export function LeagueMessageBoard({ leagueId }: Props) {
     });
   }, [isNearBottom, messages?.length]);
 
+  const latestMessageId = messages?.at(-1)?.message_id;
+  useEffect(() => {
+    if (!isNearBottom || !latestMessageId) {
+      return;
+    }
+
+    void markRead(latestMessageId).catch(() => {
+      // A failed receipt should not interfere with reading or sending messages.
+    });
+  }, [isNearBottom, latestMessageId, markRead]);
+
   useEffect(() => {
     if (isNearBottom) {
       setHasUnseenNewMessages(false);
@@ -115,7 +134,9 @@ export function LeagueMessageBoard({ leagueId }: Props) {
   }, [isNearBottom]);
 
   const invalidateMessages = async () => {
-    await utils.messages.leagueMessageBoard.invalidate({ leagueId: leagueIdNumber });
+    await utils.messages.leagueMessageBoard.invalidate({
+      leagueId: leagueIdNumber,
+    });
   };
 
   const onRefresh = async () => {
@@ -171,9 +192,7 @@ export function LeagueMessageBoard({ leagueId }: Props) {
   const onDelete = (messageId: string, username: string, mine: boolean) => {
     Alert.alert(
       "Delete Message",
-      mine
-        ? "Delete this message?"
-        : `Delete this message from ${username}?`,
+      mine ? "Delete this message?" : `Delete this message from ${username}?`,
       [
         { text: "Cancel", style: "cancel" },
         {
@@ -185,10 +204,7 @@ export function LeagueMessageBoard({ leagueId }: Props) {
               await invalidateMessages();
             } catch (error) {
               console.error("Failed to delete message", error);
-              Alert.alert(
-                "Delete Failed",
-                "Unable to delete this message.",
-              );
+              Alert.alert("Delete Failed", "Unable to delete this message.");
             }
           },
         },
@@ -228,7 +244,8 @@ export function LeagueMessageBoard({ leagueId }: Props) {
           }
           onScroll={({ nativeEvent }) => {
             const nearBottom =
-              nativeEvent.layoutMeasurement.height + nativeEvent.contentOffset.y >=
+              nativeEvent.layoutMeasurement.height +
+                nativeEvent.contentOffset.y >=
               nativeEvent.contentSize.height - NEAR_BOTTOM_THRESHOLD_PX;
             setIsNearBottom((current) =>
               current === nearBottom ? current : nearBottom,
@@ -238,7 +255,7 @@ export function LeagueMessageBoard({ leagueId }: Props) {
           ListHeaderComponent={
             <View className="gap-2 pb-2">
               <View className="rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 dark:border-zinc-700 dark:bg-zinc-900">
-                <Text className="text-app-fg-light dark:text-app-fg-dark text-xs font-semibold uppercase tracking-[0.8px]">
+                <Text className="text-xs font-semibold uppercase tracking-[0.8px] text-app-fg-light dark:text-app-fg-dark">
                   League Chat
                 </Text>
                 <Text className="mt-1 text-sm text-gray-700 dark:text-gray-200">
@@ -276,7 +293,8 @@ export function LeagueMessageBoard({ leagueId }: Props) {
             </View>
           }
           renderItem={({ item: message }) => {
-            const mine = viewerLeagueMember?.membership_id === message.member_id;
+            const mine =
+              viewerLeagueMember?.membership_id === message.member_id;
             const canDelete = mine || viewerLeagueMember?.role === "admin";
             const username = message.leaguemembers?.people.username ?? "Member";
             const createdAt = new Date(message.createdAt);
@@ -291,7 +309,7 @@ export function LeagueMessageBoard({ leagueId }: Props) {
                       : "mr-8 border-gray-200 bg-white dark:border-zinc-700 dark:bg-zinc-800",
                   ].join(" ")}
                 >
-                  <Text className="text-app-fg-light dark:text-app-fg-dark text-sm">
+                  <Text className="text-sm text-app-fg-light dark:text-app-fg-dark">
                     {message.content}
                   </Text>
                 </View>
@@ -364,10 +382,7 @@ export function LeagueMessageBoard({ leagueId }: Props) {
                 Pull down to sync
               </Text>
             </View>
-            <Button
-              onPress={onSend}
-              disabled={!canSendDraft}
-            >
+            <Button onPress={onSend} disabled={!canSendDraft}>
               {sending ? "Sending..." : "Send Message"}
             </Button>
           </View>

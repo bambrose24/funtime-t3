@@ -236,7 +236,6 @@ export default function CreateLeagueScreen() {
           try {
             await sendRenewalInvites({
               leagueId: createdLeague.league_id,
-              priorLeagueId: Number(priorLeagueId),
               memberIds: selectedMemberIds,
             });
           } catch (error) {
@@ -248,7 +247,7 @@ export default function CreateLeagueScreen() {
           }
         }
         router.replace(
-          `/league/${createdLeague.league_id}/renewal-invites?priorLeagueId=${priorLeagueId}` as any,
+          `/league/${createdLeague.league_id}/renewal-invites` as any,
         );
         return;
       }

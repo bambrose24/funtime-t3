@@ -1,4 +1,4 @@
-import { Heading, Text } from "@react-email/components";
+import { Heading, Text } from "react-email";
 import { cn } from "../../lib/utils";
 
 type TextProps = {

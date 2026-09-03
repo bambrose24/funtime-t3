@@ -9,11 +9,7 @@ import {
 import { resendApi } from "../../../services/resend";
 import { getBaseUrl } from "../../../../utils/getBaseUrl";
 import { authorizedProcedure, createTRPCRouter } from "../../trpc";
-import {
-  getMissedPickCounts,
-  getRenewalIneligibilityReason,
-  isLeagueAdmin,
-} from "./renewal";
+import { getRenewalIneligibilityReason } from "./renewal";
 
 const SUPER_ADMIN_EMAIL = "bambrose24@gmail.com";
 
@@ -74,48 +70,31 @@ const canSendBroadcastThisWeek = async (db: PrismaClient, leagueId: number) => {
   }
 };
 
-type RenewalDbUser = {
-  email?: string | null;
-  uid: number;
-  username: string;
-  leaguemembers: {
-    league_id: number;
-    role: string | null;
-  }[];
-};
-
 const buildRenewalInvitePreview = async ({
   db,
-  dbUser,
   nextLeagueId,
-  priorLeagueId,
 }: {
   db: PrismaClient;
-  dbUser: RenewalDbUser;
   nextLeagueId: number;
-  priorLeagueId: number;
 }) => {
-  const requestorIsSuperAdmin = isSuperAdminUser(dbUser.email);
-  if (
-    !requestorIsSuperAdmin &&
-    !isLeagueAdmin(dbUser.leaguemembers, priorLeagueId)
-  ) {
+  const nextLeague = await db.leagues.findFirstOrThrow({
+    where: {
+      league_id: nextLeagueId,
+    },
+  });
+  const priorLeagueId = nextLeague.prior_league_id;
+  if (!priorLeagueId) {
     throw new TRPCError({
-      code: "FORBIDDEN",
-      message: "You are not an admin of the prior league",
+      code: "BAD_REQUEST",
+      message: "This league is not linked to a prior league",
     });
   }
 
-  const [priorLeague, nextLeague, priorMembers, nextMembers] =
+  const [priorLeague, priorMembers, nextMembers, renewalRoles] =
     await Promise.all([
       db.leagues.findFirstOrThrow({
         where: {
           league_id: priorLeagueId,
-        },
-      }),
-      db.leagues.findFirstOrThrow({
-        where: {
-          league_id: nextLeagueId,
         },
       }),
       db.leaguemembers.findMany({
@@ -144,14 +123,16 @@ const buildRenewalInvitePreview = async ({
           user_id: true,
         },
       }),
+      db.league_renewal_member_roles.findMany({
+        where: {
+          league_id: nextLeagueId,
+        },
+        select: {
+          user_id: true,
+          role: true,
+        },
+      }),
     ]);
-
-  if (nextLeague.prior_league_id !== priorLeagueId) {
-    throw new TRPCError({
-      code: "BAD_REQUEST",
-      message: "The renewed league does not belong to the prior league",
-    });
-  }
 
   const ineligibilityReason = getRenewalIneligibilityReason(priorLeague);
   if (ineligibilityReason) {
@@ -161,14 +142,52 @@ const buildRenewalInvitePreview = async ({
     });
   }
 
-  const missedPicksByMemberId = await getMissedPickCounts(
-    db,
-    priorLeague.season,
-    priorMembers,
+  const priorMemberIds = priorMembers.map((member) => member.membership_id);
+  const [seasonGames, pickCounts] = await Promise.all([
+    db.games.findMany({
+      where: {
+        season: priorLeague.season,
+      },
+      select: {
+        ts: true,
+      },
+    }),
+    db.picks.groupBy({
+      by: ["member_id"],
+      where: {
+        member_id: {
+          in: priorMemberIds,
+        },
+        season: priorLeague.season,
+      },
+      _count: {
+        pickid: true,
+      },
+    }),
+  ]);
+  const pickCountByMemberId = new Map(
+    pickCounts.map((count) => [count.member_id, count._count.pickid]),
+  );
+  const missedPicksByMemberId = new Map(
+    priorMembers.map((member) => {
+      const eligibleGameCount = seasonGames.filter(
+        (game) => game.ts >= member.ts,
+      ).length;
+      const submittedPickCount =
+        pickCountByMemberId.get(member.membership_id) ?? 0;
+
+      return [
+        member.membership_id,
+        Math.max(eligibleGameCount - submittedPickCount, 0),
+      ];
+    }),
   );
 
   const nextLeagueUserIds = new Set(
     nextMembers.map((member) => member.user_id),
+  );
+  const renewalRoleByUserId = new Map(
+    renewalRoles.map((member) => [member.user_id, member.role]),
   );
   const eligibleMembersBeforeInviteCheck = priorMembers
     .filter((member) => !nextLeagueUserIds.has(member.user_id))
@@ -180,6 +199,11 @@ const buildRenewalInvitePreview = async ({
         username: member.people.username,
         email: member.people.email,
         role: member.role ?? MemberRole.player,
+        nextSeasonRole:
+          member.role === MemberRole.admin ||
+          renewalRoleByUserId.get(member.user_id) === MemberRole.admin
+            ? MemberRole.admin
+            : MemberRole.player,
         missedPickCount: missedPicksByMemberId.get(member.membership_id) ?? 0,
       };
     });
@@ -227,6 +251,9 @@ const buildRenewalInvitePreview = async ({
     defaultSelectedMemberIds: eligibleMembers.map(
       (member) => member.membershipId,
     ),
+    defaultAdminMemberIds: eligibleMembers
+      .filter((member) => member.nextSeasonRole === MemberRole.admin)
+      .map((member) => member.membershipId),
     alreadyJoinedCount,
     alreadyInvitedCount:
       eligibleMembersBeforeInviteCheck.length - eligibleMembers.length,
@@ -403,48 +430,39 @@ export const leagueAdminRouter = createTRPCRouter({
 
     return { members };
   }),
-  renewalInvitePreview: leagueAdminProcedure
-    .input(
-      z.object({
-        priorLeagueId: z.number().int(),
-      }),
-    )
-    .query(async ({ ctx, input }) => {
-      const { db, dbUser } = ctx;
-      const { leagueId, priorLeagueId } = input;
-      if (!dbUser) {
-        throw new TRPCError({ code: "UNAUTHORIZED" });
-      }
+  renewalInvitePreview: leagueAdminProcedure.query(async ({ ctx, input }) => {
+    const { db, dbUser } = ctx;
+    const { leagueId } = input;
+    if (!dbUser) {
+      throw new TRPCError({ code: "UNAUTHORIZED" });
+    }
 
-      return await buildRenewalInvitePreview({
-        db,
-        dbUser,
-        nextLeagueId: leagueId,
-        priorLeagueId,
-      });
-    }),
+    return await buildRenewalInvitePreview({
+      db,
+      nextLeagueId: leagueId,
+    });
+  }),
   sendRenewalInvites: leagueAdminProcedure
     .input(
       z.object({
-        priorLeagueId: z.number().int(),
         memberIds: z.array(z.number().int()).default([]),
+        adminMemberIds: z.array(z.number().int()).default([]),
       }),
     )
     .mutation(async ({ ctx, input }) => {
       const { db, dbUser } = ctx;
-      const { leagueId, priorLeagueId } = input;
+      const { leagueId } = input;
       if (!dbUser) {
         throw new TRPCError({ code: "UNAUTHORIZED" });
       }
 
       const preview = await buildRenewalInvitePreview({
         db,
-        dbUser,
         nextLeagueId: leagueId,
-        priorLeagueId,
       });
 
       const selectedMemberIds = new Set(input.memberIds);
+      const selectedAdminMemberIds = new Set(input.adminMemberIds);
       const eligibleMemberIds = new Set(
         preview.eligibleMembers.map((member) => member.membershipId),
       );
@@ -454,6 +472,40 @@ export const leagueAdminRouter = createTRPCRouter({
       const selectedRecipients = preview.eligibleMembers.filter((member) =>
         selectedMemberIds.has(member.membershipId),
       );
+
+      const selectedPlayerUserIds = selectedRecipients
+        .filter((member) => !selectedAdminMemberIds.has(member.membershipId))
+        .map((member) => member.userId);
+      const selectedAdminUserIds = selectedRecipients
+        .filter((member) => selectedAdminMemberIds.has(member.membershipId))
+        .map((member) => member.userId);
+
+      await db.$transaction([
+        db.league_renewal_member_roles.deleteMany({
+          where: {
+            league_id: leagueId,
+            user_id: { in: selectedPlayerUserIds },
+          },
+        }),
+        ...selectedAdminUserIds.map((userId) =>
+          db.league_renewal_member_roles.upsert({
+            where: {
+              league_id_user_id: {
+                league_id: leagueId,
+                user_id: userId,
+              },
+            },
+            create: {
+              league_id: leagueId,
+              user_id: userId,
+              role: MemberRole.admin,
+            },
+            update: {
+              role: MemberRole.admin,
+            },
+          }),
+        ),
+      ]);
 
       const previouslyInvited = await db.emailLogs.findMany({
         where: {
@@ -481,23 +533,36 @@ export const leagueAdminRouter = createTRPCRouter({
         });
       }
 
-      if (recipients.length === 0) {
-        return {
-          success: true,
-          sentCount: 0,
-          failedCount: 0,
-          skippedCount:
-            preview.eligibleMembers.length +
-            preview.alreadyJoinedCount +
-            preview.alreadyInvitedCount +
-            preview.missingEmailCount +
-            invalidSelectedCount,
-        };
-      }
-
       const joinHref = `${getBaseUrl()}/join-league/${preview.nextLeague.share_code}`;
+      const initiatingMember = await db.leaguemembers.findFirstOrThrow({
+        where: {
+          league_id: preview.nextLeague.league_id,
+          user_id: dbUser.uid,
+        },
+        include: {
+          people: true,
+        },
+      });
+      const existingInitiatorCopy = await db.emailLogs.findFirst({
+        where: {
+          league_id: preview.nextLeague.league_id,
+          member_id: initiatingMember.membership_id,
+          email_type: "renewal_invite",
+        },
+        select: { email_log_id: true },
+      });
+      const shouldSendInitiatorCopy =
+        recipients.length > 0 || !existingInitiatorCopy;
       const result = await resendApi.sendLeagueRenewalInvites({
         adminName: dbUser.username,
+        initiatorCopy: shouldSendInitiatorCopy
+          ? {
+              email: initiatingMember.people.email,
+              leagueHref: `${getBaseUrl()}/league/${preview.nextLeague.league_id}`,
+              memberId: initiatingMember.membership_id,
+              username: initiatingMember.people.username,
+            }
+          : undefined,
         joinHref,
         nextLeagueId: preview.nextLeague.league_id,
         nextLeagueName: preview.nextLeague.name,
@@ -514,9 +579,11 @@ export const leagueAdminRouter = createTRPCRouter({
       });
 
       return {
-        success: result.failedCount === 0,
+        success: result.failedCount === 0 && !result.initiatorCopyFailed,
         sentCount: result.sentCount,
         failedCount: result.failedCount,
+        initiatorCopySent: result.initiatorCopySent,
+        initiatorCopyFailed: result.initiatorCopyFailed,
         skippedCount:
           preview.eligibleMembers.length -
           recipients.length +
@@ -841,6 +908,7 @@ export const leagueAdminRouter = createTRPCRouter({
         await resendApi.sendLeagueBroadcast({
           leagueName: league.name,
           adminName: dbUser.username,
+          adminEmail: dbUser.email ?? undefined,
           markdownMessage: markdownString,
           to,
           leagueId,

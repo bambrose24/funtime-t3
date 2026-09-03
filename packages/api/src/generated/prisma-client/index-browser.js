@@ -21,12 +21,12 @@ exports.Prisma = Prisma
 exports.$Enums = {}
 
 /**
- * Prisma Client JS version: 6.19.0
- * Query Engine version: 2ba551f319ab1df4bc874a89965d8b3641056773
+ * Prisma Client JS version: 6.19.3
+ * Query Engine version: c2990dca591cba766e3b7ef5d9e8a84796e47ab7
  */
 Prisma.prismaVersion = {
-  client: "6.19.0",
-  engine: "2ba551f319ab1df4bc874a89965d8b3641056773"
+  client: "6.19.3",
+  engine: "c2990dca591cba766e3b7ef5d9e8a84796e47ab7"
 }
 
 Prisma.PrismaClientKnownRequestError = () => {
@@ -128,12 +128,27 @@ exports.Prisma.EmailLogsScalarFieldEnum = {
   email_type: 'email_type',
   ts: 'ts',
   week: 'week',
-  resend_id: 'resend_id'
+  resend_id: 'resend_id',
+  delivery_status: 'delivery_status',
+  last_event_at: 'last_event_at',
+  delivered_at: 'delivered_at',
+  failed_at: 'failed_at',
+  failure_reason: 'failure_reason'
 };
 
 exports.Prisma.RelationLoadStrategy = {
   query: 'query',
   join: 'join'
+};
+
+exports.Prisma.EmailDeliveryEventsScalarFieldEnum = {
+  id: 'id',
+  svix_id: 'svix_id',
+  resend_id: 'resend_id',
+  event_type: 'event_type',
+  occurred_at: 'occurred_at',
+  received_at: 'received_at',
+  payload: 'payload'
 };
 
 exports.Prisma.WeekWinnersScalarFieldEnum = {
@@ -188,6 +203,13 @@ exports.Prisma.LeaguemessagesScalarFieldEnum = {
   status: 'status'
 };
 
+exports.Prisma.League_message_read_stateScalarFieldEnum = {
+  membership_id: 'membership_id',
+  last_read_at: 'last_read_at',
+  last_read_message_id: 'last_read_message_id',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.LeaguesScalarFieldEnum = {
   league_id: 'league_id',
   created_by_user_id: 'created_by_user_id',
@@ -202,6 +224,15 @@ exports.Prisma.LeaguesScalarFieldEnum = {
   superbowl_competition: 'superbowl_competition',
   prior_league_id: 'prior_league_id',
   status: 'status'
+};
+
+exports.Prisma.League_renewal_member_rolesScalarFieldEnum = {
+  renewal_member_role_id: 'renewal_member_role_id',
+  league_id: 'league_id',
+  user_id: 'user_id',
+  role: 'role',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.PeopleScalarFieldEnum = {
@@ -307,6 +338,10 @@ exports.Prisma.SortOrder = {
   desc: 'desc'
 };
 
+exports.Prisma.JsonNullValueInput = {
+  JsonNull: Prisma.JsonNull
+};
+
 exports.Prisma.QueryMode = {
   default: 'default',
   insensitive: 'insensitive'
@@ -316,6 +351,12 @@ exports.Prisma.NullsOrder = {
   first: 'first',
   last: 'last'
 };
+
+exports.Prisma.JsonNullValueFilter = {
+  DbNull: Prisma.DbNull,
+  JsonNull: Prisma.JsonNull,
+  AnyNull: Prisma.AnyNull
+};
 exports.EmailType = exports.$Enums.EmailType = {
   week_reminder: 'week_reminder',
   week_summary: 'week_summary',
@@ -323,6 +364,16 @@ exports.EmailType = exports.$Enums.EmailType = {
   league_registration: 'league_registration',
   league_broadcast: 'league_broadcast',
   renewal_invite: 'renewal_invite'
+};
+
+exports.EmailDeliveryStatus = exports.$Enums.EmailDeliveryStatus = {
+  queued: 'queued',
+  delivered: 'delivered',
+  delayed: 'delayed',
+  failed: 'failed',
+  bounced: 'bounced',
+  complained: 'complained',
+  suppressed: 'suppressed'
 };
 
 exports.MemberRole = exports.$Enums.MemberRole = {
@@ -378,11 +429,14 @@ exports.Conference = exports.$Enums.Conference = {
 
 exports.Prisma.ModelName = {
   EmailLogs: 'EmailLogs',
+  EmailDeliveryEvents: 'EmailDeliveryEvents',
   WeekWinners: 'WeekWinners',
   games: 'games',
   leaguemembers: 'leaguemembers',
   leaguemessages: 'leaguemessages',
+  league_message_read_state: 'league_message_read_state',
   leagues: 'leagues',
+  league_renewal_member_roles: 'league_renewal_member_roles',
   people: 'people',
   pushNotificationTokens: 'pushNotificationTokens',
   picks: 'picks',

@@ -1,4 +1,4 @@
-import { Column, Container, Html, Preview, Row } from "@react-email/components";
+import { Body, Column, Container, Head, Html, Preview, Row } from "react-email";
 import { format } from "date-fns-tz";
 import { chunk, orderBy } from "lodash";
 import { EmailButton } from "../../emails/components/email-button";
@@ -72,91 +72,94 @@ export default function PicksConfirmationEmail({
 
   const picks = chunk(picksSorted, 2);
   return (
-    <Provider>
-      <Html>
-        <Preview>{headline}</Preview>
-        <Container className="flex flex-col items-center">
-          <EmailH1>{headline}</EmailH1>
-        </Container>
-        <Container className="flex flex-col items-center">
-          <EmailText>
-            {leagues.length > 1
-              ? `You submitted picks for ${leagues.length} leagues, ${username}. Your picks for these leagues are below.`
-              : `Your picks for ${leagues.at(0)?.name ?? ""} are below, ${username}.`}{" "}
-            If you have already submitted picks, the latest submission is the
-            one that counts up until the games start.
-          </EmailText>
-        </Container>
-        <Container className="flex justify-center">
-          {picks.map((pickChunk, chunkIdx) => {
-            return (
-              <Row key={chunkIdx}>
-                {pickChunk.map((pick, pickIdx) => {
-                  return (
-                    <Column key={pickIdx} className="w-[150px] px-2 py-1">
-                      <Container className="m-2 flex flex-col items-center justify-center gap-2 rounded bg-slate-200 p-1">
-                        <Row className="flex gap-2">
-                          <span
-                            className={cn("font-mono text-base", {
-                              underline: pick.chosen === "away",
-                            })}
-                          >
-                            {pick.awayTeam}
-                          </span>
-                          <span className="px-2 font-mono text-base">@</span>
-                          <span
-                            className={cn("font-mono text-base", {
-                              underline: pick.chosen === "home",
-                            })}
-                          >
-                            {pick.homeTeam}
-                          </span>
-                          <span>
-                            {" - "}
-                            {pick.chosen === "away"
-                              ? pick.awayTeam
-                              : pick.homeTeam}
-                          </span>
-                        </Row>
-                        {/* <Row className="flex justify-center font-mono text-xs">
+    <Html lang="en">
+      <Head />
+      <Preview>{headline}</Preview>
+      <Provider>
+        <Body className="bg-white font-sans">
+          <Container className="flex flex-col items-center">
+            <EmailH1>{headline}</EmailH1>
+          </Container>
+          <Container className="flex flex-col items-center">
+            <EmailText>
+              {leagues.length > 1
+                ? `You submitted picks for ${leagues.length} leagues, ${username}. Your picks for these leagues are below.`
+                : `Your picks for ${leagues.at(0)?.name ?? ""} are below, ${username}.`}{" "}
+              If you have already submitted picks, the latest submission is the
+              one that counts up until the games start.
+            </EmailText>
+          </Container>
+          <Container className="flex justify-center">
+            {picks.map((pickChunk, chunkIdx) => {
+              return (
+                <Row key={chunkIdx}>
+                  {pickChunk.map((pick, pickIdx) => {
+                    return (
+                      <Column key={pickIdx} className="w-[150px] px-2 py-1">
+                        <Container className="m-2 flex flex-col items-center justify-center gap-2 rounded bg-slate-200 p-1">
+                          <Row className="flex gap-2">
+                            <span
+                              className={cn("font-mono text-base", {
+                                underline: pick.chosen === "away",
+                              })}
+                            >
+                              {pick.awayTeam}
+                            </span>
+                            <span className="px-2 font-mono text-base">@</span>
+                            <span
+                              className={cn("font-mono text-base", {
+                                underline: pick.chosen === "home",
+                              })}
+                            >
+                              {pick.homeTeam}
+                            </span>
+                            <span>
+                              {" - "}
+                              {pick.chosen === "away"
+                                ? pick.awayTeam
+                                : pick.homeTeam}
+                            </span>
+                          </Row>
+                          {/* <Row className="flex justify-center font-mono text-xs">
                           {format(pick.time, "M/d/yy h:mm a", {
                             timeZone: EASTERN_TIMEZONE,
                           })}
                         </Row> */}
-                        {pick.score && pick.score > 0 ? (
-                          <Row className="flex justify-center font-mono text-sm text-muted-foreground">
-                            Score: {pick.score}
-                          </Row>
-                        ) : null}
-                      </Container>
-                    </Column>
-                  );
-                })}
-              </Row>
-            );
-          })}
-        </Container>
-        <Container className="flex w-full justify-center">
-          {leagues.length > 1 ? (
-            <EmailButton
-              href={`https://www.play-funtime.com`}
-              className="w-full"
-            >
-              Funtime Home
-            </EmailButton>
-          ) : (
-            <EmailButton
-              href={`https://www.play-funtime.com/league/${leagues.at(0)?.leagueId}`}
-              className="w-full"
-            >
-              League Home
-            </EmailButton>
-          )}
-        </Container>
-        <Container className="mt-4 text-xs text-muted-foreground">
-          This email was sent at {format(new Date(), "M/d/yy h:mm a")} UTC.
-        </Container>
-      </Html>
-    </Provider>
+                          {pick.score && pick.score > 0 ? (
+                            <Row className="flex justify-center font-mono text-sm text-muted-foreground">
+                              Score: {pick.score}
+                            </Row>
+                          ) : null}
+                        </Container>
+                      </Column>
+                    );
+                  })}
+                </Row>
+              );
+            })}
+          </Container>
+          <Container className="flex w-full justify-center">
+            {leagues.length > 1 ? (
+              <EmailButton
+                href={`https://www.play-funtime.com`}
+                className="w-full"
+              >
+                Funtime Home
+              </EmailButton>
+            ) : (
+              <EmailButton
+                href={`https://www.play-funtime.com/league/${leagues.at(0)?.leagueId}`}
+                className="w-full"
+              >
+                League Home
+              </EmailButton>
+            )}
+          </Container>
+          <Container className="mt-4 text-xs text-muted-foreground">
+            This email was sent at {format(new Date(), "M/d/yy h:mm a")} UTC.
+          </Container>
+        </Body>
+      </Provider>
+    </Html>
   );
 }

@@ -637,6 +637,11 @@
 
 ## In Progress
 
+- Task ID: `P2-MSG-UNREAD-001`
+  - Short title: Complete league-level Chat access and cross-platform unread state.
+  - Status: `IN_PROGRESS` (started `2026-09-01`).
+  - Scope: Add per-membership read cursors, batched unread counts, the canonical web Chat route/navigation, mobile Chat-tab badges/read receipts, and focused web/mobile coverage. Keep legacy week-named APIs and schema fields through a measured compatibility window.
+  - Test impact: Added/updated Playwright coverage for unread transitions and Chat access across league states, plus mobile badge/deep-link Jest coverage. Passed API/web/mobile type checks, the targeted Chat lint check, all mobile Jest suites (13 suites/52 tests), API tests (4 suites), and whitespace validation outside Prisma-generated files. Full browser E2E is still blocked before migrations because `supabase db reset` exits while recreating the local database; the failure occurs before the test app or fixture setup starts.
 - Task ID: `P5-PARITY-QA-001`
   - Short title: End-to-end parity QA pass and regression fixes.
   - Status: `IN_PROGRESS` (started `2026-02-25T20:24:07Z`).

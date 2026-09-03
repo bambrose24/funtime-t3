@@ -6,13 +6,13 @@ import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
 
 export default function LoadingScreen() {
-  const colorScheme = useColorScheme();
+  const colorScheme = useColorScheme() === "dark" ? "dark" : "light";
 
   return (
     <ThemedView style={styles.container}>
       <ActivityIndicator
         size="large"
-        color={Colors[colorScheme ?? "light"].tint}
+        color={Colors[colorScheme].tint}
       />
       <ThemedText style={styles.text}>Loading...</ThemedText>
     </ThemedView>

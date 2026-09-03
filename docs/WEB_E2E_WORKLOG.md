@@ -27,13 +27,11 @@ user-facing behavior change.
 - Do not mark PRD functionality complete until its test impact is represented
   here and the relevant automated suite passes.
 
-Current validated baseline: **21 Playwright tests in 18 files, all passing on a
-fresh local-Supabase reset and on GitHub Actions with an ephemeral Supabase
-stack (2026-08-08).**
-
-Pending baseline on this branch: **22 scenarios in 18 files**, executed once as
-desktop Chromium and once as touch-enabled mobile-web Chromium in isolated CI
-matrix jobs.
+Last recorded full-suite baseline: **21 Playwright tests in 18 files, all
+passing on a fresh local-Supabase reset and on GitHub Actions with an ephemeral
+Supabase stack (2026-08-08).** The repository currently defines **22 tests in
+18 files** after the deferred-invite renewal case was added; a new full-suite
+baseline has not yet been recorded in this worklog.
 
 ## Safety Contract
 
@@ -56,25 +54,23 @@ matrix jobs.
 - [x] Add required PR smoke suite.
 - [x] Add broader PRD regression suite.
 - [x] Add a GitHub Actions web E2E job and artifact upload.
-- [x] Run the full behavioral suite as separate desktop and mobile-web CI
-      dimensions.
 - [x] Document local and CI runbooks.
 
 ## Coverage Index
 
-| Product area            | Covered browser flows                                                                                    | Owning specs                                                                                                          |
-| ----------------------- | -------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| Authentication          | Anonymous access, signup/onboarding, login, logout, protected-route redirects                            | `auth/session.spec.ts`, `auth/signup.spec.ts`                                                                         |
-| Account settings        | Client validation, duplicate username rejection, successful persistence                                  | `profile/settings.spec.ts`                                                                                            |
-| League lifecycle        | Create with policies, join by code, duplicate prevention, waiting/completed states, renewal and invites  | `league/create-and-duplicate.spec.ts`, `league/join.spec.ts`, `league/renewal.spec.ts`, `smoke/admin-renewal.spec.ts` |
-| Weekly picks            | Validation, submission, apply-to-all, update, player kickoff lock, admin lock, super-admin override      | `picks/submit.spec.ts`, `picks/integrity.spec.ts`, `league/admin-member-workflows.spec.ts`                            |
-| Competitive integrity   | Membership authorization and opponent-pick redaction before submission and before each kickoff           | `picks/integrity.spec.ts`, `platform/access-and-responsive.spec.ts`                                                   |
-| Standings and profiles  | Weekly co-winners, competition ranking, cumulative chart, result totals, player profile                  | `standings/results.spec.ts`, `profile/superbowl.spec.ts`                                                              |
-| Super Bowl contest      | Required join prediction, edit, preseason privacy, in-progress visibility, completed bracket and ranking | `league/join.spec.ts`, `profile/superbowl.spec.ts`, `superbowl/visibility.spec.ts`, `superbowl/results.spec.ts`       |
-| Messaging               | Post, own-message deletion, admin moderation, non-member denial                                          | `league/messages.spec.ts`, `platform/access-and-responsive.spec.ts`                                                   |
-| League administration   | Rename, role, paid status, pick correction, email history, rate limiting, member removal, role denial    | `league/admin-controls.spec.ts`, `league/admin-member-workflows.spec.ts`                                              |
-| Platform and resilience | Super-admin dashboard, ordinary-user denial, mobile viewport smoke, uncaught browser-error guard         | `platform/access-and-responsive.spec.ts`, all specs through the automatic error fixture                               |
-| Regression smoke        | Public landing and completed-admin crash regression                                                      | `smoke/landing.spec.ts`, `smoke/admin-renewal.spec.ts`                                                                |
+| Product area            | Covered browser flows                                                                                                                     | Owning specs                                                                                                          |
+| ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| Authentication          | Anonymous access, signup/onboarding, login, logout, protected-route redirects                                                             | `auth/session.spec.ts`, `auth/signup.spec.ts`                                                                         |
+| Account settings        | Client validation, duplicate username rejection, successful persistence                                                                   | `profile/settings.spec.ts`                                                                                            |
+| League lifecycle        | Create with policies, join by code, duplicate prevention, waiting/completed states, renewal setup, no-send continuation, and role handoff | `league/create-and-duplicate.spec.ts`, `league/join.spec.ts`, `league/renewal.spec.ts`, `smoke/admin-renewal.spec.ts` |
+| Weekly picks            | Validation, submission, apply-to-all, update, player kickoff lock, admin lock, super-admin override                                       | `picks/submit.spec.ts`, `picks/integrity.spec.ts`, `league/admin-member-workflows.spec.ts`                            |
+| Competitive integrity   | Membership authorization and opponent-pick redaction before submission and before each kickoff                                            | `picks/integrity.spec.ts`, `platform/access-and-responsive.spec.ts`                                                   |
+| Standings and profiles  | Weekly co-winners, competition ranking, cumulative chart, result totals, player profile                                                   | `standings/results.spec.ts`, `profile/superbowl.spec.ts`                                                              |
+| Super Bowl contest      | Required join prediction, edit, preseason privacy, in-progress visibility, completed bracket and ranking                                  | `league/join.spec.ts`, `profile/superbowl.spec.ts`, `superbowl/visibility.spec.ts`, `superbowl/results.spec.ts`       |
+| Messaging               | Post, own-message deletion, admin moderation, non-member denial                                                                           | `league/messages.spec.ts`, `platform/access-and-responsive.spec.ts`                                                   |
+| League administration   | Rename, role, paid status, pick correction, email history, rate limiting, member removal, role denial                                     | `league/admin-controls.spec.ts`, `league/admin-member-workflows.spec.ts`                                              |
+| Platform and resilience | Super-admin dashboard, ordinary-user denial, mobile viewport smoke, uncaught browser-error guard                                          | `platform/access-and-responsive.spec.ts`, all specs through the automatic error fixture                               |
+| Regression smoke        | Public landing and completed-admin crash regression                                                                                       | `smoke/landing.spec.ts`, `smoke/admin-renewal.spec.ts`                                                                |
 
 ## PRD Coverage Checklist
 
@@ -85,22 +81,31 @@ matrix jobs.
 - [x] Existing user can sign in and sign out.
 - [x] Protected journeys redirect or fail closed for anonymous users.
 - [x] Profile username validation and update work.
+- [ ] Password-reset request, recovery-session handoff, and new-password confirmation work end to end.
 
 ### League lifecycle
 
 - [x] Admin can create a league with supported policy settings.
 - [x] Player can join by share code.
 - [x] Duplicate membership is prevented.
-- [x] Registration is rejected after the season's first kickoff.
 - [x] Not-started league state renders correctly.
 - [x] Completed-league admin page renders renewal controls without page errors.
-- [x] Admin can create one linked renewal league and invite eligible members.
+- [x] Admin can create a linked renewal with the suggested target-season name and creator-only initial membership.
+- [x] Admin can review eligible returning players, select a next-season admin, and verify that role is applied when the player joins.
+- [x] Prior- and renewed-league admin surfaces link to renewal invite management after creation.
+- [x] Admin can create the renewed league without sending invitations and continue on the invite-management page.
+- [ ] Direct duplicate-renewal creation is rejected after one prior-league/target-season link exists.
+- [ ] Renewal setup persists all inherited policy defaults from the prior league.
+- [ ] Renewal authorization rejects a prior-league non-admin at the preview, create, and invite-management boundaries.
+- [ ] Invite eligibility/status covers already joined, already invited, missing-email, missed-pick, skipped, and failed-recipient states.
+- [ ] Successful renewal email delivery, duplicate-send prevention, and initiating-admin confirmation are covered at the provider integration/contract layer.
 
 ### Weekly picks and integrity
 
 - [x] Player can submit a complete week and the picks persist in PostgreSQL.
 - [x] Tiebreaker validation rejects missing or invalid scores.
 - [x] Existing picks can be updated idempotently.
+- [x] Randomize fills the open week's picks before submission.
 - [x] Started games cannot be changed by a player.
 - [x] Started games cannot be changed by a league admin.
 - [x] Super admin can override a started pick for a correction.
@@ -127,6 +132,8 @@ matrix jobs.
 - [x] Member can post and delete their own message.
 - [x] League admin can delete another member's message.
 - [x] Non-members cannot access the league message board.
+- [ ] League Chat is reachable from league navigation in not-started, active, and completed league states.
+- [ ] League unread badges are scoped to the league, clear after viewing the latest message, and increment for a new message.
 
 ### League administration
 
@@ -134,6 +141,7 @@ matrix jobs.
 - [x] Admin can change a member role.
 - [x] Admin can toggle donated/paid status.
 - [x] Admin can remove a member.
+- [ ] League-admin self-demotion and self-removal are rejected while super-admin recovery remains available.
 - [x] Admin can edit a member's unstarted picks.
 - [x] Admin can view member email logs.
 - [x] Broadcast UI enforces its weekly rate-limit state without sending email.
@@ -144,19 +152,20 @@ matrix jobs.
 - [x] Authorized super admin can open aggregate admin dashboard.
 - [x] Ordinary users cannot open the aggregate admin dashboard.
 - [x] Critical pages fail the test on `pageerror` or unexpected console errors.
-- [x] Every web scenario runs in desktop and mobile-web Chromium projects.
+- [x] Responsive smoke checks cover desktop and mobile browser viewports.
 
 ## Explicit Gaps and Suite Boundaries
 
-| Not covered by this web E2E suite                                                         | Current reason/owner                                                                                              | Required follow-up when it changes                                                                                                        |
-| ----------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| Real Resend email, push notification, analytics, ESPN, cron, and postseason-sync delivery | External side effects are intentionally disabled in E2E mode; browser tests verify UI and local database outcomes | Cover provider adapters and scheduled jobs with isolated integration/contract tests; keep one no-send browser assertion for triggering UI |
-| Planned week-summary and near-real-time message notifications                             | PRD functionality is not implemented                                                                              | Add checklist rows, deterministic fixtures, and E2E/integration coverage with the implementation                                          |
-| Target persistent league-wide message thread                                              | Current product remains week-scoped                                                                               | Replace/extend the current messaging spec when the target model ships                                                                     |
-| Firefox, WebKit, and physical-device browser matrices                                     | CI gates desktop and mobile-web Chromium; it does not claim cross-browser or physical-device coverage             | Add projects and document any browser-specific exclusions before claiming broader browser support                                        |
-| Full visual-regression, accessibility, and performance auditing                           | The suite uses semantic locators and fails on runtime errors but is not a comprehensive non-functional audit      | Add dedicated visual, axe/accessibility, and performance budgets if these become release gates                                            |
-| Hosted Supabase or production data                                                        | Intentionally prohibited to avoid pollution and unsafe resets                                                     | Keep local-stack guards; validate hosted infrastructure through non-destructive deployment checks                                         |
-| Mobile application journeys                                                               | Owned by the mobile Jest/Maestro strategy                                                                         | Maintain the mobile coverage sections in `docs/TESTING_STRATEGY.md`                                                                       |
+| Not covered by this web E2E suite                                                         | Current reason/owner                                                                                                                               | Required follow-up when it changes                                                                                                            |
+| ----------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| Real Resend email, push notification, analytics, ESPN, cron, and postseason-sync delivery | External side effects are intentionally disabled in E2E mode; browser tests verify UI and local database outcomes                                  | Cover provider adapters and scheduled jobs with isolated integration/contract tests; keep one no-send browser assertion for triggering UI     |
+| Week-summary and near-real-time message notification delivery                             | The pipeline is implemented, but outbound effects remain disabled in browser E2E and staging/device delivery QA is still pending                   | Add scheduler/provider integration coverage and retain browser assertions for local UI/database outcomes                                      |
+| Renewal email fanout, confirmation copy, and delivery-state transitions                   | Outbound email is intentionally disabled in browser E2E; current renewal E2E covers linked creation, selection, deferred sending, and role handoff | Cover Resend adapter/webhook behavior with isolated contract tests and add deterministic recipient-state fixtures to the renewal browser spec |
+| Password recovery email and recovery-session browser journey                              | Signup/session paths are covered, but a deterministic local recovery-link harness has not been added                                               | Capture the local Supabase recovery link and cover reset confirmation without external email delivery                                         |
+| Firefox, WebKit, and device-browser matrices                                              | CI currently gates Chromium only                                                                                                                   | Add projects and document any browser-specific exclusions before claiming cross-browser support                                               |
+| Full visual-regression, accessibility, and performance auditing                           | The suite uses semantic locators and fails on runtime errors but is not a comprehensive non-functional audit                                       | Add dedicated visual, axe/accessibility, and performance budgets if these become release gates                                                |
+| Hosted Supabase or production data                                                        | Intentionally prohibited to avoid pollution and unsafe resets                                                                                      | Keep local-stack guards; validate hosted infrastructure through non-destructive deployment checks                                             |
+| Mobile application journeys                                                               | Owned by the mobile Jest/Maestro strategy                                                                                                          | Maintain the mobile coverage sections in `docs/TESTING_STRATEGY.md`                                                                           |
 
 ## Execution Log
 

@@ -1,4 +1,4 @@
-export const FIRST_SELF_SERVICE_RENEWAL_SEASON = 2027;
+export const FIRST_SELF_SERVICE_RENEWAL_SEASON = 2026;
 
 type PriorLeagueForRenewal = {
   season: number;

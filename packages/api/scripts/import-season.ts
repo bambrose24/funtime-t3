@@ -80,6 +80,12 @@ async function run() {
     `Found ${espnGamesResponse.length} total games from ESPN for season ${season}`,
   );
 
+  if (espnGamesResponse.length === 0) {
+    throw new Error(
+      `ESPN returned no games for season ${season}; refusing to report an empty import as successful.`,
+    );
+  }
+
   // Filter out playoff games - only keep regular season games (weeks 1-18)
   const regularSeasonGames = espnGamesResponse.filter((game) => {
     const week = game.week?.number;
@@ -89,6 +95,12 @@ async function run() {
   console.log(
     `Found ${regularSeasonGames.length} regular season games from ESPN for season ${season}`,
   );
+
+  if (regularSeasonGames.length === 0) {
+    throw new Error(
+      `ESPN returned no regular-season games for season ${season}; refusing to import an empty schedule.`,
+    );
+  }
 
   // Group games by week to determine tiebreaker games
   const groupedByWeek = groupBy(regularSeasonGames, (g) => g.week.number);

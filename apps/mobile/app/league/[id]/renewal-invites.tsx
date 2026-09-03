@@ -16,19 +16,13 @@ import { useColorScheme } from "@/lib/useColorScheme";
 import { getBaseUrl } from "@/utils/getBaseUrl";
 
 export default function RenewalInvitesScreen() {
-  const { id, priorLeagueId: priorLeagueIdParam } = useLocalSearchParams<{
+  const { id } = useLocalSearchParams<{
     id?: string;
-    priorLeagueId?: string;
   }>();
   const { isDarkColorScheme } = useColorScheme();
   const utils = clientApi.useUtils();
   const leagueId = Number(id);
-  const priorLeagueId = Number(priorLeagueIdParam);
-  const validParams =
-    Number.isInteger(leagueId) &&
-    leagueId > 0 &&
-    Number.isInteger(priorLeagueId) &&
-    priorLeagueId > 0;
+  const validParams = Number.isInteger(leagueId) && leagueId > 0;
   const { data: renewalStatus, isLoading: renewalStatusLoading } =
     clientApi.league.renewalStatus.useQuery(undefined, {
       enabled: validParams,
@@ -38,7 +32,7 @@ export default function RenewalInvitesScreen() {
     isLoading,
     refetch,
   } = clientApi.league.admin.renewalInvitePreview.useQuery(
-    { leagueId, priorLeagueId },
+    { leagueId },
     { enabled: validParams && renewalStatus?.isOpen === true },
   );
   const { mutateAsync: sendRenewalInvites } =
@@ -49,6 +43,8 @@ export default function RenewalInvitesScreen() {
   const [submitting, setSubmitting] = useState(false);
   const [sendResult, setSendResult] = useState<{
     failedCount: number;
+    initiatorCopyFailed: boolean;
+    initiatorCopySent: boolean;
     sentCount: number;
     skippedCount: number;
   } | null>(null);
@@ -90,13 +86,17 @@ export default function RenewalInvitesScreen() {
       setSubmitting(true);
       const result = await sendRenewalInvites({
         leagueId,
-        priorLeagueId,
         memberIds: selectedMemberIdList,
       });
       setSendResult(result);
       await utils.invalidate();
       await refetch();
-      Alert.alert("Invites Sent", `Sent ${result.sentCount} renewal invites.`);
+      Alert.alert(
+        result.initiatorCopyFailed
+          ? "Invites Sent, Copy Failed"
+          : "Invites Sent",
+        `Sent ${result.sentCount} renewal invites.${result.initiatorCopySent ? " A confirmation copy was sent to you." : ""}${result.initiatorCopyFailed ? " Your confirmation copy could not be delivered." : ""}`,
+      );
     } catch (error) {
       Alert.alert(
         "Invite Failed",
@@ -296,6 +296,7 @@ export default function RenewalInvitesScreen() {
                   ? `, failed ${sendResult.failedCount}`
                   : ""}
                 .
+                {sendResult.initiatorCopySent ? " A copy was sent to you." : ""}
               </Text>
             </View>
           ) : null}

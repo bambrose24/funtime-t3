@@ -1,4 +1,4 @@
-import { Container, Html, Preview } from "@react-email/components";
+import { Body, Container, Head, Html, Preview } from "react-email";
 import { EmailH1, EmailText } from "../components/email-text";
 import { Provider } from "../provider";
 import { EmailButton } from "../components/email-button";
@@ -17,22 +17,26 @@ export default function PickReminderEmail({
   const headline = `Reminder: Make Your Picks for ${leagueName}`;
 
   return (
-    <Provider>
-      <Html>
-        <Preview>{headline}</Preview>
-        <Container className="flex flex-col items-center">
-          <EmailH1>{headline}</EmailH1>
-          <EmailText>Hi {username},</EmailText>
-          <EmailText>
-            This is a friendly reminder to make your picks for {leagueName}. The
-            games are starting soon, and we don&apos;t want you to miss out!
-          </EmailText>
-          <EmailButton href={leagueHomeHref}>Make Your Picks Now</EmailButton>
-          <div className="text-xs text-muted-foreground">
-            This is an automated email sent at {new Date().toLocaleString()}.
-          </div>
-        </Container>
-      </Html>
-    </Provider>
+    <Html lang="en">
+      <Head />
+      <Preview>{headline}</Preview>
+      <Provider>
+        <Body className="bg-white font-sans">
+          <Container className="flex flex-col items-center">
+            <EmailH1>{headline}</EmailH1>
+            <EmailText>Hi {username},</EmailText>
+            <EmailText>
+              This is a friendly reminder to make your picks for {leagueName}.
+              The games are starting soon, and we don&apos;t want you to miss
+              out!
+            </EmailText>
+            <EmailButton href={leagueHomeHref}>Make Your Picks Now</EmailButton>
+            <div className="text-xs text-muted-foreground">
+              This is an automated email sent at {new Date().toLocaleString()}.
+            </div>
+          </Container>
+        </Body>
+      </Provider>
+    </Html>
   );
 }

@@ -11,15 +11,20 @@ datasource db {
 }
 
 model EmailLogs {
-  email_log_id  String        @id @default(cuid())
-  league_id     Int
-  member_id     Int
-  email_type    EmailType
-  ts            DateTime      @default(now()) @db.Timestamptz(6)
-  week          Int?
-  resend_id     String
-  leagues       leagues       @relation(fields: [league_id], references: [league_id], onUpdate: Restrict, onDelete: Cascade)
-  leaguemembers leaguemembers @relation(fields: [member_id], references: [membership_id], onDelete: Cascade)
+  email_log_id    String              @id @default(cuid())
+  league_id       Int
+  member_id       Int
+  email_type      EmailType
+  ts              DateTime            @default(now()) @db.Timestamptz(6)
+  week            Int?
+  resend_id       String
+  delivery_status EmailDeliveryStatus @default(queued)
+  last_event_at   DateTime?           @db.Timestamptz(6)
+  delivered_at    DateTime?           @db.Timestamptz(6)
+  failed_at       DateTime?           @db.Timestamptz(6)
+  failure_reason  String?
+  leagues         leagues             @relation(fields: [league_id], references: [league_id], onUpdate: Restrict, onDelete: Cascade)
+  leaguemembers   leaguemembers       @relation(fields: [member_id], references: [membership_id], onDelete: Cascade)
 
   @@index([league_id], map: "idx_emaillogs_league_id")
   @@index([league_id, member_id], map: "idx_emaillogs_league_member")
@@ -29,6 +34,19 @@ model EmailLogs {
   @@index([member_id, week], map: "idx_emaillogs_member_week")
   @@index([resend_id], map: "idx_emaillogs_resend_id")
   @@index([week], map: "idx_emaillogs_week")
+}
+
+model EmailDeliveryEvents {
+  id          String   @id @default(cuid())
+  svix_id     String   @unique
+  resend_id   String
+  event_type  String
+  occurred_at DateTime @db.Timestamptz(6)
+  received_at DateTime @default(now()) @db.Timestamptz(6)
+  payload     Json
+
+  @@index([resend_id, occurred_at], map: "idx_emaildeliveryevents_resend_occurred")
+  @@index([occurred_at], map: "idx_emaildeliveryevents_occurred_at")
 }
 
 model WeekWinners {
@@ -81,19 +99,20 @@ model games {
 }
 
 model leaguemembers {
-  membership_id  Int              @id(map: "idx_18414_primary") @default(autoincrement())
-  league_id      Int
-  user_id        Int
-  ts             DateTime         @default(now()) @db.Timestamptz(6)
-  role           MemberRole?      @default(player)
-  paid           Boolean?         @default(false)
-  EmailLogs      EmailLogs[]
-  WeekWinners    WeekWinners[]
-  people         people           @relation(fields: [user_id], references: [uid], onDelete: Cascade, onUpdate: Restrict, map: "leaguemembers_ibfk_1")
-  leagues        leagues          @relation(fields: [league_id], references: [league_id], onUpdate: Restrict, onDelete: Cascade, map: "leaguemembers_ibfk_2")
-  leaguemessages leaguemessages[]
-  picks          picks[]
-  superbowl      superbowl[]
+  membership_id             Int                        @id(map: "idx_18414_primary") @default(autoincrement())
+  league_id                 Int
+  user_id                   Int
+  ts                        DateTime                   @default(now()) @db.Timestamptz(6)
+  role                      MemberRole?                @default(player)
+  paid                      Boolean?                   @default(false)
+  EmailLogs                 EmailLogs[]
+  WeekWinners               WeekWinners[]
+  people                    people                     @relation(fields: [user_id], references: [uid], onDelete: Cascade, onUpdate: Restrict, map: "leaguemembers_ibfk_1")
+  leagues                   leagues                    @relation(fields: [league_id], references: [league_id], onUpdate: Restrict, onDelete: Cascade, map: "leaguemembers_ibfk_2")
+  leaguemessages            leaguemessages[]
+  league_message_read_state league_message_read_state?
+  picks                     picks[]
+  superbowl                 superbowl[]
 
   @@index([league_id], map: "idx_18414_league_id")
   @@index([paid], map: "idx_18414_paid")
@@ -119,31 +138,43 @@ model leaguemessages {
   @@index([league_id, member_id])
   @@index([league_id, message_type])
   @@index([league_id, message_type, status])
+  @@index([league_id, status, createdAt, message_id])
   @@index([member_id])
   @@index([message_type])
 }
 
+model league_message_read_state {
+  membership_id        Int           @id
+  last_read_at         DateTime      @db.Timestamp(3)
+  last_read_message_id String
+  updatedAt            DateTime      @updatedAt @db.Timestamp(3)
+  leaguemembers        leaguemembers @relation(fields: [membership_id], references: [membership_id], onDelete: Cascade)
+
+  @@index([last_read_at])
+}
+
 model leagues {
-  league_id             Int              @id(map: "idx_18422_primary") @default(autoincrement())
-  created_by_user_id    Int
-  name                  String
-  created_time          DateTime         @default(now()) @db.Timestamptz(6)
-  season                Int
-  late_policy           LatePolicy?      @default(allow_late_whole_week)
-  pick_policy           PickPolicy?      @default(choose_winner)
-  reminder_policy       ReminderPolicy?  @default(three_hours_before)
-  scoring_type          ScoringType?     @default(game_winner)
-  share_code            String?          @unique @default(cuid())
-  superbowl_competition Boolean?         @default(true)
-  prior_league_id       Int?
-  status                LeagueStatus     @default(not_started)
-  EmailLogs             EmailLogs[]
-  WeekWinners           WeekWinners[]
-  leaguemembers         leaguemembers[]
-  leaguemessages        leaguemessages[]
-  people                people           @relation(fields: [created_by_user_id], references: [uid], onUpdate: Restrict, map: "leagues_ibfk_1")
-  prior_league          leagues?         @relation("leaguesToleagues", fields: [prior_league_id], references: [league_id])
-  future_leagues        leagues[]        @relation("leaguesToleagues")
+  league_id                   Int                           @id(map: "idx_18422_primary") @default(autoincrement())
+  created_by_user_id          Int
+  name                        String
+  created_time                DateTime                      @default(now()) @db.Timestamptz(6)
+  season                      Int
+  late_policy                 LatePolicy?                   @default(allow_late_whole_week)
+  pick_policy                 PickPolicy?                   @default(choose_winner)
+  reminder_policy             ReminderPolicy?               @default(three_hours_before)
+  scoring_type                ScoringType?                  @default(game_winner)
+  share_code                  String?                       @unique @default(cuid())
+  superbowl_competition       Boolean?                      @default(true)
+  prior_league_id             Int?
+  status                      LeagueStatus                  @default(not_started)
+  EmailLogs                   EmailLogs[]
+  WeekWinners                 WeekWinners[]
+  leaguemembers               leaguemembers[]
+  leaguemessages              leaguemessages[]
+  league_renewal_member_roles league_renewal_member_roles[]
+  people                      people                        @relation(fields: [created_by_user_id], references: [uid], onUpdate: Restrict, map: "leagues_ibfk_1")
+  prior_league                leagues?                      @relation("leaguesToleagues", fields: [prior_league_id], references: [league_id])
+  future_leagues              leagues[]                     @relation("leaguesToleagues")
 
   @@index([created_by_user_id], map: "idx_18422_created_by_user_id")
   @@index([prior_league_id])
@@ -153,22 +184,37 @@ model leagues {
   @@index([share_code], map: "idx_share_code")
 }
 
+model league_renewal_member_roles {
+  renewal_member_role_id String     @id @default(cuid())
+  league_id              Int
+  user_id                Int
+  role                   MemberRole @default(player)
+  createdAt              DateTime   @default(now())
+  updatedAt              DateTime   @updatedAt
+  leagues                leagues    @relation(fields: [league_id], references: [league_id], onDelete: Cascade)
+  people                 people     @relation(fields: [user_id], references: [uid], onDelete: Cascade)
+
+  @@unique([league_id, user_id])
+  @@index([user_id])
+}
+
 model people {
-  uid                    Int                      @id(map: "idx_18430_primary") @default(autoincrement())
-  username               String                   @db.VarChar(255)
-  fname                  String                   @db.VarChar(255)
-  lname                  String                   @db.VarChar(255)
-  email                  String                   @unique @db.VarChar(255)
-  season                 Int
-  email2                 String?                  @db.VarChar(255)
-  google_photo_url       String?
-  google_email           String?
-  google_userid          String?
-  supabase_id            String?                  @unique @db.VarChar(255)
-  leaguemembers          leaguemembers[]
-  leagues                leagues[]
-  picks                  picks[]
-  pushNotificationTokens pushNotificationTokens[]
+  uid                         Int                           @id(map: "idx_18430_primary") @default(autoincrement())
+  username                    String                        @db.VarChar(255)
+  fname                       String                        @db.VarChar(255)
+  lname                       String                        @db.VarChar(255)
+  email                       String                        @unique @db.VarChar(255)
+  season                      Int
+  email2                      String?                       @db.VarChar(255)
+  google_photo_url            String?
+  google_email                String?
+  google_userid               String?
+  supabase_id                 String?                       @unique @db.VarChar(255)
+  leaguemembers               leaguemembers[]
+  league_renewal_member_roles league_renewal_member_roles[]
+  leagues                     leagues[]
+  picks                       picks[]
+  pushNotificationTokens      pushNotificationTokens[]
 
   @@index([email], map: "idx_18430_email_index")
   @@index([season], map: "idx_18430_season")
@@ -282,6 +328,16 @@ enum EmailType {
   league_registration
   league_broadcast
   renewal_invite
+}
+
+enum EmailDeliveryStatus {
+  queued
+  delivered
+  delayed
+  failed
+  bounced
+  complained
+  suppressed
 }
 
 enum LatePolicy {

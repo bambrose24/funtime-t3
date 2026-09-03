@@ -39,6 +39,7 @@ export function LoginClientPage() {
   const [showPassword, setShowPassword] = useState(false);
   const form = useForm<LoginFormType>({
     resolver: zodResolver(loginSchema),
+    mode: "onChange",
     reValidateMode: "onChange",
     defaultValues: {
       email: "",

@@ -3,6 +3,14 @@ import { expect, test } from "../fixtures/test";
 import { login } from "../helpers/auth";
 import { executeSql, getLeagueId, queryScalar } from "../helpers/db";
 
+test.afterEach(() => {
+  const priorLeagueId = getLeagueId(E2E_LEAGUES.completed.shareCode);
+  executeSql(`
+    DELETE FROM "leagues"
+    WHERE "prior_league_id" = ${priorLeagueId}
+  `);
+});
+
 test("admin creates one linked renewal and exercises isolated member invites", async ({
   page,
   browser,
@@ -20,11 +28,11 @@ test("admin creates one linked renewal and exercises isolated member invites", a
   await page.getByRole("link", { name: "Set Up Next Season" }).click();
   await expect(
     page.getByRole("heading", {
-      name: "Set Up the 2027 Season",
+      name: "Set Up the 2026 Season",
     }),
   ).toBeVisible();
   await expect(page.getByLabel("League Name")).toHaveValue(
-    "E2E Completed League 2027",
+    "E2E Completed League 2026",
   );
   await page.getByRole("button", { name: "Review Invites" }).click();
   await expect(
@@ -51,12 +59,15 @@ test("admin creates one linked renewal and exercises isolated member invites", a
     page.getByText(/Missed \d+ picks?|Picked every game/),
   ).toBeVisible();
   await page
+    .getByRole("switch", {
+      name: "Make webplayer an admin next season",
+    })
+    .click();
+  await page
     .getByRole("button", { name: "Create league and send 1 invite" })
     .click();
 
-  await expect(page).toHaveURL(
-    /\/league\/\d+\/renewal-invites\?priorLeagueId=\d+$/,
-  );
+  await expect(page).toHaveURL(/\/league\/\d+\/renewal-invites$/);
   await expect(
     page.getByRole("heading", { name: "Invite last year's players" }),
   ).toBeVisible();
@@ -73,7 +84,17 @@ test("admin creates one linked renewal and exercises isolated member invites", a
     WHERE next."prior_league_id" = ${priorLeagueId}
     GROUP BY next."season", next."prior_league_id"
   `);
-  expect(renewalState).toBe(`2027|${priorLeagueId}|1`);
+  expect(renewalState).toBe(`2026|${priorLeagueId}|1`);
+
+  const renewalAdminRole = queryScalar(`
+    SELECT r."role"
+    FROM "league_renewal_member_roles" r
+    JOIN "leagues" next ON next."league_id" = r."league_id"
+    JOIN "people" p ON p."uid" = r."user_id"
+    WHERE next."prior_league_id" = ${priorLeagueId}
+      AND p."email" = '${E2E_USERS.player.email}'
+  `);
+  expect(renewalAdminRole).toBe("admin");
 
   const renewalLeagueId = Number(
     queryScalar(`
@@ -128,4 +149,106 @@ test("admin creates one linked renewal and exercises isolated member invites", a
   await expect(
     page.getByRole("link", { name: "Set Up Next Season" }),
   ).toHaveCount(0);
+
+  const nextLeague = queryScalar(`
+    SELECT CONCAT(next."league_id", '|', next."share_code")
+    FROM "leagues" next
+    WHERE next."prior_league_id" = ${priorLeagueId}
+  `);
+  const [nextLeagueId, nextLeagueShareCode] = nextLeague.split("|");
+  expect(nextLeagueId).toMatch(/^\d+$/);
+  expect(nextLeagueShareCode).toBeTruthy();
+
+  await page.goto(`/league/${nextLeagueId}/admin`);
+  await expect(
+    page.getByRole("heading", { name: "Renewal Invites" }),
+  ).toBeVisible();
+  await page.getByRole("link", { name: "Manage Renewal Invites" }).click();
+  await expect(page).toHaveURL(
+    new RegExp(`/league/${nextLeagueId}/renewal-invites$`),
+  );
+  await expect(
+    page.getByRole("heading", { name: "Invite last year's players" }),
+  ).toBeVisible();
+
+  await page.getByRole("button", { name: "User menu" }).click();
+  await page.getByRole("menuitem", { name: "Log out" }).click();
+  await expect(page).toHaveURL(/\/login(?:\?|$)/);
+  await login(page, E2E_USERS.player);
+
+  await page.goto(`/join-league/${nextLeagueShareCode}`);
+  await expect(
+    page.getByRole("heading", { name: "Join E2E Completed League 2026" }),
+  ).toBeVisible();
+
+  await page.getByRole("combobox", { name: "AFC Team" }).click();
+  await page.getByRole("option", { name: "Buffalo Bills" }).click();
+  await page.getByRole("combobox", { name: "NFC Team" }).click();
+  await page.getByRole("option", { name: "Philadelphia Eagles" }).click();
+  await page.getByRole("radio", { name: "Pick Buffalo Bills to win" }).click();
+  await page.getByLabel("Total Score").fill("48");
+  await page.getByRole("button", { name: "Register" }).click();
+
+  await expect(page).toHaveURL(new RegExp(`/league/${nextLeagueId}$`));
+  await expect
+    .poll(() =>
+      queryScalar(`
+        SELECT m."role"
+        FROM "leaguemembers" m
+        JOIN "people" p ON p."uid" = m."user_id"
+        WHERE m."league_id" = ${nextLeagueId}
+          AND p."email" = '${E2E_USERS.player.email}'
+      `),
+    )
+    .toBe("admin");
+});
+
+test("admin can create a renewal without sending invitations", async ({
+  page,
+}) => {
+  const priorLeagueId = getLeagueId(E2E_LEAGUES.completed.shareCode);
+  executeSql(`
+    DELETE FROM "leagues"
+    WHERE "prior_league_id" = ${priorLeagueId}
+  `);
+  await login(page, E2E_USERS.admin);
+
+  await page.goto(`/league/${priorLeagueId}/admin`);
+  await page.getByRole("link", { name: "Set Up Next Season" }).click();
+  await page.getByRole("button", { name: "Review Invites" }).click();
+
+  await expect(
+    page.getByRole("button", { name: "Create League and Send 1 Invite" }),
+  ).toBeVisible();
+  await page
+    .getByRole("button", { name: "Create League Without Sending" })
+    .click();
+
+  await expect(page).toHaveURL(/\/league\/\d+\/renewal-invites$/);
+
+  const renewalState = queryScalar(`
+    SELECT CONCAT(
+      next."league_id", '|',
+      next."season", '|',
+      COUNT(m."membership_id"), '|',
+      COUNT(e."email_log_id")
+    )
+    FROM "leagues" next
+    JOIN "leaguemembers" m ON m."league_id" = next."league_id"
+    LEFT JOIN "EmailLogs" e
+      ON e."league_id" = next."league_id"
+      AND e."email_type" = 'renewal_invite'
+    WHERE next."prior_league_id" = ${priorLeagueId}
+    GROUP BY next."league_id", next."season"
+  `);
+  const [nextLeagueId] = renewalState.split("|");
+  expect(renewalState).toBe(`${nextLeagueId}|2026|1|0`);
+
+  await expect(
+    page.getByRole("button", { name: "Send Invites" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: "Back to Admin Settings" }),
+  ).toHaveAttribute("href", `/league/${nextLeagueId}/admin`);
+  await expect(page.getByRole("link", { name: "Open League" })).toHaveCount(0);
 });

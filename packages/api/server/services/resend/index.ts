@@ -1,4 +1,4 @@
-import { render } from "@react-email/render";
+import { createHash } from "node:crypto";
 import { chunk } from "lodash";
 import { Resend } from "resend";
 import LeagueBroadcastEmail from "../../../emails/league-broadcast";
@@ -6,6 +6,7 @@ import LeagueRenewalInvite from "../../../emails/league-renewal-invite";
 import LeagueWelcome from "../../../emails/league-welcome";
 import PicksConfirmationEmail from "../../../emails/picks-confirmation";
 import PickReminderEmail from "../../../emails/picks-reminder";
+import WeekSummaryEmail from "../../../emails/week-summary";
 
 import type {
   leaguemembers,
@@ -16,7 +17,7 @@ import { Defined } from "../../../utils/defined";
 import { isE2EMode } from "../../../utils/e2e";
 import { getLogger } from "../../../utils/logging";
 import { db } from "../../db";
-const resend = new Resend(process.env.RESEND_API_KEY ?? "");
+import { reconcileEmailDeliveryState } from "./webhooks";
 
 const FROM = "Funtime System <no-reply@play-funtime.com>";
 
@@ -27,9 +28,40 @@ const EMAILS_DISABLED =
     (process.env.FUNTIME_DISABLE_EMAILS ?? "").toLowerCase(),
   );
 
+let resendClient: Resend | undefined;
+
+const getResendClient = () => {
+  if (resendClient) {
+    return resendClient;
+  }
+
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    throw new Error(
+      "RESEND_API_KEY is required when outbound email is enabled.",
+    );
+  }
+
+  resendClient = new Resend(apiKey);
+  return resendClient;
+};
+
+const createIdempotencyKey = (scope: string, identity: string) => {
+  const digest = createHash("sha256").update(identity).digest("hex");
+  return `${scope}/${digest}`;
+};
+
+const createTags = (category: string, leagueId?: number) => [
+  { name: "category", value: category },
+  ...(leagueId === undefined
+    ? []
+    : [{ name: "league_id", value: leagueId.toString() }]),
+];
+
 const sendEmail = async (
-  payload: Parameters<typeof resend.emails.send>[0],
+  payload: Parameters<Resend["emails"]["send"]>[0],
   context: string,
+  idempotencyKey: string,
 ) => {
   if (EMAILS_DISABLED) {
     getLogger().info(
@@ -37,12 +69,13 @@ const sendEmail = async (
     );
     return { data: null, error: null };
   }
-  return await resend.emails.send(payload);
+  return await getResendClient().emails.send(payload, { idempotencyKey });
 };
 
 const sendBatchEmail = async (
-  payload: Parameters<typeof resend.batch.send>[0],
+  payload: Parameters<Resend["batch"]["send"]>[0],
   context: string,
+  idempotencyKey: string,
 ) => {
   if (EMAILS_DISABLED) {
     getLogger().info(
@@ -50,16 +83,7 @@ const sendBatchEmail = async (
     );
     return { data: null, error: null };
   }
-  return await resend.batch.send(payload);
-};
-
-const escapeHtml = (input: string) => {
-  return input
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
+  return await getResendClient().batch.send(payload, { idempotencyKey });
 };
 
 export const resendApi = {
@@ -73,7 +97,7 @@ export const resendApi = {
     const emails = await Promise.all(
       ids.map(async (id) => {
         try {
-          return await resend.emails.get(id);
+          return await getResendClient().emails.get(id);
         } catch (error) {
           getLogger().error(
             `${LOG_PREFIX} Failed to fetch email with ID ${id}:`,
@@ -93,7 +117,7 @@ export const resendApi = {
       return null;
     }
     try {
-      return await resend.emails.get(id);
+      return await getResendClient().emails.get(id);
     } catch (error) {
       getLogger().error(
         `${LOG_PREFIX} Failed to fetch email with ID ${id}:`,
@@ -150,8 +174,13 @@ export const resendApi = {
           season: league.season,
           username: member.people.username,
         }),
+        tags: createTags("league_registration", league.league_id),
       },
       `league_registration:${league.league_id}:${memberId}`,
+      createIdempotencyKey(
+        "league-registration",
+        `${league.league_id}:${memberId}`,
+      ),
     );
 
     if (error) {
@@ -174,12 +203,15 @@ export const resendApi = {
           league_id: league.league_id,
           member_id: member.membership_id,
         },
+        select: { email_log_id: true },
       });
+      await reconcileEmailDeliveryState(data.id);
     }
   },
 
   sendLeagueRenewalInvites: async ({
     adminName,
+    initiatorCopy,
     joinHref,
     nextLeagueName,
     nextLeagueId,
@@ -189,6 +221,12 @@ export const resendApi = {
     to,
   }: {
     adminName: string;
+    initiatorCopy?: {
+      email: string;
+      leagueHref: string;
+      memberId: number;
+      username: string;
+    };
     joinHref: string;
     nextLeagueName: string;
     nextLeagueId: number;
@@ -203,9 +241,11 @@ export const resendApi = {
 
     let sentCount = 0;
     let failedCount = 0;
+    let initiatorCopySent = false;
+    let initiatorCopyFailed = false;
     const chunks = chunk(to, 90);
 
-    for (const emailChunk of chunks) {
+    for (const [chunkIndex, emailChunk] of chunks.entries()) {
       const { data, error } = await sendBatchEmail(
         emailChunk.map((recipient) => {
           return {
@@ -220,9 +260,17 @@ export const resendApi = {
               season,
               username: recipient.username,
             }),
+            tags: createTags("renewal_invite", nextLeagueId),
           };
         }),
-        `renewal_invite:${priorLeagueId}`,
+        `renewal_invite:${priorLeagueId}:${chunkIndex}`,
+        createIdempotencyKey(
+          "renewal-invite",
+          `${nextLeagueId}:${emailChunk
+            .map((recipient) => recipient.memberId)
+            .sort((a, b) => a - b)
+            .join(",")}`,
+        ),
       );
 
       if (error) {
@@ -241,7 +289,7 @@ export const resendApi = {
       sentCount += data.data.length;
       const resendEmails = await Promise.all(
         data.data.map(async (email) => {
-          return await resend.emails.get(email.id);
+          return await getResendClient().emails.get(email.id);
         }),
       );
 
@@ -271,10 +319,75 @@ export const resendApi = {
         await db.emailLogs.createMany({
           data: logsToCreate,
         });
+        await Promise.all(
+          logsToCreate.map((log) => reconcileEmailDeliveryState(log.resend_id)),
+        );
       }
     }
 
-    return { sentCount, failedCount };
+    if (initiatorCopy) {
+      const { data, error } = await sendEmail(
+        {
+          from: FROM,
+          to: [initiatorCopy.email],
+          subject: `Your copy: ${nextLeagueName} is open`,
+          react: LeagueRenewalInvite({
+            adminName,
+            isInitiatorCopy: true,
+            joinHref: initiatorCopy.leagueHref,
+            nextLeagueName,
+            priorLeagueName,
+            recipientCount: sentCount,
+            season,
+            username: initiatorCopy.username,
+          }),
+          tags: createTags("renewal_invite", nextLeagueId),
+        },
+        `renewal_initiator_copy:${priorLeagueId}:${initiatorCopy.memberId}`,
+        createIdempotencyKey(
+          "renewal-initiator-copy",
+          `${nextLeagueId}:${initiatorCopy.memberId}:${
+            to
+              .map((recipient) => recipient.memberId)
+              .sort((a, b) => a - b)
+              .join(",") || "none"
+          }`,
+        ),
+      );
+
+      if (error) {
+        initiatorCopyFailed = true;
+        getLogger().error(
+          `${LOG_PREFIX} Error sending renewal confirmation copy for league ${nextLeagueId}`,
+          { error },
+        );
+      } else if (data?.id) {
+        initiatorCopySent = true;
+        const existingLog = await db.emailLogs.findFirst({
+          where: { resend_id: data.id },
+          select: { email_log_id: true },
+        });
+        if (!existingLog) {
+          await db.emailLogs.create({
+            data: {
+              resend_id: data.id,
+              email_type: "renewal_invite",
+              league_id: nextLeagueId,
+              member_id: initiatorCopy.memberId,
+            },
+            select: { email_log_id: true },
+          });
+        }
+        await reconcileEmailDeliveryState(data.id);
+      }
+    }
+
+    return {
+      sentCount,
+      failedCount,
+      initiatorCopySent,
+      initiatorCopyFailed,
+    };
   },
 
   sendWeekPicksEmail: async ({
@@ -336,36 +449,50 @@ export const resendApi = {
       `${LOG_PREFIX} Going to send weekly picks email for leagues ${leagues.map((l) => l.league_id).join(",")} for members ${members.map((m) => m.membership_id).join(",")}`,
     );
     try {
-      const emailHtml = await render(
-        PicksConfirmationEmail({
-          leagues: leagues.map((l) => {
-            return {
-              leagueId: l.league_id,
-              name: l.name,
-            };
-          }),
-          username: user.username,
-          week,
-          picks: picks.map((p) => {
-            return {
-              awayTeam: teamById.get(p.games.away)?.abbrev ?? "",
-              homeTeam: teamById.get(p.games.home)?.abbrev ?? "",
-              chosen: p.winner === p.games.home ? "home" : "away",
-              score: p.score ?? undefined,
-              time: p.games.ts,
-            };
-          }),
+      const confirmationEmail = PicksConfirmationEmail({
+        leagues: leagues.map((l) => {
+          return {
+            leagueId: l.league_id,
+            name: l.name,
+          };
         }),
-      );
+        username: user.username,
+        week,
+        picks: picks.map((p) => {
+          return {
+            awayTeam: teamById.get(p.games.away)?.abbrev ?? "",
+            homeTeam: teamById.get(p.games.home)?.abbrev ?? "",
+            chosen: p.winner === p.games.home ? "home" : "away",
+            score: p.score ?? undefined,
+            time: p.games.ts,
+          };
+        }),
+      });
 
       const { data, error } = await sendEmail(
         {
           from: FROM,
           to: [email],
           subject: `Your ${leagues.length === 1 ? (leagues.at(0)?.name ?? "") : "Funtime"} picks for Week ${week}!`,
-          html: emailHtml,
+          react: confirmationEmail,
+          tags: createTags("week_picks"),
         },
         `week_picks:${userId}:${week}`,
+        createIdempotencyKey(
+          "week-picks",
+          JSON.stringify({
+            userId,
+            week,
+            leagueIds: [...leagueIds].sort((a, b) => a - b),
+            picks: picks
+              .map((pick) => ({
+                id: pick.pickid,
+                winner: pick.winner,
+                score: pick.score,
+              }))
+              .sort((a, b) => a.id - b.id),
+          }),
+        ),
       );
 
       if (error) {
@@ -391,9 +518,11 @@ export const resendApi = {
                 league_id: m.league_id,
                 member_id: m.membership_id,
               },
+              select: { email_log_id: true },
             });
           }),
         );
+        await reconcileEmailDeliveryState(data.id);
       }
     } catch (err) {
       getLogger().error(
@@ -434,8 +563,13 @@ export const resendApi = {
           leagueName: league.name,
           leagueHomeHref: `https://www.play-funtime.com/league/${league.league_id}`,
         }),
+        tags: createTags("pick_reminder", league.league_id),
       },
       `pick_reminder:${league.league_id}:${member.membership_id}:${week}`,
+      createIdempotencyKey(
+        "pick-reminder",
+        `${league.league_id}:${member.membership_id}:${week}`,
+      ),
     );
 
     if (error) {
@@ -459,7 +593,9 @@ export const resendApi = {
           member_id: member.membership_id,
           week,
         },
+        select: { email_log_id: true },
       });
+      await reconcileEmailDeliveryState(data.id);
     }
   },
   sendWeekSummaryEmail: async ({
@@ -504,93 +640,36 @@ export const resendApi = {
       return { sent: 0 };
     }
 
-    const standingsRows = standings
-      .map((standing) => {
-        return `<tr><td style="padding:6px 8px;border-bottom:1px solid #e5e7eb;">${standing.rank}</td><td style="padding:6px 8px;border-bottom:1px solid #e5e7eb;">${escapeHtml(standing.username)}</td><td style="padding:6px 8px;border-bottom:1px solid #e5e7eb;">${standing.correctPicks}</td><td style="padding:6px 8px;border-bottom:1px solid #e5e7eb;">${standing.seasonTotal}</td></tr>`;
-      })
-      .join("");
-    const winnersText =
-      weekWinners.length > 0 ? weekWinners.map(escapeHtml).join(", ") : "TBD";
-    const tiebreakerText =
-      tiebreakerTotal === null
-        ? "No completed tiebreaker total."
-        : `Tiebreaker total: ${tiebreakerTotal}.`;
-
     let sent = 0;
     for (const recipient of recipients) {
-      const movementText =
-        recipient.seasonMovement === null
-          ? "no prior week comparison"
-          : recipient.seasonMovement === 0
-            ? "no rank change"
-            : recipient.seasonMovement > 0
-              ? `up ${recipient.seasonMovement}`
-              : `down ${Math.abs(recipient.seasonMovement)}`;
-      const recipientTiebreakerText =
-        recipient.tiebreakerPick === null || recipient.tiebreakerDiff === null
-          ? ""
-          : `<p style="margin: 0 0 12px;">Your tiebreaker pick: ${recipient.tiebreakerPick} (${recipient.tiebreakerDiff} off).</p>`;
-      const picksRows =
-        recipient.picks.length > 0
-          ? recipient.picks
-              .map((pick) => {
-                return `<tr><td style="padding:6px 8px;border-bottom:1px solid #e5e7eb;">${escapeHtml(pick.game)}</td><td style="padding:6px 8px;border-bottom:1px solid #e5e7eb;">${escapeHtml(pick.pick)}</td><td style="padding:6px 8px;border-bottom:1px solid #e5e7eb;">${pick.result}</td></tr>`;
-              })
-              .join("")
-          : `<tr><td colspan="3" style="padding:6px 8px;border-bottom:1px solid #e5e7eb;">No picks submitted.</td></tr>`;
-      const html = `
-        <div style="font-family: Arial, sans-serif; color: #111827; line-height: 1.5;">
-          <h2 style="margin-bottom: 8px;">Week ${week} Summary - ${escapeHtml(leagueName)}</h2>
-          <p style="margin-top: 0;">
-            Hi ${escapeHtml(recipient.username)}, you finished <strong>#${recipient.rank}</strong> with
-            <strong>${recipient.correctPicks}</strong> correct picks this week.
-          </p>
-          <p style="margin: 0 0 12px;">Week winner(s): <strong>${winnersText}</strong>. ${tiebreakerText}</p>
-          ${recipientTiebreakerText}
-          <p style="margin: 0 0 12px;">Season: <strong>#${recipient.seasonRank}</strong>, <strong>${recipient.seasonTotal}</strong> correct (${movementText}).</p>
-          <p>Week standings:</p>
-          <table style="border-collapse: collapse; width: 100%; max-width: 460px;">
-            <thead>
-              <tr>
-                <th align="left" style="padding:6px 8px;border-bottom:2px solid #d1d5db;">Rank</th>
-                <th align="left" style="padding:6px 8px;border-bottom:2px solid #d1d5db;">Player</th>
-                <th align="left" style="padding:6px 8px;border-bottom:2px solid #d1d5db;">Correct</th>
-                <th align="left" style="padding:6px 8px;border-bottom:2px solid #d1d5db;">Season</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${standingsRows}
-            </tbody>
-          </table>
-          <p>Your picks:</p>
-          <table style="border-collapse: collapse; width: 100%; max-width: 560px;">
-            <thead>
-              <tr>
-                <th align="left" style="padding:6px 8px;border-bottom:2px solid #d1d5db;">Game</th>
-                <th align="left" style="padding:6px 8px;border-bottom:2px solid #d1d5db;">Pick</th>
-                <th align="left" style="padding:6px 8px;border-bottom:2px solid #d1d5db;">Result</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${picksRows}
-            </tbody>
-          </table>
-          <p style="margin-top: 16px;">
-            <a href="https://www.play-funtime.com/league/${leagueId}?week=${week}" style="color: #2563eb;">
-              View league details
-            </a>
-          </p>
-        </div>
-      `;
-
       const { data, error } = await sendEmail(
         {
           from: FROM,
           to: [recipient.email],
           subject: `${leagueName} - Week ${week} Summary`,
-          html,
+          react: WeekSummaryEmail({
+            leagueId,
+            leagueName,
+            week,
+            standings,
+            weekWinners,
+            tiebreakerTotal,
+            recipient,
+          }),
+          tags: createTags("week_summary", leagueId),
         },
         `week_summary:${leagueId}:${recipient.memberId}:${week}`,
+        createIdempotencyKey(
+          "week-summary",
+          JSON.stringify({
+            leagueId,
+            week,
+            standings,
+            weekWinners,
+            tiebreakerTotal,
+            recipient,
+          }),
+        ),
       );
 
       if (error) {
@@ -611,7 +690,9 @@ export const resendApi = {
             member_id: recipient.memberId,
             week,
           },
+          select: { email_log_id: true },
         });
+        await reconcileEmailDeliveryState(data.id);
       }
     }
 
@@ -620,12 +701,14 @@ export const resendApi = {
   sendLeagueBroadcast: async ({
     leagueName,
     adminName,
+    adminEmail,
     markdownMessage,
     leagueId,
     to,
   }: {
     leagueName: string;
     adminName: string;
+    adminEmail?: string;
     markdownMessage: string;
     leagueId: number;
     to: { email: string; memberId: number }[];
@@ -636,12 +719,13 @@ export const resendApi = {
 
     // Have to chunk into <100 per batch here, so let's chunk into 90 per group and send batches that way to stay under the limit
     const chunks = chunk(to, 90);
-    for (const emailChunk of chunks) {
+    for (const [chunkIndex, emailChunk] of chunks.entries()) {
       const { data, error } = await sendBatchEmail(
         emailChunk.map((t) => {
           return {
             from: FROM,
             to: t.email,
+            replyTo: adminEmail,
             subject: `Funtime - Message from ${leagueName} Admin`,
             react: LeagueBroadcastEmail({
               leagueName,
@@ -649,9 +733,20 @@ export const resendApi = {
               adminName,
               markdownMessage,
             }),
+            tags: createTags("league_broadcast", leagueId),
           };
         }),
-        `league_broadcast:${leagueId}`,
+        `league_broadcast:${leagueId}:${chunkIndex}`,
+        createIdempotencyKey(
+          "league-broadcast",
+          JSON.stringify({
+            leagueId,
+            markdownMessage,
+            memberIds: emailChunk
+              .map((recipient) => recipient.memberId)
+              .sort((a, b) => a - b),
+          }),
+        ),
       );
 
       if (error) {
@@ -669,7 +764,7 @@ export const resendApi = {
       if (data?.data && data.data.length > 0) {
         const resendEmails = await Promise.all(
           data.data.map(async (d) => {
-            return await resend.emails.get(d.id);
+            return await getResendClient().emails.get(d.id);
           }),
         );
 
@@ -700,6 +795,9 @@ export const resendApi = {
         await db.emailLogs.createMany({
           data: toCreate,
         });
+        await Promise.all(
+          toCreate.map((log) => reconcileEmailDeliveryState(log.resend_id)),
+        );
       }
     }
   },

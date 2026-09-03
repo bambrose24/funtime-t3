@@ -1,4 +1,4 @@
-import { type LineProps, ResponsiveLine } from "@nivo/line";
+import { type LineSvgProps, ResponsiveLine } from "@nivo/line";
 import { useTheme } from "next-themes";
 import React from "react";
 import { cn } from "~/lib/utils";
@@ -34,7 +34,7 @@ const lineColors = [
   { dark: "#374151", light: "#F3F4F6" }, // gray-700
 ];
 
-function useChartTheme(): LineProps["theme"] {
+function useChartTheme(): LineSvgProps<ChartProps["entries"][number]>["theme"] {
   const { resolvedTheme } = useTheme();
 
   const key = getLightDark(resolvedTheme ?? "");
@@ -151,7 +151,7 @@ const LeaderboardChartImpl = ({ entries, className }: ChartProps) => {
         tooltip={({ point }) => {
           return (
             <div className="z-50 flex flex-col overflow-hidden rounded-md bg-primary px-3 py-1.5 text-xs text-primary-foreground animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2">
-              <p className="text-bold">{point.serieId}</p>
+              <p className="text-bold">{point.seriesId}</p>
               <p className="text-semibold pt-2">
                 Week {point.data.x.toString()}
               </p>

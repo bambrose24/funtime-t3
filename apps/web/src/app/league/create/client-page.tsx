@@ -100,6 +100,7 @@ export function CreateLeagueClientPage({
   const createLeagueFromData = async (
     data: z.infer<typeof createLeagueFormSchema>,
     selectedMemberIds?: number[],
+    adminMemberIds?: number[],
   ) => {
     try {
       const newLeague = await createLeague({
@@ -123,21 +124,25 @@ export function CreateLeagueClientPage({
           try {
             const inviteResult = await sendRenewalInvites({
               leagueId: newLeague.league_id,
-              priorLeagueId: Number(data.priorLeagueId),
               memberIds: selectedMemberIds,
+              adminMemberIds,
             });
-            toast.success(
-              `Sent ${inviteResult.sentCount} ${inviteResult.sentCount === 1 ? "invite" : "invites"}.`,
-            );
+            if (inviteResult.initiatorCopyFailed) {
+              toast.error(
+                `Sent ${inviteResult.sentCount} ${inviteResult.sentCount === 1 ? "invite" : "invites"}, but your confirmation copy could not be delivered.`,
+              );
+            } else {
+              toast.success(
+                `Sent ${inviteResult.sentCount} ${inviteResult.sentCount === 1 ? "invite" : "invites"}.${inviteResult.initiatorCopySent ? " A confirmation copy was sent to you." : ""}`,
+              );
+            }
           } catch (error) {
             toast.error(
               "The league was created, but invitations were not sent. You can send them from the next page.",
             );
           }
         }
-        router.push(
-          `/league/${newLeague.league_id}/renewal-invites?priorLeagueId=${data.priorLeagueId}`,
-        );
+        router.push(`/league/${newLeague.league_id}/renewal-invites`);
         return;
       }
       router.push(`/league/${newLeague.league_id}`);
@@ -494,18 +499,36 @@ export function CreateLeagueClientPage({
             </Card>
           </Form>
         </form>
-        {renewalInvitees ? (
+        {inviteDialogOpen && renewalInvitees ? (
           <RenewalInviteDialog
             invitees={renewalInvitees}
             open={inviteDialogOpen}
             onOpenChange={setInviteDialogOpen}
-            onConfirm={async (memberIds) => {
+            onCreateWithoutInvites={async () => {
               if (!pendingRenewalData) {
                 return;
               }
               setIsRenewalCreating(true);
-              await createLeagueFromData(pendingRenewalData, memberIds);
-              setIsRenewalCreating(false);
+              try {
+                await createLeagueFromData(pendingRenewalData);
+              } finally {
+                setIsRenewalCreating(false);
+              }
+            }}
+            onConfirm={async (memberIds, adminMemberIds) => {
+              if (!pendingRenewalData) {
+                return;
+              }
+              setIsRenewalCreating(true);
+              try {
+                await createLeagueFromData(
+                  pendingRenewalData,
+                  memberIds,
+                  adminMemberIds,
+                );
+              } finally {
+                setIsRenewalCreating(false);
+              }
             }}
             isCreating={isRenewalCreating}
           />

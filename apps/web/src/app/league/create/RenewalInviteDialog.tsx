@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { AlertTriangle, Mail, ShieldCheck, Users } from "lucide-react";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
@@ -14,46 +14,37 @@ import {
   DialogTitle,
 } from "~/components/ui/dialog";
 import { Text } from "~/components/ui/text";
+import { Switch } from "~/components/ui/switch";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "~/components/ui/tooltip";
+import type { RouterOutputs } from "~/trpc/types";
 
-type RenewalInvitees = {
-  eligibleMembers: {
-    membershipId: number;
-    username: string;
-    email: string;
-    role: string;
-    missedPickCount?: number;
-  }[];
-  defaultSelectedMemberIds: number[];
-  missingEmailCount: number;
-};
+type RenewalInvitees = RouterOutputs["league"]["renewalInvitees"];
 
 export function RenewalInviteDialog({
   invitees,
   open,
   onOpenChange,
   onConfirm,
+  onCreateWithoutInvites,
   isCreating,
 }: {
   invitees: RenewalInvitees;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onConfirm: (memberIds: number[]) => void;
+  onConfirm: (memberIds: number[], adminMemberIds: number[]) => void;
+  onCreateWithoutInvites: () => void;
   isCreating: boolean;
 }) {
   const [selectedMemberIds, setSelectedMemberIds] = useState<Set<number>>(
     () => new Set(invitees.defaultSelectedMemberIds),
   );
-
-  useEffect(() => {
-    if (open) {
-      setSelectedMemberIds(new Set(invitees.defaultSelectedMemberIds));
-    }
-  }, [invitees.defaultSelectedMemberIds, open]);
+  const [adminMemberIds, setAdminMemberIds] = useState<Set<number>>(
+    () => new Set(invitees.defaultAdminMemberIds),
+  );
 
   const selectedMemberIdList = useMemo(
     () => Array.from(selectedMemberIds),
@@ -76,21 +67,36 @@ export function RenewalInviteDialog({
     });
   };
 
+  const toggleAdmin = (memberId: number) => {
+    setAdminMemberIds((current) => {
+      const next = new Set(current);
+      if (next.has(memberId)) {
+        next.delete(memberId);
+      } else {
+        next.add(memberId);
+      }
+      return next;
+    });
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="flex max-h-[calc(100dvh-1rem)] w-[calc(100%-1rem)] max-w-2xl flex-col gap-0 overflow-hidden p-0 sm:max-h-[min(720px,calc(100dvh-2rem))]">
-        <DialogHeader className="shrink-0 px-5 pb-4 pt-5 pr-12 sm:px-6 sm:pb-5 sm:pt-6">
-          <DialogTitle>Review next-season invites</DialogTitle>
-          <DialogDescription>
-            Choose who should receive an invitation after the league is created.
-            You&apos;ll be added as an admin automatically.
+      <DialogContent className="max-h-[min(720px,calc(100vh-2rem))] max-w-2xl overflow-y-auto">
+        <DialogHeader className="gap-2">
+          <DialogTitle className="text-xl leading-7">
+            Review next-season invites
+          </DialogTitle>
+          <DialogDescription className="max-w-xl text-sm leading-6 text-muted-foreground">
+            Choose who to invite back. Returning admins keep admin access, and
+            you can make other invited players admins for the new season. You
+            can also create the league now and send invitations later.
           </DialogDescription>
         </DialogHeader>
 
-        <div className="mx-5 flex shrink-0 flex-wrap items-center justify-between gap-3 rounded-md border bg-muted/30 p-3 sm:mx-6">
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-md border bg-muted/30 p-3">
           <div className="flex items-center gap-2">
             <Users className="h-4 w-4 text-primary" />
-            <Text.Small className="font-medium">
+            <Text.Small className="font-semibold leading-5">
               {selectedCount} of {invitees.eligibleMembers.length} players
               selected
             </Text.Small>
@@ -115,119 +121,164 @@ export function RenewalInviteDialog({
           </Button>
         </div>
 
-        <div className="min-h-0 flex-1 overflow-y-auto px-5 py-4 sm:px-6">
-          {invitees.eligibleMembers.length > 0 ? (
-            <div className="overflow-hidden rounded-md border">
-              {invitees.eligibleMembers.map((member) => {
-                const checked = selectedMemberIds.has(member.membershipId);
-                const isAdmin = member.role === "admin";
-                const missedPicks = member.missedPickCount ?? 0;
+        {invitees.eligibleMembers.length > 0 ? (
+          <div className="overflow-hidden rounded-md border">
+            {invitees.eligibleMembers.map((member) => {
+              const checked = selectedMemberIds.has(member.membershipId);
+              const isAdmin = member.role === "admin";
+              const missedPicks = member.missedPickCount ?? 0;
 
-                return (
-                  <div
-                    key={member.membershipId}
-                    role="button"
-                    tabIndex={0}
-                    className="flex items-center gap-3 border-b px-4 py-3 text-left last:border-b-0 hover:bg-muted/50"
-                    onClick={() => toggleMember(member.membershipId)}
-                    onKeyDown={(event) => {
-                      if (event.key === "Enter" || event.key === " ") {
-                        event.preventDefault();
-                        toggleMember(member.membershipId);
-                      }
-                    }}
-                  >
-                    <Checkbox
-                      checked={checked}
-                      onClick={(event) => event.stopPropagation()}
-                      onCheckedChange={() => toggleMember(member.membershipId)}
-                      aria-label={`Invite ${member.username}`}
-                    />
-                    <div className="min-w-0 flex-1">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <span className="truncate text-sm font-medium">
-                          {member.username}
-                        </span>
-                        {isAdmin ? (
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Badge
-                                className="cursor-help gap-1"
-                                variant="secondary"
-                              >
-                                <ShieldCheck className="h-3 w-3" />
-                                Admin
-                              </Badge>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              This player will be an admin in the new league
-                              when they join.
-                            </TooltipContent>
-                          </Tooltip>
-                        ) : null}
-                      </div>
-                      <div className="truncate text-xs text-muted-foreground">
-                        {member.email}
-                      </div>
-                      <div className="mt-2 flex flex-wrap items-center gap-2">
-                        {missedPicks > 0 ? (
-                          <Badge
-                            className="gap-1 border-amber-500/40 bg-amber-500/10 text-amber-700 dark:text-amber-300"
-                            variant="outline"
-                          >
-                            <AlertTriangle className="h-3 w-3" />
-                            Missed {missedPicks}{" "}
-                            {missedPicks === 1 ? "pick" : "picks"}
-                          </Badge>
-                        ) : (
-                          <Badge variant="outline">Picked every game</Badge>
-                        )}
-                        <span className="text-xs text-muted-foreground">
-                          Last season
-                        </span>
-                      </div>
+              return (
+                <div
+                  key={member.membershipId}
+                  role="button"
+                  tabIndex={0}
+                  className="flex items-center gap-3 border-b px-4 py-3 text-left last:border-b-0 hover:bg-muted/50"
+                  onClick={() => toggleMember(member.membershipId)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      toggleMember(member.membershipId);
+                    }
+                  }}
+                >
+                  <Checkbox
+                    checked={checked}
+                    onClick={(event) => event.stopPropagation()}
+                    onCheckedChange={() => toggleMember(member.membershipId)}
+                    aria-label={`Invite ${member.username}`}
+                  />
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="truncate text-base font-semibold leading-5">
+                        {member.username}
+                      </span>
+                      {isAdmin ? (
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Badge
+                              className="cursor-help gap-1"
+                              variant="secondary"
+                            >
+                              <ShieldCheck className="h-3 w-3" />
+                              Returning admin
+                            </Badge>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            This player will be an admin in the new league when
+                            they join.
+                          </TooltipContent>
+                        </Tooltip>
+                      ) : null}
                     </div>
+                    <div className="mt-1 truncate text-sm leading-5 text-muted-foreground">
+                      {member.email}
+                    </div>
+                    <div className="mt-2 flex flex-wrap items-center gap-2">
+                      {missedPicks > 0 ? (
+                        <Badge className="gap-1" variant="outline">
+                          <AlertTriangle className="h-3 w-3" />
+                          Missed {missedPicks}{" "}
+                          {missedPicks === 1 ? "pick" : "picks"}
+                        </Badge>
+                      ) : (
+                        <Badge variant="secondary">Picked every game</Badge>
+                      )}
+                      <span className="text-xs text-muted-foreground">
+                        Last season
+                      </span>
+                    </div>
+                    {isAdmin ? (
+                      <div className="mt-1 text-sm leading-5 text-muted-foreground">
+                        Keeps admin access next season.
+                      </div>
+                    ) : null}
                   </div>
-                );
-              })}
-            </div>
-          ) : (
-            <div className="rounded-md border bg-muted/30 p-4 text-center">
-              <Text.Muted>There are no players to invite by email.</Text.Muted>
-            </div>
-          )}
+                  {!isAdmin ? (
+                    <div
+                      className="flex shrink-0 items-center gap-2"
+                      onClick={(event) => event.stopPropagation()}
+                    >
+                      <label
+                        className={`hidden text-right text-sm font-medium sm:block ${
+                          checked ? "" : "text-muted-foreground"
+                        }`}
+                        htmlFor={`renewal-admin-${member.membershipId}`}
+                      >
+                        Admin next season
+                      </label>
+                      <Switch
+                        id={`renewal-admin-${member.membershipId}`}
+                        checked={adminMemberIds.has(member.membershipId)}
+                        disabled={!checked}
+                        onCheckedChange={() => toggleAdmin(member.membershipId)}
+                        aria-label={`Make ${member.username} an admin next season`}
+                      />
+                    </div>
+                  ) : null}
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="rounded-md border bg-muted/30 p-4 text-center">
+            <Text.Muted>There are no players to invite by email.</Text.Muted>
+          </div>
+        )}
 
-          {invitees.missingEmailCount > 0 ? (
-            <div className="mt-4 flex items-start gap-2 text-sm text-muted-foreground">
-              <Mail className="mt-0.5 h-4 w-4 shrink-0" />
-              {invitees.missingEmailCount} prior{" "}
-              {invitees.missingEmailCount === 1 ? "player does" : "players do"}{" "}
-              not have an email address, so they cannot be invited here.
-            </div>
-          ) : null}
-        </div>
+        {invitees.missingEmailCount > 0 ? (
+          <div className="flex items-start gap-2 text-sm text-muted-foreground">
+            <Mail className="mt-0.5 h-4 w-4 shrink-0" />
+            {invitees.missingEmailCount} prior{" "}
+            {invitees.missingEmailCount === 1 ? "player does" : "players do"}{" "}
+            not have an email address, so they cannot be invited here.
+          </div>
+        ) : null}
 
-        <DialogFooter className="shrink-0 gap-2 border-t bg-background px-5 py-4 sm:gap-2 sm:space-x-0 sm:px-6">
+        <DialogFooter className="gap-2 sm:justify-between sm:space-x-0">
           <Button
             type="button"
             variant="outline"
-            className="min-h-11 w-full sm:w-auto"
             onClick={() => onOpenChange(false)}
             disabled={isCreating}
           >
             Back to setup
           </Button>
-          <Button
-            type="button"
-            className="min-h-11 w-full gap-2 whitespace-normal sm:w-auto"
-            onClick={() => onConfirm(selectedMemberIdList)}
-            loading={isCreating}
-            disabled={isCreating}
-          >
-            <Mail className="h-4 w-4" />
-            Create league and send {selectedCount}{" "}
-            {selectedCount === 1 ? "invite" : "invites"}
-          </Button>
+          <div className="flex flex-col-reverse gap-2 sm:flex-row">
+            {selectedCount > 0 ? (
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={onCreateWithoutInvites}
+                disabled={isCreating}
+              >
+                Create League Without Sending
+              </Button>
+            ) : null}
+            <Button
+              type="button"
+              className="gap-2"
+              onClick={() => {
+                if (selectedCount === 0) {
+                  onCreateWithoutInvites();
+                  return;
+                }
+                onConfirm(
+                  selectedMemberIdList,
+                  selectedMemberIdList.filter((memberId) =>
+                    adminMemberIds.has(memberId),
+                  ),
+                );
+              }}
+              loading={isCreating}
+              disabled={isCreating}
+            >
+              {selectedCount > 0 ? <Mail className="h-4 w-4" /> : null}
+              {selectedCount > 0
+                ? `Create League and Send ${selectedCount} ${selectedCount === 1 ? "Invite" : "Invites"}`
+                : "Create League"}
+            </Button>
+          </div>
         </DialogFooter>
       </DialogContent>
     </Dialog>

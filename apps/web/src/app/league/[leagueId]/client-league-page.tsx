@@ -29,15 +29,13 @@ import { CompactYourPicksList, YourPicksList } from "./your-picks-list";
 import { AlertCircleIcon, MessagesSquare, Trophy } from "lucide-react";
 import Link from "next/link";
 import { ScenariosButton } from "~/components/league/ScenariosButton";
-import { LeagueWeekMessageSheetContent } from "~/components/messages/LeagueWeekMessageSheetContent";
 import { Alert, AlertTitle } from "~/components/ui/alert";
 import { Badge } from "~/components/ui/badge";
 import { ScrollArea, ScrollBar } from "~/components/ui/scroll-area";
-import { Sheet, SheetTrigger } from "~/components/ui/sheet";
 import { clientApi } from "~/trpc/react";
 import { type RouterOutputs } from "~/trpc/types";
 import { useDictify } from "~/utils/hooks/useIdToValMemo";
-import { useUnreadMessages } from "~/utils/messageReadTracker";
+import { useLeagueUnreadMessages } from "~/hooks/useLeagueUnreadMessages";
 
 type ClientLeaguePageProps = {
   week: number;
@@ -97,24 +95,9 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
     return [...weeksWithPicks.weeks].sort((a, b) => b - a);
   }, [weeksWithPicks.weeks]);
 
-  const [desktopChatSheetOpen, setDesktopChatSheetOpen] = useState(false);
-  const [mobileChatSheetOpen, setMobileChatSheetOpen] = useState(false);
-
   const firstGame = games.at(0);
   const week = firstGame?.week;
-
-  // Fetch messages for unread badge
-  const { data: messagesData } = clientApi.messages.leagueMessageBoard.useQuery(
-    { leagueId: props.leagueId },
-  );
-
-  // Use the unread messages hook
-  const { unreadCount } = useUnreadMessages({
-    leagueId: props.leagueId,
-    week: 0,
-    messages: messagesData ?? [],
-    isChatOpen: desktopChatSheetOpen || mobileChatSheetOpen,
-  });
+  const { unreadCount } = useLeagueUnreadMessages(props.leagueId);
 
   const router = useRouter();
   const pathname = usePathname();
@@ -264,40 +247,24 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
               </SelectContent>
             </Select>
           )}
-          {week !== undefined && (
-            <Sheet
-              open={desktopChatSheetOpen}
-              onOpenChange={(open) => {
-                setDesktopChatSheetOpen(open);
-              }}
-            >
-              <SheetTrigger asChild>
-                <Button
-                  variant="secondary"
-                  className="relative flex items-center gap-2"
+          <Button
+            asChild
+            variant="secondary"
+            className="relative flex items-center gap-2"
+          >
+            <Link href={`/league/${league.league_id}/chat`}>
+              <MessagesSquare className="h-4 w-4" />
+              Chat
+              {unreadCount > 0 && (
+                <Badge
+                  variant="destructive"
+                  className="absolute -right-2 -top-2 flex h-5 min-w-5 items-center justify-center rounded-full px-1 text-xs"
                 >
-                  <MessagesSquare className="h-4 w-4" />
-                  Chat
-                  {unreadCount > 0 && (
-                    <Badge
-                      variant="destructive"
-                      className="absolute -right-2 -top-2 flex h-5 min-w-5 items-center justify-center rounded-full px-1 text-xs"
-                    >
-                      {unreadCount > 99 ? "99+" : unreadCount}
-                    </Badge>
-                  )}
-                </Button>
-              </SheetTrigger>
-              <LeagueWeekMessageSheetContent
-                className="w-[600px]"
-                week={week}
-                leagueId={league.league_id}
-                closeSheet={() => {
-                  setDesktopChatSheetOpen(false);
-                }}
-              />
-            </Sheet>
-          )}
+                  {unreadCount > 99 ? "99+" : unreadCount}
+                </Badge>
+              )}
+            </Link>
+          </Button>
           {myPicks && firstGame && (
             <Card className="w-full">
               <CardHeader>
@@ -335,40 +302,26 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
       <div className="col-span-12 xl:col-span-10">
         <div className="flex flex-col gap-4">
           <div className="flex w-full justify-between gap-2 xl:hidden">
-            {week !== undefined && (
-              <div className="w-full">
-                <Sheet
-                  open={mobileChatSheetOpen}
-                  onOpenChange={(open) => setMobileChatSheetOpen(open)}
-                >
-                  <SheetTrigger asChild>
-                    <Button
-                      variant="secondary"
-                      className="relative flex w-full items-center justify-center gap-2"
+            <div className="w-full">
+              <Button
+                asChild
+                variant="secondary"
+                className="relative flex w-full items-center justify-center gap-2"
+              >
+                <Link href={`/league/${league.league_id}/chat`}>
+                  <MessagesSquare className="h-4 w-4" />
+                  Chat
+                  {unreadCount > 0 && (
+                    <Badge
+                      variant="destructive"
+                      className="absolute -right-2 -top-2 flex h-5 min-w-5 items-center justify-center rounded-full px-1 text-xs"
                     >
-                      <MessagesSquare className="h-4 w-4" />
-                      Chat
-                      {unreadCount > 0 && (
-                        <Badge
-                          variant="destructive"
-                          className="absolute -right-2 -top-2 flex h-5 min-w-5 items-center justify-center rounded-full px-1 text-xs"
-                        >
-                          {unreadCount > 99 ? "99+" : unreadCount}
-                        </Badge>
-                      )}
-                    </Button>
-                  </SheetTrigger>
-                  <LeagueWeekMessageSheetContent
-                    className="w-full"
-                    week={week}
-                    leagueId={league.league_id}
-                    closeSheet={() => {
-                      setMobileChatSheetOpen(false);
-                    }}
-                  />
-                </Sheet>
-              </div>
-            )}
+                      {unreadCount > 99 ? "99+" : unreadCount}
+                    </Badge>
+                  )}
+                </Link>
+              </Button>
+            </div>
             {currentGame && firstGame && (
               <div className="w-full">
                 <Select

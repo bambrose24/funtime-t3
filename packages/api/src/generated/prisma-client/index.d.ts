@@ -19,6 +19,11 @@ export type PrismaPromise<T> = $Public.PrismaPromise<T>
  */
 export type EmailLogs = $Result.DefaultSelection<Prisma.$EmailLogsPayload>
 /**
+ * Model EmailDeliveryEvents
+ * 
+ */
+export type EmailDeliveryEvents = $Result.DefaultSelection<Prisma.$EmailDeliveryEventsPayload>
+/**
  * Model WeekWinners
  * 
  */
@@ -39,10 +44,20 @@ export type leaguemembers = $Result.DefaultSelection<Prisma.$leaguemembersPayloa
  */
 export type leaguemessages = $Result.DefaultSelection<Prisma.$leaguemessagesPayload>
 /**
+ * Model league_message_read_state
+ * 
+ */
+export type league_message_read_state = $Result.DefaultSelection<Prisma.$league_message_read_statePayload>
+/**
  * Model leagues
  * 
  */
 export type leagues = $Result.DefaultSelection<Prisma.$leaguesPayload>
+/**
+ * Model league_renewal_member_roles
+ * 
+ */
+export type league_renewal_member_roles = $Result.DefaultSelection<Prisma.$league_renewal_member_rolesPayload>
 /**
  * Model people
  * 
@@ -98,6 +113,19 @@ export namespace $Enums {
 };
 
 export type EmailType = (typeof EmailType)[keyof typeof EmailType]
+
+
+export const EmailDeliveryStatus: {
+  queued: 'queued',
+  delivered: 'delivered',
+  delayed: 'delayed',
+  failed: 'failed',
+  bounced: 'bounced',
+  complained: 'complained',
+  suppressed: 'suppressed'
+};
+
+export type EmailDeliveryStatus = (typeof EmailDeliveryStatus)[keyof typeof EmailDeliveryStatus]
 
 
 export const LatePolicy: {
@@ -185,6 +213,10 @@ export type Conference = (typeof Conference)[keyof typeof Conference]
 export type EmailType = $Enums.EmailType
 
 export const EmailType: typeof $Enums.EmailType
+
+export type EmailDeliveryStatus = $Enums.EmailDeliveryStatus
+
+export const EmailDeliveryStatus: typeof $Enums.EmailDeliveryStatus
 
 export type LatePolicy = $Enums.LatePolicy
 
@@ -355,6 +387,16 @@ export class PrismaClient<
   get emailLogs(): Prisma.EmailLogsDelegate<ExtArgs, ClientOptions>;
 
   /**
+   * `prisma.emailDeliveryEvents`: Exposes CRUD operations for the **EmailDeliveryEvents** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more EmailDeliveryEvents
+    * const emailDeliveryEvents = await prisma.emailDeliveryEvents.findMany()
+    * ```
+    */
+  get emailDeliveryEvents(): Prisma.EmailDeliveryEventsDelegate<ExtArgs, ClientOptions>;
+
+  /**
    * `prisma.weekWinners`: Exposes CRUD operations for the **WeekWinners** model.
     * Example usage:
     * ```ts
@@ -395,6 +437,16 @@ export class PrismaClient<
   get leaguemessages(): Prisma.leaguemessagesDelegate<ExtArgs, ClientOptions>;
 
   /**
+   * `prisma.league_message_read_state`: Exposes CRUD operations for the **league_message_read_state** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more League_message_read_states
+    * const league_message_read_states = await prisma.league_message_read_state.findMany()
+    * ```
+    */
+  get league_message_read_state(): Prisma.league_message_read_stateDelegate<ExtArgs, ClientOptions>;
+
+  /**
    * `prisma.leagues`: Exposes CRUD operations for the **leagues** model.
     * Example usage:
     * ```ts
@@ -403,6 +455,16 @@ export class PrismaClient<
     * ```
     */
   get leagues(): Prisma.leaguesDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.league_renewal_member_roles`: Exposes CRUD operations for the **league_renewal_member_roles** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more League_renewal_member_roles
+    * const league_renewal_member_roles = await prisma.league_renewal_member_roles.findMany()
+    * ```
+    */
+  get league_renewal_member_roles(): Prisma.league_renewal_member_rolesDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.people`: Exposes CRUD operations for the **people** model.
@@ -541,8 +603,8 @@ export namespace Prisma {
   export import Exact = $Public.Exact
 
   /**
-   * Prisma Client JS version: 6.19.0
-   * Query Engine version: 2ba551f319ab1df4bc874a89965d8b3641056773
+   * Prisma Client JS version: 6.19.3
+   * Query Engine version: c2990dca591cba766e3b7ef5d9e8a84796e47ab7
    */
   export type PrismaVersion = {
     client: string
@@ -925,11 +987,14 @@ export namespace Prisma {
 
   export const ModelName: {
     EmailLogs: 'EmailLogs',
+    EmailDeliveryEvents: 'EmailDeliveryEvents',
     WeekWinners: 'WeekWinners',
     games: 'games',
     leaguemembers: 'leaguemembers',
     leaguemessages: 'leaguemessages',
+    league_message_read_state: 'league_message_read_state',
     leagues: 'leagues',
+    league_renewal_member_roles: 'league_renewal_member_roles',
     people: 'people',
     pushNotificationTokens: 'pushNotificationTokens',
     picks: 'picks',
@@ -956,7 +1021,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "emailLogs" | "weekWinners" | "games" | "leaguemembers" | "leaguemessages" | "leagues" | "people" | "pushNotificationTokens" | "picks" | "superbowl" | "superbowlsquares" | "teams" | "postseason_games" | "postseason_team_seeds"
+      modelProps: "emailLogs" | "emailDeliveryEvents" | "weekWinners" | "games" | "leaguemembers" | "leaguemessages" | "league_message_read_state" | "leagues" | "league_renewal_member_roles" | "people" | "pushNotificationTokens" | "picks" | "superbowl" | "superbowlsquares" | "teams" | "postseason_games" | "postseason_team_seeds"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1031,6 +1096,80 @@ export namespace Prisma {
           count: {
             args: Prisma.EmailLogsCountArgs<ExtArgs>
             result: $Utils.Optional<EmailLogsCountAggregateOutputType> | number
+          }
+        }
+      }
+      EmailDeliveryEvents: {
+        payload: Prisma.$EmailDeliveryEventsPayload<ExtArgs>
+        fields: Prisma.EmailDeliveryEventsFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.EmailDeliveryEventsFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EmailDeliveryEventsPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.EmailDeliveryEventsFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EmailDeliveryEventsPayload>
+          }
+          findFirst: {
+            args: Prisma.EmailDeliveryEventsFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EmailDeliveryEventsPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.EmailDeliveryEventsFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EmailDeliveryEventsPayload>
+          }
+          findMany: {
+            args: Prisma.EmailDeliveryEventsFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EmailDeliveryEventsPayload>[]
+          }
+          create: {
+            args: Prisma.EmailDeliveryEventsCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EmailDeliveryEventsPayload>
+          }
+          createMany: {
+            args: Prisma.EmailDeliveryEventsCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.EmailDeliveryEventsCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EmailDeliveryEventsPayload>[]
+          }
+          delete: {
+            args: Prisma.EmailDeliveryEventsDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EmailDeliveryEventsPayload>
+          }
+          update: {
+            args: Prisma.EmailDeliveryEventsUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EmailDeliveryEventsPayload>
+          }
+          deleteMany: {
+            args: Prisma.EmailDeliveryEventsDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.EmailDeliveryEventsUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.EmailDeliveryEventsUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EmailDeliveryEventsPayload>[]
+          }
+          upsert: {
+            args: Prisma.EmailDeliveryEventsUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EmailDeliveryEventsPayload>
+          }
+          aggregate: {
+            args: Prisma.EmailDeliveryEventsAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateEmailDeliveryEvents>
+          }
+          groupBy: {
+            args: Prisma.EmailDeliveryEventsGroupByArgs<ExtArgs>
+            result: $Utils.Optional<EmailDeliveryEventsGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.EmailDeliveryEventsCountArgs<ExtArgs>
+            result: $Utils.Optional<EmailDeliveryEventsCountAggregateOutputType> | number
           }
         }
       }
@@ -1330,6 +1469,80 @@ export namespace Prisma {
           }
         }
       }
+      league_message_read_state: {
+        payload: Prisma.$league_message_read_statePayload<ExtArgs>
+        fields: Prisma.league_message_read_stateFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.league_message_read_stateFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$league_message_read_statePayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.league_message_read_stateFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$league_message_read_statePayload>
+          }
+          findFirst: {
+            args: Prisma.league_message_read_stateFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$league_message_read_statePayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.league_message_read_stateFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$league_message_read_statePayload>
+          }
+          findMany: {
+            args: Prisma.league_message_read_stateFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$league_message_read_statePayload>[]
+          }
+          create: {
+            args: Prisma.league_message_read_stateCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$league_message_read_statePayload>
+          }
+          createMany: {
+            args: Prisma.league_message_read_stateCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.league_message_read_stateCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$league_message_read_statePayload>[]
+          }
+          delete: {
+            args: Prisma.league_message_read_stateDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$league_message_read_statePayload>
+          }
+          update: {
+            args: Prisma.league_message_read_stateUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$league_message_read_statePayload>
+          }
+          deleteMany: {
+            args: Prisma.league_message_read_stateDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.league_message_read_stateUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.league_message_read_stateUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$league_message_read_statePayload>[]
+          }
+          upsert: {
+            args: Prisma.league_message_read_stateUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$league_message_read_statePayload>
+          }
+          aggregate: {
+            args: Prisma.League_message_read_stateAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateLeague_message_read_state>
+          }
+          groupBy: {
+            args: Prisma.league_message_read_stateGroupByArgs<ExtArgs>
+            result: $Utils.Optional<League_message_read_stateGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.league_message_read_stateCountArgs<ExtArgs>
+            result: $Utils.Optional<League_message_read_stateCountAggregateOutputType> | number
+          }
+        }
+      }
       leagues: {
         payload: Prisma.$leaguesPayload<ExtArgs>
         fields: Prisma.leaguesFieldRefs
@@ -1401,6 +1614,80 @@ export namespace Prisma {
           count: {
             args: Prisma.leaguesCountArgs<ExtArgs>
             result: $Utils.Optional<LeaguesCountAggregateOutputType> | number
+          }
+        }
+      }
+      league_renewal_member_roles: {
+        payload: Prisma.$league_renewal_member_rolesPayload<ExtArgs>
+        fields: Prisma.league_renewal_member_rolesFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.league_renewal_member_rolesFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$league_renewal_member_rolesPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.league_renewal_member_rolesFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$league_renewal_member_rolesPayload>
+          }
+          findFirst: {
+            args: Prisma.league_renewal_member_rolesFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$league_renewal_member_rolesPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.league_renewal_member_rolesFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$league_renewal_member_rolesPayload>
+          }
+          findMany: {
+            args: Prisma.league_renewal_member_rolesFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$league_renewal_member_rolesPayload>[]
+          }
+          create: {
+            args: Prisma.league_renewal_member_rolesCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$league_renewal_member_rolesPayload>
+          }
+          createMany: {
+            args: Prisma.league_renewal_member_rolesCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.league_renewal_member_rolesCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$league_renewal_member_rolesPayload>[]
+          }
+          delete: {
+            args: Prisma.league_renewal_member_rolesDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$league_renewal_member_rolesPayload>
+          }
+          update: {
+            args: Prisma.league_renewal_member_rolesUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$league_renewal_member_rolesPayload>
+          }
+          deleteMany: {
+            args: Prisma.league_renewal_member_rolesDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.league_renewal_member_rolesUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.league_renewal_member_rolesUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$league_renewal_member_rolesPayload>[]
+          }
+          upsert: {
+            args: Prisma.league_renewal_member_rolesUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$league_renewal_member_rolesPayload>
+          }
+          aggregate: {
+            args: Prisma.League_renewal_member_rolesAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateLeague_renewal_member_roles>
+          }
+          groupBy: {
+            args: Prisma.league_renewal_member_rolesGroupByArgs<ExtArgs>
+            result: $Utils.Optional<League_renewal_member_rolesGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.league_renewal_member_rolesCountArgs<ExtArgs>
+            result: $Utils.Optional<League_renewal_member_rolesCountAggregateOutputType> | number
           }
         }
       }
@@ -2093,11 +2380,14 @@ export namespace Prisma {
   }
   export type GlobalOmitConfig = {
     emailLogs?: EmailLogsOmit
+    emailDeliveryEvents?: EmailDeliveryEventsOmit
     weekWinners?: WeekWinnersOmit
     games?: gamesOmit
     leaguemembers?: leaguemembersOmit
     leaguemessages?: leaguemessagesOmit
+    league_message_read_state?: league_message_read_stateOmit
     leagues?: leaguesOmit
+    league_renewal_member_roles?: league_renewal_member_rolesOmit
     people?: peopleOmit
     pushNotificationTokens?: pushNotificationTokensOmit
     picks?: picksOmit
@@ -2288,6 +2578,7 @@ export namespace Prisma {
     WeekWinners: number
     leaguemembers: number
     leaguemessages: number
+    league_renewal_member_roles: number
     future_leagues: number
   }
 
@@ -2296,6 +2587,7 @@ export namespace Prisma {
     WeekWinners?: boolean | LeaguesCountOutputTypeCountWeekWinnersArgs
     leaguemembers?: boolean | LeaguesCountOutputTypeCountLeaguemembersArgs
     leaguemessages?: boolean | LeaguesCountOutputTypeCountLeaguemessagesArgs
+    league_renewal_member_roles?: boolean | LeaguesCountOutputTypeCountLeague_renewal_member_rolesArgs
     future_leagues?: boolean | LeaguesCountOutputTypeCountFuture_leaguesArgs
   }
 
@@ -2341,6 +2633,13 @@ export namespace Prisma {
   /**
    * LeaguesCountOutputType without action
    */
+  export type LeaguesCountOutputTypeCountLeague_renewal_member_rolesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: league_renewal_member_rolesWhereInput
+  }
+
+  /**
+   * LeaguesCountOutputType without action
+   */
   export type LeaguesCountOutputTypeCountFuture_leaguesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: leaguesWhereInput
   }
@@ -2352,6 +2651,7 @@ export namespace Prisma {
 
   export type PeopleCountOutputType = {
     leaguemembers: number
+    league_renewal_member_roles: number
     leagues: number
     picks: number
     pushNotificationTokens: number
@@ -2359,6 +2659,7 @@ export namespace Prisma {
 
   export type PeopleCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     leaguemembers?: boolean | PeopleCountOutputTypeCountLeaguemembersArgs
+    league_renewal_member_roles?: boolean | PeopleCountOutputTypeCountLeague_renewal_member_rolesArgs
     leagues?: boolean | PeopleCountOutputTypeCountLeaguesArgs
     picks?: boolean | PeopleCountOutputTypeCountPicksArgs
     pushNotificationTokens?: boolean | PeopleCountOutputTypeCountPushNotificationTokensArgs
@@ -2380,6 +2681,13 @@ export namespace Prisma {
    */
   export type PeopleCountOutputTypeCountLeaguemembersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: leaguemembersWhereInput
+  }
+
+  /**
+   * PeopleCountOutputType without action
+   */
+  export type PeopleCountOutputTypeCountLeague_renewal_member_rolesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: league_renewal_member_rolesWhereInput
   }
 
   /**
@@ -2574,6 +2882,11 @@ export namespace Prisma {
     ts: Date | null
     week: number | null
     resend_id: string | null
+    delivery_status: $Enums.EmailDeliveryStatus | null
+    last_event_at: Date | null
+    delivered_at: Date | null
+    failed_at: Date | null
+    failure_reason: string | null
   }
 
   export type EmailLogsMaxAggregateOutputType = {
@@ -2584,6 +2897,11 @@ export namespace Prisma {
     ts: Date | null
     week: number | null
     resend_id: string | null
+    delivery_status: $Enums.EmailDeliveryStatus | null
+    last_event_at: Date | null
+    delivered_at: Date | null
+    failed_at: Date | null
+    failure_reason: string | null
   }
 
   export type EmailLogsCountAggregateOutputType = {
@@ -2594,6 +2912,11 @@ export namespace Prisma {
     ts: number
     week: number
     resend_id: number
+    delivery_status: number
+    last_event_at: number
+    delivered_at: number
+    failed_at: number
+    failure_reason: number
     _all: number
   }
 
@@ -2618,6 +2941,11 @@ export namespace Prisma {
     ts?: true
     week?: true
     resend_id?: true
+    delivery_status?: true
+    last_event_at?: true
+    delivered_at?: true
+    failed_at?: true
+    failure_reason?: true
   }
 
   export type EmailLogsMaxAggregateInputType = {
@@ -2628,6 +2956,11 @@ export namespace Prisma {
     ts?: true
     week?: true
     resend_id?: true
+    delivery_status?: true
+    last_event_at?: true
+    delivered_at?: true
+    failed_at?: true
+    failure_reason?: true
   }
 
   export type EmailLogsCountAggregateInputType = {
@@ -2638,6 +2971,11 @@ export namespace Prisma {
     ts?: true
     week?: true
     resend_id?: true
+    delivery_status?: true
+    last_event_at?: true
+    delivered_at?: true
+    failed_at?: true
+    failure_reason?: true
     _all?: true
   }
 
@@ -2735,6 +3073,11 @@ export namespace Prisma {
     ts: Date
     week: number | null
     resend_id: string
+    delivery_status: $Enums.EmailDeliveryStatus
+    last_event_at: Date | null
+    delivered_at: Date | null
+    failed_at: Date | null
+    failure_reason: string | null
     _count: EmailLogsCountAggregateOutputType | null
     _avg: EmailLogsAvgAggregateOutputType | null
     _sum: EmailLogsSumAggregateOutputType | null
@@ -2764,6 +3107,11 @@ export namespace Prisma {
     ts?: boolean
     week?: boolean
     resend_id?: boolean
+    delivery_status?: boolean
+    last_event_at?: boolean
+    delivered_at?: boolean
+    failed_at?: boolean
+    failure_reason?: boolean
     leagues?: boolean | leaguesDefaultArgs<ExtArgs>
     leaguemembers?: boolean | leaguemembersDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["emailLogs"]>
@@ -2776,6 +3124,11 @@ export namespace Prisma {
     ts?: boolean
     week?: boolean
     resend_id?: boolean
+    delivery_status?: boolean
+    last_event_at?: boolean
+    delivered_at?: boolean
+    failed_at?: boolean
+    failure_reason?: boolean
     leagues?: boolean | leaguesDefaultArgs<ExtArgs>
     leaguemembers?: boolean | leaguemembersDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["emailLogs"]>
@@ -2788,6 +3141,11 @@ export namespace Prisma {
     ts?: boolean
     week?: boolean
     resend_id?: boolean
+    delivery_status?: boolean
+    last_event_at?: boolean
+    delivered_at?: boolean
+    failed_at?: boolean
+    failure_reason?: boolean
     leagues?: boolean | leaguesDefaultArgs<ExtArgs>
     leaguemembers?: boolean | leaguemembersDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["emailLogs"]>
@@ -2800,9 +3158,14 @@ export namespace Prisma {
     ts?: boolean
     week?: boolean
     resend_id?: boolean
+    delivery_status?: boolean
+    last_event_at?: boolean
+    delivered_at?: boolean
+    failed_at?: boolean
+    failure_reason?: boolean
   }
 
-  export type EmailLogsOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"email_log_id" | "league_id" | "member_id" | "email_type" | "ts" | "week" | "resend_id", ExtArgs["result"]["emailLogs"]>
+  export type EmailLogsOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"email_log_id" | "league_id" | "member_id" | "email_type" | "ts" | "week" | "resend_id" | "delivery_status" | "last_event_at" | "delivered_at" | "failed_at" | "failure_reason", ExtArgs["result"]["emailLogs"]>
   export type EmailLogsInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     leagues?: boolean | leaguesDefaultArgs<ExtArgs>
     leaguemembers?: boolean | leaguemembersDefaultArgs<ExtArgs>
@@ -2830,6 +3193,11 @@ export namespace Prisma {
       ts: Date
       week: number | null
       resend_id: string
+      delivery_status: $Enums.EmailDeliveryStatus
+      last_event_at: Date | null
+      delivered_at: Date | null
+      failed_at: Date | null
+      failure_reason: string | null
     }, ExtArgs["result"]["emailLogs"]>
     composites: {}
   }
@@ -3262,6 +3630,11 @@ export namespace Prisma {
     readonly ts: FieldRef<"EmailLogs", 'DateTime'>
     readonly week: FieldRef<"EmailLogs", 'Int'>
     readonly resend_id: FieldRef<"EmailLogs", 'String'>
+    readonly delivery_status: FieldRef<"EmailLogs", 'EmailDeliveryStatus'>
+    readonly last_event_at: FieldRef<"EmailLogs", 'DateTime'>
+    readonly delivered_at: FieldRef<"EmailLogs", 'DateTime'>
+    readonly failed_at: FieldRef<"EmailLogs", 'DateTime'>
+    readonly failure_reason: FieldRef<"EmailLogs", 'String'>
   }
     
 
@@ -3682,6 +4055,1032 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: EmailLogsInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model EmailDeliveryEvents
+   */
+
+  export type AggregateEmailDeliveryEvents = {
+    _count: EmailDeliveryEventsCountAggregateOutputType | null
+    _min: EmailDeliveryEventsMinAggregateOutputType | null
+    _max: EmailDeliveryEventsMaxAggregateOutputType | null
+  }
+
+  export type EmailDeliveryEventsMinAggregateOutputType = {
+    id: string | null
+    svix_id: string | null
+    resend_id: string | null
+    event_type: string | null
+    occurred_at: Date | null
+    received_at: Date | null
+  }
+
+  export type EmailDeliveryEventsMaxAggregateOutputType = {
+    id: string | null
+    svix_id: string | null
+    resend_id: string | null
+    event_type: string | null
+    occurred_at: Date | null
+    received_at: Date | null
+  }
+
+  export type EmailDeliveryEventsCountAggregateOutputType = {
+    id: number
+    svix_id: number
+    resend_id: number
+    event_type: number
+    occurred_at: number
+    received_at: number
+    payload: number
+    _all: number
+  }
+
+
+  export type EmailDeliveryEventsMinAggregateInputType = {
+    id?: true
+    svix_id?: true
+    resend_id?: true
+    event_type?: true
+    occurred_at?: true
+    received_at?: true
+  }
+
+  export type EmailDeliveryEventsMaxAggregateInputType = {
+    id?: true
+    svix_id?: true
+    resend_id?: true
+    event_type?: true
+    occurred_at?: true
+    received_at?: true
+  }
+
+  export type EmailDeliveryEventsCountAggregateInputType = {
+    id?: true
+    svix_id?: true
+    resend_id?: true
+    event_type?: true
+    occurred_at?: true
+    received_at?: true
+    payload?: true
+    _all?: true
+  }
+
+  export type EmailDeliveryEventsAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which EmailDeliveryEvents to aggregate.
+     */
+    where?: EmailDeliveryEventsWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of EmailDeliveryEvents to fetch.
+     */
+    orderBy?: EmailDeliveryEventsOrderByWithRelationInput | EmailDeliveryEventsOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: EmailDeliveryEventsWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` EmailDeliveryEvents from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` EmailDeliveryEvents.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned EmailDeliveryEvents
+    **/
+    _count?: true | EmailDeliveryEventsCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: EmailDeliveryEventsMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: EmailDeliveryEventsMaxAggregateInputType
+  }
+
+  export type GetEmailDeliveryEventsAggregateType<T extends EmailDeliveryEventsAggregateArgs> = {
+        [P in keyof T & keyof AggregateEmailDeliveryEvents]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateEmailDeliveryEvents[P]>
+      : GetScalarType<T[P], AggregateEmailDeliveryEvents[P]>
+  }
+
+
+
+
+  export type EmailDeliveryEventsGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: EmailDeliveryEventsWhereInput
+    orderBy?: EmailDeliveryEventsOrderByWithAggregationInput | EmailDeliveryEventsOrderByWithAggregationInput[]
+    by: EmailDeliveryEventsScalarFieldEnum[] | EmailDeliveryEventsScalarFieldEnum
+    having?: EmailDeliveryEventsScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: EmailDeliveryEventsCountAggregateInputType | true
+    _min?: EmailDeliveryEventsMinAggregateInputType
+    _max?: EmailDeliveryEventsMaxAggregateInputType
+  }
+
+  export type EmailDeliveryEventsGroupByOutputType = {
+    id: string
+    svix_id: string
+    resend_id: string
+    event_type: string
+    occurred_at: Date
+    received_at: Date
+    payload: JsonValue
+    _count: EmailDeliveryEventsCountAggregateOutputType | null
+    _min: EmailDeliveryEventsMinAggregateOutputType | null
+    _max: EmailDeliveryEventsMaxAggregateOutputType | null
+  }
+
+  type GetEmailDeliveryEventsGroupByPayload<T extends EmailDeliveryEventsGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<EmailDeliveryEventsGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof EmailDeliveryEventsGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], EmailDeliveryEventsGroupByOutputType[P]>
+            : GetScalarType<T[P], EmailDeliveryEventsGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type EmailDeliveryEventsSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    svix_id?: boolean
+    resend_id?: boolean
+    event_type?: boolean
+    occurred_at?: boolean
+    received_at?: boolean
+    payload?: boolean
+  }, ExtArgs["result"]["emailDeliveryEvents"]>
+
+  export type EmailDeliveryEventsSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    svix_id?: boolean
+    resend_id?: boolean
+    event_type?: boolean
+    occurred_at?: boolean
+    received_at?: boolean
+    payload?: boolean
+  }, ExtArgs["result"]["emailDeliveryEvents"]>
+
+  export type EmailDeliveryEventsSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    svix_id?: boolean
+    resend_id?: boolean
+    event_type?: boolean
+    occurred_at?: boolean
+    received_at?: boolean
+    payload?: boolean
+  }, ExtArgs["result"]["emailDeliveryEvents"]>
+
+  export type EmailDeliveryEventsSelectScalar = {
+    id?: boolean
+    svix_id?: boolean
+    resend_id?: boolean
+    event_type?: boolean
+    occurred_at?: boolean
+    received_at?: boolean
+    payload?: boolean
+  }
+
+  export type EmailDeliveryEventsOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "svix_id" | "resend_id" | "event_type" | "occurred_at" | "received_at" | "payload", ExtArgs["result"]["emailDeliveryEvents"]>
+
+  export type $EmailDeliveryEventsPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "EmailDeliveryEvents"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      svix_id: string
+      resend_id: string
+      event_type: string
+      occurred_at: Date
+      received_at: Date
+      payload: Prisma.JsonValue
+    }, ExtArgs["result"]["emailDeliveryEvents"]>
+    composites: {}
+  }
+
+  type EmailDeliveryEventsGetPayload<S extends boolean | null | undefined | EmailDeliveryEventsDefaultArgs> = $Result.GetResult<Prisma.$EmailDeliveryEventsPayload, S>
+
+  type EmailDeliveryEventsCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<EmailDeliveryEventsFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
+      select?: EmailDeliveryEventsCountAggregateInputType | true
+    }
+
+  export interface EmailDeliveryEventsDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['EmailDeliveryEvents'], meta: { name: 'EmailDeliveryEvents' } }
+    /**
+     * Find zero or one EmailDeliveryEvents that matches the filter.
+     * @param {EmailDeliveryEventsFindUniqueArgs} args - Arguments to find a EmailDeliveryEvents
+     * @example
+     * // Get one EmailDeliveryEvents
+     * const emailDeliveryEvents = await prisma.emailDeliveryEvents.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends EmailDeliveryEventsFindUniqueArgs>(args: SelectSubset<T, EmailDeliveryEventsFindUniqueArgs<ExtArgs>>): Prisma__EmailDeliveryEventsClient<$Result.GetResult<Prisma.$EmailDeliveryEventsPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one EmailDeliveryEvents that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {EmailDeliveryEventsFindUniqueOrThrowArgs} args - Arguments to find a EmailDeliveryEvents
+     * @example
+     * // Get one EmailDeliveryEvents
+     * const emailDeliveryEvents = await prisma.emailDeliveryEvents.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends EmailDeliveryEventsFindUniqueOrThrowArgs>(args: SelectSubset<T, EmailDeliveryEventsFindUniqueOrThrowArgs<ExtArgs>>): Prisma__EmailDeliveryEventsClient<$Result.GetResult<Prisma.$EmailDeliveryEventsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first EmailDeliveryEvents that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EmailDeliveryEventsFindFirstArgs} args - Arguments to find a EmailDeliveryEvents
+     * @example
+     * // Get one EmailDeliveryEvents
+     * const emailDeliveryEvents = await prisma.emailDeliveryEvents.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends EmailDeliveryEventsFindFirstArgs>(args?: SelectSubset<T, EmailDeliveryEventsFindFirstArgs<ExtArgs>>): Prisma__EmailDeliveryEventsClient<$Result.GetResult<Prisma.$EmailDeliveryEventsPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first EmailDeliveryEvents that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EmailDeliveryEventsFindFirstOrThrowArgs} args - Arguments to find a EmailDeliveryEvents
+     * @example
+     * // Get one EmailDeliveryEvents
+     * const emailDeliveryEvents = await prisma.emailDeliveryEvents.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends EmailDeliveryEventsFindFirstOrThrowArgs>(args?: SelectSubset<T, EmailDeliveryEventsFindFirstOrThrowArgs<ExtArgs>>): Prisma__EmailDeliveryEventsClient<$Result.GetResult<Prisma.$EmailDeliveryEventsPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more EmailDeliveryEvents that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EmailDeliveryEventsFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all EmailDeliveryEvents
+     * const emailDeliveryEvents = await prisma.emailDeliveryEvents.findMany()
+     * 
+     * // Get first 10 EmailDeliveryEvents
+     * const emailDeliveryEvents = await prisma.emailDeliveryEvents.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const emailDeliveryEventsWithIdOnly = await prisma.emailDeliveryEvents.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends EmailDeliveryEventsFindManyArgs>(args?: SelectSubset<T, EmailDeliveryEventsFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EmailDeliveryEventsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a EmailDeliveryEvents.
+     * @param {EmailDeliveryEventsCreateArgs} args - Arguments to create a EmailDeliveryEvents.
+     * @example
+     * // Create one EmailDeliveryEvents
+     * const EmailDeliveryEvents = await prisma.emailDeliveryEvents.create({
+     *   data: {
+     *     // ... data to create a EmailDeliveryEvents
+     *   }
+     * })
+     * 
+     */
+    create<T extends EmailDeliveryEventsCreateArgs>(args: SelectSubset<T, EmailDeliveryEventsCreateArgs<ExtArgs>>): Prisma__EmailDeliveryEventsClient<$Result.GetResult<Prisma.$EmailDeliveryEventsPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many EmailDeliveryEvents.
+     * @param {EmailDeliveryEventsCreateManyArgs} args - Arguments to create many EmailDeliveryEvents.
+     * @example
+     * // Create many EmailDeliveryEvents
+     * const emailDeliveryEvents = await prisma.emailDeliveryEvents.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends EmailDeliveryEventsCreateManyArgs>(args?: SelectSubset<T, EmailDeliveryEventsCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many EmailDeliveryEvents and returns the data saved in the database.
+     * @param {EmailDeliveryEventsCreateManyAndReturnArgs} args - Arguments to create many EmailDeliveryEvents.
+     * @example
+     * // Create many EmailDeliveryEvents
+     * const emailDeliveryEvents = await prisma.emailDeliveryEvents.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many EmailDeliveryEvents and only return the `id`
+     * const emailDeliveryEventsWithIdOnly = await prisma.emailDeliveryEvents.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends EmailDeliveryEventsCreateManyAndReturnArgs>(args?: SelectSubset<T, EmailDeliveryEventsCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EmailDeliveryEventsPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a EmailDeliveryEvents.
+     * @param {EmailDeliveryEventsDeleteArgs} args - Arguments to delete one EmailDeliveryEvents.
+     * @example
+     * // Delete one EmailDeliveryEvents
+     * const EmailDeliveryEvents = await prisma.emailDeliveryEvents.delete({
+     *   where: {
+     *     // ... filter to delete one EmailDeliveryEvents
+     *   }
+     * })
+     * 
+     */
+    delete<T extends EmailDeliveryEventsDeleteArgs>(args: SelectSubset<T, EmailDeliveryEventsDeleteArgs<ExtArgs>>): Prisma__EmailDeliveryEventsClient<$Result.GetResult<Prisma.$EmailDeliveryEventsPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one EmailDeliveryEvents.
+     * @param {EmailDeliveryEventsUpdateArgs} args - Arguments to update one EmailDeliveryEvents.
+     * @example
+     * // Update one EmailDeliveryEvents
+     * const emailDeliveryEvents = await prisma.emailDeliveryEvents.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends EmailDeliveryEventsUpdateArgs>(args: SelectSubset<T, EmailDeliveryEventsUpdateArgs<ExtArgs>>): Prisma__EmailDeliveryEventsClient<$Result.GetResult<Prisma.$EmailDeliveryEventsPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more EmailDeliveryEvents.
+     * @param {EmailDeliveryEventsDeleteManyArgs} args - Arguments to filter EmailDeliveryEvents to delete.
+     * @example
+     * // Delete a few EmailDeliveryEvents
+     * const { count } = await prisma.emailDeliveryEvents.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends EmailDeliveryEventsDeleteManyArgs>(args?: SelectSubset<T, EmailDeliveryEventsDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more EmailDeliveryEvents.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EmailDeliveryEventsUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many EmailDeliveryEvents
+     * const emailDeliveryEvents = await prisma.emailDeliveryEvents.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends EmailDeliveryEventsUpdateManyArgs>(args: SelectSubset<T, EmailDeliveryEventsUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more EmailDeliveryEvents and returns the data updated in the database.
+     * @param {EmailDeliveryEventsUpdateManyAndReturnArgs} args - Arguments to update many EmailDeliveryEvents.
+     * @example
+     * // Update many EmailDeliveryEvents
+     * const emailDeliveryEvents = await prisma.emailDeliveryEvents.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more EmailDeliveryEvents and only return the `id`
+     * const emailDeliveryEventsWithIdOnly = await prisma.emailDeliveryEvents.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends EmailDeliveryEventsUpdateManyAndReturnArgs>(args: SelectSubset<T, EmailDeliveryEventsUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EmailDeliveryEventsPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one EmailDeliveryEvents.
+     * @param {EmailDeliveryEventsUpsertArgs} args - Arguments to update or create a EmailDeliveryEvents.
+     * @example
+     * // Update or create a EmailDeliveryEvents
+     * const emailDeliveryEvents = await prisma.emailDeliveryEvents.upsert({
+     *   create: {
+     *     // ... data to create a EmailDeliveryEvents
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the EmailDeliveryEvents we want to update
+     *   }
+     * })
+     */
+    upsert<T extends EmailDeliveryEventsUpsertArgs>(args: SelectSubset<T, EmailDeliveryEventsUpsertArgs<ExtArgs>>): Prisma__EmailDeliveryEventsClient<$Result.GetResult<Prisma.$EmailDeliveryEventsPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of EmailDeliveryEvents.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EmailDeliveryEventsCountArgs} args - Arguments to filter EmailDeliveryEvents to count.
+     * @example
+     * // Count the number of EmailDeliveryEvents
+     * const count = await prisma.emailDeliveryEvents.count({
+     *   where: {
+     *     // ... the filter for the EmailDeliveryEvents we want to count
+     *   }
+     * })
+    **/
+    count<T extends EmailDeliveryEventsCountArgs>(
+      args?: Subset<T, EmailDeliveryEventsCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], EmailDeliveryEventsCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a EmailDeliveryEvents.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EmailDeliveryEventsAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends EmailDeliveryEventsAggregateArgs>(args: Subset<T, EmailDeliveryEventsAggregateArgs>): Prisma.PrismaPromise<GetEmailDeliveryEventsAggregateType<T>>
+
+    /**
+     * Group by EmailDeliveryEvents.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EmailDeliveryEventsGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends EmailDeliveryEventsGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: EmailDeliveryEventsGroupByArgs['orderBy'] }
+        : { orderBy?: EmailDeliveryEventsGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, EmailDeliveryEventsGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetEmailDeliveryEventsGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the EmailDeliveryEvents model
+   */
+  readonly fields: EmailDeliveryEventsFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for EmailDeliveryEvents.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__EmailDeliveryEventsClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the EmailDeliveryEvents model
+   */
+  interface EmailDeliveryEventsFieldRefs {
+    readonly id: FieldRef<"EmailDeliveryEvents", 'String'>
+    readonly svix_id: FieldRef<"EmailDeliveryEvents", 'String'>
+    readonly resend_id: FieldRef<"EmailDeliveryEvents", 'String'>
+    readonly event_type: FieldRef<"EmailDeliveryEvents", 'String'>
+    readonly occurred_at: FieldRef<"EmailDeliveryEvents", 'DateTime'>
+    readonly received_at: FieldRef<"EmailDeliveryEvents", 'DateTime'>
+    readonly payload: FieldRef<"EmailDeliveryEvents", 'Json'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * EmailDeliveryEvents findUnique
+   */
+  export type EmailDeliveryEventsFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EmailDeliveryEvents
+     */
+    select?: EmailDeliveryEventsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EmailDeliveryEvents
+     */
+    omit?: EmailDeliveryEventsOmit<ExtArgs> | null
+    /**
+     * Filter, which EmailDeliveryEvents to fetch.
+     */
+    where: EmailDeliveryEventsWhereUniqueInput
+    relationLoadStrategy?: RelationLoadStrategy
+  }
+
+  /**
+   * EmailDeliveryEvents findUniqueOrThrow
+   */
+  export type EmailDeliveryEventsFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EmailDeliveryEvents
+     */
+    select?: EmailDeliveryEventsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EmailDeliveryEvents
+     */
+    omit?: EmailDeliveryEventsOmit<ExtArgs> | null
+    /**
+     * Filter, which EmailDeliveryEvents to fetch.
+     */
+    where: EmailDeliveryEventsWhereUniqueInput
+    relationLoadStrategy?: RelationLoadStrategy
+  }
+
+  /**
+   * EmailDeliveryEvents findFirst
+   */
+  export type EmailDeliveryEventsFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EmailDeliveryEvents
+     */
+    select?: EmailDeliveryEventsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EmailDeliveryEvents
+     */
+    omit?: EmailDeliveryEventsOmit<ExtArgs> | null
+    /**
+     * Filter, which EmailDeliveryEvents to fetch.
+     */
+    where?: EmailDeliveryEventsWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of EmailDeliveryEvents to fetch.
+     */
+    orderBy?: EmailDeliveryEventsOrderByWithRelationInput | EmailDeliveryEventsOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for EmailDeliveryEvents.
+     */
+    cursor?: EmailDeliveryEventsWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` EmailDeliveryEvents from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` EmailDeliveryEvents.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of EmailDeliveryEvents.
+     */
+    distinct?: EmailDeliveryEventsScalarFieldEnum | EmailDeliveryEventsScalarFieldEnum[]
+    relationLoadStrategy?: RelationLoadStrategy
+  }
+
+  /**
+   * EmailDeliveryEvents findFirstOrThrow
+   */
+  export type EmailDeliveryEventsFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EmailDeliveryEvents
+     */
+    select?: EmailDeliveryEventsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EmailDeliveryEvents
+     */
+    omit?: EmailDeliveryEventsOmit<ExtArgs> | null
+    /**
+     * Filter, which EmailDeliveryEvents to fetch.
+     */
+    where?: EmailDeliveryEventsWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of EmailDeliveryEvents to fetch.
+     */
+    orderBy?: EmailDeliveryEventsOrderByWithRelationInput | EmailDeliveryEventsOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for EmailDeliveryEvents.
+     */
+    cursor?: EmailDeliveryEventsWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` EmailDeliveryEvents from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` EmailDeliveryEvents.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of EmailDeliveryEvents.
+     */
+    distinct?: EmailDeliveryEventsScalarFieldEnum | EmailDeliveryEventsScalarFieldEnum[]
+    relationLoadStrategy?: RelationLoadStrategy
+  }
+
+  /**
+   * EmailDeliveryEvents findMany
+   */
+  export type EmailDeliveryEventsFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EmailDeliveryEvents
+     */
+    select?: EmailDeliveryEventsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EmailDeliveryEvents
+     */
+    omit?: EmailDeliveryEventsOmit<ExtArgs> | null
+    /**
+     * Filter, which EmailDeliveryEvents to fetch.
+     */
+    where?: EmailDeliveryEventsWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of EmailDeliveryEvents to fetch.
+     */
+    orderBy?: EmailDeliveryEventsOrderByWithRelationInput | EmailDeliveryEventsOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing EmailDeliveryEvents.
+     */
+    cursor?: EmailDeliveryEventsWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` EmailDeliveryEvents from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` EmailDeliveryEvents.
+     */
+    skip?: number
+    distinct?: EmailDeliveryEventsScalarFieldEnum | EmailDeliveryEventsScalarFieldEnum[]
+    relationLoadStrategy?: RelationLoadStrategy
+  }
+
+  /**
+   * EmailDeliveryEvents create
+   */
+  export type EmailDeliveryEventsCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EmailDeliveryEvents
+     */
+    select?: EmailDeliveryEventsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EmailDeliveryEvents
+     */
+    omit?: EmailDeliveryEventsOmit<ExtArgs> | null
+    /**
+     * The data needed to create a EmailDeliveryEvents.
+     */
+    data: XOR<EmailDeliveryEventsCreateInput, EmailDeliveryEventsUncheckedCreateInput>
+    relationLoadStrategy?: RelationLoadStrategy
+  }
+
+  /**
+   * EmailDeliveryEvents createMany
+   */
+  export type EmailDeliveryEventsCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many EmailDeliveryEvents.
+     */
+    data: EmailDeliveryEventsCreateManyInput | EmailDeliveryEventsCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * EmailDeliveryEvents createManyAndReturn
+   */
+  export type EmailDeliveryEventsCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EmailDeliveryEvents
+     */
+    select?: EmailDeliveryEventsSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the EmailDeliveryEvents
+     */
+    omit?: EmailDeliveryEventsOmit<ExtArgs> | null
+    /**
+     * The data used to create many EmailDeliveryEvents.
+     */
+    data: EmailDeliveryEventsCreateManyInput | EmailDeliveryEventsCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * EmailDeliveryEvents update
+   */
+  export type EmailDeliveryEventsUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EmailDeliveryEvents
+     */
+    select?: EmailDeliveryEventsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EmailDeliveryEvents
+     */
+    omit?: EmailDeliveryEventsOmit<ExtArgs> | null
+    /**
+     * The data needed to update a EmailDeliveryEvents.
+     */
+    data: XOR<EmailDeliveryEventsUpdateInput, EmailDeliveryEventsUncheckedUpdateInput>
+    /**
+     * Choose, which EmailDeliveryEvents to update.
+     */
+    where: EmailDeliveryEventsWhereUniqueInput
+    relationLoadStrategy?: RelationLoadStrategy
+  }
+
+  /**
+   * EmailDeliveryEvents updateMany
+   */
+  export type EmailDeliveryEventsUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update EmailDeliveryEvents.
+     */
+    data: XOR<EmailDeliveryEventsUpdateManyMutationInput, EmailDeliveryEventsUncheckedUpdateManyInput>
+    /**
+     * Filter which EmailDeliveryEvents to update
+     */
+    where?: EmailDeliveryEventsWhereInput
+    /**
+     * Limit how many EmailDeliveryEvents to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * EmailDeliveryEvents updateManyAndReturn
+   */
+  export type EmailDeliveryEventsUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EmailDeliveryEvents
+     */
+    select?: EmailDeliveryEventsSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the EmailDeliveryEvents
+     */
+    omit?: EmailDeliveryEventsOmit<ExtArgs> | null
+    /**
+     * The data used to update EmailDeliveryEvents.
+     */
+    data: XOR<EmailDeliveryEventsUpdateManyMutationInput, EmailDeliveryEventsUncheckedUpdateManyInput>
+    /**
+     * Filter which EmailDeliveryEvents to update
+     */
+    where?: EmailDeliveryEventsWhereInput
+    /**
+     * Limit how many EmailDeliveryEvents to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * EmailDeliveryEvents upsert
+   */
+  export type EmailDeliveryEventsUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EmailDeliveryEvents
+     */
+    select?: EmailDeliveryEventsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EmailDeliveryEvents
+     */
+    omit?: EmailDeliveryEventsOmit<ExtArgs> | null
+    /**
+     * The filter to search for the EmailDeliveryEvents to update in case it exists.
+     */
+    where: EmailDeliveryEventsWhereUniqueInput
+    /**
+     * In case the EmailDeliveryEvents found by the `where` argument doesn't exist, create a new EmailDeliveryEvents with this data.
+     */
+    create: XOR<EmailDeliveryEventsCreateInput, EmailDeliveryEventsUncheckedCreateInput>
+    /**
+     * In case the EmailDeliveryEvents was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<EmailDeliveryEventsUpdateInput, EmailDeliveryEventsUncheckedUpdateInput>
+    relationLoadStrategy?: RelationLoadStrategy
+  }
+
+  /**
+   * EmailDeliveryEvents delete
+   */
+  export type EmailDeliveryEventsDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EmailDeliveryEvents
+     */
+    select?: EmailDeliveryEventsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EmailDeliveryEvents
+     */
+    omit?: EmailDeliveryEventsOmit<ExtArgs> | null
+    /**
+     * Filter which EmailDeliveryEvents to delete.
+     */
+    where: EmailDeliveryEventsWhereUniqueInput
+    relationLoadStrategy?: RelationLoadStrategy
+  }
+
+  /**
+   * EmailDeliveryEvents deleteMany
+   */
+  export type EmailDeliveryEventsDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which EmailDeliveryEvents to delete
+     */
+    where?: EmailDeliveryEventsWhereInput
+    /**
+     * Limit how many EmailDeliveryEvents to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * EmailDeliveryEvents without action
+   */
+  export type EmailDeliveryEventsDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EmailDeliveryEvents
+     */
+    select?: EmailDeliveryEventsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EmailDeliveryEvents
+     */
+    omit?: EmailDeliveryEventsOmit<ExtArgs> | null
   }
 
 
@@ -6428,6 +7827,7 @@ export namespace Prisma {
     people?: boolean | peopleDefaultArgs<ExtArgs>
     leagues?: boolean | leaguesDefaultArgs<ExtArgs>
     leaguemessages?: boolean | leaguemembers$leaguemessagesArgs<ExtArgs>
+    league_message_read_state?: boolean | leaguemembers$league_message_read_stateArgs<ExtArgs>
     picks?: boolean | leaguemembers$picksArgs<ExtArgs>
     superbowl?: boolean | leaguemembers$superbowlArgs<ExtArgs>
     _count?: boolean | LeaguemembersCountOutputTypeDefaultArgs<ExtArgs>
@@ -6471,6 +7871,7 @@ export namespace Prisma {
     people?: boolean | peopleDefaultArgs<ExtArgs>
     leagues?: boolean | leaguesDefaultArgs<ExtArgs>
     leaguemessages?: boolean | leaguemembers$leaguemessagesArgs<ExtArgs>
+    league_message_read_state?: boolean | leaguemembers$league_message_read_stateArgs<ExtArgs>
     picks?: boolean | leaguemembers$picksArgs<ExtArgs>
     superbowl?: boolean | leaguemembers$superbowlArgs<ExtArgs>
     _count?: boolean | LeaguemembersCountOutputTypeDefaultArgs<ExtArgs>
@@ -6492,6 +7893,7 @@ export namespace Prisma {
       people: Prisma.$peoplePayload<ExtArgs>
       leagues: Prisma.$leaguesPayload<ExtArgs>
       leaguemessages: Prisma.$leaguemessagesPayload<ExtArgs>[]
+      league_message_read_state: Prisma.$league_message_read_statePayload<ExtArgs> | null
       picks: Prisma.$picksPayload<ExtArgs>[]
       superbowl: Prisma.$superbowlPayload<ExtArgs>[]
     }
@@ -6901,6 +8303,7 @@ export namespace Prisma {
     people<T extends peopleDefaultArgs<ExtArgs> = {}>(args?: Subset<T, peopleDefaultArgs<ExtArgs>>): Prisma__peopleClient<$Result.GetResult<Prisma.$peoplePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     leagues<T extends leaguesDefaultArgs<ExtArgs> = {}>(args?: Subset<T, leaguesDefaultArgs<ExtArgs>>): Prisma__leaguesClient<$Result.GetResult<Prisma.$leaguesPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     leaguemessages<T extends leaguemembers$leaguemessagesArgs<ExtArgs> = {}>(args?: Subset<T, leaguemembers$leaguemessagesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$leaguemessagesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    league_message_read_state<T extends leaguemembers$league_message_read_stateArgs<ExtArgs> = {}>(args?: Subset<T, leaguemembers$league_message_read_stateArgs<ExtArgs>>): Prisma__league_message_read_stateClient<$Result.GetResult<Prisma.$league_message_read_statePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     picks<T extends leaguemembers$picksArgs<ExtArgs> = {}>(args?: Subset<T, leaguemembers$picksArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$picksPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     superbowl<T extends leaguemembers$superbowlArgs<ExtArgs> = {}>(args?: Subset<T, leaguemembers$superbowlArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$superbowlPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
@@ -7412,6 +8815,25 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: LeaguemessagesScalarFieldEnum | LeaguemessagesScalarFieldEnum[]
+  }
+
+  /**
+   * leaguemembers.league_message_read_state
+   */
+  export type leaguemembers$league_message_read_stateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the league_message_read_state
+     */
+    select?: league_message_read_stateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the league_message_read_state
+     */
+    omit?: league_message_read_stateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: league_message_read_stateInclude<ExtArgs> | null
+    where?: league_message_read_stateWhereInput
   }
 
   /**
@@ -8638,6 +10060,1094 @@ export namespace Prisma {
 
 
   /**
+   * Model league_message_read_state
+   */
+
+  export type AggregateLeague_message_read_state = {
+    _count: League_message_read_stateCountAggregateOutputType | null
+    _avg: League_message_read_stateAvgAggregateOutputType | null
+    _sum: League_message_read_stateSumAggregateOutputType | null
+    _min: League_message_read_stateMinAggregateOutputType | null
+    _max: League_message_read_stateMaxAggregateOutputType | null
+  }
+
+  export type League_message_read_stateAvgAggregateOutputType = {
+    membership_id: number | null
+  }
+
+  export type League_message_read_stateSumAggregateOutputType = {
+    membership_id: number | null
+  }
+
+  export type League_message_read_stateMinAggregateOutputType = {
+    membership_id: number | null
+    last_read_at: Date | null
+    last_read_message_id: string | null
+    updatedAt: Date | null
+  }
+
+  export type League_message_read_stateMaxAggregateOutputType = {
+    membership_id: number | null
+    last_read_at: Date | null
+    last_read_message_id: string | null
+    updatedAt: Date | null
+  }
+
+  export type League_message_read_stateCountAggregateOutputType = {
+    membership_id: number
+    last_read_at: number
+    last_read_message_id: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type League_message_read_stateAvgAggregateInputType = {
+    membership_id?: true
+  }
+
+  export type League_message_read_stateSumAggregateInputType = {
+    membership_id?: true
+  }
+
+  export type League_message_read_stateMinAggregateInputType = {
+    membership_id?: true
+    last_read_at?: true
+    last_read_message_id?: true
+    updatedAt?: true
+  }
+
+  export type League_message_read_stateMaxAggregateInputType = {
+    membership_id?: true
+    last_read_at?: true
+    last_read_message_id?: true
+    updatedAt?: true
+  }
+
+  export type League_message_read_stateCountAggregateInputType = {
+    membership_id?: true
+    last_read_at?: true
+    last_read_message_id?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type League_message_read_stateAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which league_message_read_state to aggregate.
+     */
+    where?: league_message_read_stateWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of league_message_read_states to fetch.
+     */
+    orderBy?: league_message_read_stateOrderByWithRelationInput | league_message_read_stateOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: league_message_read_stateWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` league_message_read_states from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` league_message_read_states.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned league_message_read_states
+    **/
+    _count?: true | League_message_read_stateCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: League_message_read_stateAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: League_message_read_stateSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: League_message_read_stateMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: League_message_read_stateMaxAggregateInputType
+  }
+
+  export type GetLeague_message_read_stateAggregateType<T extends League_message_read_stateAggregateArgs> = {
+        [P in keyof T & keyof AggregateLeague_message_read_state]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateLeague_message_read_state[P]>
+      : GetScalarType<T[P], AggregateLeague_message_read_state[P]>
+  }
+
+
+
+
+  export type league_message_read_stateGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: league_message_read_stateWhereInput
+    orderBy?: league_message_read_stateOrderByWithAggregationInput | league_message_read_stateOrderByWithAggregationInput[]
+    by: League_message_read_stateScalarFieldEnum[] | League_message_read_stateScalarFieldEnum
+    having?: league_message_read_stateScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: League_message_read_stateCountAggregateInputType | true
+    _avg?: League_message_read_stateAvgAggregateInputType
+    _sum?: League_message_read_stateSumAggregateInputType
+    _min?: League_message_read_stateMinAggregateInputType
+    _max?: League_message_read_stateMaxAggregateInputType
+  }
+
+  export type League_message_read_stateGroupByOutputType = {
+    membership_id: number
+    last_read_at: Date
+    last_read_message_id: string
+    updatedAt: Date
+    _count: League_message_read_stateCountAggregateOutputType | null
+    _avg: League_message_read_stateAvgAggregateOutputType | null
+    _sum: League_message_read_stateSumAggregateOutputType | null
+    _min: League_message_read_stateMinAggregateOutputType | null
+    _max: League_message_read_stateMaxAggregateOutputType | null
+  }
+
+  type GetLeague_message_read_stateGroupByPayload<T extends league_message_read_stateGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<League_message_read_stateGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof League_message_read_stateGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], League_message_read_stateGroupByOutputType[P]>
+            : GetScalarType<T[P], League_message_read_stateGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type league_message_read_stateSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    membership_id?: boolean
+    last_read_at?: boolean
+    last_read_message_id?: boolean
+    updatedAt?: boolean
+    leaguemembers?: boolean | leaguemembersDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["league_message_read_state"]>
+
+  export type league_message_read_stateSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    membership_id?: boolean
+    last_read_at?: boolean
+    last_read_message_id?: boolean
+    updatedAt?: boolean
+    leaguemembers?: boolean | leaguemembersDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["league_message_read_state"]>
+
+  export type league_message_read_stateSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    membership_id?: boolean
+    last_read_at?: boolean
+    last_read_message_id?: boolean
+    updatedAt?: boolean
+    leaguemembers?: boolean | leaguemembersDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["league_message_read_state"]>
+
+  export type league_message_read_stateSelectScalar = {
+    membership_id?: boolean
+    last_read_at?: boolean
+    last_read_message_id?: boolean
+    updatedAt?: boolean
+  }
+
+  export type league_message_read_stateOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"membership_id" | "last_read_at" | "last_read_message_id" | "updatedAt", ExtArgs["result"]["league_message_read_state"]>
+  export type league_message_read_stateInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    leaguemembers?: boolean | leaguemembersDefaultArgs<ExtArgs>
+  }
+  export type league_message_read_stateIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    leaguemembers?: boolean | leaguemembersDefaultArgs<ExtArgs>
+  }
+  export type league_message_read_stateIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    leaguemembers?: boolean | leaguemembersDefaultArgs<ExtArgs>
+  }
+
+  export type $league_message_read_statePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "league_message_read_state"
+    objects: {
+      leaguemembers: Prisma.$leaguemembersPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      membership_id: number
+      last_read_at: Date
+      last_read_message_id: string
+      updatedAt: Date
+    }, ExtArgs["result"]["league_message_read_state"]>
+    composites: {}
+  }
+
+  type league_message_read_stateGetPayload<S extends boolean | null | undefined | league_message_read_stateDefaultArgs> = $Result.GetResult<Prisma.$league_message_read_statePayload, S>
+
+  type league_message_read_stateCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<league_message_read_stateFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
+      select?: League_message_read_stateCountAggregateInputType | true
+    }
+
+  export interface league_message_read_stateDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['league_message_read_state'], meta: { name: 'league_message_read_state' } }
+    /**
+     * Find zero or one League_message_read_state that matches the filter.
+     * @param {league_message_read_stateFindUniqueArgs} args - Arguments to find a League_message_read_state
+     * @example
+     * // Get one League_message_read_state
+     * const league_message_read_state = await prisma.league_message_read_state.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends league_message_read_stateFindUniqueArgs>(args: SelectSubset<T, league_message_read_stateFindUniqueArgs<ExtArgs>>): Prisma__league_message_read_stateClient<$Result.GetResult<Prisma.$league_message_read_statePayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one League_message_read_state that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {league_message_read_stateFindUniqueOrThrowArgs} args - Arguments to find a League_message_read_state
+     * @example
+     * // Get one League_message_read_state
+     * const league_message_read_state = await prisma.league_message_read_state.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends league_message_read_stateFindUniqueOrThrowArgs>(args: SelectSubset<T, league_message_read_stateFindUniqueOrThrowArgs<ExtArgs>>): Prisma__league_message_read_stateClient<$Result.GetResult<Prisma.$league_message_read_statePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first League_message_read_state that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {league_message_read_stateFindFirstArgs} args - Arguments to find a League_message_read_state
+     * @example
+     * // Get one League_message_read_state
+     * const league_message_read_state = await prisma.league_message_read_state.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends league_message_read_stateFindFirstArgs>(args?: SelectSubset<T, league_message_read_stateFindFirstArgs<ExtArgs>>): Prisma__league_message_read_stateClient<$Result.GetResult<Prisma.$league_message_read_statePayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first League_message_read_state that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {league_message_read_stateFindFirstOrThrowArgs} args - Arguments to find a League_message_read_state
+     * @example
+     * // Get one League_message_read_state
+     * const league_message_read_state = await prisma.league_message_read_state.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends league_message_read_stateFindFirstOrThrowArgs>(args?: SelectSubset<T, league_message_read_stateFindFirstOrThrowArgs<ExtArgs>>): Prisma__league_message_read_stateClient<$Result.GetResult<Prisma.$league_message_read_statePayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more League_message_read_states that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {league_message_read_stateFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all League_message_read_states
+     * const league_message_read_states = await prisma.league_message_read_state.findMany()
+     * 
+     * // Get first 10 League_message_read_states
+     * const league_message_read_states = await prisma.league_message_read_state.findMany({ take: 10 })
+     * 
+     * // Only select the `membership_id`
+     * const league_message_read_stateWithMembership_idOnly = await prisma.league_message_read_state.findMany({ select: { membership_id: true } })
+     * 
+     */
+    findMany<T extends league_message_read_stateFindManyArgs>(args?: SelectSubset<T, league_message_read_stateFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$league_message_read_statePayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a League_message_read_state.
+     * @param {league_message_read_stateCreateArgs} args - Arguments to create a League_message_read_state.
+     * @example
+     * // Create one League_message_read_state
+     * const League_message_read_state = await prisma.league_message_read_state.create({
+     *   data: {
+     *     // ... data to create a League_message_read_state
+     *   }
+     * })
+     * 
+     */
+    create<T extends league_message_read_stateCreateArgs>(args: SelectSubset<T, league_message_read_stateCreateArgs<ExtArgs>>): Prisma__league_message_read_stateClient<$Result.GetResult<Prisma.$league_message_read_statePayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many League_message_read_states.
+     * @param {league_message_read_stateCreateManyArgs} args - Arguments to create many League_message_read_states.
+     * @example
+     * // Create many League_message_read_states
+     * const league_message_read_state = await prisma.league_message_read_state.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends league_message_read_stateCreateManyArgs>(args?: SelectSubset<T, league_message_read_stateCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many League_message_read_states and returns the data saved in the database.
+     * @param {league_message_read_stateCreateManyAndReturnArgs} args - Arguments to create many League_message_read_states.
+     * @example
+     * // Create many League_message_read_states
+     * const league_message_read_state = await prisma.league_message_read_state.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many League_message_read_states and only return the `membership_id`
+     * const league_message_read_stateWithMembership_idOnly = await prisma.league_message_read_state.createManyAndReturn({
+     *   select: { membership_id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends league_message_read_stateCreateManyAndReturnArgs>(args?: SelectSubset<T, league_message_read_stateCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$league_message_read_statePayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a League_message_read_state.
+     * @param {league_message_read_stateDeleteArgs} args - Arguments to delete one League_message_read_state.
+     * @example
+     * // Delete one League_message_read_state
+     * const League_message_read_state = await prisma.league_message_read_state.delete({
+     *   where: {
+     *     // ... filter to delete one League_message_read_state
+     *   }
+     * })
+     * 
+     */
+    delete<T extends league_message_read_stateDeleteArgs>(args: SelectSubset<T, league_message_read_stateDeleteArgs<ExtArgs>>): Prisma__league_message_read_stateClient<$Result.GetResult<Prisma.$league_message_read_statePayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one League_message_read_state.
+     * @param {league_message_read_stateUpdateArgs} args - Arguments to update one League_message_read_state.
+     * @example
+     * // Update one League_message_read_state
+     * const league_message_read_state = await prisma.league_message_read_state.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends league_message_read_stateUpdateArgs>(args: SelectSubset<T, league_message_read_stateUpdateArgs<ExtArgs>>): Prisma__league_message_read_stateClient<$Result.GetResult<Prisma.$league_message_read_statePayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more League_message_read_states.
+     * @param {league_message_read_stateDeleteManyArgs} args - Arguments to filter League_message_read_states to delete.
+     * @example
+     * // Delete a few League_message_read_states
+     * const { count } = await prisma.league_message_read_state.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends league_message_read_stateDeleteManyArgs>(args?: SelectSubset<T, league_message_read_stateDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more League_message_read_states.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {league_message_read_stateUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many League_message_read_states
+     * const league_message_read_state = await prisma.league_message_read_state.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends league_message_read_stateUpdateManyArgs>(args: SelectSubset<T, league_message_read_stateUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more League_message_read_states and returns the data updated in the database.
+     * @param {league_message_read_stateUpdateManyAndReturnArgs} args - Arguments to update many League_message_read_states.
+     * @example
+     * // Update many League_message_read_states
+     * const league_message_read_state = await prisma.league_message_read_state.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more League_message_read_states and only return the `membership_id`
+     * const league_message_read_stateWithMembership_idOnly = await prisma.league_message_read_state.updateManyAndReturn({
+     *   select: { membership_id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends league_message_read_stateUpdateManyAndReturnArgs>(args: SelectSubset<T, league_message_read_stateUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$league_message_read_statePayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one League_message_read_state.
+     * @param {league_message_read_stateUpsertArgs} args - Arguments to update or create a League_message_read_state.
+     * @example
+     * // Update or create a League_message_read_state
+     * const league_message_read_state = await prisma.league_message_read_state.upsert({
+     *   create: {
+     *     // ... data to create a League_message_read_state
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the League_message_read_state we want to update
+     *   }
+     * })
+     */
+    upsert<T extends league_message_read_stateUpsertArgs>(args: SelectSubset<T, league_message_read_stateUpsertArgs<ExtArgs>>): Prisma__league_message_read_stateClient<$Result.GetResult<Prisma.$league_message_read_statePayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of League_message_read_states.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {league_message_read_stateCountArgs} args - Arguments to filter League_message_read_states to count.
+     * @example
+     * // Count the number of League_message_read_states
+     * const count = await prisma.league_message_read_state.count({
+     *   where: {
+     *     // ... the filter for the League_message_read_states we want to count
+     *   }
+     * })
+    **/
+    count<T extends league_message_read_stateCountArgs>(
+      args?: Subset<T, league_message_read_stateCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], League_message_read_stateCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a League_message_read_state.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {League_message_read_stateAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends League_message_read_stateAggregateArgs>(args: Subset<T, League_message_read_stateAggregateArgs>): Prisma.PrismaPromise<GetLeague_message_read_stateAggregateType<T>>
+
+    /**
+     * Group by League_message_read_state.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {league_message_read_stateGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends league_message_read_stateGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: league_message_read_stateGroupByArgs['orderBy'] }
+        : { orderBy?: league_message_read_stateGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, league_message_read_stateGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetLeague_message_read_stateGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the league_message_read_state model
+   */
+  readonly fields: league_message_read_stateFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for league_message_read_state.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__league_message_read_stateClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    leaguemembers<T extends leaguemembersDefaultArgs<ExtArgs> = {}>(args?: Subset<T, leaguemembersDefaultArgs<ExtArgs>>): Prisma__leaguemembersClient<$Result.GetResult<Prisma.$leaguemembersPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the league_message_read_state model
+   */
+  interface league_message_read_stateFieldRefs {
+    readonly membership_id: FieldRef<"league_message_read_state", 'Int'>
+    readonly last_read_at: FieldRef<"league_message_read_state", 'DateTime'>
+    readonly last_read_message_id: FieldRef<"league_message_read_state", 'String'>
+    readonly updatedAt: FieldRef<"league_message_read_state", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * league_message_read_state findUnique
+   */
+  export type league_message_read_stateFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the league_message_read_state
+     */
+    select?: league_message_read_stateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the league_message_read_state
+     */
+    omit?: league_message_read_stateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: league_message_read_stateInclude<ExtArgs> | null
+    /**
+     * Filter, which league_message_read_state to fetch.
+     */
+    where: league_message_read_stateWhereUniqueInput
+    relationLoadStrategy?: RelationLoadStrategy
+  }
+
+  /**
+   * league_message_read_state findUniqueOrThrow
+   */
+  export type league_message_read_stateFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the league_message_read_state
+     */
+    select?: league_message_read_stateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the league_message_read_state
+     */
+    omit?: league_message_read_stateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: league_message_read_stateInclude<ExtArgs> | null
+    /**
+     * Filter, which league_message_read_state to fetch.
+     */
+    where: league_message_read_stateWhereUniqueInput
+    relationLoadStrategy?: RelationLoadStrategy
+  }
+
+  /**
+   * league_message_read_state findFirst
+   */
+  export type league_message_read_stateFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the league_message_read_state
+     */
+    select?: league_message_read_stateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the league_message_read_state
+     */
+    omit?: league_message_read_stateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: league_message_read_stateInclude<ExtArgs> | null
+    /**
+     * Filter, which league_message_read_state to fetch.
+     */
+    where?: league_message_read_stateWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of league_message_read_states to fetch.
+     */
+    orderBy?: league_message_read_stateOrderByWithRelationInput | league_message_read_stateOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for league_message_read_states.
+     */
+    cursor?: league_message_read_stateWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` league_message_read_states from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` league_message_read_states.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of league_message_read_states.
+     */
+    distinct?: League_message_read_stateScalarFieldEnum | League_message_read_stateScalarFieldEnum[]
+    relationLoadStrategy?: RelationLoadStrategy
+  }
+
+  /**
+   * league_message_read_state findFirstOrThrow
+   */
+  export type league_message_read_stateFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the league_message_read_state
+     */
+    select?: league_message_read_stateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the league_message_read_state
+     */
+    omit?: league_message_read_stateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: league_message_read_stateInclude<ExtArgs> | null
+    /**
+     * Filter, which league_message_read_state to fetch.
+     */
+    where?: league_message_read_stateWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of league_message_read_states to fetch.
+     */
+    orderBy?: league_message_read_stateOrderByWithRelationInput | league_message_read_stateOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for league_message_read_states.
+     */
+    cursor?: league_message_read_stateWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` league_message_read_states from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` league_message_read_states.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of league_message_read_states.
+     */
+    distinct?: League_message_read_stateScalarFieldEnum | League_message_read_stateScalarFieldEnum[]
+    relationLoadStrategy?: RelationLoadStrategy
+  }
+
+  /**
+   * league_message_read_state findMany
+   */
+  export type league_message_read_stateFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the league_message_read_state
+     */
+    select?: league_message_read_stateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the league_message_read_state
+     */
+    omit?: league_message_read_stateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: league_message_read_stateInclude<ExtArgs> | null
+    /**
+     * Filter, which league_message_read_states to fetch.
+     */
+    where?: league_message_read_stateWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of league_message_read_states to fetch.
+     */
+    orderBy?: league_message_read_stateOrderByWithRelationInput | league_message_read_stateOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing league_message_read_states.
+     */
+    cursor?: league_message_read_stateWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` league_message_read_states from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` league_message_read_states.
+     */
+    skip?: number
+    distinct?: League_message_read_stateScalarFieldEnum | League_message_read_stateScalarFieldEnum[]
+    relationLoadStrategy?: RelationLoadStrategy
+  }
+
+  /**
+   * league_message_read_state create
+   */
+  export type league_message_read_stateCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the league_message_read_state
+     */
+    select?: league_message_read_stateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the league_message_read_state
+     */
+    omit?: league_message_read_stateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: league_message_read_stateInclude<ExtArgs> | null
+    /**
+     * The data needed to create a league_message_read_state.
+     */
+    data: XOR<league_message_read_stateCreateInput, league_message_read_stateUncheckedCreateInput>
+    relationLoadStrategy?: RelationLoadStrategy
+  }
+
+  /**
+   * league_message_read_state createMany
+   */
+  export type league_message_read_stateCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many league_message_read_states.
+     */
+    data: league_message_read_stateCreateManyInput | league_message_read_stateCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * league_message_read_state createManyAndReturn
+   */
+  export type league_message_read_stateCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the league_message_read_state
+     */
+    select?: league_message_read_stateSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the league_message_read_state
+     */
+    omit?: league_message_read_stateOmit<ExtArgs> | null
+    /**
+     * The data used to create many league_message_read_states.
+     */
+    data: league_message_read_stateCreateManyInput | league_message_read_stateCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: league_message_read_stateIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * league_message_read_state update
+   */
+  export type league_message_read_stateUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the league_message_read_state
+     */
+    select?: league_message_read_stateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the league_message_read_state
+     */
+    omit?: league_message_read_stateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: league_message_read_stateInclude<ExtArgs> | null
+    /**
+     * The data needed to update a league_message_read_state.
+     */
+    data: XOR<league_message_read_stateUpdateInput, league_message_read_stateUncheckedUpdateInput>
+    /**
+     * Choose, which league_message_read_state to update.
+     */
+    where: league_message_read_stateWhereUniqueInput
+    relationLoadStrategy?: RelationLoadStrategy
+  }
+
+  /**
+   * league_message_read_state updateMany
+   */
+  export type league_message_read_stateUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update league_message_read_states.
+     */
+    data: XOR<league_message_read_stateUpdateManyMutationInput, league_message_read_stateUncheckedUpdateManyInput>
+    /**
+     * Filter which league_message_read_states to update
+     */
+    where?: league_message_read_stateWhereInput
+    /**
+     * Limit how many league_message_read_states to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * league_message_read_state updateManyAndReturn
+   */
+  export type league_message_read_stateUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the league_message_read_state
+     */
+    select?: league_message_read_stateSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the league_message_read_state
+     */
+    omit?: league_message_read_stateOmit<ExtArgs> | null
+    /**
+     * The data used to update league_message_read_states.
+     */
+    data: XOR<league_message_read_stateUpdateManyMutationInput, league_message_read_stateUncheckedUpdateManyInput>
+    /**
+     * Filter which league_message_read_states to update
+     */
+    where?: league_message_read_stateWhereInput
+    /**
+     * Limit how many league_message_read_states to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: league_message_read_stateIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * league_message_read_state upsert
+   */
+  export type league_message_read_stateUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the league_message_read_state
+     */
+    select?: league_message_read_stateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the league_message_read_state
+     */
+    omit?: league_message_read_stateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: league_message_read_stateInclude<ExtArgs> | null
+    /**
+     * The filter to search for the league_message_read_state to update in case it exists.
+     */
+    where: league_message_read_stateWhereUniqueInput
+    /**
+     * In case the league_message_read_state found by the `where` argument doesn't exist, create a new league_message_read_state with this data.
+     */
+    create: XOR<league_message_read_stateCreateInput, league_message_read_stateUncheckedCreateInput>
+    /**
+     * In case the league_message_read_state was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<league_message_read_stateUpdateInput, league_message_read_stateUncheckedUpdateInput>
+    relationLoadStrategy?: RelationLoadStrategy
+  }
+
+  /**
+   * league_message_read_state delete
+   */
+  export type league_message_read_stateDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the league_message_read_state
+     */
+    select?: league_message_read_stateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the league_message_read_state
+     */
+    omit?: league_message_read_stateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: league_message_read_stateInclude<ExtArgs> | null
+    /**
+     * Filter which league_message_read_state to delete.
+     */
+    where: league_message_read_stateWhereUniqueInput
+    relationLoadStrategy?: RelationLoadStrategy
+  }
+
+  /**
+   * league_message_read_state deleteMany
+   */
+  export type league_message_read_stateDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which league_message_read_states to delete
+     */
+    where?: league_message_read_stateWhereInput
+    /**
+     * Limit how many league_message_read_states to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * league_message_read_state without action
+   */
+  export type league_message_read_stateDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the league_message_read_state
+     */
+    select?: league_message_read_stateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the league_message_read_state
+     */
+    omit?: league_message_read_stateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: league_message_read_stateInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Model leagues
    */
 
@@ -8915,6 +11425,7 @@ export namespace Prisma {
     WeekWinners?: boolean | leagues$WeekWinnersArgs<ExtArgs>
     leaguemembers?: boolean | leagues$leaguemembersArgs<ExtArgs>
     leaguemessages?: boolean | leagues$leaguemessagesArgs<ExtArgs>
+    league_renewal_member_roles?: boolean | leagues$league_renewal_member_rolesArgs<ExtArgs>
     people?: boolean | peopleDefaultArgs<ExtArgs>
     prior_league?: boolean | leagues$prior_leagueArgs<ExtArgs>
     future_leagues?: boolean | leagues$future_leaguesArgs<ExtArgs>
@@ -8979,6 +11490,7 @@ export namespace Prisma {
     WeekWinners?: boolean | leagues$WeekWinnersArgs<ExtArgs>
     leaguemembers?: boolean | leagues$leaguemembersArgs<ExtArgs>
     leaguemessages?: boolean | leagues$leaguemessagesArgs<ExtArgs>
+    league_renewal_member_roles?: boolean | leagues$league_renewal_member_rolesArgs<ExtArgs>
     people?: boolean | peopleDefaultArgs<ExtArgs>
     prior_league?: boolean | leagues$prior_leagueArgs<ExtArgs>
     future_leagues?: boolean | leagues$future_leaguesArgs<ExtArgs>
@@ -9000,6 +11512,7 @@ export namespace Prisma {
       WeekWinners: Prisma.$WeekWinnersPayload<ExtArgs>[]
       leaguemembers: Prisma.$leaguemembersPayload<ExtArgs>[]
       leaguemessages: Prisma.$leaguemessagesPayload<ExtArgs>[]
+      league_renewal_member_roles: Prisma.$league_renewal_member_rolesPayload<ExtArgs>[]
       people: Prisma.$peoplePayload<ExtArgs>
       prior_league: Prisma.$leaguesPayload<ExtArgs> | null
       future_leagues: Prisma.$leaguesPayload<ExtArgs>[]
@@ -9416,6 +11929,7 @@ export namespace Prisma {
     WeekWinners<T extends leagues$WeekWinnersArgs<ExtArgs> = {}>(args?: Subset<T, leagues$WeekWinnersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$WeekWinnersPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     leaguemembers<T extends leagues$leaguemembersArgs<ExtArgs> = {}>(args?: Subset<T, leagues$leaguemembersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$leaguemembersPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     leaguemessages<T extends leagues$leaguemessagesArgs<ExtArgs> = {}>(args?: Subset<T, leagues$leaguemessagesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$leaguemessagesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    league_renewal_member_roles<T extends leagues$league_renewal_member_rolesArgs<ExtArgs> = {}>(args?: Subset<T, leagues$league_renewal_member_rolesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$league_renewal_member_rolesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     people<T extends peopleDefaultArgs<ExtArgs> = {}>(args?: Subset<T, peopleDefaultArgs<ExtArgs>>): Prisma__peopleClient<$Result.GetResult<Prisma.$peoplePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     prior_league<T extends leagues$prior_leagueArgs<ExtArgs> = {}>(args?: Subset<T, leagues$prior_leagueArgs<ExtArgs>>): Prisma__leaguesClient<$Result.GetResult<Prisma.$leaguesPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     future_leagues<T extends leagues$future_leaguesArgs<ExtArgs> = {}>(args?: Subset<T, leagues$future_leaguesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$leaguesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -9962,6 +12476,30 @@ export namespace Prisma {
   }
 
   /**
+   * leagues.league_renewal_member_roles
+   */
+  export type leagues$league_renewal_member_rolesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the league_renewal_member_roles
+     */
+    select?: league_renewal_member_rolesSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the league_renewal_member_roles
+     */
+    omit?: league_renewal_member_rolesOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: league_renewal_member_rolesInclude<ExtArgs> | null
+    where?: league_renewal_member_rolesWhereInput
+    orderBy?: league_renewal_member_rolesOrderByWithRelationInput | league_renewal_member_rolesOrderByWithRelationInput[]
+    cursor?: league_renewal_member_rolesWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: League_renewal_member_rolesScalarFieldEnum | League_renewal_member_rolesScalarFieldEnum[]
+  }
+
+  /**
    * leagues.prior_league
    */
   export type leagues$prior_leagueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -10020,6 +12558,1132 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: leaguesInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model league_renewal_member_roles
+   */
+
+  export type AggregateLeague_renewal_member_roles = {
+    _count: League_renewal_member_rolesCountAggregateOutputType | null
+    _avg: League_renewal_member_rolesAvgAggregateOutputType | null
+    _sum: League_renewal_member_rolesSumAggregateOutputType | null
+    _min: League_renewal_member_rolesMinAggregateOutputType | null
+    _max: League_renewal_member_rolesMaxAggregateOutputType | null
+  }
+
+  export type League_renewal_member_rolesAvgAggregateOutputType = {
+    league_id: number | null
+    user_id: number | null
+  }
+
+  export type League_renewal_member_rolesSumAggregateOutputType = {
+    league_id: number | null
+    user_id: number | null
+  }
+
+  export type League_renewal_member_rolesMinAggregateOutputType = {
+    renewal_member_role_id: string | null
+    league_id: number | null
+    user_id: number | null
+    role: $Enums.MemberRole | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type League_renewal_member_rolesMaxAggregateOutputType = {
+    renewal_member_role_id: string | null
+    league_id: number | null
+    user_id: number | null
+    role: $Enums.MemberRole | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type League_renewal_member_rolesCountAggregateOutputType = {
+    renewal_member_role_id: number
+    league_id: number
+    user_id: number
+    role: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type League_renewal_member_rolesAvgAggregateInputType = {
+    league_id?: true
+    user_id?: true
+  }
+
+  export type League_renewal_member_rolesSumAggregateInputType = {
+    league_id?: true
+    user_id?: true
+  }
+
+  export type League_renewal_member_rolesMinAggregateInputType = {
+    renewal_member_role_id?: true
+    league_id?: true
+    user_id?: true
+    role?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type League_renewal_member_rolesMaxAggregateInputType = {
+    renewal_member_role_id?: true
+    league_id?: true
+    user_id?: true
+    role?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type League_renewal_member_rolesCountAggregateInputType = {
+    renewal_member_role_id?: true
+    league_id?: true
+    user_id?: true
+    role?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type League_renewal_member_rolesAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which league_renewal_member_roles to aggregate.
+     */
+    where?: league_renewal_member_rolesWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of league_renewal_member_roles to fetch.
+     */
+    orderBy?: league_renewal_member_rolesOrderByWithRelationInput | league_renewal_member_rolesOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: league_renewal_member_rolesWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` league_renewal_member_roles from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` league_renewal_member_roles.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned league_renewal_member_roles
+    **/
+    _count?: true | League_renewal_member_rolesCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: League_renewal_member_rolesAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: League_renewal_member_rolesSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: League_renewal_member_rolesMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: League_renewal_member_rolesMaxAggregateInputType
+  }
+
+  export type GetLeague_renewal_member_rolesAggregateType<T extends League_renewal_member_rolesAggregateArgs> = {
+        [P in keyof T & keyof AggregateLeague_renewal_member_roles]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateLeague_renewal_member_roles[P]>
+      : GetScalarType<T[P], AggregateLeague_renewal_member_roles[P]>
+  }
+
+
+
+
+  export type league_renewal_member_rolesGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: league_renewal_member_rolesWhereInput
+    orderBy?: league_renewal_member_rolesOrderByWithAggregationInput | league_renewal_member_rolesOrderByWithAggregationInput[]
+    by: League_renewal_member_rolesScalarFieldEnum[] | League_renewal_member_rolesScalarFieldEnum
+    having?: league_renewal_member_rolesScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: League_renewal_member_rolesCountAggregateInputType | true
+    _avg?: League_renewal_member_rolesAvgAggregateInputType
+    _sum?: League_renewal_member_rolesSumAggregateInputType
+    _min?: League_renewal_member_rolesMinAggregateInputType
+    _max?: League_renewal_member_rolesMaxAggregateInputType
+  }
+
+  export type League_renewal_member_rolesGroupByOutputType = {
+    renewal_member_role_id: string
+    league_id: number
+    user_id: number
+    role: $Enums.MemberRole
+    createdAt: Date
+    updatedAt: Date
+    _count: League_renewal_member_rolesCountAggregateOutputType | null
+    _avg: League_renewal_member_rolesAvgAggregateOutputType | null
+    _sum: League_renewal_member_rolesSumAggregateOutputType | null
+    _min: League_renewal_member_rolesMinAggregateOutputType | null
+    _max: League_renewal_member_rolesMaxAggregateOutputType | null
+  }
+
+  type GetLeague_renewal_member_rolesGroupByPayload<T extends league_renewal_member_rolesGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<League_renewal_member_rolesGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof League_renewal_member_rolesGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], League_renewal_member_rolesGroupByOutputType[P]>
+            : GetScalarType<T[P], League_renewal_member_rolesGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type league_renewal_member_rolesSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    renewal_member_role_id?: boolean
+    league_id?: boolean
+    user_id?: boolean
+    role?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    leagues?: boolean | leaguesDefaultArgs<ExtArgs>
+    people?: boolean | peopleDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["league_renewal_member_roles"]>
+
+  export type league_renewal_member_rolesSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    renewal_member_role_id?: boolean
+    league_id?: boolean
+    user_id?: boolean
+    role?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    leagues?: boolean | leaguesDefaultArgs<ExtArgs>
+    people?: boolean | peopleDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["league_renewal_member_roles"]>
+
+  export type league_renewal_member_rolesSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    renewal_member_role_id?: boolean
+    league_id?: boolean
+    user_id?: boolean
+    role?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    leagues?: boolean | leaguesDefaultArgs<ExtArgs>
+    people?: boolean | peopleDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["league_renewal_member_roles"]>
+
+  export type league_renewal_member_rolesSelectScalar = {
+    renewal_member_role_id?: boolean
+    league_id?: boolean
+    user_id?: boolean
+    role?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type league_renewal_member_rolesOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"renewal_member_role_id" | "league_id" | "user_id" | "role" | "createdAt" | "updatedAt", ExtArgs["result"]["league_renewal_member_roles"]>
+  export type league_renewal_member_rolesInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    leagues?: boolean | leaguesDefaultArgs<ExtArgs>
+    people?: boolean | peopleDefaultArgs<ExtArgs>
+  }
+  export type league_renewal_member_rolesIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    leagues?: boolean | leaguesDefaultArgs<ExtArgs>
+    people?: boolean | peopleDefaultArgs<ExtArgs>
+  }
+  export type league_renewal_member_rolesIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    leagues?: boolean | leaguesDefaultArgs<ExtArgs>
+    people?: boolean | peopleDefaultArgs<ExtArgs>
+  }
+
+  export type $league_renewal_member_rolesPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "league_renewal_member_roles"
+    objects: {
+      leagues: Prisma.$leaguesPayload<ExtArgs>
+      people: Prisma.$peoplePayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      renewal_member_role_id: string
+      league_id: number
+      user_id: number
+      role: $Enums.MemberRole
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["league_renewal_member_roles"]>
+    composites: {}
+  }
+
+  type league_renewal_member_rolesGetPayload<S extends boolean | null | undefined | league_renewal_member_rolesDefaultArgs> = $Result.GetResult<Prisma.$league_renewal_member_rolesPayload, S>
+
+  type league_renewal_member_rolesCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<league_renewal_member_rolesFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
+      select?: League_renewal_member_rolesCountAggregateInputType | true
+    }
+
+  export interface league_renewal_member_rolesDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['league_renewal_member_roles'], meta: { name: 'league_renewal_member_roles' } }
+    /**
+     * Find zero or one League_renewal_member_roles that matches the filter.
+     * @param {league_renewal_member_rolesFindUniqueArgs} args - Arguments to find a League_renewal_member_roles
+     * @example
+     * // Get one League_renewal_member_roles
+     * const league_renewal_member_roles = await prisma.league_renewal_member_roles.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends league_renewal_member_rolesFindUniqueArgs>(args: SelectSubset<T, league_renewal_member_rolesFindUniqueArgs<ExtArgs>>): Prisma__league_renewal_member_rolesClient<$Result.GetResult<Prisma.$league_renewal_member_rolesPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one League_renewal_member_roles that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {league_renewal_member_rolesFindUniqueOrThrowArgs} args - Arguments to find a League_renewal_member_roles
+     * @example
+     * // Get one League_renewal_member_roles
+     * const league_renewal_member_roles = await prisma.league_renewal_member_roles.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends league_renewal_member_rolesFindUniqueOrThrowArgs>(args: SelectSubset<T, league_renewal_member_rolesFindUniqueOrThrowArgs<ExtArgs>>): Prisma__league_renewal_member_rolesClient<$Result.GetResult<Prisma.$league_renewal_member_rolesPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first League_renewal_member_roles that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {league_renewal_member_rolesFindFirstArgs} args - Arguments to find a League_renewal_member_roles
+     * @example
+     * // Get one League_renewal_member_roles
+     * const league_renewal_member_roles = await prisma.league_renewal_member_roles.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends league_renewal_member_rolesFindFirstArgs>(args?: SelectSubset<T, league_renewal_member_rolesFindFirstArgs<ExtArgs>>): Prisma__league_renewal_member_rolesClient<$Result.GetResult<Prisma.$league_renewal_member_rolesPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first League_renewal_member_roles that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {league_renewal_member_rolesFindFirstOrThrowArgs} args - Arguments to find a League_renewal_member_roles
+     * @example
+     * // Get one League_renewal_member_roles
+     * const league_renewal_member_roles = await prisma.league_renewal_member_roles.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends league_renewal_member_rolesFindFirstOrThrowArgs>(args?: SelectSubset<T, league_renewal_member_rolesFindFirstOrThrowArgs<ExtArgs>>): Prisma__league_renewal_member_rolesClient<$Result.GetResult<Prisma.$league_renewal_member_rolesPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more League_renewal_member_roles that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {league_renewal_member_rolesFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all League_renewal_member_roles
+     * const league_renewal_member_roles = await prisma.league_renewal_member_roles.findMany()
+     * 
+     * // Get first 10 League_renewal_member_roles
+     * const league_renewal_member_roles = await prisma.league_renewal_member_roles.findMany({ take: 10 })
+     * 
+     * // Only select the `renewal_member_role_id`
+     * const league_renewal_member_rolesWithRenewal_member_role_idOnly = await prisma.league_renewal_member_roles.findMany({ select: { renewal_member_role_id: true } })
+     * 
+     */
+    findMany<T extends league_renewal_member_rolesFindManyArgs>(args?: SelectSubset<T, league_renewal_member_rolesFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$league_renewal_member_rolesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a League_renewal_member_roles.
+     * @param {league_renewal_member_rolesCreateArgs} args - Arguments to create a League_renewal_member_roles.
+     * @example
+     * // Create one League_renewal_member_roles
+     * const League_renewal_member_roles = await prisma.league_renewal_member_roles.create({
+     *   data: {
+     *     // ... data to create a League_renewal_member_roles
+     *   }
+     * })
+     * 
+     */
+    create<T extends league_renewal_member_rolesCreateArgs>(args: SelectSubset<T, league_renewal_member_rolesCreateArgs<ExtArgs>>): Prisma__league_renewal_member_rolesClient<$Result.GetResult<Prisma.$league_renewal_member_rolesPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many League_renewal_member_roles.
+     * @param {league_renewal_member_rolesCreateManyArgs} args - Arguments to create many League_renewal_member_roles.
+     * @example
+     * // Create many League_renewal_member_roles
+     * const league_renewal_member_roles = await prisma.league_renewal_member_roles.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends league_renewal_member_rolesCreateManyArgs>(args?: SelectSubset<T, league_renewal_member_rolesCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many League_renewal_member_roles and returns the data saved in the database.
+     * @param {league_renewal_member_rolesCreateManyAndReturnArgs} args - Arguments to create many League_renewal_member_roles.
+     * @example
+     * // Create many League_renewal_member_roles
+     * const league_renewal_member_roles = await prisma.league_renewal_member_roles.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many League_renewal_member_roles and only return the `renewal_member_role_id`
+     * const league_renewal_member_rolesWithRenewal_member_role_idOnly = await prisma.league_renewal_member_roles.createManyAndReturn({
+     *   select: { renewal_member_role_id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends league_renewal_member_rolesCreateManyAndReturnArgs>(args?: SelectSubset<T, league_renewal_member_rolesCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$league_renewal_member_rolesPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a League_renewal_member_roles.
+     * @param {league_renewal_member_rolesDeleteArgs} args - Arguments to delete one League_renewal_member_roles.
+     * @example
+     * // Delete one League_renewal_member_roles
+     * const League_renewal_member_roles = await prisma.league_renewal_member_roles.delete({
+     *   where: {
+     *     // ... filter to delete one League_renewal_member_roles
+     *   }
+     * })
+     * 
+     */
+    delete<T extends league_renewal_member_rolesDeleteArgs>(args: SelectSubset<T, league_renewal_member_rolesDeleteArgs<ExtArgs>>): Prisma__league_renewal_member_rolesClient<$Result.GetResult<Prisma.$league_renewal_member_rolesPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one League_renewal_member_roles.
+     * @param {league_renewal_member_rolesUpdateArgs} args - Arguments to update one League_renewal_member_roles.
+     * @example
+     * // Update one League_renewal_member_roles
+     * const league_renewal_member_roles = await prisma.league_renewal_member_roles.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends league_renewal_member_rolesUpdateArgs>(args: SelectSubset<T, league_renewal_member_rolesUpdateArgs<ExtArgs>>): Prisma__league_renewal_member_rolesClient<$Result.GetResult<Prisma.$league_renewal_member_rolesPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more League_renewal_member_roles.
+     * @param {league_renewal_member_rolesDeleteManyArgs} args - Arguments to filter League_renewal_member_roles to delete.
+     * @example
+     * // Delete a few League_renewal_member_roles
+     * const { count } = await prisma.league_renewal_member_roles.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends league_renewal_member_rolesDeleteManyArgs>(args?: SelectSubset<T, league_renewal_member_rolesDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more League_renewal_member_roles.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {league_renewal_member_rolesUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many League_renewal_member_roles
+     * const league_renewal_member_roles = await prisma.league_renewal_member_roles.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends league_renewal_member_rolesUpdateManyArgs>(args: SelectSubset<T, league_renewal_member_rolesUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more League_renewal_member_roles and returns the data updated in the database.
+     * @param {league_renewal_member_rolesUpdateManyAndReturnArgs} args - Arguments to update many League_renewal_member_roles.
+     * @example
+     * // Update many League_renewal_member_roles
+     * const league_renewal_member_roles = await prisma.league_renewal_member_roles.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more League_renewal_member_roles and only return the `renewal_member_role_id`
+     * const league_renewal_member_rolesWithRenewal_member_role_idOnly = await prisma.league_renewal_member_roles.updateManyAndReturn({
+     *   select: { renewal_member_role_id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends league_renewal_member_rolesUpdateManyAndReturnArgs>(args: SelectSubset<T, league_renewal_member_rolesUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$league_renewal_member_rolesPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one League_renewal_member_roles.
+     * @param {league_renewal_member_rolesUpsertArgs} args - Arguments to update or create a League_renewal_member_roles.
+     * @example
+     * // Update or create a League_renewal_member_roles
+     * const league_renewal_member_roles = await prisma.league_renewal_member_roles.upsert({
+     *   create: {
+     *     // ... data to create a League_renewal_member_roles
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the League_renewal_member_roles we want to update
+     *   }
+     * })
+     */
+    upsert<T extends league_renewal_member_rolesUpsertArgs>(args: SelectSubset<T, league_renewal_member_rolesUpsertArgs<ExtArgs>>): Prisma__league_renewal_member_rolesClient<$Result.GetResult<Prisma.$league_renewal_member_rolesPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of League_renewal_member_roles.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {league_renewal_member_rolesCountArgs} args - Arguments to filter League_renewal_member_roles to count.
+     * @example
+     * // Count the number of League_renewal_member_roles
+     * const count = await prisma.league_renewal_member_roles.count({
+     *   where: {
+     *     // ... the filter for the League_renewal_member_roles we want to count
+     *   }
+     * })
+    **/
+    count<T extends league_renewal_member_rolesCountArgs>(
+      args?: Subset<T, league_renewal_member_rolesCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], League_renewal_member_rolesCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a League_renewal_member_roles.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {League_renewal_member_rolesAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends League_renewal_member_rolesAggregateArgs>(args: Subset<T, League_renewal_member_rolesAggregateArgs>): Prisma.PrismaPromise<GetLeague_renewal_member_rolesAggregateType<T>>
+
+    /**
+     * Group by League_renewal_member_roles.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {league_renewal_member_rolesGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends league_renewal_member_rolesGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: league_renewal_member_rolesGroupByArgs['orderBy'] }
+        : { orderBy?: league_renewal_member_rolesGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, league_renewal_member_rolesGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetLeague_renewal_member_rolesGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the league_renewal_member_roles model
+   */
+  readonly fields: league_renewal_member_rolesFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for league_renewal_member_roles.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__league_renewal_member_rolesClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    leagues<T extends leaguesDefaultArgs<ExtArgs> = {}>(args?: Subset<T, leaguesDefaultArgs<ExtArgs>>): Prisma__leaguesClient<$Result.GetResult<Prisma.$leaguesPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    people<T extends peopleDefaultArgs<ExtArgs> = {}>(args?: Subset<T, peopleDefaultArgs<ExtArgs>>): Prisma__peopleClient<$Result.GetResult<Prisma.$peoplePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the league_renewal_member_roles model
+   */
+  interface league_renewal_member_rolesFieldRefs {
+    readonly renewal_member_role_id: FieldRef<"league_renewal_member_roles", 'String'>
+    readonly league_id: FieldRef<"league_renewal_member_roles", 'Int'>
+    readonly user_id: FieldRef<"league_renewal_member_roles", 'Int'>
+    readonly role: FieldRef<"league_renewal_member_roles", 'MemberRole'>
+    readonly createdAt: FieldRef<"league_renewal_member_roles", 'DateTime'>
+    readonly updatedAt: FieldRef<"league_renewal_member_roles", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * league_renewal_member_roles findUnique
+   */
+  export type league_renewal_member_rolesFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the league_renewal_member_roles
+     */
+    select?: league_renewal_member_rolesSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the league_renewal_member_roles
+     */
+    omit?: league_renewal_member_rolesOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: league_renewal_member_rolesInclude<ExtArgs> | null
+    /**
+     * Filter, which league_renewal_member_roles to fetch.
+     */
+    where: league_renewal_member_rolesWhereUniqueInput
+    relationLoadStrategy?: RelationLoadStrategy
+  }
+
+  /**
+   * league_renewal_member_roles findUniqueOrThrow
+   */
+  export type league_renewal_member_rolesFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the league_renewal_member_roles
+     */
+    select?: league_renewal_member_rolesSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the league_renewal_member_roles
+     */
+    omit?: league_renewal_member_rolesOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: league_renewal_member_rolesInclude<ExtArgs> | null
+    /**
+     * Filter, which league_renewal_member_roles to fetch.
+     */
+    where: league_renewal_member_rolesWhereUniqueInput
+    relationLoadStrategy?: RelationLoadStrategy
+  }
+
+  /**
+   * league_renewal_member_roles findFirst
+   */
+  export type league_renewal_member_rolesFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the league_renewal_member_roles
+     */
+    select?: league_renewal_member_rolesSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the league_renewal_member_roles
+     */
+    omit?: league_renewal_member_rolesOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: league_renewal_member_rolesInclude<ExtArgs> | null
+    /**
+     * Filter, which league_renewal_member_roles to fetch.
+     */
+    where?: league_renewal_member_rolesWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of league_renewal_member_roles to fetch.
+     */
+    orderBy?: league_renewal_member_rolesOrderByWithRelationInput | league_renewal_member_rolesOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for league_renewal_member_roles.
+     */
+    cursor?: league_renewal_member_rolesWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` league_renewal_member_roles from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` league_renewal_member_roles.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of league_renewal_member_roles.
+     */
+    distinct?: League_renewal_member_rolesScalarFieldEnum | League_renewal_member_rolesScalarFieldEnum[]
+    relationLoadStrategy?: RelationLoadStrategy
+  }
+
+  /**
+   * league_renewal_member_roles findFirstOrThrow
+   */
+  export type league_renewal_member_rolesFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the league_renewal_member_roles
+     */
+    select?: league_renewal_member_rolesSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the league_renewal_member_roles
+     */
+    omit?: league_renewal_member_rolesOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: league_renewal_member_rolesInclude<ExtArgs> | null
+    /**
+     * Filter, which league_renewal_member_roles to fetch.
+     */
+    where?: league_renewal_member_rolesWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of league_renewal_member_roles to fetch.
+     */
+    orderBy?: league_renewal_member_rolesOrderByWithRelationInput | league_renewal_member_rolesOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for league_renewal_member_roles.
+     */
+    cursor?: league_renewal_member_rolesWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` league_renewal_member_roles from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` league_renewal_member_roles.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of league_renewal_member_roles.
+     */
+    distinct?: League_renewal_member_rolesScalarFieldEnum | League_renewal_member_rolesScalarFieldEnum[]
+    relationLoadStrategy?: RelationLoadStrategy
+  }
+
+  /**
+   * league_renewal_member_roles findMany
+   */
+  export type league_renewal_member_rolesFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the league_renewal_member_roles
+     */
+    select?: league_renewal_member_rolesSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the league_renewal_member_roles
+     */
+    omit?: league_renewal_member_rolesOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: league_renewal_member_rolesInclude<ExtArgs> | null
+    /**
+     * Filter, which league_renewal_member_roles to fetch.
+     */
+    where?: league_renewal_member_rolesWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of league_renewal_member_roles to fetch.
+     */
+    orderBy?: league_renewal_member_rolesOrderByWithRelationInput | league_renewal_member_rolesOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing league_renewal_member_roles.
+     */
+    cursor?: league_renewal_member_rolesWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` league_renewal_member_roles from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` league_renewal_member_roles.
+     */
+    skip?: number
+    distinct?: League_renewal_member_rolesScalarFieldEnum | League_renewal_member_rolesScalarFieldEnum[]
+    relationLoadStrategy?: RelationLoadStrategy
+  }
+
+  /**
+   * league_renewal_member_roles create
+   */
+  export type league_renewal_member_rolesCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the league_renewal_member_roles
+     */
+    select?: league_renewal_member_rolesSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the league_renewal_member_roles
+     */
+    omit?: league_renewal_member_rolesOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: league_renewal_member_rolesInclude<ExtArgs> | null
+    /**
+     * The data needed to create a league_renewal_member_roles.
+     */
+    data: XOR<league_renewal_member_rolesCreateInput, league_renewal_member_rolesUncheckedCreateInput>
+    relationLoadStrategy?: RelationLoadStrategy
+  }
+
+  /**
+   * league_renewal_member_roles createMany
+   */
+  export type league_renewal_member_rolesCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many league_renewal_member_roles.
+     */
+    data: league_renewal_member_rolesCreateManyInput | league_renewal_member_rolesCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * league_renewal_member_roles createManyAndReturn
+   */
+  export type league_renewal_member_rolesCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the league_renewal_member_roles
+     */
+    select?: league_renewal_member_rolesSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the league_renewal_member_roles
+     */
+    omit?: league_renewal_member_rolesOmit<ExtArgs> | null
+    /**
+     * The data used to create many league_renewal_member_roles.
+     */
+    data: league_renewal_member_rolesCreateManyInput | league_renewal_member_rolesCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: league_renewal_member_rolesIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * league_renewal_member_roles update
+   */
+  export type league_renewal_member_rolesUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the league_renewal_member_roles
+     */
+    select?: league_renewal_member_rolesSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the league_renewal_member_roles
+     */
+    omit?: league_renewal_member_rolesOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: league_renewal_member_rolesInclude<ExtArgs> | null
+    /**
+     * The data needed to update a league_renewal_member_roles.
+     */
+    data: XOR<league_renewal_member_rolesUpdateInput, league_renewal_member_rolesUncheckedUpdateInput>
+    /**
+     * Choose, which league_renewal_member_roles to update.
+     */
+    where: league_renewal_member_rolesWhereUniqueInput
+    relationLoadStrategy?: RelationLoadStrategy
+  }
+
+  /**
+   * league_renewal_member_roles updateMany
+   */
+  export type league_renewal_member_rolesUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update league_renewal_member_roles.
+     */
+    data: XOR<league_renewal_member_rolesUpdateManyMutationInput, league_renewal_member_rolesUncheckedUpdateManyInput>
+    /**
+     * Filter which league_renewal_member_roles to update
+     */
+    where?: league_renewal_member_rolesWhereInput
+    /**
+     * Limit how many league_renewal_member_roles to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * league_renewal_member_roles updateManyAndReturn
+   */
+  export type league_renewal_member_rolesUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the league_renewal_member_roles
+     */
+    select?: league_renewal_member_rolesSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the league_renewal_member_roles
+     */
+    omit?: league_renewal_member_rolesOmit<ExtArgs> | null
+    /**
+     * The data used to update league_renewal_member_roles.
+     */
+    data: XOR<league_renewal_member_rolesUpdateManyMutationInput, league_renewal_member_rolesUncheckedUpdateManyInput>
+    /**
+     * Filter which league_renewal_member_roles to update
+     */
+    where?: league_renewal_member_rolesWhereInput
+    /**
+     * Limit how many league_renewal_member_roles to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: league_renewal_member_rolesIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * league_renewal_member_roles upsert
+   */
+  export type league_renewal_member_rolesUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the league_renewal_member_roles
+     */
+    select?: league_renewal_member_rolesSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the league_renewal_member_roles
+     */
+    omit?: league_renewal_member_rolesOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: league_renewal_member_rolesInclude<ExtArgs> | null
+    /**
+     * The filter to search for the league_renewal_member_roles to update in case it exists.
+     */
+    where: league_renewal_member_rolesWhereUniqueInput
+    /**
+     * In case the league_renewal_member_roles found by the `where` argument doesn't exist, create a new league_renewal_member_roles with this data.
+     */
+    create: XOR<league_renewal_member_rolesCreateInput, league_renewal_member_rolesUncheckedCreateInput>
+    /**
+     * In case the league_renewal_member_roles was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<league_renewal_member_rolesUpdateInput, league_renewal_member_rolesUncheckedUpdateInput>
+    relationLoadStrategy?: RelationLoadStrategy
+  }
+
+  /**
+   * league_renewal_member_roles delete
+   */
+  export type league_renewal_member_rolesDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the league_renewal_member_roles
+     */
+    select?: league_renewal_member_rolesSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the league_renewal_member_roles
+     */
+    omit?: league_renewal_member_rolesOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: league_renewal_member_rolesInclude<ExtArgs> | null
+    /**
+     * Filter which league_renewal_member_roles to delete.
+     */
+    where: league_renewal_member_rolesWhereUniqueInput
+    relationLoadStrategy?: RelationLoadStrategy
+  }
+
+  /**
+   * league_renewal_member_roles deleteMany
+   */
+  export type league_renewal_member_rolesDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which league_renewal_member_roles to delete
+     */
+    where?: league_renewal_member_rolesWhereInput
+    /**
+     * Limit how many league_renewal_member_roles to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * league_renewal_member_roles without action
+   */
+  export type league_renewal_member_rolesDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the league_renewal_member_roles
+     */
+    select?: league_renewal_member_rolesSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the league_renewal_member_roles
+     */
+    omit?: league_renewal_member_rolesOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: league_renewal_member_rolesInclude<ExtArgs> | null
   }
 
 
@@ -10274,6 +13938,7 @@ export namespace Prisma {
     google_userid?: boolean
     supabase_id?: boolean
     leaguemembers?: boolean | people$leaguemembersArgs<ExtArgs>
+    league_renewal_member_roles?: boolean | people$league_renewal_member_rolesArgs<ExtArgs>
     leagues?: boolean | people$leaguesArgs<ExtArgs>
     picks?: boolean | people$picksArgs<ExtArgs>
     pushNotificationTokens?: boolean | people$pushNotificationTokensArgs<ExtArgs>
@@ -10325,6 +13990,7 @@ export namespace Prisma {
   export type peopleOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"uid" | "username" | "fname" | "lname" | "email" | "season" | "email2" | "google_photo_url" | "google_email" | "google_userid" | "supabase_id", ExtArgs["result"]["people"]>
   export type peopleInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     leaguemembers?: boolean | people$leaguemembersArgs<ExtArgs>
+    league_renewal_member_roles?: boolean | people$league_renewal_member_rolesArgs<ExtArgs>
     leagues?: boolean | people$leaguesArgs<ExtArgs>
     picks?: boolean | people$picksArgs<ExtArgs>
     pushNotificationTokens?: boolean | people$pushNotificationTokensArgs<ExtArgs>
@@ -10337,6 +14003,7 @@ export namespace Prisma {
     name: "people"
     objects: {
       leaguemembers: Prisma.$leaguemembersPayload<ExtArgs>[]
+      league_renewal_member_roles: Prisma.$league_renewal_member_rolesPayload<ExtArgs>[]
       leagues: Prisma.$leaguesPayload<ExtArgs>[]
       picks: Prisma.$picksPayload<ExtArgs>[]
       pushNotificationTokens: Prisma.$pushNotificationTokensPayload<ExtArgs>[]
@@ -10748,6 +14415,7 @@ export namespace Prisma {
   export interface Prisma__peopleClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     leaguemembers<T extends people$leaguemembersArgs<ExtArgs> = {}>(args?: Subset<T, people$leaguemembersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$leaguemembersPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    league_renewal_member_roles<T extends people$league_renewal_member_rolesArgs<ExtArgs> = {}>(args?: Subset<T, people$league_renewal_member_rolesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$league_renewal_member_rolesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     leagues<T extends people$leaguesArgs<ExtArgs> = {}>(args?: Subset<T, people$leaguesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$leaguesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     picks<T extends people$picksArgs<ExtArgs> = {}>(args?: Subset<T, people$picksArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$picksPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     pushNotificationTokens<T extends people$pushNotificationTokensArgs<ExtArgs> = {}>(args?: Subset<T, people$pushNotificationTokensArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$pushNotificationTokensPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -11209,6 +14877,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: LeaguemembersScalarFieldEnum | LeaguemembersScalarFieldEnum[]
+  }
+
+  /**
+   * people.league_renewal_member_roles
+   */
+  export type people$league_renewal_member_rolesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the league_renewal_member_roles
+     */
+    select?: league_renewal_member_rolesSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the league_renewal_member_roles
+     */
+    omit?: league_renewal_member_rolesOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: league_renewal_member_rolesInclude<ExtArgs> | null
+    where?: league_renewal_member_rolesWhereInput
+    orderBy?: league_renewal_member_rolesOrderByWithRelationInput | league_renewal_member_rolesOrderByWithRelationInput[]
+    cursor?: league_renewal_member_rolesWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: League_renewal_member_rolesScalarFieldEnum | League_renewal_member_rolesScalarFieldEnum[]
   }
 
   /**
@@ -19910,7 +23602,12 @@ export namespace Prisma {
     email_type: 'email_type',
     ts: 'ts',
     week: 'week',
-    resend_id: 'resend_id'
+    resend_id: 'resend_id',
+    delivery_status: 'delivery_status',
+    last_event_at: 'last_event_at',
+    delivered_at: 'delivered_at',
+    failed_at: 'failed_at',
+    failure_reason: 'failure_reason'
   };
 
   export type EmailLogsScalarFieldEnum = (typeof EmailLogsScalarFieldEnum)[keyof typeof EmailLogsScalarFieldEnum]
@@ -19922,6 +23619,19 @@ export namespace Prisma {
   };
 
   export type RelationLoadStrategy = (typeof RelationLoadStrategy)[keyof typeof RelationLoadStrategy]
+
+
+  export const EmailDeliveryEventsScalarFieldEnum: {
+    id: 'id',
+    svix_id: 'svix_id',
+    resend_id: 'resend_id',
+    event_type: 'event_type',
+    occurred_at: 'occurred_at',
+    received_at: 'received_at',
+    payload: 'payload'
+  };
+
+  export type EmailDeliveryEventsScalarFieldEnum = (typeof EmailDeliveryEventsScalarFieldEnum)[keyof typeof EmailDeliveryEventsScalarFieldEnum]
 
 
   export const WeekWinnersScalarFieldEnum: {
@@ -19988,6 +23698,16 @@ export namespace Prisma {
   export type LeaguemessagesScalarFieldEnum = (typeof LeaguemessagesScalarFieldEnum)[keyof typeof LeaguemessagesScalarFieldEnum]
 
 
+  export const League_message_read_stateScalarFieldEnum: {
+    membership_id: 'membership_id',
+    last_read_at: 'last_read_at',
+    last_read_message_id: 'last_read_message_id',
+    updatedAt: 'updatedAt'
+  };
+
+  export type League_message_read_stateScalarFieldEnum = (typeof League_message_read_stateScalarFieldEnum)[keyof typeof League_message_read_stateScalarFieldEnum]
+
+
   export const LeaguesScalarFieldEnum: {
     league_id: 'league_id',
     created_by_user_id: 'created_by_user_id',
@@ -20005,6 +23725,18 @@ export namespace Prisma {
   };
 
   export type LeaguesScalarFieldEnum = (typeof LeaguesScalarFieldEnum)[keyof typeof LeaguesScalarFieldEnum]
+
+
+  export const League_renewal_member_rolesScalarFieldEnum: {
+    renewal_member_role_id: 'renewal_member_role_id',
+    league_id: 'league_id',
+    user_id: 'user_id',
+    role: 'role',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type League_renewal_member_rolesScalarFieldEnum = (typeof League_renewal_member_rolesScalarFieldEnum)[keyof typeof League_renewal_member_rolesScalarFieldEnum]
 
 
   export const PeopleScalarFieldEnum: {
@@ -20137,6 +23869,13 @@ export namespace Prisma {
   export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
 
 
+  export const JsonNullValueInput: {
+    JsonNull: typeof JsonNull
+  };
+
+  export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
+
+
   export const QueryMode: {
     default: 'default',
     insensitive: 'insensitive'
@@ -20151,6 +23890,15 @@ export namespace Prisma {
   };
 
   export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
+
+
+  export const JsonNullValueFilter: {
+    DbNull: typeof DbNull,
+    JsonNull: typeof JsonNull,
+    AnyNull: typeof AnyNull
+  };
+
+  export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
 
 
   /**
@@ -20211,6 +23959,34 @@ export namespace Prisma {
    * Reference to a field of type 'DateTime[]'
    */
   export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'EmailDeliveryStatus'
+   */
+  export type EnumEmailDeliveryStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'EmailDeliveryStatus'>
+    
+
+
+  /**
+   * Reference to a field of type 'EmailDeliveryStatus[]'
+   */
+  export type ListEnumEmailDeliveryStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'EmailDeliveryStatus[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'Json'
+   */
+  export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
+    
+
+
+  /**
+   * Reference to a field of type 'QueryMode'
+   */
+  export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
     
 
 
@@ -20389,6 +24165,11 @@ export namespace Prisma {
     ts?: DateTimeFilter<"EmailLogs"> | Date | string
     week?: IntNullableFilter<"EmailLogs"> | number | null
     resend_id?: StringFilter<"EmailLogs"> | string
+    delivery_status?: EnumEmailDeliveryStatusFilter<"EmailLogs"> | $Enums.EmailDeliveryStatus
+    last_event_at?: DateTimeNullableFilter<"EmailLogs"> | Date | string | null
+    delivered_at?: DateTimeNullableFilter<"EmailLogs"> | Date | string | null
+    failed_at?: DateTimeNullableFilter<"EmailLogs"> | Date | string | null
+    failure_reason?: StringNullableFilter<"EmailLogs"> | string | null
     leagues?: XOR<LeaguesScalarRelationFilter, leaguesWhereInput>
     leaguemembers?: XOR<LeaguemembersScalarRelationFilter, leaguemembersWhereInput>
   }
@@ -20401,6 +24182,11 @@ export namespace Prisma {
     ts?: SortOrder
     week?: SortOrderInput | SortOrder
     resend_id?: SortOrder
+    delivery_status?: SortOrder
+    last_event_at?: SortOrderInput | SortOrder
+    delivered_at?: SortOrderInput | SortOrder
+    failed_at?: SortOrderInput | SortOrder
+    failure_reason?: SortOrderInput | SortOrder
     leagues?: leaguesOrderByWithRelationInput
     leaguemembers?: leaguemembersOrderByWithRelationInput
   }
@@ -20416,6 +24202,11 @@ export namespace Prisma {
     ts?: DateTimeFilter<"EmailLogs"> | Date | string
     week?: IntNullableFilter<"EmailLogs"> | number | null
     resend_id?: StringFilter<"EmailLogs"> | string
+    delivery_status?: EnumEmailDeliveryStatusFilter<"EmailLogs"> | $Enums.EmailDeliveryStatus
+    last_event_at?: DateTimeNullableFilter<"EmailLogs"> | Date | string | null
+    delivered_at?: DateTimeNullableFilter<"EmailLogs"> | Date | string | null
+    failed_at?: DateTimeNullableFilter<"EmailLogs"> | Date | string | null
+    failure_reason?: StringNullableFilter<"EmailLogs"> | string | null
     leagues?: XOR<LeaguesScalarRelationFilter, leaguesWhereInput>
     leaguemembers?: XOR<LeaguemembersScalarRelationFilter, leaguemembersWhereInput>
   }, "email_log_id">
@@ -20428,6 +24219,11 @@ export namespace Prisma {
     ts?: SortOrder
     week?: SortOrderInput | SortOrder
     resend_id?: SortOrder
+    delivery_status?: SortOrder
+    last_event_at?: SortOrderInput | SortOrder
+    delivered_at?: SortOrderInput | SortOrder
+    failed_at?: SortOrderInput | SortOrder
+    failure_reason?: SortOrderInput | SortOrder
     _count?: EmailLogsCountOrderByAggregateInput
     _avg?: EmailLogsAvgOrderByAggregateInput
     _max?: EmailLogsMaxOrderByAggregateInput
@@ -20446,6 +24242,73 @@ export namespace Prisma {
     ts?: DateTimeWithAggregatesFilter<"EmailLogs"> | Date | string
     week?: IntNullableWithAggregatesFilter<"EmailLogs"> | number | null
     resend_id?: StringWithAggregatesFilter<"EmailLogs"> | string
+    delivery_status?: EnumEmailDeliveryStatusWithAggregatesFilter<"EmailLogs"> | $Enums.EmailDeliveryStatus
+    last_event_at?: DateTimeNullableWithAggregatesFilter<"EmailLogs"> | Date | string | null
+    delivered_at?: DateTimeNullableWithAggregatesFilter<"EmailLogs"> | Date | string | null
+    failed_at?: DateTimeNullableWithAggregatesFilter<"EmailLogs"> | Date | string | null
+    failure_reason?: StringNullableWithAggregatesFilter<"EmailLogs"> | string | null
+  }
+
+  export type EmailDeliveryEventsWhereInput = {
+    AND?: EmailDeliveryEventsWhereInput | EmailDeliveryEventsWhereInput[]
+    OR?: EmailDeliveryEventsWhereInput[]
+    NOT?: EmailDeliveryEventsWhereInput | EmailDeliveryEventsWhereInput[]
+    id?: StringFilter<"EmailDeliveryEvents"> | string
+    svix_id?: StringFilter<"EmailDeliveryEvents"> | string
+    resend_id?: StringFilter<"EmailDeliveryEvents"> | string
+    event_type?: StringFilter<"EmailDeliveryEvents"> | string
+    occurred_at?: DateTimeFilter<"EmailDeliveryEvents"> | Date | string
+    received_at?: DateTimeFilter<"EmailDeliveryEvents"> | Date | string
+    payload?: JsonFilter<"EmailDeliveryEvents">
+  }
+
+  export type EmailDeliveryEventsOrderByWithRelationInput = {
+    id?: SortOrder
+    svix_id?: SortOrder
+    resend_id?: SortOrder
+    event_type?: SortOrder
+    occurred_at?: SortOrder
+    received_at?: SortOrder
+    payload?: SortOrder
+  }
+
+  export type EmailDeliveryEventsWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    svix_id?: string
+    AND?: EmailDeliveryEventsWhereInput | EmailDeliveryEventsWhereInput[]
+    OR?: EmailDeliveryEventsWhereInput[]
+    NOT?: EmailDeliveryEventsWhereInput | EmailDeliveryEventsWhereInput[]
+    resend_id?: StringFilter<"EmailDeliveryEvents"> | string
+    event_type?: StringFilter<"EmailDeliveryEvents"> | string
+    occurred_at?: DateTimeFilter<"EmailDeliveryEvents"> | Date | string
+    received_at?: DateTimeFilter<"EmailDeliveryEvents"> | Date | string
+    payload?: JsonFilter<"EmailDeliveryEvents">
+  }, "id" | "svix_id">
+
+  export type EmailDeliveryEventsOrderByWithAggregationInput = {
+    id?: SortOrder
+    svix_id?: SortOrder
+    resend_id?: SortOrder
+    event_type?: SortOrder
+    occurred_at?: SortOrder
+    received_at?: SortOrder
+    payload?: SortOrder
+    _count?: EmailDeliveryEventsCountOrderByAggregateInput
+    _max?: EmailDeliveryEventsMaxOrderByAggregateInput
+    _min?: EmailDeliveryEventsMinOrderByAggregateInput
+  }
+
+  export type EmailDeliveryEventsScalarWhereWithAggregatesInput = {
+    AND?: EmailDeliveryEventsScalarWhereWithAggregatesInput | EmailDeliveryEventsScalarWhereWithAggregatesInput[]
+    OR?: EmailDeliveryEventsScalarWhereWithAggregatesInput[]
+    NOT?: EmailDeliveryEventsScalarWhereWithAggregatesInput | EmailDeliveryEventsScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"EmailDeliveryEvents"> | string
+    svix_id?: StringWithAggregatesFilter<"EmailDeliveryEvents"> | string
+    resend_id?: StringWithAggregatesFilter<"EmailDeliveryEvents"> | string
+    event_type?: StringWithAggregatesFilter<"EmailDeliveryEvents"> | string
+    occurred_at?: DateTimeWithAggregatesFilter<"EmailDeliveryEvents"> | Date | string
+    received_at?: DateTimeWithAggregatesFilter<"EmailDeliveryEvents"> | Date | string
+    payload?: JsonWithAggregatesFilter<"EmailDeliveryEvents">
   }
 
   export type WeekWinnersWhereInput = {
@@ -20666,6 +24529,7 @@ export namespace Prisma {
     people?: XOR<PeopleScalarRelationFilter, peopleWhereInput>
     leagues?: XOR<LeaguesScalarRelationFilter, leaguesWhereInput>
     leaguemessages?: LeaguemessagesListRelationFilter
+    league_message_read_state?: XOR<League_message_read_stateNullableScalarRelationFilter, league_message_read_stateWhereInput> | null
     picks?: PicksListRelationFilter
     superbowl?: SuperbowlListRelationFilter
   }
@@ -20682,6 +24546,7 @@ export namespace Prisma {
     people?: peopleOrderByWithRelationInput
     leagues?: leaguesOrderByWithRelationInput
     leaguemessages?: leaguemessagesOrderByRelationAggregateInput
+    league_message_read_state?: league_message_read_stateOrderByWithRelationInput
     picks?: picksOrderByRelationAggregateInput
     superbowl?: superbowlOrderByRelationAggregateInput
   }
@@ -20701,6 +24566,7 @@ export namespace Prisma {
     people?: XOR<PeopleScalarRelationFilter, peopleWhereInput>
     leagues?: XOR<LeaguesScalarRelationFilter, leaguesWhereInput>
     leaguemessages?: LeaguemessagesListRelationFilter
+    league_message_read_state?: XOR<League_message_read_stateNullableScalarRelationFilter, league_message_read_stateWhereInput> | null
     picks?: PicksListRelationFilter
     superbowl?: SuperbowlListRelationFilter
   }, "membership_id">
@@ -20806,6 +24672,58 @@ export namespace Prisma {
     status?: EnumMessageStatusWithAggregatesFilter<"leaguemessages"> | $Enums.MessageStatus
   }
 
+  export type league_message_read_stateWhereInput = {
+    AND?: league_message_read_stateWhereInput | league_message_read_stateWhereInput[]
+    OR?: league_message_read_stateWhereInput[]
+    NOT?: league_message_read_stateWhereInput | league_message_read_stateWhereInput[]
+    membership_id?: IntFilter<"league_message_read_state"> | number
+    last_read_at?: DateTimeFilter<"league_message_read_state"> | Date | string
+    last_read_message_id?: StringFilter<"league_message_read_state"> | string
+    updatedAt?: DateTimeFilter<"league_message_read_state"> | Date | string
+    leaguemembers?: XOR<LeaguemembersScalarRelationFilter, leaguemembersWhereInput>
+  }
+
+  export type league_message_read_stateOrderByWithRelationInput = {
+    membership_id?: SortOrder
+    last_read_at?: SortOrder
+    last_read_message_id?: SortOrder
+    updatedAt?: SortOrder
+    leaguemembers?: leaguemembersOrderByWithRelationInput
+  }
+
+  export type league_message_read_stateWhereUniqueInput = Prisma.AtLeast<{
+    membership_id?: number
+    AND?: league_message_read_stateWhereInput | league_message_read_stateWhereInput[]
+    OR?: league_message_read_stateWhereInput[]
+    NOT?: league_message_read_stateWhereInput | league_message_read_stateWhereInput[]
+    last_read_at?: DateTimeFilter<"league_message_read_state"> | Date | string
+    last_read_message_id?: StringFilter<"league_message_read_state"> | string
+    updatedAt?: DateTimeFilter<"league_message_read_state"> | Date | string
+    leaguemembers?: XOR<LeaguemembersScalarRelationFilter, leaguemembersWhereInput>
+  }, "membership_id">
+
+  export type league_message_read_stateOrderByWithAggregationInput = {
+    membership_id?: SortOrder
+    last_read_at?: SortOrder
+    last_read_message_id?: SortOrder
+    updatedAt?: SortOrder
+    _count?: league_message_read_stateCountOrderByAggregateInput
+    _avg?: league_message_read_stateAvgOrderByAggregateInput
+    _max?: league_message_read_stateMaxOrderByAggregateInput
+    _min?: league_message_read_stateMinOrderByAggregateInput
+    _sum?: league_message_read_stateSumOrderByAggregateInput
+  }
+
+  export type league_message_read_stateScalarWhereWithAggregatesInput = {
+    AND?: league_message_read_stateScalarWhereWithAggregatesInput | league_message_read_stateScalarWhereWithAggregatesInput[]
+    OR?: league_message_read_stateScalarWhereWithAggregatesInput[]
+    NOT?: league_message_read_stateScalarWhereWithAggregatesInput | league_message_read_stateScalarWhereWithAggregatesInput[]
+    membership_id?: IntWithAggregatesFilter<"league_message_read_state"> | number
+    last_read_at?: DateTimeWithAggregatesFilter<"league_message_read_state"> | Date | string
+    last_read_message_id?: StringWithAggregatesFilter<"league_message_read_state"> | string
+    updatedAt?: DateTimeWithAggregatesFilter<"league_message_read_state"> | Date | string
+  }
+
   export type leaguesWhereInput = {
     AND?: leaguesWhereInput | leaguesWhereInput[]
     OR?: leaguesWhereInput[]
@@ -20827,6 +24745,7 @@ export namespace Prisma {
     WeekWinners?: WeekWinnersListRelationFilter
     leaguemembers?: LeaguemembersListRelationFilter
     leaguemessages?: LeaguemessagesListRelationFilter
+    league_renewal_member_roles?: League_renewal_member_rolesListRelationFilter
     people?: XOR<PeopleScalarRelationFilter, peopleWhereInput>
     prior_league?: XOR<LeaguesNullableScalarRelationFilter, leaguesWhereInput> | null
     future_leagues?: LeaguesListRelationFilter
@@ -20850,6 +24769,7 @@ export namespace Prisma {
     WeekWinners?: WeekWinnersOrderByRelationAggregateInput
     leaguemembers?: leaguemembersOrderByRelationAggregateInput
     leaguemessages?: leaguemessagesOrderByRelationAggregateInput
+    league_renewal_member_roles?: league_renewal_member_rolesOrderByRelationAggregateInput
     people?: peopleOrderByWithRelationInput
     prior_league?: leaguesOrderByWithRelationInput
     future_leagues?: leaguesOrderByRelationAggregateInput
@@ -20876,6 +24796,7 @@ export namespace Prisma {
     WeekWinners?: WeekWinnersListRelationFilter
     leaguemembers?: LeaguemembersListRelationFilter
     leaguemessages?: LeaguemessagesListRelationFilter
+    league_renewal_member_roles?: League_renewal_member_rolesListRelationFilter
     people?: XOR<PeopleScalarRelationFilter, peopleWhereInput>
     prior_league?: XOR<LeaguesNullableScalarRelationFilter, leaguesWhereInput> | null
     future_leagues?: LeaguesListRelationFilter
@@ -20921,6 +24842,72 @@ export namespace Prisma {
     status?: EnumLeagueStatusWithAggregatesFilter<"leagues"> | $Enums.LeagueStatus
   }
 
+  export type league_renewal_member_rolesWhereInput = {
+    AND?: league_renewal_member_rolesWhereInput | league_renewal_member_rolesWhereInput[]
+    OR?: league_renewal_member_rolesWhereInput[]
+    NOT?: league_renewal_member_rolesWhereInput | league_renewal_member_rolesWhereInput[]
+    renewal_member_role_id?: StringFilter<"league_renewal_member_roles"> | string
+    league_id?: IntFilter<"league_renewal_member_roles"> | number
+    user_id?: IntFilter<"league_renewal_member_roles"> | number
+    role?: EnumMemberRoleFilter<"league_renewal_member_roles"> | $Enums.MemberRole
+    createdAt?: DateTimeFilter<"league_renewal_member_roles"> | Date | string
+    updatedAt?: DateTimeFilter<"league_renewal_member_roles"> | Date | string
+    leagues?: XOR<LeaguesScalarRelationFilter, leaguesWhereInput>
+    people?: XOR<PeopleScalarRelationFilter, peopleWhereInput>
+  }
+
+  export type league_renewal_member_rolesOrderByWithRelationInput = {
+    renewal_member_role_id?: SortOrder
+    league_id?: SortOrder
+    user_id?: SortOrder
+    role?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    leagues?: leaguesOrderByWithRelationInput
+    people?: peopleOrderByWithRelationInput
+  }
+
+  export type league_renewal_member_rolesWhereUniqueInput = Prisma.AtLeast<{
+    renewal_member_role_id?: string
+    league_id_user_id?: league_renewal_member_rolesLeague_idUser_idCompoundUniqueInput
+    AND?: league_renewal_member_rolesWhereInput | league_renewal_member_rolesWhereInput[]
+    OR?: league_renewal_member_rolesWhereInput[]
+    NOT?: league_renewal_member_rolesWhereInput | league_renewal_member_rolesWhereInput[]
+    league_id?: IntFilter<"league_renewal_member_roles"> | number
+    user_id?: IntFilter<"league_renewal_member_roles"> | number
+    role?: EnumMemberRoleFilter<"league_renewal_member_roles"> | $Enums.MemberRole
+    createdAt?: DateTimeFilter<"league_renewal_member_roles"> | Date | string
+    updatedAt?: DateTimeFilter<"league_renewal_member_roles"> | Date | string
+    leagues?: XOR<LeaguesScalarRelationFilter, leaguesWhereInput>
+    people?: XOR<PeopleScalarRelationFilter, peopleWhereInput>
+  }, "renewal_member_role_id" | "league_id_user_id">
+
+  export type league_renewal_member_rolesOrderByWithAggregationInput = {
+    renewal_member_role_id?: SortOrder
+    league_id?: SortOrder
+    user_id?: SortOrder
+    role?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: league_renewal_member_rolesCountOrderByAggregateInput
+    _avg?: league_renewal_member_rolesAvgOrderByAggregateInput
+    _max?: league_renewal_member_rolesMaxOrderByAggregateInput
+    _min?: league_renewal_member_rolesMinOrderByAggregateInput
+    _sum?: league_renewal_member_rolesSumOrderByAggregateInput
+  }
+
+  export type league_renewal_member_rolesScalarWhereWithAggregatesInput = {
+    AND?: league_renewal_member_rolesScalarWhereWithAggregatesInput | league_renewal_member_rolesScalarWhereWithAggregatesInput[]
+    OR?: league_renewal_member_rolesScalarWhereWithAggregatesInput[]
+    NOT?: league_renewal_member_rolesScalarWhereWithAggregatesInput | league_renewal_member_rolesScalarWhereWithAggregatesInput[]
+    renewal_member_role_id?: StringWithAggregatesFilter<"league_renewal_member_roles"> | string
+    league_id?: IntWithAggregatesFilter<"league_renewal_member_roles"> | number
+    user_id?: IntWithAggregatesFilter<"league_renewal_member_roles"> | number
+    role?: EnumMemberRoleWithAggregatesFilter<"league_renewal_member_roles"> | $Enums.MemberRole
+    createdAt?: DateTimeWithAggregatesFilter<"league_renewal_member_roles"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"league_renewal_member_roles"> | Date | string
+  }
+
   export type peopleWhereInput = {
     AND?: peopleWhereInput | peopleWhereInput[]
     OR?: peopleWhereInput[]
@@ -20937,6 +24924,7 @@ export namespace Prisma {
     google_userid?: StringNullableFilter<"people"> | string | null
     supabase_id?: StringNullableFilter<"people"> | string | null
     leaguemembers?: LeaguemembersListRelationFilter
+    league_renewal_member_roles?: League_renewal_member_rolesListRelationFilter
     leagues?: LeaguesListRelationFilter
     picks?: PicksListRelationFilter
     pushNotificationTokens?: PushNotificationTokensListRelationFilter
@@ -20955,6 +24943,7 @@ export namespace Prisma {
     google_userid?: SortOrderInput | SortOrder
     supabase_id?: SortOrderInput | SortOrder
     leaguemembers?: leaguemembersOrderByRelationAggregateInput
+    league_renewal_member_roles?: league_renewal_member_rolesOrderByRelationAggregateInput
     leagues?: leaguesOrderByRelationAggregateInput
     picks?: picksOrderByRelationAggregateInput
     pushNotificationTokens?: pushNotificationTokensOrderByRelationAggregateInput
@@ -20976,6 +24965,7 @@ export namespace Prisma {
     google_email?: StringNullableFilter<"people"> | string | null
     google_userid?: StringNullableFilter<"people"> | string | null
     leaguemembers?: LeaguemembersListRelationFilter
+    league_renewal_member_roles?: League_renewal_member_rolesListRelationFilter
     leagues?: LeaguesListRelationFilter
     picks?: PicksListRelationFilter
     pushNotificationTokens?: PushNotificationTokensListRelationFilter
@@ -21611,6 +25601,11 @@ export namespace Prisma {
     ts?: Date | string
     week?: number | null
     resend_id: string
+    delivery_status?: $Enums.EmailDeliveryStatus
+    last_event_at?: Date | string | null
+    delivered_at?: Date | string | null
+    failed_at?: Date | string | null
+    failure_reason?: string | null
     leagues: leaguesCreateNestedOneWithoutEmailLogsInput
     leaguemembers: leaguemembersCreateNestedOneWithoutEmailLogsInput
   }
@@ -21623,6 +25618,11 @@ export namespace Prisma {
     ts?: Date | string
     week?: number | null
     resend_id: string
+    delivery_status?: $Enums.EmailDeliveryStatus
+    last_event_at?: Date | string | null
+    delivered_at?: Date | string | null
+    failed_at?: Date | string | null
+    failure_reason?: string | null
   }
 
   export type EmailLogsUpdateInput = {
@@ -21631,6 +25631,11 @@ export namespace Prisma {
     ts?: DateTimeFieldUpdateOperationsInput | Date | string
     week?: NullableIntFieldUpdateOperationsInput | number | null
     resend_id?: StringFieldUpdateOperationsInput | string
+    delivery_status?: EnumEmailDeliveryStatusFieldUpdateOperationsInput | $Enums.EmailDeliveryStatus
+    last_event_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    delivered_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    failed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    failure_reason?: NullableStringFieldUpdateOperationsInput | string | null
     leagues?: leaguesUpdateOneRequiredWithoutEmailLogsNestedInput
     leaguemembers?: leaguemembersUpdateOneRequiredWithoutEmailLogsNestedInput
   }
@@ -21643,6 +25648,11 @@ export namespace Prisma {
     ts?: DateTimeFieldUpdateOperationsInput | Date | string
     week?: NullableIntFieldUpdateOperationsInput | number | null
     resend_id?: StringFieldUpdateOperationsInput | string
+    delivery_status?: EnumEmailDeliveryStatusFieldUpdateOperationsInput | $Enums.EmailDeliveryStatus
+    last_event_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    delivered_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    failed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    failure_reason?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type EmailLogsCreateManyInput = {
@@ -21653,6 +25663,11 @@ export namespace Prisma {
     ts?: Date | string
     week?: number | null
     resend_id: string
+    delivery_status?: $Enums.EmailDeliveryStatus
+    last_event_at?: Date | string | null
+    delivered_at?: Date | string | null
+    failed_at?: Date | string | null
+    failure_reason?: string | null
   }
 
   export type EmailLogsUpdateManyMutationInput = {
@@ -21661,6 +25676,11 @@ export namespace Prisma {
     ts?: DateTimeFieldUpdateOperationsInput | Date | string
     week?: NullableIntFieldUpdateOperationsInput | number | null
     resend_id?: StringFieldUpdateOperationsInput | string
+    delivery_status?: EnumEmailDeliveryStatusFieldUpdateOperationsInput | $Enums.EmailDeliveryStatus
+    last_event_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    delivered_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    failed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    failure_reason?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type EmailLogsUncheckedUpdateManyInput = {
@@ -21671,6 +25691,81 @@ export namespace Prisma {
     ts?: DateTimeFieldUpdateOperationsInput | Date | string
     week?: NullableIntFieldUpdateOperationsInput | number | null
     resend_id?: StringFieldUpdateOperationsInput | string
+    delivery_status?: EnumEmailDeliveryStatusFieldUpdateOperationsInput | $Enums.EmailDeliveryStatus
+    last_event_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    delivered_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    failed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    failure_reason?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type EmailDeliveryEventsCreateInput = {
+    id?: string
+    svix_id: string
+    resend_id: string
+    event_type: string
+    occurred_at: Date | string
+    received_at?: Date | string
+    payload: JsonNullValueInput | InputJsonValue
+  }
+
+  export type EmailDeliveryEventsUncheckedCreateInput = {
+    id?: string
+    svix_id: string
+    resend_id: string
+    event_type: string
+    occurred_at: Date | string
+    received_at?: Date | string
+    payload: JsonNullValueInput | InputJsonValue
+  }
+
+  export type EmailDeliveryEventsUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    svix_id?: StringFieldUpdateOperationsInput | string
+    resend_id?: StringFieldUpdateOperationsInput | string
+    event_type?: StringFieldUpdateOperationsInput | string
+    occurred_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    received_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    payload?: JsonNullValueInput | InputJsonValue
+  }
+
+  export type EmailDeliveryEventsUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    svix_id?: StringFieldUpdateOperationsInput | string
+    resend_id?: StringFieldUpdateOperationsInput | string
+    event_type?: StringFieldUpdateOperationsInput | string
+    occurred_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    received_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    payload?: JsonNullValueInput | InputJsonValue
+  }
+
+  export type EmailDeliveryEventsCreateManyInput = {
+    id?: string
+    svix_id: string
+    resend_id: string
+    event_type: string
+    occurred_at: Date | string
+    received_at?: Date | string
+    payload: JsonNullValueInput | InputJsonValue
+  }
+
+  export type EmailDeliveryEventsUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    svix_id?: StringFieldUpdateOperationsInput | string
+    resend_id?: StringFieldUpdateOperationsInput | string
+    event_type?: StringFieldUpdateOperationsInput | string
+    occurred_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    received_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    payload?: JsonNullValueInput | InputJsonValue
+  }
+
+  export type EmailDeliveryEventsUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    svix_id?: StringFieldUpdateOperationsInput | string
+    resend_id?: StringFieldUpdateOperationsInput | string
+    event_type?: StringFieldUpdateOperationsInput | string
+    occurred_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    received_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    payload?: JsonNullValueInput | InputJsonValue
   }
 
   export type WeekWinnersCreateInput = {
@@ -21900,6 +25995,7 @@ export namespace Prisma {
     people: peopleCreateNestedOneWithoutLeaguemembersInput
     leagues: leaguesCreateNestedOneWithoutLeaguemembersInput
     leaguemessages?: leaguemessagesCreateNestedManyWithoutLeaguemembersInput
+    league_message_read_state?: league_message_read_stateCreateNestedOneWithoutLeaguemembersInput
     picks?: picksCreateNestedManyWithoutLeaguemembersInput
     superbowl?: superbowlCreateNestedManyWithoutLeaguemembersInput
   }
@@ -21914,6 +26010,7 @@ export namespace Prisma {
     EmailLogs?: EmailLogsUncheckedCreateNestedManyWithoutLeaguemembersInput
     WeekWinners?: WeekWinnersUncheckedCreateNestedManyWithoutLeaguemembersInput
     leaguemessages?: leaguemessagesUncheckedCreateNestedManyWithoutLeaguemembersInput
+    league_message_read_state?: league_message_read_stateUncheckedCreateNestedOneWithoutLeaguemembersInput
     picks?: picksUncheckedCreateNestedManyWithoutLeaguemembersInput
     superbowl?: superbowlUncheckedCreateNestedManyWithoutLeaguemembersInput
   }
@@ -21927,6 +26024,7 @@ export namespace Prisma {
     people?: peopleUpdateOneRequiredWithoutLeaguemembersNestedInput
     leagues?: leaguesUpdateOneRequiredWithoutLeaguemembersNestedInput
     leaguemessages?: leaguemessagesUpdateManyWithoutLeaguemembersNestedInput
+    league_message_read_state?: league_message_read_stateUpdateOneWithoutLeaguemembersNestedInput
     picks?: picksUpdateManyWithoutLeaguemembersNestedInput
     superbowl?: superbowlUpdateManyWithoutLeaguemembersNestedInput
   }
@@ -21941,6 +26039,7 @@ export namespace Prisma {
     EmailLogs?: EmailLogsUncheckedUpdateManyWithoutLeaguemembersNestedInput
     WeekWinners?: WeekWinnersUncheckedUpdateManyWithoutLeaguemembersNestedInput
     leaguemessages?: leaguemessagesUncheckedUpdateManyWithoutLeaguemembersNestedInput
+    league_message_read_state?: league_message_read_stateUncheckedUpdateOneWithoutLeaguemembersNestedInput
     picks?: picksUncheckedUpdateManyWithoutLeaguemembersNestedInput
     superbowl?: superbowlUncheckedUpdateManyWithoutLeaguemembersNestedInput
   }
@@ -22044,6 +26143,54 @@ export namespace Prisma {
     status?: EnumMessageStatusFieldUpdateOperationsInput | $Enums.MessageStatus
   }
 
+  export type league_message_read_stateCreateInput = {
+    last_read_at: Date | string
+    last_read_message_id: string
+    updatedAt?: Date | string
+    leaguemembers: leaguemembersCreateNestedOneWithoutLeague_message_read_stateInput
+  }
+
+  export type league_message_read_stateUncheckedCreateInput = {
+    membership_id: number
+    last_read_at: Date | string
+    last_read_message_id: string
+    updatedAt?: Date | string
+  }
+
+  export type league_message_read_stateUpdateInput = {
+    last_read_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    last_read_message_id?: StringFieldUpdateOperationsInput | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    leaguemembers?: leaguemembersUpdateOneRequiredWithoutLeague_message_read_stateNestedInput
+  }
+
+  export type league_message_read_stateUncheckedUpdateInput = {
+    membership_id?: IntFieldUpdateOperationsInput | number
+    last_read_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    last_read_message_id?: StringFieldUpdateOperationsInput | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type league_message_read_stateCreateManyInput = {
+    membership_id: number
+    last_read_at: Date | string
+    last_read_message_id: string
+    updatedAt?: Date | string
+  }
+
+  export type league_message_read_stateUpdateManyMutationInput = {
+    last_read_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    last_read_message_id?: StringFieldUpdateOperationsInput | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type league_message_read_stateUncheckedUpdateManyInput = {
+    membership_id?: IntFieldUpdateOperationsInput | number
+    last_read_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    last_read_message_id?: StringFieldUpdateOperationsInput | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type leaguesCreateInput = {
     name: string
     created_time?: Date | string
@@ -22059,6 +26206,7 @@ export namespace Prisma {
     WeekWinners?: WeekWinnersCreateNestedManyWithoutLeaguesInput
     leaguemembers?: leaguemembersCreateNestedManyWithoutLeaguesInput
     leaguemessages?: leaguemessagesCreateNestedManyWithoutLeaguesInput
+    league_renewal_member_roles?: league_renewal_member_rolesCreateNestedManyWithoutLeaguesInput
     people: peopleCreateNestedOneWithoutLeaguesInput
     prior_league?: leaguesCreateNestedOneWithoutFuture_leaguesInput
     future_leagues?: leaguesCreateNestedManyWithoutPrior_leagueInput
@@ -22082,6 +26230,7 @@ export namespace Prisma {
     WeekWinners?: WeekWinnersUncheckedCreateNestedManyWithoutLeaguesInput
     leaguemembers?: leaguemembersUncheckedCreateNestedManyWithoutLeaguesInput
     leaguemessages?: leaguemessagesUncheckedCreateNestedManyWithoutLeaguesInput
+    league_renewal_member_roles?: league_renewal_member_rolesUncheckedCreateNestedManyWithoutLeaguesInput
     future_leagues?: leaguesUncheckedCreateNestedManyWithoutPrior_leagueInput
   }
 
@@ -22100,6 +26249,7 @@ export namespace Prisma {
     WeekWinners?: WeekWinnersUpdateManyWithoutLeaguesNestedInput
     leaguemembers?: leaguemembersUpdateManyWithoutLeaguesNestedInput
     leaguemessages?: leaguemessagesUpdateManyWithoutLeaguesNestedInput
+    league_renewal_member_roles?: league_renewal_member_rolesUpdateManyWithoutLeaguesNestedInput
     people?: peopleUpdateOneRequiredWithoutLeaguesNestedInput
     prior_league?: leaguesUpdateOneWithoutFuture_leaguesNestedInput
     future_leagues?: leaguesUpdateManyWithoutPrior_leagueNestedInput
@@ -22123,6 +26273,7 @@ export namespace Prisma {
     WeekWinners?: WeekWinnersUncheckedUpdateManyWithoutLeaguesNestedInput
     leaguemembers?: leaguemembersUncheckedUpdateManyWithoutLeaguesNestedInput
     leaguemessages?: leaguemessagesUncheckedUpdateManyWithoutLeaguesNestedInput
+    league_renewal_member_roles?: league_renewal_member_rolesUncheckedUpdateManyWithoutLeaguesNestedInput
     future_leagues?: leaguesUncheckedUpdateManyWithoutPrior_leagueNestedInput
   }
 
@@ -22171,6 +26322,67 @@ export namespace Prisma {
     status?: EnumLeagueStatusFieldUpdateOperationsInput | $Enums.LeagueStatus
   }
 
+  export type league_renewal_member_rolesCreateInput = {
+    renewal_member_role_id?: string
+    role?: $Enums.MemberRole
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    leagues: leaguesCreateNestedOneWithoutLeague_renewal_member_rolesInput
+    people: peopleCreateNestedOneWithoutLeague_renewal_member_rolesInput
+  }
+
+  export type league_renewal_member_rolesUncheckedCreateInput = {
+    renewal_member_role_id?: string
+    league_id: number
+    user_id: number
+    role?: $Enums.MemberRole
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type league_renewal_member_rolesUpdateInput = {
+    renewal_member_role_id?: StringFieldUpdateOperationsInput | string
+    role?: EnumMemberRoleFieldUpdateOperationsInput | $Enums.MemberRole
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    leagues?: leaguesUpdateOneRequiredWithoutLeague_renewal_member_rolesNestedInput
+    people?: peopleUpdateOneRequiredWithoutLeague_renewal_member_rolesNestedInput
+  }
+
+  export type league_renewal_member_rolesUncheckedUpdateInput = {
+    renewal_member_role_id?: StringFieldUpdateOperationsInput | string
+    league_id?: IntFieldUpdateOperationsInput | number
+    user_id?: IntFieldUpdateOperationsInput | number
+    role?: EnumMemberRoleFieldUpdateOperationsInput | $Enums.MemberRole
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type league_renewal_member_rolesCreateManyInput = {
+    renewal_member_role_id?: string
+    league_id: number
+    user_id: number
+    role?: $Enums.MemberRole
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type league_renewal_member_rolesUpdateManyMutationInput = {
+    renewal_member_role_id?: StringFieldUpdateOperationsInput | string
+    role?: EnumMemberRoleFieldUpdateOperationsInput | $Enums.MemberRole
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type league_renewal_member_rolesUncheckedUpdateManyInput = {
+    renewal_member_role_id?: StringFieldUpdateOperationsInput | string
+    league_id?: IntFieldUpdateOperationsInput | number
+    user_id?: IntFieldUpdateOperationsInput | number
+    role?: EnumMemberRoleFieldUpdateOperationsInput | $Enums.MemberRole
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type peopleCreateInput = {
     username: string
     fname: string
@@ -22183,6 +26395,7 @@ export namespace Prisma {
     google_userid?: string | null
     supabase_id?: string | null
     leaguemembers?: leaguemembersCreateNestedManyWithoutPeopleInput
+    league_renewal_member_roles?: league_renewal_member_rolesCreateNestedManyWithoutPeopleInput
     leagues?: leaguesCreateNestedManyWithoutPeopleInput
     picks?: picksCreateNestedManyWithoutPeopleInput
     pushNotificationTokens?: pushNotificationTokensCreateNestedManyWithoutPeopleInput
@@ -22201,6 +26414,7 @@ export namespace Prisma {
     google_userid?: string | null
     supabase_id?: string | null
     leaguemembers?: leaguemembersUncheckedCreateNestedManyWithoutPeopleInput
+    league_renewal_member_roles?: league_renewal_member_rolesUncheckedCreateNestedManyWithoutPeopleInput
     leagues?: leaguesUncheckedCreateNestedManyWithoutPeopleInput
     picks?: picksUncheckedCreateNestedManyWithoutPeopleInput
     pushNotificationTokens?: pushNotificationTokensUncheckedCreateNestedManyWithoutPeopleInput
@@ -22218,6 +26432,7 @@ export namespace Prisma {
     google_userid?: NullableStringFieldUpdateOperationsInput | string | null
     supabase_id?: NullableStringFieldUpdateOperationsInput | string | null
     leaguemembers?: leaguemembersUpdateManyWithoutPeopleNestedInput
+    league_renewal_member_roles?: league_renewal_member_rolesUpdateManyWithoutPeopleNestedInput
     leagues?: leaguesUpdateManyWithoutPeopleNestedInput
     picks?: picksUpdateManyWithoutPeopleNestedInput
     pushNotificationTokens?: pushNotificationTokensUpdateManyWithoutPeopleNestedInput
@@ -22236,6 +26451,7 @@ export namespace Prisma {
     google_userid?: NullableStringFieldUpdateOperationsInput | string | null
     supabase_id?: NullableStringFieldUpdateOperationsInput | string | null
     leaguemembers?: leaguemembersUncheckedUpdateManyWithoutPeopleNestedInput
+    league_renewal_member_roles?: league_renewal_member_rolesUncheckedUpdateManyWithoutPeopleNestedInput
     leagues?: leaguesUncheckedUpdateManyWithoutPeopleNestedInput
     picks?: picksUncheckedUpdateManyWithoutPeopleNestedInput
     pushNotificationTokens?: pushNotificationTokensUncheckedUpdateManyWithoutPeopleNestedInput
@@ -22940,6 +27156,39 @@ export namespace Prisma {
     not?: NestedIntNullableFilter<$PrismaModel> | number | null
   }
 
+  export type EnumEmailDeliveryStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.EmailDeliveryStatus | EnumEmailDeliveryStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.EmailDeliveryStatus[] | ListEnumEmailDeliveryStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.EmailDeliveryStatus[] | ListEnumEmailDeliveryStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumEmailDeliveryStatusFilter<$PrismaModel> | $Enums.EmailDeliveryStatus
+  }
+
+  export type DateTimeNullableFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
+  }
+
+  export type StringNullableFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    mode?: QueryMode
+    not?: NestedStringNullableFilter<$PrismaModel> | string | null
+  }
+
   export type LeaguesScalarRelationFilter = {
     is?: leaguesWhereInput
     isNot?: leaguesWhereInput
@@ -22963,6 +27212,11 @@ export namespace Prisma {
     ts?: SortOrder
     week?: SortOrder
     resend_id?: SortOrder
+    delivery_status?: SortOrder
+    last_event_at?: SortOrder
+    delivered_at?: SortOrder
+    failed_at?: SortOrder
+    failure_reason?: SortOrder
   }
 
   export type EmailLogsAvgOrderByAggregateInput = {
@@ -22979,6 +27233,11 @@ export namespace Prisma {
     ts?: SortOrder
     week?: SortOrder
     resend_id?: SortOrder
+    delivery_status?: SortOrder
+    last_event_at?: SortOrder
+    delivered_at?: SortOrder
+    failed_at?: SortOrder
+    failure_reason?: SortOrder
   }
 
   export type EmailLogsMinOrderByAggregateInput = {
@@ -22989,6 +27248,11 @@ export namespace Prisma {
     ts?: SortOrder
     week?: SortOrder
     resend_id?: SortOrder
+    delivery_status?: SortOrder
+    last_event_at?: SortOrder
+    delivered_at?: SortOrder
+    failed_at?: SortOrder
+    failure_reason?: SortOrder
   }
 
   export type EmailLogsSumOrderByAggregateInput = {
@@ -23071,6 +27335,125 @@ export namespace Prisma {
     _max?: NestedIntNullableFilter<$PrismaModel>
   }
 
+  export type EnumEmailDeliveryStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.EmailDeliveryStatus | EnumEmailDeliveryStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.EmailDeliveryStatus[] | ListEnumEmailDeliveryStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.EmailDeliveryStatus[] | ListEnumEmailDeliveryStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumEmailDeliveryStatusWithAggregatesFilter<$PrismaModel> | $Enums.EmailDeliveryStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumEmailDeliveryStatusFilter<$PrismaModel>
+    _max?: NestedEnumEmailDeliveryStatusFilter<$PrismaModel>
+  }
+
+  export type DateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedDateTimeNullableFilter<$PrismaModel>
+    _max?: NestedDateTimeNullableFilter<$PrismaModel>
+  }
+
+  export type StringNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    mode?: QueryMode
+    not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedStringNullableFilter<$PrismaModel>
+    _max?: NestedStringNullableFilter<$PrismaModel>
+  }
+  export type JsonFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
+
+  export type EmailDeliveryEventsCountOrderByAggregateInput = {
+    id?: SortOrder
+    svix_id?: SortOrder
+    resend_id?: SortOrder
+    event_type?: SortOrder
+    occurred_at?: SortOrder
+    received_at?: SortOrder
+    payload?: SortOrder
+  }
+
+  export type EmailDeliveryEventsMaxOrderByAggregateInput = {
+    id?: SortOrder
+    svix_id?: SortOrder
+    resend_id?: SortOrder
+    event_type?: SortOrder
+    occurred_at?: SortOrder
+    received_at?: SortOrder
+  }
+
+  export type EmailDeliveryEventsMinOrderByAggregateInput = {
+    id?: SortOrder
+    svix_id?: SortOrder
+    resend_id?: SortOrder
+    event_type?: SortOrder
+    occurred_at?: SortOrder
+    received_at?: SortOrder
+  }
+  export type JsonWithAggregatesFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonWithAggregatesFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonWithAggregatesFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonWithAggregatesFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedJsonFilter<$PrismaModel>
+    _max?: NestedJsonFilter<$PrismaModel>
+  }
+
   export type WeekWinnersCountOrderByAggregateInput = {
     id?: SortOrder
     league_id?: SortOrder
@@ -23119,21 +27502,6 @@ export namespace Prisma {
   export type BoolNullableFilter<$PrismaModel = never> = {
     equals?: boolean | BooleanFieldRefInput<$PrismaModel> | null
     not?: NestedBoolNullableFilter<$PrismaModel> | boolean | null
-  }
-
-  export type StringNullableFilter<$PrismaModel = never> = {
-    equals?: string | StringFieldRefInput<$PrismaModel> | null
-    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    lt?: string | StringFieldRefInput<$PrismaModel>
-    lte?: string | StringFieldRefInput<$PrismaModel>
-    gt?: string | StringFieldRefInput<$PrismaModel>
-    gte?: string | StringFieldRefInput<$PrismaModel>
-    contains?: string | StringFieldRefInput<$PrismaModel>
-    startsWith?: string | StringFieldRefInput<$PrismaModel>
-    endsWith?: string | StringFieldRefInput<$PrismaModel>
-    mode?: QueryMode
-    not?: NestedStringNullableFilter<$PrismaModel> | string | null
   }
 
   export type TeamsScalarRelationFilter = {
@@ -23260,24 +27628,6 @@ export namespace Prisma {
     _max?: NestedBoolNullableFilter<$PrismaModel>
   }
 
-  export type StringNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: string | StringFieldRefInput<$PrismaModel> | null
-    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    lt?: string | StringFieldRefInput<$PrismaModel>
-    lte?: string | StringFieldRefInput<$PrismaModel>
-    gt?: string | StringFieldRefInput<$PrismaModel>
-    gte?: string | StringFieldRefInput<$PrismaModel>
-    contains?: string | StringFieldRefInput<$PrismaModel>
-    startsWith?: string | StringFieldRefInput<$PrismaModel>
-    endsWith?: string | StringFieldRefInput<$PrismaModel>
-    mode?: QueryMode
-    not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedStringNullableFilter<$PrismaModel>
-    _max?: NestedStringNullableFilter<$PrismaModel>
-  }
-
   export type EnumMemberRoleNullableFilter<$PrismaModel = never> = {
     equals?: $Enums.MemberRole | EnumMemberRoleFieldRefInput<$PrismaModel> | null
     in?: $Enums.MemberRole[] | ListEnumMemberRoleFieldRefInput<$PrismaModel> | null
@@ -23306,6 +27656,11 @@ export namespace Prisma {
     every?: leaguemessagesWhereInput
     some?: leaguemessagesWhereInput
     none?: leaguemessagesWhereInput
+  }
+
+  export type League_message_read_stateNullableScalarRelationFilter = {
+    is?: league_message_read_stateWhereInput | null
+    isNot?: league_message_read_stateWhereInput | null
   }
 
   export type SuperbowlListRelationFilter = {
@@ -23458,6 +27813,35 @@ export namespace Prisma {
     _max?: NestedEnumMessageStatusFilter<$PrismaModel>
   }
 
+  export type league_message_read_stateCountOrderByAggregateInput = {
+    membership_id?: SortOrder
+    last_read_at?: SortOrder
+    last_read_message_id?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type league_message_read_stateAvgOrderByAggregateInput = {
+    membership_id?: SortOrder
+  }
+
+  export type league_message_read_stateMaxOrderByAggregateInput = {
+    membership_id?: SortOrder
+    last_read_at?: SortOrder
+    last_read_message_id?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type league_message_read_stateMinOrderByAggregateInput = {
+    membership_id?: SortOrder
+    last_read_at?: SortOrder
+    last_read_message_id?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type league_message_read_stateSumOrderByAggregateInput = {
+    membership_id?: SortOrder
+  }
+
   export type EnumLatePolicyNullableFilter<$PrismaModel = never> = {
     equals?: $Enums.LatePolicy | EnumLatePolicyFieldRefInput<$PrismaModel> | null
     in?: $Enums.LatePolicy[] | ListEnumLatePolicyFieldRefInput<$PrismaModel> | null
@@ -23499,6 +27883,12 @@ export namespace Prisma {
     none?: leaguemembersWhereInput
   }
 
+  export type League_renewal_member_rolesListRelationFilter = {
+    every?: league_renewal_member_rolesWhereInput
+    some?: league_renewal_member_rolesWhereInput
+    none?: league_renewal_member_rolesWhereInput
+  }
+
   export type LeaguesNullableScalarRelationFilter = {
     is?: leaguesWhereInput | null
     isNot?: leaguesWhereInput | null
@@ -23511,6 +27901,10 @@ export namespace Prisma {
   }
 
   export type leaguemembersOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type league_renewal_member_rolesOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -23628,6 +28022,65 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumLeagueStatusFilter<$PrismaModel>
     _max?: NestedEnumLeagueStatusFilter<$PrismaModel>
+  }
+
+  export type EnumMemberRoleFilter<$PrismaModel = never> = {
+    equals?: $Enums.MemberRole | EnumMemberRoleFieldRefInput<$PrismaModel>
+    in?: $Enums.MemberRole[] | ListEnumMemberRoleFieldRefInput<$PrismaModel>
+    notIn?: $Enums.MemberRole[] | ListEnumMemberRoleFieldRefInput<$PrismaModel>
+    not?: NestedEnumMemberRoleFilter<$PrismaModel> | $Enums.MemberRole
+  }
+
+  export type league_renewal_member_rolesLeague_idUser_idCompoundUniqueInput = {
+    league_id: number
+    user_id: number
+  }
+
+  export type league_renewal_member_rolesCountOrderByAggregateInput = {
+    renewal_member_role_id?: SortOrder
+    league_id?: SortOrder
+    user_id?: SortOrder
+    role?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type league_renewal_member_rolesAvgOrderByAggregateInput = {
+    league_id?: SortOrder
+    user_id?: SortOrder
+  }
+
+  export type league_renewal_member_rolesMaxOrderByAggregateInput = {
+    renewal_member_role_id?: SortOrder
+    league_id?: SortOrder
+    user_id?: SortOrder
+    role?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type league_renewal_member_rolesMinOrderByAggregateInput = {
+    renewal_member_role_id?: SortOrder
+    league_id?: SortOrder
+    user_id?: SortOrder
+    role?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type league_renewal_member_rolesSumOrderByAggregateInput = {
+    league_id?: SortOrder
+    user_id?: SortOrder
+  }
+
+  export type EnumMemberRoleWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.MemberRole | EnumMemberRoleFieldRefInput<$PrismaModel>
+    in?: $Enums.MemberRole[] | ListEnumMemberRoleFieldRefInput<$PrismaModel>
+    notIn?: $Enums.MemberRole[] | ListEnumMemberRoleFieldRefInput<$PrismaModel>
+    not?: NestedEnumMemberRoleWithAggregatesFilter<$PrismaModel> | $Enums.MemberRole
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumMemberRoleFilter<$PrismaModel>
+    _max?: NestedEnumMemberRoleFilter<$PrismaModel>
   }
 
   export type PushNotificationTokensListRelationFilter = {
@@ -23837,17 +28290,6 @@ export namespace Prisma {
     member_id?: SortOrder
   }
 
-  export type DateTimeNullableFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
-  }
-
   export type superbowlCountOrderByAggregateInput = {
     pickid?: SortOrder
     uid?: SortOrder
@@ -23899,20 +28341,6 @@ export namespace Prisma {
     score?: SortOrder
     season?: SortOrder
     member_id?: SortOrder
-  }
-
-  export type DateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedDateTimeNullableFilter<$PrismaModel>
-    _max?: NestedDateTimeNullableFilter<$PrismaModel>
   }
 
   export type superbowlsquaresCountOrderByAggregateInput = {
@@ -24234,6 +28662,18 @@ export namespace Prisma {
     divide?: number
   }
 
+  export type EnumEmailDeliveryStatusFieldUpdateOperationsInput = {
+    set?: $Enums.EmailDeliveryStatus
+  }
+
+  export type NullableDateTimeFieldUpdateOperationsInput = {
+    set?: Date | string | null
+  }
+
+  export type NullableStringFieldUpdateOperationsInput = {
+    set?: string | null
+  }
+
   export type leaguesUpdateOneRequiredWithoutEmailLogsNestedInput = {
     create?: XOR<leaguesCreateWithoutEmailLogsInput, leaguesUncheckedCreateWithoutEmailLogsInput>
     connectOrCreate?: leaguesCreateOrConnectWithoutEmailLogsInput
@@ -24316,10 +28756,6 @@ export namespace Prisma {
     set?: boolean | null
   }
 
-  export type NullableStringFieldUpdateOperationsInput = {
-    set?: string | null
-  }
-
   export type teamsUpdateOneRequiredWithoutGames_games_homeToteamsNestedInput = {
     create?: XOR<teamsCreateWithoutGames_games_homeToteamsInput, teamsUncheckedCreateWithoutGames_games_homeToteamsInput>
     connectOrCreate?: teamsCreateOrConnectWithoutGames_games_homeToteamsInput
@@ -24397,6 +28833,12 @@ export namespace Prisma {
     connect?: leaguemessagesWhereUniqueInput | leaguemessagesWhereUniqueInput[]
   }
 
+  export type league_message_read_stateCreateNestedOneWithoutLeaguemembersInput = {
+    create?: XOR<league_message_read_stateCreateWithoutLeaguemembersInput, league_message_read_stateUncheckedCreateWithoutLeaguemembersInput>
+    connectOrCreate?: league_message_read_stateCreateOrConnectWithoutLeaguemembersInput
+    connect?: league_message_read_stateWhereUniqueInput
+  }
+
   export type picksCreateNestedManyWithoutLeaguemembersInput = {
     create?: XOR<picksCreateWithoutLeaguemembersInput, picksUncheckedCreateWithoutLeaguemembersInput> | picksCreateWithoutLeaguemembersInput[] | picksUncheckedCreateWithoutLeaguemembersInput[]
     connectOrCreate?: picksCreateOrConnectWithoutLeaguemembersInput | picksCreateOrConnectWithoutLeaguemembersInput[]
@@ -24430,6 +28872,12 @@ export namespace Prisma {
     connectOrCreate?: leaguemessagesCreateOrConnectWithoutLeaguemembersInput | leaguemessagesCreateOrConnectWithoutLeaguemembersInput[]
     createMany?: leaguemessagesCreateManyLeaguemembersInputEnvelope
     connect?: leaguemessagesWhereUniqueInput | leaguemessagesWhereUniqueInput[]
+  }
+
+  export type league_message_read_stateUncheckedCreateNestedOneWithoutLeaguemembersInput = {
+    create?: XOR<league_message_read_stateCreateWithoutLeaguemembersInput, league_message_read_stateUncheckedCreateWithoutLeaguemembersInput>
+    connectOrCreate?: league_message_read_stateCreateOrConnectWithoutLeaguemembersInput
+    connect?: league_message_read_stateWhereUniqueInput
   }
 
   export type picksUncheckedCreateNestedManyWithoutLeaguemembersInput = {
@@ -24508,6 +28956,16 @@ export namespace Prisma {
     deleteMany?: leaguemessagesScalarWhereInput | leaguemessagesScalarWhereInput[]
   }
 
+  export type league_message_read_stateUpdateOneWithoutLeaguemembersNestedInput = {
+    create?: XOR<league_message_read_stateCreateWithoutLeaguemembersInput, league_message_read_stateUncheckedCreateWithoutLeaguemembersInput>
+    connectOrCreate?: league_message_read_stateCreateOrConnectWithoutLeaguemembersInput
+    upsert?: league_message_read_stateUpsertWithoutLeaguemembersInput
+    disconnect?: league_message_read_stateWhereInput | boolean
+    delete?: league_message_read_stateWhereInput | boolean
+    connect?: league_message_read_stateWhereUniqueInput
+    update?: XOR<XOR<league_message_read_stateUpdateToOneWithWhereWithoutLeaguemembersInput, league_message_read_stateUpdateWithoutLeaguemembersInput>, league_message_read_stateUncheckedUpdateWithoutLeaguemembersInput>
+  }
+
   export type picksUpdateManyWithoutLeaguemembersNestedInput = {
     create?: XOR<picksCreateWithoutLeaguemembersInput, picksUncheckedCreateWithoutLeaguemembersInput> | picksCreateWithoutLeaguemembersInput[] | picksUncheckedCreateWithoutLeaguemembersInput[]
     connectOrCreate?: picksCreateOrConnectWithoutLeaguemembersInput | picksCreateOrConnectWithoutLeaguemembersInput[]
@@ -24578,6 +29036,16 @@ export namespace Prisma {
     deleteMany?: leaguemessagesScalarWhereInput | leaguemessagesScalarWhereInput[]
   }
 
+  export type league_message_read_stateUncheckedUpdateOneWithoutLeaguemembersNestedInput = {
+    create?: XOR<league_message_read_stateCreateWithoutLeaguemembersInput, league_message_read_stateUncheckedCreateWithoutLeaguemembersInput>
+    connectOrCreate?: league_message_read_stateCreateOrConnectWithoutLeaguemembersInput
+    upsert?: league_message_read_stateUpsertWithoutLeaguemembersInput
+    disconnect?: league_message_read_stateWhereInput | boolean
+    delete?: league_message_read_stateWhereInput | boolean
+    connect?: league_message_read_stateWhereUniqueInput
+    update?: XOR<XOR<league_message_read_stateUpdateToOneWithWhereWithoutLeaguemembersInput, league_message_read_stateUpdateWithoutLeaguemembersInput>, league_message_read_stateUncheckedUpdateWithoutLeaguemembersInput>
+  }
+
   export type picksUncheckedUpdateManyWithoutLeaguemembersNestedInput = {
     create?: XOR<picksCreateWithoutLeaguemembersInput, picksUncheckedCreateWithoutLeaguemembersInput> | picksCreateWithoutLeaguemembersInput[] | picksUncheckedCreateWithoutLeaguemembersInput[]
     connectOrCreate?: picksCreateOrConnectWithoutLeaguemembersInput | picksCreateOrConnectWithoutLeaguemembersInput[]
@@ -24642,6 +29110,20 @@ export namespace Prisma {
     update?: XOR<XOR<leaguemembersUpdateToOneWithWhereWithoutLeaguemessagesInput, leaguemembersUpdateWithoutLeaguemessagesInput>, leaguemembersUncheckedUpdateWithoutLeaguemessagesInput>
   }
 
+  export type leaguemembersCreateNestedOneWithoutLeague_message_read_stateInput = {
+    create?: XOR<leaguemembersCreateWithoutLeague_message_read_stateInput, leaguemembersUncheckedCreateWithoutLeague_message_read_stateInput>
+    connectOrCreate?: leaguemembersCreateOrConnectWithoutLeague_message_read_stateInput
+    connect?: leaguemembersWhereUniqueInput
+  }
+
+  export type leaguemembersUpdateOneRequiredWithoutLeague_message_read_stateNestedInput = {
+    create?: XOR<leaguemembersCreateWithoutLeague_message_read_stateInput, leaguemembersUncheckedCreateWithoutLeague_message_read_stateInput>
+    connectOrCreate?: leaguemembersCreateOrConnectWithoutLeague_message_read_stateInput
+    upsert?: leaguemembersUpsertWithoutLeague_message_read_stateInput
+    connect?: leaguemembersWhereUniqueInput
+    update?: XOR<XOR<leaguemembersUpdateToOneWithWhereWithoutLeague_message_read_stateInput, leaguemembersUpdateWithoutLeague_message_read_stateInput>, leaguemembersUncheckedUpdateWithoutLeague_message_read_stateInput>
+  }
+
   export type EmailLogsCreateNestedManyWithoutLeaguesInput = {
     create?: XOR<EmailLogsCreateWithoutLeaguesInput, EmailLogsUncheckedCreateWithoutLeaguesInput> | EmailLogsCreateWithoutLeaguesInput[] | EmailLogsUncheckedCreateWithoutLeaguesInput[]
     connectOrCreate?: EmailLogsCreateOrConnectWithoutLeaguesInput | EmailLogsCreateOrConnectWithoutLeaguesInput[]
@@ -24668,6 +29150,13 @@ export namespace Prisma {
     connectOrCreate?: leaguemessagesCreateOrConnectWithoutLeaguesInput | leaguemessagesCreateOrConnectWithoutLeaguesInput[]
     createMany?: leaguemessagesCreateManyLeaguesInputEnvelope
     connect?: leaguemessagesWhereUniqueInput | leaguemessagesWhereUniqueInput[]
+  }
+
+  export type league_renewal_member_rolesCreateNestedManyWithoutLeaguesInput = {
+    create?: XOR<league_renewal_member_rolesCreateWithoutLeaguesInput, league_renewal_member_rolesUncheckedCreateWithoutLeaguesInput> | league_renewal_member_rolesCreateWithoutLeaguesInput[] | league_renewal_member_rolesUncheckedCreateWithoutLeaguesInput[]
+    connectOrCreate?: league_renewal_member_rolesCreateOrConnectWithoutLeaguesInput | league_renewal_member_rolesCreateOrConnectWithoutLeaguesInput[]
+    createMany?: league_renewal_member_rolesCreateManyLeaguesInputEnvelope
+    connect?: league_renewal_member_rolesWhereUniqueInput | league_renewal_member_rolesWhereUniqueInput[]
   }
 
   export type peopleCreateNestedOneWithoutLeaguesInput = {
@@ -24715,6 +29204,13 @@ export namespace Prisma {
     connectOrCreate?: leaguemessagesCreateOrConnectWithoutLeaguesInput | leaguemessagesCreateOrConnectWithoutLeaguesInput[]
     createMany?: leaguemessagesCreateManyLeaguesInputEnvelope
     connect?: leaguemessagesWhereUniqueInput | leaguemessagesWhereUniqueInput[]
+  }
+
+  export type league_renewal_member_rolesUncheckedCreateNestedManyWithoutLeaguesInput = {
+    create?: XOR<league_renewal_member_rolesCreateWithoutLeaguesInput, league_renewal_member_rolesUncheckedCreateWithoutLeaguesInput> | league_renewal_member_rolesCreateWithoutLeaguesInput[] | league_renewal_member_rolesUncheckedCreateWithoutLeaguesInput[]
+    connectOrCreate?: league_renewal_member_rolesCreateOrConnectWithoutLeaguesInput | league_renewal_member_rolesCreateOrConnectWithoutLeaguesInput[]
+    createMany?: league_renewal_member_rolesCreateManyLeaguesInputEnvelope
+    connect?: league_renewal_member_rolesWhereUniqueInput | league_renewal_member_rolesWhereUniqueInput[]
   }
 
   export type leaguesUncheckedCreateNestedManyWithoutPrior_leagueInput = {
@@ -24798,6 +29294,20 @@ export namespace Prisma {
     update?: leaguemessagesUpdateWithWhereUniqueWithoutLeaguesInput | leaguemessagesUpdateWithWhereUniqueWithoutLeaguesInput[]
     updateMany?: leaguemessagesUpdateManyWithWhereWithoutLeaguesInput | leaguemessagesUpdateManyWithWhereWithoutLeaguesInput[]
     deleteMany?: leaguemessagesScalarWhereInput | leaguemessagesScalarWhereInput[]
+  }
+
+  export type league_renewal_member_rolesUpdateManyWithoutLeaguesNestedInput = {
+    create?: XOR<league_renewal_member_rolesCreateWithoutLeaguesInput, league_renewal_member_rolesUncheckedCreateWithoutLeaguesInput> | league_renewal_member_rolesCreateWithoutLeaguesInput[] | league_renewal_member_rolesUncheckedCreateWithoutLeaguesInput[]
+    connectOrCreate?: league_renewal_member_rolesCreateOrConnectWithoutLeaguesInput | league_renewal_member_rolesCreateOrConnectWithoutLeaguesInput[]
+    upsert?: league_renewal_member_rolesUpsertWithWhereUniqueWithoutLeaguesInput | league_renewal_member_rolesUpsertWithWhereUniqueWithoutLeaguesInput[]
+    createMany?: league_renewal_member_rolesCreateManyLeaguesInputEnvelope
+    set?: league_renewal_member_rolesWhereUniqueInput | league_renewal_member_rolesWhereUniqueInput[]
+    disconnect?: league_renewal_member_rolesWhereUniqueInput | league_renewal_member_rolesWhereUniqueInput[]
+    delete?: league_renewal_member_rolesWhereUniqueInput | league_renewal_member_rolesWhereUniqueInput[]
+    connect?: league_renewal_member_rolesWhereUniqueInput | league_renewal_member_rolesWhereUniqueInput[]
+    update?: league_renewal_member_rolesUpdateWithWhereUniqueWithoutLeaguesInput | league_renewal_member_rolesUpdateWithWhereUniqueWithoutLeaguesInput[]
+    updateMany?: league_renewal_member_rolesUpdateManyWithWhereWithoutLeaguesInput | league_renewal_member_rolesUpdateManyWithWhereWithoutLeaguesInput[]
+    deleteMany?: league_renewal_member_rolesScalarWhereInput | league_renewal_member_rolesScalarWhereInput[]
   }
 
   export type peopleUpdateOneRequiredWithoutLeaguesNestedInput = {
@@ -24888,6 +29398,20 @@ export namespace Prisma {
     deleteMany?: leaguemessagesScalarWhereInput | leaguemessagesScalarWhereInput[]
   }
 
+  export type league_renewal_member_rolesUncheckedUpdateManyWithoutLeaguesNestedInput = {
+    create?: XOR<league_renewal_member_rolesCreateWithoutLeaguesInput, league_renewal_member_rolesUncheckedCreateWithoutLeaguesInput> | league_renewal_member_rolesCreateWithoutLeaguesInput[] | league_renewal_member_rolesUncheckedCreateWithoutLeaguesInput[]
+    connectOrCreate?: league_renewal_member_rolesCreateOrConnectWithoutLeaguesInput | league_renewal_member_rolesCreateOrConnectWithoutLeaguesInput[]
+    upsert?: league_renewal_member_rolesUpsertWithWhereUniqueWithoutLeaguesInput | league_renewal_member_rolesUpsertWithWhereUniqueWithoutLeaguesInput[]
+    createMany?: league_renewal_member_rolesCreateManyLeaguesInputEnvelope
+    set?: league_renewal_member_rolesWhereUniqueInput | league_renewal_member_rolesWhereUniqueInput[]
+    disconnect?: league_renewal_member_rolesWhereUniqueInput | league_renewal_member_rolesWhereUniqueInput[]
+    delete?: league_renewal_member_rolesWhereUniqueInput | league_renewal_member_rolesWhereUniqueInput[]
+    connect?: league_renewal_member_rolesWhereUniqueInput | league_renewal_member_rolesWhereUniqueInput[]
+    update?: league_renewal_member_rolesUpdateWithWhereUniqueWithoutLeaguesInput | league_renewal_member_rolesUpdateWithWhereUniqueWithoutLeaguesInput[]
+    updateMany?: league_renewal_member_rolesUpdateManyWithWhereWithoutLeaguesInput | league_renewal_member_rolesUpdateManyWithWhereWithoutLeaguesInput[]
+    deleteMany?: league_renewal_member_rolesScalarWhereInput | league_renewal_member_rolesScalarWhereInput[]
+  }
+
   export type leaguesUncheckedUpdateManyWithoutPrior_leagueNestedInput = {
     create?: XOR<leaguesCreateWithoutPrior_leagueInput, leaguesUncheckedCreateWithoutPrior_leagueInput> | leaguesCreateWithoutPrior_leagueInput[] | leaguesUncheckedCreateWithoutPrior_leagueInput[]
     connectOrCreate?: leaguesCreateOrConnectWithoutPrior_leagueInput | leaguesCreateOrConnectWithoutPrior_leagueInput[]
@@ -24902,11 +29426,50 @@ export namespace Prisma {
     deleteMany?: leaguesScalarWhereInput | leaguesScalarWhereInput[]
   }
 
+  export type leaguesCreateNestedOneWithoutLeague_renewal_member_rolesInput = {
+    create?: XOR<leaguesCreateWithoutLeague_renewal_member_rolesInput, leaguesUncheckedCreateWithoutLeague_renewal_member_rolesInput>
+    connectOrCreate?: leaguesCreateOrConnectWithoutLeague_renewal_member_rolesInput
+    connect?: leaguesWhereUniqueInput
+  }
+
+  export type peopleCreateNestedOneWithoutLeague_renewal_member_rolesInput = {
+    create?: XOR<peopleCreateWithoutLeague_renewal_member_rolesInput, peopleUncheckedCreateWithoutLeague_renewal_member_rolesInput>
+    connectOrCreate?: peopleCreateOrConnectWithoutLeague_renewal_member_rolesInput
+    connect?: peopleWhereUniqueInput
+  }
+
+  export type EnumMemberRoleFieldUpdateOperationsInput = {
+    set?: $Enums.MemberRole
+  }
+
+  export type leaguesUpdateOneRequiredWithoutLeague_renewal_member_rolesNestedInput = {
+    create?: XOR<leaguesCreateWithoutLeague_renewal_member_rolesInput, leaguesUncheckedCreateWithoutLeague_renewal_member_rolesInput>
+    connectOrCreate?: leaguesCreateOrConnectWithoutLeague_renewal_member_rolesInput
+    upsert?: leaguesUpsertWithoutLeague_renewal_member_rolesInput
+    connect?: leaguesWhereUniqueInput
+    update?: XOR<XOR<leaguesUpdateToOneWithWhereWithoutLeague_renewal_member_rolesInput, leaguesUpdateWithoutLeague_renewal_member_rolesInput>, leaguesUncheckedUpdateWithoutLeague_renewal_member_rolesInput>
+  }
+
+  export type peopleUpdateOneRequiredWithoutLeague_renewal_member_rolesNestedInput = {
+    create?: XOR<peopleCreateWithoutLeague_renewal_member_rolesInput, peopleUncheckedCreateWithoutLeague_renewal_member_rolesInput>
+    connectOrCreate?: peopleCreateOrConnectWithoutLeague_renewal_member_rolesInput
+    upsert?: peopleUpsertWithoutLeague_renewal_member_rolesInput
+    connect?: peopleWhereUniqueInput
+    update?: XOR<XOR<peopleUpdateToOneWithWhereWithoutLeague_renewal_member_rolesInput, peopleUpdateWithoutLeague_renewal_member_rolesInput>, peopleUncheckedUpdateWithoutLeague_renewal_member_rolesInput>
+  }
+
   export type leaguemembersCreateNestedManyWithoutPeopleInput = {
     create?: XOR<leaguemembersCreateWithoutPeopleInput, leaguemembersUncheckedCreateWithoutPeopleInput> | leaguemembersCreateWithoutPeopleInput[] | leaguemembersUncheckedCreateWithoutPeopleInput[]
     connectOrCreate?: leaguemembersCreateOrConnectWithoutPeopleInput | leaguemembersCreateOrConnectWithoutPeopleInput[]
     createMany?: leaguemembersCreateManyPeopleInputEnvelope
     connect?: leaguemembersWhereUniqueInput | leaguemembersWhereUniqueInput[]
+  }
+
+  export type league_renewal_member_rolesCreateNestedManyWithoutPeopleInput = {
+    create?: XOR<league_renewal_member_rolesCreateWithoutPeopleInput, league_renewal_member_rolesUncheckedCreateWithoutPeopleInput> | league_renewal_member_rolesCreateWithoutPeopleInput[] | league_renewal_member_rolesUncheckedCreateWithoutPeopleInput[]
+    connectOrCreate?: league_renewal_member_rolesCreateOrConnectWithoutPeopleInput | league_renewal_member_rolesCreateOrConnectWithoutPeopleInput[]
+    createMany?: league_renewal_member_rolesCreateManyPeopleInputEnvelope
+    connect?: league_renewal_member_rolesWhereUniqueInput | league_renewal_member_rolesWhereUniqueInput[]
   }
 
   export type leaguesCreateNestedManyWithoutPeopleInput = {
@@ -24935,6 +29498,13 @@ export namespace Prisma {
     connectOrCreate?: leaguemembersCreateOrConnectWithoutPeopleInput | leaguemembersCreateOrConnectWithoutPeopleInput[]
     createMany?: leaguemembersCreateManyPeopleInputEnvelope
     connect?: leaguemembersWhereUniqueInput | leaguemembersWhereUniqueInput[]
+  }
+
+  export type league_renewal_member_rolesUncheckedCreateNestedManyWithoutPeopleInput = {
+    create?: XOR<league_renewal_member_rolesCreateWithoutPeopleInput, league_renewal_member_rolesUncheckedCreateWithoutPeopleInput> | league_renewal_member_rolesCreateWithoutPeopleInput[] | league_renewal_member_rolesUncheckedCreateWithoutPeopleInput[]
+    connectOrCreate?: league_renewal_member_rolesCreateOrConnectWithoutPeopleInput | league_renewal_member_rolesCreateOrConnectWithoutPeopleInput[]
+    createMany?: league_renewal_member_rolesCreateManyPeopleInputEnvelope
+    connect?: league_renewal_member_rolesWhereUniqueInput | league_renewal_member_rolesWhereUniqueInput[]
   }
 
   export type leaguesUncheckedCreateNestedManyWithoutPeopleInput = {
@@ -24970,6 +29540,20 @@ export namespace Prisma {
     update?: leaguemembersUpdateWithWhereUniqueWithoutPeopleInput | leaguemembersUpdateWithWhereUniqueWithoutPeopleInput[]
     updateMany?: leaguemembersUpdateManyWithWhereWithoutPeopleInput | leaguemembersUpdateManyWithWhereWithoutPeopleInput[]
     deleteMany?: leaguemembersScalarWhereInput | leaguemembersScalarWhereInput[]
+  }
+
+  export type league_renewal_member_rolesUpdateManyWithoutPeopleNestedInput = {
+    create?: XOR<league_renewal_member_rolesCreateWithoutPeopleInput, league_renewal_member_rolesUncheckedCreateWithoutPeopleInput> | league_renewal_member_rolesCreateWithoutPeopleInput[] | league_renewal_member_rolesUncheckedCreateWithoutPeopleInput[]
+    connectOrCreate?: league_renewal_member_rolesCreateOrConnectWithoutPeopleInput | league_renewal_member_rolesCreateOrConnectWithoutPeopleInput[]
+    upsert?: league_renewal_member_rolesUpsertWithWhereUniqueWithoutPeopleInput | league_renewal_member_rolesUpsertWithWhereUniqueWithoutPeopleInput[]
+    createMany?: league_renewal_member_rolesCreateManyPeopleInputEnvelope
+    set?: league_renewal_member_rolesWhereUniqueInput | league_renewal_member_rolesWhereUniqueInput[]
+    disconnect?: league_renewal_member_rolesWhereUniqueInput | league_renewal_member_rolesWhereUniqueInput[]
+    delete?: league_renewal_member_rolesWhereUniqueInput | league_renewal_member_rolesWhereUniqueInput[]
+    connect?: league_renewal_member_rolesWhereUniqueInput | league_renewal_member_rolesWhereUniqueInput[]
+    update?: league_renewal_member_rolesUpdateWithWhereUniqueWithoutPeopleInput | league_renewal_member_rolesUpdateWithWhereUniqueWithoutPeopleInput[]
+    updateMany?: league_renewal_member_rolesUpdateManyWithWhereWithoutPeopleInput | league_renewal_member_rolesUpdateManyWithWhereWithoutPeopleInput[]
+    deleteMany?: league_renewal_member_rolesScalarWhereInput | league_renewal_member_rolesScalarWhereInput[]
   }
 
   export type leaguesUpdateManyWithoutPeopleNestedInput = {
@@ -25026,6 +29610,20 @@ export namespace Prisma {
     update?: leaguemembersUpdateWithWhereUniqueWithoutPeopleInput | leaguemembersUpdateWithWhereUniqueWithoutPeopleInput[]
     updateMany?: leaguemembersUpdateManyWithWhereWithoutPeopleInput | leaguemembersUpdateManyWithWhereWithoutPeopleInput[]
     deleteMany?: leaguemembersScalarWhereInput | leaguemembersScalarWhereInput[]
+  }
+
+  export type league_renewal_member_rolesUncheckedUpdateManyWithoutPeopleNestedInput = {
+    create?: XOR<league_renewal_member_rolesCreateWithoutPeopleInput, league_renewal_member_rolesUncheckedCreateWithoutPeopleInput> | league_renewal_member_rolesCreateWithoutPeopleInput[] | league_renewal_member_rolesUncheckedCreateWithoutPeopleInput[]
+    connectOrCreate?: league_renewal_member_rolesCreateOrConnectWithoutPeopleInput | league_renewal_member_rolesCreateOrConnectWithoutPeopleInput[]
+    upsert?: league_renewal_member_rolesUpsertWithWhereUniqueWithoutPeopleInput | league_renewal_member_rolesUpsertWithWhereUniqueWithoutPeopleInput[]
+    createMany?: league_renewal_member_rolesCreateManyPeopleInputEnvelope
+    set?: league_renewal_member_rolesWhereUniqueInput | league_renewal_member_rolesWhereUniqueInput[]
+    disconnect?: league_renewal_member_rolesWhereUniqueInput | league_renewal_member_rolesWhereUniqueInput[]
+    delete?: league_renewal_member_rolesWhereUniqueInput | league_renewal_member_rolesWhereUniqueInput[]
+    connect?: league_renewal_member_rolesWhereUniqueInput | league_renewal_member_rolesWhereUniqueInput[]
+    update?: league_renewal_member_rolesUpdateWithWhereUniqueWithoutPeopleInput | league_renewal_member_rolesUpdateWithWhereUniqueWithoutPeopleInput[]
+    updateMany?: league_renewal_member_rolesUpdateManyWithWhereWithoutPeopleInput | league_renewal_member_rolesUpdateManyWithWhereWithoutPeopleInput[]
+    deleteMany?: league_renewal_member_rolesScalarWhereInput | league_renewal_member_rolesScalarWhereInput[]
   }
 
   export type leaguesUncheckedUpdateManyWithoutPeopleNestedInput = {
@@ -25164,10 +29762,6 @@ export namespace Prisma {
     create?: XOR<teamsCreateWithoutSuperbowl_superbowl_winnerToteamsInput, teamsUncheckedCreateWithoutSuperbowl_superbowl_winnerToteamsInput>
     connectOrCreate?: teamsCreateOrConnectWithoutSuperbowl_superbowl_winnerToteamsInput
     connect?: teamsWhereUniqueInput
-  }
-
-  export type NullableDateTimeFieldUpdateOperationsInput = {
-    set?: Date | string | null
   }
 
   export type teamsUpdateOneRequiredWithoutSuperbowl_superbowl_loserToteamsNestedInput = {
@@ -25760,6 +30354,38 @@ export namespace Prisma {
     not?: NestedIntNullableFilter<$PrismaModel> | number | null
   }
 
+  export type NestedEnumEmailDeliveryStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.EmailDeliveryStatus | EnumEmailDeliveryStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.EmailDeliveryStatus[] | ListEnumEmailDeliveryStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.EmailDeliveryStatus[] | ListEnumEmailDeliveryStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumEmailDeliveryStatusFilter<$PrismaModel> | $Enums.EmailDeliveryStatus
+  }
+
+  export type NestedDateTimeNullableFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
+  }
+
+  export type NestedStringNullableFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    not?: NestedStringNullableFilter<$PrismaModel> | string | null
+  }
+
   export type NestedStringWithAggregatesFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -25855,31 +30481,28 @@ export namespace Prisma {
     not?: NestedFloatNullableFilter<$PrismaModel> | number | null
   }
 
-  export type NestedBoolNullableFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel> | null
-    not?: NestedBoolNullableFilter<$PrismaModel> | boolean | null
+  export type NestedEnumEmailDeliveryStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.EmailDeliveryStatus | EnumEmailDeliveryStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.EmailDeliveryStatus[] | ListEnumEmailDeliveryStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.EmailDeliveryStatus[] | ListEnumEmailDeliveryStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumEmailDeliveryStatusWithAggregatesFilter<$PrismaModel> | $Enums.EmailDeliveryStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumEmailDeliveryStatusFilter<$PrismaModel>
+    _max?: NestedEnumEmailDeliveryStatusFilter<$PrismaModel>
   }
 
-  export type NestedStringNullableFilter<$PrismaModel = never> = {
-    equals?: string | StringFieldRefInput<$PrismaModel> | null
-    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    lt?: string | StringFieldRefInput<$PrismaModel>
-    lte?: string | StringFieldRefInput<$PrismaModel>
-    gt?: string | StringFieldRefInput<$PrismaModel>
-    gte?: string | StringFieldRefInput<$PrismaModel>
-    contains?: string | StringFieldRefInput<$PrismaModel>
-    startsWith?: string | StringFieldRefInput<$PrismaModel>
-    endsWith?: string | StringFieldRefInput<$PrismaModel>
-    not?: NestedStringNullableFilter<$PrismaModel> | string | null
-  }
-
-  export type NestedBoolNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel> | null
-    not?: NestedBoolNullableWithAggregatesFilter<$PrismaModel> | boolean | null
+  export type NestedDateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
     _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedBoolNullableFilter<$PrismaModel>
-    _max?: NestedBoolNullableFilter<$PrismaModel>
+    _min?: NestedDateTimeNullableFilter<$PrismaModel>
+    _max?: NestedDateTimeNullableFilter<$PrismaModel>
   }
 
   export type NestedStringNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -25897,6 +30520,42 @@ export namespace Prisma {
     _count?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedStringNullableFilter<$PrismaModel>
     _max?: NestedStringNullableFilter<$PrismaModel>
+  }
+  export type NestedJsonFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<NestedJsonFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonFilterBase<$PrismaModel>>, 'path'>>,
+        Required<NestedJsonFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<NestedJsonFilterBase<$PrismaModel>>, 'path'>>
+
+  export type NestedJsonFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
+
+  export type NestedBoolNullableFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel> | null
+    not?: NestedBoolNullableFilter<$PrismaModel> | boolean | null
+  }
+
+  export type NestedBoolNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel> | null
+    not?: NestedBoolNullableWithAggregatesFilter<$PrismaModel> | boolean | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedBoolNullableFilter<$PrismaModel>
+    _max?: NestedBoolNullableFilter<$PrismaModel>
   }
 
   export type NestedEnumMemberRoleNullableFilter<$PrismaModel = never> = {
@@ -26035,6 +30694,23 @@ export namespace Prisma {
     _max?: NestedEnumLeagueStatusFilter<$PrismaModel>
   }
 
+  export type NestedEnumMemberRoleFilter<$PrismaModel = never> = {
+    equals?: $Enums.MemberRole | EnumMemberRoleFieldRefInput<$PrismaModel>
+    in?: $Enums.MemberRole[] | ListEnumMemberRoleFieldRefInput<$PrismaModel>
+    notIn?: $Enums.MemberRole[] | ListEnumMemberRoleFieldRefInput<$PrismaModel>
+    not?: NestedEnumMemberRoleFilter<$PrismaModel> | $Enums.MemberRole
+  }
+
+  export type NestedEnumMemberRoleWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.MemberRole | EnumMemberRoleFieldRefInput<$PrismaModel>
+    in?: $Enums.MemberRole[] | ListEnumMemberRoleFieldRefInput<$PrismaModel>
+    notIn?: $Enums.MemberRole[] | ListEnumMemberRoleFieldRefInput<$PrismaModel>
+    not?: NestedEnumMemberRoleWithAggregatesFilter<$PrismaModel> | $Enums.MemberRole
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumMemberRoleFilter<$PrismaModel>
+    _max?: NestedEnumMemberRoleFilter<$PrismaModel>
+  }
+
   export type NestedBoolFilter<$PrismaModel = never> = {
     equals?: boolean | BooleanFieldRefInput<$PrismaModel>
     not?: NestedBoolFilter<$PrismaModel> | boolean
@@ -26046,31 +30722,6 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedBoolFilter<$PrismaModel>
     _max?: NestedBoolFilter<$PrismaModel>
-  }
-
-  export type NestedDateTimeNullableFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
-  }
-
-  export type NestedDateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedDateTimeNullableFilter<$PrismaModel>
-    _max?: NestedDateTimeNullableFilter<$PrismaModel>
   }
 
   export type NestedEnumPostseasonRoundFilter<$PrismaModel = never> = {
@@ -26138,6 +30789,7 @@ export namespace Prisma {
     WeekWinners?: WeekWinnersCreateNestedManyWithoutLeaguesInput
     leaguemembers?: leaguemembersCreateNestedManyWithoutLeaguesInput
     leaguemessages?: leaguemessagesCreateNestedManyWithoutLeaguesInput
+    league_renewal_member_roles?: league_renewal_member_rolesCreateNestedManyWithoutLeaguesInput
     people: peopleCreateNestedOneWithoutLeaguesInput
     prior_league?: leaguesCreateNestedOneWithoutFuture_leaguesInput
     future_leagues?: leaguesCreateNestedManyWithoutPrior_leagueInput
@@ -26160,6 +30812,7 @@ export namespace Prisma {
     WeekWinners?: WeekWinnersUncheckedCreateNestedManyWithoutLeaguesInput
     leaguemembers?: leaguemembersUncheckedCreateNestedManyWithoutLeaguesInput
     leaguemessages?: leaguemessagesUncheckedCreateNestedManyWithoutLeaguesInput
+    league_renewal_member_roles?: league_renewal_member_rolesUncheckedCreateNestedManyWithoutLeaguesInput
     future_leagues?: leaguesUncheckedCreateNestedManyWithoutPrior_leagueInput
   }
 
@@ -26176,6 +30829,7 @@ export namespace Prisma {
     people: peopleCreateNestedOneWithoutLeaguemembersInput
     leagues: leaguesCreateNestedOneWithoutLeaguemembersInput
     leaguemessages?: leaguemessagesCreateNestedManyWithoutLeaguemembersInput
+    league_message_read_state?: league_message_read_stateCreateNestedOneWithoutLeaguemembersInput
     picks?: picksCreateNestedManyWithoutLeaguemembersInput
     superbowl?: superbowlCreateNestedManyWithoutLeaguemembersInput
   }
@@ -26189,6 +30843,7 @@ export namespace Prisma {
     paid?: boolean | null
     WeekWinners?: WeekWinnersUncheckedCreateNestedManyWithoutLeaguemembersInput
     leaguemessages?: leaguemessagesUncheckedCreateNestedManyWithoutLeaguemembersInput
+    league_message_read_state?: league_message_read_stateUncheckedCreateNestedOneWithoutLeaguemembersInput
     picks?: picksUncheckedCreateNestedManyWithoutLeaguemembersInput
     superbowl?: superbowlUncheckedCreateNestedManyWithoutLeaguemembersInput
   }
@@ -26223,6 +30878,7 @@ export namespace Prisma {
     WeekWinners?: WeekWinnersUpdateManyWithoutLeaguesNestedInput
     leaguemembers?: leaguemembersUpdateManyWithoutLeaguesNestedInput
     leaguemessages?: leaguemessagesUpdateManyWithoutLeaguesNestedInput
+    league_renewal_member_roles?: league_renewal_member_rolesUpdateManyWithoutLeaguesNestedInput
     people?: peopleUpdateOneRequiredWithoutLeaguesNestedInput
     prior_league?: leaguesUpdateOneWithoutFuture_leaguesNestedInput
     future_leagues?: leaguesUpdateManyWithoutPrior_leagueNestedInput
@@ -26245,6 +30901,7 @@ export namespace Prisma {
     WeekWinners?: WeekWinnersUncheckedUpdateManyWithoutLeaguesNestedInput
     leaguemembers?: leaguemembersUncheckedUpdateManyWithoutLeaguesNestedInput
     leaguemessages?: leaguemessagesUncheckedUpdateManyWithoutLeaguesNestedInput
+    league_renewal_member_roles?: league_renewal_member_rolesUncheckedUpdateManyWithoutLeaguesNestedInput
     future_leagues?: leaguesUncheckedUpdateManyWithoutPrior_leagueNestedInput
   }
 
@@ -26267,6 +30924,7 @@ export namespace Prisma {
     people?: peopleUpdateOneRequiredWithoutLeaguemembersNestedInput
     leagues?: leaguesUpdateOneRequiredWithoutLeaguemembersNestedInput
     leaguemessages?: leaguemessagesUpdateManyWithoutLeaguemembersNestedInput
+    league_message_read_state?: league_message_read_stateUpdateOneWithoutLeaguemembersNestedInput
     picks?: picksUpdateManyWithoutLeaguemembersNestedInput
     superbowl?: superbowlUpdateManyWithoutLeaguemembersNestedInput
   }
@@ -26280,6 +30938,7 @@ export namespace Prisma {
     paid?: NullableBoolFieldUpdateOperationsInput | boolean | null
     WeekWinners?: WeekWinnersUncheckedUpdateManyWithoutLeaguemembersNestedInput
     leaguemessages?: leaguemessagesUncheckedUpdateManyWithoutLeaguemembersNestedInput
+    league_message_read_state?: league_message_read_stateUncheckedUpdateOneWithoutLeaguemembersNestedInput
     picks?: picksUncheckedUpdateManyWithoutLeaguemembersNestedInput
     superbowl?: superbowlUncheckedUpdateManyWithoutLeaguemembersNestedInput
   }
@@ -26298,6 +30957,7 @@ export namespace Prisma {
     EmailLogs?: EmailLogsCreateNestedManyWithoutLeaguesInput
     leaguemembers?: leaguemembersCreateNestedManyWithoutLeaguesInput
     leaguemessages?: leaguemessagesCreateNestedManyWithoutLeaguesInput
+    league_renewal_member_roles?: league_renewal_member_rolesCreateNestedManyWithoutLeaguesInput
     people: peopleCreateNestedOneWithoutLeaguesInput
     prior_league?: leaguesCreateNestedOneWithoutFuture_leaguesInput
     future_leagues?: leaguesCreateNestedManyWithoutPrior_leagueInput
@@ -26320,6 +30980,7 @@ export namespace Prisma {
     EmailLogs?: EmailLogsUncheckedCreateNestedManyWithoutLeaguesInput
     leaguemembers?: leaguemembersUncheckedCreateNestedManyWithoutLeaguesInput
     leaguemessages?: leaguemessagesUncheckedCreateNestedManyWithoutLeaguesInput
+    league_renewal_member_roles?: league_renewal_member_rolesUncheckedCreateNestedManyWithoutLeaguesInput
     future_leagues?: leaguesUncheckedCreateNestedManyWithoutPrior_leagueInput
   }
 
@@ -26336,6 +30997,7 @@ export namespace Prisma {
     people: peopleCreateNestedOneWithoutLeaguemembersInput
     leagues: leaguesCreateNestedOneWithoutLeaguemembersInput
     leaguemessages?: leaguemessagesCreateNestedManyWithoutLeaguemembersInput
+    league_message_read_state?: league_message_read_stateCreateNestedOneWithoutLeaguemembersInput
     picks?: picksCreateNestedManyWithoutLeaguemembersInput
     superbowl?: superbowlCreateNestedManyWithoutLeaguemembersInput
   }
@@ -26349,6 +31011,7 @@ export namespace Prisma {
     paid?: boolean | null
     EmailLogs?: EmailLogsUncheckedCreateNestedManyWithoutLeaguemembersInput
     leaguemessages?: leaguemessagesUncheckedCreateNestedManyWithoutLeaguemembersInput
+    league_message_read_state?: league_message_read_stateUncheckedCreateNestedOneWithoutLeaguemembersInput
     picks?: picksUncheckedCreateNestedManyWithoutLeaguemembersInput
     superbowl?: superbowlUncheckedCreateNestedManyWithoutLeaguemembersInput
   }
@@ -26383,6 +31046,7 @@ export namespace Prisma {
     EmailLogs?: EmailLogsUpdateManyWithoutLeaguesNestedInput
     leaguemembers?: leaguemembersUpdateManyWithoutLeaguesNestedInput
     leaguemessages?: leaguemessagesUpdateManyWithoutLeaguesNestedInput
+    league_renewal_member_roles?: league_renewal_member_rolesUpdateManyWithoutLeaguesNestedInput
     people?: peopleUpdateOneRequiredWithoutLeaguesNestedInput
     prior_league?: leaguesUpdateOneWithoutFuture_leaguesNestedInput
     future_leagues?: leaguesUpdateManyWithoutPrior_leagueNestedInput
@@ -26405,6 +31069,7 @@ export namespace Prisma {
     EmailLogs?: EmailLogsUncheckedUpdateManyWithoutLeaguesNestedInput
     leaguemembers?: leaguemembersUncheckedUpdateManyWithoutLeaguesNestedInput
     leaguemessages?: leaguemessagesUncheckedUpdateManyWithoutLeaguesNestedInput
+    league_renewal_member_roles?: league_renewal_member_rolesUncheckedUpdateManyWithoutLeaguesNestedInput
     future_leagues?: leaguesUncheckedUpdateManyWithoutPrior_leagueNestedInput
   }
 
@@ -26427,6 +31092,7 @@ export namespace Prisma {
     people?: peopleUpdateOneRequiredWithoutLeaguemembersNestedInput
     leagues?: leaguesUpdateOneRequiredWithoutLeaguemembersNestedInput
     leaguemessages?: leaguemessagesUpdateManyWithoutLeaguemembersNestedInput
+    league_message_read_state?: league_message_read_stateUpdateOneWithoutLeaguemembersNestedInput
     picks?: picksUpdateManyWithoutLeaguemembersNestedInput
     superbowl?: superbowlUpdateManyWithoutLeaguemembersNestedInput
   }
@@ -26440,6 +31106,7 @@ export namespace Prisma {
     paid?: NullableBoolFieldUpdateOperationsInput | boolean | null
     EmailLogs?: EmailLogsUncheckedUpdateManyWithoutLeaguemembersNestedInput
     leaguemessages?: leaguemessagesUncheckedUpdateManyWithoutLeaguemembersNestedInput
+    league_message_read_state?: league_message_read_stateUncheckedUpdateOneWithoutLeaguemembersNestedInput
     picks?: picksUncheckedUpdateManyWithoutLeaguemembersNestedInput
     superbowl?: superbowlUncheckedUpdateManyWithoutLeaguemembersNestedInput
   }
@@ -26704,6 +31371,11 @@ export namespace Prisma {
     ts?: Date | string
     week?: number | null
     resend_id: string
+    delivery_status?: $Enums.EmailDeliveryStatus
+    last_event_at?: Date | string | null
+    delivered_at?: Date | string | null
+    failed_at?: Date | string | null
+    failure_reason?: string | null
     leagues: leaguesCreateNestedOneWithoutEmailLogsInput
   }
 
@@ -26714,6 +31386,11 @@ export namespace Prisma {
     ts?: Date | string
     week?: number | null
     resend_id: string
+    delivery_status?: $Enums.EmailDeliveryStatus
+    last_event_at?: Date | string | null
+    delivered_at?: Date | string | null
+    failed_at?: Date | string | null
+    failure_reason?: string | null
   }
 
   export type EmailLogsCreateOrConnectWithoutLeaguemembersInput = {
@@ -26762,6 +31439,7 @@ export namespace Prisma {
     google_email?: string | null
     google_userid?: string | null
     supabase_id?: string | null
+    league_renewal_member_roles?: league_renewal_member_rolesCreateNestedManyWithoutPeopleInput
     leagues?: leaguesCreateNestedManyWithoutPeopleInput
     picks?: picksCreateNestedManyWithoutPeopleInput
     pushNotificationTokens?: pushNotificationTokensCreateNestedManyWithoutPeopleInput
@@ -26779,6 +31457,7 @@ export namespace Prisma {
     google_email?: string | null
     google_userid?: string | null
     supabase_id?: string | null
+    league_renewal_member_roles?: league_renewal_member_rolesUncheckedCreateNestedManyWithoutPeopleInput
     leagues?: leaguesUncheckedCreateNestedManyWithoutPeopleInput
     picks?: picksUncheckedCreateNestedManyWithoutPeopleInput
     pushNotificationTokens?: pushNotificationTokensUncheckedCreateNestedManyWithoutPeopleInput
@@ -26803,6 +31482,7 @@ export namespace Prisma {
     EmailLogs?: EmailLogsCreateNestedManyWithoutLeaguesInput
     WeekWinners?: WeekWinnersCreateNestedManyWithoutLeaguesInput
     leaguemessages?: leaguemessagesCreateNestedManyWithoutLeaguesInput
+    league_renewal_member_roles?: league_renewal_member_rolesCreateNestedManyWithoutLeaguesInput
     people: peopleCreateNestedOneWithoutLeaguesInput
     prior_league?: leaguesCreateNestedOneWithoutFuture_leaguesInput
     future_leagues?: leaguesCreateNestedManyWithoutPrior_leagueInput
@@ -26825,6 +31505,7 @@ export namespace Prisma {
     EmailLogs?: EmailLogsUncheckedCreateNestedManyWithoutLeaguesInput
     WeekWinners?: WeekWinnersUncheckedCreateNestedManyWithoutLeaguesInput
     leaguemessages?: leaguemessagesUncheckedCreateNestedManyWithoutLeaguesInput
+    league_renewal_member_roles?: league_renewal_member_rolesUncheckedCreateNestedManyWithoutLeaguesInput
     future_leagues?: leaguesUncheckedCreateNestedManyWithoutPrior_leagueInput
   }
 
@@ -26861,6 +31542,23 @@ export namespace Prisma {
   export type leaguemessagesCreateManyLeaguemembersInputEnvelope = {
     data: leaguemessagesCreateManyLeaguemembersInput | leaguemessagesCreateManyLeaguemembersInput[]
     skipDuplicates?: boolean
+  }
+
+  export type league_message_read_stateCreateWithoutLeaguemembersInput = {
+    last_read_at: Date | string
+    last_read_message_id: string
+    updatedAt?: Date | string
+  }
+
+  export type league_message_read_stateUncheckedCreateWithoutLeaguemembersInput = {
+    last_read_at: Date | string
+    last_read_message_id: string
+    updatedAt?: Date | string
+  }
+
+  export type league_message_read_stateCreateOrConnectWithoutLeaguemembersInput = {
+    where: league_message_read_stateWhereUniqueInput
+    create: XOR<league_message_read_stateCreateWithoutLeaguemembersInput, league_message_read_stateUncheckedCreateWithoutLeaguemembersInput>
   }
 
   export type picksCreateWithoutLeaguemembersInput = {
@@ -26958,6 +31656,11 @@ export namespace Prisma {
     ts?: DateTimeFilter<"EmailLogs"> | Date | string
     week?: IntNullableFilter<"EmailLogs"> | number | null
     resend_id?: StringFilter<"EmailLogs"> | string
+    delivery_status?: EnumEmailDeliveryStatusFilter<"EmailLogs"> | $Enums.EmailDeliveryStatus
+    last_event_at?: DateTimeNullableFilter<"EmailLogs"> | Date | string | null
+    delivered_at?: DateTimeNullableFilter<"EmailLogs"> | Date | string | null
+    failed_at?: DateTimeNullableFilter<"EmailLogs"> | Date | string | null
+    failure_reason?: StringNullableFilter<"EmailLogs"> | string | null
   }
 
   export type WeekWinnersUpsertWithWhereUniqueWithoutLeaguemembersInput = {
@@ -27010,6 +31713,7 @@ export namespace Prisma {
     google_email?: NullableStringFieldUpdateOperationsInput | string | null
     google_userid?: NullableStringFieldUpdateOperationsInput | string | null
     supabase_id?: NullableStringFieldUpdateOperationsInput | string | null
+    league_renewal_member_roles?: league_renewal_member_rolesUpdateManyWithoutPeopleNestedInput
     leagues?: leaguesUpdateManyWithoutPeopleNestedInput
     picks?: picksUpdateManyWithoutPeopleNestedInput
     pushNotificationTokens?: pushNotificationTokensUpdateManyWithoutPeopleNestedInput
@@ -27027,6 +31731,7 @@ export namespace Prisma {
     google_email?: NullableStringFieldUpdateOperationsInput | string | null
     google_userid?: NullableStringFieldUpdateOperationsInput | string | null
     supabase_id?: NullableStringFieldUpdateOperationsInput | string | null
+    league_renewal_member_roles?: league_renewal_member_rolesUncheckedUpdateManyWithoutPeopleNestedInput
     leagues?: leaguesUncheckedUpdateManyWithoutPeopleNestedInput
     picks?: picksUncheckedUpdateManyWithoutPeopleNestedInput
     pushNotificationTokens?: pushNotificationTokensUncheckedUpdateManyWithoutPeopleNestedInput
@@ -27057,6 +31762,7 @@ export namespace Prisma {
     EmailLogs?: EmailLogsUpdateManyWithoutLeaguesNestedInput
     WeekWinners?: WeekWinnersUpdateManyWithoutLeaguesNestedInput
     leaguemessages?: leaguemessagesUpdateManyWithoutLeaguesNestedInput
+    league_renewal_member_roles?: league_renewal_member_rolesUpdateManyWithoutLeaguesNestedInput
     people?: peopleUpdateOneRequiredWithoutLeaguesNestedInput
     prior_league?: leaguesUpdateOneWithoutFuture_leaguesNestedInput
     future_leagues?: leaguesUpdateManyWithoutPrior_leagueNestedInput
@@ -27079,6 +31785,7 @@ export namespace Prisma {
     EmailLogs?: EmailLogsUncheckedUpdateManyWithoutLeaguesNestedInput
     WeekWinners?: WeekWinnersUncheckedUpdateManyWithoutLeaguesNestedInput
     leaguemessages?: leaguemessagesUncheckedUpdateManyWithoutLeaguesNestedInput
+    league_renewal_member_roles?: league_renewal_member_rolesUncheckedUpdateManyWithoutLeaguesNestedInput
     future_leagues?: leaguesUncheckedUpdateManyWithoutPrior_leagueNestedInput
   }
 
@@ -27110,6 +31817,29 @@ export namespace Prisma {
     message_type?: EnumMessageTypeFilter<"leaguemessages"> | $Enums.MessageType
     createdAt?: DateTimeFilter<"leaguemessages"> | Date | string
     status?: EnumMessageStatusFilter<"leaguemessages"> | $Enums.MessageStatus
+  }
+
+  export type league_message_read_stateUpsertWithoutLeaguemembersInput = {
+    update: XOR<league_message_read_stateUpdateWithoutLeaguemembersInput, league_message_read_stateUncheckedUpdateWithoutLeaguemembersInput>
+    create: XOR<league_message_read_stateCreateWithoutLeaguemembersInput, league_message_read_stateUncheckedCreateWithoutLeaguemembersInput>
+    where?: league_message_read_stateWhereInput
+  }
+
+  export type league_message_read_stateUpdateToOneWithWhereWithoutLeaguemembersInput = {
+    where?: league_message_read_stateWhereInput
+    data: XOR<league_message_read_stateUpdateWithoutLeaguemembersInput, league_message_read_stateUncheckedUpdateWithoutLeaguemembersInput>
+  }
+
+  export type league_message_read_stateUpdateWithoutLeaguemembersInput = {
+    last_read_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    last_read_message_id?: StringFieldUpdateOperationsInput | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type league_message_read_stateUncheckedUpdateWithoutLeaguemembersInput = {
+    last_read_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    last_read_message_id?: StringFieldUpdateOperationsInput | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type picksUpsertWithWhereUniqueWithoutLeaguemembersInput = {
@@ -27172,6 +31902,7 @@ export namespace Prisma {
     EmailLogs?: EmailLogsCreateNestedManyWithoutLeaguesInput
     WeekWinners?: WeekWinnersCreateNestedManyWithoutLeaguesInput
     leaguemembers?: leaguemembersCreateNestedManyWithoutLeaguesInput
+    league_renewal_member_roles?: league_renewal_member_rolesCreateNestedManyWithoutLeaguesInput
     people: peopleCreateNestedOneWithoutLeaguesInput
     prior_league?: leaguesCreateNestedOneWithoutFuture_leaguesInput
     future_leagues?: leaguesCreateNestedManyWithoutPrior_leagueInput
@@ -27194,6 +31925,7 @@ export namespace Prisma {
     EmailLogs?: EmailLogsUncheckedCreateNestedManyWithoutLeaguesInput
     WeekWinners?: WeekWinnersUncheckedCreateNestedManyWithoutLeaguesInput
     leaguemembers?: leaguemembersUncheckedCreateNestedManyWithoutLeaguesInput
+    league_renewal_member_roles?: league_renewal_member_rolesUncheckedCreateNestedManyWithoutLeaguesInput
     future_leagues?: leaguesUncheckedCreateNestedManyWithoutPrior_leagueInput
   }
 
@@ -27210,6 +31942,7 @@ export namespace Prisma {
     WeekWinners?: WeekWinnersCreateNestedManyWithoutLeaguemembersInput
     people: peopleCreateNestedOneWithoutLeaguemembersInput
     leagues: leaguesCreateNestedOneWithoutLeaguemembersInput
+    league_message_read_state?: league_message_read_stateCreateNestedOneWithoutLeaguemembersInput
     picks?: picksCreateNestedManyWithoutLeaguemembersInput
     superbowl?: superbowlCreateNestedManyWithoutLeaguemembersInput
   }
@@ -27223,6 +31956,7 @@ export namespace Prisma {
     paid?: boolean | null
     EmailLogs?: EmailLogsUncheckedCreateNestedManyWithoutLeaguemembersInput
     WeekWinners?: WeekWinnersUncheckedCreateNestedManyWithoutLeaguemembersInput
+    league_message_read_state?: league_message_read_stateUncheckedCreateNestedOneWithoutLeaguemembersInput
     picks?: picksUncheckedCreateNestedManyWithoutLeaguemembersInput
     superbowl?: superbowlUncheckedCreateNestedManyWithoutLeaguemembersInput
   }
@@ -27257,6 +31991,7 @@ export namespace Prisma {
     EmailLogs?: EmailLogsUpdateManyWithoutLeaguesNestedInput
     WeekWinners?: WeekWinnersUpdateManyWithoutLeaguesNestedInput
     leaguemembers?: leaguemembersUpdateManyWithoutLeaguesNestedInput
+    league_renewal_member_roles?: league_renewal_member_rolesUpdateManyWithoutLeaguesNestedInput
     people?: peopleUpdateOneRequiredWithoutLeaguesNestedInput
     prior_league?: leaguesUpdateOneWithoutFuture_leaguesNestedInput
     future_leagues?: leaguesUpdateManyWithoutPrior_leagueNestedInput
@@ -27279,6 +32014,7 @@ export namespace Prisma {
     EmailLogs?: EmailLogsUncheckedUpdateManyWithoutLeaguesNestedInput
     WeekWinners?: WeekWinnersUncheckedUpdateManyWithoutLeaguesNestedInput
     leaguemembers?: leaguemembersUncheckedUpdateManyWithoutLeaguesNestedInput
+    league_renewal_member_roles?: league_renewal_member_rolesUncheckedUpdateManyWithoutLeaguesNestedInput
     future_leagues?: leaguesUncheckedUpdateManyWithoutPrior_leagueNestedInput
   }
 
@@ -27301,6 +32037,7 @@ export namespace Prisma {
     WeekWinners?: WeekWinnersUpdateManyWithoutLeaguemembersNestedInput
     people?: peopleUpdateOneRequiredWithoutLeaguemembersNestedInput
     leagues?: leaguesUpdateOneRequiredWithoutLeaguemembersNestedInput
+    league_message_read_state?: league_message_read_stateUpdateOneWithoutLeaguemembersNestedInput
     picks?: picksUpdateManyWithoutLeaguemembersNestedInput
     superbowl?: superbowlUpdateManyWithoutLeaguemembersNestedInput
   }
@@ -27314,6 +32051,77 @@ export namespace Prisma {
     paid?: NullableBoolFieldUpdateOperationsInput | boolean | null
     EmailLogs?: EmailLogsUncheckedUpdateManyWithoutLeaguemembersNestedInput
     WeekWinners?: WeekWinnersUncheckedUpdateManyWithoutLeaguemembersNestedInput
+    league_message_read_state?: league_message_read_stateUncheckedUpdateOneWithoutLeaguemembersNestedInput
+    picks?: picksUncheckedUpdateManyWithoutLeaguemembersNestedInput
+    superbowl?: superbowlUncheckedUpdateManyWithoutLeaguemembersNestedInput
+  }
+
+  export type leaguemembersCreateWithoutLeague_message_read_stateInput = {
+    ts?: Date | string
+    role?: $Enums.MemberRole | null
+    paid?: boolean | null
+    EmailLogs?: EmailLogsCreateNestedManyWithoutLeaguemembersInput
+    WeekWinners?: WeekWinnersCreateNestedManyWithoutLeaguemembersInput
+    people: peopleCreateNestedOneWithoutLeaguemembersInput
+    leagues: leaguesCreateNestedOneWithoutLeaguemembersInput
+    leaguemessages?: leaguemessagesCreateNestedManyWithoutLeaguemembersInput
+    picks?: picksCreateNestedManyWithoutLeaguemembersInput
+    superbowl?: superbowlCreateNestedManyWithoutLeaguemembersInput
+  }
+
+  export type leaguemembersUncheckedCreateWithoutLeague_message_read_stateInput = {
+    membership_id?: number
+    league_id: number
+    user_id: number
+    ts?: Date | string
+    role?: $Enums.MemberRole | null
+    paid?: boolean | null
+    EmailLogs?: EmailLogsUncheckedCreateNestedManyWithoutLeaguemembersInput
+    WeekWinners?: WeekWinnersUncheckedCreateNestedManyWithoutLeaguemembersInput
+    leaguemessages?: leaguemessagesUncheckedCreateNestedManyWithoutLeaguemembersInput
+    picks?: picksUncheckedCreateNestedManyWithoutLeaguemembersInput
+    superbowl?: superbowlUncheckedCreateNestedManyWithoutLeaguemembersInput
+  }
+
+  export type leaguemembersCreateOrConnectWithoutLeague_message_read_stateInput = {
+    where: leaguemembersWhereUniqueInput
+    create: XOR<leaguemembersCreateWithoutLeague_message_read_stateInput, leaguemembersUncheckedCreateWithoutLeague_message_read_stateInput>
+  }
+
+  export type leaguemembersUpsertWithoutLeague_message_read_stateInput = {
+    update: XOR<leaguemembersUpdateWithoutLeague_message_read_stateInput, leaguemembersUncheckedUpdateWithoutLeague_message_read_stateInput>
+    create: XOR<leaguemembersCreateWithoutLeague_message_read_stateInput, leaguemembersUncheckedCreateWithoutLeague_message_read_stateInput>
+    where?: leaguemembersWhereInput
+  }
+
+  export type leaguemembersUpdateToOneWithWhereWithoutLeague_message_read_stateInput = {
+    where?: leaguemembersWhereInput
+    data: XOR<leaguemembersUpdateWithoutLeague_message_read_stateInput, leaguemembersUncheckedUpdateWithoutLeague_message_read_stateInput>
+  }
+
+  export type leaguemembersUpdateWithoutLeague_message_read_stateInput = {
+    ts?: DateTimeFieldUpdateOperationsInput | Date | string
+    role?: NullableEnumMemberRoleFieldUpdateOperationsInput | $Enums.MemberRole | null
+    paid?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    EmailLogs?: EmailLogsUpdateManyWithoutLeaguemembersNestedInput
+    WeekWinners?: WeekWinnersUpdateManyWithoutLeaguemembersNestedInput
+    people?: peopleUpdateOneRequiredWithoutLeaguemembersNestedInput
+    leagues?: leaguesUpdateOneRequiredWithoutLeaguemembersNestedInput
+    leaguemessages?: leaguemessagesUpdateManyWithoutLeaguemembersNestedInput
+    picks?: picksUpdateManyWithoutLeaguemembersNestedInput
+    superbowl?: superbowlUpdateManyWithoutLeaguemembersNestedInput
+  }
+
+  export type leaguemembersUncheckedUpdateWithoutLeague_message_read_stateInput = {
+    membership_id?: IntFieldUpdateOperationsInput | number
+    league_id?: IntFieldUpdateOperationsInput | number
+    user_id?: IntFieldUpdateOperationsInput | number
+    ts?: DateTimeFieldUpdateOperationsInput | Date | string
+    role?: NullableEnumMemberRoleFieldUpdateOperationsInput | $Enums.MemberRole | null
+    paid?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    EmailLogs?: EmailLogsUncheckedUpdateManyWithoutLeaguemembersNestedInput
+    WeekWinners?: WeekWinnersUncheckedUpdateManyWithoutLeaguemembersNestedInput
+    leaguemessages?: leaguemessagesUncheckedUpdateManyWithoutLeaguemembersNestedInput
     picks?: picksUncheckedUpdateManyWithoutLeaguemembersNestedInput
     superbowl?: superbowlUncheckedUpdateManyWithoutLeaguemembersNestedInput
   }
@@ -27324,6 +32132,11 @@ export namespace Prisma {
     ts?: Date | string
     week?: number | null
     resend_id: string
+    delivery_status?: $Enums.EmailDeliveryStatus
+    last_event_at?: Date | string | null
+    delivered_at?: Date | string | null
+    failed_at?: Date | string | null
+    failure_reason?: string | null
     leaguemembers: leaguemembersCreateNestedOneWithoutEmailLogsInput
   }
 
@@ -27334,6 +32147,11 @@ export namespace Prisma {
     ts?: Date | string
     week?: number | null
     resend_id: string
+    delivery_status?: $Enums.EmailDeliveryStatus
+    last_event_at?: Date | string | null
+    delivered_at?: Date | string | null
+    failed_at?: Date | string | null
+    failure_reason?: string | null
   }
 
   export type EmailLogsCreateOrConnectWithoutLeaguesInput = {
@@ -27379,6 +32197,7 @@ export namespace Prisma {
     WeekWinners?: WeekWinnersCreateNestedManyWithoutLeaguemembersInput
     people: peopleCreateNestedOneWithoutLeaguemembersInput
     leaguemessages?: leaguemessagesCreateNestedManyWithoutLeaguemembersInput
+    league_message_read_state?: league_message_read_stateCreateNestedOneWithoutLeaguemembersInput
     picks?: picksCreateNestedManyWithoutLeaguemembersInput
     superbowl?: superbowlCreateNestedManyWithoutLeaguemembersInput
   }
@@ -27392,6 +32211,7 @@ export namespace Prisma {
     EmailLogs?: EmailLogsUncheckedCreateNestedManyWithoutLeaguemembersInput
     WeekWinners?: WeekWinnersUncheckedCreateNestedManyWithoutLeaguemembersInput
     leaguemessages?: leaguemessagesUncheckedCreateNestedManyWithoutLeaguemembersInput
+    league_message_read_state?: league_message_read_stateUncheckedCreateNestedOneWithoutLeaguemembersInput
     picks?: picksUncheckedCreateNestedManyWithoutLeaguemembersInput
     superbowl?: superbowlUncheckedCreateNestedManyWithoutLeaguemembersInput
   }
@@ -27436,6 +32256,32 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type league_renewal_member_rolesCreateWithoutLeaguesInput = {
+    renewal_member_role_id?: string
+    role?: $Enums.MemberRole
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    people: peopleCreateNestedOneWithoutLeague_renewal_member_rolesInput
+  }
+
+  export type league_renewal_member_rolesUncheckedCreateWithoutLeaguesInput = {
+    renewal_member_role_id?: string
+    user_id: number
+    role?: $Enums.MemberRole
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type league_renewal_member_rolesCreateOrConnectWithoutLeaguesInput = {
+    where: league_renewal_member_rolesWhereUniqueInput
+    create: XOR<league_renewal_member_rolesCreateWithoutLeaguesInput, league_renewal_member_rolesUncheckedCreateWithoutLeaguesInput>
+  }
+
+  export type league_renewal_member_rolesCreateManyLeaguesInputEnvelope = {
+    data: league_renewal_member_rolesCreateManyLeaguesInput | league_renewal_member_rolesCreateManyLeaguesInput[]
+    skipDuplicates?: boolean
+  }
+
   export type peopleCreateWithoutLeaguesInput = {
     username: string
     fname: string
@@ -27448,6 +32294,7 @@ export namespace Prisma {
     google_userid?: string | null
     supabase_id?: string | null
     leaguemembers?: leaguemembersCreateNestedManyWithoutPeopleInput
+    league_renewal_member_roles?: league_renewal_member_rolesCreateNestedManyWithoutPeopleInput
     picks?: picksCreateNestedManyWithoutPeopleInput
     pushNotificationTokens?: pushNotificationTokensCreateNestedManyWithoutPeopleInput
   }
@@ -27465,6 +32312,7 @@ export namespace Prisma {
     google_userid?: string | null
     supabase_id?: string | null
     leaguemembers?: leaguemembersUncheckedCreateNestedManyWithoutPeopleInput
+    league_renewal_member_roles?: league_renewal_member_rolesUncheckedCreateNestedManyWithoutPeopleInput
     picks?: picksUncheckedCreateNestedManyWithoutPeopleInput
     pushNotificationTokens?: pushNotificationTokensUncheckedCreateNestedManyWithoutPeopleInput
   }
@@ -27489,6 +32337,7 @@ export namespace Prisma {
     WeekWinners?: WeekWinnersCreateNestedManyWithoutLeaguesInput
     leaguemembers?: leaguemembersCreateNestedManyWithoutLeaguesInput
     leaguemessages?: leaguemessagesCreateNestedManyWithoutLeaguesInput
+    league_renewal_member_roles?: league_renewal_member_rolesCreateNestedManyWithoutLeaguesInput
     people: peopleCreateNestedOneWithoutLeaguesInput
     prior_league?: leaguesCreateNestedOneWithoutFuture_leaguesInput
   }
@@ -27511,6 +32360,7 @@ export namespace Prisma {
     WeekWinners?: WeekWinnersUncheckedCreateNestedManyWithoutLeaguesInput
     leaguemembers?: leaguemembersUncheckedCreateNestedManyWithoutLeaguesInput
     leaguemessages?: leaguemessagesUncheckedCreateNestedManyWithoutLeaguesInput
+    league_renewal_member_roles?: league_renewal_member_rolesUncheckedCreateNestedManyWithoutLeaguesInput
   }
 
   export type leaguesCreateOrConnectWithoutFuture_leaguesInput = {
@@ -27533,6 +32383,7 @@ export namespace Prisma {
     WeekWinners?: WeekWinnersCreateNestedManyWithoutLeaguesInput
     leaguemembers?: leaguemembersCreateNestedManyWithoutLeaguesInput
     leaguemessages?: leaguemessagesCreateNestedManyWithoutLeaguesInput
+    league_renewal_member_roles?: league_renewal_member_rolesCreateNestedManyWithoutLeaguesInput
     people: peopleCreateNestedOneWithoutLeaguesInput
     future_leagues?: leaguesCreateNestedManyWithoutPrior_leagueInput
   }
@@ -27554,6 +32405,7 @@ export namespace Prisma {
     WeekWinners?: WeekWinnersUncheckedCreateNestedManyWithoutLeaguesInput
     leaguemembers?: leaguemembersUncheckedCreateNestedManyWithoutLeaguesInput
     leaguemessages?: leaguemessagesUncheckedCreateNestedManyWithoutLeaguesInput
+    league_renewal_member_roles?: league_renewal_member_rolesUncheckedCreateNestedManyWithoutLeaguesInput
     future_leagues?: leaguesUncheckedCreateNestedManyWithoutPrior_leagueInput
   }
 
@@ -27643,6 +32495,34 @@ export namespace Prisma {
     data: XOR<leaguemessagesUpdateManyMutationInput, leaguemessagesUncheckedUpdateManyWithoutLeaguesInput>
   }
 
+  export type league_renewal_member_rolesUpsertWithWhereUniqueWithoutLeaguesInput = {
+    where: league_renewal_member_rolesWhereUniqueInput
+    update: XOR<league_renewal_member_rolesUpdateWithoutLeaguesInput, league_renewal_member_rolesUncheckedUpdateWithoutLeaguesInput>
+    create: XOR<league_renewal_member_rolesCreateWithoutLeaguesInput, league_renewal_member_rolesUncheckedCreateWithoutLeaguesInput>
+  }
+
+  export type league_renewal_member_rolesUpdateWithWhereUniqueWithoutLeaguesInput = {
+    where: league_renewal_member_rolesWhereUniqueInput
+    data: XOR<league_renewal_member_rolesUpdateWithoutLeaguesInput, league_renewal_member_rolesUncheckedUpdateWithoutLeaguesInput>
+  }
+
+  export type league_renewal_member_rolesUpdateManyWithWhereWithoutLeaguesInput = {
+    where: league_renewal_member_rolesScalarWhereInput
+    data: XOR<league_renewal_member_rolesUpdateManyMutationInput, league_renewal_member_rolesUncheckedUpdateManyWithoutLeaguesInput>
+  }
+
+  export type league_renewal_member_rolesScalarWhereInput = {
+    AND?: league_renewal_member_rolesScalarWhereInput | league_renewal_member_rolesScalarWhereInput[]
+    OR?: league_renewal_member_rolesScalarWhereInput[]
+    NOT?: league_renewal_member_rolesScalarWhereInput | league_renewal_member_rolesScalarWhereInput[]
+    renewal_member_role_id?: StringFilter<"league_renewal_member_roles"> | string
+    league_id?: IntFilter<"league_renewal_member_roles"> | number
+    user_id?: IntFilter<"league_renewal_member_roles"> | number
+    role?: EnumMemberRoleFilter<"league_renewal_member_roles"> | $Enums.MemberRole
+    createdAt?: DateTimeFilter<"league_renewal_member_roles"> | Date | string
+    updatedAt?: DateTimeFilter<"league_renewal_member_roles"> | Date | string
+  }
+
   export type peopleUpsertWithoutLeaguesInput = {
     update: XOR<peopleUpdateWithoutLeaguesInput, peopleUncheckedUpdateWithoutLeaguesInput>
     create: XOR<peopleCreateWithoutLeaguesInput, peopleUncheckedCreateWithoutLeaguesInput>
@@ -27666,6 +32546,7 @@ export namespace Prisma {
     google_userid?: NullableStringFieldUpdateOperationsInput | string | null
     supabase_id?: NullableStringFieldUpdateOperationsInput | string | null
     leaguemembers?: leaguemembersUpdateManyWithoutPeopleNestedInput
+    league_renewal_member_roles?: league_renewal_member_rolesUpdateManyWithoutPeopleNestedInput
     picks?: picksUpdateManyWithoutPeopleNestedInput
     pushNotificationTokens?: pushNotificationTokensUpdateManyWithoutPeopleNestedInput
   }
@@ -27683,6 +32564,7 @@ export namespace Prisma {
     google_userid?: NullableStringFieldUpdateOperationsInput | string | null
     supabase_id?: NullableStringFieldUpdateOperationsInput | string | null
     leaguemembers?: leaguemembersUncheckedUpdateManyWithoutPeopleNestedInput
+    league_renewal_member_roles?: league_renewal_member_rolesUncheckedUpdateManyWithoutPeopleNestedInput
     picks?: picksUncheckedUpdateManyWithoutPeopleNestedInput
     pushNotificationTokens?: pushNotificationTokensUncheckedUpdateManyWithoutPeopleNestedInput
   }
@@ -27713,6 +32595,7 @@ export namespace Prisma {
     WeekWinners?: WeekWinnersUpdateManyWithoutLeaguesNestedInput
     leaguemembers?: leaguemembersUpdateManyWithoutLeaguesNestedInput
     leaguemessages?: leaguemessagesUpdateManyWithoutLeaguesNestedInput
+    league_renewal_member_roles?: league_renewal_member_rolesUpdateManyWithoutLeaguesNestedInput
     people?: peopleUpdateOneRequiredWithoutLeaguesNestedInput
     prior_league?: leaguesUpdateOneWithoutFuture_leaguesNestedInput
   }
@@ -27735,6 +32618,7 @@ export namespace Prisma {
     WeekWinners?: WeekWinnersUncheckedUpdateManyWithoutLeaguesNestedInput
     leaguemembers?: leaguemembersUncheckedUpdateManyWithoutLeaguesNestedInput
     leaguemessages?: leaguemessagesUncheckedUpdateManyWithoutLeaguesNestedInput
+    league_renewal_member_roles?: league_renewal_member_rolesUncheckedUpdateManyWithoutLeaguesNestedInput
   }
 
   export type leaguesUpsertWithWhereUniqueWithoutPrior_leagueInput = {
@@ -27772,6 +32656,190 @@ export namespace Prisma {
     status?: EnumLeagueStatusFilter<"leagues"> | $Enums.LeagueStatus
   }
 
+  export type leaguesCreateWithoutLeague_renewal_member_rolesInput = {
+    name: string
+    created_time?: Date | string
+    season: number
+    late_policy?: $Enums.LatePolicy | null
+    pick_policy?: $Enums.PickPolicy | null
+    reminder_policy?: $Enums.ReminderPolicy | null
+    scoring_type?: $Enums.ScoringType | null
+    share_code?: string | null
+    superbowl_competition?: boolean | null
+    status?: $Enums.LeagueStatus
+    EmailLogs?: EmailLogsCreateNestedManyWithoutLeaguesInput
+    WeekWinners?: WeekWinnersCreateNestedManyWithoutLeaguesInput
+    leaguemembers?: leaguemembersCreateNestedManyWithoutLeaguesInput
+    leaguemessages?: leaguemessagesCreateNestedManyWithoutLeaguesInput
+    people: peopleCreateNestedOneWithoutLeaguesInput
+    prior_league?: leaguesCreateNestedOneWithoutFuture_leaguesInput
+    future_leagues?: leaguesCreateNestedManyWithoutPrior_leagueInput
+  }
+
+  export type leaguesUncheckedCreateWithoutLeague_renewal_member_rolesInput = {
+    league_id?: number
+    created_by_user_id: number
+    name: string
+    created_time?: Date | string
+    season: number
+    late_policy?: $Enums.LatePolicy | null
+    pick_policy?: $Enums.PickPolicy | null
+    reminder_policy?: $Enums.ReminderPolicy | null
+    scoring_type?: $Enums.ScoringType | null
+    share_code?: string | null
+    superbowl_competition?: boolean | null
+    prior_league_id?: number | null
+    status?: $Enums.LeagueStatus
+    EmailLogs?: EmailLogsUncheckedCreateNestedManyWithoutLeaguesInput
+    WeekWinners?: WeekWinnersUncheckedCreateNestedManyWithoutLeaguesInput
+    leaguemembers?: leaguemembersUncheckedCreateNestedManyWithoutLeaguesInput
+    leaguemessages?: leaguemessagesUncheckedCreateNestedManyWithoutLeaguesInput
+    future_leagues?: leaguesUncheckedCreateNestedManyWithoutPrior_leagueInput
+  }
+
+  export type leaguesCreateOrConnectWithoutLeague_renewal_member_rolesInput = {
+    where: leaguesWhereUniqueInput
+    create: XOR<leaguesCreateWithoutLeague_renewal_member_rolesInput, leaguesUncheckedCreateWithoutLeague_renewal_member_rolesInput>
+  }
+
+  export type peopleCreateWithoutLeague_renewal_member_rolesInput = {
+    username: string
+    fname: string
+    lname: string
+    email: string
+    season: number
+    email2?: string | null
+    google_photo_url?: string | null
+    google_email?: string | null
+    google_userid?: string | null
+    supabase_id?: string | null
+    leaguemembers?: leaguemembersCreateNestedManyWithoutPeopleInput
+    leagues?: leaguesCreateNestedManyWithoutPeopleInput
+    picks?: picksCreateNestedManyWithoutPeopleInput
+    pushNotificationTokens?: pushNotificationTokensCreateNestedManyWithoutPeopleInput
+  }
+
+  export type peopleUncheckedCreateWithoutLeague_renewal_member_rolesInput = {
+    uid?: number
+    username: string
+    fname: string
+    lname: string
+    email: string
+    season: number
+    email2?: string | null
+    google_photo_url?: string | null
+    google_email?: string | null
+    google_userid?: string | null
+    supabase_id?: string | null
+    leaguemembers?: leaguemembersUncheckedCreateNestedManyWithoutPeopleInput
+    leagues?: leaguesUncheckedCreateNestedManyWithoutPeopleInput
+    picks?: picksUncheckedCreateNestedManyWithoutPeopleInput
+    pushNotificationTokens?: pushNotificationTokensUncheckedCreateNestedManyWithoutPeopleInput
+  }
+
+  export type peopleCreateOrConnectWithoutLeague_renewal_member_rolesInput = {
+    where: peopleWhereUniqueInput
+    create: XOR<peopleCreateWithoutLeague_renewal_member_rolesInput, peopleUncheckedCreateWithoutLeague_renewal_member_rolesInput>
+  }
+
+  export type leaguesUpsertWithoutLeague_renewal_member_rolesInput = {
+    update: XOR<leaguesUpdateWithoutLeague_renewal_member_rolesInput, leaguesUncheckedUpdateWithoutLeague_renewal_member_rolesInput>
+    create: XOR<leaguesCreateWithoutLeague_renewal_member_rolesInput, leaguesUncheckedCreateWithoutLeague_renewal_member_rolesInput>
+    where?: leaguesWhereInput
+  }
+
+  export type leaguesUpdateToOneWithWhereWithoutLeague_renewal_member_rolesInput = {
+    where?: leaguesWhereInput
+    data: XOR<leaguesUpdateWithoutLeague_renewal_member_rolesInput, leaguesUncheckedUpdateWithoutLeague_renewal_member_rolesInput>
+  }
+
+  export type leaguesUpdateWithoutLeague_renewal_member_rolesInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    created_time?: DateTimeFieldUpdateOperationsInput | Date | string
+    season?: IntFieldUpdateOperationsInput | number
+    late_policy?: NullableEnumLatePolicyFieldUpdateOperationsInput | $Enums.LatePolicy | null
+    pick_policy?: NullableEnumPickPolicyFieldUpdateOperationsInput | $Enums.PickPolicy | null
+    reminder_policy?: NullableEnumReminderPolicyFieldUpdateOperationsInput | $Enums.ReminderPolicy | null
+    scoring_type?: NullableEnumScoringTypeFieldUpdateOperationsInput | $Enums.ScoringType | null
+    share_code?: NullableStringFieldUpdateOperationsInput | string | null
+    superbowl_competition?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    status?: EnumLeagueStatusFieldUpdateOperationsInput | $Enums.LeagueStatus
+    EmailLogs?: EmailLogsUpdateManyWithoutLeaguesNestedInput
+    WeekWinners?: WeekWinnersUpdateManyWithoutLeaguesNestedInput
+    leaguemembers?: leaguemembersUpdateManyWithoutLeaguesNestedInput
+    leaguemessages?: leaguemessagesUpdateManyWithoutLeaguesNestedInput
+    people?: peopleUpdateOneRequiredWithoutLeaguesNestedInput
+    prior_league?: leaguesUpdateOneWithoutFuture_leaguesNestedInput
+    future_leagues?: leaguesUpdateManyWithoutPrior_leagueNestedInput
+  }
+
+  export type leaguesUncheckedUpdateWithoutLeague_renewal_member_rolesInput = {
+    league_id?: IntFieldUpdateOperationsInput | number
+    created_by_user_id?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    created_time?: DateTimeFieldUpdateOperationsInput | Date | string
+    season?: IntFieldUpdateOperationsInput | number
+    late_policy?: NullableEnumLatePolicyFieldUpdateOperationsInput | $Enums.LatePolicy | null
+    pick_policy?: NullableEnumPickPolicyFieldUpdateOperationsInput | $Enums.PickPolicy | null
+    reminder_policy?: NullableEnumReminderPolicyFieldUpdateOperationsInput | $Enums.ReminderPolicy | null
+    scoring_type?: NullableEnumScoringTypeFieldUpdateOperationsInput | $Enums.ScoringType | null
+    share_code?: NullableStringFieldUpdateOperationsInput | string | null
+    superbowl_competition?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    prior_league_id?: NullableIntFieldUpdateOperationsInput | number | null
+    status?: EnumLeagueStatusFieldUpdateOperationsInput | $Enums.LeagueStatus
+    EmailLogs?: EmailLogsUncheckedUpdateManyWithoutLeaguesNestedInput
+    WeekWinners?: WeekWinnersUncheckedUpdateManyWithoutLeaguesNestedInput
+    leaguemembers?: leaguemembersUncheckedUpdateManyWithoutLeaguesNestedInput
+    leaguemessages?: leaguemessagesUncheckedUpdateManyWithoutLeaguesNestedInput
+    future_leagues?: leaguesUncheckedUpdateManyWithoutPrior_leagueNestedInput
+  }
+
+  export type peopleUpsertWithoutLeague_renewal_member_rolesInput = {
+    update: XOR<peopleUpdateWithoutLeague_renewal_member_rolesInput, peopleUncheckedUpdateWithoutLeague_renewal_member_rolesInput>
+    create: XOR<peopleCreateWithoutLeague_renewal_member_rolesInput, peopleUncheckedCreateWithoutLeague_renewal_member_rolesInput>
+    where?: peopleWhereInput
+  }
+
+  export type peopleUpdateToOneWithWhereWithoutLeague_renewal_member_rolesInput = {
+    where?: peopleWhereInput
+    data: XOR<peopleUpdateWithoutLeague_renewal_member_rolesInput, peopleUncheckedUpdateWithoutLeague_renewal_member_rolesInput>
+  }
+
+  export type peopleUpdateWithoutLeague_renewal_member_rolesInput = {
+    username?: StringFieldUpdateOperationsInput | string
+    fname?: StringFieldUpdateOperationsInput | string
+    lname?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    season?: IntFieldUpdateOperationsInput | number
+    email2?: NullableStringFieldUpdateOperationsInput | string | null
+    google_photo_url?: NullableStringFieldUpdateOperationsInput | string | null
+    google_email?: NullableStringFieldUpdateOperationsInput | string | null
+    google_userid?: NullableStringFieldUpdateOperationsInput | string | null
+    supabase_id?: NullableStringFieldUpdateOperationsInput | string | null
+    leaguemembers?: leaguemembersUpdateManyWithoutPeopleNestedInput
+    leagues?: leaguesUpdateManyWithoutPeopleNestedInput
+    picks?: picksUpdateManyWithoutPeopleNestedInput
+    pushNotificationTokens?: pushNotificationTokensUpdateManyWithoutPeopleNestedInput
+  }
+
+  export type peopleUncheckedUpdateWithoutLeague_renewal_member_rolesInput = {
+    uid?: IntFieldUpdateOperationsInput | number
+    username?: StringFieldUpdateOperationsInput | string
+    fname?: StringFieldUpdateOperationsInput | string
+    lname?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    season?: IntFieldUpdateOperationsInput | number
+    email2?: NullableStringFieldUpdateOperationsInput | string | null
+    google_photo_url?: NullableStringFieldUpdateOperationsInput | string | null
+    google_email?: NullableStringFieldUpdateOperationsInput | string | null
+    google_userid?: NullableStringFieldUpdateOperationsInput | string | null
+    supabase_id?: NullableStringFieldUpdateOperationsInput | string | null
+    leaguemembers?: leaguemembersUncheckedUpdateManyWithoutPeopleNestedInput
+    leagues?: leaguesUncheckedUpdateManyWithoutPeopleNestedInput
+    picks?: picksUncheckedUpdateManyWithoutPeopleNestedInput
+    pushNotificationTokens?: pushNotificationTokensUncheckedUpdateManyWithoutPeopleNestedInput
+  }
+
   export type leaguemembersCreateWithoutPeopleInput = {
     ts?: Date | string
     role?: $Enums.MemberRole | null
@@ -27780,6 +32848,7 @@ export namespace Prisma {
     WeekWinners?: WeekWinnersCreateNestedManyWithoutLeaguemembersInput
     leagues: leaguesCreateNestedOneWithoutLeaguemembersInput
     leaguemessages?: leaguemessagesCreateNestedManyWithoutLeaguemembersInput
+    league_message_read_state?: league_message_read_stateCreateNestedOneWithoutLeaguemembersInput
     picks?: picksCreateNestedManyWithoutLeaguemembersInput
     superbowl?: superbowlCreateNestedManyWithoutLeaguemembersInput
   }
@@ -27793,6 +32862,7 @@ export namespace Prisma {
     EmailLogs?: EmailLogsUncheckedCreateNestedManyWithoutLeaguemembersInput
     WeekWinners?: WeekWinnersUncheckedCreateNestedManyWithoutLeaguemembersInput
     leaguemessages?: leaguemessagesUncheckedCreateNestedManyWithoutLeaguemembersInput
+    league_message_read_state?: league_message_read_stateUncheckedCreateNestedOneWithoutLeaguemembersInput
     picks?: picksUncheckedCreateNestedManyWithoutLeaguemembersInput
     superbowl?: superbowlUncheckedCreateNestedManyWithoutLeaguemembersInput
   }
@@ -27804,6 +32874,32 @@ export namespace Prisma {
 
   export type leaguemembersCreateManyPeopleInputEnvelope = {
     data: leaguemembersCreateManyPeopleInput | leaguemembersCreateManyPeopleInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type league_renewal_member_rolesCreateWithoutPeopleInput = {
+    renewal_member_role_id?: string
+    role?: $Enums.MemberRole
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    leagues: leaguesCreateNestedOneWithoutLeague_renewal_member_rolesInput
+  }
+
+  export type league_renewal_member_rolesUncheckedCreateWithoutPeopleInput = {
+    renewal_member_role_id?: string
+    league_id: number
+    role?: $Enums.MemberRole
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type league_renewal_member_rolesCreateOrConnectWithoutPeopleInput = {
+    where: league_renewal_member_rolesWhereUniqueInput
+    create: XOR<league_renewal_member_rolesCreateWithoutPeopleInput, league_renewal_member_rolesUncheckedCreateWithoutPeopleInput>
+  }
+
+  export type league_renewal_member_rolesCreateManyPeopleInputEnvelope = {
+    data: league_renewal_member_rolesCreateManyPeopleInput | league_renewal_member_rolesCreateManyPeopleInput[]
     skipDuplicates?: boolean
   }
 
@@ -27822,6 +32918,7 @@ export namespace Prisma {
     WeekWinners?: WeekWinnersCreateNestedManyWithoutLeaguesInput
     leaguemembers?: leaguemembersCreateNestedManyWithoutLeaguesInput
     leaguemessages?: leaguemessagesCreateNestedManyWithoutLeaguesInput
+    league_renewal_member_roles?: league_renewal_member_rolesCreateNestedManyWithoutLeaguesInput
     prior_league?: leaguesCreateNestedOneWithoutFuture_leaguesInput
     future_leagues?: leaguesCreateNestedManyWithoutPrior_leagueInput
   }
@@ -27843,6 +32940,7 @@ export namespace Prisma {
     WeekWinners?: WeekWinnersUncheckedCreateNestedManyWithoutLeaguesInput
     leaguemembers?: leaguemembersUncheckedCreateNestedManyWithoutLeaguesInput
     leaguemessages?: leaguemessagesUncheckedCreateNestedManyWithoutLeaguesInput
+    league_renewal_member_roles?: league_renewal_member_rolesUncheckedCreateNestedManyWithoutLeaguesInput
     future_leagues?: leaguesUncheckedCreateNestedManyWithoutPrior_leagueInput
   }
 
@@ -27941,6 +33039,22 @@ export namespace Prisma {
     data: XOR<leaguemembersUpdateManyMutationInput, leaguemembersUncheckedUpdateManyWithoutPeopleInput>
   }
 
+  export type league_renewal_member_rolesUpsertWithWhereUniqueWithoutPeopleInput = {
+    where: league_renewal_member_rolesWhereUniqueInput
+    update: XOR<league_renewal_member_rolesUpdateWithoutPeopleInput, league_renewal_member_rolesUncheckedUpdateWithoutPeopleInput>
+    create: XOR<league_renewal_member_rolesCreateWithoutPeopleInput, league_renewal_member_rolesUncheckedCreateWithoutPeopleInput>
+  }
+
+  export type league_renewal_member_rolesUpdateWithWhereUniqueWithoutPeopleInput = {
+    where: league_renewal_member_rolesWhereUniqueInput
+    data: XOR<league_renewal_member_rolesUpdateWithoutPeopleInput, league_renewal_member_rolesUncheckedUpdateWithoutPeopleInput>
+  }
+
+  export type league_renewal_member_rolesUpdateManyWithWhereWithoutPeopleInput = {
+    where: league_renewal_member_rolesScalarWhereInput
+    data: XOR<league_renewal_member_rolesUpdateManyMutationInput, league_renewal_member_rolesUncheckedUpdateManyWithoutPeopleInput>
+  }
+
   export type leaguesUpsertWithWhereUniqueWithoutPeopleInput = {
     where: leaguesWhereUniqueInput
     update: XOR<leaguesUpdateWithoutPeopleInput, leaguesUncheckedUpdateWithoutPeopleInput>
@@ -28015,6 +33129,7 @@ export namespace Prisma {
     google_userid?: string | null
     supabase_id?: string | null
     leaguemembers?: leaguemembersCreateNestedManyWithoutPeopleInput
+    league_renewal_member_roles?: league_renewal_member_rolesCreateNestedManyWithoutPeopleInput
     leagues?: leaguesCreateNestedManyWithoutPeopleInput
     picks?: picksCreateNestedManyWithoutPeopleInput
   }
@@ -28032,6 +33147,7 @@ export namespace Prisma {
     google_userid?: string | null
     supabase_id?: string | null
     leaguemembers?: leaguemembersUncheckedCreateNestedManyWithoutPeopleInput
+    league_renewal_member_roles?: league_renewal_member_rolesUncheckedCreateNestedManyWithoutPeopleInput
     leagues?: leaguesUncheckedCreateNestedManyWithoutPeopleInput
     picks?: picksUncheckedCreateNestedManyWithoutPeopleInput
   }
@@ -28064,6 +33180,7 @@ export namespace Prisma {
     google_userid?: NullableStringFieldUpdateOperationsInput | string | null
     supabase_id?: NullableStringFieldUpdateOperationsInput | string | null
     leaguemembers?: leaguemembersUpdateManyWithoutPeopleNestedInput
+    league_renewal_member_roles?: league_renewal_member_rolesUpdateManyWithoutPeopleNestedInput
     leagues?: leaguesUpdateManyWithoutPeopleNestedInput
     picks?: picksUpdateManyWithoutPeopleNestedInput
   }
@@ -28081,6 +33198,7 @@ export namespace Prisma {
     google_userid?: NullableStringFieldUpdateOperationsInput | string | null
     supabase_id?: NullableStringFieldUpdateOperationsInput | string | null
     leaguemembers?: leaguemembersUncheckedUpdateManyWithoutPeopleNestedInput
+    league_renewal_member_roles?: league_renewal_member_rolesUncheckedUpdateManyWithoutPeopleNestedInput
     leagues?: leaguesUncheckedUpdateManyWithoutPeopleNestedInput
     picks?: picksUncheckedUpdateManyWithoutPeopleNestedInput
   }
@@ -28147,6 +33265,7 @@ export namespace Prisma {
     google_userid?: string | null
     supabase_id?: string | null
     leaguemembers?: leaguemembersCreateNestedManyWithoutPeopleInput
+    league_renewal_member_roles?: league_renewal_member_rolesCreateNestedManyWithoutPeopleInput
     leagues?: leaguesCreateNestedManyWithoutPeopleInput
     pushNotificationTokens?: pushNotificationTokensCreateNestedManyWithoutPeopleInput
   }
@@ -28164,6 +33283,7 @@ export namespace Prisma {
     google_userid?: string | null
     supabase_id?: string | null
     leaguemembers?: leaguemembersUncheckedCreateNestedManyWithoutPeopleInput
+    league_renewal_member_roles?: league_renewal_member_rolesUncheckedCreateNestedManyWithoutPeopleInput
     leagues?: leaguesUncheckedCreateNestedManyWithoutPeopleInput
     pushNotificationTokens?: pushNotificationTokensUncheckedCreateNestedManyWithoutPeopleInput
   }
@@ -28182,6 +33302,7 @@ export namespace Prisma {
     people: peopleCreateNestedOneWithoutLeaguemembersInput
     leagues: leaguesCreateNestedOneWithoutLeaguemembersInput
     leaguemessages?: leaguemessagesCreateNestedManyWithoutLeaguemembersInput
+    league_message_read_state?: league_message_read_stateCreateNestedOneWithoutLeaguemembersInput
     superbowl?: superbowlCreateNestedManyWithoutLeaguemembersInput
   }
 
@@ -28195,6 +33316,7 @@ export namespace Prisma {
     EmailLogs?: EmailLogsUncheckedCreateNestedManyWithoutLeaguemembersInput
     WeekWinners?: WeekWinnersUncheckedCreateNestedManyWithoutLeaguemembersInput
     leaguemessages?: leaguemessagesUncheckedCreateNestedManyWithoutLeaguemembersInput
+    league_message_read_state?: league_message_read_stateUncheckedCreateNestedOneWithoutLeaguemembersInput
     superbowl?: superbowlUncheckedCreateNestedManyWithoutLeaguemembersInput
   }
 
@@ -28324,6 +33446,7 @@ export namespace Prisma {
     google_userid?: NullableStringFieldUpdateOperationsInput | string | null
     supabase_id?: NullableStringFieldUpdateOperationsInput | string | null
     leaguemembers?: leaguemembersUpdateManyWithoutPeopleNestedInput
+    league_renewal_member_roles?: league_renewal_member_rolesUpdateManyWithoutPeopleNestedInput
     leagues?: leaguesUpdateManyWithoutPeopleNestedInput
     pushNotificationTokens?: pushNotificationTokensUpdateManyWithoutPeopleNestedInput
   }
@@ -28341,6 +33464,7 @@ export namespace Prisma {
     google_userid?: NullableStringFieldUpdateOperationsInput | string | null
     supabase_id?: NullableStringFieldUpdateOperationsInput | string | null
     leaguemembers?: leaguemembersUncheckedUpdateManyWithoutPeopleNestedInput
+    league_renewal_member_roles?: league_renewal_member_rolesUncheckedUpdateManyWithoutPeopleNestedInput
     leagues?: leaguesUncheckedUpdateManyWithoutPeopleNestedInput
     pushNotificationTokens?: pushNotificationTokensUncheckedUpdateManyWithoutPeopleNestedInput
   }
@@ -28365,6 +33489,7 @@ export namespace Prisma {
     people?: peopleUpdateOneRequiredWithoutLeaguemembersNestedInput
     leagues?: leaguesUpdateOneRequiredWithoutLeaguemembersNestedInput
     leaguemessages?: leaguemessagesUpdateManyWithoutLeaguemembersNestedInput
+    league_message_read_state?: league_message_read_stateUpdateOneWithoutLeaguemembersNestedInput
     superbowl?: superbowlUpdateManyWithoutLeaguemembersNestedInput
   }
 
@@ -28378,6 +33503,7 @@ export namespace Prisma {
     EmailLogs?: EmailLogsUncheckedUpdateManyWithoutLeaguemembersNestedInput
     WeekWinners?: WeekWinnersUncheckedUpdateManyWithoutLeaguemembersNestedInput
     leaguemessages?: leaguemessagesUncheckedUpdateManyWithoutLeaguemembersNestedInput
+    league_message_read_state?: league_message_read_stateUncheckedUpdateOneWithoutLeaguemembersNestedInput
     superbowl?: superbowlUncheckedUpdateManyWithoutLeaguemembersNestedInput
   }
 
@@ -28480,6 +33606,7 @@ export namespace Prisma {
     people: peopleCreateNestedOneWithoutLeaguemembersInput
     leagues: leaguesCreateNestedOneWithoutLeaguemembersInput
     leaguemessages?: leaguemessagesCreateNestedManyWithoutLeaguemembersInput
+    league_message_read_state?: league_message_read_stateCreateNestedOneWithoutLeaguemembersInput
     picks?: picksCreateNestedManyWithoutLeaguemembersInput
   }
 
@@ -28493,6 +33620,7 @@ export namespace Prisma {
     EmailLogs?: EmailLogsUncheckedCreateNestedManyWithoutLeaguemembersInput
     WeekWinners?: WeekWinnersUncheckedCreateNestedManyWithoutLeaguemembersInput
     leaguemessages?: leaguemessagesUncheckedCreateNestedManyWithoutLeaguemembersInput
+    league_message_read_state?: league_message_read_stateUncheckedCreateNestedOneWithoutLeaguemembersInput
     picks?: picksUncheckedCreateNestedManyWithoutLeaguemembersInput
   }
 
@@ -28611,6 +33739,7 @@ export namespace Prisma {
     people?: peopleUpdateOneRequiredWithoutLeaguemembersNestedInput
     leagues?: leaguesUpdateOneRequiredWithoutLeaguemembersNestedInput
     leaguemessages?: leaguemessagesUpdateManyWithoutLeaguemembersNestedInput
+    league_message_read_state?: league_message_read_stateUpdateOneWithoutLeaguemembersNestedInput
     picks?: picksUpdateManyWithoutLeaguemembersNestedInput
   }
 
@@ -28624,6 +33753,7 @@ export namespace Prisma {
     EmailLogs?: EmailLogsUncheckedUpdateManyWithoutLeaguemembersNestedInput
     WeekWinners?: WeekWinnersUncheckedUpdateManyWithoutLeaguemembersNestedInput
     leaguemessages?: leaguemessagesUncheckedUpdateManyWithoutLeaguemembersNestedInput
+    league_message_read_state?: league_message_read_stateUncheckedUpdateOneWithoutLeaguemembersNestedInput
     picks?: picksUncheckedUpdateManyWithoutLeaguemembersNestedInput
   }
 
@@ -29809,6 +34939,11 @@ export namespace Prisma {
     ts?: Date | string
     week?: number | null
     resend_id: string
+    delivery_status?: $Enums.EmailDeliveryStatus
+    last_event_at?: Date | string | null
+    delivered_at?: Date | string | null
+    failed_at?: Date | string | null
+    failure_reason?: string | null
   }
 
   export type WeekWinnersCreateManyLeaguemembersInput = {
@@ -29860,6 +34995,11 @@ export namespace Prisma {
     ts?: DateTimeFieldUpdateOperationsInput | Date | string
     week?: NullableIntFieldUpdateOperationsInput | number | null
     resend_id?: StringFieldUpdateOperationsInput | string
+    delivery_status?: EnumEmailDeliveryStatusFieldUpdateOperationsInput | $Enums.EmailDeliveryStatus
+    last_event_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    delivered_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    failed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    failure_reason?: NullableStringFieldUpdateOperationsInput | string | null
     leagues?: leaguesUpdateOneRequiredWithoutEmailLogsNestedInput
   }
 
@@ -29870,6 +35010,11 @@ export namespace Prisma {
     ts?: DateTimeFieldUpdateOperationsInput | Date | string
     week?: NullableIntFieldUpdateOperationsInput | number | null
     resend_id?: StringFieldUpdateOperationsInput | string
+    delivery_status?: EnumEmailDeliveryStatusFieldUpdateOperationsInput | $Enums.EmailDeliveryStatus
+    last_event_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    delivered_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    failed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    failure_reason?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type EmailLogsUncheckedUpdateManyWithoutLeaguemembersInput = {
@@ -29879,6 +35024,11 @@ export namespace Prisma {
     ts?: DateTimeFieldUpdateOperationsInput | Date | string
     week?: NullableIntFieldUpdateOperationsInput | number | null
     resend_id?: StringFieldUpdateOperationsInput | string
+    delivery_status?: EnumEmailDeliveryStatusFieldUpdateOperationsInput | $Enums.EmailDeliveryStatus
+    last_event_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    delivered_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    failed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    failure_reason?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type WeekWinnersUpdateWithoutLeaguemembersInput = {
@@ -30014,6 +35164,11 @@ export namespace Prisma {
     ts?: Date | string
     week?: number | null
     resend_id: string
+    delivery_status?: $Enums.EmailDeliveryStatus
+    last_event_at?: Date | string | null
+    delivered_at?: Date | string | null
+    failed_at?: Date | string | null
+    failure_reason?: string | null
   }
 
   export type WeekWinnersCreateManyLeaguesInput = {
@@ -30042,6 +35197,14 @@ export namespace Prisma {
     status?: $Enums.MessageStatus
   }
 
+  export type league_renewal_member_rolesCreateManyLeaguesInput = {
+    renewal_member_role_id?: string
+    user_id: number
+    role?: $Enums.MemberRole
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
   export type leaguesCreateManyPrior_leagueInput = {
     league_id?: number
     created_by_user_id: number
@@ -30063,6 +35226,11 @@ export namespace Prisma {
     ts?: DateTimeFieldUpdateOperationsInput | Date | string
     week?: NullableIntFieldUpdateOperationsInput | number | null
     resend_id?: StringFieldUpdateOperationsInput | string
+    delivery_status?: EnumEmailDeliveryStatusFieldUpdateOperationsInput | $Enums.EmailDeliveryStatus
+    last_event_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    delivered_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    failed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    failure_reason?: NullableStringFieldUpdateOperationsInput | string | null
     leaguemembers?: leaguemembersUpdateOneRequiredWithoutEmailLogsNestedInput
   }
 
@@ -30073,6 +35241,11 @@ export namespace Prisma {
     ts?: DateTimeFieldUpdateOperationsInput | Date | string
     week?: NullableIntFieldUpdateOperationsInput | number | null
     resend_id?: StringFieldUpdateOperationsInput | string
+    delivery_status?: EnumEmailDeliveryStatusFieldUpdateOperationsInput | $Enums.EmailDeliveryStatus
+    last_event_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    delivered_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    failed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    failure_reason?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type EmailLogsUncheckedUpdateManyWithoutLeaguesInput = {
@@ -30082,6 +35255,11 @@ export namespace Prisma {
     ts?: DateTimeFieldUpdateOperationsInput | Date | string
     week?: NullableIntFieldUpdateOperationsInput | number | null
     resend_id?: StringFieldUpdateOperationsInput | string
+    delivery_status?: EnumEmailDeliveryStatusFieldUpdateOperationsInput | $Enums.EmailDeliveryStatus
+    last_event_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    delivered_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    failed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    failure_reason?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type WeekWinnersUpdateWithoutLeaguesInput = {
@@ -30115,6 +35293,7 @@ export namespace Prisma {
     WeekWinners?: WeekWinnersUpdateManyWithoutLeaguemembersNestedInput
     people?: peopleUpdateOneRequiredWithoutLeaguemembersNestedInput
     leaguemessages?: leaguemessagesUpdateManyWithoutLeaguemembersNestedInput
+    league_message_read_state?: league_message_read_stateUpdateOneWithoutLeaguemembersNestedInput
     picks?: picksUpdateManyWithoutLeaguemembersNestedInput
     superbowl?: superbowlUpdateManyWithoutLeaguemembersNestedInput
   }
@@ -30128,6 +35307,7 @@ export namespace Prisma {
     EmailLogs?: EmailLogsUncheckedUpdateManyWithoutLeaguemembersNestedInput
     WeekWinners?: WeekWinnersUncheckedUpdateManyWithoutLeaguemembersNestedInput
     leaguemessages?: leaguemessagesUncheckedUpdateManyWithoutLeaguemembersNestedInput
+    league_message_read_state?: league_message_read_stateUncheckedUpdateOneWithoutLeaguemembersNestedInput
     picks?: picksUncheckedUpdateManyWithoutLeaguemembersNestedInput
     superbowl?: superbowlUncheckedUpdateManyWithoutLeaguemembersNestedInput
   }
@@ -30170,6 +35350,30 @@ export namespace Prisma {
     status?: EnumMessageStatusFieldUpdateOperationsInput | $Enums.MessageStatus
   }
 
+  export type league_renewal_member_rolesUpdateWithoutLeaguesInput = {
+    renewal_member_role_id?: StringFieldUpdateOperationsInput | string
+    role?: EnumMemberRoleFieldUpdateOperationsInput | $Enums.MemberRole
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    people?: peopleUpdateOneRequiredWithoutLeague_renewal_member_rolesNestedInput
+  }
+
+  export type league_renewal_member_rolesUncheckedUpdateWithoutLeaguesInput = {
+    renewal_member_role_id?: StringFieldUpdateOperationsInput | string
+    user_id?: IntFieldUpdateOperationsInput | number
+    role?: EnumMemberRoleFieldUpdateOperationsInput | $Enums.MemberRole
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type league_renewal_member_rolesUncheckedUpdateManyWithoutLeaguesInput = {
+    renewal_member_role_id?: StringFieldUpdateOperationsInput | string
+    user_id?: IntFieldUpdateOperationsInput | number
+    role?: EnumMemberRoleFieldUpdateOperationsInput | $Enums.MemberRole
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type leaguesUpdateWithoutPrior_leagueInput = {
     name?: StringFieldUpdateOperationsInput | string
     created_time?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -30185,6 +35389,7 @@ export namespace Prisma {
     WeekWinners?: WeekWinnersUpdateManyWithoutLeaguesNestedInput
     leaguemembers?: leaguemembersUpdateManyWithoutLeaguesNestedInput
     leaguemessages?: leaguemessagesUpdateManyWithoutLeaguesNestedInput
+    league_renewal_member_roles?: league_renewal_member_rolesUpdateManyWithoutLeaguesNestedInput
     people?: peopleUpdateOneRequiredWithoutLeaguesNestedInput
     future_leagues?: leaguesUpdateManyWithoutPrior_leagueNestedInput
   }
@@ -30206,6 +35411,7 @@ export namespace Prisma {
     WeekWinners?: WeekWinnersUncheckedUpdateManyWithoutLeaguesNestedInput
     leaguemembers?: leaguemembersUncheckedUpdateManyWithoutLeaguesNestedInput
     leaguemessages?: leaguemessagesUncheckedUpdateManyWithoutLeaguesNestedInput
+    league_renewal_member_roles?: league_renewal_member_rolesUncheckedUpdateManyWithoutLeaguesNestedInput
     future_leagues?: leaguesUncheckedUpdateManyWithoutPrior_leagueNestedInput
   }
 
@@ -30230,6 +35436,14 @@ export namespace Prisma {
     ts?: Date | string
     role?: $Enums.MemberRole | null
     paid?: boolean | null
+  }
+
+  export type league_renewal_member_rolesCreateManyPeopleInput = {
+    renewal_member_role_id?: string
+    league_id: number
+    role?: $Enums.MemberRole
+    createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
   export type leaguesCreateManyPeopleInput = {
@@ -30280,6 +35494,7 @@ export namespace Prisma {
     WeekWinners?: WeekWinnersUpdateManyWithoutLeaguemembersNestedInput
     leagues?: leaguesUpdateOneRequiredWithoutLeaguemembersNestedInput
     leaguemessages?: leaguemessagesUpdateManyWithoutLeaguemembersNestedInput
+    league_message_read_state?: league_message_read_stateUpdateOneWithoutLeaguemembersNestedInput
     picks?: picksUpdateManyWithoutLeaguemembersNestedInput
     superbowl?: superbowlUpdateManyWithoutLeaguemembersNestedInput
   }
@@ -30293,6 +35508,7 @@ export namespace Prisma {
     EmailLogs?: EmailLogsUncheckedUpdateManyWithoutLeaguemembersNestedInput
     WeekWinners?: WeekWinnersUncheckedUpdateManyWithoutLeaguemembersNestedInput
     leaguemessages?: leaguemessagesUncheckedUpdateManyWithoutLeaguemembersNestedInput
+    league_message_read_state?: league_message_read_stateUncheckedUpdateOneWithoutLeaguemembersNestedInput
     picks?: picksUncheckedUpdateManyWithoutLeaguemembersNestedInput
     superbowl?: superbowlUncheckedUpdateManyWithoutLeaguemembersNestedInput
   }
@@ -30303,6 +35519,30 @@ export namespace Prisma {
     ts?: DateTimeFieldUpdateOperationsInput | Date | string
     role?: NullableEnumMemberRoleFieldUpdateOperationsInput | $Enums.MemberRole | null
     paid?: NullableBoolFieldUpdateOperationsInput | boolean | null
+  }
+
+  export type league_renewal_member_rolesUpdateWithoutPeopleInput = {
+    renewal_member_role_id?: StringFieldUpdateOperationsInput | string
+    role?: EnumMemberRoleFieldUpdateOperationsInput | $Enums.MemberRole
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    leagues?: leaguesUpdateOneRequiredWithoutLeague_renewal_member_rolesNestedInput
+  }
+
+  export type league_renewal_member_rolesUncheckedUpdateWithoutPeopleInput = {
+    renewal_member_role_id?: StringFieldUpdateOperationsInput | string
+    league_id?: IntFieldUpdateOperationsInput | number
+    role?: EnumMemberRoleFieldUpdateOperationsInput | $Enums.MemberRole
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type league_renewal_member_rolesUncheckedUpdateManyWithoutPeopleInput = {
+    renewal_member_role_id?: StringFieldUpdateOperationsInput | string
+    league_id?: IntFieldUpdateOperationsInput | number
+    role?: EnumMemberRoleFieldUpdateOperationsInput | $Enums.MemberRole
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type leaguesUpdateWithoutPeopleInput = {
@@ -30320,6 +35560,7 @@ export namespace Prisma {
     WeekWinners?: WeekWinnersUpdateManyWithoutLeaguesNestedInput
     leaguemembers?: leaguemembersUpdateManyWithoutLeaguesNestedInput
     leaguemessages?: leaguemessagesUpdateManyWithoutLeaguesNestedInput
+    league_renewal_member_roles?: league_renewal_member_rolesUpdateManyWithoutLeaguesNestedInput
     prior_league?: leaguesUpdateOneWithoutFuture_leaguesNestedInput
     future_leagues?: leaguesUpdateManyWithoutPrior_leagueNestedInput
   }
@@ -30341,6 +35582,7 @@ export namespace Prisma {
     WeekWinners?: WeekWinnersUncheckedUpdateManyWithoutLeaguesNestedInput
     leaguemembers?: leaguemembersUncheckedUpdateManyWithoutLeaguesNestedInput
     leaguemessages?: leaguemessagesUncheckedUpdateManyWithoutLeaguesNestedInput
+    league_renewal_member_roles?: league_renewal_member_rolesUncheckedUpdateManyWithoutLeaguesNestedInput
     future_leagues?: leaguesUncheckedUpdateManyWithoutPrior_leagueNestedInput
   }
 

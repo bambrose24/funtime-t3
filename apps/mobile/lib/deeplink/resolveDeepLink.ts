@@ -1,4 +1,7 @@
-const WEB_DEEP_LINK_HOSTS = new Set(["play-funtime.com", "www.play-funtime.com"]);
+const WEB_DEEP_LINK_HOSTS = new Set([
+  "play-funtime.com",
+  "www.play-funtime.com",
+]);
 const WEB_PROTOCOLS = new Set(["http", "https"]);
 
 export type DeepLinkTarget = {
@@ -104,11 +107,20 @@ export function resolveDeepLink(url: string): DeepLinkTarget | null {
       query.set("error_description", errorDescription);
     }
 
-    if (!code && !(accessToken && refreshToken) && type !== "recovery" && flow !== "recovery") {
+    if (
+      !code &&
+      !(accessToken && refreshToken) &&
+      type !== "recovery" &&
+      flow !== "recovery"
+    ) {
       return null;
     }
 
-    if (!query.has("flow") && (query.get("type") === "recovery" || (query.has("access_token") && query.has("refresh_token")))) {
+    if (
+      !query.has("flow") &&
+      (query.get("type") === "recovery" ||
+        (query.has("access_token") && query.has("refresh_token")))
+    ) {
       query.set("flow", "recovery");
     }
     return {
@@ -118,11 +130,12 @@ export function resolveDeepLink(url: string): DeepLinkTarget | null {
   }
 
   const leagueTabPathMatch = routePath.match(
-    /^\/league\/(?<leagueId>\d+)\/(?<tab>info|leaderboard|pick|superbowl)$/,
+    /^\/league\/(?<leagueId>\d+)\/(?<tab>chat|info|leaderboard|pick|superbowl)$/,
   );
   if (leagueTabPathMatch?.groups?.leagueId && leagueTabPathMatch.groups.tab) {
     const leagueId = leagueTabPathMatch.groups.leagueId;
     const tabMap: Record<string, string> = {
+      chat: "messages",
       info: "info",
       leaderboard: "leaderboard",
       pick: "picks",

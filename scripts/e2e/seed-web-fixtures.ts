@@ -150,10 +150,10 @@ INSERT INTO "leagues" ("created_by_user_id", "name", "season", "late_policy", "p
 SELECT "uid", 'E2E Admin Ops League', 2027, 'allow_late_and_lock_after_start', 'choose_winner', 'three_hours_before', 'game_winner', 'E2EADMINOPS', FALSE, 'not_started'
 FROM "people" WHERE "email" = 'web.e2e.admin@example.com';
 INSERT INTO "leagues" ("created_by_user_id", "name", "season", "late_policy", "pick_policy", "reminder_policy", "scoring_type", "share_code", "superbowl_competition", "status")
-SELECT "uid", 'E2E Completed League', 2026, 'allow_late_and_lock_after_start', 'choose_winner', 'three_hours_before', 'game_winner', 'E2ECOMPLETE', TRUE, 'completed'
+SELECT "uid", 'E2E Completed League', 2025, 'allow_late_and_lock_after_start', 'choose_winner', 'three_hours_before', 'game_winner', 'E2ECOMPLETE', TRUE, 'completed'
 FROM "people" WHERE "email" = 'web.e2e.admin@example.com';
 INSERT INTO "leagues" ("created_by_user_id", "name", "season", "late_policy", "pick_policy", "reminder_policy", "scoring_type", "share_code", "superbowl_competition", "status")
-SELECT "uid", 'E2E Completed Regression League', 2026, 'allow_late_and_lock_after_start', 'choose_winner', 'three_hours_before', 'game_winner', 'E2EREGRESSION', TRUE, 'completed'
+SELECT "uid", 'E2E Completed Regression League', 2025, 'allow_late_and_lock_after_start', 'choose_winner', 'three_hours_before', 'game_winner', 'E2EREGRESSION', TRUE, 'completed'
 FROM "people" WHERE "email" = 'web.e2e.admin@example.com';
 INSERT INTO "leagues" ("created_by_user_id", "name", "season", "late_policy", "pick_policy", "reminder_policy", "scoring_type", "share_code", "superbowl_competition", "status")
 SELECT "uid", 'E2E Competition League', 2027, 'allow_late_and_lock_after_start', 'choose_winner', 'three_hours_before', 'game_winner', 'E2ECOMPETE', TRUE, 'in_progress'
