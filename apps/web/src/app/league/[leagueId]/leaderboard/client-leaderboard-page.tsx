@@ -129,7 +129,7 @@ export function ClientLeaderboardPage(props: Props) {
           </ScrollArea>
         </Card>
       </div>
-      <div className="col-span-12 hidden md:col-span-8 md:block">
+      <div className="col-span-12 min-w-0 md:col-span-8">
         <Card className="w-full">
           <CardHeader>
             <CardTitle>Weekly Standings</CardTitle>
@@ -137,12 +137,12 @@ export function ClientLeaderboardPage(props: Props) {
               Select players to view them in the graph
             </CardDescription>
           </CardHeader>
-          <CardContent className="flex h-full w-full justify-center">
+          <CardContent className="flex h-full w-full min-w-0 justify-center overflow-hidden px-2 sm:px-6">
             {chartData && (
               <LeaderboardChart2
                 data={chartData}
                 members={members}
-                className="h-[65vh] w-[50vw]"
+                className="h-[22rem] w-full min-w-0 md:h-[65vh]"
               />
             )}
           </CardContent>

@@ -5,10 +5,12 @@ import { getLeagueId, queryScalar } from "../helpers/db";
 
 test("league admin renames a league, updates a member, and player is denied admin access", async ({
   page,
-}) => {
+}, testInfo) => {
   test.setTimeout(60_000);
   const leagueId = getLeagueId(E2E_LEAGUES.competition.shareCode);
-  const renamedLeague = "E2E Competition Renamed";
+  const renamedLeague = `E2E Competition Renamed${
+    testInfo.retry === 0 ? "" : ` ${testInfo.retry}`
+  }`;
   await login(page, E2E_USERS.admin);
 
   await page.goto(`/league/${leagueId}/admin`);
@@ -90,6 +92,7 @@ test("league admin renames a league, updates a member, and player is denied admi
     )
     .toBe("player");
 
+  await page.goto("about:blank");
   await page.context().clearCookies();
   await login(page, E2E_USERS.player);
   const deniedResponse = await page

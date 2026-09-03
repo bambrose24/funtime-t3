@@ -1,0 +1,29 @@
+appId: com.funtime.mobile
+---
+- runFlow:
+    file: boot-and-login.yaml
+    env:
+      LOGIN_EMAIL: ${E2E_OUTSIDER_EMAIL}
+- openLink: ${E2E_EXPO_ROUTE_URL}/join-league/E2ELATEJOIN
+- extendedWaitUntil:
+    visible: "Join E2E Late Registration League"
+    timeout: 30000
+- tapOn: "Select AFC team"
+- tapOn: "BUF"
+- tapOn: "Select NFC team"
+- tapOn: "PHI"
+- tapOn: "BUF"
+- scrollUntilVisible:
+    element:
+      text: "e.g. 47"
+    direction: DOWN
+- tapOn: "e.g. 47"
+- inputText: "48"
+- hideKeyboard
+- tapOn: "Register for League"
+- extendedWaitUntil:
+    visible: "Registration Failed"
+    timeout: 30000
+- assertVisible: "Registration is closed because the season has started"
+- tapOn: "OK"
+- assertVisible: "Join E2E Late Registration League"

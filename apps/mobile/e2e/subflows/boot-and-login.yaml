@@ -1,0 +1,33 @@
+appId: com.funtime.mobile
+---
+- launchApp:
+    clearState: true
+- repeat:
+    times: 8
+    commands:
+      - openLink: ${E2E_APP_BOOT_URL}
+      - tapOn:
+          text: ${E2E_DEV_SERVER_URL}
+          optional: true
+      - tapOn:
+          text: "Continue"
+          optional: true
+      - tapOn:
+          text: "Reload"
+          optional: true
+      - tapOn:
+          text: "Go home"
+          optional: true
+      - waitForAnimationToEnd
+- extendedWaitUntil:
+    visible: "Enter your email"
+    timeout: 180000
+- tapOn: "Enter your email"
+- inputText: ${LOGIN_EMAIL}
+- tapOn: "Enter your password"
+- inputText: ${E2E_PASSWORD}
+- hideKeyboard
+- tapOn: "Sign In"
+- extendedWaitUntil:
+    visible: "My Leagues"
+    timeout: 60000

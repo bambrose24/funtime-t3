@@ -52,7 +52,7 @@ export function LeaderboardChart2({ data, members, className }: Props) {
   );
 
   return (
-    <Card>
+    <Card className="w-full min-w-0">
       <CardHeader>
         <CardTitle>Correct Picks by Week</CardTitle>
         <CardDescription>{league.data?.name}</CardDescription>

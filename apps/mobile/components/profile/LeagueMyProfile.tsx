@@ -89,44 +89,7 @@ export function LeagueMyProfile({ leagueId }: Props) {
       return `${a.loc} ${a.name}`.localeCompare(`${b.loc} ${b.name}`);
     });
   }, [teams]);
-
-  if (sessionLoading || profileLoading || leagueLoading || hasSeasonStartedLoading) {
-    return <LeagueTabLoadingSkeleton rows={3} />;
-  }
-
-  if (!viewerMembership || !profileData) {
-    return (
-      <View className="flex-1 items-center justify-center px-6">
-        <Text className="text-center text-base text-gray-500 dark:text-gray-400">
-          Unable to load your league profile.
-        </Text>
-      </View>
-    );
-  }
-
-  const member = profileData.member;
-  const superbowlPick = member.superbowl[0];
-  const superbowlWinner = superbowlPick ? teamById.get(superbowlPick.winner) : null;
-  const superbowlLoser = superbowlPick ? teamById.get(superbowlPick.loser) : null;
-  const selectedWinner = winnerTeamId ? teamById.get(Number(winnerTeamId)) : null;
-  const selectedLoser = loserTeamId ? teamById.get(Number(loserTeamId)) : null;
-  const correctPicks = profileData.correctPicks;
-  const wrongPicks = profileData.wrongPicks;
-  const totalPicks = correctPicks + wrongPicks;
-  const winRate = totalPicks > 0 ? Math.round((correctPicks / totalPicks) * 100) : null;
-  const canEditSuperbowl =
-    Boolean(leagueData?.superbowl_competition) &&
-    Boolean(viewerMembership) &&
-    hasSeasonStarted === false;
-  const validScore =
-    /^\d+$/.test(score) && Number(score) >= 1 && Number(score) <= 200;
-  const canSavePick =
-    canEditSuperbowl &&
-    !!winnerTeamId &&
-    !!loserTeamId &&
-    winnerTeamId !== loserTeamId &&
-    validScore &&
-    !savingPick;
+  const superbowlPick = profileData?.member.superbowl[0];
 
   const resetSuperbowlDraft = useCallback(() => {
     setWinnerTeamId(superbowlPick?.winner ? String(superbowlPick.winner) : "");
@@ -163,6 +126,43 @@ export function LeagueMyProfile({ leagueId }: Props) {
     refetchSession,
     refetchTeams,
   ]);
+
+  if (sessionLoading || profileLoading || leagueLoading || hasSeasonStartedLoading) {
+    return <LeagueTabLoadingSkeleton rows={3} />;
+  }
+
+  if (!viewerMembership || !profileData) {
+    return (
+      <View className="flex-1 items-center justify-center px-6">
+        <Text className="text-center text-base text-gray-500 dark:text-gray-400">
+          Unable to load your league profile.
+        </Text>
+      </View>
+    );
+  }
+
+  const member = profileData.member;
+  const superbowlWinner = superbowlPick ? teamById.get(superbowlPick.winner) : null;
+  const superbowlLoser = superbowlPick ? teamById.get(superbowlPick.loser) : null;
+  const selectedWinner = winnerTeamId ? teamById.get(Number(winnerTeamId)) : null;
+  const selectedLoser = loserTeamId ? teamById.get(Number(loserTeamId)) : null;
+  const correctPicks = profileData.correctPicks;
+  const wrongPicks = profileData.wrongPicks;
+  const totalPicks = correctPicks + wrongPicks;
+  const winRate = totalPicks > 0 ? Math.round((correctPicks / totalPicks) * 100) : null;
+  const canEditSuperbowl =
+    Boolean(leagueData?.superbowl_competition) &&
+    Boolean(viewerMembership) &&
+    hasSeasonStarted === false;
+  const validScore =
+    /^\d+$/.test(score) && Number(score) >= 1 && Number(score) <= 200;
+  const canSavePick =
+    canEditSuperbowl &&
+    !!winnerTeamId &&
+    !!loserTeamId &&
+    winnerTeamId !== loserTeamId &&
+    validScore &&
+    !savingPick;
 
   const onSaveSuperbowlPick = async () => {
     if (!viewerMembership) {

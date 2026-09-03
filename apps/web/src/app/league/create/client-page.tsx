@@ -499,7 +499,7 @@ export function CreateLeagueClientPage({
             </Card>
           </Form>
         </form>
-        {renewalInvitees ? (
+        {inviteDialogOpen && renewalInvitees ? (
           <RenewalInviteDialog
             invitees={renewalInvitees}
             open={inviteDialogOpen}

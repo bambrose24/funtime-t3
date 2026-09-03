@@ -29,7 +29,9 @@ export default function ForgotPasswordScreen() {
 
     const parsed = forgotPasswordSchema.safeParse({ email });
     if (!parsed.success) {
-      setError(parsed.error.errors[0]?.message ?? "Enter a valid email address");
+      setError(
+        parsed.error.errors[0]?.message ?? "Enter a valid email address",
+      );
       return;
     }
 
@@ -49,10 +51,7 @@ export default function ForgotPasswordScreen() {
       }
 
       setSent(true);
-      Alert.alert(
-        "Email sent",
-        "Check your inbox for a password reset link.",
-      );
+      Alert.alert("Email sent", "Check your inbox for a password reset link.");
     } catch (submitError) {
       console.error("Forgot password error:", submitError);
       Alert.alert("Error", "Unable to send reset email right now.");
@@ -66,6 +65,7 @@ export default function ForgotPasswordScreen() {
       <ScrollView
         className="flex-1"
         showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
         contentContainerStyle={{
           flexGrow: 1,
           justifyContent: "center",
@@ -100,11 +100,17 @@ export default function ForgotPasswordScreen() {
               autoComplete="email"
               className={error ? "border-red-500" : ""}
             />
-            {error ? <Text className="mt-1 text-sm text-red-500">{error}</Text> : null}
+            {error ? (
+              <Text className="mt-1 text-sm text-red-500">{error}</Text>
+            ) : null}
           </View>
 
           <Button onPress={onSubmit} disabled={loading || sent}>
-            {loading ? "Sending..." : sent ? "Check your email" : "Send reset link"}
+            {loading
+              ? "Sending..."
+              : sent
+                ? "Check your email"
+                : "Send reset link"}
           </Button>
 
           <View className="mt-6">

@@ -77,12 +77,12 @@ export default function LeagueRenewalInvite({
               season.
             </EmailText>
             <EmailText>
-              Join {nextLeagueName} before week 1 starts to play with last
-              year&apos;s players again.
+              Use the button below to sign in and join {nextLeagueName}. Your
+              Funtime account keeps the same username you used last season.
             </EmailText>
           </Container>
           <Container className="flex justify-center">
-            <EmailButton href={joinHref}>Join Next Season League</EmailButton>
+            <EmailButton href={joinHref}>Sign In and Join</EmailButton>
           </Container>
         </Body>
       </Provider>

@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { Mail, ShieldCheck, Users } from "lucide-react";
+import { useMemo, useState } from "react";
+import { AlertTriangle, Mail, ShieldCheck, Users } from "lucide-react";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { Checkbox } from "~/components/ui/checkbox";
@@ -15,6 +15,11 @@ import {
 } from "~/components/ui/dialog";
 import { Text } from "~/components/ui/text";
 import { Switch } from "~/components/ui/switch";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "~/components/ui/tooltip";
 import type { RouterOutputs } from "~/trpc/types";
 
 type RenewalInvitees = RouterOutputs["league"]["renewalInvitees"];
@@ -40,13 +45,6 @@ export function RenewalInviteDialog({
   const [adminMemberIds, setAdminMemberIds] = useState<Set<number>>(
     () => new Set(invitees.defaultAdminMemberIds),
   );
-
-  useEffect(() => {
-    if (open) {
-      setSelectedMemberIds(new Set(invitees.defaultSelectedMemberIds));
-      setAdminMemberIds(new Set(invitees.defaultAdminMemberIds));
-    }
-  }, [invitees.defaultAdminMemberIds, invitees.defaultSelectedMemberIds, open]);
 
   const selectedMemberIdList = useMemo(
     () => Array.from(selectedMemberIds),
@@ -128,6 +126,7 @@ export function RenewalInviteDialog({
             {invitees.eligibleMembers.map((member) => {
               const checked = selectedMemberIds.has(member.membershipId);
               const isAdmin = member.role === "admin";
+              const missedPicks = member.missedPickCount ?? 0;
 
               return (
                 <div
@@ -155,14 +154,39 @@ export function RenewalInviteDialog({
                         {member.username}
                       </span>
                       {isAdmin ? (
-                        <Badge className="gap-1" variant="secondary">
-                          <ShieldCheck className="h-3 w-3" />
-                          Returning admin
-                        </Badge>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Badge
+                              className="cursor-help gap-1"
+                              variant="secondary"
+                            >
+                              <ShieldCheck className="h-3 w-3" />
+                              Returning admin
+                            </Badge>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            This player will be an admin in the new league when
+                            they join.
+                          </TooltipContent>
+                        </Tooltip>
                       ) : null}
                     </div>
                     <div className="mt-1 truncate text-sm leading-5 text-muted-foreground">
                       {member.email}
+                    </div>
+                    <div className="mt-2 flex flex-wrap items-center gap-2">
+                      {missedPicks > 0 ? (
+                        <Badge className="gap-1" variant="outline">
+                          <AlertTriangle className="h-3 w-3" />
+                          Missed {missedPicks}{" "}
+                          {missedPicks === 1 ? "pick" : "picks"}
+                        </Badge>
+                      ) : (
+                        <Badge variant="secondary">Picked every game</Badge>
+                      )}
+                      <span className="text-xs text-muted-foreground">
+                        Last season
+                      </span>
                     </div>
                     {isAdmin ? (
                       <div className="mt-1 text-sm leading-5 text-muted-foreground">

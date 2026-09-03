@@ -1,0 +1,11 @@
+appId: com.funtime.mobile
+---
+- runFlow:
+    file: boot-and-login.yaml
+    env:
+      LOGIN_EMAIL: ${E2E_PLAYER_EMAIL}
+- openLink: ${E2E_EXPO_ROUTE_URL}/join-league/E2EACTIVE
+- extendedWaitUntil:
+    visible: "You're Already In"
+    timeout: 30000
+- assertVisible: "You are already registered for E2E Active League."
