@@ -1,0 +1,3 @@
+interface:
+  display_name: "Funtime Observability"
+  short_description: "Investigate production issues with Railway and PostHog"
