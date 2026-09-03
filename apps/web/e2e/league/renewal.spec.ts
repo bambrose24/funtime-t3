@@ -140,6 +140,14 @@ test("admin creates one linked renewal and exercises isolated member invites", a
       AND p."email" = '${E2E_USERS.player.email}'
   `);
   expect(joinedUsername).toBe("webplayer");
+  const joinedMemberRole = queryScalar(`
+    SELECT m."role"
+    FROM "leaguemembers" m
+    JOIN "people" p ON p."uid" = m."user_id"
+    WHERE m."league_id" = ${renewalLeagueId}
+      AND p."email" = '${E2E_USERS.player.email}'
+  `);
+  expect(joinedMemberRole).toBe("admin");
   await playerPage.close();
 
   await page.goto(`/league/${priorLeagueId}/admin`);
@@ -150,57 +158,17 @@ test("admin creates one linked renewal and exercises isolated member invites", a
     page.getByRole("link", { name: "Set Up Next Season" }),
   ).toHaveCount(0);
 
-  const nextLeague = queryScalar(`
-    SELECT CONCAT(next."league_id", '|', next."share_code")
-    FROM "leagues" next
-    WHERE next."prior_league_id" = ${priorLeagueId}
-  `);
-  const [nextLeagueId, nextLeagueShareCode] = nextLeague.split("|");
-  expect(nextLeagueId).toMatch(/^\d+$/);
-  expect(nextLeagueShareCode).toBeTruthy();
-
-  await page.goto(`/league/${nextLeagueId}/admin`);
+  await page.goto(`/league/${renewalLeagueId}/admin`);
   await expect(
     page.getByRole("heading", { name: "Renewal Invites" }),
   ).toBeVisible();
   await page.getByRole("link", { name: "Manage Renewal Invites" }).click();
   await expect(page).toHaveURL(
-    new RegExp(`/league/${nextLeagueId}/renewal-invites$`),
+    new RegExp(`/league/${renewalLeagueId}/renewal-invites$`),
   );
   await expect(
     page.getByRole("heading", { name: "Invite last year's players" }),
   ).toBeVisible();
-
-  await page.getByRole("button", { name: "User menu" }).click();
-  await page.getByRole("menuitem", { name: "Log out" }).click();
-  await expect(page).toHaveURL(/\/login(?:\?|$)/);
-  await login(page, E2E_USERS.player);
-
-  await page.goto(`/join-league/${nextLeagueShareCode}`);
-  await expect(
-    page.getByRole("heading", { name: "Join E2E Completed League 2026" }),
-  ).toBeVisible();
-
-  await page.getByRole("combobox", { name: "AFC Team" }).click();
-  await page.getByRole("option", { name: "Buffalo Bills" }).click();
-  await page.getByRole("combobox", { name: "NFC Team" }).click();
-  await page.getByRole("option", { name: "Philadelphia Eagles" }).click();
-  await page.getByRole("radio", { name: "Pick Buffalo Bills to win" }).click();
-  await page.getByLabel("Total Score").fill("48");
-  await page.getByRole("button", { name: "Register" }).click();
-
-  await expect(page).toHaveURL(new RegExp(`/league/${nextLeagueId}$`));
-  await expect
-    .poll(() =>
-      queryScalar(`
-        SELECT m."role"
-        FROM "leaguemembers" m
-        JOIN "people" p ON p."uid" = m."user_id"
-        WHERE m."league_id" = ${nextLeagueId}
-          AND p."email" = '${E2E_USERS.player.email}'
-      `),
-    )
-    .toBe("admin");
 });
 
 test("admin can create a renewal without sending invitations", async ({

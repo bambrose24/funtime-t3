@@ -102,25 +102,31 @@ export function JoinLeagueClientPage({ data, session, teams }: Props) {
   const onSubmit: Parameters<typeof form.handleSubmit>[0] = async (
     formData,
   ) => {
-    await register({
-      code: data.share_code!,
-      ...(data.superbowl_competition
-        ? {
-            superbowl: {
-              winnerTeamId: Number(formData.superbowlWinnerTeam),
-              loserTeamId: Number(
-                formData.superbowlWinnerTeam === formData.superbowlAfcTeamId
-                  ? formData.superbowlNfcTeamId
-                  : formData.superbowlAfcTeamId,
-              ),
-              score: Number(formData.superbowlTotalScore),
-            },
-          }
-        : {}),
-    });
-    toast.success(`Successfully registered for ${data.name}`);
-    await trpcUtils.invalidate();
-    window.location.href = `/league/${data.league_id}`;
+    try {
+      await register({
+        code: data.share_code!,
+        ...(data.superbowl_competition
+          ? {
+              superbowl: {
+                winnerTeamId: Number(formData.superbowlWinnerTeam),
+                loserTeamId: Number(
+                  formData.superbowlWinnerTeam === formData.superbowlAfcTeamId
+                    ? formData.superbowlNfcTeamId
+                    : formData.superbowlAfcTeamId,
+                ),
+                score: Number(formData.superbowlTotalScore),
+              },
+            }
+          : {}),
+      });
+      toast.success(`Successfully registered for ${data.name}`);
+      await trpcUtils.invalidate();
+      window.location.href = `/league/${data.league_id}`;
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Unable to register for league",
+      );
+    }
   };
 
   const afcTeam = teams.find((t) => t.teamid.toString() === afcTeamId);
