@@ -10,6 +10,11 @@ export const getNavOptions = (baseHref: string) => {
       href: `${baseHref}/members`,
       display: "Members",
     },
+    {
+      id: "superbowl",
+      href: `${baseHref}/superbowl`,
+      display: "Super Bowl",
+    },
   ];
   return links;
 };

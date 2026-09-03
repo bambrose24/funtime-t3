@@ -430,6 +430,73 @@ export const leagueAdminRouter = createTRPCRouter({
 
     return { members };
   }),
+  superbowlPicks: leagueAdminProcedure.query(async ({ ctx, input }) => {
+    const { db } = ctx;
+    const { leagueId } = input;
+
+    const league = await db.leagues.findFirstOrThrow({
+      where: {
+        league_id: leagueId,
+      },
+      select: {
+        superbowl_competition: true,
+      },
+    });
+
+    const members = await db.leaguemembers.findMany({
+      where: {
+        league_id: leagueId,
+      },
+      orderBy: {
+        people: {
+          username: "asc",
+        },
+      },
+      select: {
+        membership_id: true,
+        people: {
+          select: {
+            username: true,
+          },
+        },
+        superbowl: {
+          orderBy: {
+            ts: "desc",
+          },
+          take: 1,
+          select: {
+            pickid: true,
+            winner: true,
+            loser: true,
+            score: true,
+            ts: true,
+            teams_superbowl_winnerToteams: {
+              select: {
+                abbrev: true,
+                loc: true,
+                name: true,
+              },
+            },
+            teams_superbowl_loserToteams: {
+              select: {
+                abbrev: true,
+                loc: true,
+                name: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    return {
+      enabled: league.superbowl_competition === true,
+      members: members.map(({ superbowl, ...member }) => ({
+        ...member,
+        pick: superbowl.at(0) ?? null,
+      })),
+    };
+  }),
   renewalInvitePreview: leagueAdminProcedure.query(async ({ ctx, input }) => {
     const { db, dbUser } = ctx;
     const { leagueId } = input;
