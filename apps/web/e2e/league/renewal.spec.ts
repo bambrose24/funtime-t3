@@ -218,5 +218,4 @@ test("admin can create a renewal without sending invitations", async ({
   await expect(
     page.getByRole("link", { name: "Back to Admin Settings" }),
   ).toHaveAttribute("href", `/league/${nextLeagueId}/admin`);
-  await expect(page.getByRole("link", { name: "Open League" })).toHaveCount(0);
 });

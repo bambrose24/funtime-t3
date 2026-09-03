@@ -157,6 +157,7 @@ export function ClientNav({ data: initialData, canCreateLeague }: NavData) {
             <>
               <Separator orientation="vertical" className="my-4" />
               <LeagueDropdownMenu chosenLeague={chosenLeague} />
+              <LeagueChatNavLink chosenLeague={chosenLeague} />
             </>
           )}
         </div>
@@ -507,5 +508,42 @@ function LeagueDropdownMenu({ chosenLeague }: { chosenLeague: ChosenLeague }) {
         </DropdownMenuContent>
       </DropdownMenu>
     </>
+  );
+}
+
+function LeagueChatNavLink({ chosenLeague }: { chosenLeague: ChosenLeague }) {
+  const pathname = usePathname();
+  const { unreadCount } = useLeagueUnreadMessages(chosenLeague.league_id);
+  const isActive = pathname.includes("/chat");
+  const unreadLabel = unreadCount > 99 ? "99+" : unreadCount;
+
+  return (
+    <Button
+      asChild
+      variant={isActive ? "secondary" : "ghost"}
+      size="sm"
+      className="relative shrink-0 gap-2"
+    >
+      <Link
+        href={`/league/${chosenLeague.league_id}/chat`}
+        prefetch
+        aria-label={
+          unreadCount > 0
+            ? `Open league chat, ${unreadCount} unread messages`
+            : "Open league chat"
+        }
+      >
+        <MessagesSquare className="h-4 w-4" />
+        <span className="hidden sm:inline">Chat</span>
+        {unreadCount > 0 ? (
+          <Badge
+            variant="destructive"
+            className="absolute -right-1 -top-1 h-5 min-w-5 justify-center rounded-full px-1 text-[10px]"
+          >
+            {unreadLabel}
+          </Badge>
+        ) : null}
+      </Link>
+    </Button>
   );
 }
