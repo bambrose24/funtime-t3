@@ -27,7 +27,7 @@
     "dev": "tsc --watch",
     "email:dev": "email dev --dir emails --port 3001",
     "email:export": "email export --dir emails",
-    "test": "node --experimental-strip-types --test tests/resend-webhook-events.test.mts",
+    "test": "node --experimental-strip-types --test tests/*.test.mts",
     "typecheck": "tsc --noEmit",
     "clean": "rm -rf dist",
     "postinstall": "prisma generate",

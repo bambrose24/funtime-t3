@@ -3,35 +3,30 @@
 import { usePathname, useRouter } from "next/navigation";
 import { Tabs, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { getNavOptions } from "./nav-options";
-import Link from "next/link";
 
 export function MobileAdminNav({ leagueId }: { leagueId: number }) {
   const router = useRouter();
   const pathname = usePathname();
   const baseHref = `/league/${leagueId}/admin`;
-  const defaultValue =
-    getNavOptions(baseHref).find((opt) => pathname === opt.href)?.id ?? "";
 
   return (
     <Tabs
-      defaultValue={defaultValue}
+      value={pathname}
       onValueChange={(tabHrefValue) => {
         router.push(tabHrefValue);
       }}
       className="w-full"
     >
       <TabsList className="w-full md:w-auto">
-        {getNavOptions(baseHref).map((opt, idx) => {
+        {getNavOptions(baseHref).map((opt) => {
           return (
-            <Link
-              href={opt.href}
-              key={idx}
+            <TabsTrigger
+              value={opt.href}
+              key={opt.id}
               className="flex-grow md:flex-grow-0"
             >
-              <TabsTrigger value={opt.id} className="w-full">
-                {opt.display}
-              </TabsTrigger>
-            </Link>
+              {opt.display}
+            </TabsTrigger>
           );
         })}
       </TabsList>

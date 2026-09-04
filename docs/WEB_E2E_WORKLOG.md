@@ -68,7 +68,7 @@ baseline has not yet been recorded in this worklog.
 | Standings and profiles  | Weekly co-winners, competition ranking, cumulative chart, result totals, player profile                                                   | `standings/results.spec.ts`, `profile/superbowl.spec.ts`                                                              |
 | Super Bowl contest      | Required join prediction, edit, preseason privacy, in-progress visibility, completed bracket and ranking                                  | `league/join.spec.ts`, `profile/superbowl.spec.ts`, `superbowl/visibility.spec.ts`, `superbowl/results.spec.ts`       |
 | Messaging               | Post, own-message deletion, admin moderation, non-member denial                                                                           | `league/messages.spec.ts`, `platform/access-and-responsive.spec.ts`                                                   |
-| League administration   | Rename, role, paid status, pick correction, email history, rate limiting, member removal, role denial                                     | `league/admin-controls.spec.ts`, `league/admin-member-workflows.spec.ts`                                              |
+| League administration   | Rename, role, paid status, pick correction, email history, Super Bowl pick review/navigation, rate limiting, member removal, role denial  | `league/admin-controls.spec.ts`, `league/admin-member-workflows.spec.ts`, `league/admin-superbowl.spec.ts`            |
 | Platform and resilience | Super-admin dashboard, ordinary-user denial, mobile viewport smoke, uncaught browser-error guard                                          | `platform/access-and-responsive.spec.ts`, all specs through the automatic error fixture                               |
 | Regression smoke        | Public landing and completed-admin crash regression                                                                                       | `smoke/landing.spec.ts`, `smoke/admin-renewal.spec.ts`                                                                |
 
@@ -144,6 +144,7 @@ baseline has not yet been recorded in this worklog.
 - [ ] League-admin self-demotion and self-removal are rejected while super-admin recovery remains available.
 - [x] Admin can edit a member's unstarted picks.
 - [x] Admin can view member email logs.
+- [x] Admin can navigate to an unredacted view of every member's Super Bowl pick.
 - [x] Broadcast UI enforces its weekly rate-limit state without sending email.
 - [x] Non-admin members cannot access league admin routes.
 

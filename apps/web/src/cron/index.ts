@@ -26,6 +26,14 @@ export async function run() {
   console.log(`${LOG_PREFIX} Starting cron for season ${season}`);
   console.log(`${"=".repeat(50)}\n`);
 
+  // Keep derived postseason data clean even when the regular-season ESPN
+  // request fails later in this run.
+  try {
+    await syncPostseason(season);
+  } catch (error) {
+    console.error(`${LOG_PREFIX} ❌ Error in postseason sync:`, error);
+  }
+
   // ========================================
   // Fetch ESPN games
   // ========================================
@@ -365,15 +373,6 @@ export async function run() {
     }
   }
   console.log(`${LOG_PREFIX} ✓ Updated tiebreakers for ${tiebreakersUpdated} weeks`);
-
-  // ========================================
-  // Sync postseason data (seeds + games)
-  // ========================================
-  try {
-    await syncPostseason(season);
-  } catch (error) {
-    console.error(`${LOG_PREFIX} ❌ Error in postseason sync:`, error);
-  }
 
   // ========================================
   // Send pick reminders

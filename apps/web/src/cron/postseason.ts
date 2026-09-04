@@ -1,4 +1,4 @@
-import { prisma as db, espn } from "@funtime/api";
+import { prisma as db, espn, isRegularSeasonComplete } from "@funtime/api";
 import { groupBy } from "lodash";
 import { DEFAULT_SEASON } from "../utils/const";
 
@@ -33,13 +33,29 @@ export async function syncPostseason(
 
   console.log(`${LOG_PREFIX} Starting postseason sync for season ${season}...`);
 
-  const teams = await db.teams.findMany();
-  const teamByAbbrev = groupBy(teams, (t) => t.abbrev);
-
   const result: PostseasonSyncResult = {
     seeds: { processed: 0, errors: 0 },
     games: { created: 0, updated: 0, skipped: 0, errors: 0 },
   };
+
+  const [regularSeasonGames, completedRegularSeasonGames] = await Promise.all([
+    db.games.count({ where: { season } }),
+    db.games.count({ where: { season, done: true } }),
+  ]);
+
+  if (!isRegularSeasonComplete(regularSeasonGames, completedRegularSeasonGames)) {
+    const [deletedGames, deletedSeeds] = await db.$transaction([
+      db.postseason_games.deleteMany({ where: { season } }),
+      db.postseason_team_seeds.deleteMany({ where: { season } }),
+    ]);
+    console.log(
+      `${LOG_PREFIX} Regular season is incomplete (${completedRegularSeasonGames}/${regularSeasonGames}); removed ${deletedSeeds.count} premature seeds and ${deletedGames.count} premature games.`
+    );
+    return result;
+  }
+
+  const teams = await db.teams.findMany();
+  const teamByAbbrev = groupBy(teams, (t) => t.abbrev);
 
   // ========================================
   // Sync postseason team seeds from ESPN
@@ -52,39 +68,76 @@ export async function syncPostseason(
       `${LOG_PREFIX} Found ${espnSeedings.length} playoff teams from ESPN standings`
     );
 
-    for (const seeding of espnSeedings) {
+    const resolvedSeedings = espnSeedings.flatMap((seeding) => {
       const team = teamByAbbrev[seeding.teamAbbrev]?.at(0);
       if (!team) {
         console.log(
           `${LOG_PREFIX} ⚠️  Could not find team for seeding: ${seeding.teamAbbrev}`
         );
         result.seeds.errors++;
-        continue;
+        return [];
       }
 
-      await db.postseason_team_seeds.upsert({
-        where: {
-          season_teamid: {
-            season,
-            teamid: team.teamid,
-          },
-        },
-        create: {
-          season,
-          teamid: team.teamid,
-          conference: seeding.conference,
-          seed: seeding.seed,
-        },
-        update: {
-          conference: seeding.conference,
-          seed: seeding.seed,
-        },
-      });
+      return [{ seeding, team }];
+    });
 
-      console.log(
-        `${LOG_PREFIX} ✓ ${seeding.conference} #${seeding.seed}: ${seeding.teamName}`
+    const expectedSeedSlots = new Set(
+      ["AFC", "NFC"].flatMap((conference) =>
+        Array.from({ length: 7 }, (_, index) => `${conference}-${index + 1}`)
+      )
+    );
+    const actualSeedSlots = new Set(
+      resolvedSeedings.map(
+        ({ seeding }) => `${seeding.conference}-${seeding.seed}`
+      )
+    );
+    const hasCompleteSeedings =
+      resolvedSeedings.length === 14 &&
+      actualSeedSlots.size === 14 &&
+      [...expectedSeedSlots].every((slot) => actualSeedSlots.has(slot));
+
+    if (!hasCompleteSeedings) {
+      result.seeds.errors += Math.max(
+        1,
+        espnSeedings.length - resolvedSeedings.length
       );
-      result.seeds.processed++;
+      console.error(
+        `${LOG_PREFIX} ❌ ESPN returned an incomplete playoff field; preserving existing seeds.`
+      );
+    } else {
+      const teamIds = resolvedSeedings.map(({ team }) => team.teamid);
+      await db.$transaction([
+        db.postseason_team_seeds.deleteMany({
+          where: { season, teamid: { notIn: teamIds } },
+        }),
+        ...resolvedSeedings.map(({ seeding, team }) =>
+          db.postseason_team_seeds.upsert({
+            where: {
+              season_teamid: {
+                season,
+                teamid: team.teamid,
+              },
+            },
+            create: {
+              season,
+              teamid: team.teamid,
+              conference: seeding.conference,
+              seed: seeding.seed,
+            },
+            update: {
+              conference: seeding.conference,
+              seed: seeding.seed,
+            },
+          })
+        ),
+      ]);
+
+      for (const { seeding } of resolvedSeedings) {
+        console.log(
+          `${LOG_PREFIX} ✓ ${seeding.conference} #${seeding.seed}: ${seeding.teamName}`
+        );
+        result.seeds.processed++;
+      }
     }
 
     console.log(
