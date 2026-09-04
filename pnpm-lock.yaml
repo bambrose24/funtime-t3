@@ -19,6 +19,9 @@ importers:
       '@playwright/test':
         specifier: ^1.62.1
         version: 1.62.1
+      '@posthog/cli':
+        specifier: 0.18.0
+        version: 0.18.0
       '@types/eslint':
         specifier: ^9.6.1
         version: 9.6.1
@@ -2099,6 +2102,11 @@ packages:
 
   '@posthog/browser-common@0.7.0':
     resolution: {integrity: sha512-Kr6j9sH7NisT3fC3w7jZlonYeCFjPXZrDwHl3usFpjNEdgbHUrxPAmekEkTt+zRAa2huldFPIAmibZ3KC4hXoQ==}
+
+  '@posthog/cli@0.18.0':
+    resolution: {integrity: sha512-9C2yzz4/iUdQG/Iqo4HixA5StVWOmr0YNAk2E8llZRF2I7cGLC/8wT+HS3Bg0eoL5x96+NqU6vjjFBwhqv3NVA==}
+    engines: {node: '>=14.14', npm: '>=6'}
+    hasBin: true
 
   '@posthog/core@1.49.2':
     resolution: {integrity: sha512-AXHDo/4nisUg7OPG1TQNgREK7n+chBQXLQyttp7bDTDsDg2k9lV06TmnpvuNbwJs53q9mP9hjezKEZu4fYadfg==}
@@ -10045,6 +10053,10 @@ snapshots:
     dependencies:
       '@posthog/core': 1.49.2
       '@posthog/types': 1.407.1
+
+  '@posthog/cli@0.18.0':
+    dependencies:
+      detect-libc: 2.1.2
 
   '@posthog/core@1.49.2':
     dependencies:
