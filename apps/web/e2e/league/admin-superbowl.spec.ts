@@ -9,7 +9,9 @@ test("league admin can review every preseason Super Bowl pick", async ({
   const leagueId = getLeagueId(E2E_LEAGUES.active.shareCode);
   await login(page, E2E_USERS.admin);
 
-  await page.goto(`/league/${leagueId}/admin/superbowl`);
+  await page.goto(`/league/${leagueId}/admin`);
+  await page.getByRole("tab", { name: "Super Bowl" }).click();
+  await expect(page).toHaveURL(`/league/${leagueId}/admin/superbowl`);
 
   await expect(
     page.getByRole("heading", { name: "Super Bowl Picks", exact: true }),

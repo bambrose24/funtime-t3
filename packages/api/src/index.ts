@@ -17,6 +17,7 @@ export { db as prisma } from "../server/db";
 export { espn } from "../server/services/espn";
 
 export * as config from "../utils/config";
+export { isRegularSeasonComplete } from "../utils/postseason";
 
 export { resendApi } from "../server/services/resend";
 export {

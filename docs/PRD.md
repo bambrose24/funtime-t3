@@ -257,6 +257,7 @@ Unless a requirement is explicitly labeled **Target** or **Planned**, it describ
 - Edit member picks for specific games **before kickoff only**.
 - Toggle paid/donated tracking.
 - View member email logs/content.
+- Open an admin-only Super Bowl pick view from league administration that shows every member's winner, runner-up, and predicted score without preseason redaction.
 - Export member performance, role, and paid-status data as CSV on supported clients.
 - Rename league.
 - Send league broadcast email with weekly rate limiting.
@@ -285,7 +286,7 @@ Unless a requirement is explicitly labeled **Target** or **Planned**, it describ
 - Updates scores, winners, pick correctness.
 - Creates week winner records after full-week completion.
 - Updates game metadata (records, tiebreaker assignment, future start times).
-- Syncs postseason seeds/games for bracket views.
+- Syncs postseason seeds/games for bracket views only after every regular-season game is final, and removes premature current-season postseason data while the regular season is incomplete.
 - Runs policy-based pick reminders and completed-week notification fanout.
 
 ### 7.11 Global Admin
