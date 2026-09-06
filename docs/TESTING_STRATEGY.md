@@ -78,21 +78,55 @@ checklist records behavioral coverage, and its gaps register records intentional
 boundaries. It must describe the current repository state, not an aspirational
 future state.
 
-For every new or changed user-facing web behavior, the same change must:
+### Choosing the test layer (agreed September 6, 2026)
 
-1. Add or update the corresponding PRD requirement.
-2. Add or update the coverage item and owning spec in the web E2E worklog.
-3. Add or update deterministic Playwright coverage against local Supabase.
-4. Update fixtures and direct database assertions when persistence or
-   authorization changes.
-5. Run `pnpm e2e:web` and record a completed full-suite baseline.
+Validate flows, not every feature with a new browser test. Choose the lowest
+layer that can catch the actual regression; preserve representative end-to-end
+coverage for the player and commissioner journeys.
 
-This applies to authentication, league membership, picks, standings, messaging,
-administration, route authorization, and any new user journey. A unit test or
-manual check does not make an E2E checkbox complete. If Playwright is not the
-appropriate layer, add the behavior to the explicit gaps register with its
-owning test layer and follow-up instead of omitting it. Pull requests should not
-describe functionality as complete while its coverage status is undocumented.
+| Change | Coverage expected |
+| --- | --- |
+| New critical journey, or changed multi-step auth/navigation/submission flow | Add or update a representative browser/native E2E journey. |
+| UI-to-API wiring, session handoff, persistence shown after navigation/reload, or a browser-only regression | Add/update E2E at that integration boundary. |
+| API authorization, kickoff/scoring rules, retry/concurrency or database constraints | Direct API/database integration tests for the rule matrix; reuse existing E2E for the surrounding flow unless its behavior changes. |
+| Pure transformation, validation boundary, formatting or isolated component state | Unit/component tests when behavior warrants them; no duplicate E2E cases. |
+| Copy, spacing, styling, documentation, or behavior-preserving refactor | Relevant existing checks and targeted inspection; no mandatory new E2E or redundant implementation-mirroring tests. |
+| Email/push provider or scheduler behavior | Isolated integration/contract tests with fake providers/clock; device tests for OS delivery/tap behavior. Browser E2E does not prove delivery. |
+
+Add E2E when failure would only be visible across layers, when a core journey
+has no representative coverage, or when the regression escaped because the
+existing journey omitted the affected step. Extend an existing journey before
+adding a near-duplicate one. Test exhaustive roles, times and payloads below
+the browser layer when possible.
+
+Each behavior PR records the affected journey, existing owning spec, selected
+test layer, new/changed assertions and actual run results. Explain why existing
+E2E is sufficient when no new E2E is added; this is a normal coverage decision,
+not a deferral requiring an artificial follow-up ticket. If meaningful coverage
+is genuinely missing, name the gap, owner and follow-up explicitly.
+
+Update the PRD only when product expectations change, and the coverage worklog
+when coverage or behavior changes. A unit/API test does not turn an untested
+browser-flow checkbox into a covered journey. For auth, membership, picks,
+standings, messaging, authorization or shared persistence changes, run the
+relevant tests and full local web E2E suite before calling validation complete
+(or record an explicit environment blocker and obtain the CI result). The
+existing full-suite CI gate remains in place. Do not require a full local E2E
+run solely for documentation/cosmetic changes unrelated to flow behavior.
+
+These criteria also apply to mobile: use native E2E for core journeys and OS
+integration, and focused unit/component/API tests for their underlying rules.
+
+### Direct pick API/database regression gate
+
+After the isolated local schema and schedule seed are ready, run
+`pnpm --filter @funtime/api test:integration`. The script fixes its database URL
+to `127.0.0.1:55422`, enables E2E mode, and disables outbound delivery. Tests
+call the real routers with authenticated-actor contexts and real PostgreSQL
+queries; each fixture is rolled back. Confirmation delivery is stubbed at the
+service boundary. A controlled clock exercises exact kickoff semantics.
+This validates API rules, not Supabase authentication or browser interactions.
+The web CI workflow runs this gate before its existing browser journeys.
 
 ## Mobile Testing Strategy (Expo)
 

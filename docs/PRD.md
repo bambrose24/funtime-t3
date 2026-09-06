@@ -350,20 +350,19 @@ The product requirements and automated coverage must evolve together.
 coverage, owning specs, the latest validated baseline, and explicit gaps.
 `docs/TESTING_STRATEGY.md` defines how the suite runs locally and in CI.
 
-A user-facing feature or behavior change is not complete until the same change:
+Coverage is based on risk and user journeys, not a requirement to add a new
+E2E test for every feature. Follow the test-layer criteria in
+`docs/TESTING_STRATEGY.md`.
 
-1. Updates this PRD when product behavior changes.
-2. Adds or updates the corresponding row/checklist item in the web E2E worklog.
-3. Adds or updates deterministic E2E coverage against local Supabase.
-4. Runs the relevant tests and records the full-suite result.
+Each behavior change identifies the affected journey, the existing coverage,
+and the smallest test layer that proves the change. Add or update E2E when a
+critical journey or cross-layer interaction changes or lacks coverage; test
+API rules, database races and validation matrices directly at their owning
+layer. Reuse existing flow E2E when it already validates the surrounding
+experience. Copy, styling and documentation do not automatically need new tests.
 
-Add new coverage items as unchecked before or during implementation so missing
-coverage remains visible. If browser E2E is not the correct test layer, record
-the behavior in the worklog's explicit gaps register, name the owning test
-layer, and track the follow-up. Manual verification alone is not sufficient to
-mark a behavior covered.
-
-This policy applies to new features, behavior changes, bug fixes, authorization
-rules, persistence changes, and regressions discovered in production. Every
-production regression should receive an automated test that fails without the
-fix whenever the behavior can be reproduced safely and deterministically.
+Update this PRD when product expectations change, and record coverage decisions
+and actual validation results in the worklog. Every reproducible production
+regression needs an automated test at the appropriate layer. Explicitly record
+remaining coverage gaps and owners; do not claim device/provider delivery or
+browser coverage from a test that does not exercise it.
