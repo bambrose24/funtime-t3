@@ -11,7 +11,8 @@
 ## Audit backlog execution — WEB-01
 
 - Task ID: `WEB-01`; started/validated 2026-09-06 17:34 UTC.
-- Branch: `codex/web-01-kickoff-guard`; status: IN_PROGRESS / preparing PR.
+- Branch: `codex/web-01-kickoff-guard`; status: PR OPEN (draft),
+  [PR #34](https://github.com/bambrose24/funtime-t3/pull/34); browser CI pending.
 - Scope: shared kickoff guard for bulk overrides and dedicated member-pick
   edits; regular player filtering includes exact kickoff. No late-policy,
   scoring-recalculation, uniqueness or UI redesign work included.
