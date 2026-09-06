@@ -16,9 +16,10 @@ user-facing behavior change.
   local Supabase, and passed in the most recent full-suite baseline.
 - An unchecked item means coverage is missing or incomplete, even if the
   feature works manually or has unit tests.
-- New or changed functionality must add or update its checklist item and E2E
-  spec in the same change. Add the checklist item before implementation so a
-  missing test remains visible.
+- Use the risk/flow-based criteria in `docs/TESTING_STRATEGY.md`. Add or
+  update an E2E journey when its flow or cross-layer behavior changes; direct
+  API tests can cover rule matrices while existing E2E validates the flow.
+  Record the layer decision and any real remaining gaps in the same change.
 - If browser E2E is genuinely the wrong layer, record the behavior in the
   explicit gaps register below with the test layer that owns it and a concrete
   follow-up. Do not silently omit it.
