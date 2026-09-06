@@ -62,6 +62,10 @@ Funtime solves this by combining:
   - If a member has not submitted picks for that week, they cannot see other members' picks.
   - If a member has submitted picks, they can see picks for games that have started.
 - Late policy: league-configurable; no single mandated league default requirement.
+- `close_at_first_game_start` closes the entire week at its earliest scheduled kickoff, including later games. Recompute against the current schedule after rescheduling. Ordinary admins follow this deadline; explicit super-admin corrections remain exempt.
+- `allow_late_and_lock_after_start` locks each game at its own kickoff. Legacy `allow_late_whole_week` and unset policies temporarily retain this same per-game behavior pending inventory and migration decisions.
+- WEB-02a: if an apply-to-all request includes a closed week, reject the entire request before saving and name the closed leagues. The website retains the draft and permits retry for the current open league. Per-league partial-save outcomes remain a follow-up; mobile uses the same server rejection.
+- The website shows the weekly cutoff and replaces the pick form with a closed state when that deadline passes.
 - Leaderboard ties must use shared ranking (example: scores `10, 8, 8, 4` => ranks `1, 2, 2, 4`).
 - League admins cannot edit picks after kickoff.
 - Super admin can edit picks regardless of kickoff lock.

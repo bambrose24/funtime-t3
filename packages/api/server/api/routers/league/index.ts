@@ -1,3 +1,7 @@
+import {
+  getWeekPickDeadline,
+  isPickLocked,
+} from "../../../../utils/pickPermissions";
 import { TRPCError } from "@trpc/server";
 import { orderBy } from "lodash";
 import { z } from "zod";
@@ -652,6 +656,7 @@ export const leagueRouter = createTRPCRouter({
         },
         select: {
           season: true,
+          late_policy: true,
         },
       });
       if (!data?.season) {
@@ -739,7 +744,12 @@ export const leagueRouter = createTRPCRouter({
       const gamesToReturn =
         weekToReturn === week ? mostRecentStartedWeekGames : nextWeekGames;
 
+      const picksCloseAt = getWeekPickDeadline(data.late_policy, gamesToReturn);
       return {
+        picksCloseAt,
+        picksClosed: picksCloseAt
+          ? isPickLocked(picksCloseAt, new Date())
+          : false,
         season,
         week: weekToReturn,
         games: gamesToReturn,

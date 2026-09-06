@@ -14,22 +14,22 @@ Priority definitions: **P0** = fix first because existing integrity/privacy is a
 
 ## Website queue
 
-| Order | Ticket | Priority | Deliverable | Mobile dependency |
-| --- | --- | --- | --- | --- |
-| 1 | WEB-01 | P0 | One enforced kickoff/override policy for every pick writer | Required |
-| 2 | WEB-02 | P0 | Actual late-policy enforcement and honest apply-to-all outcomes | Required |
-| 3 | WEB-03 | P0 | Valid, unique, retry-safe picks | Required |
-| 4 | WEB-04 | P0 | API-level preseason prediction privacy | Required |
-| 5 | WEB-05 | P1 | Atomic league join and explicit late-join contest eligibility | Required |
-| 6 | WEB-06 | P1 | Correct finalized winners after admin corrections | Required if correction tools remain available |
-| 7 | WEB-07 | P1 | “No reminders” persists and is honored | Required |
-| 8 | WEB-08 | P1 | Cross-platform-safe renewal role updates | Required while renewal sending is exposed |
-| 9 | WEB-09 | P1 | Deterministic auth recovery and protected-link journeys | Shared release validation |
-| 10 | WEB-10 | P1 | Documented and verified season lifecycle | Shared release validation |
-| 11 | WEB-11 | P1 | Independent email/push delivery tracking and explicit UTC scheduling | Required before enabling summary push |
-| 12 | WEB-12 | P2 | Consistent validation and username uniqueness | Shared improvement |
-| 13 | WEB-13 | P2 | Useful notification settings and email-delivery history | Shared preference API needed by mobile |
-| 14 | WEB-14 | P2 | Bounded chat history and accurate unread validation | Shared improvement; size-based release gate |
+| Order | Ticket | Priority | Deliverable                                                          | Mobile dependency                             |
+| ----- | ------ | -------- | -------------------------------------------------------------------- | --------------------------------------------- |
+| 1     | WEB-01 | P0       | One enforced kickoff/override policy for every pick writer           | Required                                      |
+| 2     | WEB-02 | P0       | Actual late-policy enforcement and honest apply-to-all outcomes      | Required                                      |
+| 3     | WEB-03 | P0       | Valid, unique, retry-safe picks                                      | Required                                      |
+| 4     | WEB-04 | P0       | API-level preseason prediction privacy                               | Required                                      |
+| 5     | WEB-05 | P1       | Atomic league join and explicit late-join contest eligibility        | Required                                      |
+| 6     | WEB-06 | P1       | Correct finalized winners after admin corrections                    | Required if correction tools remain available |
+| 7     | WEB-07 | P1       | “No reminders” persists and is honored                               | Required                                      |
+| 8     | WEB-08 | P1       | Cross-platform-safe renewal role updates                             | Required while renewal sending is exposed     |
+| 9     | WEB-09 | P1       | Deterministic auth recovery and protected-link journeys              | Shared release validation                     |
+| 10    | WEB-10 | P1       | Documented and verified season lifecycle                             | Shared release validation                     |
+| 11    | WEB-11 | P1       | Independent email/push delivery tracking and explicit UTC scheduling | Required before enabling summary push         |
+| 12    | WEB-12 | P2       | Consistent validation and username uniqueness                        | Shared improvement                            |
+| 13    | WEB-13 | P2       | Useful notification settings and email-delivery history              | Shared preference API needed by mobile        |
+| 14    | WEB-14 | P2       | Bounded chat history and accurate unread validation                  | Shared improvement; size-based release gate   |
 
 ### WEB-01 — Close the alternate admin kickoff bypass
 
@@ -42,6 +42,10 @@ Priority definitions: **P0** = fix first because existing integrity/privacy is a
 **Done when:** direct router integration tests cover both writers for player/admin/super-admin, someone else's league, and before/equal/after kickoff with an injected clock. A started-game ordinary-admin request is rejected and the stored pick is unchanged. Extend web integrity/admin E2E to cover the user-facing denial.
 
 ### WEB-02 — Make league deadlines match selected policy
+
+**Status: IN PROGRESS — WEB-02a.** From merged WEB-01 (`40148de`). First slice enforces the first-kickoff policy across both writers and shows website deadline/closed state. Mixed-policy submissions reject before saving any league, name closed leagues, and preserve the website draft for retry. API regression: 35 pass / 10 fail before, 45 pass after; all platform typechecks pass; new browser recovery journey pending CI.
+
+**Next small slice (WEB-02b):** define per-league apply-to-all outcomes, preserve existing mobile-client compatibility, save only eligible leagues with accurate confirmation and email scope, and display saved/skipped league names on web. Inventory legacy/null policy usage without writes before proposing removal/migration of that setting. WEB-02 is not complete until these acceptance criteria are resolved.
 
 **Why / evidence:** F02. Clients expose a first-kickoff deadline, but submission only checks each game's timestamp.
 
@@ -175,18 +179,18 @@ Priority definitions: **P0** = fix first because existing integrity/privacy is a
 
 Public release means an App Store/Google Play release, not just a development build. Store/configuration observations below identify work to verify; this audit did not inspect developer-console settings or signed artifacts. Do not assume a missing checked-in file proves a remote build configuration is absent.
 
-| Order | Ticket | Priority | Release condition |
-| --- | --- | --- | --- |
-| 1 | MOB-01 | P0 | No prior-account data or pushes after logout/account switch |
-| 2 | MOB-02 | P1 | Explicit notification preference survives registration/restart |
-| 3 | MOB-03 | P1 | No duplicate actions or misleading saves on bad networks |
-| 4 | MOB-04 | P1 | Working invite, recovery and contextual links on devices |
-| 5 | MOB-05 | P1 | Reproducible, correctly identified/signed release builds |
-| 6 | MOB-06 | P1 | Account deletion and accessible privacy/support surfaces |
-| 7 | MOB-07 | P1 | Appropriate moderation/report/block flows for shipped Chat |
-| 8 | MOB-08 | P1 | Complete core-player device test gate and release evidence |
-| 9 | MOB-09 | P1/P2 | Safe renewal functionality now; richer commissioner parity next |
-| 10 | MOB-10 | P2 | Exports, visual parity and optional additions after launch |
+| Order | Ticket | Priority | Release condition                                               |
+| ----- | ------ | -------- | --------------------------------------------------------------- |
+| 1     | MOB-01 | P0       | No prior-account data or pushes after logout/account switch     |
+| 2     | MOB-02 | P1       | Explicit notification preference survives registration/restart  |
+| 3     | MOB-03 | P1       | No duplicate actions or misleading saves on bad networks        |
+| 4     | MOB-04 | P1       | Working invite, recovery and contextual links on devices        |
+| 5     | MOB-05 | P1       | Reproducible, correctly identified/signed release builds        |
+| 6     | MOB-06 | P1       | Account deletion and accessible privacy/support surfaces        |
+| 7     | MOB-07 | P1       | Appropriate moderation/report/block flows for shipped Chat      |
+| 8     | MOB-08 | P1       | Complete core-player device test gate and release evidence      |
+| 9     | MOB-09 | P1/P2    | Safe renewal functionality now; richer commissioner parity next |
+| 10    | MOB-10 | P2       | Exports, visual parity and optional additions after launch      |
 
 ### MOB-01 — Clear account data and revoke device association
 
@@ -312,21 +316,23 @@ Maintain at most one active implementation PR from this backlog. Finish its vali
 
 Status vocabulary: `OPEN`, `IN PROGRESS`, `PR OPEN`, `READY FOR REVIEW`, `MERGED / VERIFICATION PENDING`, `DONE`, `BLOCKED` (with explicit reason).
 
-| Ticket / slice | Status | Owner | Branch / PR | Before-fix evidence | After-fix checks | Merge / remaining verification |
-| --- | --- | --- | --- | --- | --- | --- |
-| WEB-01 / kickoff guard | PR OPEN (draft) | Codex | [PR #34](https://github.com/bambrose24/funtime-t3/pull/34), `codex/web-01-kickoff-guard` | Original routers: 18 pass / 4 fail | Fixed: 22 API integration cases and 7 API unit tests pass; all 3 typechecks pass | Not merged; browser CI pending (local Supabase startup blocked) |
+| Ticket / slice         | Status | Owner | Branch / PR                                                                              | Before-fix evidence                | After-fix checks                                                                 | Merge / remaining verification                                     |
+| ---------------------- | ------ | ----- | ---------------------------------------------------------------------------------------- | ---------------------------------- | -------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
+| WEB-01 / kickoff guard | DONE   | Codex | [PR #34](https://github.com/bambrose24/funtime-t3/pull/34), `codex/web-01-kickoff-guard` | Original routers: 18 pass / 4 fail | Fixed: 22 API integration cases and 7 API unit tests pass; all 3 typechecks pass | Merged main `40148de`; full browser/API CI passed, run 34049186920 |
 
 Add a row when each later slice starts. Keep one active implementation slice; record test counts and links to actual runs, not intended commands as if they passed.
 
 ## Product decisions to resolve without blocking unrelated fixes
 
-| Decision | Recommendation | Blocks |
-| --- | --- | --- |
+| Decision                             | Recommendation                                                                  | Blocks                    |
+| ------------------------------------ | ------------------------------------------------------------------------------- | ------------------------- |
 | Late joining with Super Bowl enabled | Allow weekly participation; no new preseason-contest eligibility after deadline | WEB-05 eligibility UI/API |
-| Legacy all-week late policy | Stop offering it; agree on compatibility/migration after inventory | WEB-02 legacy behavior |
-| Partial-week picks | Define explicit draft/submitted semantics and visibility threshold | WEB-03 completeness rules |
-| Completion/postseason window | One shared state contract with documented operational owner | WEB-10 final behavior |
-| Account deletion and league history | Explicit retention/anonymization and ownership-transfer policy | MOB-06 data mutation |
-| Initial mobile scope | Player-complete; essential commissioner actions with tested web fallbacks | MOB-09 release acceptance |
+| Legacy all-week late policy          | Stop offering it; agree on compatibility/migration after inventory              | WEB-02 legacy behavior    |
+| Partial-week picks                   | Define explicit draft/submitted semantics and visibility threshold              | WEB-03 completeness rules |
+| Completion/postseason window         | One shared state contract with documented operational owner                     | WEB-10 final behavior     |
+| Account deletion and league history  | Explicit retention/anonymization and ownership-transfer policy                  | MOB-06 data mutation      |
+| Initial mobile scope                 | Player-complete; essential commissioner actions with tested web fallbacks       | MOB-09 release acceptance |
 
 Store guidance was checked against primary Apple/Google sources on September 6, 2026. Recheck before submission; developer-console configuration and actual submission outcomes remain unverified. This file and the audit are the only intended changes from this planning work.
+
+WEB-02a: branch `codex/web-02-late-pick-policy`; API and typechecks validated, full browser CI pending. Final PR validation evidence will be recorded in the PR.

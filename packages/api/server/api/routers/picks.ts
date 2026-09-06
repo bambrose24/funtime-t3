@@ -3,7 +3,10 @@ import { groupBy } from "lodash";
 import { z } from "zod";
 
 import { getLogger } from "../../../utils/logging";
-import { isPickLocked } from "../../../utils/pickPermissions";
+import {
+  getWeekPickDeadline,
+  isPickLocked,
+} from "../../../utils/pickPermissions";
 import { resendApi } from "../../services/resend";
 import { authorizedProcedure, createTRPCRouter } from "../trpc";
 
@@ -152,7 +155,45 @@ export const picksRouter = createTRPCRouter({
         }
       });
 
+      const weeks = Array.from(new Set(pickedGames.map((g) => g.week)));
+      const policyMembers = members.filter(
+        (m) => m.leagues.late_policy === "close_at_first_game_start",
+      );
+      const schedule = policyMembers.length
+        ? await db.games.findMany({
+            where: {
+              season: { in: policyMembers.map((m) => m.leagues.season) },
+              week: { in: weeks },
+            },
+            select: { season: true, week: true, ts: true },
+          })
+        : [];
       const now = new Date();
+      const closedLeagues = policyMembers.filter((member) =>
+        weeks.some((week) => {
+          const deadline = getWeekPickDeadline(
+            member.leagues.late_policy,
+            schedule.filter(
+              (game) =>
+                game.season === member.leagues.season && game.week === week,
+            ),
+          );
+          return (
+            deadline &&
+            isPickLocked(
+              deadline,
+              now,
+              overrideMember ? dbUser.email : undefined,
+            )
+          );
+        }),
+      );
+      if (closedLeagues.length) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: `Weekly picks closed at the first kickoff for: ${closedLeagues.map((m) => m.leagues.name).join(", ")}. No picks were saved. Submit for an open league separately.`,
+        });
+      }
 
       // Reject the whole override before any writes, even if it also contains
       // open games. The bulk endpoint must honor the dedicated editor's lock.
@@ -178,8 +219,6 @@ export const picksRouter = createTRPCRouter({
             }
             return true;
           });
-
-      const weeks = Array.from(new Set(pickedGames.map((g) => g.week)));
 
       const picksSearch: NonNullable<Parameters<typeof db.picks.findMany>[0]> =
         {

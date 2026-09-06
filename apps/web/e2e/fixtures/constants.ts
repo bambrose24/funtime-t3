@@ -1,6 +1,7 @@
 export const E2E_PASSWORD = "Password123!";
 
 export const E2E_USERS = {
+  policyPlayer: { email: "web.e2e.policy@example.com", password: E2E_PASSWORD },
   admin: { email: "web.e2e.admin@example.com", password: E2E_PASSWORD },
   player: { email: "web.e2e.player@example.com", password: E2E_PASSWORD },
   outsider: { email: "web.e2e.outsider@example.com", password: E2E_PASSWORD },

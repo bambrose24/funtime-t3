@@ -27,7 +27,7 @@ import {
 } from "~/components/ui/form";
 import { clientApi } from "~/trpc/react";
 import { toast } from "sonner";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -112,7 +112,27 @@ export function ClientPickPage({
   // existingPicks: existingPicksProp,
   existingPicks,
 }: Props) {
-  const { week, season, games } = weekToPick;
+  const { week, season, games, picksCloseAt } = weekToPick;
+  const [picksClosed, setPicksClosed] = useState(weekToPick.picksClosed);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const deadlineMs = picksCloseAt?.getTime();
+  useEffect(() => {
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const refresh = () => {
+      clearTimeout(timer);
+      const remaining =
+        deadlineMs === undefined ? Infinity : deadlineMs - Date.now();
+      setPicksClosed(remaining <= 0);
+      if (Number.isFinite(remaining) && remaining > 0)
+        timer = setTimeout(refresh, Math.min(remaining, 2147483647));
+    };
+    refresh();
+    window.addEventListener("focus", refresh);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener("focus", refresh);
+    };
+  }, [deadlineMs]);
   const { league_id: leagueId } = league;
 
   // do this to test out missing the first game
@@ -192,6 +212,7 @@ export function ClientPickPage({
       console.log(
         `going to submit picks for league(s): ${leagueIds.join(",")}`,
       );
+      setSubmitError(null);
       await submitPicks({
         picks: data.picks
           .map((p) => {
@@ -223,10 +244,12 @@ export function ClientPickPage({
 
       setPicksDialogOpen(true);
     } catch (e) {
-      console.error(`Error submitting picks`, e);
-      toast.error(
-        `There was an error submitting your picks. Contact Bob at bambrose24@gmail.com`,
-      );
+      const message =
+        e instanceof Error
+          ? e.message
+          : "Unable to submit picks. Please try again.";
+      setSubmitError(message);
+      toast.error(message);
     }
   };
 
@@ -269,6 +292,28 @@ export function ClientPickPage({
     });
   };
 
+  if (picksClosed && games.length) {
+    return (
+      <Card className="col-span-12 md:col-span-8 md:col-start-3">
+        <CardHeader>
+          <Text.H2>Picks are closed for week {week}</Text.H2>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-4">
+          <p>
+            This league closes all weekly picks at the first kickoff
+            {picksCloseAt
+              ? ` (${format(picksCloseAt, "EEE MMM d, h:mm a zzz", { timeZone: EASTERN_TIMEZONE })})`
+              : ""}
+            .
+          </p>
+          <Button onClick={() => router.push(`/league/${leagueId}`)}>
+            Back to league
+          </Button>
+        </CardContent>
+      </Card>
+    );
+  }
+
   if (!week || !season || !games.length) {
     return (
       <div className="col-span-12 flex max-w-[1000px] flex-col gap-4 md:col-span-6 md:col-start-4 xl:col-span-4 xl:col-start-5">
@@ -291,6 +336,20 @@ export function ClientPickPage({
         className="col-span-12 flex flex-col gap-3 md:col-span-8 md:col-start-3 lg:col-span-4 lg:col-start-5"
       >
         <Form {...form}>
+          {picksCloseAt && (
+            <p>
+              All picks close at the first kickoff:{" "}
+              {format(picksCloseAt, "EEE MMM d, h:mm a zzz", {
+                timeZone: EASTERN_TIMEZONE,
+              })}
+              .
+            </p>
+          )}
+          {submitError && (
+            <Alert role="alert">
+              <AlertTitle>{submitError}</AlertTitle>
+            </Alert>
+          )}
           <div className="flex flex-col items-center justify-center">
             <Text.H2>
               {hasSubmittedAlready ? "Update Your Picks" : "Make Your Picks"}
@@ -299,7 +358,7 @@ export function ClientPickPage({
               Week {week}, {season}
             </div>
           </div>
-          <div className="mb-4 flex flex-col gap-3 ">
+          <div className="mb-4 flex flex-col gap-3">
             <Alert
               variant="default"
               className="col-span-8 col-start-3 flex flex-row items-center lg:col-span-4 lg:col-start-5"
@@ -603,7 +662,7 @@ export function ClientPickPage({
             <Button
               type="submit"
               disabled={
-                form.formState.isSubmitted ||
+                picksDialogOpen ||
                 form.formState.isSubmitting ||
                 !form.formState.isValid ||
                 !form.formState.isDirty
@@ -630,8 +689,8 @@ export function ClientPickPage({
               Your picks are in for week {week}
             </DialogTitle>
             <DialogDescription className="text-center">
-              You can come back to this page to update them until the week
-              starts.{" "}
+              You can update picks until the applicable league deadline or game
+              kickoff.{" "}
               {hasMultipleLeagues &&
                 applyToAllSeasonLeagues &&
                 `These picks apply to all ${sameSeasonMemberships.length} of your leagues for the season.`}

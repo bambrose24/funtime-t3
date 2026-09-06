@@ -11,6 +11,7 @@ import { getBaseUrl } from "../../../../utils/getBaseUrl";
 import { authorizedProcedure, createTRPCRouter } from "../../trpc";
 import { getRenewalIneligibilityReason } from "./renewal";
 import {
+  getWeekPickDeadline,
   isPickLocked,
   isSuperAdminUser,
 } from "../../../../utils/pickPermissions";
@@ -772,6 +773,21 @@ export const leagueAdminRouter = createTRPCRouter({
         throw new TRPCError({
           code: "BAD_REQUEST",
           message: "League admins cannot edit picks after kickoff",
+        });
+      }
+
+      const schedule =
+        league.late_policy === "close_at_first_game_start"
+          ? await ctx.db.games.findMany({
+              where: { season: league.season, week: game.week },
+              select: { ts: true },
+            })
+          : [];
+      const deadline = getWeekPickDeadline(league.late_policy, schedule);
+      if (deadline && isPickLocked(deadline, new Date(), ctx.dbUser?.email)) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Weekly picks closed at the first kickoff for this league",
         });
       }
 
