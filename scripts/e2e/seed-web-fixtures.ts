@@ -20,6 +20,13 @@ if (!serviceRoleKey) {
 
 const users = [
   {
+    email: "web.e2e.policy@example.com",
+    password: "Password123!",
+    username: "webpolicy",
+    firstName: "Web",
+    lastName: "Policy",
+  },
+  {
     email: "web.e2e.admin@example.com",
     password: "Password123!",
     username: "webadmin",

@@ -84,14 +84,14 @@ Validate flows, not every feature with a new browser test. Choose the lowest
 layer that can catch the actual regression; preserve representative end-to-end
 coverage for the player and commissioner journeys.
 
-| Change | Coverage expected |
-| --- | --- |
-| New critical journey, or changed multi-step auth/navigation/submission flow | Add or update a representative browser/native E2E journey. |
-| UI-to-API wiring, session handoff, persistence shown after navigation/reload, or a browser-only regression | Add/update E2E at that integration boundary. |
-| API authorization, kickoff/scoring rules, retry/concurrency or database constraints | Direct API/database integration tests for the rule matrix; reuse existing E2E for the surrounding flow unless its behavior changes. |
-| Pure transformation, validation boundary, formatting or isolated component state | Unit/component tests when behavior warrants them; no duplicate E2E cases. |
-| Copy, spacing, styling, documentation, or behavior-preserving refactor | Relevant existing checks and targeted inspection; no mandatory new E2E or redundant implementation-mirroring tests. |
-| Email/push provider or scheduler behavior | Isolated integration/contract tests with fake providers/clock; device tests for OS delivery/tap behavior. Browser E2E does not prove delivery. |
+| Change                                                                                                     | Coverage expected                                                                                                                              |
+| ---------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| New critical journey, or changed multi-step auth/navigation/submission flow                                | Add or update a representative browser/native E2E journey.                                                                                     |
+| UI-to-API wiring, session handoff, persistence shown after navigation/reload, or a browser-only regression | Add/update E2E at that integration boundary.                                                                                                   |
+| API authorization, kickoff/scoring rules, retry/concurrency or database constraints                        | Direct API/database integration tests for the rule matrix; reuse existing E2E for the surrounding flow unless its behavior changes.            |
+| Pure transformation, validation boundary, formatting or isolated component state                           | Unit/component tests when behavior warrants them; no duplicate E2E cases.                                                                      |
+| Copy, spacing, styling, documentation, or behavior-preserving refactor                                     | Relevant existing checks and targeted inspection; no mandatory new E2E or redundant implementation-mirroring tests.                            |
+| Email/push provider or scheduler behavior                                                                  | Isolated integration/contract tests with fake providers/clock; device tests for OS delivery/tap behavior. Browser E2E does not prove delivery. |
 
 Add E2E when failure would only be visible across layers, when a core journey
 has no representative coverage, or when the regression escaped because the
@@ -277,3 +277,9 @@ Minimum required coverage set:
     1. Jest/RNTL coverage where applicable,
     2. Maestro flow coverage where user-visible E2E behavior changes, and
     3. `pnpm e2e:seed:verify` logic when backend season/pickability rules change.
+
+### WEB-02a late-policy coverage (September 6, 2026)
+
+- `packages/api/tests/integration/late-policy.test.ts`: 23 direct-router/PostgreSQL cases for first-kickoff cutoff, admin/super-admin, existing policies, mixed-request preflight, rescheduled schedule, and week metadata. Combined integration suite: 45 passing; pre-fix baseline: 35 passing / 10 failing.
+- `apps/web/e2e/picks/late-policy.spec.ts`: dedicated player and isolated leagues validate closed-state UI, apply-to-all denial, retained picks/score, retry, and persisted outcomes. A new E2E is warranted because the recovery journey crosses the form, API and database.
+- All three platform typechecks pass. Full browser CI is required before this PR is ready. Local API validation uses an isolated PostgreSQL container; local Supabase auth startup is blocked. Device UI behavior remains outside this web slice.

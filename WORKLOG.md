@@ -8,11 +8,20 @@
 - Worklog policy: mandatory update on task start/status change/commit/blocker/decision/validation, plus test-impact logging for any flow/screen behavior change.
 - Testing-plan stream (`P6-TEST-*` / E2E infra): `PAUSED` by request with handoff snapshot captured for later resume.
 
+## Audit backlog execution — WEB-02a
+
+- Started 2026-09-06 from merged main `40148de`; branch `codex/web-02-late-pick-policy`.
+- Scope: enforce first-kickoff weekly cutoff in both pick writers; expose deadline/closed metadata; website closed state and recoverable mixed-policy errors.
+- Decision: keep this PR small. Mixed requests reject before any writes; partial-save outcomes and legacy-setting migration remain WEB-02 follow-ups. Existing per-game and legacy semantics are preserved.
+- Regression evidence: before 35 pass / 10 fail; after 45 pass / 0 fail across both API integration files. Cases include exact cutoff, later-only payload, admin/super-admin, rescheduling, and no writes/emails after rejection.
+- Validation: all 3 platform typechecks pass. New browser journey covers closed-state display, mixed rejection, preserved draft, and successful single-league retry; full browser validation pending CI (local Supabase startup remains blocked).
+- Test-layer choice: role/time rules use real-router/PostgreSQL integration; changed error/retry UI/API journey receives E2E. No new mobile screen in this slice.
+
 ## Audit backlog execution — WEB-01
 
 - Task ID: `WEB-01`; started/validated 2026-09-06 17:34 UTC.
-- Branch: `codex/web-01-kickoff-guard`; status: PR OPEN (draft),
-  [PR #34](https://github.com/bambrose24/funtime-t3/pull/34); browser CI pending.
+- Branch: `codex/web-01-kickoff-guard`; status: DONE, merged into main `40148de`;
+  [PR #34](https://github.com/bambrose24/funtime-t3/pull/34). Full browser/API CI passed on `9ce3f94`.
 - Scope: shared kickoff guard for bulk overrides and dedicated member-pick
   edits; regular player filtering includes exact kickoff. No late-policy,
   scoring-recalculation, uniqueness or UI redesign work included.
@@ -23,8 +32,8 @@
   fixed 22 pass / 0 fail. Existing browser journeys are retained under the
   newly agreed flow-based E2E criteria, rather than adding duplicate E2E tests.
 - Validation: `pnpm --filter @funtime/api test:integration`, API unit suite
-  (7 passed), `pnpm typecheck` (all 3 passed). Browser validation is pending CI:
-  local Supabase startup failed; isolated standalone PostgreSQL with repository
+  (7 passed), `pnpm typecheck` (all 3 passed). Browser validation passed in CI run 34049186920.
+  Local Supabase startup failed; isolated standalone PostgreSQL with repository
   migrations/seed provided the API test database. No external side effects.
 - Decision: one implementation PR at a time; do not start WEB-02 until this
   slice is reviewed/merged and its required validation is resolved.
