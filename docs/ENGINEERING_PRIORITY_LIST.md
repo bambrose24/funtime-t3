@@ -314,7 +314,7 @@ Status vocabulary: `OPEN`, `IN PROGRESS`, `PR OPEN`, `READY FOR REVIEW`, `MERGED
 
 | Ticket / slice | Status | Owner | Branch / PR | Before-fix evidence | After-fix checks | Merge / remaining verification |
 | --- | --- | --- | --- | --- | --- | --- |
-| WEB-01 / kickoff guard | OPEN — first queued | Unassigned | Not started | Pending reproduction | Not run | Not merged |
+| WEB-01 / kickoff guard | IN PROGRESS | Codex | `codex/web-01-kickoff-guard`; PR pending | Original routers: 18 pass / 4 fail | Fixed: 22 API integration cases and 7 API unit tests pass; all 3 typechecks pass | Not merged; browser CI pending (local Supabase startup blocked) |
 
 Add a row when each later slice starts. Keep one active implementation slice; record test counts and links to actual runs, not intended commands as if they passed.
 

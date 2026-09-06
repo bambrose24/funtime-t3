@@ -8,6 +8,26 @@
 - Worklog policy: mandatory update on task start/status change/commit/blocker/decision/validation, plus test-impact logging for any flow/screen behavior change.
 - Testing-plan stream (`P6-TEST-*` / E2E infra): `PAUSED` by request with handoff snapshot captured for later resume.
 
+## Audit backlog execution — WEB-01
+
+- Task ID: `WEB-01`; started/validated 2026-09-06 17:34 UTC.
+- Branch: `codex/web-01-kickoff-guard`; status: IN_PROGRESS / preparing PR.
+- Scope: shared kickoff guard for bulk overrides and dedicated member-pick
+  edits; regular player filtering includes exact kickoff. No late-policy,
+  scoring-recalculation, uniqueness or UI redesign work included.
+- Outcome: ordinary admins cannot override started games through either API;
+  supported super-admin correction remains available. Rejected mixed requests
+  write nothing. No migrations.
+- Test impact: new direct router/PostgreSQL matrix; original 18 pass / 4 fail,
+  fixed 22 pass / 0 fail. Existing browser journeys are retained under the
+  newly agreed flow-based E2E criteria, rather than adding duplicate E2E tests.
+- Validation: `pnpm --filter @funtime/api test:integration`, API unit suite
+  (7 passed), `pnpm typecheck` (all 3 passed). Browser validation is pending CI:
+  local Supabase startup failed; isolated standalone PostgreSQL with repository
+  migrations/seed provided the API test database. No external side effects.
+- Decision: one implementation PR at a time; do not start WEB-02 until this
+  slice is reviewed/merged and its required validation is resolved.
+
 ## Current Phase
 
 - Active phase: `Phase 3 - Admin + Ops Parity`.

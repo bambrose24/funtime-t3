@@ -10,12 +10,10 @@ import { resendApi } from "../../../services/resend";
 import { getBaseUrl } from "../../../../utils/getBaseUrl";
 import { authorizedProcedure, createTRPCRouter } from "../../trpc";
 import { getRenewalIneligibilityReason } from "./renewal";
-
-const SUPER_ADMIN_EMAIL = "bambrose24@gmail.com";
-
-const isSuperAdminUser = (email?: string | null) => {
-  return email?.toLowerCase() === SUPER_ADMIN_EMAIL;
-};
+import {
+  isPickLocked,
+  isSuperAdminUser,
+} from "../../../../utils/pickPermissions";
 
 const leagueAdminProcedure = authorizedProcedure
   .input(z.object({ leagueId: z.number().int() }))
@@ -737,7 +735,6 @@ export const leagueAdminRouter = createTRPCRouter({
     )
     .mutation(async ({ ctx, input }) => {
       const { gameId, memberId, leagueId, winner, score } = input;
-      const requestorIsSuperAdmin = isSuperAdminUser(ctx.dbUser?.email);
       const [game, member, league] = await Promise.all([
         ctx.db.games.findFirstOrThrow({
           where: {
@@ -771,7 +768,7 @@ export const leagueAdminRouter = createTRPCRouter({
         });
       }
 
-      if (!requestorIsSuperAdmin && game.ts <= new Date()) {
+      if (isPickLocked(game.ts, new Date(), ctx.dbUser?.email)) {
         throw new TRPCError({
           code: "BAD_REQUEST",
           message: "League admins cannot edit picks after kickoff",

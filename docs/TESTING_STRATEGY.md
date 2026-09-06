@@ -117,6 +117,17 @@ run solely for documentation/cosmetic changes unrelated to flow behavior.
 These criteria also apply to mobile: use native E2E for core journeys and OS
 integration, and focused unit/component/API tests for their underlying rules.
 
+### Direct pick API/database regression gate
+
+After the isolated local schema and schedule seed are ready, run
+`pnpm --filter @funtime/api test:integration`. The script fixes its database URL
+to `127.0.0.1:55422`, enables E2E mode, and disables outbound delivery. Tests
+call the real routers with authenticated-actor contexts and real PostgreSQL
+queries; each fixture is rolled back. Confirmation delivery is stubbed at the
+service boundary. A controlled clock exercises exact kickoff semantics.
+This validates API rules, not Supabase authentication or browser interactions.
+The web CI workflow runs this gate before its existing browser journeys.
+
 ## Mobile Testing Strategy (Expo)
 
 ## 1. Purpose

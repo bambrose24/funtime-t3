@@ -3,6 +3,7 @@ import { groupBy } from "lodash";
 import { z } from "zod";
 
 import { getLogger } from "../../../utils/logging";
+import { isPickLocked } from "../../../utils/pickPermissions";
 import { resendApi } from "../../services/resend";
 import { authorizedProcedure, createTRPCRouter } from "../trpc";
 
@@ -153,6 +154,18 @@ export const picksRouter = createTRPCRouter({
 
       const now = new Date();
 
+      // Reject the whole override before any writes, even if it also contains
+      // open games. The bulk endpoint must honor the dedicated editor's lock.
+      if (
+        overrideMember &&
+        pickedGames.some((game) => isPickLocked(game.ts, now, dbUser.email))
+      ) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "League admins cannot edit picks after kickoff",
+        });
+      }
+
       /**
        * Filter out picks that have already happened (unless doing an override)
        */
@@ -160,7 +173,7 @@ export const picksRouter = createTRPCRouter({
         ? input.picks
         : input.picks.filter((p) => {
             const game = gamesById[p.gid]?.at(0);
-            if (!game || game.ts < now) {
+            if (!game || isPickLocked(game.ts, now)) {
               return false;
             }
             return true;

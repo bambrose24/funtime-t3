@@ -73,6 +73,9 @@ jobs:
       - name: Start, reset, migrate, and seed temporary Supabase
         run: pnpm e2e:backend:up
 
+      - name: Validate pick API kickoff rules against local PostgreSQL
+        run: pnpm --filter @funtime/api test:integration
+
       - name: Seed web fixtures and run E2E suite
         run: pnpm e2e:web -- --skip-backend-up
 

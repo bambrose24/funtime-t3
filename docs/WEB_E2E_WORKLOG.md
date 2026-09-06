@@ -169,6 +169,27 @@ baseline has not yet been recorded in this worklog.
 | Hosted Supabase or production data                                                        | Intentionally prohibited to avoid pollution and unsafe resets                                                                                      | Keep local-stack guards; validate hosted infrastructure through non-destructive deployment checks                                             |
 | Mobile application journeys                                                               | Owned by the mobile Jest/Maestro strategy                                                                                                          | Maintain the mobile coverage sections in `docs/TESTING_STRATEGY.md`                                                                           |
 
+## WEB-01 validation (2026-09-06)
+
+- Flow: player pick submission and commissioner correction. Existing owning
+  browser specs: `picks/integrity.spec.ts`, `picks/submit.spec.ts`, and
+  `league/admin-member-workflows.spec.ts`.
+- New coverage belongs at the API/database layer:
+  `packages/api/tests/integration/pick-kickoff.test.ts` exercises both real
+  mutation routes, player/admin/super-admin authorization, target-league
+  membership, before/equal/after kickoff, unchanged rejected writes, and mixed
+  locked/open requests. No new duplicate browser journey is needed.
+- Original routers: 18 passed / 4 failed. Fixed routers: 22 passed / 0 failed.
+  Fixtures use local PostgreSQL with the repository migrations/seed, a
+  controlled clock, rollback cleanup and stubbed confirmation delivery.
+- Existing API unit suite: 7 passed. API/web/mobile typechecks: passed.
+- Full local browser run: blocked at Supabase bootstrap (stale local service
+  credentials/container conflicts; CI-pinned CLI attempt also did not complete
+  startup). A disposable standalone local PostgreSQL instance was used for
+  the direct API suite. This does not establish a new browser E2E baseline.
+- GitHub Actions browser and API gate: pending PR run. No production changes,
+  external emails, push notifications or scoring cron were executed.
+
 ## Execution Log
 
 - 2026-08-08: Audited PRD, web routes, existing mobile E2E infrastructure, and
