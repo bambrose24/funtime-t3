@@ -27,6 +27,8 @@
 
 ## Audit backlog execution — WEB-02c native confirmation
 
+- PR #37 E2E follow-up: run 34081955390 passed 24 browser tests and failed the existing submit journey. The rendered confirmation contained `E2E Competition Renamed` after the admin-controls test changed the shared fixture; the assertion used its seed name. The retry also inherited saved picks. Fixed the test to assert current database names and reset only the fixture player's week-1 picks in its two target leagues before every attempt. Earlier diagnosis attributing this to membership order was incorrect. Full browser rerun remains for CI; stop after pushing per user preference.
+
 - Started 2026-09-07 from merged main `fd8a37f`; branch `codex/mobile-pick-outcome-confirmation`.
 - Scope: native picks confirmation consumes the existing additive `outcomes` response and names saved/skipped leagues. It labels partial success honestly instead of claiming all season leagues updated.
 - Test impact: added two focused helper cases for full and partial outcome copy. This is a pure alert-copy transform; no new device E2E is required under the flow-based coverage rule.
