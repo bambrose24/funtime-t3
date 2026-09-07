@@ -26,11 +26,10 @@ test("player submits, applies, and idempotently updates weekly picks", async ({
   await expect(
     page.getByRole("heading", { name: "Your picks are in for week 1" }),
   ).toBeVisible();
-  await expect(
-    page.getByText(
-      "These picks apply to E2E Active League, E2E Competition League.",
-    ),
-  ).toBeVisible();
+  const confirmation = page.getByRole("dialog");
+  await expect(confirmation).toContainText("These picks apply to");
+  await expect(confirmation).toContainText("E2E Active League");
+  await expect(confirmation).toContainText("E2E Competition League");
 
   await expect
     .poll(() =>
