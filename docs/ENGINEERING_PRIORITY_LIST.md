@@ -43,9 +43,9 @@ Priority definitions: **P0** = fix first because existing integrity/privacy is a
 
 ### WEB-02 — Make league deadlines match selected policy
 
-**Status: IN PROGRESS — WEB-02b.** WEB-02a merged as `f5ba79a` / [PR #35](https://github.com/bambrose24/funtime-t3/pull/35), with full browser/API CI passing in run 34050693786. This slice changes mixed-policy apply-to-all from an all-or-nothing rejection to named per-league outcomes: save every eligible league, skip only first-kickoff-closed leagues, and scope confirmation email to saved leagues. The response adds `outcomes` without removing existing fields, preserving released mobile client parsing. Website confirmation names saved and skipped leagues.
+**Status: IN PROGRESS — WEB-02c.** WEB-02a merged as `f5ba79a` / [PR #35](https://github.com/bambrose24/funtime-t3/pull/35), with full browser/API CI passing in run 34050693786; WEB-02b merged as `fd8a37f` / [PR #36](https://github.com/bambrose24/funtime-t3/pull/36). The shared response returns named per-league outcomes without removing existing fields. This slice makes native confirmation consume those outcomes, so it distinguishes full and partial saves instead of claiming every league updated.
 
-**Next small slice (WEB-02c):** inventory legacy/null policy usage with read-only production evidence, decide compatibility/migration, and update native confirmation copy to consume outcomes before treating WEB-02 as complete. Do not silently reinterpret existing leagues.
+**Remaining decision task:** inventory legacy/null policy usage with read-only production evidence and decide compatibility/migration before treating WEB-02 as complete. Do not silently reinterpret existing leagues.
 
 **Why / evidence:** F02. Clients expose a first-kickoff deadline, but submission only checks each game's timestamp.
 
@@ -335,4 +335,4 @@ Add a row when each later slice starts. Keep one active implementation slice; re
 
 Store guidance was checked against primary Apple/Google sources on September 6, 2026. Recheck before submission; developer-console configuration and actual submission outcomes remain unverified. This file and the audit are the only intended changes from this planning work.
 
-WEB-02a: merged as `f5ba79a` / PR #35. WEB-02b: branch `codex/web-02b-partial-outcomes`; direct API and web E2E outcome coverage are included, with final CI evidence recorded in its PR.
+WEB-02a: merged as `f5ba79a` / PR #35. WEB-02b: merged as `fd8a37f` / PR #36. WEB-02c native confirmation: branch `codex/mobile-pick-outcome-confirmation`; focused helper coverage and native typecheck are included. The outstanding legacy-policy decision needs read-only production data.

@@ -25,6 +25,16 @@
 - Regression evidence: original behavior rejected the mixed request (44 pass / 1 fail after the changed expectation). Fixed: 45 direct router/PostgreSQL integration checks pass, including saved/skipped outcome, zero skipped rows and email scope.
 - Validation: API unit suite (7 passed), web typecheck passed; mobile and API typechecks pending. Web policy E2E was updated for partial success and will run in required CI. Local Supabase startup remains blocked; no external effects.
 
+## Audit backlog execution — WEB-02c native confirmation
+
+- PR #37 E2E follow-up: run 34081955390 passed 24 browser tests and failed the existing submit journey. The rendered confirmation contained `E2E Competition Renamed` after the admin-controls test changed the shared fixture; the assertion used its seed name. The retry also inherited saved picks. Fixed the test to assert current database names and reset only the fixture player's week-1 picks in its two target leagues before every attempt. Earlier diagnosis attributing this to membership order was incorrect. Full browser rerun remains for CI; stop after pushing per user preference.
+
+- Started 2026-09-07 from merged main `fd8a37f`; branch `codex/mobile-pick-outcome-confirmation`.
+- Scope: native picks confirmation consumes the existing additive `outcomes` response and names saved/skipped leagues. It labels partial success honestly instead of claiming all season leagues updated.
+- Test impact: added two focused helper cases for full and partial outcome copy. This is a pure alert-copy transform; no new device E2E is required under the flow-based coverage rule.
+- Validation: `pnpm --filter @funtime/mobile test -- --runInBand tests/picks/getPickSubmissionConfirmation.test.ts` (2 passed), `pnpm --filter @funtime/mobile typecheck` passed. No external effects.
+- Deferred: a read-only inventory of production `allow_late_whole_week`/null usage and an explicit migration/compatibility decision. This PR deliberately changes no existing league policy.
+
 ## Audit backlog execution — WEB-01
 
 - Task ID: `WEB-01`; started/validated 2026-09-06 17:34 UTC.

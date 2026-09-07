@@ -1,13 +1,34 @@
 import { E2E_LEAGUES, E2E_USERS } from "../fixtures/constants";
 import { expect, test } from "../fixtures/test";
 import { login } from "../helpers/auth";
-import { getLeagueId, queryScalar } from "../helpers/db";
+import { executeSql, getLeagueId, queryScalar } from "../helpers/db";
+
+test.beforeEach(() => {
+  // Each attempt starts before submission, including a retry after a failed
+  // confirmation assertion. Never clear another player's or week's picks.
+  executeSql(`
+    DELETE FROM "picks" p
+    USING "leaguemembers" m, "people" person, "leagues" l
+    WHERE p."member_id" = m."membership_id"
+      AND m."user_id" = person."uid"
+      AND m."league_id" = l."league_id"
+      AND person."email" = '${E2E_USERS.player.email}'
+      AND l."share_code" IN ('${E2E_LEAGUES.active.shareCode}', '${E2E_LEAGUES.competition.shareCode}')
+      AND p."week" = 1
+  `);
+});
 
 test("player submits, applies, and idempotently updates weekly picks", async ({
   page,
 }) => {
   const activeLeagueId = getLeagueId(E2E_LEAGUES.active.shareCode);
   const competitionLeagueId = getLeagueId(E2E_LEAGUES.competition.shareCode);
+  // The admin-controls spec renames a shared league. Verify the current
+  // persisted names, whether this spec runs alone or after that journey.
+  const leagueNames = [activeLeagueId, competitionLeagueId].map((leagueId) =>
+    queryScalar(`SELECT "name" FROM "leagues" WHERE "league_id" = ${leagueId}`),
+  );
+  for (const name of leagueNames) expect(name).not.toBe("");
   await login(page, E2E_USERS.player);
 
   await page.goto(`/league/${activeLeagueId}/pick`);
@@ -28,8 +49,9 @@ test("player submits, applies, and idempotently updates weekly picks", async ({
   ).toBeVisible();
   const confirmation = page.getByRole("dialog");
   await expect(confirmation).toContainText("These picks apply to");
-  await expect(confirmation).toContainText("E2E Active League");
-  await expect(confirmation).toContainText("E2E Competition League");
+  for (const name of leagueNames) {
+    await expect(confirmation).toContainText(name);
+  }
 
   await expect
     .poll(() =>
