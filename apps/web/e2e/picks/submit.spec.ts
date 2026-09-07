@@ -27,7 +27,9 @@ test("player submits, applies, and idempotently updates weekly picks", async ({
     page.getByRole("heading", { name: "Your picks are in for week 1" }),
   ).toBeVisible();
   await expect(
-    page.getByText("These picks apply to all 2 of your leagues"),
+    page.getByText(
+      "These picks apply to E2E Active League, E2E Competition League.",
+    ),
   ).toBeVisible();
 
   await expect
