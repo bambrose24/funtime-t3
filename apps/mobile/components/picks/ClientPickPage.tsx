@@ -13,6 +13,7 @@ import { createComponentLogger } from "@/lib/logging";
 import { Input } from "../ui/input";
 import { LeagueTabLoadingSkeleton } from "@/components/league/LeagueTabLoadingSkeleton";
 import { getSeasonOverUpsell } from "@/lib/picks/getSeasonOverUpsell";
+import { getPickSubmissionConfirmation } from "@/lib/picks/getPickSubmissionConfirmation";
 
 type Props = {
   leagueId: string;
@@ -77,10 +78,18 @@ type PickFormProps = {
   leagueIdNumber: number;
 };
 
-function PickForm({ league, weekToPick, teams, existingPicks, leagueIdNumber }: PickFormProps) {
+function PickForm({
+  league,
+  weekToPick,
+  teams,
+  existingPicks,
+  leagueIdNumber,
+}: PickFormProps) {
   const { week, season, games } = weekToPick;
   const [submitting, setSubmitting] = useState(false);
-  const logger = createComponentLogger('PickForm', { leagueId: leagueIdNumber });
+  const logger = createComponentLogger("PickForm", {
+    leagueId: leagueIdNumber,
+  });
   const { data: session } = clientApi.session.current.useQuery();
   const sameSeasonMemberships = useMemo(() => {
     return (
@@ -142,7 +151,8 @@ function PickForm({ league, weekToPick, teams, existingPicks, leagueIdNumber }: 
     name: "picks",
   });
 
-  const { mutateAsync: submitPicks } = clientApi.picks.submitPicks.useMutation();
+  const { mutateAsync: submitPicks } =
+    clientApi.picks.submitPicks.useMutation();
 
   const onSubmit = async (data: PicksFormData) => {
     try {
@@ -166,7 +176,7 @@ function PickForm({ league, weekToPick, teams, existingPicks, leagueIdNumber }: 
         })
         .filter((p): p is NonNullable<typeof p> => p !== null);
 
-      await submitPicks({
+      const response = await submitPicks({
         picks: picksToSubmit,
         leagueIds:
           data.applyToAllSeasonLeagues && hasMultipleLeagues
@@ -175,20 +185,16 @@ function PickForm({ league, weekToPick, teams, existingPicks, leagueIdNumber }: 
         overrideMemberId: undefined,
       });
 
-      const applyAllMessage =
-        data.applyToAllSeasonLeagues && hasMultipleLeagues
-          ? `\n\nThese picks were submitted to all ${sameSeasonLeagueIds.length} of your ${season} leagues.`
-          : "";
-      Alert.alert(
-        "Success!",
-        `Your picks are in for week ${week}!\n\nYou can come back to update them until the week starts.${applyAllMessage}`,
-        [{ text: "OK" }],
-      );
+      const confirmation = getPickSubmissionConfirmation({
+        week,
+        outcomes: response.outcomes,
+      });
+      Alert.alert(confirmation.title, confirmation.message, [{ text: "OK" }]);
     } catch (error) {
-      logger.error("Error submitting picks", { 
+      logger.error("Error submitting picks", {
         error: error instanceof Error ? error.message : String(error),
         leagueId: leagueIdNumber,
-        week 
+        week,
       });
       Alert.alert(
         "Error",
@@ -242,7 +248,9 @@ function PickForm({ league, weekToPick, teams, existingPicks, leagueIdNumber }: 
   const isFormDirty = form.formState.isDirty;
   const applyToAllSeasonLeagues = form.watch("applyToAllSeasonLeagues");
   const currentPicks = form.watch("picks");
-  const pickableGameCount = currentPicks.filter((pick) => pick.type === "toPick").length;
+  const pickableGameCount = currentPicks.filter(
+    (pick) => pick.type === "toPick",
+  ).length;
   const pickedOpenGameCount = currentPicks.filter(
     (pick) => pick.type === "toPick" && pick.winner !== null,
   ).length;
@@ -276,7 +284,7 @@ function PickForm({ league, weekToPick, teams, existingPicks, leagueIdNumber }: 
       <View className="px-4 py-6">
         {/* Header */}
         <View className="mb-6">
-          <Text className="text-app-fg-light dark:text-app-fg-dark mb-2 text-center text-2xl font-bold">
+          <Text className="mb-2 text-center text-2xl font-bold text-app-fg-light dark:text-app-fg-dark">
             {hasSubmittedAlready ? "Update Your Picks" : "Make Your Picks"}
           </Text>
           <Text className="text-center text-gray-600 dark:text-gray-400">
@@ -285,12 +293,13 @@ function PickForm({ league, weekToPick, teams, existingPicks, leagueIdNumber }: 
         </View>
 
         <View className="mb-4 rounded-xl border border-gray-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-800">
-          <Text className="text-app-fg-light dark:text-app-fg-dark text-sm font-semibold">
+          <Text className="text-sm font-semibold text-app-fg-light dark:text-app-fg-dark">
             {pickedOpenGameCount}/{pickableGameCount} open games picked
           </Text>
           {lockedGameCount > 0 ? (
             <Text className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-              {lockedGameCount} game{lockedGameCount === 1 ? "" : "s"} locked at kickoff.
+              {lockedGameCount} game{lockedGameCount === 1 ? "" : "s"} locked at
+              kickoff.
             </Text>
           ) : null}
           {pickableGameCount === 0 ? (
@@ -299,8 +308,8 @@ function PickForm({ league, weekToPick, teams, existingPicks, leagueIdNumber }: 
             </Text>
           ) : remainingPickCount > 0 ? (
             <Text className="mt-2 text-xs text-amber-700 dark:text-amber-300">
-              Pick {remainingPickCount} more game{remainingPickCount === 1 ? "" : "s"} to
-              submit.
+              Pick {remainingPickCount} more game
+              {remainingPickCount === 1 ? "" : "s"} to submit.
             </Text>
           ) : (
             <Text className="mt-2 text-xs text-emerald-700 dark:text-emerald-300">
@@ -312,13 +321,17 @@ function PickForm({ league, weekToPick, teams, existingPicks, leagueIdNumber }: 
         {hasMultipleLeagues ? (
           <Pressable
             onPress={() =>
-              form.setValue("applyToAllSeasonLeagues", !applyToAllSeasonLeagues, {
-                shouldDirty: true,
-              })
+              form.setValue(
+                "applyToAllSeasonLeagues",
+                !applyToAllSeasonLeagues,
+                {
+                  shouldDirty: true,
+                },
+              )
             }
             className="mb-4 rounded-xl border border-gray-200 bg-white px-4 py-3 dark:border-zinc-700 dark:bg-zinc-800"
           >
-            <Text className="text-app-fg-light dark:text-app-fg-dark text-sm font-semibold">
+            <Text className="text-sm font-semibold text-app-fg-light dark:text-app-fg-dark">
               Apply picks to all {sameSeasonLeagueIds.length} season leagues
             </Text>
             <Text className="mt-1 text-xs text-gray-600 dark:text-gray-400">
@@ -335,7 +348,9 @@ function PickForm({ league, weekToPick, teams, existingPicks, leagueIdNumber }: 
           className="mb-6"
           disabled={!canRandomize}
         >
-          {pickableGameCount > 0 ? "Randomize Open Picks" : "No Open Games to Randomize"}
+          {pickableGameCount > 0
+            ? "Randomize Open Picks"
+            : "No Open Games to Randomize"}
         </Button>
 
         <View className="mb-6 gap-4">
@@ -425,34 +440,47 @@ function PickForm({ league, weekToPick, teams, existingPicks, leagueIdNumber }: 
 
 export function ClientPickPage({ leagueId }: Props) {
   const leagueIdNumber = parseInt(leagueId, 10);
-  
+
   // Fetch all required data (should be prefetched and cached)
-  const { data: league, isLoading: leagueLoading } = clientApi.league.get.useQuery({
-    leagueId: leagueIdNumber,
-  }, {
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    refetchOnWindowFocus: true,
-  });
+  const { data: league, isLoading: leagueLoading } =
+    clientApi.league.get.useQuery(
+      {
+        leagueId: leagueIdNumber,
+      },
+      {
+        staleTime: 5 * 60 * 1000, // 5 minutes
+        refetchOnWindowFocus: true,
+      },
+    );
 
-  const { data: weekToPick, isLoading: weekLoading } = clientApi.league.weekToPick.useQuery({
-    leagueId: leagueIdNumber,
-  }, {
-    staleTime: 2 * 60 * 1000, // 2 minutes
-    refetchOnWindowFocus: true,
-  });
+  const { data: weekToPick, isLoading: weekLoading } =
+    clientApi.league.weekToPick.useQuery(
+      {
+        leagueId: leagueIdNumber,
+      },
+      {
+        staleTime: 2 * 60 * 1000, // 2 minutes
+        refetchOnWindowFocus: true,
+      },
+    );
 
-  const { data: teams, isLoading: teamsLoading } = clientApi.teams.getTeams.useQuery(undefined, {
-    staleTime: 30 * 60 * 1000, // 30 minutes
-  });
+  const { data: teams, isLoading: teamsLoading } =
+    clientApi.teams.getTeams.useQuery(undefined, {
+      staleTime: 30 * 60 * 1000, // 30 minutes
+    });
 
-  const { data: existingPicks, isLoading: picksLoading } = clientApi.member.picksForWeek.useQuery({
-    leagueId: leagueIdNumber,
-    week: weekToPick?.week ?? 0,
-  }, {
-    enabled: !!weekToPick?.week,
-    staleTime: 1 * 60 * 1000, // 1 minute
-    refetchOnWindowFocus: true,
-  });
+  const { data: existingPicks, isLoading: picksLoading } =
+    clientApi.member.picksForWeek.useQuery(
+      {
+        leagueId: leagueIdNumber,
+        week: weekToPick?.week ?? 0,
+      },
+      {
+        enabled: !!weekToPick?.week,
+        staleTime: 1 * 60 * 1000, // 1 minute
+        refetchOnWindowFocus: true,
+      },
+    );
 
   const { data: nextLeagueResult } = clientApi.league.nextLeague.useQuery(
     {
@@ -481,16 +509,19 @@ export function ClientPickPage({ leagueId }: Props) {
   }
 
   if (!weekToPick?.week || !weekToPick?.games?.length) {
-    const seasonOverUpsell = getSeasonOverUpsell(nextLeagueResult?.nextLeague ?? null);
+    const seasonOverUpsell = getSeasonOverUpsell(
+      nextLeagueResult?.nextLeague ?? null,
+    );
 
     return (
       <View className="flex-1 px-4 py-8">
         <View className="w-full max-w-2xl self-center rounded-2xl border border-gray-200 bg-white p-5 dark:border-zinc-700 dark:bg-zinc-800">
-          <Text className="text-app-fg-light dark:text-app-fg-dark mb-2 text-center text-2xl font-bold">
+          <Text className="mb-2 text-center text-2xl font-bold text-app-fg-light dark:text-app-fg-dark">
             Season Complete
           </Text>
           <Text className="text-center text-base text-gray-600 dark:text-gray-400">
-            Great run this year. There are no remaining games to pick in this league.
+            Great run this year. There are no remaining games to pick in this
+            league.
           </Text>
 
           {seasonOverUpsell ? (
@@ -500,13 +531,17 @@ export function ClientPickPage({ leagueId }: Props) {
               </Text>
               <Text className="mt-1 text-sm text-emerald-700 dark:text-emerald-300">
                 Join {seasonOverUpsell.leagueName}
-                {seasonOverUpsell.season ? ` (${seasonOverUpsell.season})` : ""} before week
-                1 starts.
+                {seasonOverUpsell.season
+                  ? ` (${seasonOverUpsell.season})`
+                  : ""}{" "}
+                before week 1 starts.
               </Text>
               <Button
                 className="mt-3"
                 onPress={() =>
-                  router.push(`/join-league/${seasonOverUpsell.shareCode}` as any)
+                  router.push(
+                    `/join-league/${seasonOverUpsell.shareCode}` as any,
+                  )
                 }
               >
                 Join Next Season League
@@ -514,7 +549,8 @@ export function ClientPickPage({ leagueId }: Props) {
             </View>
           ) : (
             <Text className="mt-4 text-center text-sm text-gray-500 dark:text-gray-400">
-              No follow-up league is open yet. Check back soon or ask your league admin.
+              No follow-up league is open yet. Check back soon or ask your
+              league admin.
             </Text>
           )}
         </View>

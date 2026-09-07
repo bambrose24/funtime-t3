@@ -289,3 +289,8 @@ Minimum required coverage set:
 - The existing real-router/PostgreSQL mixed-policy case now asserts that an open league saves, a first-kickoff-closed league is skipped with a stable reason, no skipped pick exists, and confirmation scope contains only the saved league.
 - The existing web policy E2E now exercises closed state plus apply-to-all partial success and named confirmation. It does not duplicate the API role/time matrix.
 - The additive response shape keeps old mobile callers functional. Native success wording is a subsequent client adoption slice, not evidence of native outcome UX.
+
+### WEB-02c native outcome-confirmation coverage (September 7, 2026)
+
+- `apps/mobile/tests/picks/getPickSubmissionConfirmation.test.ts` covers full and partial-save alert copy, including named saved and skipped leagues.
+- This is a pure presentation transform of an already-tested server response, so focused unit tests and mobile typecheck are sufficient. Device E2E is reserved for a changed native flow, navigation, provider handoff, or persisted behavior.
