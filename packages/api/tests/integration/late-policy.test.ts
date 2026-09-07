@@ -157,14 +157,12 @@ async function scenario({
           // schedule, not just game IDs in the submitted payload.
           const result =
             endpoint === "setPick"
-              ? leagueAdminRouter
-                  .createCaller(ctx)
-                  .setPick({
-                    leagueId: league.league_id,
-                    memberId,
-                    gameId: laterGame.gid,
-                    winner: laterGame.away,
-                  })
+              ? leagueAdminRouter.createCaller(ctx).setPick({
+                  leagueId: league.league_id,
+                  memberId,
+                  gameId: laterGame.gid,
+                  winner: laterGame.away,
+                })
               : picksRouter.createCaller(ctx).submitPicks({
                   leagueIds: openLeague
                     ? [openLeague.league_id, league.league_id]
@@ -178,7 +176,30 @@ async function scenario({
                     },
                   ],
                 });
-          if (closed && actor !== "superAdmin") {
+          if (closed && actor !== "superAdmin" && mixed) {
+            const response = await result;
+            expect(response.outcomes).toEqual(
+              expect.arrayContaining([
+                expect.objectContaining({
+                  status: "saved",
+                  leagueId: openLeague?.league_id,
+                }),
+                expect.objectContaining({
+                  status: "skipped",
+                  leagueId: league.league_id,
+                  reason: "first_kickoff",
+                }),
+              ]),
+            );
+            expect(response.outcomes).toHaveLength(2);
+            expect(confirmation.mock.calls.length).toBe(callsBefore + 1);
+            expect(confirmation.mock.calls.at(-1)?.[0]?.leagueIds).toEqual([
+              openLeague?.league_id,
+            ]);
+            expect(await tx.picks.count({ where: { uid: person.uid } })).toBe(
+              1,
+            );
+          } else if (closed && actor !== "superAdmin") {
             await expect(result).rejects.toThrow("first kickoff");
             expect(confirmation.mock.calls.length).toBe(callsBefore);
             expect(await tx.picks.count({ where: { uid: person.uid } })).toBe(
@@ -225,7 +246,7 @@ for (const policy of [
   test(`preserve ${policy}: unstarted later game stays open`, () =>
     scenario({ policy, offset: 1 }));
 }
-test("mixed-policy submission rejects before writing the open league", () =>
+test("mixed-policy submission saves open leagues and names the skipped closed league", () =>
   scenario({ policy: "close_at_first_game_start", offset: 1, mixed: true }));
 test("cutoff follows the current schedule after rescheduling", () =>
   scenario({

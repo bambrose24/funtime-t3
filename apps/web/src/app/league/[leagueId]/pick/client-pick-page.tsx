@@ -115,6 +115,9 @@ export function ClientPickPage({
   const { week, season, games, picksCloseAt } = weekToPick;
   const [picksClosed, setPicksClosed] = useState(weekToPick.picksClosed);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [submissionOutcomes, setSubmissionOutcomes] = useState<
+    RouterOutputs["picks"]["submitPicks"]["outcomes"]
+  >([]);
   const deadlineMs = picksCloseAt?.getTime();
   useEffect(() => {
     let timer: ReturnType<typeof setTimeout> | undefined;
@@ -213,7 +216,7 @@ export function ClientPickPage({
         `going to submit picks for league(s): ${leagueIds.join(",")}`,
       );
       setSubmitError(null);
-      await submitPicks({
+      const response = await submitPicks({
         picks: data.picks
           .map((p) => {
             if (p.type !== "toPick" || !p.winner) {
@@ -234,6 +237,7 @@ export function ClientPickPage({
         leagueIds,
         overrideMemberId: undefined,
       });
+      setSubmissionOutcomes(response.outcomes);
 
       // Trigger confetti
       void confetti({
@@ -691,9 +695,26 @@ export function ClientPickPage({
             <DialogDescription className="text-center">
               You can update picks until the applicable league deadline or game
               kickoff.{" "}
-              {hasMultipleLeagues &&
-                applyToAllSeasonLeagues &&
-                `These picks apply to all ${sameSeasonMemberships.length} of your leagues for the season.`}
+              {submissionOutcomes.length > 0 && (
+                <>
+                  {" "}
+                  {submissionOutcomes.some(
+                    (outcome) => outcome.status === "skipped",
+                  )
+                    ? `Saved to ${submissionOutcomes
+                        .filter((outcome) => outcome.status === "saved")
+                        .map((outcome) => outcome.leagueName)
+                        .join(", ")}. Skipped ${submissionOutcomes
+                        .filter((outcome) => outcome.status === "skipped")
+                        .map((outcome) => outcome.leagueName)
+                        .join(
+                          ", ",
+                        )} because its weekly picks closed at the first kickoff.`
+                    : `These picks apply to ${submissionOutcomes
+                        .map((outcome) => outcome.leagueName)
+                        .join(", ")}.`}
+                </>
+              )}
             </DialogDescription>
           </DialogHeader>
           <div className="flex w-full justify-center">

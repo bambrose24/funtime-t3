@@ -43,9 +43,9 @@ Priority definitions: **P0** = fix first because existing integrity/privacy is a
 
 ### WEB-02 — Make league deadlines match selected policy
 
-**Status: IN PROGRESS — WEB-02a.** From merged WEB-01 (`40148de`). First slice enforces the first-kickoff policy across both writers and shows website deadline/closed state. Mixed-policy submissions reject before saving any league, name closed leagues, and preserve the website draft for retry. API regression: 35 pass / 10 fail before, 45 pass after; all platform typechecks pass; new browser recovery journey pending CI.
+**Status: IN PROGRESS — WEB-02b.** WEB-02a merged as `f5ba79a` / [PR #35](https://github.com/bambrose24/funtime-t3/pull/35), with full browser/API CI passing in run 34050693786. This slice changes mixed-policy apply-to-all from an all-or-nothing rejection to named per-league outcomes: save every eligible league, skip only first-kickoff-closed leagues, and scope confirmation email to saved leagues. The response adds `outcomes` without removing existing fields, preserving released mobile client parsing. Website confirmation names saved and skipped leagues.
 
-**Next small slice (WEB-02b):** define per-league apply-to-all outcomes, preserve existing mobile-client compatibility, save only eligible leagues with accurate confirmation and email scope, and display saved/skipped league names on web. Inventory legacy/null policy usage without writes before proposing removal/migration of that setting. WEB-02 is not complete until these acceptance criteria are resolved.
+**Next small slice (WEB-02c):** inventory legacy/null policy usage with read-only production evidence, decide compatibility/migration, and update native confirmation copy to consume outcomes before treating WEB-02 as complete. Do not silently reinterpret existing leagues.
 
 **Why / evidence:** F02. Clients expose a first-kickoff deadline, but submission only checks each game's timestamp.
 
@@ -335,4 +335,4 @@ Add a row when each later slice starts. Keep one active implementation slice; re
 
 Store guidance was checked against primary Apple/Google sources on September 6, 2026. Recheck before submission; developer-console configuration and actual submission outcomes remain unverified. This file and the audit are the only intended changes from this planning work.
 
-WEB-02a: branch `codex/web-02-late-pick-policy`; API and typechecks validated, full browser CI pending. Final PR validation evidence will be recorded in the PR.
+WEB-02a: merged as `f5ba79a` / PR #35. WEB-02b: branch `codex/web-02b-partial-outcomes`; direct API and web E2E outcome coverage are included, with final CI evidence recorded in its PR.
