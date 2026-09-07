@@ -8,6 +8,15 @@
 - Worklog policy: mandatory update on task start/status change/commit/blocker/decision/validation, plus test-impact logging for any flow/screen behavior change.
 - Testing-plan stream (`P6-TEST-*` / E2E infra): `PAUSED` by request with handoff snapshot captured for later resume.
 
+## Audit backlog execution — WEB-03a payload validation
+
+- Started September 7, 2026 from merged main `1780d21`; branch `codex/web-03-pick-validation`. Verified PR #37 merged before advancing.
+- Scope: validate all requested memberships, nonempty/unique bulk payloads, existing games, valid matchup winners, matching destination seasons and shared integer 1–200 tiebreaker scores before either pick writer saves.
+- Test impact: new direct router/PostgreSQL regression matrix checks rejection without modifying existing picks or sending confirmations, plus valid creates/edits. Existing browser pick submission, late-policy and admin journeys own the unchanged UI/API flow; no duplicate browser rule matrix added.
+- Remaining WEB-03: production duplicate inventory/canonical-row decision, uniqueness migration/concurrent writers and explicit partial-week/multi-league failure decisions. No migration or historical data changes in this slice.
+- Delivery blocker: automatic approval review rejected pushing this branch to `https://github.com/bambrose24/funtime-t3`, including after presenting the prior task’s small-PR authorization. Review requires fresh approval for publishing this payload/destination. Implementation is committed locally; no PR created and no CI monitoring started.
+- Validation: all 3 platform typechecks passed; API unit suite 7 passed; real-router/PostgreSQL suite 79 passed (34 new cases); full local `pnpm e2e:web` passed all 25 browser tests in 20 files after a fresh reset/migration/seed. Initial bootstrap hit a stale container-name conflict; Supabase cleanup removed those containers and the retry succeeded. The first API run had 4 test-expectation failures because omitted scores default to zero, not null; corrected the expectations and reran successfully. No outbound provider effects.
+
 ## Audit backlog execution — WEB-02a
 
 - Started 2026-09-06 from merged main `40148de`; branch `codex/web-02-late-pick-policy`.

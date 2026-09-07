@@ -1,12 +1,12 @@
 # Engineering priority list: website first, mobile release next
 
-Updated September 6, 2026. Source reviewed: `main` at `aaa5f89c01aa46c0ea807b9daef2119d54839319`.
+Updated September 7, 2026. Original audit: `aaa5f89c01aa46c0ea807b9daef2119d54839319`; latest execution starts from merged `main` at `1780d21`.
 
-This is the implementation backlog. The agreed delivery approach is one focused PR at a time, with behavior validation before advancing. All tickets below are **OPEN**; this plan update implements no fixes and authorizes no automatic merge or deployment. Original evidence and source permalinks are in [the cross-platform audit](PRD_CROSS_PLATFORM_AUDIT_2026-09-05.md). Ticket references such as F01 refer to that report. New findings from this follow-up are recorded at the end of that report.
+This is the implementation backlog. The agreed delivery approach is one focused PR at a time, with behavior validation before advancing. Per-ticket status below records completed slices and remaining work; unmarked tickets remain **OPEN**. No automatic merge or deployment is authorized. Original evidence and source permalinks are in [the cross-platform audit](PRD_CROSS_PLATFORM_AUDIT_2026-09-05.md). Ticket references such as F01 refer to that report. New findings from this follow-up are recorded at the end of that report.
 
 ## Recommendation
 
-Fix the website's shared competitive rules before adding features. A polished pick screen cannot compensate for a commissioner bypassing kickoff, a league ignoring its selected deadline, duplicate picks affecting scores, or hidden predictions leaking through another endpoint. Start with **WEB-01**, followed by **WEB-02–05**. These backend changes also make mobile safer to release.
+Fix the website's shared competitive rules before adding features. A polished pick screen cannot compensate for a commissioner bypassing kickoff, a league ignoring its selected deadline, duplicate picks affecting scores, or hidden predictions leaking through another endpoint. **WEB-01** and the WEB-02 implementation slices have merged. Continue **WEB-03**, then **WEB-04–05**, while tracking the remaining WEB-02 policy inventory separately. These backend changes also make mobile safer to release.
 
 For mobile, aim for a reliable player release, with basic commissioner workflows and a working web fallback for deferred tools. Do not wait for every chart, export and renewal-review detail to match web. Do require account isolation, dependable picks and auth, working invite links, deliberate notification behavior, a reproducible signed build, and the account/moderation flows needed for distribution.
 
@@ -33,6 +33,8 @@ Priority definitions: **P0** = fix first because existing integrity/privacy is a
 
 ### WEB-01 — Close the alternate admin kickoff bypass
 
+**Status: DONE.** Merged as `40148de` / [PR #34](https://github.com/bambrose24/funtime-t3/pull/34); full browser/API CI passed on `9ce3f94`.
+
 **Why / evidence:** F01. `picks.submitPicks` treats any admin override as exempt from kickoff filtering, unlike `league.admin.setPick`.
 
 **Change:** extract shared authorization/lock evaluation used by both mutations. Validate actor, target member and league before writing. Ordinary admins cannot alter a game at or after its kickoff; only the existing super-admin identity gets that exemption. Preserve the supported super-admin correction path. Do not rely on disabling form controls, or remove an API input without checking older mobile callers.
@@ -43,7 +45,7 @@ Priority definitions: **P0** = fix first because existing integrity/privacy is a
 
 ### WEB-02 — Make league deadlines match selected policy
 
-**Status: IN PROGRESS — WEB-02c.** WEB-02a merged as `f5ba79a` / [PR #35](https://github.com/bambrose24/funtime-t3/pull/35), with full browser/API CI passing in run 34050693786; WEB-02b merged as `fd8a37f` / [PR #36](https://github.com/bambrose24/funtime-t3/pull/36). The shared response returns named per-league outcomes without removing existing fields. This slice makes native confirmation consume those outcomes, so it distinguishes full and partial saves instead of claiming every league updated.
+**Status: IN PROGRESS — implementation slices merged; policy inventory remains.** WEB-02a merged as `f5ba79a` / [PR #35](https://github.com/bambrose24/funtime-t3/pull/35), WEB-02b as `fd8a37f` / [PR #36](https://github.com/bambrose24/funtime-t3/pull/36), and WEB-02c as `1780d21` / [PR #37](https://github.com/bambrose24/funtime-t3/pull/37). Both clients consume named saved/skipped outcomes; PR #37 also fixes shared-fixture name and retry isolation in the web submit journey. Merge state verified September 7; this does not assert a newly checked CI result.
 
 **Remaining decision task:** inventory legacy/null policy usage with read-only production evidence and decide compatibility/migration before treating WEB-02 as complete. Do not silently reinterpret existing leagues.
 
@@ -58,6 +60,10 @@ Priority definitions: **P0** = fix first because existing integrity/privacy is a
 **Done when:** a Thursday-start fixture proves Sunday games remain editable in one policy and locked in the other; mixed-policy apply-to-all reports exact outcomes; equal-to-kickoff and rescheduled game cases are tested. Depends on WEB-01.
 
 ### WEB-03 — Validate and deduplicate pick writes
+
+**Status: IN PROGRESS — WEB-03a payload validation.** Both writers validate matchup, season and tiebreaker score before writes. Bulk requests require every requested membership, nonempty picks/destinations and unique payload game IDs; unknown games reject the entire request. Scores use the existing 1–200 integer contract. Direct router/database cases cover invalid requests without writes or confirmation emails, and valid creates/edits.
+
+**Remaining:** read-only duplicate inventory and canonical-row decision, uniqueness migration, concurrent/retry-safe writers, and explicit partial-week/multi-league failure contracts. This slice preserves partial-week submissions and does not claim database uniqueness or historical cleanup.
 
 **Why / evidence:** F08. Invalid team/season combinations and duplicate member/game rows are possible.
 

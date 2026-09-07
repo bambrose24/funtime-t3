@@ -4,6 +4,10 @@ import { z } from "zod";
 
 import { getLogger } from "../../../utils/logging";
 import {
+  pickScoreSchema,
+  validatePickGame,
+} from "../../../utils/pickValidation";
+import {
   getWeekPickDeadline,
   isPickLocked,
 } from "../../../utils/pickPermissions";
@@ -13,14 +17,20 @@ import { authorizedProcedure, createTRPCRouter } from "../trpc";
 const pickSchema = z.object({
   gid: z.number().int(),
   winner: z.number().int(),
-  score: z.number().int().min(1).max(200).optional(),
+  score: pickScoreSchema.optional(),
   isRandom: z.boolean(),
 });
 
 const submitPicksSchema = z.object({
   overrideMemberId: z.number().int().optional(),
-  picks: z.array(pickSchema),
-  leagueIds: z.array(z.number().int()),
+  picks: z
+    .array(pickSchema)
+    .min(1)
+    .refine(
+      (picks) => new Set(picks.map((pick) => pick.gid)).size === picks.length,
+      "Each game may appear only once in a submission",
+    ),
+  leagueIds: z.array(z.number().int()).min(1),
 });
 
 export const picksRouter = createTRPCRouter({
@@ -118,7 +128,9 @@ export const picksRouter = createTRPCRouter({
         leagueIds.includes(m.league_id),
       );
 
-      if (!viewerMembers.length) {
+      if (
+        leagueIds.some((id) => !viewerMembers.some((m) => m.league_id === id))
+      ) {
         throw new TRPCError({
           code: "UNAUTHORIZED",
           message: `You are not a member of all of these leagues (user ${dbUser.uid} leagueIds ${input.leagueIds.join(",")})`,
@@ -140,20 +152,13 @@ export const picksRouter = createTRPCRouter({
 
       const gamesById = groupBy(pickedGames, (g) => g.gid);
 
-      /**
-       * Make sure every game with a score is actually a tiebreaker game
-       */
-      const picksWithScores = input.picks.filter((p) => p.score !== undefined);
-      const picksWithScoresGids = picksWithScores.map((p) => p.gid);
-      picksWithScoresGids.forEach((gid) => {
-        const game = gamesById[gid]?.at(0);
-        if (!game?.is_tiebreaker) {
-          throw new TRPCError({
-            code: "BAD_REQUEST",
-            message: `Gamd ID ${gid} is not a tiebreaker game`,
-          });
-        }
-      });
+      for (const pick of input.picks) {
+        validatePickGame(
+          pick,
+          gamesById[pick.gid]?.at(0),
+          members.map((member) => member.leagues.season),
+        );
+      }
 
       const weeks = Array.from(new Set(pickedGames.map((g) => g.week)));
       const policyMembers = members.filter(

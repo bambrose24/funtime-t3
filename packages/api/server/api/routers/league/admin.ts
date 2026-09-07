@@ -8,6 +8,10 @@ import {
 } from "../../../../src/generated/prisma-client";
 import { resendApi } from "../../../services/resend";
 import { getBaseUrl } from "../../../../utils/getBaseUrl";
+import {
+  pickScoreSchema,
+  validatePickGame,
+} from "../../../../utils/pickValidation";
 import { authorizedProcedure, createTRPCRouter } from "../../trpc";
 import { getRenewalIneligibilityReason } from "./renewal";
 import {
@@ -731,7 +735,7 @@ export const leagueAdminRouter = createTRPCRouter({
         memberId: z.number().int().min(1),
         gameId: z.number().int().min(1),
         winner: z.number().int().min(1),
-        score: z.number().int().optional(),
+        score: pickScoreSchema.optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -762,12 +766,7 @@ export const leagueAdminRouter = createTRPCRouter({
         });
       }
 
-      if (![game.away, game.home].includes(winner)) {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: `Could not find team ${winner} for game ${game.gid}`,
-        });
-      }
+      validatePickGame({ gid: gameId, winner, score }, game, [league.season]);
 
       if (isPickLocked(game.ts, new Date(), ctx.dbUser?.email)) {
         throw new TRPCError({
