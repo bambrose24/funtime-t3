@@ -3,14 +3,10 @@ import { expect, test } from "../fixtures/test";
 import { login } from "../helpers/auth";
 import { executeSql, getLeagueId, queryScalar } from "../helpers/db";
 
-test("closed week is read-only and mixed-policy rejection preserves a retryable draft", async ({
+test("closed week is read-only and mixed-policy submission saves only open leagues", async ({
   page,
   browserErrorGuard,
 }) => {
-  browserErrorGuard.allow(
-    /Failed to load resource: the server responded with a status of 400/,
-  );
-  browserErrorGuard.allow(/picks\.submitPicks[\s\S]*first kickoff/);
   executeSql(`
     INSERT INTO "leagues" ("created_by_user_id", "name", "season", "late_policy", "pick_policy", "scoring_type", "share_code", "status")
     SELECT "uid", 'E2E Policy Open', 2028, 'allow_late_and_lock_after_start', 'choose_winner', 'game_winner', 'E2EPOLICYOPEN', 'in_progress'
@@ -47,28 +43,16 @@ test("closed week is read-only and mixed-policy rejection preserves a retryable 
     await applyAll.check();
     await page.getByRole("button", { name: "Submit Picks" }).click();
     await expect(
-      page
-        .getByRole("alert")
-        .filter({
-          hasText:
-            "Weekly picks closed at the first kickoff for: E2E Policy Closed",
-        }),
+      page.getByRole("dialog").filter({
+        hasText:
+          "Saved to E2E Policy Open. Skipped E2E Policy Closed because its weekly picks closed at the first kickoff.",
+      }),
     ).toBeVisible();
     expect(
       queryScalar(
         `SELECT COUNT(*) FROM "picks" p JOIN "leaguemembers" m ON m."membership_id" = p."member_id" WHERE m."league_id" IN (${openId}, ${closedId})`,
       ),
-    ).toBe("0");
-    await expect(page.getByLabel("Tiebreaker Score")).toHaveValue("51");
-    await expect(page.locator(`[id="${chosen}"]`)).toBeChecked();
-    await applyAll.uncheck();
-    await expect(
-      page.getByRole("button", { name: "Submit Picks" }),
-    ).toBeEnabled();
-    await page.getByRole("button", { name: "Submit Picks" }).click();
-    await expect(
-      page.getByRole("heading", { name: "Your picks are in for week 1" }),
-    ).toBeVisible();
+    ).toBe("1");
     expect(
       queryScalar(
         `SELECT COUNT(*) FROM "picks" p JOIN "leaguemembers" m ON m."membership_id" = p."member_id" WHERE m."league_id" = ${openId}`,

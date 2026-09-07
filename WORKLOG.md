@@ -14,8 +14,16 @@
 - Scope: enforce first-kickoff weekly cutoff in both pick writers; expose deadline/closed metadata; website closed state and recoverable mixed-policy errors.
 - Decision: keep this PR small. Mixed requests reject before any writes; partial-save outcomes and legacy-setting migration remain WEB-02 follow-ups. Existing per-game and legacy semantics are preserved.
 - Regression evidence: before 35 pass / 10 fail; after 45 pass / 0 fail across both API integration files. Cases include exact cutoff, later-only payload, admin/super-admin, rescheduling, and no writes/emails after rejection.
-- Validation: all 3 platform typechecks pass. New browser journey covers closed-state display, mixed rejection, preserved draft, and successful single-league retry; full browser validation pending CI (local Supabase startup remains blocked).
+- Validation: all 3 platform typechecks pass. New browser journey covers closed-state display, mixed rejection, preserved draft, and successful single-league retry; full browser/API CI passed in run 34050693786. Local Supabase startup remains blocked.
 - Test-layer choice: role/time rules use real-router/PostgreSQL integration; changed error/retry UI/API journey receives E2E. No new mobile screen in this slice.
+
+## Audit backlog execution — WEB-02b
+
+- Started 2026-09-06 from merged main `f5ba79a`; branch `codex/web-02b-partial-outcomes`.
+- Scope: mixed-policy apply-to-all saves eligible leagues, skips first-kickoff-closed leagues, returns additive named outcomes, scopes confirmation email to saved leagues, and names results in the web confirmation dialog.
+- Compatibility: existing `pickedGames` and `picks` response fields remain. The mobile client can continue parsing its existing response; native outcome wording is explicitly deferred to WEB-02c.
+- Regression evidence: original behavior rejected the mixed request (44 pass / 1 fail after the changed expectation). Fixed: 45 direct router/PostgreSQL integration checks pass, including saved/skipped outcome, zero skipped rows and email scope.
+- Validation: API unit suite (7 passed), web typecheck passed; mobile and API typechecks pending. Web policy E2E was updated for partial success and will run in required CI. Local Supabase startup remains blocked; no external effects.
 
 ## Audit backlog execution — WEB-01
 

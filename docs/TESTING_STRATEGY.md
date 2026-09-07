@@ -281,5 +281,11 @@ Minimum required coverage set:
 ### WEB-02a late-policy coverage (September 6, 2026)
 
 - `packages/api/tests/integration/late-policy.test.ts`: 23 direct-router/PostgreSQL cases for first-kickoff cutoff, admin/super-admin, existing policies, mixed-request preflight, rescheduled schedule, and week metadata. Combined integration suite: 45 passing; pre-fix baseline: 35 passing / 10 failing.
-- `apps/web/e2e/picks/late-policy.spec.ts`: dedicated player and isolated leagues validate closed-state UI, apply-to-all denial, retained picks/score, retry, and persisted outcomes. A new E2E is warranted because the recovery journey crosses the form, API and database.
+- `apps/web/e2e/picks/late-policy.spec.ts`: dedicated player and isolated leagues validate closed-state UI and the original mixed-policy rejection/retry journey. WEB-02b updates that owner spec to validate partial success instead.
 - All three platform typechecks pass. Full browser CI is required before this PR is ready. Local API validation uses an isolated PostgreSQL container; local Supabase auth startup is blocked. Device UI behavior remains outside this web slice.
+
+### WEB-02b partial-outcome coverage (September 6, 2026)
+
+- The existing real-router/PostgreSQL mixed-policy case now asserts that an open league saves, a first-kickoff-closed league is skipped with a stable reason, no skipped pick exists, and confirmation scope contains only the saved league.
+- The existing web policy E2E now exercises closed state plus apply-to-all partial success and named confirmation. It does not duplicate the API role/time matrix.
+- The additive response shape keeps old mobile callers functional. Native success wording is a subsequent client adoption slice, not evidence of native outcome UX.

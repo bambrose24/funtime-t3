@@ -169,7 +169,7 @@ export const picksRouter = createTRPCRouter({
           })
         : [];
       const now = new Date();
-      const closedLeagues = policyMembers.filter((member) =>
+      const closedMembers = policyMembers.filter((member) =>
         weeks.some((week) => {
           const deadline = getWeekPickDeadline(
             member.leagues.late_policy,
@@ -188,10 +188,30 @@ export const picksRouter = createTRPCRouter({
           );
         }),
       );
-      if (closedLeagues.length) {
+      const closedMemberIds = new Set(
+        closedMembers.map((member) => member.membership_id),
+      );
+      const eligibleMembers = members.filter(
+        (member) => !closedMemberIds.has(member.membership_id),
+      );
+      const outcomes = members.map((member) =>
+        closedMemberIds.has(member.membership_id)
+          ? {
+              leagueId: member.league_id,
+              leagueName: member.leagues.name,
+              status: "skipped" as const,
+              reason: "first_kickoff" as const,
+            }
+          : {
+              leagueId: member.league_id,
+              leagueName: member.leagues.name,
+              status: "saved" as const,
+            },
+      );
+      if (!eligibleMembers.length) {
         throw new TRPCError({
           code: "BAD_REQUEST",
-          message: `Weekly picks closed at the first kickoff for: ${closedLeagues.map((m) => m.leagues.name).join(", ")}. No picks were saved. Submit for an open league separately.`,
+          message: `Weekly picks closed at the first kickoff for: ${closedMembers.map((m) => m.leagues.name).join(", ")}. No picks were saved.`,
         });
       }
 
@@ -223,7 +243,7 @@ export const picksRouter = createTRPCRouter({
       const picksSearch: NonNullable<Parameters<typeof db.picks.findMany>[0]> =
         {
           where: {
-            member_id: { in: members.map((m) => m.membership_id) },
+            member_id: { in: eligibleMembers.map((m) => m.membership_id) },
             week: {
               in: weeks,
             },
@@ -236,7 +256,7 @@ export const picksRouter = createTRPCRouter({
         (p) => `${p.member_id}_${p.gid}`,
       );
 
-      for (const member of members) {
+      for (const member of eligibleMembers) {
         await db.$transaction(async (tx) => {
           const promises = [];
 
@@ -300,11 +320,11 @@ export const picksRouter = createTRPCRouter({
       );
 
       await resendApi.sendWeekPicksEmail({
-        leagueIds,
+        leagueIds: eligibleMembers.map((member) => member.league_id),
         pickIds: picksForWeeks.map((p) => p.pickid),
-        userId: members.at(0)?.user_id ?? 0,
+        userId: eligibleMembers.at(0)?.user_id ?? 0,
       });
 
-      return { pickedGames, picks: picksForWeeks };
+      return { pickedGames, picks: picksForWeeks, outcomes };
     }),
 });
