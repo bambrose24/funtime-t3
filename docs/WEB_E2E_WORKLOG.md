@@ -28,11 +28,9 @@ user-facing behavior change.
 - Do not mark PRD functionality complete until its test impact is represented
   here and the relevant automated suite passes.
 
-Last recorded full-suite baseline: **21 Playwright tests in 18 files, all
-passing on a fresh local-Supabase reset and on GitHub Actions with an ephemeral
-Supabase stack (2026-08-08).** The repository currently defines **22 tests in
-18 files** after the deferred-invite renewal case was added; a new full-suite
-baseline has not yet been recorded in this worklog.
+Last recorded full-suite baseline: **25 Playwright tests in 20 files, all passing
+on a fresh local-Supabase reset, migration and seed (2026-09-07, WEB-03a).**
+This is local execution evidence; CI for the WEB-03a PR has not been monitored.
 
 ## Safety Contract
 
@@ -64,7 +62,7 @@ baseline has not yet been recorded in this worklog.
 | Authentication          | Anonymous access, signup/onboarding, login, logout, protected-route redirects                                                             | `auth/session.spec.ts`, `auth/signup.spec.ts`                                                                         |
 | Account settings        | Client validation, duplicate username rejection, successful persistence                                                                   | `profile/settings.spec.ts`                                                                                            |
 | League lifecycle        | Create with policies, join by code, duplicate prevention, waiting/completed states, renewal setup, no-send continuation, and role handoff | `league/create-and-duplicate.spec.ts`, `league/join.spec.ts`, `league/renewal.spec.ts`, `smoke/admin-renewal.spec.ts` |
-| Weekly picks            | Validation, submission, apply-to-all, update, player kickoff lock, admin lock, super-admin override                                       | `picks/submit.spec.ts`, `picks/integrity.spec.ts`, `league/admin-member-workflows.spec.ts`                            |
+| Weekly picks            | Validation, submission, apply-to-all saved/skipped confirmation, first-kickoff policy, update, player kickoff lock, admin lock, super-admin override                                       | `picks/submit.spec.ts`, `picks/late-policy.spec.ts`, `picks/integrity.spec.ts`, `league/admin-member-workflows.spec.ts`                            |
 | Competitive integrity   | Membership authorization and opponent-pick redaction before submission and before each kickoff                                            | `picks/integrity.spec.ts`, `platform/access-and-responsive.spec.ts`                                                   |
 | Standings and profiles  | Weekly co-winners, competition ranking, cumulative chart, result totals, player profile                                                   | `standings/results.spec.ts`, `profile/superbowl.spec.ts`                                                              |
 | Super Bowl contest      | Required join prediction, edit, preseason privacy, in-progress visibility, completed bracket and ranking                                  | `league/join.spec.ts`, `profile/superbowl.spec.ts`, `superbowl/visibility.spec.ts`, `superbowl/results.spec.ts`       |
@@ -444,3 +442,11 @@ passed`). All planned web PRD coverage paths are now checked.
   tests in 6.6 minutes, evidence upload, and no-backup teardown. The complete
   `chromium-e2e` job passed in 11m27s; this is the first green hosted baseline
   for [PR #9](https://github.com/bambrose24/funtime-t3/pull/9).
+
+## September 7, 2026 — WEB-03a validation coverage
+
+The shared pick writers now reject invalid matchup/season/score payloads before writes. Bulk requests also require every requested membership, nonempty arrays, known games and unique payload game IDs. `packages/api/tests/integration/pick-validation.test.ts` owns this direct-API rule matrix (34 cases); the combined API/database suite passes 79 cases.
+
+Existing `picks/submit.spec.ts`, `picks/late-policy.spec.ts`, `picks/integrity.spec.ts` and `league/admin-member-workflows.spec.ts` own the player/admin browser journeys. No new browser test duplicates the API matrix. Database uniqueness, race safety and historical duplicate cleanup remain WEB-03 follow-ups and are not proven by payload validation.
+
+Validation: full `pnpm e2e:web` passed all 25 browser tests on September 7 after a fresh local Supabase reset/migration/seed. Initial startup encountered a stale container-name conflict; Supabase's cleanup removed those containers and the retry succeeded. No new browser specs were needed for this server-validation slice.

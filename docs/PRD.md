@@ -201,9 +201,11 @@ Unless a requirement is explicitly labeled **Target** or **Planned**, it describ
 - Show games for target week ordered for usable entry.
 - Allow a player to randomize open-game selections while preserving locked games.
 - Submit picks for one or more leagues with validation:
-  - Membership required
+  - Membership required in every requested league
+  - Nonempty picks and destinations; each game appears at most once in the payload
+  - Every game exists, matches every destination league season, and names a participating team as winner
   - Admin-only override for editing another member
-  - Tiebreaker score only for tiebreaker game
+  - Optional tiebreaker scores are integers from 1–200 and only accepted for tiebreaker games, including admin edits
   - Non-admin submissions filter out already-started games
 - Let a player apply the same picks to all eligible same-season league memberships.
 - Update existing picks or create new picks idempotently by member/game.

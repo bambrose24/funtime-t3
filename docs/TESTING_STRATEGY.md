@@ -294,3 +294,11 @@ Minimum required coverage set:
 
 - `apps/mobile/tests/picks/getPickSubmissionConfirmation.test.ts` covers full and partial-save alert copy, including named saved and skipped leagues.
 - This is a pure presentation transform of an already-tested server response, so focused unit tests and mobile typecheck are sufficient. Device E2E is reserved for a changed native flow, navigation, provider handoff, or persisted behavior.
+
+### WEB-03a payload-validation coverage (September 7, 2026)
+
+- `packages/api/tests/integration/pick-validation.test.ts` calls both real writers against rollback-only PostgreSQL fixtures. It checks matchup/season/score validation, every requested membership, nonempty payloads, duplicate and unknown games, and valid creates/edits. Invalid requests must preserve all fixture picks and emit no confirmation.
+- The existing browser submit, late-policy and admin journeys remain the UI/API coverage owners. Exhaustive invalid payloads are tested at the API/database boundary, where UI constraints cannot hide a server bypass.
+- Duplicate payload rejection does not prove concurrent-write uniqueness. The database constraint and concurrent request matrix remain a separate WEB-03 slice after the required historical inventory.
+
+- Execution: 79 API/database cases, 7 API unit tests, all 3 platform typechecks and all 25 local browser tests passed. The local Supabase startup blocker recorded in the earlier WEB-02 entries was cleared on this run; those entries remain historical evidence.
