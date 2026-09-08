@@ -1,3 +1,4 @@
+import { hasSeasonKickedOff } from "../../../../utils/superbowlVisibility";
 import { z } from "zod";
 import { authorizedProcedure, createTRPCRouter } from "../../trpc";
 import { TRPCError } from "@trpc/server";
@@ -72,19 +73,7 @@ export const memberRouter = createTRPCRouter({
         }),
       ]);
 
-      const hasSeasonStarted = Boolean(
-        await db.games.findFirst({
-          where: {
-            season: league.season,
-            ts: {
-              lte: new Date(),
-            },
-          },
-          select: {
-            gid: true,
-          },
-        }),
-      );
+      const hasSeasonStarted = await hasSeasonKickedOff(db, league.season);
 
       if (!league.superbowl_competition) {
         throw new TRPCError({

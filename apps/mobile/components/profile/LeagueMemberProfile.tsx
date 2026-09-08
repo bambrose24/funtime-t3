@@ -148,7 +148,11 @@ export function LeagueMemberProfile({ leagueId, memberId }: Props) {
           <Text className="text-app-fg-light dark:text-app-fg-dark mb-3 text-base font-semibold">
             Super Bowl Pick
           </Text>
-          {!superbowlPick ? (
+          {profileData.superbowlPickHidden ? (
+            <Text className="text-sm text-gray-600 dark:text-gray-400">
+              Super Bowl picks are hidden until the season starts.
+            </Text>
+          ) : !superbowlPick ? (
             <Text className="text-sm text-gray-600 dark:text-gray-400">
               No Super Bowl pick submitted.
             </Text>

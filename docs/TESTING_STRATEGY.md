@@ -302,3 +302,13 @@ Minimum required coverage set:
 - Duplicate payload rejection does not prove concurrent-write uniqueness. The database constraint and concurrent request matrix remain a separate WEB-03 slice after the required historical inventory.
 
 - Execution: 79 API/database cases, 7 API unit tests, all 3 platform typechecks and all 25 local browser tests passed. The local Supabase startup blocker recorded in the earlier WEB-02 entries was cleared on this run; those entries remain historical evidence.
+
+### WEB-04 prediction-privacy coverage (September 7, 2026)
+
+- `packages/api/tests/integration/superbowl-privacy.test.ts`: 15 real-router/PostgreSQL cases for profile/board redaction before, at and after kickoff; owner/admin/super-admin behavior; stale statuses; missing schedule; nonmembers/anonymous viewers; cross-league targets; commissioner access and owner edit locks. Serialized profiles exclude unnecessary member/person/message fields.
+- `apps/mobile/tests/profile/LeagueMemberProfile.test.tsx`: three component tests for hidden versus missing predictions and replacing displayed details after a refreshed redacted response. This proves renderer/refetch behavior, not durable account-cache isolation or OS behavior.
+- The existing `superbowl/visibility.spec.ts` browser journey now checks the authenticated profile API payload, initial server-rendered serialized profile, hidden UI and reload. Existing own-profile editing and commissioner review journeys remain the owners for those access paths.
+
+- Started-board fixtures now use a dedicated league in the already-started 2028 schedule; the completed 2030 bracket fixture includes a past regular-season game. The 2027 competition fixture stays unchanged for apply-to-all picks. Persisted status alone is not evidence of kickoff.
+
+- Final execution: 94 API/database cases, 7 API unit tests, 3 focused mobile tests, all platform typechecks and 25 full local browser tests passed. The first browser run exposed two inconsistent lifecycle fixtures (23 passed / 2 failed); corrected fixtures passed the fresh-reset rerun.

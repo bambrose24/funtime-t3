@@ -211,6 +211,8 @@ Unless a requirement is explicitly labeled **Target** or **Planned**, it describ
 - Update existing picks or create new picks idempotently by member/game.
 - Trigger picks confirmation emails after submit.
 
+Super Bowl prediction privacy is enforced in player-profile and public-board responses. Opponents reveal at the season's first scheduled kickoff (inclusive), matching the owner-edit lock, regardless of persisted league status. Without a schedule, opponents remain hidden. Owners may see their own prediction; authorized commissioner review is a separate access path. Hidden profiles return an empty prediction array and an explicit hidden flag, so clients distinguish hidden from unsubmitted predictions.
+
 ### 7.4 Pick Visibility and Integrity
 
 - Weekly picks summary is league-member-only.
