@@ -8,6 +8,15 @@
 - Worklog policy: mandatory update on task start/status change/commit/blocker/decision/validation, plus test-impact logging for any flow/screen behavior change.
 - Testing-plan stream (`P6-TEST-*` / E2E infra): `PAUSED` by request with handoff snapshot captured for later resume.
 
+## Audit backlog execution — WEB-05a atomic registration
+
+- Started September 8, 2026 from merged main `ce4e023`; branch `codex/web-05-atomic-registration`. Verified PR #39 merged before advancing.
+- Scope: membership and optional/required prediction commit together; prediction failure rolls membership back; welcome delivery begins after commit and cannot turn a committed join into a failed API response. Renewal role behavior, response shape and existing eligibility remain unchanged.
+- Regression evidence: corrected pre-fix baseline 101 passed / 3 failed; after 104 passed / 0 failed. A real PostgreSQL foreign-key failure demonstrates rollback and a corrected retry. Fake delivery reads through the independent global database connection to verify both rows are committed before sending; throwing delivery failures preserve a successful join with and without predictions. Renewal promotion, prior-admin retention and ordinary-player roles are covered.
+- Test setup: 10 new direct-router tests use committed uniquely named E2E fixtures and the real mutation transaction (no transaction proxy), then delete only their own fixture leagues/users in `finally`. An unsupported matcher in the initial test draft was corrected before recording the baseline. Providers remain stubbed/disabled.
+- Validation: all platform typechecks, 7 API unit tests, 104 API/database tests and all 25 browser tests pass. Full browser execution used a fresh local Supabase reset/migration/seed. Ready for review on the named branch; CI will not be monitored. Existing join, duplicate-join and renewal journeys own UI/API coverage; no new screen, session handoff or navigation is introduced, so the failure matrix belongs below the browser layer.
+- Remaining WEB-05: duplicate inventory/constraints, concurrent/idempotent successful retries, shared team/score validation, and an explicit late-join eligibility decision. No schema migration, historical cleanup or welcome retry queue in this slice.
+
 ## Audit backlog execution — WEB-04 prediction privacy
 
 - Started September 7, 2026 from merged main `e238b42`; branch `codex/web-04-prediction-privacy`. Verified PR #38 merged before advancing. WEB-04 is independent of WEB-03's pending production inventory and migration decisions.
