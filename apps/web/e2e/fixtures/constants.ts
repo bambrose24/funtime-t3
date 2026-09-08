@@ -9,6 +9,10 @@ export const E2E_USERS = {
 } as const;
 
 export const E2E_LEAGUES = {
+  visiblePredictions: {
+    shareCode: "E2EVISIBLE",
+    name: "E2E Visible Predictions League",
+  },
   adminOps: { shareCode: "E2EADMINOPS", name: "E2E Admin Ops League" },
   active: { shareCode: "E2EACTIVE", name: "E2E Active League" },
   bracket: { shareCode: "E2EBRACKET", name: "E2E Bracket League" },

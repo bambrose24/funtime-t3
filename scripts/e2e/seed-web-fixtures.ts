@@ -135,14 +135,15 @@ const peopleRows = users
 const fixtureSql = `
 BEGIN;
 TRUNCATE TABLE "people" RESTART IDENTITY CASCADE;
-DELETE FROM "games" WHERE "season" IN (2028, 2029);
+DELETE FROM "games" WHERE "season" IN (2028, 2029, 2030);
 DELETE FROM "postseason_games" WHERE "season" = 2030;
 INSERT INTO "games" ("gid", "season", "week", "ts", "home", "away", "done", "winner", "international", "is_tiebreaker", "espn_id")
 VALUES
   (2028001, 2028, 1, NOW() - INTERVAL '1 hour', 2, 1, FALSE, 0, FALSE, FALSE, 600001),
   (2028002, 2028, 1, NOW() + INTERVAL '1 day', 6, 5, FALSE, 0, FALSE, TRUE, 600002),
   (2029001, 2029, 1, NOW() - INTERVAL '2 days', 2, 1, TRUE, 2, FALSE, FALSE, 700001),
-  (2029002, 2029, 1, NOW() - INTERVAL '1 day', 6, 5, TRUE, 6, FALSE, TRUE, 700002);
+  (2029002, 2029, 1, NOW() - INTERVAL '1 day', 6, 5, TRUE, 6, FALSE, TRUE, 700002),
+  (2030001, 2030, 1, NOW() - INTERVAL '5 months', 2, 1, TRUE, 2, FALSE, TRUE, 800002);
 INSERT INTO "people" ("username", "fname", "lname", "email", "season", "supabase_id")
 VALUES
 ${peopleRows};
@@ -176,6 +177,11 @@ SELECT "uid", 'E2E Results League', 2029, 'allow_late_and_lock_after_start', 'ch
 FROM "people" WHERE "email" = 'web.e2e.admin@example.com';
 INSERT INTO "leagues" ("created_by_user_id", "name", "season", "late_policy", "pick_policy", "reminder_policy", "scoring_type", "share_code", "superbowl_competition", "status")
 SELECT "uid", 'E2E Waiting League', 2027, 'allow_late_and_lock_after_start', 'choose_winner', 'three_hours_before', 'game_winner', 'E2EWAITING', FALSE, 'not_started'
+FROM "people" WHERE "email" = 'web.e2e.admin@example.com';
+
+-- Keep the started Super Bowl journey separate from 2027 apply-to-all fixtures.
+INSERT INTO "leagues" ("created_by_user_id", "name", "season", "late_policy", "pick_policy", "reminder_policy", "scoring_type", "share_code", "superbowl_competition", "status")
+SELECT "uid", 'E2E Visible Predictions League', 2028, 'allow_late_and_lock_after_start', 'choose_winner', 'three_hours_before', 'game_winner', 'E2EVISIBLE', TRUE, 'in_progress'
 FROM "people" WHERE "email" = 'web.e2e.admin@example.com';
 
 INSERT INTO "leaguemembers" ("league_id", "user_id", "role", "paid")
@@ -226,7 +232,7 @@ SELECT m."user_id",
 FROM "leaguemembers" m
 JOIN "leagues" l ON l."league_id" = m."league_id"
 JOIN "people" p ON p."uid" = m."user_id"
-WHERE l."share_code" = 'E2ECOMPETE'
+WHERE l."share_code" IN ('E2ECOMPETE', 'E2EVISIBLE')
   AND p."email" IN ('web.e2e.admin@example.com', 'web.e2e.player@example.com');
 
 INSERT INTO "superbowl" ("uid", "winner", "loser", "score", "season", "member_id")
@@ -303,5 +309,5 @@ execFileSync(
 );
 
 console.log(
-  `[web-e2e] Seeded ${users.length} local auth users and 10 deterministic leagues.`,
+  `[web-e2e] Seeded ${users.length} local auth users and 11 deterministic leagues.`,
 );

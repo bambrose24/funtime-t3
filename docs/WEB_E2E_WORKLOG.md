@@ -29,8 +29,8 @@ user-facing behavior change.
   here and the relevant automated suite passes.
 
 Last recorded full-suite baseline: **25 Playwright tests in 20 files, all passing
-on a fresh local-Supabase reset, migration and seed (2026-09-07, WEB-03a).**
-This is local execution evidence; CI for the WEB-03a PR has not been monitored.
+on a fresh local-Supabase reset, migration and seed (2026-09-07, WEB-04).**
+This is local execution evidence; CI for the WEB-04 PR has not been monitored.
 
 ## Safety Contract
 
@@ -450,3 +450,9 @@ The shared pick writers now reject invalid matchup/season/score payloads before 
 Existing `picks/submit.spec.ts`, `picks/late-policy.spec.ts`, `picks/integrity.spec.ts` and `league/admin-member-workflows.spec.ts` own the player/admin browser journeys. No new browser test duplicates the API matrix. Database uniqueness, race safety and historical duplicate cleanup remain WEB-03 follow-ups and are not proven by payload validation.
 
 Validation: full `pnpm e2e:web` passed all 25 browser tests on September 7 after a fresh local Supabase reset/migration/seed. Initial startup encountered a stale container-name conflict; Supabase's cleanup removed those containers and the retry succeeded. No new browser specs were needed for this server-validation slice.
+
+## September 7, 2026 — WEB-04 prediction privacy
+
+Extended `superbowl/visibility.spec.ts` to inspect the authenticated profile API and server-rendered profile payload before kickoff, then verify hidden details after navigation/reload. The existing own-profile editing and commissioner Super Bowl review specs cover preserved access. The role/time/status matrix belongs to 15 direct API/database cases; mobile hidden/empty/refreshed rendering has three component cases. These checks do not prove removal of data previously persisted in device caches (MOB-01).
+
+Full local `pnpm e2e:web` passed all 25 tests after a fresh reset/migration/seed. Initial run: 23 passed / 2 failed because the legacy visibility fixture had only future games and the completed bracket fixture had no regular-season schedule. Added a dedicated 2028 started-season visibility league and a past 2030 regular-season game for the bracket; the 2027 apply-to-all fixture stays unchanged. The corrected full rerun verifies both response privacy and visible completed rankings.

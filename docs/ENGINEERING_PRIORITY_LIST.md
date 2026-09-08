@@ -1,12 +1,12 @@
 # Engineering priority list: website first, mobile release next
 
-Updated September 7, 2026. Original audit: `aaa5f89c01aa46c0ea807b9daef2119d54839319`; latest execution starts from merged `main` at `1780d21`.
+Updated September 7, 2026. Original audit: `aaa5f89c01aa46c0ea807b9daef2119d54839319`; latest execution starts from merged `main` at `e238b42`.
 
 This is the implementation backlog. The agreed delivery approach is one focused PR at a time, with behavior validation before advancing. Per-ticket status below records completed slices and remaining work; unmarked tickets remain **OPEN**. No automatic merge or deployment is authorized. Original evidence and source permalinks are in [the cross-platform audit](PRD_CROSS_PLATFORM_AUDIT_2026-09-05.md). Ticket references such as F01 refer to that report. New findings from this follow-up are recorded at the end of that report.
 
 ## Recommendation
 
-Fix the website's shared competitive rules before adding features. A polished pick screen cannot compensate for a commissioner bypassing kickoff, a league ignoring its selected deadline, duplicate picks affecting scores, or hidden predictions leaking through another endpoint. **WEB-01** and the WEB-02 implementation slices have merged. Continue **WEB-03**, then **WEB-04–05**, while tracking the remaining WEB-02 policy inventory separately. These backend changes also make mobile safer to release.
+Fix the website's shared competitive rules before adding features. A polished pick screen cannot compensate for a commissioner bypassing kickoff, a league ignoring its selected deadline, duplicate picks affecting scores, or hidden predictions leaking through another endpoint. **WEB-01** and the WEB-02 implementation slices have merged. WEB-03a has merged; continue **WEB-04** independently while WEB-03 awaits the duplicate inventory/canonical-row decision. Keep the remaining WEB-02 policy inventory separate. These backend changes also make mobile safer to release.
 
 For mobile, aim for a reliable player release, with basic commissioner workflows and a working web fallback for deferred tools. Do not wait for every chart, export and renewal-review detail to match web. Do require account isolation, dependable picks and auth, working invite links, deliberate notification behavior, a reproducible signed build, and the account/moderation flows needed for distribution.
 
@@ -61,7 +61,7 @@ Priority definitions: **P0** = fix first because existing integrity/privacy is a
 
 ### WEB-03 — Validate and deduplicate pick writes
 
-**Status: IN PROGRESS — WEB-03a payload validation.** Both writers validate matchup, season and tiebreaker score before writes. Bulk requests require every requested membership, nonempty picks/destinations and unique payload game IDs; unknown games reject the entire request. Scores use the existing 1–200 integer contract. Direct router/database cases cover invalid requests without writes or confirmation emails, and valid creates/edits.
+**Status: IN PROGRESS — WEB-03a merged as `e238b42` / [PR #38](https://github.com/bambrose24/funtime-t3/pull/38).** Both writers validate matchup, season and tiebreaker score before writes. Bulk requests require every requested membership, nonempty picks/destinations and unique payload game IDs; unknown games reject the entire request. Scores use the existing 1–200 integer contract. Direct router/database cases cover invalid requests without writes or confirmation emails, and valid creates/edits.
 
 **Remaining:** read-only duplicate inventory and canonical-row decision, uniqueness migration, concurrent/retry-safe writers, and explicit partial-week/multi-league failure contracts. This slice preserves partial-week submissions and does not claim database uniqueness or historical cleanup.
 
@@ -76,6 +76,12 @@ Priority definitions: **P0** = fix first because existing integrity/privacy is a
 **Done when:** two simultaneous submissions and two identical payload game entries cannot create extra rows; repeated updates keep one row; invalid payloads make no unintended writes; counts/standings do not inflate. Depends on WEB-01/02 for policy integration.
 
 ### WEB-04 — Enforce prediction privacy in the response
+
+**Status: IMPLEMENTED — awaiting review on `codex/web-04-prediction-privacy`.** The profile and public board share the scheduled-first-kickoff reveal rule used by owner editing. Before kickoff (or without a schedule), profiles return an empty opponent prediction array plus an explicit hidden flag; the board keeps its null-field redaction. Owners retain their own prediction, and the separately authorized commissioner review retains full access. Stale league status cannot reveal preseason opponents. Profile responses project only fields used by current clients; mobile distinguishes hidden from missing predictions.
+
+**Validation:** 94 API/database tests, 7 API unit tests, 3 native component tests, all platform typechecks and all 25 browser E2E tests passed locally.
+
+**Scope boundary:** no season-state migration or account-cache purge. Previously downloaded data is outside server response redaction; native tests verify a refreshed redacted response replaces displayed prediction details. Broader account/cache isolation remains MOB-01.
 
 **Why / evidence:** F03. The profile endpoint returns hidden Super Bowl fields even when web hides its section.
 

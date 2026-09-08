@@ -1,6 +1,9 @@
 import { z } from "zod";
 
-import { db } from "../../db";
+import {
+  canViewSuperbowlPrediction,
+  hasSeasonKickedOff,
+} from "../../../utils/superbowlVisibility";
 import { UnauthorizedError } from "../../util/errors/unauthorized";
 import { createTRPCRouter, publicProcedure } from "../trpc";
 
@@ -14,7 +17,7 @@ export const playerProfileRouter = createTRPCRouter({
     .input(getPlayerProfileSchema)
     .query(async ({ ctx, input }) => {
       const { leagueId, memberId } = input;
-      const { dbUser } = ctx;
+      const { dbUser, db } = ctx;
       if (!dbUser) {
         throw UnauthorizedError;
       }
@@ -27,17 +30,26 @@ export const playerProfileRouter = createTRPCRouter({
 
       const member = await db.leaguemembers.findFirstOrThrow({
         where: { membership_id: memberId },
-        include: {
-          people: true,
-          superbowl: true,
-          WeekWinners: true,
-          leaguemessages: true,
-          leagues: true,
+        select: {
+          membership_id: true,
+          league_id: true,
+          role: true,
+          people: { select: { username: true, email: true } },
+          superbowl: { select: { winner: true, loser: true, score: true } },
+          WeekWinners: { select: { week: true } },
+          leaguemessages: { select: { message_id: true } },
+          leagues: { select: { season: true } },
         },
       });
       if (member.league_id !== leagueId) {
         throw UnauthorizedError;
       }
+
+      const superbowlPickHidden = !canViewSuperbowlPrediction(
+        viewerMember.membership_id,
+        member.membership_id,
+        await hasSeasonKickedOff(db, member.leagues.season),
+      );
 
       const doneGames = await db.games.findMany({
         where: {
@@ -60,6 +72,14 @@ export const playerProfileRouter = createTRPCRouter({
       const correctPicks = picks.filter((p) => p.correct === 1).length;
       const wrongPicks = picks.filter((p) => p.correct !== 1).length;
 
-      return { member, correctPicks, wrongPicks };
+      return {
+        member: {
+          ...member,
+          superbowl: superbowlPickHidden ? [] : member.superbowl,
+        },
+        superbowlPickHidden,
+        correctPicks,
+        wrongPicks,
+      };
     }),
 });

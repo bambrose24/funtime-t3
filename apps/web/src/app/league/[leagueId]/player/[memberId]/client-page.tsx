@@ -97,7 +97,6 @@ export function ClientMemberPage({
   const superbowlWinner = teams.find((t) => t.teamid === superbowl?.winner);
   const superbowlLoser = teams.find((t) => t.teamid === superbowl?.loser);
 
-  console.log("playerProfile", playerProfile);
   const correct = playerProfile.correctPicks;
   const wrong = playerProfile.wrongPicks;
   const total = correct + wrong;
@@ -162,7 +161,7 @@ export function ClientMemberPage({
             </div>
             <Separator />
             {league.superbowl_competition === true &&
-              (hasLeagueStarted === true || isViewer) && (
+              !playerProfile.superbowlPickHidden && (
                 <>
                   <div className="flex w-full flex-row justify-between">
                     <div>Super Bowl</div>

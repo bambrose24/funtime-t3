@@ -1,4 +1,8 @@
 import {
+  canViewSuperbowlPrediction,
+  hasSeasonKickedOff,
+} from "../../../../utils/superbowlVisibility";
+import {
   getWeekPickDeadline,
   isPickLocked,
 } from "../../../../utils/pickPermissions";
@@ -578,15 +582,7 @@ export const leagueRouter = createTRPCRouter({
           league_id: leagueId,
         },
       });
-      const firstGame = await ctx.db.games.findFirst({
-        where: {
-          season: league.season,
-        },
-        orderBy: {
-          ts: "asc",
-        },
-      });
-      return firstGame && firstGame.ts < new Date();
+      return hasSeasonKickedOff(ctx.db, league.season);
     }),
   get: authorizedProcedure
     .input(leagueIdSchema)
@@ -949,7 +945,7 @@ export const leagueRouter = createTRPCRouter({
         },
       });
 
-      const leagueNotStarted = league.status === LeagueStatus.not_started;
+      const seasonStarted = await hasSeasonKickedOff(ctx.db, league.season);
 
       const superbowlPicks = await ctx.db.superbowl.findMany({
         where: {
@@ -972,7 +968,13 @@ export const leagueRouter = createTRPCRouter({
           (s) => s.leaguemembers?.people.username?.toLocaleLowerCase(),
           "asc",
         ).map((p) => {
-          if (leagueNotStarted && p.member_id !== member.membership_id) {
+          if (
+            !canViewSuperbowlPrediction(
+              member.membership_id,
+              p.member_id,
+              seasonStarted,
+            )
+          ) {
             return {
               ...p,
               winner: null,

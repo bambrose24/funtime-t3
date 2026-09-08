@@ -8,6 +8,14 @@
 - Worklog policy: mandatory update on task start/status change/commit/blocker/decision/validation, plus test-impact logging for any flow/screen behavior change.
 - Testing-plan stream (`P6-TEST-*` / E2E infra): `PAUSED` by request with handoff snapshot captured for later resume.
 
+## Audit backlog execution — WEB-04 prediction privacy
+
+- Started September 7, 2026 from merged main `e238b42`; branch `codex/web-04-prediction-privacy`. Verified PR #38 merged before advancing. WEB-04 is independent of WEB-03's pending production inventory and migration decisions.
+- Scope: shared schedule-based reveal boundary for profiles/public board and owner edit locking; fail closed without a schedule; own prediction and separate commissioner access preserved. Profiles now project only fields used by current clients, return empty hidden predictions and an additive hidden flag, and use the request database context. Web relies on server visibility; native shows hidden copy and removes visible details when refreshed data is redacted.
+- Test impact: 15 real-router/PostgreSQL cases cover player/admin/super-admin at before/equal/after kickoff, stale league statuses, no schedule, unauthorized viewers, cross-league targets, commissioner review and owner edits. Three native component cases cover hidden/empty states and refreshed response handling. Extended the existing Super Bowl browser journey to assert API and server-rendered profile redaction, plus reload behavior.
+- Validation so far: 94 API/database tests and 3 focused native tests pass; all 3 platform typechecks pass. Three initial kickoff-equality fixture failures came from PostgreSQL microseconds being truncated by JS Date; tests now normalize the fixture boundary inside their rollback transaction. First full browser run: 23 passed / 2 failed because the existing in-progress fixture had only future games and the completed bracket fixture had no regular-season schedule. Added an isolated started-season prediction league and a past regular-season game for the bracket fixture; full fresh-reset browser rerun passed all 25 tests. The new API/server-rendered redaction assertions passed on both runs. Final API suite on the corrected fixtures also passed all 94 cases; API unit suite passed all 7. Implementation is ready for review on the named branch; CI will not be monitored.
+- Remaining boundary: this does not purge previously downloaded account caches or redefine season lifecycle status ownership (MOB-01/WEB-10). No migrations or external provider sends.
+
 ## Audit backlog execution — WEB-03a payload validation
 
 - Started September 7, 2026 from merged main `1780d21`; branch `codex/web-03-pick-validation`. Verified PR #37 merged before advancing.
