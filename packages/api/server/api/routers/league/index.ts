@@ -810,8 +810,6 @@ export const leagueRouter = createTRPCRouter({
         (mp) => mp.membership_id === viewerMember.membership_id,
       );
       const viewerHasPicks = Boolean(viewerMemberPicks?.picks?.length);
-      const now = new Date();
-      const gameById = new Map(games.map((game) => [game.gid, game]));
 
       const gidToIndex = games.reduce((prev, curr, idx) => {
         prev.set(curr.gid, idx);
@@ -827,10 +825,10 @@ export const leagueRouter = createTRPCRouter({
         );
 
         mp.picks = mp.picks.map((p) => {
-          const gameTs = gameById.get(p.gid)?.ts;
-          const gameHasStarted = gameTs !== undefined && gameTs < now;
+          // Submitting picks reveals the entire week, including future games.
+          // Keep this gate on the server so unsubmitted viewers receive no picks.
           if (
-            (!viewerHasPicks || !gameHasStarted) &&
+            !viewerHasPicks &&
             mp.membership_id !== viewerMember.membership_id
           ) {
             return { ...p, winner: null, correct: null, score: null };
