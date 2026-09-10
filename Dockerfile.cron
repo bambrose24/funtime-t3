@@ -12,6 +12,8 @@ RUN apt-get update -y && apt-get install -y openssl && rm -rf /var/lib/apt/lists
 
 # Install pnpm and Bun
 RUN npm install -g pnpm bun
+# The Bun cron uses Node's native fetch for ESPN requests.
+RUN node --input-type=module -e 'if (typeof fetch !== "function") process.exit(1)'
 
 # Copy the Prisma schema file from the API package
 COPY packages/api/prisma ./packages/api/prisma

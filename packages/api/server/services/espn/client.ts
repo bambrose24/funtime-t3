@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { isE2EMode } from "../../../utils/e2e";
+import { fetchEspnResponse } from "./transport.mjs";
 
 const BASE_URL = "https://site.api.espn.com/apis/site/v2/sports/football/nfl";
 
@@ -25,7 +26,7 @@ export class ESPNResponseError extends Error {
 }
 
 async function fetchEspnJson(url: string): Promise<unknown> {
-  const response = await fetch(url);
+  const response = await fetchEspnResponse(url);
   const contentType = response.headers.get("content-type");
   const body = await response.text();
   const bodyPreview = body.slice(0, 500);
@@ -314,7 +315,7 @@ export class ESPNClient {
       return [];
     }
     const url = `https://site.api.espn.com/apis/v2/sports/football/nfl/standings?season=${season}`;
-    const response = await fetch(url);
+    const response = await fetchEspnResponse(url);
     const data = (await response.json()) as {
       children?: Array<{
         abbreviation: string;
