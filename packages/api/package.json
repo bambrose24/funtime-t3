@@ -27,7 +27,7 @@
     "dev": "tsc --watch",
     "email:dev": "email dev --dir emails --port 3001",
     "email:export": "email export --dir emails",
-    "test": "node --experimental-strip-types --test tests/*.test.mts",
+    "test": "node --experimental-strip-types --test tests/*.test.mts && bun test tests/routers",
     "test:integration": "DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:55422/postgres DIRECT_URL=postgresql://postgres:postgres@127.0.0.1:55422/postgres E2E_MODE=1 FUNTIME_DISABLE_EMAILS=1 NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:55421 NEXT_PUBLIC_SUPABASE_ANON_KEY=local-test bun test tests/integration",
     "typecheck": "tsc --noEmit",
     "clean": "rm -rf dist",

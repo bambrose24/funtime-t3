@@ -60,7 +60,7 @@ Funtime solves this by combining:
 - Mobile release order: player-first core loop, then admin capabilities.
 - Pick visibility:
   - If a member has not submitted picks for that week, they cannot see other members' picks.
-  - If a member has submitted picks, they can see picks for games that have started.
+  - If a member has submitted picks for that week, they can see the full slate of other members' picks, including games that have not started and the tiebreaker score.
 - Late policy: league-configurable; no single mandated league default requirement.
 - `close_at_first_game_start` closes the entire week at its earliest scheduled kickoff, including later games. Recompute against the current schedule after rescheduling. Ordinary admins follow this deadline; explicit super-admin corrections remain exempt.
 - `allow_late_and_lock_after_start` locks each game at its own kickoff. Legacy `allow_late_whole_week` and unset policies temporarily retain this same per-game behavior pending inventory and migration decisions.
