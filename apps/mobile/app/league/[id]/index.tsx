@@ -1,3 +1,7 @@
+import {
+  getStartedTiebreakerScore,
+  sortWeekPicks,
+} from "@funtime/api/utils/weekPicksSort";
 import React, {
   useState,
   useEffect,
@@ -1635,10 +1639,7 @@ function MobilePicksTable({
   const currentUserId = user?.uid;
   // Find tiebreaker game and its actual total score
   const tiebreakerGame = games.find((g) => g.is_tiebreaker);
-  const actualTiebreakerScore =
-    tiebreakerGame && tiebreakerGame.done
-      ? (tiebreakerGame.homescore || 0) + (tiebreakerGame.awayscore || 0)
-      : null;
+  const actualTiebreakerScore = getStartedTiebreakerScore(tiebreakerGame);
   const now = new Date();
   const gameStateById = new Map(
     games.map((game) => [
@@ -1650,27 +1651,7 @@ function MobilePicksTable({
     ]),
   );
 
-  // Sort picks summary by correct picks (desc), then by tiebreaker accuracy (asc)
-  const sortedPicksSummary = [...picksSummary].sort((a, b) => {
-    // First sort by correct picks (highest first)
-    if (a.correctPicks !== b.correctPicks) {
-      return b.correctPicks - a.correctPicks;
-    }
-
-    // If correct picks are tied and we have an actual tiebreaker score, sort by accuracy
-    if (actualTiebreakerScore !== null && tiebreakerGame) {
-      const aTiebreakerScore = a.tiebreakerScore ?? 0;
-      const bTiebreakerScore = b.tiebreakerScore ?? 0;
-
-      const aDiff = Math.abs(actualTiebreakerScore - aTiebreakerScore);
-      const bDiff = Math.abs(actualTiebreakerScore - bTiebreakerScore);
-
-      return aDiff - bDiff; // Closest to actual score wins (lowest difference)
-    }
-
-    // If no tiebreaker or game not done, maintain original order
-    return 0;
-  });
+  const sortedPicksSummary = sortWeekPicks(picksSummary, actualTiebreakerScore);
   const rankedPicksSummary: {
     member: RouterOutputs["league"]["picksSummary"][number];
     rank: number;
