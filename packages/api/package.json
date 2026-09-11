@@ -20,6 +20,7 @@
     "./server/api/trpc": "./server/api/trpc.ts",
     "./server/api/root": "./server/api/root.ts",
     "./utils/config": "./utils/config.ts",
+    "./utils/weekPicksSort": "./utils/weekPicksSort.ts",
     "./utils/logging": "./utils/logging.ts"
   },
   "scripts": {

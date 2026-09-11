@@ -15,7 +15,10 @@ import {
   TableRow,
 } from "~/components/ui/table";
 import { Suspense, useMemo } from "react";
-import sortBy from "lodash/sortBy";
+import {
+  getStartedTiebreakerScore,
+  sortWeekPicks,
+} from "@funtime/api/utils/weekPicksSort";
 import { cn } from "~/lib/utils";
 import { Skeleton } from "~/components/ui/skeleton";
 import { useDictify } from "~/utils/hooks/useIdToValMemo";
@@ -60,11 +63,13 @@ function PicksTableImpl({ picksSummary, games, teams, simulatedGames }: Props) {
   const user = clientApi.session.current.useQuery();
   const gameIdToGame = useDictify(games, (g) => g.gid);
 
-  const sortedData = useMemo(() => {
-    return sortBy(picksSummary, (p) => {
-      return -p.correctPicks;
-    });
-  }, [picksSummary]);
+  const actualTiebreakerScore = getStartedTiebreakerScore(
+    games.find((game) => game.is_tiebreaker),
+  );
+  const sortedData = useMemo(
+    () => sortWeekPicks(picksSummary, actualTiebreakerScore),
+    [picksSummary, actualTiebreakerScore],
+  );
   const columns: ColumnDef<Pick>[] = [
     {
       maxSize: 30,
