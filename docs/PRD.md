@@ -114,6 +114,8 @@ Unless a requirement is explicitly labeled **Target** or **Planned**, it describ
   - Super Bowl competition toggle
   - Optional `priorLeagueId` linkage
 - Join league by share code.
+- Save membership and any supplied Super Bowl prediction in one transaction; failure saving the prediction leaves no partial membership, so the player can correct and retry.
+- Attempt the welcome email after registration commits. A welcome-delivery exception is logged without reporting the committed join as a failure.
 - Shared join URLs work on the web and can deep-link into the installed mobile app.
 - Prevent duplicate membership.
 - Detect not-started league state and render appropriate experience.

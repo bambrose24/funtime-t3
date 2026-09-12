@@ -117,7 +117,7 @@ run solely for documentation/cosmetic changes unrelated to flow behavior.
 These criteria also apply to mobile: use native E2E for core journeys and OS
 integration, and focused unit/component/API tests for their underlying rules.
 
-### Direct pick API/database regression gate
+### Direct API/database regression gate
 
 After the isolated local schema and schedule seed are ready, run
 `pnpm --filter @funtime/api test:integration`. The script fixes its database URL
@@ -312,3 +312,12 @@ Minimum required coverage set:
 - Started-board fixtures now use a dedicated league in the already-started 2028 schedule; the completed 2030 bracket fixture includes a past regular-season game. The 2027 competition fixture stays unchanged for apply-to-all picks. Persisted status alone is not evidence of kickoff.
 
 - Final execution: 94 API/database cases, 7 API unit tests, 3 focused mobile tests, all platform typechecks and 25 full local browser tests passed. The first browser run exposed two inconsistent lifecycle fixtures (23 passed / 2 failed); corrected fixtures passed the fresh-reset rerun.
+
+### WEB-05a registration atomicity (September 8, 2026)
+
+- `packages/api/tests/integration/registration-atomicity.test.ts`: 10 direct-router/PostgreSQL cases. Committed uniquely named fixture users/leagues allow the real registration transaction to run normally; `finally` removes only those fixtures. A database foreign-key failure proves rollback and corrected retry. A fake welcome service independently reads committed membership/prediction rows and simulates delivery failure. Tests also cover no-prediction leagues, missing required predictions, existing members and renewal roles.
+- This file deliberately does not use the rollback-transaction proxy from pick-policy tests: that would not prove that the mutation's own transaction rolls back. It still enforces the fixed local database URL and E2E mode and stubs outbound welcome delivery.
+- Existing browser `league/join.spec.ts`, `league/create-and-duplicate.spec.ts` and `league/renewal.spec.ts` own the unchanged user flows. The failure matrix is direct API/database coverage; no redundant browser rule matrix or native component tests are needed for this shared server-only slice.
+- Database uniqueness, concurrent successful joins, changed late-join policy and durable email retries remain separate backlog work.
+
+- Final execution: 104 API/database tests, 7 API unit tests, all platform typechecks and 25 browser tests passed. Browser validation used the complete fresh-reset local harness.

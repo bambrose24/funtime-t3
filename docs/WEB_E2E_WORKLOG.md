@@ -29,8 +29,8 @@ user-facing behavior change.
   here and the relevant automated suite passes.
 
 Last recorded full-suite baseline: **25 Playwright tests in 20 files, all passing
-on a fresh local-Supabase reset, migration and seed (2026-09-07, WEB-04).**
-This is local execution evidence; CI for the WEB-04 PR has not been monitored.
+on a fresh local-Supabase reset, migration and seed (2026-09-08, WEB-05a).**
+This is local execution evidence; CI for the WEB-05a PR has not been monitored.
 
 ## Safety Contract
 
@@ -456,3 +456,9 @@ Validation: full `pnpm e2e:web` passed all 25 browser tests on September 7 after
 Extended `superbowl/visibility.spec.ts` to inspect the authenticated profile API and server-rendered profile payload before kickoff, then verify hidden details after navigation/reload. The existing own-profile editing and commissioner Super Bowl review specs cover preserved access. The role/time/status matrix belongs to 15 direct API/database cases; mobile hidden/empty/refreshed rendering has three component cases. These checks do not prove removal of data previously persisted in device caches (MOB-01).
 
 Full local `pnpm e2e:web` passed all 25 tests after a fresh reset/migration/seed. Initial run: 23 passed / 2 failed because the legacy visibility fixture had only future games and the completed bracket fixture had no regular-season schedule. Added a dedicated 2028 started-season visibility league and a past 2030 regular-season game for the bracket; the 2027 apply-to-all fixture stays unchanged. The corrected full rerun verifies both response privacy and visible completed rankings.
+
+## September 8, 2026 — WEB-05a registration atomicity
+
+The shared registration mutation now commits membership and prediction together and treats welcome-email exceptions as delivery failures after a successful join. The existing `league/join.spec.ts`, `league/create-and-duplicate.spec.ts` and `league/renewal.spec.ts` journeys own submission, navigation, duplicate denial and renewal-role handoff. Ten new direct API/database tests own rollback, corrected retry, committed-data delivery and provider-failure behavior. No browser journey was added because these failures can be proven at the real transaction/provider boundary without duplicating the UI flow. Concurrent membership uniqueness and changed late-join rules remain unimplemented WEB-05 work.
+
+Full `pnpm e2e:web` passed all 25 tests across 20 files on September 8 after a fresh local reset/migration/seed. No browser specs or fixtures changed in WEB-05a.
