@@ -33,24 +33,6 @@ pnpm --filter @funtime/web typecheck
 
 The isolated delivery test process replaces Resend, the database, and webhook reconciliation with in-memory doubles; tests do not send email or contact a database. The recap suite covers ranking, winners, ties, missing picks, season movement, completion timing, DST, rendered content, escaping, and final-week links. Delivery tests cover personalized recipients, failures, logging, and stable retry identities.
 
-## Send a test email to your inbox
+## Test emails
 
-From the repository root, with `RESEND_API_KEY` set in your shell or your untracked root `.env.local`:
-
-```sh
-# Send one preview to bambrose24@gmail.com
-pnpm email:test-weekly
-
-# Choose the recipient and use your real league's picks/standings links
-pnpm email:test-weekly --to you@example.com --league-id 42
-
-# Render plain text locally without sending or needing credentials
-pnpm email:test-weekly --dry-run
-
-# Preview other outcomes
-pnpm email:test-weekly --scenario shared
-pnpm email:test-weekly --scenario missing-picks
-pnpm email:test-weekly --scenario final-week
-```
-
-Scenarios: `tiebreaker` (default), `outright`, `shared`, `missing-picks`, `final-week`. The subject starts with `[TEST]`, and the league is labeled as test data. The email uses the production template and calculated simulated results, sends to exactly one address, and never reads or writes the database or production delivery claims. You can rerun it to receive another preview. The default league ID 123 is a placeholder; use `--league-id` for working links to a league you belong to. `FUNTIME_DISABLE_EMAILS` and `E2E_MODE` prevent sending when enabled. Resend acceptance does not confirm inbox delivery.
+Use the shared `pnpm email:test` command. Run it with no arguments to list email IDs and scenarios. See [EMAIL_TESTING.md](EMAIL_TESTING.md) for all options, sample commands, and template coverage.

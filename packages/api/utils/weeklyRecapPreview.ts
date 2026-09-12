@@ -1,4 +1,3 @@
-import { z } from "zod";
 import { buildWeekSummary } from "./weekSummary";
 
 export const previewScenarios = [
@@ -9,30 +8,6 @@ export const previewScenarios = [
   "final-week",
 ] as const;
 export type PreviewScenario = (typeof previewScenarios)[number];
-
-export function parsePreviewArgs(args: string[]) {
-  let to = "bambrose24@gmail.com";
-  let scenario: PreviewScenario = "tiebreaker";
-  let leagueId = 123;
-  let dryRun = false;
-  let help = false;
-  for (let i = 0; i < args.length; i++) {
-    const arg = args[i];
-    if (arg === "--dry-run") dryRun = true;
-    else if (arg === "--help") help = true;
-    else if (arg === "--to" || arg === "--scenario" || arg === "--league-id") {
-      const value = args[++i];
-      if (!value || value.startsWith("--"))
-        throw new Error(`Missing value for ${arg}`);
-      if (arg === "--to") to = z.string().email().parse(value);
-      if (arg === "--scenario")
-        scenario = z.enum(previewScenarios).parse(value);
-      if (arg === "--league-id")
-        leagueId = z.coerce.number().int().positive().parse(value);
-    } else throw new Error(`Unknown argument: ${arg}`);
-  }
-  return { to, scenario, leagueId, dryRun, help };
-}
 
 export function buildPreview(
   scenario: PreviewScenario,
