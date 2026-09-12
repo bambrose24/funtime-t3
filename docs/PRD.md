@@ -134,7 +134,7 @@ Unless a requirement is explicitly labeled **Target** or **Planned**, it describ
 - Do not present partial-week progress such as **4 picks left**, **12/16 picked**, or **Finish remaining picks**. Unsaved form selections are not a submitted entry or a separate home-screen task.
 - When the player has not submitted and picking has closed, show **Picks not submitted · Closed** without a make-picks action. When no week is available, show the appropriate preseason or season-over context instead of prompting for picks.
 - A valid late weekly submission under the league's policy counts as **Picks are in** even if earlier locked games were missed. Missed games belong in results, not an unfinished-picks task on Home.
-- Keep renewal/setup actions discoverable as compact rows and prior-season history collapsed by default. Current-season leagues use a stable alphabetical order. Future-season memberships appear separately from past seasons.
+- Keep renewal/setup actions discoverable as compact rows and prior-season history collapsed by default. Current-season leagues use a stable alphabetical order. Future-season memberships appear separately from past seasons. The navigation league menu uses the same season groups and ordering as Home: current season first, upcoming seasons next, then past seasons; within each group, season descending and league name ascending, with league ID breaking identical-name ties.
 - Refresh weekly status when returning to Home or focusing the window, and periodically while Home is visible. Failed refreshes show unavailable status with a retry action rather than claiming that picks are in.
 
 ### 7.2.1 League Renewal and Season Continuity
