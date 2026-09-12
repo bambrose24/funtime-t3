@@ -8,6 +8,7 @@ import {
   isPickLocked,
 } from "../../../../utils/pickPermissions";
 import { TRPCError } from "@trpc/server";
+import { getWeekToPick } from "../../../../utils/weekToPick";
 import { orderBy } from "lodash";
 import { z } from "zod";
 import {
@@ -751,7 +752,10 @@ export const leagueRouter = createTRPCRouter({
       // A submitted pick is not a reason to advance: players may update any
       // game that has not started yet. Move forward only when the next game on
       // the schedule belongs to the following week.
-      const weekToReturn = nextGameToStart?.week === week + 1 ? week + 1 : week;
+      const weekToReturn = getWeekToPick(
+        mostRecentStartedGame?.week,
+        nextGameToStart?.week,
+      );
 
       const picksToReturn =
         weekToReturn === week ? mostRecentStartedWeekPicks : nextWeekPicks;

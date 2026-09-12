@@ -1,10 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, RefreshCw, Users } from "lucide-react";
-import { Badge } from "~/components/ui/badge";
-import { Button } from "~/components/ui/button";
-import { Card, CardContent, CardHeader } from "~/components/ui/card";
-import { Text } from "~/components/ui/text";
-import { DEFAULT_SEASON } from "~/utils/const";
+import { ArrowRight } from "lucide-react";
 import type { RouterOutputs } from "~/trpc/types";
 
 type RenewalCandidate = RouterOutputs["league"]["renewalCandidates"][number];
@@ -14,62 +9,34 @@ export function NextSeasonRenewalSection({
 }: {
   candidates: RenewalCandidate[];
 }) {
-  if (candidates.length === 0) {
-    return null;
-  }
-
+  if (!candidates.length) return null;
   return (
-    <>
-      <div className="col-span-12 flex justify-center pt-2">
-        <div className="flex flex-col items-center gap-1 text-center">
-          <div className="flex items-center gap-2">
-            <RefreshCw className="h-5 w-5 text-primary" />
-            <Text.H2>Next Season</Text.H2>
-          </div>
-          <Text.Muted>
-            Renew a prior league and invite last year&apos;s players.
-          </Text.Muted>
-        </div>
-      </div>
-      <div className="col-span-12 flex w-full flex-row flex-wrap justify-center gap-4 py-4">
+    <section aria-labelledby="season-setup-heading" className="mt-8">
+      <h2 id="season-setup-heading" className="mb-3 text-sm font-medium">
+        Season setup
+      </h2>
+      <ul className="divide-y divide-border border-y border-border">
         {candidates.map((candidate) => (
-          <Card
+          <li
             key={candidate.priorLeagueId}
-            className="w-full max-w-[320px] transition-colors hover:border-primary"
+            className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2 py-4"
           >
-            <CardHeader className="flex flex-col gap-2">
-              <div className="flex items-center justify-between gap-2">
-                <Badge variant="secondary">{candidate.season}</Badge>
-                <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                  <Users className="h-3.5 w-3.5" />
-                  {candidate.memberCount}
-                </div>
-              </div>
-              <Text.H4>{candidate.name}</Text.H4>
-            </CardHeader>
-            <CardContent className="flex flex-col gap-4">
-              <div className="grid grid-cols-2 gap-2 text-sm">
-                <div>
-                  <div className="text-muted-foreground">Admins</div>
-                  <div className="font-medium">{candidate.adminCount}</div>
-                </div>
-                <div>
-                  <div className="text-muted-foreground">New Name</div>
-                  <div className="font-medium">{candidate.suggestedName}</div>
-                </div>
-              </div>
-              <Button asChild className="w-full gap-2">
-                <Link
-                  href={`/league/create?priorLeagueId=${candidate.priorLeagueId}`}
-                >
-                  Set Up Next Season
-                  <ArrowRight className="h-4 w-4" />
-                </Link>
-              </Button>
-            </CardContent>
-          </Card>
+            <div className="min-w-0 flex-1 basis-48">
+              <p className="break-words font-medium">{candidate.name}</p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Renew your league and invite players back.
+              </p>
+            </div>
+            <Link
+              href={`/league/create?priorLeagueId=${candidate.priorLeagueId}`}
+              className="inline-flex min-h-11 items-center gap-2 text-sm font-medium text-primary underline-offset-4 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring"
+            >
+              Set Up Next Season{" "}
+              <ArrowRight aria-hidden="true" className="h-4 w-4" />
+            </Link>
+          </li>
         ))}
-      </div>
-    </>
+      </ul>
+    </section>
   );
 }

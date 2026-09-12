@@ -53,9 +53,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Verify ESPN transport under Node and Bun
+      - name: Validate API tests and ESPN transport under Bun
         run: |
-          node --experimental-strip-types --test packages/api/tests/espn-transport.test.mts
+          pnpm --filter @funtime/api test
           bun test packages/api/tests/espn-transport.test.mts
 
       - name: Setup Supabase CLI
