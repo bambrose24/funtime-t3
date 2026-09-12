@@ -8,6 +8,32 @@
 - Worklog policy: mandatory update on task start/status change/commit/blocker/decision/validation, plus test-impact logging for any flow/screen behavior change.
 - Testing-plan stream (`P6-TEST-*` / E2E infra): `PAUSED` by request with handoff snapshot captured for later resume.
 
+## Web home league list — September 12, 2026
+
+- In-season follow-up: removed **Create league** from web navigation and the Home header, removed the unused navigation eligibility query, and changed the empty state to joining an existing league. Web typecheck and targeted lint pass. This removes UI shortcuts without changing creation or submission logic, so no new tests or full-suite rerun were needed.
+- Implemented the requested first pass: responsive league rows, weekly **Picks needed** / **Picks are in** status and direct actions, compact renewals, collapsed past seasons, and a code/invite-link join form. Home stays accessible with a single active league. Existing native Home remains unchanged.
+- Added `home.leagues` as a lightweight, membership-scoped batch query; retained the existing `home.summary` contract for native clients. Reused the pick editor's week-selection rule and existing cutoff helper. Valid late weekly submissions count as submitted even when already-locked games were missed.
+- Test impact: ten focused API/status cases cover submission state, week rollover, late policies, cutoff equality, no schedule, season completion and membership/query scope. A browser journey exercises Home → weekly submission → Home, collapsed history, single-league navigation and narrow-screen layout.
+- Validation on the isolated PR branch from `origin/main` (`778ee8f`): all 30 API package tests pass (including 10 new Home cases), API/web/mobile typechecks pass, and lint passes for the changed web components. Reviewed screenshots at 390px and 1440px. Full fresh-reset local Supabase browser suite: **26 passed**, including the new Home submission journey.
+- PR scope includes the home UI, batched status query, shared week-selection helper, tests, and product/coverage documentation. CI now runs the API suite, including the new Home cases. The existing native Home, chat work, recap work, and database schema are outside this change. No deployed changes or outbound notifications.
+
+## Weekly submission and home status clarification — September 11, 2026
+
+- Confirmed the user's product decision: players submit the week's available picks together, including the required tiebreaker; partial-week progress is not a home-screen state.
+- Updated `docs/PRD.md` sections 6.1 and 7.3 to make the weekly submission model explicit, preserving late-pick rules and per-league saved/skipped outcomes. Added the target list-based home requirements under 7.2 with **Picks are in** / **Picks needed** status and direct actions.
+- Validation: inspected both web and mobile pick-form schemas, the shared submission API, and the existing PRD diff. Both forms require all available winners and a tiebreaker; the API does not independently enforce a complete weekly entry. Recorded that enforcement gap in the PRD for the weekly-picks/API implementation workstream.
+- Documentation-only change; no runtime behavior changed and no tests were run. Preserved existing PRD and worklog edits. Layout selection and single-league redirect behavior remain undecided.
+
+
+## Audit backlog execution — WEB-05a atomic registration
+
+- Started September 8, 2026 from merged main `ce4e023`; branch `codex/web-05-atomic-registration`. Verified PR #39 merged before advancing.
+- Scope: membership and optional/required prediction commit together; prediction failure rolls membership back; welcome delivery begins after commit and cannot turn a committed join into a failed API response. Renewal role behavior, response shape and existing eligibility remain unchanged.
+- Regression evidence: corrected pre-fix baseline 101 passed / 3 failed; after 104 passed / 0 failed. A real PostgreSQL foreign-key failure demonstrates rollback and a corrected retry. Fake delivery reads through the independent global database connection to verify both rows are committed before sending; throwing delivery failures preserve a successful join with and without predictions. Renewal promotion, prior-admin retention and ordinary-player roles are covered.
+- Test setup: 10 new direct-router tests use committed uniquely named E2E fixtures and the real mutation transaction (no transaction proxy), then delete only their own fixture leagues/users in `finally`. An unsupported matcher in the initial test draft was corrected before recording the baseline. Providers remain stubbed/disabled.
+- Validation: all platform typechecks, 7 API unit tests, 104 API/database tests and all 25 browser tests pass. Full browser execution used a fresh local Supabase reset/migration/seed. Ready for review on the named branch; CI will not be monitored. Existing join, duplicate-join and renewal journeys own UI/API coverage; no new screen, session handoff or navigation is introduced, so the failure matrix belongs below the browser layer.
+- Remaining WEB-05: duplicate inventory/constraints, concurrent/idempotent successful retries, shared team/score validation, and an explicit late-join eligibility decision. No schema migration, historical cleanup or welcome retry queue in this slice.
+
 ## Audit backlog execution — WEB-04 prediction privacy
 
 - Started September 7, 2026 from merged main `e238b42`; branch `codex/web-04-prediction-privacy`. Verified PR #38 merged before advancing. WEB-04 is independent of WEB-03's pending production inventory and migration decisions.

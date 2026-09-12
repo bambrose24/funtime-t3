@@ -1,3 +1,4 @@
+import { getLogger } from "../../../../utils/logging";
 import {
   canViewSuperbowlPrediction,
   hasSeasonKickedOff,
@@ -7,6 +8,7 @@ import {
   isPickLocked,
 } from "../../../../utils/pickPermissions";
 import { TRPCError } from "@trpc/server";
+import { getWeekToPick } from "../../../../utils/weekToPick";
 import { orderBy } from "lodash";
 import { z } from "zod";
 import {
@@ -419,28 +421,45 @@ export const leagueRouter = createTRPCRouter({
           ? MemberRole.admin
           : MemberRole.player;
 
-      const leagueMember = await ctx.db.leaguemembers.create({
-        data: {
-          league_id: league.league_id,
-          user_id: dbUser.uid,
-          role,
-        },
-      });
-
-      if (superbowl) {
-        await ctx.db.superbowl.create({
+      const leagueMember = await ctx.db.$transaction(async (tx) => {
+        const member = await tx.leaguemembers.create({
           data: {
-            winner: superbowl.winnerTeamId,
-            loser: superbowl.loserTeamId,
-            uid: dbUser.uid,
-            season: league.season,
-            member_id: leagueMember.membership_id,
-            score: superbowl.score,
+            league_id: league.league_id,
+            user_id: dbUser.uid,
+            role,
           },
         });
-      }
 
-      await resendApi.sendLeagueRegistrationEmail(leagueMember.membership_id);
+        if (superbowl) {
+          await tx.superbowl.create({
+            data: {
+              winner: superbowl.winnerTeamId,
+              loser: superbowl.loserTeamId,
+              uid: dbUser.uid,
+              season: league.season,
+              member_id: member.membership_id,
+              score: superbowl.score,
+            },
+          });
+        }
+
+        return member;
+      });
+
+      // Registration is committed before delivery. A failed welcome email must
+      // not tell a member that their successful join needs to be submitted again.
+      try {
+        await resendApi.sendLeagueRegistrationEmail(leagueMember.membership_id);
+      } catch (error) {
+        getLogger().error(
+          "Welcome email failed after successful registration",
+          {
+            leagueId: league.league_id,
+            memberId: leagueMember.membership_id,
+            error,
+          },
+        );
+      }
 
       return leagueMember;
     }),
@@ -733,7 +752,10 @@ export const leagueRouter = createTRPCRouter({
       // A submitted pick is not a reason to advance: players may update any
       // game that has not started yet. Move forward only when the next game on
       // the schedule belongs to the following week.
-      const weekToReturn = nextGameToStart?.week === week + 1 ? week + 1 : week;
+      const weekToReturn = getWeekToPick(
+        mostRecentStartedGame?.week,
+        nextGameToStart?.week,
+      );
 
       const picksToReturn =
         weekToReturn === week ? mostRecentStartedWeekPicks : nextWeekPicks;

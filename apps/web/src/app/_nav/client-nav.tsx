@@ -34,7 +34,6 @@ import {
   MedalIcon,
   MessagesSquare,
   PenIcon,
-  PlusIcon,
   SettingsIcon,
   ShieldCheck,
   TrophyIcon,
@@ -51,10 +50,9 @@ import { useLeagueUnreadMessages } from "~/hooks/useLeagueUnreadMessages";
 
 type NavData = {
   data: RouterOutputs["home"]["nav"];
-  canCreateLeague: RouterOutputs["league"]["canCreate"];
 };
 
-export function ClientNav({ data: initialData, canCreateLeague }: NavData) {
+export function ClientNav({ data: initialData }: NavData) {
   const leagueId = useLeagueIdFromPath();
   const logout = useLogout();
   const router = useRouter();
@@ -118,20 +116,6 @@ export function ClientNav({ data: initialData, canCreateLeague }: NavData) {
                     </Link>
                   );
                 })}
-                {!canCreateLeague ? null : (
-                  <>
-                    <DropdownMenuSeparator className="my-2" />
-                    <DropdownMenuItem
-                      className="flex gap-2"
-                      onSelect={() => {
-                        router.push("/league/create");
-                      }}
-                    >
-                      <PlusIcon className="h-4 w-4 text-foreground" />
-                      <span>Create a League</span>
-                    </DropdownMenuItem>
-                  </>
-                )}
                 <DropdownMenuSeparator className="my-2" />
 
                 <DropdownMenuLabel>Prior Leagues</DropdownMenuLabel>

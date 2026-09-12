@@ -1,103 +1,45 @@
 "use client";
 
-import React from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Button, buttonVariants } from "~/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "~/components/ui/card";
-import { Input } from "~/components/ui/input";
-import { z } from "zod";
-import Link from "next/link";
-import { cn } from "~/lib/utils";
+import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
+import { Button } from "~/components/ui/button";
+import { Input } from "~/components/ui/input";
 
 export function JoinOrCreateALeague() {
-  return (
-    <>
-      <div className="col-span-12 flex justify-center md:col-span-6">
-        <JoinLeagueCard />
-      </div>
-      <div className="col-span-12 flex justify-center md:col-span-6">
-        <CreateLeagueCard />
-      </div>
-    </>
-  );
-}
-
-function CreateLeagueCard() {
-  return (
-    <Card className="max-w-[400px]">
-      <CardHeader>
-        <CardTitle>Create a League</CardTitle>
-      </CardHeader>
-      <CardContent>
-        If you want to play, but don&apos;t have a league, you can create one
-        here.
-      </CardContent>
-      <CardFooter>
-        <Link
-          className={cn(buttonVariants({ variant: "default" }), "w-full")}
-          href="/league/create"
-        >
-          Create a League
-        </Link>
-      </CardFooter>
-    </Card>
-  );
-}
-
-const joinLeagueSchema = z.object({ leagueCode: z.string().min(1) });
-type JoinLeagueData = z.infer<typeof joinLeagueSchema>;
-
-function JoinLeagueCard() {
-  const { register, handleSubmit, watch } = useForm<JoinLeagueData>({
-    resolver: zodResolver(joinLeagueSchema),
-    defaultValues: {
-      leagueCode: "",
-    },
-  });
-
-  const leagueCodeValue = watch("leagueCode");
-
+  const [code, setCode] = useState("");
   const router = useRouter();
-
-  const onSubmit = (data: JoinLeagueData) => {
-    // TODO handle URL's and codes
-    if (data.leagueCode.includes("play-funtime.com")) {
-      router.push(data.leagueCode);
-    } else {
-      router.push(`/join-league/${data.leagueCode}`);
-    }
-  };
-
+  function join(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const value = code.trim();
+    // Extract the code from pasted invite links; always navigate locally.
+    const inviteCode = /\/join-league\/([^/?#]+)/.exec(value)?.[1] ?? value;
+    if (inviteCode)
+      router.push(`/join-league/${encodeURIComponent(inviteCode)}`);
+  }
   return (
-    <Card className="max-w-[400px]">
-      <CardHeader>
-        <CardTitle>Join a League</CardTitle>
-      </CardHeader>
-      <CardContent>
-        If you know about a league, you can enter the code here.
-      </CardContent>
-      <CardFooter>
-        <form onSubmit={handleSubmit(onSubmit)} className="w-full">
-          <div className="flex flex-col gap-2">
-            <Input id="leagueCode" {...register("leagueCode")} />
-            <Button
-              type="submit"
-              className="w-full"
-              disabled={leagueCodeValue.length === 0}
-            >
-              Join League
-            </Button>
-          </div>
-        </form>
-      </CardFooter>
-    </Card>
+    <details className="mt-8">
+      <summary className="w-fit cursor-pointer py-3 text-sm text-muted-foreground hover:text-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring">
+        Have a league code?
+      </summary>
+      <form onSubmit={join} className="mt-2 max-w-sm">
+        <label htmlFor="leagueCode" className="text-sm font-medium">
+          League code or invite link
+        </label>
+        <div className="mt-2 flex gap-2">
+          <Input
+            id="leagueCode"
+            value={code}
+            onChange={(event) => setCode(event.target.value)}
+            autoCapitalize="none"
+            autoCorrect="off"
+            className="min-w-0"
+            required
+          />
+          <Button type="submit" variant="outline" disabled={!code.trim()}>
+            Join league
+          </Button>
+        </div>
+      </form>
+    </details>
   );
 }

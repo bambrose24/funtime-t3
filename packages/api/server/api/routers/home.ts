@@ -1,11 +1,65 @@
 import { orderBy } from "lodash";
 
 import { createTRPCRouter, publicProcedure } from "../trpc";
-
-// const HOME_REVALIDATE_SECONDS = 60 * 3; // 3 minutes should be good
-const HOME_REVALIDATE_SECONDS = 10; // testing
+import { DEFAULT_SEASON } from "../../../utils/const";
+import { getHomeLeagueStatus } from "../../../utils/homeLeagueStatus";
 
 export const homeRouter = createTRPCRouter({
+  leagues: publicProcedure.query(async ({ ctx }) => {
+    if (!ctx.supabaseUser || !ctx.dbUser) return null;
+
+    const memberships = ctx.dbUser.leaguemembers;
+    const activeMemberIds = memberships
+      .filter((member) => member.leagues.season === DEFAULT_SEASON)
+      .map((member) => member.membership_id);
+    const [leagues, schedule] = await Promise.all([
+      ctx.db.leagues.findMany({
+        where: { league_id: { in: memberships.map((m) => m.league_id) } },
+        select: {
+          league_id: true,
+          name: true,
+          season: true,
+          late_policy: true,
+        },
+        orderBy: [{ season: "desc" }, { name: "asc" }, { league_id: "asc" }],
+      }),
+      activeMemberIds.length
+        ? ctx.db.games.findMany({
+            where: { season: DEFAULT_SEASON },
+            select: { gid: true, week: true, ts: true, done: true },
+          })
+        : Promise.resolve([]),
+    ]);
+    // Weekly submissions are represented by the existing per-game pick rows.
+    // Do not turn missing locked games from a valid late entry into a task.
+    const submissions =
+      activeMemberIds.length && schedule.length
+        ? await ctx.db.picks.findMany({
+            where: {
+              member_id: { in: activeMemberIds },
+              gid: { in: schedule.map((game) => game.gid) },
+            },
+            select: { member_id: true, week: true },
+            distinct: ["member_id", "week"],
+          })
+        : [];
+    const now = new Date();
+    return leagues.map(({ late_policy, ...league }) => {
+      const member = memberships.find((m) => m.league_id === league.league_id);
+      const submittedWeeks = new Set(
+        submissions
+          .filter((pick) => pick.member_id === member?.membership_id)
+          .map((pick) => pick.week),
+      );
+      return {
+        ...league,
+        weeklyStatus:
+          league.season === DEFAULT_SEASON
+            ? getHomeLeagueStatus(schedule, submittedWeeks, late_policy, now)
+            : null,
+      };
+    });
+  }),
   nav: publicProcedure.query(async ({ ctx }) => {
     const { db, supabaseUser, dbUser } = ctx;
 
@@ -138,9 +192,9 @@ export const homeRouter = createTRPCRouter({
       const counts = memberId
         ? correctPickCountsByMemberId.get(memberId)
         : undefined;
-      const weekWins = [...new Set(league.WeekWinners.map((week) => week.week))].sort(
-        (a, b) => a - b,
-      );
+      const weekWins = [
+        ...new Set(league.WeekWinners.map((week) => week.week)),
+      ].sort((a, b) => a - b);
 
       return {
         ...league,

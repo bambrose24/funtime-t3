@@ -1,5 +1,10 @@
 # Repository Instructions
 
+## Production incident investigation
+
+- Use the repo-local `funtime-observability` skill in `.agents/skills/funtime-observability/` for production errors, login failures, stuck screens, slow requests, or Railway/PostHog investigations.
+- Keep observability credentials and raw user identifiers out of the repository, commits, PRs, and summaries.
+
 ## Pull request CI monitoring
 
 - Be usage-minded whenever the user asks to watch or monitor CI for a pull request.
