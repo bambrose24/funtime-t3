@@ -7,168 +7,122 @@ import {
   Link,
   Preview,
   Text,
+  Hr,
 } from "react-email";
 import { Provider } from "../provider";
+import { EmailButton } from "../components/email-button";
+import { movement, ordinal, type WeekSummary } from "../../utils/weekSummary";
 
-type Standing = {
-  rank: number;
-  username: string;
-  correctPicks: number;
-  seasonTotal: number;
-};
-
-type Recipient = {
-  username: string;
-  rank: number;
-  correctPicks: number;
-  seasonRank: number;
-  seasonTotal: number;
-  seasonMovement: number | null;
-  tiebreakerPick: number | null;
-  tiebreakerDiff: number | null;
-  picks: Array<{
-    game: string;
-    pick: string;
-    result: "Correct" | "Wrong" | "Pending";
-  }>;
-};
-
-type Props = {
+type Props = Omit<WeekSummary, "recipients"> & {
   leagueId: number;
   leagueName: string;
   week: number;
-  standings: Standing[];
-  weekWinners: string[];
-  tiebreakerTotal: number | null;
-  recipient: Recipient;
+  recipient: WeekSummary["recipients"][number];
+};
+const cellStyle = {
+  borderBottom: "1px solid #e2e8f0",
+  padding: "10px 6px",
+  textAlign: "left" as const,
 };
 
-const cellClassName = "border-b border-slate-200 px-2 py-2 text-left";
-
 export default function WeekSummaryEmail({
-  leagueId = 1,
-  leagueName = "Funtime League",
-  week = 1,
-  standings = [],
-  weekWinners = [],
-  tiebreakerTotal = null,
-  recipient = {
-    username: "friend",
-    rank: 1,
-    correctPicks: 0,
-    seasonRank: 1,
-    seasonTotal: 0,
-    seasonMovement: null,
-    tiebreakerPick: null,
-    tiebreakerDiff: null,
-    picks: [],
-  },
+  leagueId,
+  leagueName,
+  week,
+  standings,
+  winnerText,
+  totalGames,
+  totalMembers,
+  nextWeek,
+  recipient,
 }: Props) {
-  const movementText =
-    recipient.seasonMovement === null
-      ? "no prior week comparison"
-      : recipient.seasonMovement === 0
-        ? "no rank change"
-        : recipient.seasonMovement > 0
-          ? `up ${recipient.seasonMovement}`
-          : `down ${Math.abs(recipient.seasonMovement)}`;
-  const winnerText = weekWinners.length > 0 ? weekWinners.join(", ") : "TBD";
-
+  const standingsUrl = `https://www.play-funtime.com/league/${leagueId}?week=${week}`;
   return (
     <Html lang="en">
       <Head />
-      <Preview>{`${leagueName} Week ${week} summary`}</Preview>
+      <Preview>{`${leagueName}: ${recipient.correctPicks} / ${totalGames} correct, ${ordinal(recipient.rank)} this week.`}</Preview>
       <Provider>
         <Body className="bg-white font-sans text-slate-900">
-          <Container className="mx-auto max-w-[600px] py-8">
-            <Heading className="mb-2 text-2xl">
-              Week {week} Summary — {leagueName}
+          <Container className="mx-auto max-w-[600px] px-4 py-8">
+            <Text className="text-sm text-slate-500">{leagueName}</Text>
+            <Text>Hi {recipient.username},</Text>
+            <Heading as="h1" className="text-xl">
+              Your Week {week}
+            </Heading>
+            <Text style={{ lineHeight: "28px" }}>
+              Correct picks:{" "}
+              <strong>
+                {recipient.correctPicks} / {totalGames}
+              </strong>
+              <br />
+              Point differential:{" "}
+              <strong>{recipient.tiebreakerDiff ?? "N/A"}</strong>
+              <br />
+              Weekly standing:{" "}
+              <strong>
+                {recipient.tied ? "Tied " : ""}
+                {ordinal(recipient.rank)} of {totalMembers}
+              </strong>
+              <br />
+              Season standing:{" "}
+              <strong>
+                {ordinal(recipient.seasonRank)}
+                {movement(recipient.seasonMovement)}
+              </strong>
+            </Text>
+            <Hr />
+            <Heading as="h2" className="text-lg">
+              Week {week} results
             </Heading>
             <Text>
-              Hi {recipient.username}, you finished{" "}
-              <strong>#{recipient.rank}</strong> with{" "}
-              <strong>{recipient.correctPicks}</strong> correct picks this week.
+              <strong>{winnerText}</strong>
             </Text>
-            <Text>
-              Week winner(s): <strong>{winnerText}</strong>.{" "}
-              {tiebreakerTotal === null
-                ? "No completed tiebreaker total."
-                : `Tiebreaker total: ${tiebreakerTotal}.`}
-            </Text>
-            {recipient.tiebreakerPick !== null &&
-            recipient.tiebreakerDiff !== null ? (
-              <Text>
-                Your tiebreaker pick: {recipient.tiebreakerPick} (
-                {recipient.tiebreakerDiff} off).
-              </Text>
-            ) : null}
-            <Text>
-              Season: <strong>#{recipient.seasonRank}</strong>,{" "}
-              <strong>{recipient.seasonTotal}</strong> correct ({movementText}).
-            </Text>
-
-            <Heading as="h2" className="mt-6 text-lg">
-              Week standings
-            </Heading>
-            <table className="w-full border-collapse text-sm">
+            <table
+              style={{
+                width: "100%",
+                borderCollapse: "collapse",
+                fontSize: "14px",
+              }}
+            >
               <thead>
                 <tr>
-                  <th className={cellClassName}>Rank</th>
-                  <th className={cellClassName}>Player</th>
-                  <th className={cellClassName}>Correct</th>
-                  <th className={cellClassName}>Season</th>
+                  {[
+                    "Place",
+                    "Player",
+                    "Correct picks",
+                    "Point differential",
+                  ].map((label) => (
+                    <th key={label} scope="col" style={cellStyle}>
+                      {label}
+                    </th>
+                  ))}
                 </tr>
               </thead>
               <tbody>
-                {standings.map((standing) => (
-                  <tr key={`${standing.rank}-${standing.username}`}>
-                    <td className={cellClassName}>{standing.rank}</td>
-                    <td className={cellClassName}>{standing.username}</td>
-                    <td className={cellClassName}>{standing.correctPicks}</td>
-                    <td className={cellClassName}>{standing.seasonTotal}</td>
+                {standings.map((s, i) => (
+                  <tr key={i}>
+                    <td style={cellStyle}>{ordinal(s.rank)}</td>
+                    <td style={cellStyle}>{s.username}</td>
+                    <td style={cellStyle}>
+                      {s.correctPicks} / {totalGames}
+                    </td>
+                    <td style={cellStyle}>{s.tiebreakerDiff ?? "N/A"}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
-
-            <Heading as="h2" className="mt-6 text-lg">
-              Your picks
-            </Heading>
-            <table className="w-full border-collapse text-sm">
-              <thead>
-                <tr>
-                  <th className={cellClassName}>Game</th>
-                  <th className={cellClassName}>Pick</th>
-                  <th className={cellClassName}>Result</th>
-                </tr>
-              </thead>
-              <tbody>
-                {recipient.picks.length > 0 ? (
-                  recipient.picks.map((pick, index) => (
-                    <tr key={`${pick.game}-${index}`}>
-                      <td className={cellClassName}>{pick.game}</td>
-                      <td className={cellClassName}>{pick.pick}</td>
-                      <td className={cellClassName}>{pick.result}</td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td className={cellClassName} colSpan={3}>
-                      No picks submitted.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-
-            <Text className="mt-6">
-              <Link
-                className="text-primary underline"
-                href={`https://www.play-funtime.com/league/${leagueId}?week=${week}`}
-              >
-                View league details
-              </Link>
+            <Text>
+              <Link href={standingsUrl}>View full standings</Link>
             </Text>
+            {nextWeek !== null ? (
+              <EmailButton
+                href={`https://www.play-funtime.com/league/${leagueId}/pick`}
+              >
+                Make your Week {nextWeek} picks
+              </EmailButton>
+            ) : (
+              <Text>Thanks for playing this season!</Text>
+            )}
           </Container>
         </Body>
       </Provider>

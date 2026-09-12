@@ -19,6 +19,7 @@
     "./trpc/react": "./trpc/react.tsx",
     "./server/api/trpc": "./server/api/trpc.ts",
     "./server/api/root": "./server/api/root.ts",
+    "./utils/weekSummary": "./utils/weekSummary.ts",
     "./utils/config": "./utils/config.ts",
     "./utils/weekPicksSort": "./utils/weekPicksSort.ts",
     "./utils/logging": "./utils/logging.ts"
@@ -28,7 +29,7 @@
     "dev": "tsc --watch",
     "email:dev": "email dev --dir emails --port 3001",
     "email:export": "email export --dir emails",
-    "test": "node --experimental-strip-types --test tests/*.test.mts && bun test tests/routers",
+    "test": "node --experimental-strip-types --test tests/*.test.mts && bun test ./tests/routers ./tests/week-summary/summary.test.tsx && bun test ./tests/week-summary-delivery.test.ts",
     "test:integration": "DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:55422/postgres DIRECT_URL=postgresql://postgres:postgres@127.0.0.1:55422/postgres E2E_MODE=1 FUNTIME_DISABLE_EMAILS=1 NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:55421 NEXT_PUBLIC_SUPABASE_ANON_KEY=local-test bun test tests/integration",
     "typecheck": "tsc --noEmit",
     "clean": "rm -rf dist",
