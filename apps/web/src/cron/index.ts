@@ -150,9 +150,11 @@ export async function run() {
         status: "in_progress",
       },
     });
-    console.log(
-      `${LOG_PREFIX} ✓ Marked ${startedLeagues.count} league(s) in progress for season ${season}`,
-    );
+    if (startedLeagues.count > 0) {
+      console.log(
+        `${LOG_PREFIX} ✓ Marked ${startedLeagues.count} league(s) in progress for season ${season}`,
+      );
+    }
   } else {
     console.log(`${LOG_PREFIX} ✓ Season ${season} has not kicked off yet`);
   }
