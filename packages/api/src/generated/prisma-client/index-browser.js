@@ -170,6 +170,7 @@ exports.Prisma.GamesScalarFieldEnum = {
   homescore: 'homescore',
   awayscore: 'awayscore',
   done: 'done',
+  completed_at: 'completed_at',
   winner: 'winner',
   international: 'international',
   seconds: 'seconds',

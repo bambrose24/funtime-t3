@@ -1,3 +1,4 @@
+import type { WeekSummary } from "../../../utils/weekSummary";
 import { createHash } from "node:crypto";
 import { chunk } from "lodash";
 import { Resend } from "resend";
@@ -602,40 +603,9 @@ export const resendApi = {
     leagueId,
     leagueName,
     week,
-    standings,
-    weekWinners,
-    tiebreakerTotal,
     recipients,
-  }: {
-    leagueId: number;
-    leagueName: string;
-    week: number;
-    standings: Array<{
-      rank: number;
-      username: string;
-      correctPicks: number;
-      seasonTotal: number;
-    }>;
-    weekWinners: string[];
-    tiebreakerTotal: number | null;
-    recipients: Array<{
-      email: string;
-      memberId: number;
-      username: string;
-      rank: number;
-      correctPicks: number;
-      seasonRank: number;
-      seasonTotal: number;
-      seasonMovement: number | null;
-      tiebreakerPick: number | null;
-      tiebreakerDiff: number | null;
-      picks: Array<{
-        game: string;
-        pick: string;
-        result: "Correct" | "Wrong" | "Pending";
-      }>;
-    }>;
-  }) => {
+    ...summary
+  }: WeekSummary & { leagueId: number; leagueName: string; week: number }) => {
     if (recipients.length === 0) {
       return { sent: 0 };
     }
@@ -646,14 +616,12 @@ export const resendApi = {
         {
           from: FROM,
           to: [recipient.email],
-          subject: `${leagueName} - Week ${week} Summary`,
+          subject: `${leagueName} · Your Week ${week} results`,
           react: WeekSummaryEmail({
             leagueId,
             leagueName,
             week,
-            standings,
-            weekWinners,
-            tiebreakerTotal,
+            ...summary,
             recipient,
           }),
           tags: createTags("week_summary", leagueId),
@@ -661,14 +629,7 @@ export const resendApi = {
         `week_summary:${leagueId}:${recipient.memberId}:${week}`,
         createIdempotencyKey(
           "week-summary",
-          JSON.stringify({
-            leagueId,
-            week,
-            standings,
-            weekWinners,
-            tiebreakerTotal,
-            recipient,
-          }),
+          JSON.stringify({ leagueId, week, memberId: recipient.memberId }),
         ),
       );
 
@@ -680,8 +641,8 @@ export const resendApi = {
         continue;
       }
 
-      sent += 1;
       if (data?.id) {
+        sent += 1;
         await db.emailLogs.create({
           data: {
             email_type: "week_summary",

@@ -74,6 +74,7 @@ model games {
   homescore                         Int?     @default(0)
   awayscore                         Int?     @default(0)
   done                              Boolean? @default(false)
+  completed_at                      DateTime? @db.Timestamptz(6)
   winner                            Int?     @default(0)
   international                     Boolean? @default(false)
   seconds                           Int?

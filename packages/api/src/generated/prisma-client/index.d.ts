@@ -6280,6 +6280,7 @@ export namespace Prisma {
     homescore: number | null
     awayscore: number | null
     done: boolean | null
+    completed_at: Date | null
     winner: number | null
     international: boolean | null
     seconds: number | null
@@ -6303,6 +6304,7 @@ export namespace Prisma {
     homescore: number | null
     awayscore: number | null
     done: boolean | null
+    completed_at: Date | null
     winner: number | null
     international: boolean | null
     seconds: number | null
@@ -6326,6 +6328,7 @@ export namespace Prisma {
     homescore: number
     awayscore: number
     done: number
+    completed_at: number
     winner: number
     international: number
     seconds: number
@@ -6383,6 +6386,7 @@ export namespace Prisma {
     homescore?: true
     awayscore?: true
     done?: true
+    completed_at?: true
     winner?: true
     international?: true
     seconds?: true
@@ -6406,6 +6410,7 @@ export namespace Prisma {
     homescore?: true
     awayscore?: true
     done?: true
+    completed_at?: true
     winner?: true
     international?: true
     seconds?: true
@@ -6429,6 +6434,7 @@ export namespace Prisma {
     homescore?: true
     awayscore?: true
     done?: true
+    completed_at?: true
     winner?: true
     international?: true
     seconds?: true
@@ -6539,6 +6545,7 @@ export namespace Prisma {
     homescore: number | null
     awayscore: number | null
     done: boolean | null
+    completed_at: Date | null
     winner: number | null
     international: boolean | null
     seconds: number | null
@@ -6581,6 +6588,7 @@ export namespace Prisma {
     homescore?: boolean
     awayscore?: boolean
     done?: boolean
+    completed_at?: boolean
     winner?: boolean
     international?: boolean
     seconds?: boolean
@@ -6608,6 +6616,7 @@ export namespace Prisma {
     homescore?: boolean
     awayscore?: boolean
     done?: boolean
+    completed_at?: boolean
     winner?: boolean
     international?: boolean
     seconds?: boolean
@@ -6633,6 +6642,7 @@ export namespace Prisma {
     homescore?: boolean
     awayscore?: boolean
     done?: boolean
+    completed_at?: boolean
     winner?: boolean
     international?: boolean
     seconds?: boolean
@@ -6658,6 +6668,7 @@ export namespace Prisma {
     homescore?: boolean
     awayscore?: boolean
     done?: boolean
+    completed_at?: boolean
     winner?: boolean
     international?: boolean
     seconds?: boolean
@@ -6671,7 +6682,7 @@ export namespace Prisma {
     espn_id?: boolean
   }
 
-  export type gamesOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"gid" | "season" | "week" | "ts" | "home" | "away" | "homescore" | "awayscore" | "done" | "winner" | "international" | "seconds" | "current_record" | "is_tiebreaker" | "homerecord" | "awayrecord" | "current_quarter_seconds_remaining" | "current_quarter" | "msf_id" | "espn_id", ExtArgs["result"]["games"]>
+  export type gamesOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"gid" | "season" | "week" | "ts" | "home" | "away" | "homescore" | "awayscore" | "done" | "completed_at" | "winner" | "international" | "seconds" | "current_record" | "is_tiebreaker" | "homerecord" | "awayrecord" | "current_quarter_seconds_remaining" | "current_quarter" | "msf_id" | "espn_id", ExtArgs["result"]["games"]>
   export type gamesInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     teams_games_homeToteams?: boolean | teamsDefaultArgs<ExtArgs>
     teams_games_awayToteams?: boolean | teamsDefaultArgs<ExtArgs>
@@ -6704,6 +6715,7 @@ export namespace Prisma {
       homescore: number | null
       awayscore: number | null
       done: boolean | null
+      completed_at: Date | null
       winner: number | null
       international: boolean | null
       seconds: number | null
@@ -7150,6 +7162,7 @@ export namespace Prisma {
     readonly homescore: FieldRef<"games", 'Int'>
     readonly awayscore: FieldRef<"games", 'Int'>
     readonly done: FieldRef<"games", 'Boolean'>
+    readonly completed_at: FieldRef<"games", 'DateTime'>
     readonly winner: FieldRef<"games", 'Int'>
     readonly international: FieldRef<"games", 'Boolean'>
     readonly seconds: FieldRef<"games", 'Int'>
@@ -23656,6 +23669,7 @@ export namespace Prisma {
     homescore: 'homescore',
     awayscore: 'awayscore',
     done: 'done',
+    completed_at: 'completed_at',
     winner: 'winner',
     international: 'international',
     seconds: 'seconds',
@@ -24389,6 +24403,7 @@ export namespace Prisma {
     homescore?: IntNullableFilter<"games"> | number | null
     awayscore?: IntNullableFilter<"games"> | number | null
     done?: BoolNullableFilter<"games"> | boolean | null
+    completed_at?: DateTimeNullableFilter<"games"> | Date | string | null
     winner?: IntNullableFilter<"games"> | number | null
     international?: BoolNullableFilter<"games"> | boolean | null
     seconds?: IntNullableFilter<"games"> | number | null
@@ -24415,6 +24430,7 @@ export namespace Prisma {
     homescore?: SortOrderInput | SortOrder
     awayscore?: SortOrderInput | SortOrder
     done?: SortOrderInput | SortOrder
+    completed_at?: SortOrderInput | SortOrder
     winner?: SortOrderInput | SortOrder
     international?: SortOrderInput | SortOrder
     seconds?: SortOrderInput | SortOrder
@@ -24445,6 +24461,7 @@ export namespace Prisma {
     homescore?: IntNullableFilter<"games"> | number | null
     awayscore?: IntNullableFilter<"games"> | number | null
     done?: BoolNullableFilter<"games"> | boolean | null
+    completed_at?: DateTimeNullableFilter<"games"> | Date | string | null
     winner?: IntNullableFilter<"games"> | number | null
     international?: BoolNullableFilter<"games"> | boolean | null
     seconds?: IntNullableFilter<"games"> | number | null
@@ -24470,6 +24487,7 @@ export namespace Prisma {
     homescore?: SortOrderInput | SortOrder
     awayscore?: SortOrderInput | SortOrder
     done?: SortOrderInput | SortOrder
+    completed_at?: SortOrderInput | SortOrder
     winner?: SortOrderInput | SortOrder
     international?: SortOrderInput | SortOrder
     seconds?: SortOrderInput | SortOrder
@@ -24501,6 +24519,7 @@ export namespace Prisma {
     homescore?: IntNullableWithAggregatesFilter<"games"> | number | null
     awayscore?: IntNullableWithAggregatesFilter<"games"> | number | null
     done?: BoolNullableWithAggregatesFilter<"games"> | boolean | null
+    completed_at?: DateTimeNullableWithAggregatesFilter<"games"> | Date | string | null
     winner?: IntNullableWithAggregatesFilter<"games"> | number | null
     international?: BoolNullableWithAggregatesFilter<"games"> | boolean | null
     seconds?: IntNullableWithAggregatesFilter<"games"> | number | null
@@ -25833,6 +25852,7 @@ export namespace Prisma {
     homescore?: number | null
     awayscore?: number | null
     done?: boolean | null
+    completed_at?: Date | string | null
     winner?: number | null
     international?: boolean | null
     seconds?: number | null
@@ -25859,6 +25879,7 @@ export namespace Prisma {
     homescore?: number | null
     awayscore?: number | null
     done?: boolean | null
+    completed_at?: Date | string | null
     winner?: number | null
     international?: boolean | null
     seconds?: number | null
@@ -25880,6 +25901,7 @@ export namespace Prisma {
     homescore?: NullableIntFieldUpdateOperationsInput | number | null
     awayscore?: NullableIntFieldUpdateOperationsInput | number | null
     done?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     winner?: NullableIntFieldUpdateOperationsInput | number | null
     international?: NullableBoolFieldUpdateOperationsInput | boolean | null
     seconds?: NullableIntFieldUpdateOperationsInput | number | null
@@ -25906,6 +25928,7 @@ export namespace Prisma {
     homescore?: NullableIntFieldUpdateOperationsInput | number | null
     awayscore?: NullableIntFieldUpdateOperationsInput | number | null
     done?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     winner?: NullableIntFieldUpdateOperationsInput | number | null
     international?: NullableBoolFieldUpdateOperationsInput | boolean | null
     seconds?: NullableIntFieldUpdateOperationsInput | number | null
@@ -25930,6 +25953,7 @@ export namespace Prisma {
     homescore?: number | null
     awayscore?: number | null
     done?: boolean | null
+    completed_at?: Date | string | null
     winner?: number | null
     international?: boolean | null
     seconds?: number | null
@@ -25950,6 +25974,7 @@ export namespace Prisma {
     homescore?: NullableIntFieldUpdateOperationsInput | number | null
     awayscore?: NullableIntFieldUpdateOperationsInput | number | null
     done?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     winner?: NullableIntFieldUpdateOperationsInput | number | null
     international?: NullableBoolFieldUpdateOperationsInput | boolean | null
     seconds?: NullableIntFieldUpdateOperationsInput | number | null
@@ -25973,6 +25998,7 @@ export namespace Prisma {
     homescore?: NullableIntFieldUpdateOperationsInput | number | null
     awayscore?: NullableIntFieldUpdateOperationsInput | number | null
     done?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     winner?: NullableIntFieldUpdateOperationsInput | number | null
     international?: NullableBoolFieldUpdateOperationsInput | boolean | null
     seconds?: NullableIntFieldUpdateOperationsInput | number | null
@@ -27529,6 +27555,7 @@ export namespace Prisma {
     homescore?: SortOrder
     awayscore?: SortOrder
     done?: SortOrder
+    completed_at?: SortOrder
     winner?: SortOrder
     international?: SortOrder
     seconds?: SortOrder
@@ -27568,6 +27595,7 @@ export namespace Prisma {
     homescore?: SortOrder
     awayscore?: SortOrder
     done?: SortOrder
+    completed_at?: SortOrder
     winner?: SortOrder
     international?: SortOrder
     seconds?: SortOrder
@@ -27591,6 +27619,7 @@ export namespace Prisma {
     homescore?: SortOrder
     awayscore?: SortOrder
     done?: SortOrder
+    completed_at?: SortOrder
     winner?: SortOrder
     international?: SortOrder
     seconds?: SortOrder
@@ -33210,6 +33239,7 @@ export namespace Prisma {
     homescore?: number | null
     awayscore?: number | null
     done?: boolean | null
+    completed_at?: Date | string | null
     winner?: number | null
     international?: boolean | null
     seconds?: number | null
@@ -33235,6 +33265,7 @@ export namespace Prisma {
     homescore?: number | null
     awayscore?: number | null
     done?: boolean | null
+    completed_at?: Date | string | null
     winner?: number | null
     international?: boolean | null
     seconds?: number | null
@@ -33385,6 +33416,7 @@ export namespace Prisma {
     homescore?: NullableIntFieldUpdateOperationsInput | number | null
     awayscore?: NullableIntFieldUpdateOperationsInput | number | null
     done?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     winner?: NullableIntFieldUpdateOperationsInput | number | null
     international?: NullableBoolFieldUpdateOperationsInput | boolean | null
     seconds?: NullableIntFieldUpdateOperationsInput | number | null
@@ -33410,6 +33442,7 @@ export namespace Prisma {
     homescore?: NullableIntFieldUpdateOperationsInput | number | null
     awayscore?: NullableIntFieldUpdateOperationsInput | number | null
     done?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     winner?: NullableIntFieldUpdateOperationsInput | number | null
     international?: NullableBoolFieldUpdateOperationsInput | boolean | null
     seconds?: NullableIntFieldUpdateOperationsInput | number | null
@@ -33812,6 +33845,7 @@ export namespace Prisma {
     homescore?: number | null
     awayscore?: number | null
     done?: boolean | null
+    completed_at?: Date | string | null
     winner?: number | null
     international?: boolean | null
     seconds?: number | null
@@ -33836,6 +33870,7 @@ export namespace Prisma {
     homescore?: number | null
     awayscore?: number | null
     done?: boolean | null
+    completed_at?: Date | string | null
     winner?: number | null
     international?: boolean | null
     seconds?: number | null
@@ -33867,6 +33902,7 @@ export namespace Prisma {
     homescore?: number | null
     awayscore?: number | null
     done?: boolean | null
+    completed_at?: Date | string | null
     winner?: number | null
     international?: boolean | null
     seconds?: number | null
@@ -33891,6 +33927,7 @@ export namespace Prisma {
     homescore?: number | null
     awayscore?: number | null
     done?: boolean | null
+    completed_at?: Date | string | null
     winner?: number | null
     international?: boolean | null
     seconds?: number | null
@@ -34197,6 +34234,7 @@ export namespace Prisma {
     homescore?: IntNullableFilter<"games"> | number | null
     awayscore?: IntNullableFilter<"games"> | number | null
     done?: BoolNullableFilter<"games"> | boolean | null
+    completed_at?: DateTimeNullableFilter<"games"> | Date | string | null
     winner?: IntNullableFilter<"games"> | number | null
     international?: BoolNullableFilter<"games"> | boolean | null
     seconds?: IntNullableFilter<"games"> | number | null
@@ -35684,6 +35722,7 @@ export namespace Prisma {
     homescore?: number | null
     awayscore?: number | null
     done?: boolean | null
+    completed_at?: Date | string | null
     winner?: number | null
     international?: boolean | null
     seconds?: number | null
@@ -35706,6 +35745,7 @@ export namespace Prisma {
     homescore?: number | null
     awayscore?: number | null
     done?: boolean | null
+    completed_at?: Date | string | null
     winner?: number | null
     international?: boolean | null
     seconds?: number | null
@@ -35816,6 +35856,7 @@ export namespace Prisma {
     homescore?: NullableIntFieldUpdateOperationsInput | number | null
     awayscore?: NullableIntFieldUpdateOperationsInput | number | null
     done?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     winner?: NullableIntFieldUpdateOperationsInput | number | null
     international?: NullableBoolFieldUpdateOperationsInput | boolean | null
     seconds?: NullableIntFieldUpdateOperationsInput | number | null
@@ -35840,6 +35881,7 @@ export namespace Prisma {
     homescore?: NullableIntFieldUpdateOperationsInput | number | null
     awayscore?: NullableIntFieldUpdateOperationsInput | number | null
     done?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     winner?: NullableIntFieldUpdateOperationsInput | number | null
     international?: NullableBoolFieldUpdateOperationsInput | boolean | null
     seconds?: NullableIntFieldUpdateOperationsInput | number | null
@@ -35863,6 +35905,7 @@ export namespace Prisma {
     homescore?: NullableIntFieldUpdateOperationsInput | number | null
     awayscore?: NullableIntFieldUpdateOperationsInput | number | null
     done?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     winner?: NullableIntFieldUpdateOperationsInput | number | null
     international?: NullableBoolFieldUpdateOperationsInput | boolean | null
     seconds?: NullableIntFieldUpdateOperationsInput | number | null
@@ -35883,6 +35926,7 @@ export namespace Prisma {
     homescore?: NullableIntFieldUpdateOperationsInput | number | null
     awayscore?: NullableIntFieldUpdateOperationsInput | number | null
     done?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     winner?: NullableIntFieldUpdateOperationsInput | number | null
     international?: NullableBoolFieldUpdateOperationsInput | boolean | null
     seconds?: NullableIntFieldUpdateOperationsInput | number | null
@@ -35907,6 +35951,7 @@ export namespace Prisma {
     homescore?: NullableIntFieldUpdateOperationsInput | number | null
     awayscore?: NullableIntFieldUpdateOperationsInput | number | null
     done?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     winner?: NullableIntFieldUpdateOperationsInput | number | null
     international?: NullableBoolFieldUpdateOperationsInput | boolean | null
     seconds?: NullableIntFieldUpdateOperationsInput | number | null
@@ -35930,6 +35975,7 @@ export namespace Prisma {
     homescore?: NullableIntFieldUpdateOperationsInput | number | null
     awayscore?: NullableIntFieldUpdateOperationsInput | number | null
     done?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     winner?: NullableIntFieldUpdateOperationsInput | number | null
     international?: NullableBoolFieldUpdateOperationsInput | boolean | null
     seconds?: NullableIntFieldUpdateOperationsInput | number | null
