@@ -43,7 +43,8 @@ import { usePathname, useRouter } from "next/navigation";
 import { FuntimeAvatarFallback } from "./AvatarFallback";
 import { type RouterOutputs } from "~/trpc/types";
 import { clientApi } from "~/trpc/react";
-import { useEffect } from "react";
+import { Fragment, useEffect } from "react";
+import { DEFAULT_SEASON } from "~/utils/const";
 import { PrefetchKind } from "next/dist/client/components/router-reducer/router-reducer-types";
 import { Badge } from "~/components/ui/badge";
 import { useLeagueUnreadMessages } from "~/hooks/useLeagueUnreadMessages";
@@ -69,11 +70,19 @@ export function ClientNav({ data: initialData }: NavData) {
   const chosenLeague = leagues?.find((l) => l.league_id === leagueId);
 
   const activeLeagues = leagues?.filter(
-    (l) => l.status !== "completed" && new Date().getFullYear() - 1 < l.season,
+    (league) => league.season === DEFAULT_SEASON,
   );
-  const inactiveLeagues = leagues?.filter(
-    (l) => l.status === "completed" || new Date().getFullYear() - 1 >= l.season,
-  );
+  const leagueGroups = [
+    { label: "Active leagues", leagues: activeLeagues },
+    {
+      label: "Upcoming seasons",
+      leagues: leagues?.filter((league) => league.season > DEFAULT_SEASON),
+    },
+    {
+      label: "Past seasons",
+      leagues: leagues?.filter((league) => league.season < DEFAULT_SEASON),
+    },
+  ].filter((group) => group.leagues?.length);
 
   useEffect(() => {
     activeLeagues?.forEach((league) => {
@@ -101,37 +110,24 @@ export function ClientNav({ data: initialData }: NavData) {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-64 p-1">
-                <DropdownMenuLabel>Active Leagues</DropdownMenuLabel>
-                {activeLeagues?.map((l) => {
-                  return (
-                    <Link
-                      prefetch
-                      passHref
-                      href={`/league/${l.league_id}`}
-                      key={l.league_id}
-                    >
-                      <DropdownMenuItem>
-                        <MenuRow>{l.name}</MenuRow>
-                      </DropdownMenuItem>
-                    </Link>
-                  );
-                })}
-                <DropdownMenuSeparator className="my-2" />
-
-                <DropdownMenuLabel>Prior Leagues</DropdownMenuLabel>
-                {inactiveLeagues?.map((l) => {
-                  return (
-                    <Link
-                      passHref
-                      href={`/league/${l.league_id}`}
-                      key={l.league_id}
-                    >
-                      <DropdownMenuItem>
-                        <MenuRow>{l.name}</MenuRow>
-                      </DropdownMenuItem>
-                    </Link>
-                  );
-                })}
+                {leagueGroups.map((group, index) => (
+                  <Fragment key={group.label}>
+                    {index > 0 && <DropdownMenuSeparator className="my-2" />}
+                    <DropdownMenuLabel>{group.label}</DropdownMenuLabel>
+                    {group.leagues?.map((league) => (
+                      <Link
+                        prefetch={league.season === DEFAULT_SEASON}
+                        passHref
+                        href={`/league/${league.league_id}`}
+                        key={league.league_id}
+                      >
+                        <DropdownMenuItem>
+                          <MenuRow>{league.name}</MenuRow>
+                        </DropdownMenuItem>
+                      </Link>
+                    ))}
+                  </Fragment>
+                ))}
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (

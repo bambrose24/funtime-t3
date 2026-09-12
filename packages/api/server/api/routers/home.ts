@@ -1,8 +1,16 @@
 import { orderBy } from "lodash";
+import type { Prisma } from "../../../src/generated/prisma-client";
 
 import { createTRPCRouter, publicProcedure } from "../trpc";
 import { DEFAULT_SEASON } from "../../../utils/const";
 import { getHomeLeagueStatus } from "../../../utils/homeLeagueStatus";
+
+// Keep Home and navigation ordering identical, including duplicate names.
+const leagueListOrder = [
+  { season: "desc" },
+  { name: "asc" },
+  { league_id: "asc" },
+] satisfies Prisma.leaguesOrderByWithRelationInput[];
 
 export const homeRouter = createTRPCRouter({
   leagues: publicProcedure.query(async ({ ctx }) => {
@@ -21,7 +29,7 @@ export const homeRouter = createTRPCRouter({
           season: true,
           late_policy: true,
         },
-        orderBy: [{ season: "desc" }, { name: "asc" }, { league_id: "asc" }],
+        orderBy: leagueListOrder,
       }),
       activeMemberIds.length
         ? ctx.db.games.findMany({
@@ -75,14 +83,7 @@ export const homeRouter = createTRPCRouter({
           in: leagueIds,
         },
       },
-      orderBy: [
-        {
-          season: "desc",
-        },
-        {
-          created_time: "asc", // maybe newer leagues are less prominent? who's to say
-        },
-      ],
+      orderBy: leagueListOrder,
     });
     return { leagues, dbUser };
   }),
