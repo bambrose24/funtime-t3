@@ -28,9 +28,15 @@ user-facing behavior change.
 - Do not mark PRD functionality complete until its test impact is represented
   here and the relevant automated suite passes.
 
-Last recorded full-suite baseline: **25 Playwright tests in 20 files, all passing
-on a fresh local-Supabase reset, migration and seed (2026-09-08, WEB-05a).**
-This is local execution evidence; CI for the WEB-05a PR has not been monitored.
+Last recorded full-suite baseline: **26 Playwright tests in 21 files, all passing
+on a fresh local-Supabase reset, migration and seed (2026-09-12, home league list).**
+This is local execution evidence from the isolated PR branch based on `778ee8f`.
+
+## Home league list — September 12, 2026
+
+- Added `home/leagues.spec.ts` for the first web home redesign: single active league remains on Home, weekly picks-needed status links to submission, returning after submission shows picks-in, past seasons expand on demand, and a 390px viewport has no horizontal overflow. Desktop and mobile screenshots support visual review.
+- `packages/api/tests/routers/home-leagues.test.ts` owns the status/cutoff/rollover and membership-scoping matrix (10 passing cases). The browser test owns the integrated player journey, not each status permutation.
+- Full fresh-reset local suite on the isolated PR branch: **26 passed**. The Home journey, existing pick-visibility journey, and existing chat journey all pass against current main. API/web/mobile typechecks, targeted web lint, and all 30 API tests pass. Native home redesign and device coverage are outside this web slice.
 
 ## Safety Contract
 

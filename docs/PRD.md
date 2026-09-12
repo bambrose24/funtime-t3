@@ -58,6 +58,7 @@ Funtime solves this by combining:
 
 - Mobile direction: full feature parity with web is the end goal.
 - Mobile release order: player-first core loop, then admin capabilities.
+- Weekly picks are one complete weekly submission per league, not a sequence of partial submissions. Players select every available game and enter the required tiebreaker before submitting. Home reports whether that week's picks are in or still need to be made; it does not show per-game completion counts.
 - Pick visibility:
   - If a member has not submitted picks for that week, they cannot see other members' picks.
   - If a member has submitted picks for that week, they can see the full slate of other members' picks, including games that have not started and the tiebreaker score.
@@ -122,8 +123,18 @@ Unless a requirement is explicitly labeled **Target** or **Planned**, it describ
 - Link prior/next season leagues for continuity and upsell.
 - Show current-season leagues before renewal opportunities and prior-season history on the home screen.
 - Surface a linked, not-started next-season league to prior members with a direct join action.
-- When a signed-in user has exactly one current-season league and no pending renewal choices, the home flow can open that league directly.
+- Web Home remains accessible even with exactly one current-season league, so players can check weekly submission status. Mobile currently retains its single-league auto-open behavior when no renewal choices are pending.
 - Mobile home supports league search/filter and keeps long prior-season history collapsible.
+
+#### Home screen league list (Web; Target for mobile)
+
+- Present active leagues as a clean, simple list, with each league's weekly submission status and relevant action alongside its name.
+- Identify the week the status refers to. Use **Picks are in** with **View picks** after successful weekly submission, or **Picks needed** with **Make picks** when the player has not submitted and picking is still open.
+- Do not present partial-week progress such as **4 picks left**, **12/16 picked**, or **Finish remaining picks**. Unsaved form selections are not a submitted entry or a separate home-screen task.
+- When the player has not submitted and picking has closed, show **Picks not submitted · Closed** without a make-picks action. When no week is available, show the appropriate preseason or season-over context instead of prompting for picks.
+- A valid late weekly submission under the league's policy counts as **Picks are in** even if earlier locked games were missed. Missed games belong in results, not an unfinished-picks task on Home.
+- Keep renewal/setup actions discoverable as compact rows and prior-season history collapsed by default. Current-season leagues use a stable alphabetical order. Future-season memberships appear separately from past seasons.
+- Refresh weekly status when returning to Home or focusing the window, and periodically while Home is visible. Failed refreshes show unavailable status with a retry action rather than claiming that picks are in.
 
 ### 7.2.1 League Renewal and Season Continuity
 
@@ -199,6 +210,8 @@ Unless a requirement is explicitly labeled **Target** or **Planned**, it describ
 
 ### 7.3 Weekly Picks
 
+- The player-facing unit of work is the whole week: choose every available game's winner and supply the required tiebreaker score, then submit once. There is no supported save-partial-week workflow. Players may revise their submitted picks while the applicable locks permit it.
+- Under a per-game late policy, a player who arrives after kickoff submits all still-available games together. Previously locked games are preserved or remain missed; they do not make an otherwise valid weekly submission "incomplete." The first-kickoff policy instead closes the entire week as defined in section 6.1.
 - Determine the current target week for picks (`weekToPick`) from the game schedule and kickoff state. Existing picks alone must not advance a player past a week that still has open games.
 - Show games for target week ordered for usable entry.
 - Allow a player to randomize open-game selections while preserving locked games.
@@ -212,6 +225,8 @@ Unless a requirement is explicitly labeled **Target** or **Planned**, it describ
 - Let a player apply the same picks to all eligible same-season league memberships.
 - Update existing picks or create new picks idempotently by member/game.
 - Trigger picks confirmation emails after submit.
+
+Implementation gap: web and mobile forms enforce selection of every available game and a tiebreaker before submission, but the shared `submitPicks` API currently validates a nonempty set of individual picks without requiring the full available weekly slate or a tiebreaker. This is an enforcement gap, not support for a partial-week product workflow. API hardening must preserve permitted late submissions, edits to existing entries, admin corrections, and the documented per-league `saved`/`skipped` outcomes. "Whole-week submission" does not mean all-or-nothing saving across multiple leagues.
 
 Super Bowl prediction privacy is enforced in player-profile and public-board responses. Opponents reveal at the season's first scheduled kickoff (inclusive), matching the owner-edit lock, regardless of persisted league status. Without a schedule, opponents remain hidden. Owners may see their own prediction; authorized commissioner review is a separate access path. Hidden profiles return an empty prediction array and an explicit hidden flag, so clients distinguish hidden from unsubmitted predictions.
 
