@@ -334,6 +334,18 @@ exports.Prisma.Postseason_team_seedsScalarFieldEnum = {
   seed: 'seed'
 };
 
+exports.Prisma.WeeklyRecapDeliveryScalarFieldEnum = {
+  id: 'id',
+  league_id: 'league_id',
+  user_id: 'user_id',
+  season: 'season',
+  week: 'week',
+  state: 'state',
+  resend_id: 'resend_id',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -445,7 +457,8 @@ exports.Prisma.ModelName = {
   superbowlsquares: 'superbowlsquares',
   teams: 'teams',
   postseason_games: 'postseason_games',
-  postseason_team_seeds: 'postseason_team_seeds'
+  postseason_team_seeds: 'postseason_team_seeds',
+  WeeklyRecapDelivery: 'WeeklyRecapDelivery'
 };
 
 /**

@@ -98,6 +98,11 @@ export type postseason_games = $Result.DefaultSelection<Prisma.$postseason_games
  * 
  */
 export type postseason_team_seeds = $Result.DefaultSelection<Prisma.$postseason_team_seedsPayload>
+/**
+ * Model WeeklyRecapDelivery
+ *
+ */
+export type WeeklyRecapDelivery = $Result.DefaultSelection<Prisma.$WeeklyRecapDeliveryPayload>
 
 /**
  * Enums
@@ -545,6 +550,16 @@ export class PrismaClient<
     * ```
     */
   get postseason_team_seeds(): Prisma.postseason_team_seedsDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.weeklyRecapDelivery`: Exposes CRUD operations for the **WeeklyRecapDelivery** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more WeeklyRecapDeliveries
+    * const weeklyRecapDeliveries = await prisma.weeklyRecapDelivery.findMany()
+    * ```
+    */
+  get weeklyRecapDelivery(): Prisma.WeeklyRecapDeliveryDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -1002,7 +1017,8 @@ export namespace Prisma {
     superbowlsquares: 'superbowlsquares',
     teams: 'teams',
     postseason_games: 'postseason_games',
-    postseason_team_seeds: 'postseason_team_seeds'
+    postseason_team_seeds: 'postseason_team_seeds',
+    WeeklyRecapDelivery: 'WeeklyRecapDelivery'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -1021,7 +1037,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "emailLogs" | "emailDeliveryEvents" | "weekWinners" | "games" | "leaguemembers" | "leaguemessages" | "league_message_read_state" | "leagues" | "league_renewal_member_roles" | "people" | "pushNotificationTokens" | "picks" | "superbowl" | "superbowlsquares" | "teams" | "postseason_games" | "postseason_team_seeds"
+      modelProps: "emailLogs" | "emailDeliveryEvents" | "weekWinners" | "games" | "leaguemembers" | "leaguemessages" | "league_message_read_state" | "leagues" | "league_renewal_member_roles" | "people" | "pushNotificationTokens" | "picks" | "superbowl" | "superbowlsquares" | "teams" | "postseason_games" | "postseason_team_seeds" | "weeklyRecapDelivery"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -2283,6 +2299,80 @@ export namespace Prisma {
           }
         }
       }
+      WeeklyRecapDelivery: {
+        payload: Prisma.$WeeklyRecapDeliveryPayload<ExtArgs>
+        fields: Prisma.WeeklyRecapDeliveryFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.WeeklyRecapDeliveryFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$WeeklyRecapDeliveryPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.WeeklyRecapDeliveryFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$WeeklyRecapDeliveryPayload>
+          }
+          findFirst: {
+            args: Prisma.WeeklyRecapDeliveryFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$WeeklyRecapDeliveryPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.WeeklyRecapDeliveryFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$WeeklyRecapDeliveryPayload>
+          }
+          findMany: {
+            args: Prisma.WeeklyRecapDeliveryFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$WeeklyRecapDeliveryPayload>[]
+          }
+          create: {
+            args: Prisma.WeeklyRecapDeliveryCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$WeeklyRecapDeliveryPayload>
+          }
+          createMany: {
+            args: Prisma.WeeklyRecapDeliveryCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.WeeklyRecapDeliveryCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$WeeklyRecapDeliveryPayload>[]
+          }
+          delete: {
+            args: Prisma.WeeklyRecapDeliveryDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$WeeklyRecapDeliveryPayload>
+          }
+          update: {
+            args: Prisma.WeeklyRecapDeliveryUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$WeeklyRecapDeliveryPayload>
+          }
+          deleteMany: {
+            args: Prisma.WeeklyRecapDeliveryDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.WeeklyRecapDeliveryUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.WeeklyRecapDeliveryUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$WeeklyRecapDeliveryPayload>[]
+          }
+          upsert: {
+            args: Prisma.WeeklyRecapDeliveryUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$WeeklyRecapDeliveryPayload>
+          }
+          aggregate: {
+            args: Prisma.WeeklyRecapDeliveryAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateWeeklyRecapDelivery>
+          }
+          groupBy: {
+            args: Prisma.WeeklyRecapDeliveryGroupByArgs<ExtArgs>
+            result: $Utils.Optional<WeeklyRecapDeliveryGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.WeeklyRecapDeliveryCountArgs<ExtArgs>
+            result: $Utils.Optional<WeeklyRecapDeliveryCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -2396,6 +2486,7 @@ export namespace Prisma {
     teams?: teamsOmit
     postseason_games?: postseason_gamesOmit
     postseason_team_seeds?: postseason_team_seedsOmit
+    weeklyRecapDelivery?: WeeklyRecapDeliveryOmit
   }
 
   /* Types for Logging */
@@ -23595,6 +23686,1108 @@ export namespace Prisma {
 
 
   /**
+   * Model WeeklyRecapDelivery
+   */
+
+  export type AggregateWeeklyRecapDelivery = {
+    _count: WeeklyRecapDeliveryCountAggregateOutputType | null
+    _avg: WeeklyRecapDeliveryAvgAggregateOutputType | null
+    _sum: WeeklyRecapDeliverySumAggregateOutputType | null
+    _min: WeeklyRecapDeliveryMinAggregateOutputType | null
+    _max: WeeklyRecapDeliveryMaxAggregateOutputType | null
+  }
+
+  export type WeeklyRecapDeliveryAvgAggregateOutputType = {
+    league_id: number | null
+    user_id: number | null
+    season: number | null
+    week: number | null
+  }
+
+  export type WeeklyRecapDeliverySumAggregateOutputType = {
+    league_id: number | null
+    user_id: number | null
+    season: number | null
+    week: number | null
+  }
+
+  export type WeeklyRecapDeliveryMinAggregateOutputType = {
+    id: string | null
+    league_id: number | null
+    user_id: number | null
+    season: number | null
+    week: number | null
+    state: string | null
+    resend_id: string | null
+    created_at: Date | null
+    updated_at: Date | null
+  }
+
+  export type WeeklyRecapDeliveryMaxAggregateOutputType = {
+    id: string | null
+    league_id: number | null
+    user_id: number | null
+    season: number | null
+    week: number | null
+    state: string | null
+    resend_id: string | null
+    created_at: Date | null
+    updated_at: Date | null
+  }
+
+  export type WeeklyRecapDeliveryCountAggregateOutputType = {
+    id: number
+    league_id: number
+    user_id: number
+    season: number
+    week: number
+    state: number
+    resend_id: number
+    created_at: number
+    updated_at: number
+    _all: number
+  }
+
+
+  export type WeeklyRecapDeliveryAvgAggregateInputType = {
+    league_id?: true
+    user_id?: true
+    season?: true
+    week?: true
+  }
+
+  export type WeeklyRecapDeliverySumAggregateInputType = {
+    league_id?: true
+    user_id?: true
+    season?: true
+    week?: true
+  }
+
+  export type WeeklyRecapDeliveryMinAggregateInputType = {
+    id?: true
+    league_id?: true
+    user_id?: true
+    season?: true
+    week?: true
+    state?: true
+    resend_id?: true
+    created_at?: true
+    updated_at?: true
+  }
+
+  export type WeeklyRecapDeliveryMaxAggregateInputType = {
+    id?: true
+    league_id?: true
+    user_id?: true
+    season?: true
+    week?: true
+    state?: true
+    resend_id?: true
+    created_at?: true
+    updated_at?: true
+  }
+
+  export type WeeklyRecapDeliveryCountAggregateInputType = {
+    id?: true
+    league_id?: true
+    user_id?: true
+    season?: true
+    week?: true
+    state?: true
+    resend_id?: true
+    created_at?: true
+    updated_at?: true
+    _all?: true
+  }
+
+  export type WeeklyRecapDeliveryAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which WeeklyRecapDelivery to aggregate.
+     */
+    where?: WeeklyRecapDeliveryWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     *
+     * Determine the order of WeeklyRecapDeliveries to fetch.
+     */
+    orderBy?: WeeklyRecapDeliveryOrderByWithRelationInput | WeeklyRecapDeliveryOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     *
+     * Sets the start position
+     */
+    cursor?: WeeklyRecapDeliveryWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Take `±n` WeeklyRecapDeliveries from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Skip the first `n` WeeklyRecapDeliveries.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     *
+     * Count returned WeeklyRecapDeliveries
+    **/
+    _count?: true | WeeklyRecapDeliveryCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     *
+     * Select which fields to average
+    **/
+    _avg?: WeeklyRecapDeliveryAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     *
+     * Select which fields to sum
+    **/
+    _sum?: WeeklyRecapDeliverySumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     *
+     * Select which fields to find the minimum value
+    **/
+    _min?: WeeklyRecapDeliveryMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     *
+     * Select which fields to find the maximum value
+    **/
+    _max?: WeeklyRecapDeliveryMaxAggregateInputType
+  }
+
+  export type GetWeeklyRecapDeliveryAggregateType<T extends WeeklyRecapDeliveryAggregateArgs> = {
+        [P in keyof T & keyof AggregateWeeklyRecapDelivery]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateWeeklyRecapDelivery[P]>
+      : GetScalarType<T[P], AggregateWeeklyRecapDelivery[P]>
+  }
+
+
+
+
+  export type WeeklyRecapDeliveryGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: WeeklyRecapDeliveryWhereInput
+    orderBy?: WeeklyRecapDeliveryOrderByWithAggregationInput | WeeklyRecapDeliveryOrderByWithAggregationInput[]
+    by: WeeklyRecapDeliveryScalarFieldEnum[] | WeeklyRecapDeliveryScalarFieldEnum
+    having?: WeeklyRecapDeliveryScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: WeeklyRecapDeliveryCountAggregateInputType | true
+    _avg?: WeeklyRecapDeliveryAvgAggregateInputType
+    _sum?: WeeklyRecapDeliverySumAggregateInputType
+    _min?: WeeklyRecapDeliveryMinAggregateInputType
+    _max?: WeeklyRecapDeliveryMaxAggregateInputType
+  }
+
+  export type WeeklyRecapDeliveryGroupByOutputType = {
+    id: string
+    league_id: number
+    user_id: number
+    season: number
+    week: number
+    state: string
+    resend_id: string | null
+    created_at: Date
+    updated_at: Date
+    _count: WeeklyRecapDeliveryCountAggregateOutputType | null
+    _avg: WeeklyRecapDeliveryAvgAggregateOutputType | null
+    _sum: WeeklyRecapDeliverySumAggregateOutputType | null
+    _min: WeeklyRecapDeliveryMinAggregateOutputType | null
+    _max: WeeklyRecapDeliveryMaxAggregateOutputType | null
+  }
+
+  type GetWeeklyRecapDeliveryGroupByPayload<T extends WeeklyRecapDeliveryGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<WeeklyRecapDeliveryGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof WeeklyRecapDeliveryGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], WeeklyRecapDeliveryGroupByOutputType[P]>
+            : GetScalarType<T[P], WeeklyRecapDeliveryGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type WeeklyRecapDeliverySelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    league_id?: boolean
+    user_id?: boolean
+    season?: boolean
+    week?: boolean
+    state?: boolean
+    resend_id?: boolean
+    created_at?: boolean
+    updated_at?: boolean
+  }, ExtArgs["result"]["weeklyRecapDelivery"]>
+
+  export type WeeklyRecapDeliverySelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    league_id?: boolean
+    user_id?: boolean
+    season?: boolean
+    week?: boolean
+    state?: boolean
+    resend_id?: boolean
+    created_at?: boolean
+    updated_at?: boolean
+  }, ExtArgs["result"]["weeklyRecapDelivery"]>
+
+  export type WeeklyRecapDeliverySelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    league_id?: boolean
+    user_id?: boolean
+    season?: boolean
+    week?: boolean
+    state?: boolean
+    resend_id?: boolean
+    created_at?: boolean
+    updated_at?: boolean
+  }, ExtArgs["result"]["weeklyRecapDelivery"]>
+
+  export type WeeklyRecapDeliverySelectScalar = {
+    id?: boolean
+    league_id?: boolean
+    user_id?: boolean
+    season?: boolean
+    week?: boolean
+    state?: boolean
+    resend_id?: boolean
+    created_at?: boolean
+    updated_at?: boolean
+  }
+
+  export type WeeklyRecapDeliveryOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "league_id" | "user_id" | "season" | "week" | "state" | "resend_id" | "created_at" | "updated_at", ExtArgs["result"]["weeklyRecapDelivery"]>
+
+  export type $WeeklyRecapDeliveryPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "WeeklyRecapDelivery"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      league_id: number
+      user_id: number
+      season: number
+      week: number
+      state: string
+      resend_id: string | null
+      created_at: Date
+      updated_at: Date
+    }, ExtArgs["result"]["weeklyRecapDelivery"]>
+    composites: {}
+  }
+
+  type WeeklyRecapDeliveryGetPayload<S extends boolean | null | undefined | WeeklyRecapDeliveryDefaultArgs> = $Result.GetResult<Prisma.$WeeklyRecapDeliveryPayload, S>
+
+  type WeeklyRecapDeliveryCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<WeeklyRecapDeliveryFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
+      select?: WeeklyRecapDeliveryCountAggregateInputType | true
+    }
+
+  export interface WeeklyRecapDeliveryDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['WeeklyRecapDelivery'], meta: { name: 'WeeklyRecapDelivery' } }
+    /**
+     * Find zero or one WeeklyRecapDelivery that matches the filter.
+     * @param {WeeklyRecapDeliveryFindUniqueArgs} args - Arguments to find a WeeklyRecapDelivery
+     * @example
+     * // Get one WeeklyRecapDelivery
+     * const weeklyRecapDelivery = await prisma.weeklyRecapDelivery.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends WeeklyRecapDeliveryFindUniqueArgs>(args: SelectSubset<T, WeeklyRecapDeliveryFindUniqueArgs<ExtArgs>>): Prisma__WeeklyRecapDeliveryClient<$Result.GetResult<Prisma.$WeeklyRecapDeliveryPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one WeeklyRecapDelivery that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {WeeklyRecapDeliveryFindUniqueOrThrowArgs} args - Arguments to find a WeeklyRecapDelivery
+     * @example
+     * // Get one WeeklyRecapDelivery
+     * const weeklyRecapDelivery = await prisma.weeklyRecapDelivery.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends WeeklyRecapDeliveryFindUniqueOrThrowArgs>(args: SelectSubset<T, WeeklyRecapDeliveryFindUniqueOrThrowArgs<ExtArgs>>): Prisma__WeeklyRecapDeliveryClient<$Result.GetResult<Prisma.$WeeklyRecapDeliveryPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first WeeklyRecapDelivery that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {WeeklyRecapDeliveryFindFirstArgs} args - Arguments to find a WeeklyRecapDelivery
+     * @example
+     * // Get one WeeklyRecapDelivery
+     * const weeklyRecapDelivery = await prisma.weeklyRecapDelivery.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends WeeklyRecapDeliveryFindFirstArgs>(args?: SelectSubset<T, WeeklyRecapDeliveryFindFirstArgs<ExtArgs>>): Prisma__WeeklyRecapDeliveryClient<$Result.GetResult<Prisma.$WeeklyRecapDeliveryPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first WeeklyRecapDelivery that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {WeeklyRecapDeliveryFindFirstOrThrowArgs} args - Arguments to find a WeeklyRecapDelivery
+     * @example
+     * // Get one WeeklyRecapDelivery
+     * const weeklyRecapDelivery = await prisma.weeklyRecapDelivery.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends WeeklyRecapDeliveryFindFirstOrThrowArgs>(args?: SelectSubset<T, WeeklyRecapDeliveryFindFirstOrThrowArgs<ExtArgs>>): Prisma__WeeklyRecapDeliveryClient<$Result.GetResult<Prisma.$WeeklyRecapDeliveryPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more WeeklyRecapDeliveries that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {WeeklyRecapDeliveryFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all WeeklyRecapDeliveries
+     * const weeklyRecapDeliveries = await prisma.weeklyRecapDelivery.findMany()
+     *
+     * // Get first 10 WeeklyRecapDeliveries
+     * const weeklyRecapDeliveries = await prisma.weeklyRecapDelivery.findMany({ take: 10 })
+     *
+     * // Only select the `id`
+     * const weeklyRecapDeliveryWithIdOnly = await prisma.weeklyRecapDelivery.findMany({ select: { id: true } })
+     *
+     */
+    findMany<T extends WeeklyRecapDeliveryFindManyArgs>(args?: SelectSubset<T, WeeklyRecapDeliveryFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$WeeklyRecapDeliveryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a WeeklyRecapDelivery.
+     * @param {WeeklyRecapDeliveryCreateArgs} args - Arguments to create a WeeklyRecapDelivery.
+     * @example
+     * // Create one WeeklyRecapDelivery
+     * const WeeklyRecapDelivery = await prisma.weeklyRecapDelivery.create({
+     *   data: {
+     *     // ... data to create a WeeklyRecapDelivery
+     *   }
+     * })
+     *
+     */
+    create<T extends WeeklyRecapDeliveryCreateArgs>(args: SelectSubset<T, WeeklyRecapDeliveryCreateArgs<ExtArgs>>): Prisma__WeeklyRecapDeliveryClient<$Result.GetResult<Prisma.$WeeklyRecapDeliveryPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many WeeklyRecapDeliveries.
+     * @param {WeeklyRecapDeliveryCreateManyArgs} args - Arguments to create many WeeklyRecapDeliveries.
+     * @example
+     * // Create many WeeklyRecapDeliveries
+     * const weeklyRecapDelivery = await prisma.weeklyRecapDelivery.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *
+     */
+    createMany<T extends WeeklyRecapDeliveryCreateManyArgs>(args?: SelectSubset<T, WeeklyRecapDeliveryCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many WeeklyRecapDeliveries and returns the data saved in the database.
+     * @param {WeeklyRecapDeliveryCreateManyAndReturnArgs} args - Arguments to create many WeeklyRecapDeliveries.
+     * @example
+     * // Create many WeeklyRecapDeliveries
+     * const weeklyRecapDelivery = await prisma.weeklyRecapDelivery.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *
+     * // Create many WeeklyRecapDeliveries and only return the `id`
+     * const weeklyRecapDeliveryWithIdOnly = await prisma.weeklyRecapDelivery.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     *
+     */
+    createManyAndReturn<T extends WeeklyRecapDeliveryCreateManyAndReturnArgs>(args?: SelectSubset<T, WeeklyRecapDeliveryCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$WeeklyRecapDeliveryPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a WeeklyRecapDelivery.
+     * @param {WeeklyRecapDeliveryDeleteArgs} args - Arguments to delete one WeeklyRecapDelivery.
+     * @example
+     * // Delete one WeeklyRecapDelivery
+     * const WeeklyRecapDelivery = await prisma.weeklyRecapDelivery.delete({
+     *   where: {
+     *     // ... filter to delete one WeeklyRecapDelivery
+     *   }
+     * })
+     *
+     */
+    delete<T extends WeeklyRecapDeliveryDeleteArgs>(args: SelectSubset<T, WeeklyRecapDeliveryDeleteArgs<ExtArgs>>): Prisma__WeeklyRecapDeliveryClient<$Result.GetResult<Prisma.$WeeklyRecapDeliveryPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one WeeklyRecapDelivery.
+     * @param {WeeklyRecapDeliveryUpdateArgs} args - Arguments to update one WeeklyRecapDelivery.
+     * @example
+     * // Update one WeeklyRecapDelivery
+     * const weeklyRecapDelivery = await prisma.weeklyRecapDelivery.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     *
+     */
+    update<T extends WeeklyRecapDeliveryUpdateArgs>(args: SelectSubset<T, WeeklyRecapDeliveryUpdateArgs<ExtArgs>>): Prisma__WeeklyRecapDeliveryClient<$Result.GetResult<Prisma.$WeeklyRecapDeliveryPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more WeeklyRecapDeliveries.
+     * @param {WeeklyRecapDeliveryDeleteManyArgs} args - Arguments to filter WeeklyRecapDeliveries to delete.
+     * @example
+     * // Delete a few WeeklyRecapDeliveries
+     * const { count } = await prisma.weeklyRecapDelivery.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     *
+     */
+    deleteMany<T extends WeeklyRecapDeliveryDeleteManyArgs>(args?: SelectSubset<T, WeeklyRecapDeliveryDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more WeeklyRecapDeliveries.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {WeeklyRecapDeliveryUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many WeeklyRecapDeliveries
+     * const weeklyRecapDelivery = await prisma.weeklyRecapDelivery.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     *
+     */
+    updateMany<T extends WeeklyRecapDeliveryUpdateManyArgs>(args: SelectSubset<T, WeeklyRecapDeliveryUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more WeeklyRecapDeliveries and returns the data updated in the database.
+     * @param {WeeklyRecapDeliveryUpdateManyAndReturnArgs} args - Arguments to update many WeeklyRecapDeliveries.
+     * @example
+     * // Update many WeeklyRecapDeliveries
+     * const weeklyRecapDelivery = await prisma.weeklyRecapDelivery.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *
+     * // Update zero or more WeeklyRecapDeliveries and only return the `id`
+     * const weeklyRecapDeliveryWithIdOnly = await prisma.weeklyRecapDelivery.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     *
+     */
+    updateManyAndReturn<T extends WeeklyRecapDeliveryUpdateManyAndReturnArgs>(args: SelectSubset<T, WeeklyRecapDeliveryUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$WeeklyRecapDeliveryPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one WeeklyRecapDelivery.
+     * @param {WeeklyRecapDeliveryUpsertArgs} args - Arguments to update or create a WeeklyRecapDelivery.
+     * @example
+     * // Update or create a WeeklyRecapDelivery
+     * const weeklyRecapDelivery = await prisma.weeklyRecapDelivery.upsert({
+     *   create: {
+     *     // ... data to create a WeeklyRecapDelivery
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the WeeklyRecapDelivery we want to update
+     *   }
+     * })
+     */
+    upsert<T extends WeeklyRecapDeliveryUpsertArgs>(args: SelectSubset<T, WeeklyRecapDeliveryUpsertArgs<ExtArgs>>): Prisma__WeeklyRecapDeliveryClient<$Result.GetResult<Prisma.$WeeklyRecapDeliveryPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of WeeklyRecapDeliveries.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {WeeklyRecapDeliveryCountArgs} args - Arguments to filter WeeklyRecapDeliveries to count.
+     * @example
+     * // Count the number of WeeklyRecapDeliveries
+     * const count = await prisma.weeklyRecapDelivery.count({
+     *   where: {
+     *     // ... the filter for the WeeklyRecapDeliveries we want to count
+     *   }
+     * })
+    **/
+    count<T extends WeeklyRecapDeliveryCountArgs>(
+      args?: Subset<T, WeeklyRecapDeliveryCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], WeeklyRecapDeliveryCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a WeeklyRecapDelivery.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {WeeklyRecapDeliveryAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends WeeklyRecapDeliveryAggregateArgs>(args: Subset<T, WeeklyRecapDeliveryAggregateArgs>): Prisma.PrismaPromise<GetWeeklyRecapDeliveryAggregateType<T>>
+
+    /**
+     * Group by WeeklyRecapDelivery.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {WeeklyRecapDeliveryGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     *
+    **/
+    groupBy<
+      T extends WeeklyRecapDeliveryGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: WeeklyRecapDeliveryGroupByArgs['orderBy'] }
+        : { orderBy?: WeeklyRecapDeliveryGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, WeeklyRecapDeliveryGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetWeeklyRecapDeliveryGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the WeeklyRecapDelivery model
+   */
+  readonly fields: WeeklyRecapDeliveryFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for WeeklyRecapDelivery.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__WeeklyRecapDeliveryClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the WeeklyRecapDelivery model
+   */
+  interface WeeklyRecapDeliveryFieldRefs {
+    readonly id: FieldRef<"WeeklyRecapDelivery", 'String'>
+    readonly league_id: FieldRef<"WeeklyRecapDelivery", 'Int'>
+    readonly user_id: FieldRef<"WeeklyRecapDelivery", 'Int'>
+    readonly season: FieldRef<"WeeklyRecapDelivery", 'Int'>
+    readonly week: FieldRef<"WeeklyRecapDelivery", 'Int'>
+    readonly state: FieldRef<"WeeklyRecapDelivery", 'String'>
+    readonly resend_id: FieldRef<"WeeklyRecapDelivery", 'String'>
+    readonly created_at: FieldRef<"WeeklyRecapDelivery", 'DateTime'>
+    readonly updated_at: FieldRef<"WeeklyRecapDelivery", 'DateTime'>
+  }
+
+
+  // Custom InputTypes
+  /**
+   * WeeklyRecapDelivery findUnique
+   */
+  export type WeeklyRecapDeliveryFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the WeeklyRecapDelivery
+     */
+    select?: WeeklyRecapDeliverySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the WeeklyRecapDelivery
+     */
+    omit?: WeeklyRecapDeliveryOmit<ExtArgs> | null
+    /**
+     * Filter, which WeeklyRecapDelivery to fetch.
+     */
+    where: WeeklyRecapDeliveryWhereUniqueInput
+    relationLoadStrategy?: RelationLoadStrategy
+  }
+
+  /**
+   * WeeklyRecapDelivery findUniqueOrThrow
+   */
+  export type WeeklyRecapDeliveryFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the WeeklyRecapDelivery
+     */
+    select?: WeeklyRecapDeliverySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the WeeklyRecapDelivery
+     */
+    omit?: WeeklyRecapDeliveryOmit<ExtArgs> | null
+    /**
+     * Filter, which WeeklyRecapDelivery to fetch.
+     */
+    where: WeeklyRecapDeliveryWhereUniqueInput
+    relationLoadStrategy?: RelationLoadStrategy
+  }
+
+  /**
+   * WeeklyRecapDelivery findFirst
+   */
+  export type WeeklyRecapDeliveryFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the WeeklyRecapDelivery
+     */
+    select?: WeeklyRecapDeliverySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the WeeklyRecapDelivery
+     */
+    omit?: WeeklyRecapDeliveryOmit<ExtArgs> | null
+    /**
+     * Filter, which WeeklyRecapDelivery to fetch.
+     */
+    where?: WeeklyRecapDeliveryWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     *
+     * Determine the order of WeeklyRecapDeliveries to fetch.
+     */
+    orderBy?: WeeklyRecapDeliveryOrderByWithRelationInput | WeeklyRecapDeliveryOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     *
+     * Sets the position for searching for WeeklyRecapDeliveries.
+     */
+    cursor?: WeeklyRecapDeliveryWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Take `±n` WeeklyRecapDeliveries from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Skip the first `n` WeeklyRecapDeliveries.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     *
+     * Filter by unique combinations of WeeklyRecapDeliveries.
+     */
+    distinct?: WeeklyRecapDeliveryScalarFieldEnum | WeeklyRecapDeliveryScalarFieldEnum[]
+    relationLoadStrategy?: RelationLoadStrategy
+  }
+
+  /**
+   * WeeklyRecapDelivery findFirstOrThrow
+   */
+  export type WeeklyRecapDeliveryFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the WeeklyRecapDelivery
+     */
+    select?: WeeklyRecapDeliverySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the WeeklyRecapDelivery
+     */
+    omit?: WeeklyRecapDeliveryOmit<ExtArgs> | null
+    /**
+     * Filter, which WeeklyRecapDelivery to fetch.
+     */
+    where?: WeeklyRecapDeliveryWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     *
+     * Determine the order of WeeklyRecapDeliveries to fetch.
+     */
+    orderBy?: WeeklyRecapDeliveryOrderByWithRelationInput | WeeklyRecapDeliveryOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     *
+     * Sets the position for searching for WeeklyRecapDeliveries.
+     */
+    cursor?: WeeklyRecapDeliveryWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Take `±n` WeeklyRecapDeliveries from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Skip the first `n` WeeklyRecapDeliveries.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     *
+     * Filter by unique combinations of WeeklyRecapDeliveries.
+     */
+    distinct?: WeeklyRecapDeliveryScalarFieldEnum | WeeklyRecapDeliveryScalarFieldEnum[]
+    relationLoadStrategy?: RelationLoadStrategy
+  }
+
+  /**
+   * WeeklyRecapDelivery findMany
+   */
+  export type WeeklyRecapDeliveryFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the WeeklyRecapDelivery
+     */
+    select?: WeeklyRecapDeliverySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the WeeklyRecapDelivery
+     */
+    omit?: WeeklyRecapDeliveryOmit<ExtArgs> | null
+    /**
+     * Filter, which WeeklyRecapDeliveries to fetch.
+     */
+    where?: WeeklyRecapDeliveryWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     *
+     * Determine the order of WeeklyRecapDeliveries to fetch.
+     */
+    orderBy?: WeeklyRecapDeliveryOrderByWithRelationInput | WeeklyRecapDeliveryOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     *
+     * Sets the position for listing WeeklyRecapDeliveries.
+     */
+    cursor?: WeeklyRecapDeliveryWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Take `±n` WeeklyRecapDeliveries from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Skip the first `n` WeeklyRecapDeliveries.
+     */
+    skip?: number
+    distinct?: WeeklyRecapDeliveryScalarFieldEnum | WeeklyRecapDeliveryScalarFieldEnum[]
+    relationLoadStrategy?: RelationLoadStrategy
+  }
+
+  /**
+   * WeeklyRecapDelivery create
+   */
+  export type WeeklyRecapDeliveryCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the WeeklyRecapDelivery
+     */
+    select?: WeeklyRecapDeliverySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the WeeklyRecapDelivery
+     */
+    omit?: WeeklyRecapDeliveryOmit<ExtArgs> | null
+    /**
+     * The data needed to create a WeeklyRecapDelivery.
+     */
+    data: XOR<WeeklyRecapDeliveryCreateInput, WeeklyRecapDeliveryUncheckedCreateInput>
+    relationLoadStrategy?: RelationLoadStrategy
+  }
+
+  /**
+   * WeeklyRecapDelivery createMany
+   */
+  export type WeeklyRecapDeliveryCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many WeeklyRecapDeliveries.
+     */
+    data: WeeklyRecapDeliveryCreateManyInput | WeeklyRecapDeliveryCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * WeeklyRecapDelivery createManyAndReturn
+   */
+  export type WeeklyRecapDeliveryCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the WeeklyRecapDelivery
+     */
+    select?: WeeklyRecapDeliverySelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the WeeklyRecapDelivery
+     */
+    omit?: WeeklyRecapDeliveryOmit<ExtArgs> | null
+    /**
+     * The data used to create many WeeklyRecapDeliveries.
+     */
+    data: WeeklyRecapDeliveryCreateManyInput | WeeklyRecapDeliveryCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * WeeklyRecapDelivery update
+   */
+  export type WeeklyRecapDeliveryUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the WeeklyRecapDelivery
+     */
+    select?: WeeklyRecapDeliverySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the WeeklyRecapDelivery
+     */
+    omit?: WeeklyRecapDeliveryOmit<ExtArgs> | null
+    /**
+     * The data needed to update a WeeklyRecapDelivery.
+     */
+    data: XOR<WeeklyRecapDeliveryUpdateInput, WeeklyRecapDeliveryUncheckedUpdateInput>
+    /**
+     * Choose, which WeeklyRecapDelivery to update.
+     */
+    where: WeeklyRecapDeliveryWhereUniqueInput
+    relationLoadStrategy?: RelationLoadStrategy
+  }
+
+  /**
+   * WeeklyRecapDelivery updateMany
+   */
+  export type WeeklyRecapDeliveryUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update WeeklyRecapDeliveries.
+     */
+    data: XOR<WeeklyRecapDeliveryUpdateManyMutationInput, WeeklyRecapDeliveryUncheckedUpdateManyInput>
+    /**
+     * Filter which WeeklyRecapDeliveries to update
+     */
+    where?: WeeklyRecapDeliveryWhereInput
+    /**
+     * Limit how many WeeklyRecapDeliveries to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * WeeklyRecapDelivery updateManyAndReturn
+   */
+  export type WeeklyRecapDeliveryUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the WeeklyRecapDelivery
+     */
+    select?: WeeklyRecapDeliverySelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the WeeklyRecapDelivery
+     */
+    omit?: WeeklyRecapDeliveryOmit<ExtArgs> | null
+    /**
+     * The data used to update WeeklyRecapDeliveries.
+     */
+    data: XOR<WeeklyRecapDeliveryUpdateManyMutationInput, WeeklyRecapDeliveryUncheckedUpdateManyInput>
+    /**
+     * Filter which WeeklyRecapDeliveries to update
+     */
+    where?: WeeklyRecapDeliveryWhereInput
+    /**
+     * Limit how many WeeklyRecapDeliveries to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * WeeklyRecapDelivery upsert
+   */
+  export type WeeklyRecapDeliveryUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the WeeklyRecapDelivery
+     */
+    select?: WeeklyRecapDeliverySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the WeeklyRecapDelivery
+     */
+    omit?: WeeklyRecapDeliveryOmit<ExtArgs> | null
+    /**
+     * The filter to search for the WeeklyRecapDelivery to update in case it exists.
+     */
+    where: WeeklyRecapDeliveryWhereUniqueInput
+    /**
+     * In case the WeeklyRecapDelivery found by the `where` argument doesn't exist, create a new WeeklyRecapDelivery with this data.
+     */
+    create: XOR<WeeklyRecapDeliveryCreateInput, WeeklyRecapDeliveryUncheckedCreateInput>
+    /**
+     * In case the WeeklyRecapDelivery was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<WeeklyRecapDeliveryUpdateInput, WeeklyRecapDeliveryUncheckedUpdateInput>
+    relationLoadStrategy?: RelationLoadStrategy
+  }
+
+  /**
+   * WeeklyRecapDelivery delete
+   */
+  export type WeeklyRecapDeliveryDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the WeeklyRecapDelivery
+     */
+    select?: WeeklyRecapDeliverySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the WeeklyRecapDelivery
+     */
+    omit?: WeeklyRecapDeliveryOmit<ExtArgs> | null
+    /**
+     * Filter which WeeklyRecapDelivery to delete.
+     */
+    where: WeeklyRecapDeliveryWhereUniqueInput
+    relationLoadStrategy?: RelationLoadStrategy
+  }
+
+  /**
+   * WeeklyRecapDelivery deleteMany
+   */
+  export type WeeklyRecapDeliveryDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which WeeklyRecapDeliveries to delete
+     */
+    where?: WeeklyRecapDeliveryWhereInput
+    /**
+     * Limit how many WeeklyRecapDeliveries to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * WeeklyRecapDelivery without action
+   */
+  export type WeeklyRecapDeliveryDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the WeeklyRecapDelivery
+     */
+    select?: WeeklyRecapDeliverySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the WeeklyRecapDelivery
+     */
+    omit?: WeeklyRecapDeliveryOmit<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -23873,6 +25066,21 @@ export namespace Prisma {
   };
 
   export type Postseason_team_seedsScalarFieldEnum = (typeof Postseason_team_seedsScalarFieldEnum)[keyof typeof Postseason_team_seedsScalarFieldEnum]
+
+
+  export const WeeklyRecapDeliveryScalarFieldEnum: {
+    id: 'id',
+    league_id: 'league_id',
+    user_id: 'user_id',
+    season: 'season',
+    week: 'week',
+    state: 'state',
+    resend_id: 'resend_id',
+    created_at: 'created_at',
+    updated_at: 'updated_at'
+  };
+
+  export type WeeklyRecapDeliveryScalarFieldEnum = (typeof WeeklyRecapDeliveryScalarFieldEnum)[keyof typeof WeeklyRecapDeliveryScalarFieldEnum]
 
 
   export const SortOrder: {
@@ -25614,6 +26822,81 @@ export namespace Prisma {
     seed?: IntWithAggregatesFilter<"postseason_team_seeds"> | number
   }
 
+  export type WeeklyRecapDeliveryWhereInput = {
+    AND?: WeeklyRecapDeliveryWhereInput | WeeklyRecapDeliveryWhereInput[]
+    OR?: WeeklyRecapDeliveryWhereInput[]
+    NOT?: WeeklyRecapDeliveryWhereInput | WeeklyRecapDeliveryWhereInput[]
+    id?: StringFilter<"WeeklyRecapDelivery"> | string
+    league_id?: IntFilter<"WeeklyRecapDelivery"> | number
+    user_id?: IntFilter<"WeeklyRecapDelivery"> | number
+    season?: IntFilter<"WeeklyRecapDelivery"> | number
+    week?: IntFilter<"WeeklyRecapDelivery"> | number
+    state?: StringFilter<"WeeklyRecapDelivery"> | string
+    resend_id?: StringNullableFilter<"WeeklyRecapDelivery"> | string | null
+    created_at?: DateTimeFilter<"WeeklyRecapDelivery"> | Date | string
+    updated_at?: DateTimeFilter<"WeeklyRecapDelivery"> | Date | string
+  }
+
+  export type WeeklyRecapDeliveryOrderByWithRelationInput = {
+    id?: SortOrder
+    league_id?: SortOrder
+    user_id?: SortOrder
+    season?: SortOrder
+    week?: SortOrder
+    state?: SortOrder
+    resend_id?: SortOrderInput | SortOrder
+    created_at?: SortOrder
+    updated_at?: SortOrder
+  }
+
+  export type WeeklyRecapDeliveryWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    league_id_user_id_season_week?: WeeklyRecapDeliveryLeague_idUser_idSeasonWeekCompoundUniqueInput
+    AND?: WeeklyRecapDeliveryWhereInput | WeeklyRecapDeliveryWhereInput[]
+    OR?: WeeklyRecapDeliveryWhereInput[]
+    NOT?: WeeklyRecapDeliveryWhereInput | WeeklyRecapDeliveryWhereInput[]
+    league_id?: IntFilter<"WeeklyRecapDelivery"> | number
+    user_id?: IntFilter<"WeeklyRecapDelivery"> | number
+    season?: IntFilter<"WeeklyRecapDelivery"> | number
+    week?: IntFilter<"WeeklyRecapDelivery"> | number
+    state?: StringFilter<"WeeklyRecapDelivery"> | string
+    resend_id?: StringNullableFilter<"WeeklyRecapDelivery"> | string | null
+    created_at?: DateTimeFilter<"WeeklyRecapDelivery"> | Date | string
+    updated_at?: DateTimeFilter<"WeeklyRecapDelivery"> | Date | string
+  }, "id" | "league_id_user_id_season_week">
+
+  export type WeeklyRecapDeliveryOrderByWithAggregationInput = {
+    id?: SortOrder
+    league_id?: SortOrder
+    user_id?: SortOrder
+    season?: SortOrder
+    week?: SortOrder
+    state?: SortOrder
+    resend_id?: SortOrderInput | SortOrder
+    created_at?: SortOrder
+    updated_at?: SortOrder
+    _count?: WeeklyRecapDeliveryCountOrderByAggregateInput
+    _avg?: WeeklyRecapDeliveryAvgOrderByAggregateInput
+    _max?: WeeklyRecapDeliveryMaxOrderByAggregateInput
+    _min?: WeeklyRecapDeliveryMinOrderByAggregateInput
+    _sum?: WeeklyRecapDeliverySumOrderByAggregateInput
+  }
+
+  export type WeeklyRecapDeliveryScalarWhereWithAggregatesInput = {
+    AND?: WeeklyRecapDeliveryScalarWhereWithAggregatesInput | WeeklyRecapDeliveryScalarWhereWithAggregatesInput[]
+    OR?: WeeklyRecapDeliveryScalarWhereWithAggregatesInput[]
+    NOT?: WeeklyRecapDeliveryScalarWhereWithAggregatesInput | WeeklyRecapDeliveryScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"WeeklyRecapDelivery"> | string
+    league_id?: IntWithAggregatesFilter<"WeeklyRecapDelivery"> | number
+    user_id?: IntWithAggregatesFilter<"WeeklyRecapDelivery"> | number
+    season?: IntWithAggregatesFilter<"WeeklyRecapDelivery"> | number
+    week?: IntWithAggregatesFilter<"WeeklyRecapDelivery"> | number
+    state?: StringWithAggregatesFilter<"WeeklyRecapDelivery"> | string
+    resend_id?: StringNullableWithAggregatesFilter<"WeeklyRecapDelivery"> | string | null
+    created_at?: DateTimeWithAggregatesFilter<"WeeklyRecapDelivery"> | Date | string
+    updated_at?: DateTimeWithAggregatesFilter<"WeeklyRecapDelivery"> | Date | string
+  }
+
   export type EmailLogsCreateInput = {
     email_log_id?: string
     email_type: $Enums.EmailType
@@ -27125,6 +28408,90 @@ export namespace Prisma {
     teamid?: IntFieldUpdateOperationsInput | number
     conference?: EnumConferenceFieldUpdateOperationsInput | $Enums.Conference
     seed?: IntFieldUpdateOperationsInput | number
+  }
+
+  export type WeeklyRecapDeliveryCreateInput = {
+    id?: string
+    league_id: number
+    user_id: number
+    season: number
+    week: number
+    state?: string
+    resend_id?: string | null
+    created_at?: Date | string
+    updated_at?: Date | string
+  }
+
+  export type WeeklyRecapDeliveryUncheckedCreateInput = {
+    id?: string
+    league_id: number
+    user_id: number
+    season: number
+    week: number
+    state?: string
+    resend_id?: string | null
+    created_at?: Date | string
+    updated_at?: Date | string
+  }
+
+  export type WeeklyRecapDeliveryUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    league_id?: IntFieldUpdateOperationsInput | number
+    user_id?: IntFieldUpdateOperationsInput | number
+    season?: IntFieldUpdateOperationsInput | number
+    week?: IntFieldUpdateOperationsInput | number
+    state?: StringFieldUpdateOperationsInput | string
+    resend_id?: NullableStringFieldUpdateOperationsInput | string | null
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type WeeklyRecapDeliveryUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    league_id?: IntFieldUpdateOperationsInput | number
+    user_id?: IntFieldUpdateOperationsInput | number
+    season?: IntFieldUpdateOperationsInput | number
+    week?: IntFieldUpdateOperationsInput | number
+    state?: StringFieldUpdateOperationsInput | string
+    resend_id?: NullableStringFieldUpdateOperationsInput | string | null
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type WeeklyRecapDeliveryCreateManyInput = {
+    id?: string
+    league_id: number
+    user_id: number
+    season: number
+    week: number
+    state?: string
+    resend_id?: string | null
+    created_at?: Date | string
+    updated_at?: Date | string
+  }
+
+  export type WeeklyRecapDeliveryUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    league_id?: IntFieldUpdateOperationsInput | number
+    user_id?: IntFieldUpdateOperationsInput | number
+    season?: IntFieldUpdateOperationsInput | number
+    week?: IntFieldUpdateOperationsInput | number
+    state?: StringFieldUpdateOperationsInput | string
+    resend_id?: NullableStringFieldUpdateOperationsInput | string | null
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type WeeklyRecapDeliveryUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    league_id?: IntFieldUpdateOperationsInput | number
+    user_id?: IntFieldUpdateOperationsInput | number
+    season?: IntFieldUpdateOperationsInput | number
+    week?: IntFieldUpdateOperationsInput | number
+    state?: StringFieldUpdateOperationsInput | string
+    resend_id?: NullableStringFieldUpdateOperationsInput | string | null
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type StringFilter<$PrismaModel = never> = {
@@ -28657,6 +30024,63 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumConferenceFilter<$PrismaModel>
     _max?: NestedEnumConferenceFilter<$PrismaModel>
+  }
+
+  export type WeeklyRecapDeliveryLeague_idUser_idSeasonWeekCompoundUniqueInput = {
+    league_id: number
+    user_id: number
+    season: number
+    week: number
+  }
+
+  export type WeeklyRecapDeliveryCountOrderByAggregateInput = {
+    id?: SortOrder
+    league_id?: SortOrder
+    user_id?: SortOrder
+    season?: SortOrder
+    week?: SortOrder
+    state?: SortOrder
+    resend_id?: SortOrder
+    created_at?: SortOrder
+    updated_at?: SortOrder
+  }
+
+  export type WeeklyRecapDeliveryAvgOrderByAggregateInput = {
+    league_id?: SortOrder
+    user_id?: SortOrder
+    season?: SortOrder
+    week?: SortOrder
+  }
+
+  export type WeeklyRecapDeliveryMaxOrderByAggregateInput = {
+    id?: SortOrder
+    league_id?: SortOrder
+    user_id?: SortOrder
+    season?: SortOrder
+    week?: SortOrder
+    state?: SortOrder
+    resend_id?: SortOrder
+    created_at?: SortOrder
+    updated_at?: SortOrder
+  }
+
+  export type WeeklyRecapDeliveryMinOrderByAggregateInput = {
+    id?: SortOrder
+    league_id?: SortOrder
+    user_id?: SortOrder
+    season?: SortOrder
+    week?: SortOrder
+    state?: SortOrder
+    resend_id?: SortOrder
+    created_at?: SortOrder
+    updated_at?: SortOrder
+  }
+
+  export type WeeklyRecapDeliverySumOrderByAggregateInput = {
+    league_id?: SortOrder
+    user_id?: SortOrder
+    season?: SortOrder
+    week?: SortOrder
   }
 
   export type leaguesCreateNestedOneWithoutEmailLogsInput = {

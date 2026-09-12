@@ -4,6 +4,7 @@ import { formatInTimeZone, fromZonedTime } from "date-fns-tz";
 
 type Member = {
   membership_id: number;
+  user_id: number;
   people: { username: string; email: string };
 };
 type Pick = {
@@ -222,6 +223,7 @@ export function buildWeekSummary({
     nextWeek,
     recipients: standings.map((s) => ({
       memberId: s.member.membership_id,
+      userId: s.member.user_id,
       email: s.member.people.email,
       username: s.member.people.username,
       rank: s.rank,

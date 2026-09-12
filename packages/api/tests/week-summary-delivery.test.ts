@@ -18,7 +18,26 @@ mock.module("resend", () => ({
     emails = { send };
   },
 }));
-mock.module("../server/db", () => ({ db: { emailLogs: { create } } }));
+const claims = new Map<string, { state: string; resend_id?: string }>();
+const key = (value: any) =>
+  JSON.stringify([value.league_id, value.user_id, value.season, value.week]);
+const weeklyRecapDelivery = {
+  createMany: async ({ data }: any) => {
+    const id = key(data);
+    if (claims.has(id)) return { count: 0 };
+    claims.set(id, { state: data.state });
+    return { count: 1 };
+  },
+  updateMany: async ({ where, data }: any) => {
+    const row = claims.get(key(where));
+    if (!row || (where.state && row.state !== where.state)) return { count: 0 };
+    Object.assign(row, data);
+    return { count: 1 };
+  },
+};
+mock.module("../server/db", () => ({
+  db: { emailLogs: { create }, weeklyRecapDelivery },
+}));
 mock.module("../server/services/resend/webhooks", () => ({
   reconcileEmailDeliveryState: reconcile,
 }));
@@ -32,10 +51,12 @@ function payload() {
       members: [
         {
           membership_id: 1,
+          user_id: 1,
           people: { username: "Alex", email: "alex@example.com" },
         },
         {
           membership_id: 2,
+          user_id: 2,
           people: { username: "Brian", email: "brian@example.com" },
         },
       ],
@@ -45,12 +66,14 @@ function payload() {
       week: 4,
       nextWeek: 5,
     }),
+    season: 2026,
     leagueId: 123,
     leagueName: "Sunday Crew",
     week: 4,
   };
 }
 beforeEach(() => {
+  claims.clear();
   send.mockReset();
   create.mockReset();
   reconcile.mockClear();
@@ -83,7 +106,7 @@ test("sends separate personalized emails and records each member", async () => {
 test("provider failure is not logged as sent and does not stop other recipients", async () => {
   send.mockImplementationOnce(async () => ({
     data: null,
-    error: { message: "rate limited" },
+    error: { message: "rate limited", statusCode: 429 },
   }));
   expect(await resendApi.sendWeekSummaryEmail(payload())).toEqual({ sent: 1 });
   expect(create).toHaveBeenCalledTimes(1);
@@ -92,6 +115,10 @@ test("provider failure is not logged as sent and does not stop other recipients"
 });
 test("retry identity stays stable when results or wording change", async () => {
   const p = payload();
+  send.mockImplementation(async () => ({
+    data: null,
+    error: { statusCode: 429 },
+  }));
   await resendApi.sendWeekSummaryEmail(p);
   const keys = send.mock.calls.map((c) => c[1].idempotencyKey);
   await resendApi.sendWeekSummaryEmail({
@@ -115,4 +142,83 @@ test("no provider message ID is not counted as a successful send", async () => {
   send.mockImplementation(async () => ({ data: null, error: null }));
   expect(await resendApi.sendWeekSummaryEmail(payload())).toEqual({ sent: 0 });
   expect(create).not.toHaveBeenCalled();
+});
+
+test("overlapping cron runs send each user only once", async () => {
+  const results = await Promise.all(
+    Array.from({ length: 10 }, () => resendApi.sendWeekSummaryEmail(payload())),
+  );
+  expect(send).toHaveBeenCalledTimes(2);
+  expect(results.reduce((sum, r) => sum + r.sent, 0)).toBe(2);
+});
+test("later cron runs skip previously sent emails indefinitely", async () => {
+  await resendApi.sendWeekSummaryEmail(payload());
+  expect(await resendApi.sendWeekSummaryEmail(payload())).toEqual({ sent: 0 });
+  expect(send).toHaveBeenCalledTimes(2);
+});
+test("membership changes do not permit a second email to the same user", async () => {
+  const p = payload();
+  await resendApi.sendWeekSummaryEmail(p);
+  await resendApi.sendWeekSummaryEmail({
+    ...p,
+    recipients: p.recipients.map((r) => ({ ...r, memberId: r.memberId + 100 })),
+  });
+  expect(send).toHaveBeenCalledTimes(2);
+});
+test("one user with duplicate memberships is sent only one email", async () => {
+  const p = payload();
+  await resendApi.sendWeekSummaryEmail({
+    ...p,
+    recipients: [p.recipients[0]!, { ...p.recipients[0]!, memberId: 99 }],
+  });
+  expect(send).toHaveBeenCalledTimes(1);
+});
+test("accepted email is never resent when the email log write fails", async () => {
+  create.mockImplementation(async () => {
+    throw new Error("database unavailable");
+  });
+  await resendApi.sendWeekSummaryEmail(payload());
+  await resendApi.sendWeekSummaryEmail(payload());
+  expect(send).toHaveBeenCalledTimes(2);
+  expect([...claims.values()].every((r) => r.state === "sent")).toBe(true);
+});
+test("network timeout leaves the claim held and still processes other users", async () => {
+  send.mockImplementationOnce(async () => {
+    throw new Error("timeout after acceptance");
+  });
+  expect(await resendApi.sendWeekSummaryEmail(payload())).toEqual({ sent: 1 });
+  await resendApi.sendWeekSummaryEmail(payload());
+  expect(send).toHaveBeenCalledTimes(2);
+});
+test("ambiguous provider error never automatically resends", async () => {
+  send.mockImplementation(async () => ({
+    data: null,
+    error: { statusCode: 500 },
+  }));
+  await resendApi.sendWeekSummaryEmail(payload());
+  await resendApi.sendWeekSummaryEmail(payload());
+  expect(send).toHaveBeenCalledTimes(2);
+  expect([...claims.values()].every((r) => r.state === "uncertain")).toBe(true);
+});
+test("only one concurrent runner retries a confirmed rate limit rejection", async () => {
+  send.mockImplementation(async () => ({
+    data: null,
+    error: { statusCode: 429 },
+  }));
+  await resendApi.sendWeekSummaryEmail(payload());
+  send.mockImplementation(async () => ({
+    data: { id: "retry-success" },
+    error: null,
+  }));
+  await Promise.all(
+    Array.from({ length: 10 }, () => resendApi.sendWeekSummaryEmail(payload())),
+  );
+  expect(send).toHaveBeenCalledTimes(4);
+  expect([...claims.values()].every((r) => r.state === "sent")).toBe(true);
+});
+test("a different season can send a new recap", async () => {
+  await resendApi.sendWeekSummaryEmail(payload());
+  expect(
+    await resendApi.sendWeekSummaryEmail({ ...payload(), season: 2027 }),
+  ).toEqual({ sent: 2 });
 });

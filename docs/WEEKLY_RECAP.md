@@ -12,11 +12,15 @@ Already-completed games without a timestamp are assigned their first observation
 
 ## Delivery
 
-Existing email logs exclude members already sent a recap. Provider idempotency keys use league, member, and week rather than mutable email content, protecting overlapping requests and immediate retries. Provider acceptance is recorded in EmailLogs, with delivery events reconciled using the existing webhook flow. This is not an exactly-once guarantee if a provider accepts a message but logging fails and a retry occurs beyond the provider's idempotency retention period.
+A unique database claim on `(league_id, user_id, season, week)` is acquired **before** calling the provider. This includes user identity rather than membership identity so duplicate memberships or leaving/rejoining cannot resend the recap. Concurrent cron runs use an atomic insert; only the winner sends. Legacy email logs are backfilled into claims during migration.
+
+States are `sending`, `sent`, `retryable`, and `uncertain`. Only a confirmed HTTP 429 rejection becomes automatically retryable, using an atomic compare-and-set to ensure one retrying worker. Accepted messages become `sent` before the secondary EmailLogs write. Network timeouts, unknown provider errors, and missing message IDs are held for review. Claims never expire automatically. Provider idempotency remains an additional safeguard.
+
+This favors avoiding duplicate emails over guaranteed delivery: a crash after claiming but before sending may leave a message unsent. An operator must verify the provider outcome before manually releasing a held claim. The cron logs these errors; held claims can be inspected in WeeklyRecapDelivery. EmailLogs/webhooks continue to track accepted-message delivery.
 
 ## Rollout and verification
 
-Apply `20260911000000_track_game_completion` before deploying code that selects `games.completed_at`. Regenerate the Prisma client as usual. No additional email provider or scheduled service is required. Existing cron configuration runs often enough for the 8 a.m. window.
+Pause the old cron and let in-flight runs finish. Apply `20260911000000_track_game_completion` and `20260911010000_claim_weekly_recap_delivery`, then deploy the updated code and resume the cron. This avoids an old worker sending between legacy-log backfill and the new claim mechanism. Regenerate the Prisma client as usual. No additional email provider or scheduled service is required. Existing cron configuration runs often enough for the 8 a.m. window.
 
 Run:
 

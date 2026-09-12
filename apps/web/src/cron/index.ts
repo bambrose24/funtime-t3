@@ -528,6 +528,7 @@ export async function run() {
 
       if (WEEK_SUMMARY_EMAILS_ENABLED && recipients.length > 0) {
         const emailResult = await resendApi.sendWeekSummaryEmail({
+          season,
           leagueId: league.league_id,
           leagueName: league.name,
           week,

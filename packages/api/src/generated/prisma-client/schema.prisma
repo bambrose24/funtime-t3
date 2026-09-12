@@ -439,3 +439,18 @@ model postseason_team_seeds {
   @@index([season])
   @@index([season, conference])
 }
+
+// Durable send claim: membership deletion/rejoining must not resend the recap.
+model WeeklyRecapDelivery {
+  id         String   @id @default(cuid())
+  league_id  Int
+  user_id    Int
+  season     Int
+  week       Int
+  state      String   @default("sending")
+  resend_id  String?
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  updated_at DateTime @updatedAt @db.Timestamptz(6)
+
+  @@unique([league_id, user_id, season, week])
+}

@@ -25,6 +25,7 @@ function fixture(
   }));
   const members = scores.map(([username], i) => ({
     membership_id: i + 1,
+    user_id: i + 1,
     people: { username, email: `${i}@example.com` },
   }));
   const weekPicks = scores.flatMap(([, correct, score], i) =>
