@@ -96,8 +96,7 @@ export function HomeLeagues({
           <div className="border-y border-border py-8">
             <p className="font-medium">No leagues for this season yet.</p>
             <p className="mt-2 text-sm text-muted-foreground">
-              Create a league or join one with a friend&apos;s invite link or
-              code.
+              Join a league with a friend&apos;s invite link or code.
             </p>
           </div>
         ) : null}

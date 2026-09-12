@@ -10,6 +10,7 @@
 
 ## Web home league list — September 12, 2026
 
+- In-season follow-up: removed **Create league** from web navigation and the Home header, removed the unused navigation eligibility query, and changed the empty state to joining an existing league. Web typecheck and targeted lint pass. This removes UI shortcuts without changing creation or submission logic, so no new tests or full-suite rerun were needed.
 - Implemented the requested first pass: responsive league rows, weekly **Picks needed** / **Picks are in** status and direct actions, compact renewals, collapsed past seasons, and a code/invite-link join form. Home stays accessible with a single active league. Existing native Home remains unchanged.
 - Added `home.leagues` as a lightweight, membership-scoped batch query; retained the existing `home.summary` contract for native clients. Reused the pick editor's week-selection rule and existing cutoff helper. Valid late weekly submissions count as submitted even when already-locked games were missed.
 - Test impact: ten focused API/status cases cover submission state, week rollover, late policies, cutoff equality, no schedule, season completion and membership/query scope. A browser journey exercises Home → weekly submission → Home, collapsed history, single-league navigation and narrow-screen layout.

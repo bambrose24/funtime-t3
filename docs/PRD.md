@@ -128,6 +128,7 @@ Unless a requirement is explicitly labeled **Target** or **Planned**, it describ
 
 #### Home screen league list (Web; Target for mobile)
 
+- Web navigation and signed-in Home omit the **Create league** shortcut for the in-season experience. The empty state directs players to join an existing league.
 - Present active leagues as a clean, simple list, with each league's weekly submission status and relevant action alongside its name.
 - Identify the week the status refers to. Use **Picks are in** with **View picks** after successful weekly submission, or **Picks needed** with **Make picks** when the player has not submitted and picking is still open.
 - Do not present partial-week progress such as **4 picks left**, **12/16 picked**, or **Finish remaining picks**. Unsaved form selections are not a submitted entry or a separate home-screen task.
