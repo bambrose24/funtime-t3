@@ -8,6 +8,7 @@
   },
   "packageManager": "pnpm@9.15.0",
   "scripts": {
+    "email:test-weekly": "bun run packages/api/scripts/send-weekly-recap-preview.ts",
     "build": "turbo run db:generate && turbo run build",
     "build-web": "turbo run db:generate && turbo run build --filter=@funtime/web",
     "web-cron": "cd apps/web && bun run cron",
