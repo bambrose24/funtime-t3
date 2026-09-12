@@ -131,6 +131,33 @@ export async function run() {
   const gamesById = groupBy(games, (g) => g.gid);
 
   // ========================================
+  // Mark leagues in progress once the season kicks off
+  // ========================================
+  console.log(`${LOG_PREFIX} Checking season kickoff...`);
+
+  const firstSeasonGame = orderBy(games, ["ts", "gid"], ["asc", "asc"]).at(0);
+  const seasonHasKickedOff = Boolean(
+    firstSeasonGame && firstSeasonGame.ts <= new Date(),
+  );
+
+  if (seasonHasKickedOff) {
+    const startedLeagues = await db.leagues.updateMany({
+      where: {
+        season,
+        status: "not_started",
+      },
+      data: {
+        status: "in_progress",
+      },
+    });
+    console.log(
+      `${LOG_PREFIX} ✓ Marked ${startedLeagues.count} league(s) in progress for season ${season}`,
+    );
+  } else {
+    console.log(`${LOG_PREFIX} ✓ Season ${season} has not kicked off yet`);
+  }
+
+  // ========================================
   // Complete leagues after the season is truly over
   // ========================================
   console.log(`${LOG_PREFIX} Checking season completion...`);
