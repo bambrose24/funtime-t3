@@ -1,8 +1,6 @@
 import React, {
   useCallback,
-  useEffect,
   useMemo,
-  useRef,
   useState,
 } from "react";
 import {
@@ -16,6 +14,7 @@ import {
 import { router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
+import { useFocusEffect } from "@react-navigation/native";
 import { useColorScheme } from "@/lib/useColorScheme";
 import { clientApi } from "@/lib/trpc/react";
 import { HomeLeagueCard } from "@/components/home/HomeLeagueCard";
@@ -24,7 +23,6 @@ import { usePrefetchActiveSeasonLeagues } from "@/hooks/usePrefetchForLeague";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useDataAvailabilityTracker } from "@/hooks/useCacheDebugger";
 import { Button } from "@/components/ui/button";
-import { getSingleActiveLeague } from "@/lib/home/getSingleActiveLeague";
 import { Input } from "@/components/ui/input";
 import { filterLeaguesByQuery } from "@/lib/home/filterLeaguesByQuery";
 
@@ -32,14 +30,11 @@ export default function HomeScreen() {
   const { isDarkColorScheme } = useColorScheme();
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [showPriorLeagues, setShowPriorLeagues] = useState(false);
-  const [isAutoOpeningLeague, setIsAutoOpeningLeague] = useState(false);
   const [leagueSearchQuery, setLeagueSearchQuery] = useState("");
-  const hasAutoOpenedLeagueRef = useRef(false);
 
   // Always call; no-ops outside __DEV__.
   useDataAvailabilityTracker();
 
-  // Fetch session and home summary data
   const {
     data: session,
     isLoading: sessionLoading,
@@ -48,11 +43,16 @@ export default function HomeScreen() {
   const {
     data: homeData,
     isLoading: homeLoading,
+    isError: homeError,
+    isFetching: homeFetching,
     refetch: refetchHomeData,
-  } = clientApi.home.summary.useQuery(
-    undefined,
-    { enabled: !!session?.dbUser }, // Only fetch if user is authenticated
-  );
+  } = clientApi.home.leagues.useQuery(undefined, {
+    enabled: !!session?.dbUser,
+    staleTime: 0,
+    refetchOnMount: "always",
+    refetchOnWindowFocus: true,
+    refetchInterval: 60_000,
+  });
   const {
     data: renewalCandidatesData,
     isLoading: renewalCandidatesLoading,
@@ -76,6 +76,15 @@ export default function HomeScreen() {
     }
   }, [refetchHomeData, refetchRenewalCandidates, refetchSession]);
 
+  useFocusEffect(
+    useCallback(() => {
+      if (!session?.dbUser) {
+        return;
+      }
+      void refetchHomeData();
+    }, [refetchHomeData, session?.dbUser]),
+  );
+
   // Prefetch active season leagues for faster transitions.
   const prefetchLeagueIds = useMemo(() => {
     if (!homeData) return [];
@@ -84,38 +93,33 @@ export default function HomeScreen() {
       .map((l) => l.league_id);
   }, [homeData]);
 
-  // Always call the hook to maintain hook order, but it will handle empty arrays gracefully
   usePrefetchActiveSeasonLeagues(prefetchLeagueIds, {
     immediate: true,
     aggressive: false,
   });
 
-  // Sort all leagues by season first (descending), then by member count (descending)
-  // These must be called before any early returns to maintain hook order
-  const sortedLeagues = useMemo(() => {
-    return [...(homeData ?? [])].sort((a, b) => {
-      // First sort by season (descending - newer seasons first)
-      if (a.season !== b.season) {
-        return b.season - a.season;
-      }
-      // Then sort by member count (descending - more members first)
-      const aCount = (a as any)._count?.leaguemembers ?? 0;
-      const bCount = (b as any)._count?.leaguemembers ?? 0;
-      return bCount - aCount;
-    });
-  }, [homeData]);
+  // Preserve server ordering from home.leagues (season desc, name asc, id).
+  const leagues = homeData ?? [];
 
-  // Filter the sorted leagues by season
   const activeLeagues = useMemo(() => {
-    return sortedLeagues.filter((l) => l.season === DEFAULT_SEASON);
-  }, [sortedLeagues]);
+    return leagues.filter((l) => l.season === DEFAULT_SEASON);
+  }, [leagues]);
+
+  const upcomingLeagues = useMemo(() => {
+    return leagues.filter((l) => l.season > DEFAULT_SEASON);
+  }, [leagues]);
 
   const priorLeagues = useMemo(() => {
-    return sortedLeagues.filter((l) => l.season !== DEFAULT_SEASON);
-  }, [sortedLeagues]);
+    return leagues.filter((l) => l.season < DEFAULT_SEASON);
+  }, [leagues]);
+
   const filteredActiveLeagues = useMemo(
     () => filterLeaguesByQuery(activeLeagues, leagueSearchQuery),
     [activeLeagues, leagueSearchQuery],
+  );
+  const filteredUpcomingLeagues = useMemo(
+    () => filterLeaguesByQuery(upcomingLeagues, leagueSearchQuery),
+    [leagueSearchQuery, upcomingLeagues],
   );
   const filteredPriorLeagues = useMemo(
     () => filterLeaguesByQuery(priorLeagues, leagueSearchQuery),
@@ -126,42 +130,13 @@ export default function HomeScreen() {
       ? filteredPriorLeagues
       : filteredPriorLeagues.slice(0, 3);
   }, [filteredPriorLeagues, showPriorLeagues]);
-  const singleActiveLeague = useMemo(
-    () => getSingleActiveLeague(homeData, DEFAULT_SEASON),
-    [homeData],
+
+  const neededCount = useMemo(
+    () =>
+      activeLeagues.filter((league) => league.weeklyStatus?.state === "needed")
+        .length,
+    [activeLeagues],
   );
-
-  useEffect(() => {
-    if (hasAutoOpenedLeagueRef.current) {
-      return;
-    }
-    if (
-      sessionLoading ||
-      homeLoading ||
-      renewalCandidatesLoading ||
-      isRefreshing
-    ) {
-      return;
-    }
-    if (!session?.dbUser || !singleActiveLeague) {
-      return;
-    }
-    if (renewalCandidates.length > 0) {
-      return;
-    }
-
-    hasAutoOpenedLeagueRef.current = true;
-    setIsAutoOpeningLeague(true);
-    router.replace(`/league/${singleActiveLeague.league_id}` as any);
-  }, [
-    homeLoading,
-    isRefreshing,
-    renewalCandidates.length,
-    renewalCandidatesLoading,
-    session?.dbUser,
-    sessionLoading,
-    singleActiveLeague,
-  ]);
 
   // Show loading while fetching session
   if (sessionLoading) {
@@ -201,21 +176,6 @@ export default function HomeScreen() {
     );
   }
 
-  if (isAutoOpeningLeague && singleActiveLeague) {
-    return (
-      <SafeAreaView className="bg-app-bg-light dark:bg-app-bg-dark flex-1">
-        <View className="flex-1 items-center justify-center px-6">
-          <Text className="text-app-fg-light dark:text-app-fg-dark text-center text-xl font-semibold">
-            Opening {singleActiveLeague.name}...
-          </Text>
-          <Text className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
-            Taking you straight to your active league.
-          </Text>
-        </View>
-      </SafeAreaView>
-    );
-  }
-
   return (
     <SafeAreaView className="bg-app-bg-light dark:bg-app-bg-dark flex-1">
       <ScrollView
@@ -230,7 +190,6 @@ export default function HomeScreen() {
           />
         }
       >
-        {/* Header with Account button */}
         <View className="flex-row items-center justify-between px-6 pb-4 pt-6">
           <Text className="text-app-fg-light dark:text-app-fg-dark text-2xl font-bold">
             My Leagues
@@ -248,21 +207,12 @@ export default function HomeScreen() {
         </View>
 
         <View className="px-6 pb-4">
-          <View className="flex-row gap-3">
-            <View className="flex-1">
-              <Button
-                variant="outline"
-                onPress={() => router.push("/join-league" as any)}
-              >
-                Join League
-              </Button>
-            </View>
-            <View className="flex-1">
-              <Button onPress={() => router.push("/league/create" as any)}>
-                Create League
-              </Button>
-            </View>
-          </View>
+          <Button
+            variant="outline"
+            onPress={() => router.push("/join-league" as any)}
+          >
+            Join League
+          </Button>
           {renewalCandidates.length > 0 ? (
             <Pressable
               onPress={() =>
@@ -291,7 +241,7 @@ export default function HomeScreen() {
                     {renewalCandidates[0]?.name}
                   </Text>
                   <Text className="mt-1 text-xs text-blue-700 dark:text-blue-300">
-                    Renew a prior league and invite last year&apos;s players.
+                    Renew a prior league and invite last year's players.
                   </Text>
                 </View>
                 <Ionicons
@@ -300,31 +250,6 @@ export default function HomeScreen() {
                   color={isDarkColorScheme ? "#93c5fd" : "#1d4ed8"}
                 />
               </View>
-            </Pressable>
-          ) : null}
-          {singleActiveLeague && !homeLoading ? (
-            <Pressable
-              onPress={() =>
-                router.push(`/league/${singleActiveLeague.league_id}` as any)
-              }
-              className="mt-3 flex-row items-center justify-between rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 dark:border-blue-900 dark:bg-blue-950"
-            >
-              <View className="flex-1 pr-3">
-                <Text className="text-[11px] uppercase tracking-wide text-blue-700 dark:text-blue-300">
-                  Active League
-                </Text>
-                <Text
-                  className="mt-1 text-sm font-semibold text-blue-800 dark:text-blue-200"
-                  numberOfLines={1}
-                >
-                  {singleActiveLeague.name}
-                </Text>
-              </View>
-              <Ionicons
-                name="chevron-forward"
-                size={18}
-                color={isDarkColorScheme ? "#93c5fd" : "#1d4ed8"}
-              />
             </Pressable>
           ) : null}
           <View className="mt-3 flex-row items-center gap-2">
@@ -350,33 +275,29 @@ export default function HomeScreen() {
         </View>
 
         <View className="px-4">
-          {!homeLoading ? (
-            <View className="mx-2 mb-4 rounded-xl border border-gray-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-800">
-              <View className="flex-row items-center justify-between">
-                <View className="items-center">
-                  <Text className="text-[11px] uppercase tracking-wide text-gray-500 dark:text-gray-400">
-                    Active
-                  </Text>
-                  <Text className="text-app-fg-light dark:text-app-fg-dark mt-1 text-base font-semibold">
-                    {activeLeagues.length}
-                  </Text>
-                </View>
-                <View className="items-center">
-                  <Text className="text-[11px] uppercase tracking-wide text-gray-500 dark:text-gray-400">
-                    Prior
-                  </Text>
-                  <Text className="text-app-fg-light dark:text-app-fg-dark mt-1 text-base font-semibold">
-                    {priorLeagues.length}
-                  </Text>
-                </View>
-                <View className="items-center">
-                  <Text className="text-[11px] uppercase tracking-wide text-gray-500 dark:text-gray-400">
-                    Season
-                  </Text>
-                  <Text className="text-app-fg-light dark:text-app-fg-dark mt-1 text-base font-semibold">
-                    {DEFAULT_SEASON}
-                  </Text>
-                </View>
+          {!homeLoading && !homeError && neededCount > 0 ? (
+            <Text className="mx-2 mb-3 text-sm text-gray-600 dark:text-gray-400">
+              {neededCount === 1
+                ? "1 league needs picks"
+                : `${neededCount} leagues need picks`}
+            </Text>
+          ) : null}
+
+          {homeError ? (
+            <View className="mx-2 mb-4 rounded-xl border border-amber-200 bg-amber-50 p-4 dark:border-amber-900 dark:bg-amber-950">
+              <Text className="text-sm text-amber-900 dark:text-amber-100">
+                Couldn't refresh your leagues. Pick status is unavailable.
+              </Text>
+              <View className="mt-3">
+                <Button
+                  variant="outline"
+                  disabled={homeFetching || renewalCandidatesLoading}
+                  onPress={() => {
+                    void refetchHomeData();
+                  }}
+                >
+                  {homeFetching ? "Retrying…" : "Try again"}
+                </Button>
               </View>
             </View>
           ) : null}
@@ -388,23 +309,15 @@ export default function HomeScreen() {
                   key={i}
                   className="mx-2 rounded-xl border border-gray-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-800"
                 >
-                  {/* League Name Header Skeleton */}
                   <View className="mb-4">
                     <Skeleton className="mx-auto h-6 w-40 rounded" />
                   </View>
-
-                  {/* Stats Section Skeleton */}
                   <View className="gap-3">
-                    {/* Correct Picks Row Skeleton */}
                     <View className="flex-row items-center justify-between">
                       <Skeleton className="h-4 w-24 rounded" />
                       <Skeleton className="h-4 w-16 rounded" />
                     </View>
-
-                    {/* Separator */}
                     <View className="h-px bg-gray-200 dark:bg-zinc-700" />
-
-                    {/* Week Wins Row Skeleton */}
                     <View className="flex-row items-center justify-between">
                       <Skeleton className="h-4 w-20 rounded" />
                       <Skeleton className="h-4 w-12 rounded" />
@@ -413,25 +326,52 @@ export default function HomeScreen() {
                 </View>
               ))}
             </View>
-          ) : filteredActiveLeagues.length === 0 ? (
+          ) : filteredActiveLeagues.length === 0 && !homeError ? (
             <View className="px-4 py-8">
-              <Text className="text-center text-base text-gray-600 dark:text-gray-400">
+              <Text className="text-center text-base font-medium text-gray-800 dark:text-gray-200">
                 {leagueSearchQuery.trim().length > 0
                   ? `No active leagues match "${leagueSearchQuery.trim()}".`
-                  : `No active leagues for the ${DEFAULT_SEASON} season.\nCreate one or join from a friend's share link.`}
+                  : `No leagues for the ${DEFAULT_SEASON} season yet.`}
               </Text>
+              {leagueSearchQuery.trim().length === 0 ? (
+                <Text className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
+                  Join a league with a friend's invite link or code.
+                </Text>
+              ) : null}
             </View>
-          ) : (
+          ) : filteredActiveLeagues.length > 0 ? (
             <View className="gap-4">
               {filteredActiveLeagues.map((league) => (
-                <HomeLeagueCard key={league.league_id} data={league} />
+                <HomeLeagueCard
+                  key={league.league_id}
+                  data={league}
+                  statusUnavailable={homeError}
+                />
               ))}
             </View>
-          )}
+          ) : null}
         </View>
 
-        {/* Prior Leagues Section */}
-        {filteredPriorLeagues.length > 0 && (
+        {filteredUpcomingLeagues.length > 0 ? (
+          <>
+            <View className="px-6 pb-4 pt-8">
+              <Text className="text-app-fg-light dark:text-app-fg-dark text-2xl font-bold">
+                Upcoming Seasons
+              </Text>
+            </View>
+            <View className="gap-4 px-4">
+              {filteredUpcomingLeagues.map((league) => (
+                <HomeLeagueCard
+                  key={league.league_id}
+                  data={league}
+                  statusUnavailable={homeError}
+                />
+              ))}
+            </View>
+          </>
+        ) : null}
+
+        {filteredPriorLeagues.length > 0 ? (
           <>
             <View className="flex-row items-center justify-between px-6 pb-4 pt-8">
               <View>
@@ -439,7 +379,7 @@ export default function HomeScreen() {
                   Prior Leagues
                 </Text>
                 <Text className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                  Sorted by season then league size.
+                  Past seasons, collapsed by default.
                 </Text>
               </View>
               {filteredPriorLeagues.length > 3 ? (
@@ -458,12 +398,16 @@ export default function HomeScreen() {
             <View className="px-4">
               <View className="gap-4">
                 {visiblePriorLeagues.map((league) => (
-                  <HomeLeagueCard key={league.league_id} data={league} />
+                  <HomeLeagueCard
+                    key={league.league_id}
+                    data={league}
+                    statusUnavailable={homeError}
+                  />
                 ))}
               </View>
             </View>
           </>
-        )}
+        ) : null}
       </ScrollView>
     </SafeAreaView>
   );

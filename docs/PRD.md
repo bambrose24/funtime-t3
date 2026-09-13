@@ -123,7 +123,7 @@ Unless a requirement is explicitly labeled **Target** or **Planned**, it describ
 - Link prior/next season leagues for continuity and upsell.
 - Show current-season leagues before renewal opportunities and prior-season history on the home screen.
 - Surface a linked, not-started next-season league to prior members with a direct join action.
-- Web Home remains accessible even with exactly one current-season league, so players can check weekly submission status. Mobile currently retains its single-league auto-open behavior when no renewal choices are pending.
+- Home remains accessible even with exactly one current-season league on web and mobile, so players can check weekly submission status. Mobile no longer auto-opens a single active league.
 - Mobile home supports league search/filter and keeps long prior-season history collapsible.
 
 #### Home screen league list (Web; Target for mobile)
