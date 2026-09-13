@@ -330,7 +330,7 @@ MOB-01 through MOB-10 above remain the release epics and keep their IDs and rele
 | 17    | MOB-03c | P2       | Chat client: incremental fetch, optimistic send, honest copy               | Component                     |
 | 18    | MOB-13b | P3       | Split the 1,849-line league screen; deliberately last                     | Existing checks only          |
 
-**Current position:** **MOB-12b** in progress (mobile-only; PostHog-only crash reporting recorded as known limitation vs Sentry). **MOB-12a** merged (#53). **WEB-15** deferred/BLOCKED; **WEB-12a**, **MOB-02a / MOB-02b**, **WEB-14a** deferred from auto-merge. Update this line when a slice starts or merges.
+**Current position:** **MOB-12c** in progress (mobile-only). **MOB-12b** merged (#54). **WEB-15** deferred/BLOCKED; **WEB-12a**, **MOB-02a / MOB-02b**, **WEB-14a** deferred from auto-merge. Next after MOB-12c: **MOB-13b** (or stop if queue complete aside from deferred). Update this line when a slice starts or merges.
 
 MOB-05 (build and signing), MOB-06 (account deletion) and MOB-07 (chat moderation) are not in this queue because they need product decisions and have long external lead times. They remain public-release prerequisites; start their decisions in parallel with this queue even though their implementation is serial with it.
 
@@ -543,6 +543,8 @@ Prefer clearing on transition over namespacing the persister key by user id: it 
 **Test layer:** mobile unit — `apps/mobile/tests/observability/analyticsIdentity.test.ts` against an injected fake client: identify on sign-in, reset then identify on A-to-B, reset on sign-out, and metadata redaction.
 
 **Decision required first:** keep or disable session replay for a private-league app. The code and its adjacent comment currently disagree, so someone should decide on purpose.
+
+**Decision (2026-09-13):** **disable session replay** on mobile (`enableSessionReplay: false`). Private league screens can expose picks, messages, and emails; replay is not worth the privacy risk for v1.
 
 **Done when:** events are attributable to the signed-in user and never to the previous one, and replay is a recorded decision.
 
