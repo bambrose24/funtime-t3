@@ -1,8 +1,6 @@
 import { useEffect, useRef } from "react";
-import { Platform } from "react-native";
-import Constants from "expo-constants";
-import * as Notifications from "expo-notifications";
 import * as Linking from "expo-linking";
+import * as Notifications from "expo-notifications";
 import { router } from "expo-router";
 import { clientApi } from "@/lib/trpc/react";
 import { isE2EMode } from "@/lib/e2e";
@@ -11,6 +9,7 @@ import {
   flushPendingPushTokenRevocations,
 } from "@/lib/auth/pendingPushTokenRevocation";
 import { resolveAppDestination } from "@/lib/deeplink/resolveDeepLink";
+import { registerDevicePushToken } from "@/lib/notifications/registerDevicePushToken";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -142,55 +141,20 @@ export function usePushNotificationRegistration(hasSession: boolean) {
     }
     registrationAttemptedForUserRef.current = dbUser.uid;
 
-    const registerToken = async () => {
-      if (Platform.OS === "android") {
-        await Notifications.setNotificationChannelAsync("default", {
-          name: "Default",
-          importance: Notifications.AndroidImportance.DEFAULT,
-        });
-      }
-
-      let { status } = await Notifications.getPermissionsAsync();
-      if (status !== "granted") {
-        const permission = await Notifications.requestPermissionsAsync();
-        status = permission.status;
-      }
-      if (status !== "granted") {
-        return;
-      }
-
-      const projectId =
-        process.env.EXPO_PUBLIC_EAS_PROJECT_ID ??
-        Constants.easConfig?.projectId ??
-        Constants.expoConfig?.extra?.eas?.projectId;
-
-      if (!projectId) {
-        console.warn(
-          "[Push] Skipping Expo push token registration because no EAS projectId is configured. Set EXPO_PUBLIC_EAS_PROJECT_ID or expose expo.extra.eas.projectId.",
-        );
-        return;
-      }
-
-      const tokenResult = await Notifications.getExpoPushTokenAsync({
-        projectId,
+    // Never prompt on cold launch. Only refresh an already-granted token so
+    // the OS permission dialog stays tied to an intentional Account action.
+    registerDevicePushToken({
+      registerPushToken,
+      requestPermissionIfNeeded: false,
+      isE2EMode,
+    })
+      .then(async (result) => {
+        if (result.status === "registered") {
+          await clearPendingPushTokenRevocation(result.token, dbUser.uid);
+        }
+      })
+      .catch((error) => {
+        console.error("Failed to register push notification token", error);
       });
-
-      const platform: "ios" | "android" | "web" =
-        Platform.OS === "ios" || Platform.OS === "android"
-          ? Platform.OS
-          : "web";
-
-      await registerPushToken({
-        token: tokenResult.data,
-        platform,
-      });
-      // A successful re-register for this user means this installation is
-      // active again; drop any stale revoke queue for the same token.
-      await clearPendingPushTokenRevocation(tokenResult.data, dbUser.uid);
-    };
-
-    registerToken().catch((error) => {
-      console.error("Failed to register push notification token", error);
-    });
   }, [appSession?.dbUser, hasSession, registerPushToken]);
 }
