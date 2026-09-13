@@ -267,7 +267,23 @@ export default function LeagueAdminScreen() {
   ]);
 
   const invalidateMembers = async () => {
-    await utils.league.admin.members.invalidate({ leagueId: leagueIdNumber });
+    await Promise.all([
+      utils.league.admin.members.invalidate({ leagueId: leagueIdNumber }),
+      utils.home.summary.invalidate(),
+      utils.home.leagues.invalidate(),
+      utils.home.nav.invalidate(),
+      utils.session.current.invalidate(),
+    ]);
+  };
+
+  const invalidateLeagueIdentity = async () => {
+    await Promise.all([
+      utils.league.get.invalidate({ leagueId: leagueIdNumber }),
+      utils.home.summary.invalidate(),
+      utils.home.leagues.invalidate(),
+      utils.home.nav.invalidate(),
+      utils.session.current.invalidate(),
+    ]);
   };
 
   const openMemberSheet = (member: (typeof members)[number]) => {
@@ -387,7 +403,7 @@ export default function LeagueAdminScreen() {
         leagueId: leagueIdNumber,
         leagueName: trimmedName,
       });
-      await utils.league.get.invalidate({ leagueId: leagueIdNumber });
+      await invalidateLeagueIdentity();
       Alert.alert("Updated", "League name updated.");
     } catch (error) {
       console.error("Failed to update league name", error);
