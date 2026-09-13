@@ -11,9 +11,12 @@ test("member posts and deletes their message and admin deletes another member's 
   await login(page, E2E_USERS.admin);
 
   await page.goto(`/league/${leagueId}`);
-  const chatLink = page.getByRole("link", { name: /Open league chat/ });
-  await expect(chatLink).toBeVisible();
-  await chatLink.click();
+  const chatButton = page
+    .getByRole("button", { name: /Open league chat/ })
+    .first();
+  await expect(chatButton).toBeVisible();
+  await chatButton.click();
+  await expect(page).toHaveURL(new RegExp(`/league/${leagueId}$`));
   await expect(
     page.getByRole("heading", { name: "League Chat" }),
   ).toBeVisible();

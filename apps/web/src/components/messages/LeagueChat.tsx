@@ -30,9 +30,11 @@ type LeagueMessage = RouterOutputs["messages"]["leagueMessageBoard"][number];
 export function LeagueChat({
   leagueId,
   leagueName,
+  embedded = false,
 }: {
   leagueId: number;
   leagueName: string;
+  embedded?: boolean;
 }) {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const lastMessageIdRef = useRef<string | undefined>(undefined);
@@ -122,14 +124,22 @@ export function LeagueChat({
   };
 
   return (
-    <Card className="mx-auto flex w-full max-w-4xl flex-col overflow-hidden border-border/80 bg-card/95 shadow-sm">
-      <CardHeader className="flex-row items-start justify-between gap-4 border-b bg-muted/30 px-5 py-4">
+    <Card
+      className={
+        embedded
+          ? "flex min-h-0 w-full flex-1 flex-col overflow-hidden rounded-none border-0 bg-card/95 shadow-none"
+          : "mx-auto flex w-full max-w-4xl flex-col overflow-hidden border-border/80 bg-card/95 shadow-sm"
+      }
+    >
+      <CardHeader className="flex-row items-start justify-between gap-4 border-b bg-muted/30 px-5 py-4 max-md:px-4 max-md:pb-3">
         <div className="flex min-w-0 items-center gap-3">
-          <div className="rounded-lg bg-primary/10 p-2 text-primary">
+          <div className="rounded-lg bg-primary/10 p-2 text-primary max-md:p-1.5">
             <MessagesSquare className="h-5 w-5" />
           </div>
           <div className="min-w-0">
-            <CardTitle className="text-lg">League Chat</CardTitle>
+            <CardTitle className="text-lg max-md:text-base">
+              League Chat
+            </CardTitle>
             <p className="truncate text-sm text-muted-foreground">
               {leagueName}
             </p>
@@ -139,7 +149,13 @@ export function LeagueChat({
           {messages.length} {messages.length === 1 ? "message" : "messages"}
         </p>
       </CardHeader>
-      <CardContent className="grid min-h-[min(68vh,680px)] grid-rows-[1fr_auto] p-0">
+      <CardContent
+        className={
+          embedded
+            ? "grid min-h-0 flex-1 grid-rows-[1fr_auto] p-0"
+            : "grid min-h-[min(68vh,680px)] grid-rows-[1fr_auto] p-0"
+        }
+      >
         <ScrollArea ref={scrollAreaRef} className="min-h-0 px-5 py-5">
           {isLoading ? (
             <p className="text-sm text-muted-foreground">Loading chat…</p>
