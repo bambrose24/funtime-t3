@@ -1,12 +1,14 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { View, ScrollView, Alert, Pressable } from "react-native";
 import { router } from "expo-router";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { format } from "date-fns";
 import { clientApi } from "@/lib/trpc/react";
 import { type RouterOutputs } from "~/trpc/types";
 import { PickGameCard } from "./PickGameCard";
+import { ClosedWeekState } from "./ClosedWeekState";
 import { Button } from "../ui/button";
 import { Text } from "../ui/text";
 import { createComponentLogger } from "@/lib/logging";
@@ -14,6 +16,8 @@ import { Input } from "../ui/input";
 import { LeagueTabLoadingSkeleton } from "@/components/league/LeagueTabLoadingSkeleton";
 import { getSeasonOverUpsell } from "@/lib/picks/getSeasonOverUpsell";
 import { getPickSubmissionConfirmation } from "@/lib/picks/getPickSubmissionConfirmation";
+import { getPickWindow } from "@/lib/picks/getPickWindow";
+import { useTickingNow } from "@/lib/picks/useTickingNow";
 
 type Props = {
   leagueId: string;
@@ -86,6 +90,16 @@ function PickForm({
   leagueIdNumber,
 }: PickFormProps) {
   const { week, season, games } = weekToPick;
+  const now = useTickingNow();
+  const pickWindow = useMemo(
+    () =>
+      getPickWindow({
+        policy: league.late_policy,
+        games,
+        now,
+      }),
+    [games, league.late_policy, now],
+  );
   const [submitting, setSubmitting] = useState(false);
   const logger = createComponentLogger("PickForm", {
     leagueId: leagueIdNumber,
@@ -120,7 +134,7 @@ function PickForm({
       applyToAllSeasonLeagues: false,
       picks: games.map((g) => {
         const existingPick = existingPicks.find((p) => p.gid === g.gid);
-        if (g.ts < new Date()) {
+        if (pickWindow.lockedGameIds.has(g.gid)) {
           return {
             gid: g.gid,
             type: "alreadyStarted",
@@ -151,6 +165,26 @@ function PickForm({
     name: "picks",
   });
 
+  // Promote open fields to locked when kickoff passes while the form is open.
+  const lockedGameIdsKey = [...pickWindow.lockedGameIds].sort().join(",");
+  useEffect(() => {
+    picksField.fields.forEach((field, idx) => {
+      if (
+        field.type === "toPick" &&
+        pickWindow.lockedGameIds.has(field.gid)
+      ) {
+        picksField.update(idx, {
+          gid: field.gid,
+          type: "alreadyStarted",
+          alreadyPickedWinner: field.winner,
+          cannotPick: true,
+        });
+      }
+    });
+    // Intentionally depend on the lock set key, not fields (avoids update loops).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lockedGameIdsKey]);
+
   const { mutateAsync: submitPicks } =
     clientApi.picks.submitPicks.useMutation();
   const utils = clientApi.useUtils();
@@ -161,7 +195,11 @@ function PickForm({
 
       const picksToSubmit = data.picks
         .map((p) => {
-          if (p.type !== "toPick" || !p.winner) {
+          if (
+            p.type !== "toPick" ||
+            !p.winner ||
+            pickWindow.lockedGameIds.has(p.gid)
+          ) {
             return null;
           }
           const score =
@@ -224,8 +262,7 @@ function PickForm({
     idx: number;
     winner: number;
   }) => {
-    const game = games.find((g) => g.gid === gid);
-    if (!game || game.ts < new Date()) {
+    if (pickWindow.lockedGameIds.has(gid)) {
       return;
     }
 
@@ -240,7 +277,7 @@ function PickForm({
   const randomizePicks = () => {
     picksField.fields.forEach((f, idx) => {
       const game = games.find((g) => g.gid === f.gid);
-      if (!game || game.ts < new Date()) {
+      if (!game || pickWindow.lockedGameIds.has(f.gid)) {
         return;
       }
       const winner = Math.random() < 0.5 ? game.away : game.home;
@@ -258,10 +295,14 @@ function PickForm({
   const applyToAllSeasonLeagues = form.watch("applyToAllSeasonLeagues");
   const currentPicks = form.watch("picks");
   const pickableGameCount = currentPicks.filter(
-    (pick) => pick.type === "toPick",
+    (pick) =>
+      pick.type === "toPick" && !pickWindow.lockedGameIds.has(pick.gid),
   ).length;
   const pickedOpenGameCount = currentPicks.filter(
-    (pick) => pick.type === "toPick" && pick.winner !== null,
+    (pick) =>
+      pick.type === "toPick" &&
+      !pickWindow.lockedGameIds.has(pick.gid) &&
+      pick.winner !== null,
   ).length;
   const remainingPickCount = pickableGameCount - pickedOpenGameCount;
   const lockedGameCount = games.length - pickableGameCount;
@@ -284,6 +325,16 @@ function PickForm({
             ? "Update Picks"
             : "Submit Picks";
 
+  if (pickWindow.isWeekClosed && games.length > 0) {
+    return (
+      <ClosedWeekState
+        week={week}
+        deadline={pickWindow.deadline}
+        leagueId={leagueIdNumber}
+      />
+    );
+  }
+
   return (
     <ScrollView
       className="flex-1"
@@ -299,6 +350,12 @@ function PickForm({
           <Text className="text-center text-gray-600 dark:text-gray-400">
             Week {week}, {season}
           </Text>
+          {pickWindow.deadline ? (
+            <Text className="mt-2 text-center text-xs text-amber-700 dark:text-amber-300">
+              All picks close at the first kickoff:{" "}
+              {format(pickWindow.deadline, "EEE MMM d, h:mm a")}.
+            </Text>
+          ) : null}
         </View>
 
         <View className="mb-4 rounded-xl border border-gray-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-800">
@@ -366,8 +423,9 @@ function PickForm({
           {picksField.fields.map((field, idx) => {
             const game = games.find((g) => g.gid === field.gid);
             if (!game) return null;
+            const gameLocked = pickWindow.lockedGameIds.has(game.gid);
             const isTiebreakerEditable =
-              field.type === "toPick" && game.ts >= new Date();
+              !gameLocked && !pickWindow.isTiebreakerLocked;
 
             const winner =
               field.type === "toPick"
@@ -388,6 +446,7 @@ function PickForm({
                 onTeamSelect={(teamId: number) =>
                   onTeamPick({ gid: game.gid, idx, winner: teamId })
                 }
+                locked={gameLocked}
                 disabled={field.type === "alreadyStarted"}
                 tiebreakerScore={
                   game.is_tiebreaker ? (
