@@ -190,8 +190,8 @@ model league_renewal_member_roles {
   league_id              Int
   user_id                Int
   role                   MemberRole @default(player)
-  createdAt              DateTime   @default(now())
-  updatedAt              DateTime   @updatedAt
+  createdAt              DateTime   @default(now()) @db.Timestamptz(6)
+  updatedAt              DateTime   @updatedAt @db.Timestamptz(6)
   leagues                leagues    @relation(fields: [league_id], references: [league_id], onDelete: Cascade)
   people                 people     @relation(fields: [user_id], references: [uid], onDelete: Cascade)
 
@@ -452,7 +452,7 @@ model WeeklyRecapDelivery {
   state      String   @default("sending")
   resend_id  String?
   created_at DateTime @default(now()) @db.Timestamptz(6)
-  updated_at DateTime @updatedAt @db.Timestamptz(6)
+  updated_at DateTime @default(now()) @updatedAt @db.Timestamptz(6)
 
   @@unique([league_id, user_id, season, week])
 }

@@ -1,0 +1,73 @@
+name: Prisma schema sync
+
+on:
+  workflow_dispatch:
+  pull_request:
+  merge_group:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: prisma-schema-sync-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  schema-migrations-in-sync:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      CI: "true"
+      DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/postgres
+      DIRECT_URL: postgresql://postgres:postgres@127.0.0.1:5432/postgres
+      SHADOW_DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/prisma_shadow
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22.23.1"
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Create shadow database
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
+          PGPASSWORD=postgres psql -h 127.0.0.1 -U postgres -d postgres \
+            -c "CREATE DATABASE prisma_shadow;"
+
+      - name: Assert schema matches migrations
+        run: pnpm prisma:schema-sync
+
+      - name: Unit tests for the schema-sync gate
+        run: node --experimental-strip-types --test packages/api/tests/prisma-schema-sync.test.mts

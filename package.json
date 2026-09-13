@@ -25,6 +25,7 @@
     "db:studio": "turbo run db:studio",
     "prisma:migrate:check": "bun run scripts/prisma/validate-migrations.ts",
     "prisma:migrate:apply": "bun run scripts/prisma/validate-migrations.ts --apply",
+    "prisma:schema-sync": "bun run scripts/prisma/assert-schema-migrations-in-sync.ts",
     "season:validate-readonly": "bun run scripts/db/validate-season-readonly.ts",
     "season:import": "cd packages/api && bun run scripts/import-season.ts",
     "season:validate-import": "cd packages/api && bun run scripts/validate-season-import.ts",

@@ -43,6 +43,7 @@
     "db:migrate:resolve": "DOTENV_CONFIG_PATH=../../.env.local prisma migrate resolve",
     "db:migrate:check": "bun run ../../scripts/prisma/validate-migrations.ts",
     "db:migrate:check:apply": "bun run ../../scripts/prisma/validate-migrations.ts --apply",
+    "db:schema-sync": "bun run ../../scripts/prisma/assert-schema-migrations-in-sync.ts",
     "db:push": "DOTENV_CONFIG_PATH=../../.env.local prisma db push",
     "db:pull": "DOTENV_CONFIG_PATH=../../.env.local prisma db pull",
     "db:studio": "DOTENV_CONFIG_PATH=../../.env.local prisma studio"
