@@ -200,26 +200,28 @@ model league_renewal_member_roles {
 }
 
 model people {
-  uid                    Int                      @id(map: "idx_18430_primary") @default(autoincrement())
-  username               String                   @db.VarChar(255)
-  fname                  String                   @db.VarChar(255)
-  lname                  String                   @db.VarChar(255)
-  email                  String                   @unique @db.VarChar(255)
-  season                 Int
-  email2                 String?                  @db.VarChar(255)
-  google_photo_url       String?
-  google_email           String?
-  google_userid          String?
-  supabase_id            String?                  @unique @db.VarChar(255)
-  leaguemembers          leaguemembers[]
+  uid                         Int                      @id(map: "idx_18430_primary") @default(autoincrement())
+  username                    String                   @db.VarChar(255)
+  fname                       String                   @db.VarChar(255)
+  lname                       String                   @db.VarChar(255)
+  email                       String                   @unique @db.VarChar(255)
+  season                      Int
+  email2                      String?                  @db.VarChar(255)
+  google_photo_url            String?
+  google_email                String?
+  google_userid               String?
+  supabase_id                 String?                  @unique @db.VarChar(255)
+  push_notifications_enabled  Boolean                  @default(true)
+  leaguemembers               leaguemembers[]
   league_renewal_member_roles league_renewal_member_roles[]
-  leagues                leagues[]
-  picks                  picks[]
-  pushNotificationTokens pushNotificationTokens[]
+  leagues                     leagues[]
+  picks                       picks[]
+  pushNotificationTokens      pushNotificationTokens[]
 
   @@index([email], map: "idx_18430_email_index")
   @@index([season], map: "idx_18430_season")
   @@index([supabase_id], map: "idx_18430_supabase_id")
+  @@index([push_notifications_enabled], map: "idx_people_push_notifications_enabled")
 }
 
 model pushNotificationTokens {

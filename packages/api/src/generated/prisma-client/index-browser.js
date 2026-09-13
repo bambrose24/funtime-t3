@@ -247,7 +247,8 @@ exports.Prisma.PeopleScalarFieldEnum = {
   google_photo_url: 'google_photo_url',
   google_email: 'google_email',
   google_userid: 'google_userid',
-  supabase_id: 'supabase_id'
+  supabase_id: 'supabase_id',
+  push_notifications_enabled: 'push_notifications_enabled'
 };
 
 exports.Prisma.PushNotificationTokensScalarFieldEnum = {
