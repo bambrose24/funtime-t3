@@ -4,6 +4,28 @@ on:
   workflow_dispatch:
   schedule:
     - cron: "0 10 * * *"
+  pull_request:
+    paths:
+      - "apps/mobile/**"
+      - "packages/api/**"
+      - "scripts/e2e/**"
+      - ".github/workflows/mobile-e2e-supabase.yml"
+  merge_group:
+  push:
+    branches:
+      - main
+    paths:
+      - "apps/mobile/**"
+      - "packages/api/**"
+      - "scripts/e2e/**"
+      - ".github/workflows/mobile-e2e-supabase.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mobile-e2e-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   android-e2e:
@@ -17,24 +39,24 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-          cache: "pnpm"
-
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
           version: 9.15.0
 
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22.23.1"
+          cache: "pnpm"
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
       - name: Setup Supabase CLI
-        uses: supabase/setup-cli@v1
+        uses: supabase/setup-cli@v2
         with:
-          version: latest
+          version: 2.113.0
 
       - name: Install Maestro CLI
         run: |
