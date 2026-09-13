@@ -23,6 +23,8 @@
     "db:push": "turbo run db:push",
     "db:pull": "turbo run db:pull",
     "db:studio": "turbo run db:studio",
+    "db:migrate:deploy": "pnpm --filter @funtime/api exec prisma migrate deploy --schema prisma/schema.prisma",
+    "db:migrate:status": "pnpm --filter @funtime/api exec prisma migrate status --schema prisma/schema.prisma",
     "prisma:migrate:check": "bun run scripts/prisma/validate-migrations.ts",
     "prisma:migrate:apply": "bun run scripts/prisma/validate-migrations.ts --apply",
     "season:validate-readonly": "bun run scripts/db/validate-season-readonly.ts",

@@ -38,9 +38,9 @@
     "db:generate": "prisma generate",
     "db:migrate:dev": "DOTENV_CONFIG_PATH=../../.env.local prisma migrate dev",
     "db:migrate:create": "DOTENV_CONFIG_PATH=../../.env.local prisma migrate dev --create-only",
-    "db:migrate:deploy": "DOTENV_CONFIG_PATH=../../.env.local prisma migrate deploy",
-    "db:migrate:status": "DOTENV_CONFIG_PATH=../../.env.local prisma migrate status",
-    "db:migrate:resolve": "DOTENV_CONFIG_PATH=../../.env.local prisma migrate resolve",
+    "db:migrate:deploy": "prisma migrate deploy",
+    "db:migrate:status": "prisma migrate status",
+    "db:migrate:resolve": "prisma migrate resolve",
     "db:migrate:check": "bun run ../../scripts/prisma/validate-migrations.ts",
     "db:migrate:check:apply": "bun run ../../scripts/prisma/validate-migrations.ts --apply",
     "db:push": "DOTENV_CONFIG_PATH=../../.env.local prisma db push",
@@ -55,6 +55,7 @@
     "@prisma/adapter-pg": "^6.19.3",
     "@prisma/client": "^6.19.3",
     "@prisma/nextjs-monorepo-workaround-plugin": "^6.19.3",
+    "prisma": "^6.19.3",
     "@supabase/ssr": "^0.12.5",
     "@supabase/supabase-js": "^2.112.4",
     "@t3-oss/env-nextjs": "^0.13.11",
@@ -84,7 +85,6 @@
   "devDependencies": {
     "@types/lodash": "^4.17.0",
     "@types/node": "^24.13.3",
-    "prisma": "^6.19.3",
     "typescript": "~6.0.3"
   }
 }
