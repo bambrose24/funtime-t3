@@ -1,6 +1,7 @@
 import PostHog from 'posthog-react-native'
 import { getPostHog } from '../posthog'
 import { getLoggingConfig, type LogLevel } from './config'
+import { sanitizeLogMeta } from '../observability/analyticsIdentity'
 
 export interface LoggerMeta {
   userId?: string
@@ -57,12 +58,12 @@ class MobileLogger implements Logger {
       logFn(formattedMessage, combinedMeta)
     }
 
-    // PostHog logging for important events
+    // PostHog logging for important events — metadata is redacted/bounded.
     if (this.config.enablePostHog && this.posthog && level !== 'debug') {
       this.posthog.capture('mobile_log', {
         level,
-        message,
-        ...combinedMeta,
+        message: message.slice(0, 500),
+        ...sanitizeLogMeta(combinedMeta),
         timestamp: new Date().toISOString(),
       })
     }

@@ -3,6 +3,12 @@ import { isE2EMode } from "./e2e";
 
 let posthogInstance: PostHog | null = null;
 
+/**
+ * Session replay is disabled for the private-league mobile app (MOB-12c).
+ * The previous `enableSessionReplay: true` + "Disable…" comment were contradictory.
+ */
+export const MOBILE_SESSION_REPLAY_ENABLED = false;
+
 export function initPostHog() {
   if (isE2EMode) {
     return null;
@@ -25,8 +31,8 @@ export function initPostHog() {
 
   posthogInstance = new PostHog(POSTHOG_API_KEY, {
     host: POSTHOG_HOST,
-    enableSessionReplay: true, // Disable session replay for mobile
-    captureAppLifecycleEvents: true, // Track app lifecycle
+    enableSessionReplay: MOBILE_SESSION_REPLAY_ENABLED,
+    captureAppLifecycleEvents: true,
   });
 
   return posthogInstance;
@@ -34,4 +40,9 @@ export function initPostHog() {
 
 export function getPostHog(): PostHog | null {
   return posthogInstance;
+}
+
+/** Test-only helper to inject/clear the singleton. */
+export function __setPostHogForTests(instance: PostHog | null) {
+  posthogInstance = instance;
 }

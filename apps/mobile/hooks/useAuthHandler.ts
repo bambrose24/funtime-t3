@@ -20,6 +20,8 @@ import {
   shouldPurgeAccountCache,
 } from "@/lib/auth/identitySession";
 import { removePersistedQueryCache } from "@/lib/trpc/persisted-cache";
+import { getPostHog } from "@/lib/posthog";
+import { syncAnalyticsIdentity } from "@/lib/observability/analyticsIdentity";
 
 // Lightweight hook for just Supabase session state (for auth navigation logic)
 export function useSupabaseSession() {
@@ -148,11 +150,10 @@ export function useAuthHandler() {
     sessionRef.current = session;
   }, [globalSearchParams, pathname, session]);
 
-  // Purge account-scoped cache on identity change (sign-out, switch, cold-start
-  // signed-out with leftover persisted private data). Local purge is immediate;
-  // token revocation is best-effort in the account sign-out path.
+  // Purge account-scoped cache and sync analytics identity on auth transitions.
   useEffect(() => {
     const nextUid = session?.user?.id ?? null;
+    const posthog = getPostHog();
 
     if (previousUidRef.current === undefined) {
       previousUidRef.current = nextUid;
@@ -166,6 +167,8 @@ export function useAuthHandler() {
             error,
           );
         });
+      } else {
+        syncAnalyticsIdentity({ type: "signed_in", uid: nextUid }, posthog);
       }
       return;
     }
@@ -175,6 +178,7 @@ export function useAuthHandler() {
       nextUid,
     );
     previousUidRef.current = nextUid;
+    syncAnalyticsIdentity(transition, posthog);
 
     if (!shouldPurgeAccountCache(transition)) {
       return;
