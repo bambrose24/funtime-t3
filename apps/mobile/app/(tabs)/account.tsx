@@ -4,13 +4,14 @@ import {
   View,
   Text,
   Alert,
+  AppState,
+  Linking,
   Modal,
   Platform,
   ScrollView,
   SafeAreaView,
   Pressable,
   RefreshControl,
-  Switch,
 } from "react-native";
 import { router } from "expo-router";
 import * as Clipboard from "expo-clipboard";
@@ -19,20 +20,31 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import * as Updates from "expo-updates";
-import { useColorScheme } from "@/lib/useColorScheme";
 import * as Notifications from "expo-notifications";
+import { useColorScheme } from "@/lib/useColorScheme";
 import { supabase } from "@/lib/supabase/client";
 import { clientApi } from "@/lib/trpc/react";
 import { isE2EMode } from "@/lib/e2e";
-import { revokePushTokenBestEffort } from "@/lib/auth/pendingPushTokenRevocation";
+import { revokePushTokenBestEffort, clearPendingPushTokenRevocation } from "@/lib/auth/pendingPushTokenRevocation";
+import {
+  getOsNotificationPermission,
+  registerDevicePushToken,
+} from "@/lib/notifications/registerDevicePushToken";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { PushNotificationsSettings } from "@/components/settings/PushNotificationsSettings";
 import {
   APP_DIAGNOSTICS_FIELDS,
   buildAppDiagnostics,
   formatAppDiagnosticsForClipboard,
 } from "@/lib/settings/appDiagnostics";
+import {
+  NOTIFICATION_PERMISSION_CONTEXT_BODY,
+  NOTIFICATION_PERMISSION_CONTEXT_TITLE,
+  type OsNotificationPermission,
+  type PushNotificationStatusReason,
+} from "@/lib/settings/pushNotificationPreference";
 import { cn } from "@/lib/utils";
 
 type SettingsSectionProps = {
@@ -166,6 +178,8 @@ export default function AccountScreen() {
   const [isUpdatingPushPreference, setIsUpdatingPushPreference] =
     useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [osPermission, setOsPermission] =
+    useState<OsNotificationPermission>("unknown");
   const insets = useSafeAreaInsets();
   const { isDarkColorScheme } = useColorScheme();
   const utils = clientApi.useUtils();
@@ -183,12 +197,32 @@ export default function AccountScreen() {
     clientApi.settings.updateUsername.useMutation();
   const { mutateAsync: setPushNotificationsEnabled } =
     clientApi.settings.setPushNotificationsEnabled.useMutation();
+  const { mutateAsync: registerPushToken } =
+    clientApi.settings.registerPushToken.useMutation();
   const { mutateAsync: unregisterPushToken } =
     clientApi.settings.unregisterPushToken.useMutation();
   const { data: pushStatus, refetch: refetchPushStatus } =
     clientApi.settings.pushNotificationStatus.useQuery(undefined, {
       enabled: Boolean(userData?.dbUser),
     });
+
+  const refreshOsPermission = useCallback(async () => {
+    const status = await getOsNotificationPermission();
+    setOsPermission(status);
+    return status;
+  }, []);
+
+  useEffect(() => {
+    void refreshOsPermission();
+    const subscription = AppState.addEventListener("change", (nextState) => {
+      if (nextState === "active") {
+        void refreshOsPermission();
+      }
+    });
+    return () => {
+      subscription.remove();
+    };
+  }, [refreshOsPermission]);
 
   const trimmedUsernameDraft = usernameDraft.trim();
   const usernamePattern = /^[A-Za-z\d]{8,30}$/;
@@ -220,23 +254,6 @@ export default function AccountScreen() {
     return username.slice(0, 2).toUpperCase();
   }, [username]);
 
-  const pushStatusSummary = pushStatus?.unavailable
-    ? "Push settings are unavailable until notification token storage is deployed."
-    : pushStatus?.tokenCount
-      ? `Enabled on ${pushStatus.tokenCount} device${pushStatus.tokenCount === 1 ? "" : "s"}.`
-      : "No registered device token yet. Enable notifications at the OS level first.";
-  const pushStatusState = pushStatus?.unavailable
-    ? "Unavailable"
-    : pushStatus?.enabled
-      ? "Enabled"
-      : "Disabled";
-  const pushGuidance = pushStatus?.unavailable
-    ? "Notification delivery settings are temporarily unavailable."
-    : !pushStatus?.tokenCount
-      ? "Allow notifications on a physical device to register a push token."
-      : pushStatus.enabled
-        ? "Weekly reminders and league updates will be delivered to your device."
-        : "Turn this on to receive reminders, summaries, and message alerts.";
   const lastSyncLabel = lastSyncedAt
     ? `Synced ${lastSyncedAt.toLocaleTimeString([], {
         hour: "numeric",
@@ -279,11 +296,6 @@ export default function AccountScreen() {
       : `v${appDiagnostics.appVersion} (${appDiagnostics.buildVersion})`;
   const appVersionTypeSummary = `${appDiagnostics.otaSource} • ${appDiagnostics.otaVersion}`;
 
-  const canTogglePushNotifications =
-    !isUpdatingPushPreference &&
-    !pushStatus?.unavailable &&
-    Boolean(pushStatus?.tokenCount);
-
   const triggerSelectionHaptic = useCallback(() => {
     Haptics.selectionAsync().catch(() => {
       // No-op if haptics are unavailable.
@@ -305,6 +317,7 @@ export default function AccountScreen() {
     try {
       await refetchUserData();
       await refetchIsSuperAdmin();
+      await refreshOsPermission();
       if (userData?.dbUser) {
         await refetchPushStatus();
       }
@@ -316,6 +329,7 @@ export default function AccountScreen() {
     refetchIsSuperAdmin,
     refetchPushStatus,
     refetchUserData,
+    refreshOsPermission,
     triggerSelectionHaptic,
     userData?.dbUser,
   ]);
@@ -419,29 +433,160 @@ export default function AccountScreen() {
     }
   };
 
-  const onTogglePushNotifications = async () => {
-    if (!pushStatus || pushStatus.unavailable) {
+  const persistPushPreference = async (nextEnabled: boolean) => {
+    await setPushNotificationsEnabled({ enabled: nextEnabled });
+    await refetchPushStatus();
+    setLastSyncedAt(new Date());
+    triggerSuccessHaptic();
+  };
+
+  const registerTokenAfterPermission = async () => {
+    const result = await registerDevicePushToken({
+      registerPushToken,
+      requestPermissionIfNeeded: false,
+      isE2EMode,
+    });
+    if (result.status === "registered" && userData?.dbUser?.uid) {
+      await clearPendingPushTokenRevocation(
+        result.token,
+        userData.dbUser.uid,
+      );
+    }
+    await refreshOsPermission();
+    await refetchPushStatus();
+    return result;
+  };
+
+  const enablePushWithPermissionContext = async () => {
+    const currentPermission = await refreshOsPermission();
+
+    if (currentPermission === "granted") {
+      setIsUpdatingPushPreference(true);
+      try {
+        await persistPushPreference(true);
+        await registerTokenAfterPermission();
+        Alert.alert("Updated", "Push notifications enabled.");
+      } finally {
+        setIsUpdatingPushPreference(false);
+      }
+      return;
+    }
+
+    if (currentPermission === "denied") {
+      setIsUpdatingPushPreference(true);
+      try {
+        await persistPushPreference(true);
+      } finally {
+        setIsUpdatingPushPreference(false);
+      }
       Alert.alert(
-        "Unavailable",
-        "Push notification settings are unavailable until the database table is deployed.",
+        "Permission needed",
+        "Your Funtime preference is on, but this device blocked notifications. Open system settings to allow them.",
+        [
+          { text: "Not now", style: "cancel" },
+          {
+            text: "Open settings",
+            onPress: () => {
+              void Linking.openSettings();
+            },
+          },
+        ],
       );
       return;
     }
 
-    const nextEnabled = !pushStatus.enabled;
+    Alert.alert(
+      NOTIFICATION_PERMISSION_CONTEXT_TITLE,
+      NOTIFICATION_PERMISSION_CONTEXT_BODY,
+      [
+        { text: "Not now", style: "cancel" },
+        {
+          text: "Continue",
+          onPress: () => {
+            void (async () => {
+              try {
+                setIsUpdatingPushPreference(true);
+                const permission =
+                  await Notifications.requestPermissionsAsync();
+                setOsPermission(
+                  permission.status === "granted" ||
+                    permission.status === "denied" ||
+                    permission.status === "undetermined"
+                    ? permission.status
+                    : "unknown",
+                );
+                await persistPushPreference(true);
+                if (permission.status === "granted") {
+                  await registerTokenAfterPermission();
+                  Alert.alert("Updated", "Push notifications enabled.");
+                } else {
+                  Alert.alert(
+                    "Permission needed",
+                    "Your Funtime preference is on. Allow notifications in system settings so this device can register.",
+                    [
+                      { text: "OK", style: "cancel" },
+                      {
+                        text: "Open settings",
+                        onPress: () => {
+                          void Linking.openSettings();
+                        },
+                      },
+                    ],
+                  );
+                }
+              } catch (error) {
+                console.error(
+                  "Failed to enable push notifications with permission",
+                  error,
+                );
+                Alert.alert(
+                  "Update Failed",
+                  error instanceof Error
+                    ? error.message
+                    : "Unable to update push notification settings.",
+                );
+              } finally {
+                setIsUpdatingPushPreference(false);
+              }
+            })();
+          },
+        },
+      ],
+    );
+  };
+
+  const onTogglePushNotifications = async () => {
+    if (!pushStatus || pushStatus.unavailable) {
+      Alert.alert(
+        "Unavailable",
+        "Push notification settings are unavailable until notification storage is deployed.",
+      );
+      return;
+    }
+
+    const nextEnabled = !(pushStatus.preference ?? pushStatus.enabled);
+    triggerSelectionHaptic();
+
+    if (nextEnabled) {
+      try {
+        await enablePushWithPermissionContext();
+      } catch (error) {
+        console.error("Failed to update push notification preferences", error);
+        Alert.alert(
+          "Update Failed",
+          error instanceof Error
+            ? error.message
+            : "Unable to update push notification settings.",
+        );
+        setIsUpdatingPushPreference(false);
+      }
+      return;
+    }
+
     try {
       setIsUpdatingPushPreference(true);
-      triggerSelectionHaptic();
-      await setPushNotificationsEnabled({ enabled: nextEnabled });
-      await refetchPushStatus();
-      setLastSyncedAt(new Date());
-      triggerSuccessHaptic();
-      Alert.alert(
-        "Updated",
-        nextEnabled
-          ? "Push notifications enabled."
-          : "Push notifications disabled.",
-      );
+      await persistPushPreference(false);
+      Alert.alert("Updated", "Push notifications disabled.");
     } catch (error) {
       console.error("Failed to update push notification preferences", error);
       Alert.alert(
@@ -662,105 +807,32 @@ export default function AccountScreen() {
               </SettingsSection>
 
               <SettingsSection title="Notifications">
-                <SettingsRow
-                  icon="notifications-outline"
-                  title="Notification Status"
-                  value={pushStatusState}
-                  trailing={
-                    <View
-                      className={cn(
-                        "rounded-full px-2 py-0.5",
-                        pushStatus?.unavailable
-                          ? "bg-amber-100 dark:bg-amber-950"
-                          : pushStatus?.enabled
-                            ? "bg-emerald-100 dark:bg-emerald-950"
-                            : "bg-gray-100 dark:bg-zinc-700",
-                      )}
-                    >
-                      <Text
-                        className={cn(
-                          "text-[10px] font-semibold",
-                          pushStatus?.unavailable
-                            ? "text-amber-700 dark:text-amber-300"
-                            : pushStatus?.enabled
-                              ? "text-emerald-700 dark:text-emerald-300"
-                              : "text-gray-600 dark:text-gray-300",
-                        )}
-                      >
-                        {pushStatus?.unavailable
-                          ? "N/A"
-                          : pushStatus?.enabled
-                            ? "ON"
-                            : "OFF"}
-                      </Text>
-                    </View>
+                <PushNotificationsSettings
+                  preference={Boolean(
+                    pushStatus?.preference ?? pushStatus?.enabled,
+                  )}
+                  tokenCount={pushStatus?.tokenCount ?? 0}
+                  reason={
+                    (pushStatus?.reason as PushNotificationStatusReason | undefined) ??
+                    (pushStatus?.unavailable
+                      ? "storage_unavailable"
+                      : pushStatus?.enabled
+                        ? "ok"
+                        : "in_app_disabled")
                   }
+                  unavailable={Boolean(pushStatus?.unavailable)}
+                  osPermission={osPermission}
+                  isUpdating={isUpdatingPushPreference}
+                  onToggle={() => {
+                    void onTogglePushNotifications();
+                  }}
+                  onRefresh={() => {
+                    void onRefresh();
+                  }}
+                  onOpenSettings={() => {
+                    void Linking.openSettings();
+                  }}
                 />
-                <View className="h-px bg-gray-200 dark:bg-zinc-700" />
-                <View className="gap-2 p-3">
-                  <View className="flex-row flex-wrap gap-2">
-                    <View className="rounded-full border border-gray-200 bg-gray-50 px-2.5 py-1 dark:border-zinc-700 dark:bg-zinc-900">
-                      <Text className="text-[10px] font-semibold uppercase tracking-[0.8px] text-gray-600 dark:text-gray-300">
-                        Tokens: {pushStatus?.tokenCount ?? 0}
-                      </Text>
-                    </View>
-                    <View
-                      className={cn(
-                        "rounded-full border px-2.5 py-1",
-                        pushStatus?.enabled
-                          ? "border-emerald-300 bg-emerald-50 dark:border-emerald-800 dark:bg-emerald-950"
-                          : "border-gray-200 bg-gray-50 dark:border-zinc-700 dark:bg-zinc-900",
-                      )}
-                    >
-                      <Text
-                        className={cn(
-                          "text-[10px] font-semibold uppercase tracking-[0.8px]",
-                          pushStatus?.enabled
-                            ? "text-emerald-700 dark:text-emerald-300"
-                            : "text-gray-600 dark:text-gray-300",
-                        )}
-                      >
-                        Preference: {pushStatus?.enabled ? "On" : "Off"}
-                      </Text>
-                    </View>
-                  </View>
-                  <Text className="text-xs text-gray-500 dark:text-gray-400">
-                    {pushStatusSummary}
-                  </Text>
-                  <Text className="text-xs text-gray-500 dark:text-gray-400">
-                    {pushGuidance}
-                  </Text>
-
-                  <View className="mt-1 flex-row items-center justify-between rounded-md border border-gray-200 bg-gray-50 px-3 py-2.5 dark:border-zinc-700 dark:bg-zinc-900">
-                    <View className="flex-1 pr-3">
-                      <Text className="text-app-fg-light dark:text-app-fg-dark text-sm font-medium">
-                        Allow Push Notifications
-                      </Text>
-                      <Text className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
-                        {canTogglePushNotifications
-                          ? "Toggle notification delivery for this account."
-                          : "Enable OS notifications and register a token first."}
-                      </Text>
-                    </View>
-                    <Switch
-                      value={Boolean(pushStatus?.enabled)}
-                      onValueChange={() => {
-                        void onTogglePushNotifications();
-                      }}
-                      disabled={!canTogglePushNotifications}
-                      trackColor={{ false: "#9ca3af", true: "#22c55e" }}
-                      thumbColor={pushStatus?.enabled ? "#ffffff" : "#f3f4f6"}
-                    />
-                  </View>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    disabled={isUpdatingPushPreference}
-                    onPress={() => void onRefresh()}
-                  >
-                    {isUpdatingPushPreference ? "Saving..." : "Refresh Notification Status"}
-                  </Button>
-                </View>
               </SettingsSection>
 
               <SettingsSection title="App Info">
