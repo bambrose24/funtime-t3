@@ -31,11 +31,16 @@ fi
 
 configure_java17() {
   local java_home_17=""
-  if [[ -d "/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home" ]]; then
+  if [[ -n "${JAVA_HOME:-}" && -x "${JAVA_HOME}/bin/java" ]]; then
+    if "${JAVA_HOME}/bin/java" -version 2>&1 | head -n 1 | grep -Eq 'version "1[7-9]|version "[2-9][0-9]'; then
+      java_home_17="$JAVA_HOME"
+    fi
+  fi
+  if [[ -z "$java_home_17" && -d "/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home" ]]; then
     java_home_17="/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home"
-  elif [[ -d "/opt/homebrew/opt/openjdk@17" ]]; then
+  elif [[ -z "$java_home_17" && -d "/opt/homebrew/opt/openjdk@17" ]]; then
     java_home_17="/opt/homebrew/opt/openjdk@17"
-  elif command -v /usr/libexec/java_home >/dev/null 2>&1; then
+  elif [[ -z "$java_home_17" ]] && command -v /usr/libexec/java_home >/dev/null 2>&1; then
     # java_home can return a lower version when exact 17 is unavailable; validate major below.
     java_home_17="$(/usr/libexec/java_home -v 17 2>/dev/null || true)"
   fi
