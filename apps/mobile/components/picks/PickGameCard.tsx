@@ -15,6 +15,8 @@ type Props = {
   awayTeam: Team;
   selectedWinner: number | null;
   onTeamSelect: (teamId: number) => void;
+  /** Explicit lock state from the ticking pick window. */
+  locked?: boolean;
   disabled?: boolean;
   tiebreakerScore?: React.ReactNode;
 };
@@ -25,17 +27,16 @@ export function PickGameCard({
   awayTeam,
   selectedWinner,
   onTeamSelect,
+  locked = false,
   disabled = false,
   tiebreakerScore,
 }: Props) {
-  const started = game.ts < new Date();
-  const isDisabled = disabled || started;
+  const isDisabled = disabled || locked;
   const statusLabel = isDisabled ? "Locked" : "Open";
   const lockedMessage = selectedWinner
     ? "Locked at kickoff"
     : "Game started before pick was submitted";
 
-  // Determine which team is selected
   const homeSelected = selectedWinner === homeTeam.teamid;
   const awaySelected = selectedWinner === awayTeam.teamid;
 
@@ -47,7 +48,6 @@ export function PickGameCard({
           : "border-gray-200 bg-white dark:border-zinc-700 dark:bg-zinc-800"
       }`}
     >
-      {/* Game Time */}
       <View className="mb-2 items-center gap-1">
         <Text className="text-center text-sm text-secondary-foreground">
           {format(game.ts, "EEE MMM d, h:mm a")}
@@ -76,9 +76,7 @@ export function PickGameCard({
         )}
       </View>
 
-      {/* Main Game Selection - 5 Column Grid Layout */}
       <View className="mb-2 flex-row items-center">
-        {/* Away Team - 2 columns */}
         <SelectOption
           onPress={() => !isDisabled && onTeamSelect(awayTeam.teamid)}
           disabled={isDisabled}
@@ -94,14 +92,12 @@ export function PickGameCard({
           </View>
         </SelectOption>
 
-        {/* VS Separator - 1 column */}
         <View className="items-center justify-center px-2" style={{ flex: 1 }}>
           <Text className="text-lg font-semibold text-secondary-foreground">
             @
           </Text>
         </View>
 
-        {/* Home Team - 2 columns */}
         <SelectOption
           onPress={() => !isDisabled && onTeamSelect(homeTeam.teamid)}
           disabled={isDisabled}
@@ -118,7 +114,6 @@ export function PickGameCard({
         </SelectOption>
       </View>
 
-      {/* Records row */}
       {(game.awayrecord || game.homerecord) && (
         <View className="mb-2 flex-row items-center">
           <View className="items-center" style={{ flex: 2 }}>
@@ -135,14 +130,12 @@ export function PickGameCard({
         </View>
       )}
 
-      {/* Disabled message */}
-      {started && (
+      {locked && (
         <Text className="mt-2 text-center text-sm text-warning">
           {lockedMessage}
         </Text>
       )}
 
-      {/* Tiebreaker Score Input */}
       {tiebreakerScore}
     </View>
   );

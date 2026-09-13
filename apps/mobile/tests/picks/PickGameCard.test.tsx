@@ -25,6 +25,7 @@ describe("PickGameCard", () => {
         awayTeam={awayTeam}
         selectedWinner={null}
         onTeamSelect={onTeamSelect}
+        locked={false}
       />,
     );
 
@@ -33,16 +34,17 @@ describe("PickGameCard", () => {
     expect(onTeamSelect).toHaveBeenCalledWith(awayTeam.teamid);
   });
 
-  it("renders locked state and prevents team selection after kickoff", () => {
+  it("renders locked state and prevents team selection when locked", () => {
     const onTeamSelect = jest.fn();
 
     render(
       <PickGameCard
-        game={buildGame({ ts: new Date(Date.now() - 60 * 60 * 1000) })}
+        game={buildGame()}
         homeTeam={homeTeam}
         awayTeam={awayTeam}
         selectedWinner={awayTeam.teamid}
         onTeamSelect={onTeamSelect}
+        locked
       />,
     );
 

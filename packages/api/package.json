@@ -22,7 +22,8 @@
     "./utils/weekSummary": "./utils/weekSummary.ts",
     "./utils/config": "./utils/config.ts",
     "./utils/weekPicksSort": "./utils/weekPicksSort.ts",
-    "./utils/logging": "./utils/logging.ts"
+    "./utils/logging": "./utils/logging.ts",
+    "./utils/pickPermissions": "./utils/pickPermissions.ts"
   },
   "scripts": {
     "build": "tsc",
