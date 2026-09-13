@@ -36,10 +36,8 @@ export default function HomeScreen() {
   const [leagueSearchQuery, setLeagueSearchQuery] = useState("");
   const hasAutoOpenedLeagueRef = useRef(false);
 
-  // Debug data availability (remove in production)
-  if (__DEV__) {
-    useDataAvailabilityTracker();
-  }
+  // Always call; no-ops outside __DEV__.
+  useDataAvailabilityTracker();
 
   // Fetch session and home summary data
   const {

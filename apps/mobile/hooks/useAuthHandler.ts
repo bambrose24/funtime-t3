@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useGlobalSearchParams, usePathname, useRouter } from "expo-router";
 import * as Linking from "expo-linking";
+import { useQueryClient } from "@tanstack/react-query";
 import { type Session } from "@supabase/supabase-js";
 import {
   clearPersistedSupabaseSession,
@@ -9,6 +10,12 @@ import {
 } from "@/lib/supabase/client";
 import { resolveDeepLink } from "@/lib/deeplink/resolveDeepLink";
 import { clientApi } from "@/lib/trpc/react";
+import {
+  purgeAccountScopedCache,
+  resolveIdentityTransition,
+  shouldPurgeAccountCache,
+} from "@/lib/auth/identitySession";
+import { removePersistedQueryCache } from "@/lib/trpc/persisted-cache";
 
 // Lightweight hook for just Supabase session state (for auth navigation logic)
 export function useSupabaseSession() {
@@ -98,9 +105,12 @@ export function useSupabaseSession() {
  * - Supabase session state (for auth navigation)
  * - Deep link handling for email confirmations
  * - Auth-based navigation routing
+ * - Account-scoped query cache purge on identity change
  */
 export function useAuthHandler() {
   const { session, isLoading } = useSupabaseSession();
+  const queryClient = useQueryClient();
+  const previousUidRef = useRef<string | null | undefined>(undefined);
   const { data: appSession, isLoading: isAppSessionLoading } =
     clientApi.session.current.useQuery(undefined, {
       enabled: !!session,
@@ -130,6 +140,46 @@ export function useAuthHandler() {
     pathnameRef.current = pathname;
     sessionRef.current = session;
   }, [pathname, session]);
+
+  // Purge account-scoped cache on identity change (sign-out, switch, cold-start
+  // signed-out with leftover persisted private data). Local purge is immediate;
+  // token revocation is best-effort in the account sign-out path.
+  useEffect(() => {
+    const nextUid = session?.user?.id ?? null;
+
+    if (previousUidRef.current === undefined) {
+      previousUidRef.current = nextUid;
+      if (nextUid === null) {
+        void purgeAccountScopedCache({
+          queryClient,
+          removePersistedCache: removePersistedQueryCache,
+        }).catch((error) => {
+          console.warn(
+            "[Auth] Failed to purge leftover cache on signed-out cold start.",
+            error,
+          );
+        });
+      }
+      return;
+    }
+
+    const transition = resolveIdentityTransition(
+      previousUidRef.current,
+      nextUid,
+    );
+    previousUidRef.current = nextUid;
+
+    if (!shouldPurgeAccountCache(transition)) {
+      return;
+    }
+
+    void purgeAccountScopedCache({
+      queryClient,
+      removePersistedCache: removePersistedQueryCache,
+    }).catch((error) => {
+      console.warn("[Auth] Failed to purge account-scoped cache.", error);
+    });
+  }, [queryClient, session?.user?.id]);
 
   // Handle deep links for auth flows
   useEffect(() => {

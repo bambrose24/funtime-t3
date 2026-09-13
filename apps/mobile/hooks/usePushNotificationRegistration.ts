@@ -5,6 +5,10 @@ import * as Notifications from "expo-notifications";
 import { router } from "expo-router";
 import { clientApi } from "@/lib/trpc/react";
 import { isE2EMode } from "@/lib/e2e";
+import {
+  clearPendingPushTokenRevocation,
+  flushPendingPushTokenRevocations,
+} from "@/lib/auth/pendingPushTokenRevocation";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -18,6 +22,7 @@ Notifications.setNotificationHandler({
 
 export function usePushNotificationRegistration(hasSession: boolean) {
   const registrationAttemptedForUserRef = useRef<number | null>(null);
+  const pendingRevokeFlushForUserRef = useRef<number | null>(null);
   const lastHandledNotificationResponseIdRef = useRef<string | null>(null);
   const { data: appSession } = clientApi.session.current.useQuery(undefined, {
     enabled: hasSession,
@@ -25,6 +30,8 @@ export function usePushNotificationRegistration(hasSession: boolean) {
   });
   const { mutateAsync: registerPushToken } =
     clientApi.settings.registerPushToken.useMutation();
+  const { mutateAsync: unregisterPushToken } =
+    clientApi.settings.unregisterPushToken.useMutation();
 
   useEffect(() => {
     if (isE2EMode) {
@@ -75,6 +82,32 @@ export function usePushNotificationRegistration(hasSession: boolean) {
       subscription.remove();
     };
   }, []);
+
+  // Retry push-token revocations that failed or were deferred during a prior
+  // sign-out for this same app user.
+  useEffect(() => {
+    if (isE2EMode) {
+      return;
+    }
+
+    const dbUser = appSession?.dbUser;
+    if (!hasSession || !dbUser) {
+      pendingRevokeFlushForUserRef.current = null;
+      return;
+    }
+
+    if (pendingRevokeFlushForUserRef.current === dbUser.uid) {
+      return;
+    }
+    pendingRevokeFlushForUserRef.current = dbUser.uid;
+
+    void flushPendingPushTokenRevocations({
+      uid: dbUser.uid,
+      unregisterPushToken,
+    }).catch((error) => {
+      console.warn("[Push] Failed flushing pending token revocations", error);
+    });
+  }, [appSession?.dbUser, hasSession, unregisterPushToken]);
 
   useEffect(() => {
     if (isE2EMode) {
@@ -134,6 +167,9 @@ export function usePushNotificationRegistration(hasSession: boolean) {
         token: tokenResult.data,
         platform,
       });
+      // A successful re-register for this user means this installation is
+      // active again; drop any stale revoke queue for the same token.
+      await clearPendingPushTokenRevocation(tokenResult.data, dbUser.uid);
     };
 
     registerToken().catch((error) => {

@@ -1,0 +1,54 @@
+name: Mobile CI
+
+on:
+  workflow_dispatch:
+  pull_request:
+  merge_group:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mobile-ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  mobile-unit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+
+    env:
+      CI: "true"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22.23.1"
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Typecheck mobile
+        run: pnpm --filter @funtime/mobile typecheck
+
+      - name: Run mobile Jest suite
+        run: pnpm --filter @funtime/mobile test -- --ci --coverage=false
+
+      # expo lint currently fails on many pre-existing issues across the app tree.
+      # Keep it visible without blocking merges until a dedicated hygiene pass.
+      - name: Lint mobile (non-blocking)
+        continue-on-error: true
+        run: pnpm --filter @funtime/mobile lint

@@ -103,6 +103,49 @@ export const settingsRouter = createTRPCRouter({
         throw error;
       }
     }),
+  unregisterPushToken: publicProcedure
+    .input(
+      z.object({
+        token: z.string().min(1),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const dbUser = ctx.dbUser;
+      if (!dbUser) {
+        throw UnauthorizedError;
+      }
+
+      try {
+        // Only the caller's own token for this installation. Other devices of
+        // the same user are left enabled.
+        const result = await ctx.db.pushNotificationTokens.updateMany({
+          where: {
+            token: input.token,
+            user_id: dbUser.uid,
+          },
+          data: {
+            enabled: false,
+          },
+        });
+        return {
+          success: true,
+          updatedCount: result.count,
+          unavailable: false as const,
+        };
+      } catch (error) {
+        if (isMissingPushTokensTableError(error)) {
+          console.warn(
+            "Push token unregister skipped: pushNotificationTokens table missing.",
+          );
+          return {
+            success: false,
+            updatedCount: 0,
+            unavailable: true as const,
+          };
+        }
+        throw error;
+      }
+    }),
   setPushNotificationsEnabled: publicProcedure
     .input(
       z.object({

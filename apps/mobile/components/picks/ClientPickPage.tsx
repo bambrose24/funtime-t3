@@ -153,6 +153,7 @@ function PickForm({
 
   const { mutateAsync: submitPicks } =
     clientApi.picks.submitPicks.useMutation();
+  const utils = clientApi.useUtils();
 
   const onSubmit = async (data: PicksFormData) => {
     try {
@@ -184,6 +185,14 @@ function PickForm({
             : [leagueIdNumber],
         overrideMemberId: undefined,
       });
+
+      await Promise.all([
+        utils.member.picksForWeek.invalidate(),
+        utils.league.picksSummary.invalidate(),
+        utils.league.weekToPick.invalidate({ leagueId: leagueIdNumber }),
+        utils.home.summary.invalidate(),
+        utils.home.leagues.invalidate(),
+      ]);
 
       const confirmation = getPickSubmissionConfirmation({
         week,

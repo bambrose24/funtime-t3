@@ -182,6 +182,11 @@ export default function LeagueAdminPicksScreen() {
         leagueId: leagueIdNumber,
         memberId: memberIdNumber,
       });
+      await Promise.all([
+        utils.league.picksSummary.invalidate({ leagueId: leagueIdNumber }),
+        utils.member.picksForWeek.invalidate(),
+        utils.home.summary.invalidate(),
+      ]);
     } catch (error) {
       console.error("Failed to set pick", error);
       Alert.alert(

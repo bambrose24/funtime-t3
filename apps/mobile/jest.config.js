@@ -18,6 +18,5 @@ module.exports = {
     "<rootDir>/components/**/*.{ts,tsx}",
     "<rootDir>/lib/**/*.{ts,tsx}",
     "!<rootDir>/**/*.d.ts",
-    "!<rootDir>/lib/trpc/**/*",
   ],
 };

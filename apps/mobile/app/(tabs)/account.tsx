@@ -20,8 +20,11 @@ import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import * as Updates from "expo-updates";
 import { useColorScheme } from "@/lib/useColorScheme";
+import * as Notifications from "expo-notifications";
 import { supabase } from "@/lib/supabase/client";
 import { clientApi } from "@/lib/trpc/react";
+import { isE2EMode } from "@/lib/e2e";
+import { revokePushTokenBestEffort } from "@/lib/auth/pendingPushTokenRevocation";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -180,6 +183,8 @@ export default function AccountScreen() {
     clientApi.settings.updateUsername.useMutation();
   const { mutateAsync: setPushNotificationsEnabled } =
     clientApi.settings.setPushNotificationsEnabled.useMutation();
+  const { mutateAsync: unregisterPushToken } =
+    clientApi.settings.unregisterPushToken.useMutation();
   const { data: pushStatus, refetch: refetchPushStatus } =
     clientApi.settings.pushNotificationStatus.useQuery(undefined, {
       enabled: Boolean(userData?.dbUser),
@@ -317,11 +322,47 @@ export default function AccountScreen() {
 
   const signOut = async () => {
     setIsSigningOut(true);
-    const { error } = await supabase.auth.signOut();
-    if (error) {
-      Alert.alert("Error", error.message);
+    try {
+      // Best-effort revocation must not block local sign-out: offline mutations
+      // with networkMode "online" pause instead of rejecting, so we bound the
+      // attempt and queue failures for retry on the next auth for this uid.
+      const uid = userData?.dbUser?.uid;
+      if (!isE2EMode && typeof uid === "number") {
+        try {
+          const projectId =
+            process.env.EXPO_PUBLIC_EAS_PROJECT_ID ??
+            Constants.easConfig?.projectId ??
+            Constants.expoConfig?.extra?.eas?.projectId;
+          if (projectId) {
+            const tokenResult = await Notifications.getExpoPushTokenAsync({
+              projectId,
+            });
+            const outcome = await revokePushTokenBestEffort({
+              token: tokenResult.data,
+              uid,
+              unregisterPushToken,
+            });
+            if (outcome === "queued") {
+              console.warn(
+                "[Auth] Push token revocation queued for retry after sign-out.",
+              );
+            }
+          }
+        } catch (error) {
+          console.warn(
+            "[Auth] Failed to prepare push token revocation before sign-out; continuing.",
+            error,
+          );
+        }
+      }
+
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        Alert.alert("Error", error.message);
+      }
+    } finally {
+      setIsSigningOut(false);
     }
-    setIsSigningOut(false);
   };
 
   const onPressSignOut = () => {
