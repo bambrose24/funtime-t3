@@ -18,6 +18,7 @@ import { getSeasonOverUpsell } from "@/lib/picks/getSeasonOverUpsell";
 import { getPickSubmissionConfirmation } from "@/lib/picks/getPickSubmissionConfirmation";
 import { getPickWindow } from "@/lib/picks/getPickWindow";
 import { useTickingNow } from "@/lib/picks/useTickingNow";
+import { isValidTiebreakerScoreInput } from "@funtime/api/utils/pickValidation";
 
 type Props = {
   leagueId: string;
@@ -59,16 +60,9 @@ const picksSchema = z.object({
     score: z
       .string()
       .min(1, "You must pick a score")
-      .refine(
-        (val) =>
-          !isNaN(Number(val)) &&
-          Number.isInteger(Number(val)) &&
-          Number(val) > 0 &&
-          Number(val) < 200,
-        {
-          message: "Score must be between 1 and 200",
-        },
-      ),
+      .refine(isValidTiebreakerScoreInput, {
+        message: "Score must be between 1 and 200",
+      }),
   }),
 });
 

@@ -23,7 +23,8 @@
     "./utils/config": "./utils/config.ts",
     "./utils/weekPicksSort": "./utils/weekPicksSort.ts",
     "./utils/logging": "./utils/logging.ts",
-    "./utils/pickPermissions": "./utils/pickPermissions.ts"
+    "./utils/pickPermissions": "./utils/pickPermissions.ts",
+    "./utils/pickValidation": "./utils/pickValidation.ts"
   },
   "scripts": {
     "build": "tsc",
