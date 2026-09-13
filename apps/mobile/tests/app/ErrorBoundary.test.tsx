@@ -8,7 +8,7 @@ jest.mock("@/lib/app/crashReporting", () => ({
   reportCrash: (...args: unknown[]) => mockReportCrash(...args),
 }));
 
-function AlwaysBoom() {
+function AlwaysBoom(): React.ReactNode {
   throw new Error("boom");
 }
 
