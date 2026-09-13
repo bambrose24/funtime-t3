@@ -1,3 +1,5 @@
+import { webFallbackUrl } from "@/lib/deeplink/routeInventory";
+
 const WEB_DEEP_LINK_HOSTS = new Set([
   "play-funtime.com",
   "www.play-funtime.com",
@@ -9,6 +11,8 @@ const PATH_PARAM_KEYS = new Set(["id", "leagueId", "code", "memberId"]);
 export type DeepLinkTarget = {
   href: string;
   mode: "push" | "replace";
+  /** When true, `href` is a full https URL to open in the system browser. */
+  openInBrowser?: boolean;
 };
 
 const normalizePath = (path?: string | null) => {
@@ -122,8 +126,8 @@ export function resolveDeepLink(url: string): DeepLinkTarget | null {
   // Expo dev URLs include "/--/" before the app route.
   routePath = routePath.replace(/^\/--\//, "/");
 
-  if (WEB_DEEP_LINK_HOSTS.has(host)) {
-    if (routePath === "/settings") {
+  if (WEB_DEEP_LINK_HOSTS.has(host) || !WEB_PROTOCOLS.has(protocol)) {
+    if (routePath === "/settings" || routePath.startsWith("/settings/")) {
       return { href: "/account", mode: "replace" };
     }
     if (routePath === "/login") {
@@ -223,7 +227,82 @@ export function resolveDeepLink(url: string): DeepLinkTarget | null {
     }
   }
 
-  const routablePaths = [
+  const leaguePlayerMatch = routePath.match(
+    /^\/league\/(?<leagueId>\d+)\/player\/(?<memberId>\d+)$/,
+  );
+  if (leaguePlayerMatch?.groups?.leagueId && leaguePlayerMatch.groups.memberId) {
+    return {
+      href: withQueryString(
+        `/league/${leaguePlayerMatch.groups.leagueId}/player/${leaguePlayerMatch.groups.memberId}`,
+        mergedParams,
+      ),
+      mode: "replace",
+    };
+  }
+
+  const leagueAdminMembersMatch = routePath.match(
+    /^\/league\/(?<leagueId>\d+)\/admin\/members$/,
+  );
+  if (leagueAdminMembersMatch?.groups?.leagueId) {
+    return {
+      href: withQueryString(
+        `/league/${leagueAdminMembersMatch.groups.leagueId}/admin`,
+        mergedParams,
+      ),
+      mode: "replace",
+    };
+  }
+
+  const leagueNativeSuffixMatch = routePath.match(
+    /^\/league\/(?<leagueId>\d+)\/(?<suffix>admin|admin-picks|admin-emails|renewal-invites)$/,
+  );
+  if (
+    leagueNativeSuffixMatch?.groups?.leagueId &&
+    leagueNativeSuffixMatch.groups.suffix
+  ) {
+    return {
+      href: withQueryString(
+        `/league/${leagueNativeSuffixMatch.groups.leagueId}/${leagueNativeSuffixMatch.groups.suffix}`,
+        mergedParams,
+      ),
+      mode: "replace",
+    };
+  }
+
+  const leagueWebFallbackMatch = routePath.match(
+    /^\/league\/(?<leagueId>\d+)\/(?:my-profile|admin\/superbowl)$/,
+  );
+  if (leagueWebFallbackMatch) {
+    return {
+      href: webFallbackUrl(withQueryString(routePath, mergedParams)),
+      mode: "replace",
+      openInBrowser: true,
+    };
+  }
+
+  const leagueRootMatch = routePath.match(/^\/league\/(?<leagueId>\d+)$/);
+  if (leagueRootMatch?.groups?.leagueId) {
+    return {
+      href: withQueryString(
+        `/league/${leagueRootMatch.groups.leagueId}`,
+        mergedParams,
+      ),
+      mode: "replace",
+    };
+  }
+
+  const joinCodeMatch = routePath.match(/^\/join-league\/(?<code>[^/]+)$/);
+  if (joinCodeMatch?.groups?.code) {
+    return {
+      href: withQueryString(
+        `/join-league/${joinCodeMatch.groups.code}`,
+        mergedParams,
+      ),
+      mode: "replace",
+    };
+  }
+
+  const exactNativePaths = new Set([
     "/",
     "/join-league",
     "/league/create",
@@ -234,22 +313,18 @@ export function resolveDeepLink(url: string): DeepLinkTarget | null {
     "/confirm-signup",
     "/account",
     "/admin",
-  ];
-  const prefixPaths = ["/join-league/", "/league/"];
+  ]);
 
-  if (
-    routablePaths.includes(routePath) ||
-    prefixPaths.some((prefix) => routePath.startsWith(prefix))
-  ) {
+  if (exactNativePaths.has(routePath)) {
     if (routePath === "/") {
       return { href: "/home", mode: "replace" };
     }
-
     return {
       href: withQueryString(routePath, mergedParams),
       mode: "replace",
     };
   }
 
+  // Do not accept arbitrary /league/... suffixes as native destinations.
   return null;
 }

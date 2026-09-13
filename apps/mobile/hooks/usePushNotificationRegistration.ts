@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import { Platform } from "react-native";
 import Constants from "expo-constants";
 import * as Notifications from "expo-notifications";
+import * as Linking from "expo-linking";
 import { router } from "expo-router";
 import { clientApi } from "@/lib/trpc/react";
 import { isE2EMode } from "@/lib/e2e";
@@ -65,7 +66,9 @@ export function usePushNotificationRegistration(hasSession: boolean) {
           lastHandledNotificationResponseIdRef.current = responseId;
         } else {
           lastHandledNotificationResponseIdRef.current = responseId;
-          if (target.mode === "replace") {
+          if (target.openInBrowser) {
+            void Linking.openURL(target.href);
+          } else if (target.mode === "replace") {
             router.replace(target.href as any);
           } else {
             router.push(target.href as any);
