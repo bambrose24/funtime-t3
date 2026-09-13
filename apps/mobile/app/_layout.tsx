@@ -9,6 +9,14 @@ if (!("structuredClone" in globalThis)) {
   globalThis.structuredClone = structuredClone;
 }
 
+import * as SplashScreen from "expo-splash-screen";
+
+// Keep the native splash visible until fonts, cache restore, and session resolve
+// (or the hard timeout fires). Must run at module scope before first paint.
+void SplashScreen.preventAutoHideAsync().catch(() => {
+  // Expo Go / web may reject; ignore.
+});
+
 import {
   DarkTheme,
   DefaultTheme,
@@ -24,7 +32,7 @@ import {
 } from "@expo-google-fonts/inter";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Platform } from "react-native";
 import "react-native-reanimated";
 
@@ -37,6 +45,10 @@ import { useCacheDebugger } from "@/hooks/useCacheDebugger";
 import { useAuthHandler } from "@/hooks/useAuthHandler";
 import { usePushNotificationRegistration } from "@/hooks/usePushNotificationRegistration";
 import { PostHogProvider } from "@/providers/PostHogProvider";
+import {
+  shouldHideSplash,
+  SPLASH_TIMEOUT_MS,
+} from "@/lib/app/splashGate";
 
 const LIGHT_THEME: Theme = {
   ...DefaultTheme,
@@ -47,22 +59,52 @@ const DARK_THEME: Theme = {
   colors: NAV_THEME.dark,
 };
 
-function AppContent() {
+function AppContent({
+  fontsLoaded,
+  cacheRestored,
+  timedOut,
+}: {
+  fontsLoaded: boolean;
+  cacheRestored: boolean;
+  timedOut: boolean;
+}) {
   const { isDarkColorScheme } = useColorScheme();
-  
+
   // Handle all auth logic (session, deep links, navigation)
   const { session, isLoading } = useAuthHandler();
+  const sessionResolved = !isLoading;
+  const splashHiddenRef = useRef(false);
+
+  useEffect(() => {
+    if (splashHiddenRef.current) {
+      return;
+    }
+    if (
+      !shouldHideSplash({
+        fontsLoaded,
+        cacheRestored,
+        sessionResolved,
+        timedOut,
+      })
+    ) {
+      return;
+    }
+    splashHiddenRef.current = true;
+    void SplashScreen.hideAsync().catch(() => {
+      // Already hidden or unavailable.
+    });
+  }, [cacheRestored, fontsLoaded, sessionResolved, timedOut]);
 
   // Register and refresh Expo push token once user session is active.
   usePushNotificationRegistration(Boolean(session));
-  
+
   // Prefetch essential data on cold start
   useColdStartPrefetch(session, isLoading);
-  
+
   // Always call; no-ops outside __DEV__.
   useCacheDebugger();
 
-  // Show loading screen while checking authentication
+  // Show loading screen while checking authentication (under the splash until hide).
   if (isLoading) {
     return (
       <ThemeProvider value={isDarkColorScheme ? DARK_THEME : LIGHT_THEME}>
@@ -90,14 +132,19 @@ function AppContent() {
 
 export default function RootLayout() {
   const hasMounted = useRef(false);
-  const { isDarkColorScheme } = useColorScheme();
   const [isColorSchemeLoaded, setIsColorSchemeLoaded] = useState(false);
+  const [cacheRestored, setCacheRestored] = useState(false);
+  const [timedOut, setTimedOut] = useState(false);
   const [loaded] = useFonts({
     Inter_400Regular,
     Inter_500Medium,
     Inter_600SemiBold,
     Inter_700Bold,
   });
+
+  const onCacheRestored = useCallback(() => {
+    setCacheRestored(true);
+  }, []);
 
   useEffect(() => {
     if (hasMounted.current) {
@@ -112,15 +159,24 @@ export default function RootLayout() {
     hasMounted.current = true;
   }, []);
 
-  // Show loading screen while fonts or color scheme load
-  if (!loaded || !isColorSchemeLoaded) {
-    return null;
-  }
+  useEffect(() => {
+    const id = setTimeout(() => {
+      setTimedOut(true);
+    }, SPLASH_TIMEOUT_MS);
+    return () => clearTimeout(id);
+  }, []);
 
+  const fontsLoaded = loaded && isColorSchemeLoaded;
+
+  // Always mount the tree behind the native splash — never return null here.
   return (
     <PostHogProvider>
-      <TRPCReactProvider>
-        <AppContent />
+      <TRPCReactProvider onCacheRestored={onCacheRestored}>
+        <AppContent
+          fontsLoaded={fontsLoaded}
+          cacheRestored={cacheRestored}
+          timedOut={timedOut}
+        />
       </TRPCReactProvider>
     </PostHogProvider>
   );

@@ -47,9 +47,16 @@ let queryClientSingleton: QueryClient | undefined;
 export const getQueryClient = () =>
   (queryClientSingleton ??= createQueryClient());
 
-export function TRPCReactProvider({ children }: { children: React.ReactNode }) {
+export function TRPCReactProvider({
+  children,
+  onCacheRestored,
+}: {
+  children: React.ReactNode;
+  onCacheRestored?: () => void;
+}) {
   const queryClient = getQueryClient();
-  const [isReady, setIsReady] = useState(false);
+  const onCacheRestoredRef = React.useRef(onCacheRestored);
+  onCacheRestoredRef.current = onCacheRestored;
 
   useEffect(() => {
     const persister = createAsyncStoragePersister({
@@ -71,7 +78,16 @@ export function TRPCReactProvider({ children }: { children: React.ReactNode }) {
       },
     });
 
-    restorePromise.finally(() => setIsReady(true));
+    let settled = false;
+    const markRestored = () => {
+      if (settled) {
+        return;
+      }
+      settled = true;
+      onCacheRestoredRef.current?.();
+    };
+
+    restorePromise.finally(markRestored);
 
     return unsubscribe;
   }, [queryClient]);
@@ -136,8 +152,8 @@ export function TRPCReactProvider({ children }: { children: React.ReactNode }) {
     }),
   );
 
-  if (!isReady) return null; // or a splash screen
-
+  // Always render the tree; the root splash gate covers restore instead of
+  // returning null (which produced a blank frame between splash and UI).
   return (
     <QueryClientProvider client={queryClient}>
       <clientApi.Provider client={trpcClient} queryClient={queryClient}>
