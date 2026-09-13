@@ -1,3 +1,5 @@
+import { claimWeeklyRecap } from "../../../utils/weeklyRecapDelivery";
+import type { WeekSummary } from "../../../utils/weekSummary";
 import { createHash } from "node:crypto";
 import { chunk } from "lodash";
 import { Resend } from "resend";
@@ -599,100 +601,95 @@ export const resendApi = {
     }
   },
   sendWeekSummaryEmail: async ({
+    season,
     leagueId,
     leagueName,
     week,
-    standings,
-    weekWinners,
-    tiebreakerTotal,
     recipients,
-  }: {
+    ...summary
+  }: WeekSummary & {
     leagueId: number;
     leagueName: string;
     week: number;
-    standings: Array<{
-      rank: number;
-      username: string;
-      correctPicks: number;
-      seasonTotal: number;
-    }>;
-    weekWinners: string[];
-    tiebreakerTotal: number | null;
-    recipients: Array<{
-      email: string;
-      memberId: number;
-      username: string;
-      rank: number;
-      correctPicks: number;
-      seasonRank: number;
-      seasonTotal: number;
-      seasonMovement: number | null;
-      tiebreakerPick: number | null;
-      tiebreakerDiff: number | null;
-      picks: Array<{
-        game: string;
-        pick: string;
-        result: "Correct" | "Wrong" | "Pending";
-      }>;
-    }>;
+    season: number;
   }) => {
-    if (recipients.length === 0) {
+    if (EMAILS_DISABLED || recipients.length === 0) {
       return { sent: 0 };
     }
 
     let sent = 0;
     for (const recipient of recipients) {
-      const { data, error } = await sendEmail(
-        {
-          from: FROM,
-          to: [recipient.email],
-          subject: `${leagueName} - Week ${week} Summary`,
-          react: WeekSummaryEmail({
-            leagueId,
-            leagueName,
-            week,
-            standings,
-            weekWinners,
-            tiebreakerTotal,
-            recipient,
-          }),
-          tags: createTags("week_summary", leagueId),
-        },
-        `week_summary:${leagueId}:${recipient.memberId}:${week}`,
-        createIdempotencyKey(
-          "week-summary",
-          JSON.stringify({
-            leagueId,
-            week,
-            standings,
-            weekWinners,
-            tiebreakerTotal,
-            recipient,
-          }),
-        ),
-      );
-
-      if (error) {
-        getLogger().error(
-          `${LOG_PREFIX} Error sending week summary email for league ${leagueId} member ${recipient.memberId}`,
-          { error },
-        );
-        continue;
-      }
-
-      sent += 1;
-      if (data?.id) {
-        await db.emailLogs.create({
-          data: {
-            email_type: "week_summary",
-            resend_id: data.id,
-            league_id: leagueId,
-            member_id: recipient.memberId,
-            week,
+      const identity = {
+        league_id: leagueId,
+        user_id: recipient.userId,
+        season,
+        week,
+      };
+      if (!(await claimWeeklyRecap(db, identity))) continue;
+      try {
+        const { data, error } = await sendEmail(
+          {
+            from: FROM,
+            to: [recipient.email],
+            subject: `${leagueName} · Your Week ${week} results`,
+            react: WeekSummaryEmail({
+              leagueId,
+              leagueName,
+              week,
+              ...summary,
+              recipient,
+            }),
+            tags: createTags("week_summary", leagueId),
           },
-          select: { email_log_id: true },
-        });
-        await reconcileEmailDeliveryState(data.id);
+          `week_summary:${leagueId}:${recipient.memberId}:${week}`,
+          createIdempotencyKey("week-summary", JSON.stringify(identity)),
+        );
+
+        if (error) {
+          // Only an explicit rate-limit rejection is automatically retryable.
+          // Unknown outcomes stay claimed, even after the provider deduplication window.
+          await db.weeklyRecapDelivery.updateMany({
+            where: identity,
+            data: {
+              state: error.statusCode === 429 ? "retryable" : "uncertain",
+            },
+          });
+          getLogger().error(
+            `${LOG_PREFIX} Error sending week summary email for league ${leagueId} member ${recipient.memberId}`,
+            { error },
+          );
+          continue;
+        }
+
+        if (data?.id) {
+          await db.weeklyRecapDelivery.updateMany({
+            where: identity,
+            data: { state: "sent", resend_id: data.id },
+          });
+          sent += 1;
+          await db.emailLogs.create({
+            data: {
+              email_type: "week_summary",
+              resend_id: data.id,
+              league_id: leagueId,
+              member_id: recipient.memberId,
+              week,
+            },
+            select: { email_log_id: true },
+          });
+          await reconcileEmailDeliveryState(data.id);
+        } else {
+          await db.weeklyRecapDelivery.updateMany({
+            where: identity,
+            data: { state: "uncertain" },
+          });
+        }
+      } catch (error) {
+        // A crash/network timeout may happen after acceptance. Never expire this claim.
+        getLogger().error(
+          `${LOG_PREFIX} Weekly recap outcome requires review`,
+          { identity, error },
+        );
       }
     }
 
