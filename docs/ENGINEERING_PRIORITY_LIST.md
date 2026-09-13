@@ -330,7 +330,7 @@ MOB-01 through MOB-10 above remain the release epics and keep their IDs and rele
 | 17    | MOB-03c | P2       | Chat client: incremental fetch, optimistic send, honest copy               | Component                     |
 | 18    | MOB-13b | P3       | Split the 1,849-line league screen; deliberately last                     | Existing checks only          |
 
-**Current position:** **MOB-13b** in progress (mobile-only). **MOB-12c** merged (#55). Auto-mergeable queue ends after this slice; remaining **WEB-15** (BLOCKED), **WEB-12a**, **MOB-02a / MOB-02b**, **WEB-14a** / **MOB-03c** stay deferred from auto-merge (web/shared). Update this line when a slice starts or merges.
+**Current position:** Auto-mergeable September mobile queue complete. **MOB-13b** merged (#56). Remaining deferred (no auto-merge): **WEB-15** (BLOCKED), **WEB-12a**, **MOB-02a / MOB-02b**, **WEB-14a** / **MOB-03c**. Update this line when a deferred slice starts or merges.
 
 MOB-05 (build and signing), MOB-06 (account deletion) and MOB-07 (chat moderation) are not in this queue because they need product decisions and have long external lead times. They remain public-release prerequisites; start their decisions in parallel with this queue even though their implementation is serial with it.
 
