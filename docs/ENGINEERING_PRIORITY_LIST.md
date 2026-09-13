@@ -330,7 +330,7 @@ MOB-01 through MOB-10 above remain the release epics and keep their IDs and rele
 | 17    | MOB-03c | P2       | Chat client: incremental fetch, optimistic send, honest copy               | Component                     |
 | 18    | MOB-13b | P3       | Split the 1,849-line league screen; deliberately last                     | Existing checks only          |
 
-**Current position:** **MOB-12a** in progress (mobile-only). **MOB-04b** merged (#52). **WEB-15** deferred/BLOCKED pending product decision on peer email; **WEB-12a**, **MOB-02a / MOB-02b**, **WEB-14a** deferred from auto-merge (web/shared). Update this line when a slice starts or merges.
+**Current position:** **MOB-12b** in progress (mobile-only; PostHog-only crash reporting recorded as known limitation vs Sentry). **MOB-12a** merged (#53). **WEB-15** deferred/BLOCKED; **WEB-12a**, **MOB-02a / MOB-02b**, **WEB-14a** deferred from auto-merge. Update this line when a slice starts or merges.
 
 MOB-05 (build and signing), MOB-06 (account deletion) and MOB-07 (chat moderation) are not in this queue because they need product decisions and have long external lead times. They remain public-release prerequisites; start their decisions in parallel with this queue even though their implementation is serial with it.
 
@@ -527,6 +527,8 @@ Prefer clearing on transition over namespacing the persister key by user id: it 
 **Test layer:** component — `apps/mobile/tests/app/ErrorBoundary.test.tsx`: a throwing child renders the fallback, retry remounts the tree, and the reporter receives the error exactly once.
 
 **Decision required first:** which reporter. Recommendation: Sentry via `@sentry/react-native`. PostHog-only error capture is acceptable if recorded as a known limitation.
+
+**Decision (2026-09-13):** ship **PostHog-only** (`mobile_crash` events + logger) for this slice; Sentry remains optional follow-up. Recorded as a known limitation: no dedicated crash grouping/symbolication beyond PostHog.
 
 **Done when:** a render error shows a recoverable screen and produces one reported event with enough context to act on.
 

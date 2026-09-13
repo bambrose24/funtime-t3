@@ -49,6 +49,10 @@ import {
   shouldHideSplash,
   SPLASH_TIMEOUT_MS,
 } from "@/lib/app/splashGate";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { installGlobalErrorHandlers } from "@/lib/app/crashReporting";
+import { getQueryClient } from "@/lib/trpc/react";
+import { removePersistedQueryCache } from "@/lib/trpc/persisted-cache";
 
 const LIGHT_THEME: Theme = {
   ...DefaultTheme,
@@ -166,18 +170,30 @@ export default function RootLayout() {
     return () => clearTimeout(id);
   }, []);
 
+  useEffect(() => {
+    installGlobalErrorHandlers();
+  }, []);
+
   const fontsLoaded = loaded && isColorSchemeLoaded;
+
+  const handleBoundaryReset = useCallback(async () => {
+    const queryClient = getQueryClient();
+    queryClient.clear();
+    await removePersistedQueryCache();
+  }, []);
 
   // Always mount the tree behind the native splash — never return null here.
   return (
     <PostHogProvider>
-      <TRPCReactProvider onCacheRestored={onCacheRestored}>
-        <AppContent
-          fontsLoaded={fontsLoaded}
-          cacheRestored={cacheRestored}
-          timedOut={timedOut}
-        />
-      </TRPCReactProvider>
+      <ErrorBoundary onReset={handleBoundaryReset}>
+        <TRPCReactProvider onCacheRestored={onCacheRestored}>
+          <AppContent
+            fontsLoaded={fontsLoaded}
+            cacheRestored={cacheRestored}
+            timedOut={timedOut}
+          />
+        </TRPCReactProvider>
+      </ErrorBoundary>
     </PostHogProvider>
   );
 }
