@@ -1,4 +1,9 @@
-import { resolveDeepLink } from "@/lib/deeplink/resolveDeepLink";
+import {
+  hrefFromPathAndParams,
+  resolveAppDestination,
+  resolveDeepLink,
+  shouldNavigate,
+} from "@/lib/deeplink/resolveDeepLink";
 
 describe("resolveDeepLink", () => {
   it("maps required play-funtime.com routes to mobile routes", () => {
@@ -124,5 +129,63 @@ describe("resolveDeepLink", () => {
       mode: "replace",
     });
     expect(resolveDeepLink("https://play-funtime.com/not-a-route")).toBeNull();
+  });
+});
+
+describe("resolveAppDestination", () => {
+  it("resolves notification path payloads through the same allowlist", () => {
+    expect(resolveAppDestination("/league/42/pick")).toEqual({
+      href: "/league/42?tab=picks",
+      mode: "replace",
+    });
+    expect(resolveAppDestination("/league/42?week=3&tab=picks")).toEqual({
+      href: "/league/42?week=3&tab=picks",
+      mode: "replace",
+    });
+    expect(
+      resolveAppDestination("https://play-funtime.com/join-league/ABC123"),
+    ).toEqual({
+      href: "/join-league/ABC123",
+      mode: "replace",
+    });
+  });
+
+  it("rejects empty and unknown notification destinations", () => {
+    expect(resolveAppDestination("")).toBeNull();
+    expect(resolveAppDestination("   ")).toBeNull();
+    expect(resolveAppDestination("/not-a-route")).toBeNull();
+  });
+});
+
+describe("shouldNavigate", () => {
+  it("navigates when query changes on the same path", () => {
+    expect(
+      shouldNavigate("/league/42?week=1", "/league/42?week=2"),
+    ).toBe(true);
+    expect(
+      shouldNavigate("/league/42?tab=picks", "/league/42?tab=messages"),
+    ).toBe(true);
+  });
+
+  it("skips navigation when path and query already match", () => {
+    expect(
+      shouldNavigate(
+        "/league/42?week=1&tab=picks",
+        "/league/42?tab=picks&week=1",
+      ),
+    ).toBe(false);
+    expect(shouldNavigate("/home", "/home")).toBe(false);
+  });
+});
+
+describe("hrefFromPathAndParams", () => {
+  it("omits dynamic route params already present in the path", () => {
+    expect(
+      hrefFromPathAndParams("/league/42", {
+        id: "42",
+        week: "3",
+        tab: "picks",
+      }),
+    ).toBe("/league/42?week=3&tab=picks");
   });
 });

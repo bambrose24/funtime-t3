@@ -9,6 +9,7 @@ import {
   clearPendingPushTokenRevocation,
   flushPendingPushTokenRevocations,
 } from "@/lib/auth/pendingPushTokenRevocation";
+import { resolveAppDestination } from "@/lib/deeplink/resolveDeepLink";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -55,8 +56,21 @@ export function usePushNotificationRegistration(hasSession: boolean) {
 
       const path = response?.notification.request.content.data?.path;
       if (typeof path === "string" && path.length > 0) {
-        lastHandledNotificationResponseIdRef.current = responseId;
-        router.push(path as any);
+        const target = resolveAppDestination(path);
+        if (!target) {
+          console.warn(
+            "[Push] Ignoring notification destination outside the allowlist",
+            { path },
+          );
+          lastHandledNotificationResponseIdRef.current = responseId;
+        } else {
+          lastHandledNotificationResponseIdRef.current = responseId;
+          if (target.mode === "replace") {
+            router.replace(target.href as any);
+          } else {
+            router.push(target.href as any);
+          }
+        }
       }
 
       try {
