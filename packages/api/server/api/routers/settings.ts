@@ -16,6 +16,20 @@ const isMissingPushTokensTableError = (error: unknown) => {
   );
 };
 
+const isMissingPushPreferenceColumnError = (error: unknown) => {
+  return (
+    typeof error === "object" &&
+    error !== null &&
+    "code" in error &&
+    (error as { code?: string }).code === "P2022"
+  );
+};
+
+export type PushNotificationStatusReason =
+  | "ok"
+  | "in_app_disabled"
+  | "storage_unavailable";
+
 export const settingsRouter = createTRPCRouter({
   get: publicProcedure.query(async ({ ctx }) => {
     const { dbUser: dbUserCached } = ctx;
@@ -85,10 +99,10 @@ export const settingsRouter = createTRPCRouter({
             enabled: true,
             last_seen_at: new Date(),
           },
+          // Do not flip token.enabled or the account preference on re-register.
           update: {
             user_id: dbUser.uid,
             platform: input.platform ?? null,
-            enabled: true,
             last_seen_at: new Date(),
           },
         });
@@ -159,23 +173,26 @@ export const settingsRouter = createTRPCRouter({
       }
 
       try {
-        const result = await ctx.db.pushNotificationTokens.updateMany({
+        await ctx.db.people.update({
           where: {
-            user_id: dbUser.uid,
+            uid: dbUser.uid,
           },
           data: {
-            enabled: input.enabled,
+            push_notifications_enabled: input.enabled,
           },
         });
         return {
           success: true,
-          updatedCount: result.count,
+          updatedCount: 1,
           unavailable: false as const,
         };
       } catch (error) {
-        if (isMissingPushTokensTableError(error)) {
+        if (
+          isMissingPushTokensTableError(error) ||
+          isMissingPushPreferenceColumnError(error)
+        ) {
           console.warn(
-            "Push notification preference update skipped: pushNotificationTokens table missing.",
+            "Push notification preference update skipped: account preference column or push storage missing.",
           );
           return {
             success: false,
@@ -193,31 +210,42 @@ export const settingsRouter = createTRPCRouter({
     }
 
     try {
-      const tokens = await ctx.db.pushNotificationTokens.findMany({
-        where: {
-          user_id: dbUser.uid,
-        },
-        select: {
-          enabled: true,
-        },
-      });
+      const [person, tokenCount] = await Promise.all([
+        ctx.db.people.findUniqueOrThrow({
+          where: { uid: dbUser.uid },
+          select: { push_notifications_enabled: true },
+        }),
+        ctx.db.pushNotificationTokens.count({
+          where: { user_id: dbUser.uid },
+        }),
+      ]);
 
-      const tokenCount = tokens.length;
-      const enabled = tokenCount > 0 && tokens.some((token) => token.enabled);
+      const preference = person.push_notifications_enabled;
+      const reason: PushNotificationStatusReason = preference
+        ? "ok"
+        : "in_app_disabled";
 
       return {
-        enabled,
+        // `enabled` remains the durable account preference for existing clients.
+        enabled: preference,
+        preference,
         tokenCount,
+        reason,
         unavailable: false as const,
       };
     } catch (error) {
-      if (isMissingPushTokensTableError(error)) {
+      if (
+        isMissingPushTokensTableError(error) ||
+        isMissingPushPreferenceColumnError(error)
+      ) {
         console.warn(
-          "Push notification status unavailable: pushNotificationTokens table missing.",
+          "Push notification status unavailable: push preference or token storage missing.",
         );
         return {
           enabled: false,
+          preference: false,
           tokenCount: 0,
+          reason: "storage_unavailable" as const,
           unavailable: true as const,
         };
       }

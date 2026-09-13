@@ -144,6 +144,9 @@ export const expoPushApi = {
             in: recipientUserIds,
           },
           enabled: true,
+          people: {
+            push_notifications_enabled: true,
+          },
         },
         select: {
           token: true,
@@ -207,6 +210,9 @@ export const expoPushApi = {
               in: recipients.map((recipient) => recipient.userId),
             },
             enabled: true,
+            people: {
+              push_notifications_enabled: true,
+            },
           },
           select: {
             token: true,
