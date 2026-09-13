@@ -56,6 +56,10 @@ export function GameCard({
       seconds === null
     )
       return "In Progress";
+    // ESPN reports Q2 with 0:00 during STATUS_HALFTIME (we don't store status name).
+    if (quarter === 2 && seconds === 0) {
+      return "Halftime";
+    }
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
     const prefix = quarter > 4 ? "OT" : `Q${quarter}`;
