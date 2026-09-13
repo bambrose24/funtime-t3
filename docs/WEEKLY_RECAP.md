@@ -2,7 +2,7 @@
 
 Each member receives their own results first, followed by the top three weekly places (including ties at third), full standings link, and next-week picks button. At season end the button is omitted.
 
-Weekly rank uses correct picks descending, then absolute difference from the final tiebreaker game's combined score ascending. Equal results share a rank, with subsequent positions skipped (1, 1, 3). Missing predictions display N/A and sort behind submitted predictions for equal correct counts. Season rank uses cumulative correct picks through the recap week; movement is previous rank minus current rank. Week 1 has no movement suffix.
+Weekly rank uses correct picks descending, then absolute difference from the final tiebreaker game's combined score ascending. Equal results share a rank, with subsequent positions skipped (1, 1, 3). The personal differential includes the saved prediction and actual game total (for example, `3 (picked 45; game total 48)`). Saved predictions come from the member’s pick for the designated tiebreaker game; actual totals require both final scores. Database-default zero predictions are treated as unsubmitted, matching the positive-score submission rule. Missing predictions display N/A and sort behind submitted predictions for equal correct counts. Season rank uses cumulative correct picks through the recap week; movement is previous rank minus current rank. Week 1 has no movement suffix.
 
 ## Timing
 

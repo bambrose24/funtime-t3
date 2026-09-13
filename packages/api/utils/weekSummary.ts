@@ -128,25 +128,33 @@ export function buildWeekSummary({
   const previousSeasonRanks = week > 1 ? getSeasonRanks(week - 1) : null;
 
   const tiebreakerGame = weekGames.find((game) => game.is_tiebreaker);
-  const tiebreakerTotal = tiebreakerGame?.done
-    ? (tiebreakerGame.homescore ?? 0) + (tiebreakerGame.awayscore ?? 0)
-    : null;
+  const tiebreakerTotal =
+    tiebreakerGame?.done &&
+    tiebreakerGame.homescore != null &&
+    tiebreakerGame.awayscore != null
+      ? tiebreakerGame.homescore + tiebreakerGame.awayscore
+      : null;
 
   const standingsBase = members.map((member) => {
     const picks = picksByMember[member.membership_id] ?? [];
     const correctPicks = picks.filter((pick) => pick.correct === 1).length;
-    const tiebreakerPick =
-      tiebreakerGame && tiebreakerTotal !== null
-        ? picks.find((pick) => pick.gid === tiebreakerGame.gid)
+    const tiebreakerPick = tiebreakerGame
+      ? picks.find((pick) => pick.gid === tiebreakerGame.gid)
+      : null;
+    // Saved scores default to 0, but submitted predictions must be positive.
+    const predictedPoints =
+      tiebreakerPick?.score != null && tiebreakerPick.score > 0
+        ? tiebreakerPick.score
         : null;
     const tiebreakerDiff =
-      tiebreakerTotal !== null && tiebreakerPick?.score != null
-        ? Math.abs(tiebreakerPick.score - tiebreakerTotal)
+      tiebreakerTotal !== null && predictedPoints !== null
+        ? Math.abs(predictedPoints - tiebreakerTotal)
         : Number.POSITIVE_INFINITY;
 
     return {
       member,
       correctPicks,
+      tiebreakerPick: predictedPoints,
       tiebreakerDiff,
     };
   });
@@ -229,6 +237,7 @@ export function buildWeekSummary({
       rank: s.rank,
       tied: standings.filter((r) => r.rank === s.rank).length > 1,
       correctPicks: s.correctPicks,
+      tiebreakerPick: s.tiebreakerPick,
       seasonRank: currentSeasonRanks.get(s.member.membership_id)!.rank,
       seasonMovement: previousSeasonRanks
         ? previousSeasonRanks.get(s.member.membership_id)!.rank -

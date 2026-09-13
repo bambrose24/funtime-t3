@@ -123,11 +123,11 @@ describe("weekly results", () => {
     expect(person(s, "A")).toMatchObject({ rank: 2, tiebreakerDiff: null });
     expect(person(s, "B").tiebreakerDiff).toBe(0);
   });
-  test("zero is a valid prediction", () => {
+  test("database-default zero is a missing prediction", () => {
     const f = fixture([["A", 0, 0]]);
     f.weekGames[3]!.homescore = 0;
     f.weekGames[3]!.awayscore = 0;
-    expect(person(buildWeekSummary(f), "A").tiebreakerDiff).toBe(0);
+    expect(person(buildWeekSummary(f), "A").tiebreakerDiff).toBeNull();
   });
   test("missing or unfinished tiebreaker keeps tied correct counts tied", () => {
     for (const mode of ["missing", "unfinished"]) {
@@ -400,4 +400,73 @@ describe("rendered email", () => {
       'href="https://www.play-funtime.com/league/123/pick"',
     );
   });
+});
+
+describe("tiebreaker source data", () => {
+  test("uses each member's saved prediction for the designated game, not other scores", () => {
+    const f = fixture([
+      ["Alex", 3, 45],
+      ["Brian", 2, 53],
+    ]);
+    f.weekPicks[0]!.score = 99;
+    const result = buildWeekSummary(f);
+    expect(result.tiebreakerTotal).toBe(48);
+    expect(person(result, "Alex")).toMatchObject({
+      tiebreakerPick: 45,
+      tiebreakerDiff: 3,
+    });
+    expect(person(result, "Brian")).toMatchObject({
+      tiebreakerPick: 53,
+      tiebreakerDiff: 5,
+    });
+  });
+  test("preserves a saved prediction when final scores are missing or pending", () => {
+    for (const change of [
+      { done: false },
+      { homescore: null },
+      { awayscore: null },
+    ]) {
+      const f = fixture([["Brian", 2, 45]]);
+      Object.assign(f.weekGames[3]!, change);
+      const result = buildWeekSummary(f);
+      expect(result.tiebreakerTotal).toBeNull();
+      expect(person(result, "Brian")).toMatchObject({
+        tiebreakerPick: 45,
+        tiebreakerDiff: null,
+      });
+    }
+  });
+  test("scoreless actual total is preserved without inventing a zero prediction", () => {
+    const f = fixture([["Brian", 2, 0]]);
+    Object.assign(f.weekGames[3]!, { homescore: 0, awayscore: 0 });
+    const result = buildWeekSummary(f);
+    expect(result.tiebreakerTotal).toBe(0);
+    expect(person(result, "Brian")).toMatchObject({
+      tiebreakerPick: null,
+      tiebreakerDiff: null,
+    });
+  });
+  for (const [prediction, total, expected] of [
+    [45, 48, "Point differential: 3 (picked 45; game total 48)"],
+    [null, 48, "Point differential: N/A (picked not submitted; game total 48)"],
+    [0, 0, "Point differential: N/A (picked not submitted; game total 0)"],
+    [1, 0, "Point differential: 1 (picked 1; game total 0)"],
+    [45, null, "Point differential: N/A (picked 45; game total unavailable)"],
+  ] as const)
+    test(`renders prediction ${prediction} and actual total ${total}`, async () => {
+      const f = fixture([["Brian", 2, prediction]]);
+      Object.assign(f.weekGames[3]!, { homescore: total, awayscore: 0 });
+      const summary = buildWeekSummary(f);
+      const text = await render(
+        <WeekSummaryEmail
+          {...summary}
+          leagueId={123}
+          leagueName="Sunday Crew"
+          week={4}
+          recipient={summary.recipients[0]!}
+        />,
+        { plainText: true },
+      );
+      expect(text).toContain(expected);
+    });
 });

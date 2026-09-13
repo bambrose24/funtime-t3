@@ -32,6 +32,7 @@ export default function WeekSummaryEmail({
   standings,
   winnerText,
   totalGames,
+  tiebreakerTotal,
   totalMembers,
   nextWeek,
   recipient,
@@ -56,7 +57,9 @@ export default function WeekSummaryEmail({
               </strong>
               <br />
               Point differential:{" "}
-              <strong>{recipient.tiebreakerDiff ?? "N/A"}</strong>
+              <strong>{recipient.tiebreakerDiff ?? "N/A"}</strong> (picked{" "}
+              {recipient.tiebreakerPick ?? "not submitted"}; game total{" "}
+              {tiebreakerTotal ?? "unavailable"})
               <br />
               Weekly standing:{" "}
               <strong>
