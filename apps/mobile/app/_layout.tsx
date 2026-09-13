@@ -47,11 +47,6 @@ const DARK_THEME: Theme = {
   colors: NAV_THEME.dark,
 };
 
-const useIsomorphicLayoutEffect =
-  Platform.OS === "web" && typeof window === "undefined"
-    ? useEffect
-    : useEffect;
-
 function AppContent() {
   const { isDarkColorScheme } = useColorScheme();
   
@@ -64,10 +59,8 @@ function AppContent() {
   // Prefetch essential data on cold start
   useColdStartPrefetch(session, isLoading);
   
-  // Debug cache hydration (remove in production)
-  if (__DEV__) {
-    useCacheDebugger();
-  }
+  // Always call; no-ops outside __DEV__.
+  useCacheDebugger();
 
   // Show loading screen while checking authentication
   if (isLoading) {
@@ -106,7 +99,7 @@ export default function RootLayout() {
     Inter_700Bold,
   });
 
-  useIsomorphicLayoutEffect(() => {
+  useEffect(() => {
     if (hasMounted.current) {
       return;
     }

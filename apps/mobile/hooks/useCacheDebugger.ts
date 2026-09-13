@@ -4,14 +4,18 @@ import { clientApi } from "@/lib/trpc/react";
 import { createComponentLogger } from "@/lib/logging";
 
 /**
- * Debug hook to visualize cache hydration in real-time
- * Add this to your _layout.tsx to see what's happening
+ * Debug hook to visualize cache hydration in real-time.
+ * Always call unconditionally; no-ops outside __DEV__.
  */
 export function useCacheDebugger() {
   const queryClient = useQueryClient();
-  const logger = createComponentLogger('CacheDebugger');
+  const logger = createComponentLogger("CacheDebugger");
 
   useEffect(() => {
+    if (!__DEV__) {
+      return;
+    }
+
     const logCacheState = () => {
       const cache = queryClient.getQueryCache();
       const queries = cache.getAll();
@@ -28,10 +32,8 @@ export function useCacheDebugger() {
       });
     };
 
-    // Log initial state
     logCacheState();
 
-    // Subscribe to cache changes
     const unsubscribe = queryClient.getQueryCache().subscribe((event: any) => {
       logger.debug("Cache event", {
         type: event.type,
@@ -40,7 +42,7 @@ export function useCacheDebugger() {
       });
 
       if (event.type === "added" || event.type === "updated") {
-        setTimeout(logCacheState, 100); // Small delay to see final state
+        setTimeout(logCacheState, 100);
       }
     });
 
@@ -49,44 +51,38 @@ export function useCacheDebugger() {
 }
 
 /**
- * Hook to show exactly when data becomes available vs when components mount
+ * Hook to show exactly when data becomes available vs when components mount.
+ * Always call unconditionally; no-ops outside __DEV__.
  */
 export function useDataAvailabilityTracker() {
   const utils = clientApi.useUtils();
-  const logger = createComponentLogger('DataAvailabilityTracker');
+  const logger = createComponentLogger("DataAvailabilityTracker");
 
   useEffect(() => {
-    // Check what's already in cache when this component mounts
-    const checkCachedData = () => {
-      // Check session data
-      const sessionData = utils.session.current.getData();
-      
-      // Check home data
-      const homeData = utils.home.summary.getData();
-      
-      // Check teams data
-      const teamsData = utils.teams.getTeams.getData();
-      
-      let firstLeagueDataAvailable = false;
-      // If we have home data, check league data
-      if (homeData && homeData.length > 0) {
-        const firstLeague = homeData[0];
-        const leagueData = utils.league.get.getData({
-          leagueId: firstLeague.league_id,
-        });
-        firstLeagueDataAvailable = !!leagueData;
-      }
+    if (!__DEV__) {
+      return;
+    }
 
-      logger.info("Data availability check", {
-        sessionDataAvailable: !!sessionData,
-        homeDataAvailable: !!homeData,
-        homeLeaguesCount: homeData?.length || 0,
-        teamsDataAvailable: !!teamsData,
-        teamsCount: teamsData?.length || 0,
-        firstLeagueDataAvailable,
+    const sessionData = utils.session.current.getData();
+    const homeData = utils.home.summary.getData();
+    const teamsData = utils.teams.getTeams.getData();
+
+    let firstLeagueDataAvailable = false;
+    if (homeData && homeData.length > 0) {
+      const firstLeague = homeData[0];
+      const leagueData = utils.league.get.getData({
+        leagueId: firstLeague.league_id,
       });
-    };
+      firstLeagueDataAvailable = !!leagueData;
+    }
 
-    checkCachedData();
+    logger.info("Data availability check", {
+      sessionDataAvailable: !!sessionData,
+      homeDataAvailable: !!homeData,
+      homeLeaguesCount: homeData?.length || 0,
+      teamsDataAvailable: !!teamsData,
+      teamsCount: teamsData?.length || 0,
+      firstLeagueDataAvailable,
+    });
   }, [utils, logger]);
 }

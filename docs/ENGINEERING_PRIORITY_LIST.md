@@ -330,7 +330,7 @@ MOB-01 through MOB-10 above remain the release epics and keep their IDs and rele
 | 17    | MOB-03c | P2       | Chat client: incremental fetch, optimistic send, honest copy               | Component                     |
 | 18    | MOB-13b | P3       | Split the 1,849-line league screen; deliberately last                     | Existing checks only          |
 
-**Current position:** no slice from this queue has started. The next slice is **MOB-13a**. Update this line when a slice starts or merges.
+**Current position:** **MOB-13a / MOB-01a / MOB-03a / MOB-11a** batched in one PR (mobile not live; shared `lib/trpc` + auth files). Next unstarted slice after that lands: **MOB-02a**. Update this line when a slice starts or merges.
 
 MOB-05 (build and signing), MOB-06 (account deletion) and MOB-07 (chat moderation) are not in this queue because they need product decisions and have long external lead times. They remain public-release prerequisites; start their decisions in parallel with this queue even though their implementation is serial with it.
 
@@ -627,6 +627,7 @@ Status vocabulary: `OPEN`, `IN PROGRESS`, `PR OPEN`, `READY FOR REVIEW`, `MERGED
 | Ticket / slice         | Status | Owner | Branch / PR                                                                              | Before-fix evidence                | After-fix checks                                                                 | Merge / remaining verification                                     |
 | ---------------------- | ------ | ----- | ---------------------------------------------------------------------------------------- | ---------------------------------- | -------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
 | WEB-01 / kickoff guard | DONE   | Codex | [PR #34](https://github.com/bambrose24/funtime-t3/pull/34), `codex/web-01-kickoff-guard` | Original routers: 18 pass / 4 fail | Fixed: 22 API integration cases and 7 API unit tests pass; all 3 typechecks pass | Merged main `40148de`; full browser/API CI passed, run 34049186920 |
+| MOB-13a+01a+03a+11a   | IN PROGRESS | Auto | `codex/mob-core-identity-cache` | Source-confirmed F26/F27/F28/F31; no prior failing suite for cache purge | Pending: mobile Jest + typecheck; API push-token integration when local DB available | Open PR; no web UI changes |
 
 Add a row when each later slice starts. Keep one active implementation slice; record test counts and links to actual runs, not intended commands as if they passed.
 

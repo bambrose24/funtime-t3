@@ -134,9 +134,12 @@ export function LeagueMessageBoard({ leagueId }: Props) {
   }, [isNearBottom]);
 
   const invalidateMessages = async () => {
-    await utils.messages.leagueMessageBoard.invalidate({
-      leagueId: leagueIdNumber,
-    });
+    await Promise.all([
+      utils.messages.leagueMessageBoard.invalidate({
+        leagueId: leagueIdNumber,
+      }),
+      utils.messages.unreadCounts.invalidate(),
+    ]);
   };
 
   const onRefresh = async () => {

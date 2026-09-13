@@ -1,7 +1,8 @@
 import { useCallback } from "react";
 import { clientApi } from "@/lib/trpc/react";
 
-const UNREAD_REFETCH_INTERVAL_MS = 10 * 1000;
+/** Unread badges poll less often than an open chat thread. */
+const UNREAD_REFETCH_INTERVAL_MS = 30 * 1000;
 
 export function useLeagueUnreadMessages(leagueId: number | undefined) {
   const utils = clientApi.useUtils();
@@ -11,6 +12,8 @@ export function useLeagueUnreadMessages(leagueId: number | undefined) {
   );
   const { mutateAsync: markReadMutation } =
     clientApi.messages.markRead.useMutation({
+      // Intentionally narrow: a read receipt must not refetch the message board
+      // or any other active query.
       onSuccess: () => utils.messages.unreadCounts.invalidate(),
     });
 

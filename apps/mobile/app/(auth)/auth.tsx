@@ -11,7 +11,6 @@ import { router, useLocalSearchParams } from "expo-router";
 import { supabase } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { clientApi } from "@/lib/trpc/react";
 import { z } from "zod";
 
 // Validation schema matching web app
@@ -28,7 +27,6 @@ export default function LoginScreen() {
   const [errors, setErrors] = useState<{ email?: string; password?: string }>(
     {},
   );
-  const utils = clientApi.useUtils();
   const normalizedRedirectTo = useMemo(() => {
     if (typeof redirectTo !== "string" || redirectTo.length === 0) {
       return null;
@@ -72,13 +70,9 @@ export default function LoginScreen() {
 
       if (error) {
         Alert.alert("Login Failed", error.message);
-      } else {
-        // Give Supabase a moment to establish the session, then invalidate cache
-        setTimeout(async () => {
-          await utils.invalidate();
-        }, 100);
       }
-      // Success navigation is handled by auth state change in _layout.tsx
+      // Success navigation and cache isolation are handled by useAuthHandler
+      // on the identity transition. Do not race-invalidate here.
     } catch (error) {
       console.error("Login error:", error);
       Alert.alert("Error", "An unexpected error occurred");

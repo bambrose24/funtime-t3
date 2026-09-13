@@ -59,6 +59,7 @@ export default function ConfirmSignupScreen() {
     mode: "onChange",
   });
 
+  const utils = clientApi.useUtils();
   const { mutateAsync: funtimeSignup } = clientApi.auth.signup.useMutation();
 
   const onSubmit = async (data: SignupFormData) => {
@@ -67,6 +68,7 @@ export default function ConfirmSignupScreen() {
       const { username, firstName, lastName } = data;
 
       await funtimeSignup({ firstName, lastName, username });
+      await utils.session.current.invalidate();
 
       Alert.alert(
         "Success!",

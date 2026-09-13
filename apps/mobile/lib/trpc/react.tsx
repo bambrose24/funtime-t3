@@ -25,6 +25,7 @@ import {
   supabase,
 } from "@/lib/supabase/client";
 import { createQueryClient } from "./create-query-client";
+import { QUERY_CACHE_STORAGE_KEY } from "./persisted-cache";
 
 export const clientApi = createTRPCReact<AppRouter>();
 
@@ -43,7 +44,8 @@ onlineManager.setEventListener((setOnline) => {
 });
 
 let queryClientSingleton: QueryClient | undefined;
-const getQueryClient = () => (queryClientSingleton ??= createQueryClient());
+export const getQueryClient = () =>
+  (queryClientSingleton ??= createQueryClient());
 
 export function TRPCReactProvider({ children }: { children: React.ReactNode }) {
   const queryClient = getQueryClient();
@@ -52,20 +54,24 @@ export function TRPCReactProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const persister = createAsyncStoragePersister({
       storage: AsyncStorage,
+      key: QUERY_CACHE_STORAGE_KEY,
       serialize: SuperJSON.stringify,
       deserialize: SuperJSON.parse,
     });
 
+    // Offline write queueing is unsupported in v1: never persist mutations, and
+    // do not call resumePausedMutations (no mutation defaults are registered).
     const [unsubscribe, restorePromise] = persistQueryClient({
       queryClient,
       persister,
       maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
       buster: "app-v1",
+      dehydrateOptions: {
+        shouldDehydrateMutation: () => false,
+      },
     });
 
-    restorePromise
-      .then(() => queryClient.resumePausedMutations())
-      .finally(() => setIsReady(true));
+    restorePromise.finally(() => setIsReady(true));
 
     return unsubscribe;
   }, [queryClient]);
@@ -79,7 +85,7 @@ export function TRPCReactProvider({ children }: { children: React.ReactNode }) {
         }),
         httpBatchLink({
           url: `${getBaseUrl()}/api/trpc`,
-          transformer: SuperJSON, // <— moved here
+          transformer: SuperJSON,
           headers: async () => {
             const headers = new Headers();
             headers.set("x-trpc-source", "react-native");
