@@ -129,6 +129,19 @@ describe("resolveDeepLink", () => {
       mode: "replace",
     });
     expect(resolveDeepLink("https://play-funtime.com/not-a-route")).toBeNull();
+    expect(
+      resolveDeepLink("https://play-funtime.com/league/42/not-a-real-page"),
+    ).toBeNull();
+  });
+
+  it("opens web-only league surfaces in the browser", () => {
+    expect(
+      resolveDeepLink("https://play-funtime.com/league/42/my-profile"),
+    ).toEqual({
+      href: "https://play-funtime.com/league/42/my-profile",
+      mode: "replace",
+      openInBrowser: true,
+    });
   });
 });
 

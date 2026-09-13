@@ -199,6 +199,11 @@ export function useAuthHandler() {
           return;
         }
 
+        if (target.openInBrowser) {
+          void Linking.openURL(target.href);
+          return;
+        }
+
         if (!shouldNavigate(currentHrefRef.current ?? "/", target.href)) {
           return;
         }
