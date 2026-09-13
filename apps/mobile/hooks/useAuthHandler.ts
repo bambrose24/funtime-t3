@@ -8,7 +8,11 @@ import {
   isInvalidRefreshTokenError,
   supabase,
 } from "@/lib/supabase/client";
-import { resolveDeepLink } from "@/lib/deeplink/resolveDeepLink";
+import {
+  hrefFromPathAndParams,
+  resolveDeepLink,
+  shouldNavigate,
+} from "@/lib/deeplink/resolveDeepLink";
 import { clientApi } from "@/lib/trpc/react";
 import {
   purgeAccountScopedCache,
@@ -121,7 +125,7 @@ export function useAuthHandler() {
   const globalSearchParams = useGlobalSearchParams<{ redirectTo?: string }>();
   const router = useRouter();
   const pendingDeepLinkRef = useRef<string | null>(null);
-  const pathnameRef = useRef(pathname);
+  const currentHrefRef = useRef(pathname);
   const sessionRef = useRef(session);
   const initialDeepLinkHandledRef = useRef(false);
   const routeRedirectTo =
@@ -137,9 +141,12 @@ export function useAuthHandler() {
       : null;
 
   useEffect(() => {
-    pathnameRef.current = pathname;
+    currentHrefRef.current = hrefFromPathAndParams(
+      pathname,
+      globalSearchParams as Record<string, string | string[] | undefined>,
+    );
     sessionRef.current = session;
-  }, [pathname, session]);
+  }, [globalSearchParams, pathname, session]);
 
   // Purge account-scoped cache on identity change (sign-out, switch, cold-start
   // signed-out with leftover persisted private data). Local purge is immediate;
@@ -192,10 +199,7 @@ export function useAuthHandler() {
           return;
         }
 
-        const nextPathname = target.href.split("?")[0] ?? target.href;
-        const currentPath = pathnameRef.current ?? "/";
-        const currentPathname = currentPath.split("?")[0] ?? currentPath;
-        if (nextPathname === currentPathname) {
+        if (!shouldNavigate(currentHrefRef.current ?? "/", target.href)) {
           return;
         }
 

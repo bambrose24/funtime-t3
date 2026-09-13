@@ -3,6 +3,8 @@ const WEB_DEEP_LINK_HOSTS = new Set([
   "www.play-funtime.com",
 ]);
 const WEB_PROTOCOLS = new Set(["http", "https"]);
+/** Expo Router dynamic segment keys that are already encoded in the pathname. */
+const PATH_PARAM_KEYS = new Set(["id", "leagueId", "code", "memberId"]);
 
 export type DeepLinkTarget = {
   href: string;
@@ -34,6 +36,75 @@ const mergeSearchAndHashParams = (parsed: URL) => {
   });
   return merged;
 };
+
+/** Stable href comparison that ignores query-param order. */
+export function normalizeHref(href: string): string {
+  const [rawPath = "/", rawQuery = ""] = href.split("?");
+  const path =
+    rawPath.length > 1 && rawPath.endsWith("/")
+      ? rawPath.replace(/\/+$/, "")
+      : rawPath || "/";
+  if (!rawQuery) {
+    return path;
+  }
+  const params = new URLSearchParams(rawQuery);
+  const sorted = new URLSearchParams(
+    [...params.entries()].sort((a, b) => {
+      const keyCmp = a[0].localeCompare(b[0]);
+      return keyCmp !== 0 ? keyCmp : a[1].localeCompare(b[1]);
+    }),
+  );
+  return withQueryString(path, sorted);
+}
+
+/** True when navigation should run (path or query differs). */
+export function shouldNavigate(currentHref: string, nextHref: string): boolean {
+  return normalizeHref(currentHref) !== normalizeHref(nextHref);
+}
+
+/**
+ * Build the current in-app href from pathname + search params, omitting
+ * dynamic route segment keys that Expo also surfaces in search params.
+ */
+export function hrefFromPathAndParams(
+  pathname: string,
+  params: Record<string, string | string[] | undefined>,
+): string {
+  const query = new URLSearchParams();
+  for (const [key, value] of Object.entries(params)) {
+    if (PATH_PARAM_KEYS.has(key) || value == null) {
+      continue;
+    }
+    if (Array.isArray(value)) {
+      for (const item of value) {
+        query.append(key, item);
+      }
+    } else {
+      query.set(key, value);
+    }
+  }
+  return withQueryString(pathname || "/", query);
+}
+
+/**
+ * Resolve a full URL or an in-app/notification path through the same allowlist.
+ * Empty or unknown destinations return null (caller should not navigate).
+ */
+export function resolveAppDestination(raw: string): DeepLinkTarget | null {
+  const trimmed = raw.trim();
+  if (!trimmed) {
+    return null;
+  }
+  try {
+    if (/^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(trimmed)) {
+      return resolveDeepLink(trimmed);
+    }
+    const path = trimmed.startsWith("/") ? trimmed : `/${trimmed}`;
+    return resolveDeepLink(`https://play-funtime.com${path}`);
+  } catch {
+    return null;
+  }
+}
 
 export function resolveDeepLink(url: string): DeepLinkTarget | null {
   const parsed = new URL(url);
