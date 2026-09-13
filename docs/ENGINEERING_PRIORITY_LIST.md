@@ -1,8 +1,13 @@
 # Engineering priority list: website first, mobile release next
 
-Updated September 8, 2026. Original audit: `aaa5f89c01aa46c0ea807b9daef2119d54839319`; latest execution starts from merged `main` at `ce4e023`.
+Updated September 12, 2026. Original audit: `aaa5f89c01aa46c0ea807b9daef2119d54839319`; latest execution starts from merged `main` at `5efc01a`.
 
-This is the implementation backlog. The agreed delivery approach is one focused PR at a time, with behavior validation before advancing. Per-ticket status below records completed slices and remaining work; unmarked tickets remain **OPEN**. No automatic merge or deployment is authorized. Original evidence and source permalinks are in [the cross-platform audit](PRD_CROSS_PLATFORM_AUDIT_2026-09-05.md). Ticket references such as F01 refer to that report. New findings from this follow-up are recorded at the end of that report.
+This is the implementation backlog. The agreed delivery approach is **one focused PR at a time, strictly serial**, with behavior validation before advancing. Per-ticket status below records completed slices and remaining work; unmarked tickets remain **OPEN**. No automatic merge or deployment is authorized.
+
+Evidence sources, and the finding-ID ranges each one owns:
+
+- [Cross-platform audit, September 5](PRD_CROSS_PLATFORM_AUDIT_2026-09-05.md) — owns **F01–F25**, including the September 6 follow-up findings F22–F25.
+- [Mobile audit, September 12](MOBILE_AUDIT_2026-09-12.md) — owns **F26–F35**, covering app initialization, the query/cache layer, launch experience, observability and mobile PRD parity. Its serial implementation queue is [below](#mobile-remediation-queue-september-12-audit).
 
 ## Recommendation
 
@@ -296,6 +301,283 @@ Public release means an App Store/Google Play release, not just a development bu
 
 After release prerequisites: named CSV file sharing, richer charts/postseason presentation, additional home search parity, animations, more granular notification categories, and push pick reminders if adopted by the PRD. Prioritize real player feedback over making every screen structurally identical to web. Maintain the current non-goals: do not add payments, public leagues or new scoring systems as part of launch preparation.
 
+## Mobile remediation queue (September 12 audit)
+
+Evidence: [the mobile audit](MOBILE_AUDIT_2026-09-12.md), findings F26–F35, plus the still-open mobile findings it re-verified.
+
+MOB-01 through MOB-10 above remain the release epics and keep their IDs and release conditions. The slices below are the PR-sized units of work. Slices of an existing epic keep its number with a letter suffix, following the `WEB-02a`/`WEB-02b` precedent. New epics start at MOB-11. Every slice names its own test layer rather than defaulting to end-to-end; use the decision table in [Testing Strategy](TESTING_STRATEGY.md#choosing-the-test-layer-agreed-september-6-2026).
+
+**Execute this table top to bottom, one PR at a time.** The order is chosen so each slice lands before anything that shares its files, which keeps rebases small and keeps a behavioral fix from colliding with a refactor. Do not reorder without recording the reason.
+
+| Order | Slice   | Priority | Deliverable                                                               | Test layer                    |
+| ----- | ------- | -------- | ------------------------------------------------------------------------- | ----------------------------- |
+| 1     | MOB-13a | P3       | Hook hygiene warm-up; unblocks `_layout.tsx` and `home.tsx`               | Existing checks only          |
+| 2     | MOB-01a | P0       | Purge account-scoped cache and revoke this device's token on identity change | Mobile unit + API integration |
+| 3     | MOB-03a | P1       | One honest mutation retry and persistence contract                        | Mobile unit                   |
+| 4     | MOB-11a | P1       | Targeted invalidation instead of invalidate-everything                    | Component + unit              |
+| 5     | MOB-02a | P1       | Durable push preference, independent of token rows                        | API integration + migration   |
+| 6     | MOB-02b | P1       | Notification permission and preference UX                                 | Component + device record     |
+| 7     | MOB-14a | P1       | Home weekly-status league list (PRD §7.2 parity)                          | Component                     |
+| 8     | WEB-12a | P2       | Inclusive 1–200 tiebreaker bound on both clients                          | API integration + unit        |
+| 9     | MOB-15a | P1       | Live kickoff locks and a real closed-week state on the pick page          | Mobile unit + component       |
+| 10    | MOB-04a | P1       | One validated resolver for links and notification taps                    | Mobile unit                   |
+| 11    | MOB-04b | P1       | Route inventory with an explicit web fallback                             | Mobile unit + device record   |
+| 12    | WEB-15  | P1       | Stop returning peer email addresses from the member profile               | API integration + component   |
+| 13    | MOB-12a | P2       | Hold the splash screen through initialization                             | Mobile unit                   |
+| 14    | MOB-12b | P2       | Root error boundary and crash reporting                                   | Component                     |
+| 15    | MOB-12c | P2       | Analytics identity and a deliberate session-replay decision               | Mobile unit                   |
+| 16    | WEB-14a | P1       | Cursor-paginate the league message board                                  | API integration               |
+| 17    | MOB-03c | P2       | Chat client: incremental fetch, optimistic send, honest copy               | Component                     |
+| 18    | MOB-13b | P3       | Split the 1,849-line league screen; deliberately last                     | Existing checks only          |
+
+**Current position:** no slice from this queue has started. The next slice is **MOB-13a**. Update this line when a slice starts or merges.
+
+MOB-05 (build and signing), MOB-06 (account deletion) and MOB-07 (chat moderation) are not in this queue because they need product decisions and have long external lead times. They remain public-release prerequisites; start their decisions in parallel with this queue even though their implementation is serial with it.
+
+### File ownership and ordering constraints
+
+The order above exists because these files are touched by more than one slice. A later slice must rebase onto the earlier one, never the reverse.
+
+| File or area                                        | Slices that touch it                     | Ordering constraint                                                           |
+| --------------------------------------------------- | ---------------------------------------- | ----------------------------------------------------------------------------- |
+| `lib/trpc/react.tsx`, `lib/trpc/create-query-client.ts` | MOB-01a, MOB-03a, MOB-11a, MOB-12a       | In that order. This is the app's highest-traffic shared file pair.            |
+| `app/_layout.tsx`                                   | MOB-13a, MOB-01a, MOB-12a, MOB-12b       | MOB-13a first, so later slices do not inherit the conditional hook calls.    |
+| `app/(tabs)/home.tsx`                               | MOB-13a, MOB-14a                         | MOB-13a first; it is small and removes a hook-order hazard.                   |
+| `app/(tabs)/account.tsx`                            | MOB-01a, MOB-02b                         | MOB-01a owns `signOut`; MOB-02b then owns the notification toggle.            |
+| `components/picks/ClientPickPage.tsx`               | WEB-12a, MOB-15a                         | WEB-12a's bound change first, or fold it into MOB-15a and close both.         |
+| `components/messages/LeagueMessageBoard.tsx`        | MOB-11a, MOB-03c                         | MOB-11a adjusts polling; MOB-03c then rewrites the fetch strategy.            |
+| `app/league/[id]/index.tsx`                         | MOB-13b                                  | Last. Any behavioral fix in this file lands before the split.                 |
+
+### MOB-13a — Hook hygiene warm-up
+
+**Priority: P3. Fixes: F31 (partial).**
+
+**Change:** make `useCacheDebugger` and `useDataAvailabilityTracker` unconditional calls that no-op internally when `!__DEV__`, removing the two `if (__DEV__)` hook call sites. Delete the `useIsomorphicLayoutEffect` indirection in `_layout.tsx`, whose branches both resolve to `useEffect`. Do not touch `lib/trpc/cache-persistence.ts`; MOB-01a deletes it as part of the real fix, and deleting it here would imply F04 was addressed.
+
+**Start in:** `apps/mobile/app/_layout.tsx`, `apps/mobile/app/(tabs)/home.tsx`, `apps/mobile/hooks/useCacheDebugger.ts`.
+
+**Test layer:** none new. This is the behavior-preserving-refactor row of the testing-strategy table, and a new test here would only mirror the implementation. Evidence is mobile typecheck, the existing suite, and `expo lint`.
+
+**Done when:** no conditional hook call sites remain in the app tree; lint, typecheck and the existing suite are green; the diff contains no behavior change.
+
+### MOB-01a — Purge account-scoped cache and revoke the device token on identity change
+
+**Priority: P0. Fixes: F26, F04, F06.**
+
+**Change:** add `lib/auth/identitySession.ts` exporting a pure `resolveIdentityTransition(previousUid, nextUid)` and an effectful `purgeAccountScopedCache({ queryClient, persister })` that cancels in-flight queries, clears the `QueryClient`, and removes the persisted cache entry. Drive both from one owner — the `onAuthStateChange` handler in `useAuthHandler` — keyed on the Supabase user id so it fires on `SIGNED_OUT`, on an A-to-B switch, and on `clearPersistedSupabaseSession` recovery. Add a `settings.unregisterPushToken({ token })` mutation and call it on explicit sign-out before `supabase.auth.signOut()`, scoped to this installation's token only so other signed-in devices keep working. Delete `lib/trpc/cache-persistence.ts` and remove the `setTimeout(() => utils.invalidate(), 100)` in the login screen.
+
+Prefer clearing on transition over namespacing the persister key by user id: it is simpler and leaves no stale per-user keys behind. Define offline sign-out explicitly — the local purge is immediate and unconditional, while server revocation is best-effort and retried on the next authenticated request rather than promised offline.
+
+**Start in:** `apps/mobile/lib/auth/identitySession.ts` (new), `lib/trpc/react.tsx`, `hooks/useAuthHandler.ts`, `app/(tabs)/account.tsx`, `app/(auth)/auth.tsx`, delete `lib/trpc/cache-persistence.ts`; `packages/api/server/api/routers/settings.ts`.
+
+**Test layer:** mobile unit plus API integration.
+
+- `apps/mobile/tests/auth/identitySession.test.ts`: the transition matrix (null→A, A→A, A→B, A→null), and a real `QueryClient` seeded with data proving `clear()` empties it and the AsyncStorage key is removed. The AsyncStorage package ships a Jest mock; no new harness framework is required.
+- `packages/api/tests/integration/push-token-lifecycle.test.ts`: unregister disables only the calling device's token, leaves the same user's other tokens enabled, and rejects another user's token.
+- Remove the `!<rootDir>/lib/trpc/**/*` exclusion from `jest.config.js` `collectCoverageFrom`, since this becomes tested code.
+
+**Design requirement:** the purge and transition logic must be pure and injectable. The audit's coverage-limitations section explains why: nothing touching the query client is currently testable, and inlining this logic in a component would keep it that way.
+
+**Done when:** an A-to-B transition leaves zero A-scoped queries in memory or in storage; sign-out revokes this device's token and leaves other devices enabled; invalid-refresh-token recovery takes the same purge path; a sign-out whose revocation request fails still purges locally and surfaces a retryable state.
+
+### MOB-03a — One honest mutation retry and persistence contract
+
+**Priority: P1. Fixes: F27, F18.**
+
+**Change:** stop persisting mutations (`shouldDehydrateMutation: () => false`) and remove the `resumePausedMutations()` call that no registered mutation default can satisfy. Set `mutations.retry: 0` so no non-idempotent write is retried automatically. Set `mutations.networkMode: "online"` so an offline write fails fast with an actionable error instead of pausing invisibly, while queries keep `offlineFirst` so cached reading still works. Record that offline write queueing is unsupported in v1; client operation IDs for genuinely queueable writes are a later slice under MOB-03, not this one.
+
+**Start in:** `apps/mobile/lib/trpc/create-query-client.ts`, `lib/trpc/react.tsx`.
+
+**Test layer:** mobile unit — `apps/mobile/tests/trpc/queryClientDefaults.test.ts` asserting mutation defaults are `retry: 0` and `networkMode: "online"`, query defaults keep `offlineFirst`, and a dehydrated client contains no mutations.
+
+**Done when:** no mutation survives a restart in a resumable-looking state; a failed write surfaces an error rather than pausing silently; the unsupported-offline-write decision is written down.
+
+### MOB-11a — Targeted invalidation instead of invalidate-everything
+
+**Priority: P1. Fixes: F28.**
+
+**Change:** remove the app-wide `MutationCache` `onSettled` invalidation. Audit every `useMutation` call site and give each one explicit invalidations; most screens already do their own, so the blanket handler is mostly redundant work. Explicitly exempt `messages.markRead`, so a read receipt can no longer refetch the app. Collapse the duplicated ten-second polling: derive unread state from the message-board query while a thread is open, or lengthen the `unreadCounts` interval in that case.
+
+**Start in:** `apps/mobile/lib/trpc/create-query-client.ts`, `hooks/useLeagueUnreadMessages.ts`, `components/messages/LeagueMessageBoard.tsx`, and every `useMutation` caller that relied on the global handler.
+
+**Test layer:** component plus unit. A component test with a mocked tRPC provider asserting `markRead` causes no message-board refetch, and that sending a message invalidates the board and unread counts only. A unit assertion that the query client registers no global `onSettled`. A grep-derived inventory of call sites is not sufficient evidence on its own.
+
+**Done when:** an incoming chat message no longer refetches unrelated queries, each mutation's invalidation set is explicit in code, and one open thread requires one poll rather than two.
+
+### MOB-02a — Durable push preference, independent of token rows
+
+**Priority: P1. Fixes: F05. Consumed by WEB-13.**
+
+**Change:** store the notification preference on the account rather than inferring it from token rows, with a reviewed migration that defaults existing users conservatively so anyone currently disabled stays disabled. `registerPushToken` stops writing `enabled: true` on its update branch and may only refresh ownership, platform and `last_seen_at`. Fanout requires both an enabled account preference and an eligible token. `pushNotificationStatus` returns preference, token count and a reason so clients can distinguish OS-denied from in-app-disabled from storage-unavailable.
+
+**Start in:** `packages/api/prisma/schema.prisma` and a new migration, `server/api/routers/settings.ts`, `server/services/expo-push/index.ts`.
+
+**Test layer:** API integration plus migration evidence — `packages/api/tests/integration/push-preference.test.ts`: disable, then re-register the same token and a new token, and assert the preference stays off; fanout selects nobody while disabled; zero-token and denied-permission response shapes. Per delivery rule 4, include a read-only inventory of current token rows in the PR before the migration runs.
+
+**Done when:** a disabled user receives no pushes across restart, re-login, token change and a second device, until they deliberately re-enable.
+
+### MOB-02b — Notification permission and preference UX
+
+**Priority: P1. Fixes: F05 (client half). Depends on MOB-02a and MOB-01a.**
+
+**Change:** request OS notification permission with context at a meaningful moment rather than as an unexplained interruption during the first authenticated launch. Bind the account toggle to the durable preference so it is controllable with zero registered tokens; today `canTogglePushNotifications` disables the switch unless a token exists, which makes the setting unreachable in exactly the state a user wants to fix. Distinguish OS-denied, in-app-disabled and storage-unavailable in the copy, and offer a route to OS settings when denied.
+
+**Start in:** `apps/mobile/hooks/usePushNotificationRegistration.ts`, `app/(tabs)/account.tsx`.
+
+**Test layer:** component, plus a recorded device check. The component test covers the toggle reflecting a durable preference with zero tokens and each unavailable state rendering its own guidance. The actual OS prompt is verified on a device under MOB-08 and must not be claimed from the component test.
+
+**Done when:** the preference is controllable without a token, permission is requested with context, and each state has honest copy.
+
+### MOB-14a — Home weekly-status league list
+
+**Priority: P1. Fixes the PRD §7.2 parity and ordering gaps.**
+
+**Change:** switch home from `home.summary` to the existing `home.leagues`, which already returns `weeklyStatus` and the PRD ordering (season descending, name ascending, league id). No API work is required; web already consumes it. Render per-league status with the week named: **Picks are in** with **View picks**, **Picks needed** with **Make picks**, and **Picks not submitted · Closed** with no action once picking closed. Show preseason or season-over context when no week is available. Remove all partial-progress language and the in-season **Create League** shortcut, keeping **Join**. Refresh on screen focus and on an interval while visible; a failed refresh shows unavailable status with retry rather than implying picks are in.
+
+**Start in:** `apps/mobile/app/(tabs)/home.tsx`, `components/home/HomeLeagueCard.tsx`, `lib/home/getSingleActiveLeague.ts`, and `docs/PRD.md` for the auto-open sentence.
+
+**Test layer:** component — `apps/mobile/tests/home/HomeLeagueList.test.tsx` covering submitted, needed, closed, no-week and status-unavailable states, and asserting no partial-progress copy renders. Reuse the shared `getHomeLeagueStatus` coverage rather than re-deriving status in the client.
+
+**Decision required first:** keep or drop single-league auto-open on mobile. Recommendation: drop it, since Home now carries the status the screen exists to show; the PRD currently grandfathers the behavior and would be amended by this slice.
+
+**Done when:** mobile home matches the PRD league-list contract, ordering is stable within a season, and no refresh failure can claim picks are in.
+
+### WEB-12a — Inclusive 1–200 tiebreaker bound on both clients
+
+**Priority: P2. Fixes: F20 (score half).**
+
+**Change:** change the client validation from `Number(val) < 200` to `<= 200` on both pick forms so the copy, both clients and the server agree. Confirm the admin pick writer applies the same 1–200 integer and tiebreaker-only rule.
+
+**Start in:** `apps/mobile/components/picks/ClientPickPage.tsx`, `apps/web/src/app/league/[leagueId]/pick/client-pick-page.tsx`, `packages/api/server/api/routers/league/admin.ts`.
+
+**Test layer:** API integration plus unit — extend `packages/api/tests/integration/pick-validation.test.ts` with 200 accepted and 0 and 201 rejected on both the bulk and admin writers, plus one mobile Jest case for the form boundary.
+
+**Done when:** a score of exactly 200 is accepted everywhere the copy promises it, and rejected values behave identically across writers.
+
+### MOB-15a — Live kickoff locks and a real closed-week state
+
+**Priority: P1. Fixes: F33.**
+
+**Change:** replace mount-time `new Date()` comparisons with a ticking clock, refreshed on an interval and on `AppState` resume, so games and the tiebreaker flip to locked while the form is open instead of letting a user pick a started game and learn about it from a server skip outcome. For `close_at_first_game_start` leagues, show the weekly cutoff and replace the form with a closed state once it passes, matching web and PRD §6.1. Preserve locked-game handling and the WEB-02c saved/skipped confirmation.
+
+**Start in:** `apps/mobile/components/picks/ClientPickPage.tsx`, `components/picks/PickGameCard.tsx`, `lib/picks/getPickWindow.ts` (new).
+
+**Test layer:** mobile unit plus component — `apps/mobile/tests/picks/getPickWindow.test.ts` with a controlled clock covering before first kickoff, exactly at kickoff, between games, all locked, and per-game versus first-kickoff policy; a component test that the form is replaced by the closed state. Server enforcement stays covered by `packages/api/tests/integration/late-policy.test.ts` and must not be duplicated in the client.
+
+**Done when:** a kickoff passing with the form open locks that game and its tiebreaker without a reload, and a closed week shows a closed state rather than a submit button.
+
+### MOB-04a — One validated resolver for links and notification taps
+
+**Priority: P1. Fixes: F34, F13.**
+
+**Change:** route the notification payload's `content.data.path` through `resolveDeepLink`, or a shared `resolveAppDestination`, so taps use the same allowlist as URLs instead of pushing an unvalidated string. Compare the full destination href rather than the pathname alone in `useAuthHandler`, so a shared link with a changed `week` or `tab` navigates while already inside that league.
+
+**Start in:** `apps/mobile/hooks/usePushNotificationRegistration.ts`, `hooks/useAuthHandler.ts`, `lib/deeplink/resolveDeepLink.ts`.
+
+**Test layer:** mobile unit — extend `apps/mobile/tests/deeplink/resolveDeepLink.test.ts` with notification payload cases (valid, unknown path, empty), and add cases for a pure `shouldNavigate(currentHref, nextHref)` covering same-path/different-query and same-path/same-query.
+
+**Done when:** taps and URLs resolve through one validated function, unknown destinations produce a useful outcome, and week and tab changes navigate inside the same league.
+
+### MOB-04b — Route inventory with an explicit web fallback
+
+**Priority: P1. Fixes: F12. Depends on MOB-04a.**
+
+**Change:** enumerate every shareable web route and map it to an existing native screen or an explicit unsupported-to-web fallback. Stop accepting arbitrary `/league/` suffixes, so an app-link association cannot turn a working web URL into a missing native destination.
+
+**Start in:** `apps/mobile/lib/deeplink/resolveDeepLink.ts`, `app/+not-found.tsx`.
+
+**Test layer:** mobile unit plus a recorded device check — a table-driven test over the full route matrix asserting each web URL maps to an existing native route file or a declared fallback, failing on any unmapped route. Device link verification belongs to MOB-08 and is not claimed here.
+
+**Done when:** every shareable destination has a tested native target or a working web fallback, and unauthorized or missing destinations give a useful outcome.
+
+### WEB-15 — Stop returning peer email addresses from the member profile
+
+**Priority: P1. Fixes: F32.**
+
+**Change:** project only the fields clients use out of `playerProfile.get`, dropping `people.email` for non-admin viewers — the same response-level approach WEB-04 used for predictions. Preserve email on authorized commissioner surfaces and on self-view. Remove the email line from the mobile member profile once the response changes.
+
+**Start in:** `packages/api/server/api/routers/playerProfileRouter.ts`, `apps/mobile/components/profile/LeagueMemberProfile.tsx`, the web profile component.
+
+**Test layer:** API integration plus component — `packages/api/tests/integration/profile-privacy.test.ts` asserting a peer viewer receives no email field, the commissioner path still does, and self-view is unchanged; update the existing `apps/mobile/tests/profile/LeagueMemberProfile.test.tsx` expectations.
+
+**Decision required first:** is peer email visibility intentional for small private leagues? If yes, this slice becomes a PRD §7.5 amendment recording it, not a code change. If the decision is unresolved when the queue reaches this slice, mark it `BLOCKED` and advance.
+
+**Done when:** no peer-visible endpoint returns another member's email, or the PRD records the exposure as intended.
+
+### MOB-12a — Hold the splash screen through initialization
+
+**Priority: P2. Fixes: F29.**
+
+**Change:** call `SplashScreen.preventAutoHideAsync()` at module scope and `hideAsync()` only once fonts, cache restore and the initial session check have resolved. Stop returning `null` from `TRPCReactProvider`; render the tree behind the splash, or gate only the subtree that genuinely needs restored cache. Add a hard timeout so a failed or slow restore can never hold the splash indefinitely.
+
+**Start in:** `apps/mobile/app/_layout.tsx`, `lib/trpc/react.tsx`.
+
+**Test layer:** mobile unit — `apps/mobile/tests/app/splashGate.test.ts` against an extracted pure `shouldHideSplash({ fontsLoaded, cacheRestored, sessionResolved, timedOut })`, including the timeout path.
+
+**Done when:** cold start goes splash to first frame with no blank interval, and a restore failure still reaches the app within the timeout.
+
+### MOB-12b — Root error boundary and crash reporting
+
+**Priority: P2. Fixes: F30 (partial). Depends on MOB-12a.**
+
+**Change:** add an error boundary above the router with a user-facing retry screen that can reset state and optionally purge the cache, and forward the caught error to the logger and a crash reporter. Install the chosen reporter and wire the global JS error and unhandled-rejection handlers so a blank screen is never silent.
+
+**Start in:** `apps/mobile/app/_layout.tsx`, `apps/mobile/components/ErrorBoundary.tsx` (new).
+
+**Test layer:** component — `apps/mobile/tests/app/ErrorBoundary.test.tsx`: a throwing child renders the fallback, retry remounts the tree, and the reporter receives the error exactly once.
+
+**Decision required first:** which reporter. Recommendation: Sentry via `@sentry/react-native`. PostHog-only error capture is acceptable if recorded as a known limitation.
+
+**Done when:** a render error shows a recoverable screen and produces one reported event with enough context to act on.
+
+### MOB-12c — Analytics identity and a deliberate session-replay decision
+
+**Priority: P2. Fixes: F30 (remainder). Depends on MOB-01a.**
+
+**Change:** call `identify(uid)` on sign-in and `reset()` on the same identity transition MOB-01a introduces, so events stop being anonymous and never bleed across accounts. Resolve `enableSessionReplay`: either set it false and delete the contradictory comment, or keep it with a documented privacy decision and masking configuration. Bound logger metadata so `mobile_log` cannot ship arbitrary or sensitive payloads.
+
+**Start in:** `apps/mobile/lib/posthog.ts`, `providers/PostHogProvider.tsx`, `lib/logging/index.ts`.
+
+**Test layer:** mobile unit — `apps/mobile/tests/observability/analyticsIdentity.test.ts` against an injected fake client: identify on sign-in, reset then identify on A-to-B, reset on sign-out, and metadata redaction.
+
+**Decision required first:** keep or disable session replay for a private-league app. The code and its adjacent comment currently disagree, so someone should decide on purpose.
+
+**Done when:** events are attributable to the signed-in user and never to the previous one, and replay is a recorded decision.
+
+### WEB-14a — Cursor-paginate the league message board
+
+**Priority: P1. Fixes: F17 (server half). First slice of WEB-14.**
+
+**Change:** add cursor pagination and a stable order (`createdAt` with `message_id` as tiebreak) to `messages.leagueMessageBoard`, keeping the existing response shape available so already-installed mobile clients keep working, per delivery rule 3. Record explicit payload-size and response-time budgets for a full season's thread.
+
+**Start in:** `packages/api/server/api/routers/messages/index.ts`.
+
+**Test layer:** API integration — `packages/api/tests/integration/message-pagination.test.ts`: page boundaries, identical-timestamp ordering, cursor stability while new messages arrive, and old-shape callers still succeeding.
+
+**Done when:** a long thread loads in bounded pages with a stable order and released mobile clients are unaffected.
+
+### MOB-03c — Chat client: incremental fetch, optimistic send, honest copy
+
+**Priority: P2. Fixes: F17 (client half), F35. Depends on WEB-14a, MOB-03a, MOB-11a.**
+
+**Change:** consume the cursor API with `useInfiniteQuery` and delete the download-everything-then-`slice` approach. Append optimistically with rollback on failure so sending feels immediate rather than waiting on a round trip plus a full invalidation. Replace implementation copy — "auto-refreshes every 10s", "Pull down to sync" — with product copy per PRD §7.2.2, and enlarge the delete affordance with `hitSlop` or move it behind a long-press.
+
+**Start in:** `apps/mobile/components/messages/LeagueMessageBoard.tsx`.
+
+**Test layer:** component — `apps/mobile/tests/messages/LeagueMessageBoard.test.tsx`: an optimistic message appears then reconciles with the server row, rolls back on error, older pages load, and a retry produces no duplicate.
+
+**Done when:** sending feels immediate, history pages in, and no user-facing copy describes the refresh mechanism.
+
+### MOB-13b — Split the league screen
+
+**Priority: P3. Fixes: F31 (remainder).**
+
+**Change:** extract per-tab containers and the header and sharing logic from the 1,849-line `app/league/[id]/index.tsx`, with no behavior change.
+
+**Test layer:** none new; behavior-preserving refactor covered by the existing suite, typecheck and a reviewed diff.
+
+**Done when:** the screen is decomposed, behavior is unchanged, and the diff is reviewable. Deliberately last so it never collides with a behavioral fix in the same file.
+
 ## Delivery and handoff rules
 
 1. Start with WEB-01 as a small, reviewable integrity fix; capture the failing direct-API regression before changing behavior. Follow the serial PR workflow below rather than starting other tickets in parallel.
@@ -312,6 +594,14 @@ Use the decision table in [Testing Strategy](TESTING_STRATEGY.md#choosing-the-te
 ## Agreed workflow: one small PR at a time
 
 Maintain at most one active implementation PR from this backlog. Finish its validation and review, and wait for it to merge before starting the next slice. Do not bundle unrelated cleanup or another finding into a fix. A ticket can span several sequential PRs when that makes each change safer to review; no slice may leave a known partial integrity fix presented as complete.
+
+**Serial execution is a standing decision, reaffirmed September 12, 2026.** Parallel lanes were considered and rejected for cost reasons. One active implementation PR across the entire backlog, website and mobile alike — not one per area, and not one per lane. Concretely:
+
+- Take slices in the documented queue order. The mobile queue order additionally encodes file ownership, so reordering creates avoidable rebase conflicts; record the reason if you must.
+- If a slice is blocked on an unresolved product decision when the queue reaches it, record it as `BLOCKED` with the specific decision needed and advance to the next unblocked slice. Do not open a second concurrent PR to work around a block.
+- Decisions and external lead times may run concurrently with implementation. Only implementation PRs are serialized.
+
+**Keep this file current as work proceeds.** It is the single source of truth for what is in flight, so a stale entry is worse than no entry. On starting a slice, add its execution-record row with owner, branch and the pre-fix evidence you captured. On merging, update the status, the merged commit and the remaining verification. When a finding turns out to be already fixed or not reproducible, record that evidence against its ID instead of silently dropping it. Audit reports keep their original findings and IDs; status lives here.
 
 1. **Choose a bounded behavior.** Use the queue order and dependencies. Record the ticket, exact scope, expected before/after behavior, and any decision needed. Recheck the finding against latest main; if it is already fixed or cannot be reproduced, document that evidence rather than manufacturing a change.
 2. **Start from current main.** Check for local changes, pull main safely, and create a `codex/` branch for this slice. Preserve unrelated work. Keep the large initial audit/priority documents in a separate documentation commit/PR so they do not obscure the first fix; subsequent fix PRs include only relevant status/coverage updates.
@@ -350,6 +640,11 @@ Add a row when each later slice starts. Keep one active implementation slice; re
 | Completion/postseason window         | One shared state contract with documented operational owner                     | WEB-10 final behavior     |
 | Account deletion and league history  | Explicit retention/anonymization and ownership-transfer policy                  | MOB-06 data mutation      |
 | Initial mobile scope                 | Player-complete; essential commissioner actions with tested web fallbacks       | MOB-09 release acceptance |
+| Peer email visibility on profiles    | Hide it in the response; amend PRD §7.5 instead if it is intentional            | WEB-15                    |
+| Single-league auto-open on mobile    | Drop it once Home carries weekly status, matching web                           | MOB-14a                   |
+| Crash reporter choice                | Sentry via `@sentry/react-native`; PostHog-only capture is a recorded limitation | MOB-12b                   |
+| Session replay on mobile             | Disable it; the code and its own comment currently disagree                     | MOB-12c                   |
+| Offline write queueing               | Not a v1 requirement; cached reads and preserved drafts only                     | MOB-03a                   |
 
 Store guidance was checked against primary Apple/Google sources on September 6, 2026. Recheck before submission; developer-console configuration and actual submission outcomes remain unverified. This file and the audit are the only intended changes from this planning work.
 
