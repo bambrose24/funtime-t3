@@ -6,19 +6,17 @@ import { type RouterOutputs } from "~/trpc/types";
 import { useColorScheme } from "@/lib/useColorScheme";
 import { createComponentLogger } from "@/lib/logging";
 import { getShareLeagueInvite } from "@/lib/league/getShareLeagueInvite";
-import { type TabType } from "@/lib/league/leagueTabs";
 
 type Props = {
   leagueId: string;
   leagueIdNumber?: number;
   leagueData?: RouterOutputs["league"]["get"];
   leagueLoading: boolean;
-  activeTab: TabType;
   unreadCount: number;
   unreadBadgeLabel: string | null;
   isLeagueAdmin: boolean;
   isSuperAdmin: boolean;
-  onSwitchToMessages: () => void;
+  onOpenChat: () => void;
 };
 
 export function LeagueScreenHeader({
@@ -26,12 +24,11 @@ export function LeagueScreenHeader({
   leagueIdNumber,
   leagueData,
   leagueLoading,
-  activeTab,
   unreadCount,
   unreadBadgeLabel,
   isLeagueAdmin,
   isSuperAdmin,
-  onSwitchToMessages,
+  onOpenChat,
 }: Props) {
   const logger = createComponentLogger("LeagueScreen");
   const { isDarkColorScheme } = useColorScheme();
@@ -81,31 +78,29 @@ export function LeagueScreenHeader({
           </Text>
         </View>
         <View className="flex-row items-center gap-2">
-          {activeTab !== "messages" ? (
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel={
-                unreadCount > 0
-                  ? `Open league chat, ${unreadBadgeLabel} unread messages`
-                  : "Open league chat"
-              }
-              onPress={onSwitchToMessages}
-              className="bg-app-card-light dark:bg-app-card-dark relative rounded-lg p-2"
-            >
-              <Ionicons
-                name="chatbubble-ellipses-outline"
-                size={20}
-                color={isDarkColorScheme ? "#e5e7eb" : "#374151"}
-              />
-              {unreadBadgeLabel ? (
-                <View className="absolute -right-1 -top-1 min-w-5 items-center rounded-full bg-red-600 px-1.5 py-0.5">
-                  <Text className="text-[10px] font-bold text-white">
-                    {unreadBadgeLabel}
-                  </Text>
-                </View>
-              ) : null}
-            </Pressable>
-          ) : null}
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={
+              unreadCount > 0
+                ? `Open league chat, ${unreadBadgeLabel} unread messages`
+                : "Open league chat"
+            }
+            onPress={onOpenChat}
+            className="bg-app-card-light dark:bg-app-card-dark relative rounded-lg p-2"
+          >
+            <Ionicons
+              name="chatbubble-ellipses-outline"
+              size={20}
+              color={isDarkColorScheme ? "#e5e7eb" : "#374151"}
+            />
+            {unreadBadgeLabel ? (
+              <View className="absolute -right-1 -top-1 min-w-5 items-center rounded-full bg-red-600 px-1.5 py-0.5">
+                <Text className="text-[10px] font-bold text-white">
+                  {unreadBadgeLabel}
+                </Text>
+              </View>
+            ) : null}
+          </Pressable>
           {canManageLeague ? (
             <Pressable
               onPress={() => router.push(`/league/${leagueId}/admin` as any)}

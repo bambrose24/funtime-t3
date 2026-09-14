@@ -48,6 +48,7 @@ import { DEFAULT_SEASON } from "~/utils/const";
 import { PrefetchKind } from "next/dist/client/components/router-reducer/router-reducer-types";
 import { Badge } from "~/components/ui/badge";
 import { useLeagueUnreadMessages } from "~/hooks/useLeagueUnreadMessages";
+import { useChatLayer } from "~/components/messages/ChatLayer";
 
 type NavData = {
   data: RouterOutputs["home"]["nav"];
@@ -381,7 +382,6 @@ function TabLabel() {
 function LeagueDropdownMenu({ chosenLeague }: { chosenLeague: ChosenLeague }) {
   const leaderboardHref = `/league/${chosenLeague.league_id}/leaderboard`;
   const pickHref = `/league/${chosenLeague.league_id}/pick`;
-  const chatHref = `/league/${chosenLeague.league_id}/chat`;
   const adminHref = `/league/${chosenLeague.league_id}/admin`;
   const myProfileHref = `/league/${chosenLeague.league_id}/my-profile`;
   const infoHref = `/league/${chosenLeague.league_id}/info`;
@@ -389,6 +389,7 @@ function LeagueDropdownMenu({ chosenLeague }: { chosenLeague: ChosenLeague }) {
 
   const { data: session } = clientApi.session.current.useQuery();
   const { unreadCount } = useLeagueUnreadMessages(chosenLeague.league_id);
+  const { openChat } = useChatLayer();
   const isAdmin =
     session?.dbUser?.leaguemembers?.find(
       (m) => m.league_id === chosenLeague.league_id,
@@ -432,24 +433,29 @@ function LeagueDropdownMenu({ chosenLeague }: { chosenLeague: ChosenLeague }) {
               </div>
             </DropdownMenuItem>
           </Link>
-          <Link href={chatHref} prefetch>
-            <DropdownMenuItem>
-              <div className="flex w-full flex-row items-center justify-between gap-3">
-                <div className="flex flex-row items-center gap-3">
-                  <MessagesSquare className="h-4 w-4" />
-                  <>Chat</>
-                </div>
-                {unreadCount > 0 ? (
-                  <Badge
-                    variant="destructive"
-                    className="h-5 min-w-5 justify-center rounded-full px-1 text-[10px]"
-                  >
-                    {unreadCount > 99 ? "99+" : unreadCount}
-                  </Badge>
-                ) : null}
+          <DropdownMenuItem
+            onSelect={() =>
+              openChat({
+                leagueId: chosenLeague.league_id,
+                leagueName: chosenLeague.name,
+              })
+            }
+          >
+            <div className="flex w-full flex-row items-center justify-between gap-3">
+              <div className="flex flex-row items-center gap-3">
+                <MessagesSquare className="h-4 w-4" />
+                <>Chat</>
               </div>
-            </DropdownMenuItem>
-          </Link>
+              {unreadCount > 0 ? (
+                <Badge
+                  variant="destructive"
+                  className="h-5 min-w-5 justify-center rounded-full px-1 text-[10px]"
+                >
+                  {unreadCount > 99 ? "99+" : unreadCount}
+                </Badge>
+              ) : null}
+            </div>
+          </DropdownMenuItem>
           <Link href={superbowlHref} prefetch>
             <DropdownMenuItem>
               <div className="flex flex-row items-center gap-3">
@@ -492,38 +498,37 @@ function LeagueDropdownMenu({ chosenLeague }: { chosenLeague: ChosenLeague }) {
 }
 
 function LeagueChatNavLink({ chosenLeague }: { chosenLeague: ChosenLeague }) {
-  const pathname = usePathname();
   const { unreadCount } = useLeagueUnreadMessages(chosenLeague.league_id);
-  const isActive = pathname.includes("/chat");
+  const { openChat } = useChatLayer();
   const unreadLabel = unreadCount > 99 ? "99+" : unreadCount;
 
   return (
     <Button
-      asChild
-      variant={isActive ? "secondary" : "ghost"}
+      variant="ghost"
       size="sm"
       className="relative shrink-0 gap-2"
+      onClick={() =>
+        openChat({
+          leagueId: chosenLeague.league_id,
+          leagueName: chosenLeague.name,
+        })
+      }
+      aria-label={
+        unreadCount > 0
+          ? `Open league chat, ${unreadCount} unread messages`
+          : "Open league chat"
+      }
     >
-      <Link
-        href={`/league/${chosenLeague.league_id}/chat`}
-        prefetch
-        aria-label={
-          unreadCount > 0
-            ? `Open league chat, ${unreadCount} unread messages`
-            : "Open league chat"
-        }
-      >
-        <MessagesSquare className="h-4 w-4" />
-        <span className="hidden sm:inline">Chat</span>
-        {unreadCount > 0 ? (
-          <Badge
-            variant="destructive"
-            className="absolute -right-1 -top-1 h-5 min-w-5 justify-center rounded-full px-1 text-[10px]"
-          >
-            {unreadLabel}
-          </Badge>
-        ) : null}
-      </Link>
+      <MessagesSquare className="h-4 w-4" />
+      <span className="hidden sm:inline">Chat</span>
+      {unreadCount > 0 ? (
+        <Badge
+          variant="destructive"
+          className="absolute -right-1 -top-1 h-5 min-w-5 justify-center rounded-full px-1 text-[10px]"
+        >
+          {unreadLabel}
+        </Badge>
+      ) : null}
     </Button>
   );
 }

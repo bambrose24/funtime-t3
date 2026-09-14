@@ -36,6 +36,7 @@ import { clientApi } from "~/trpc/react";
 import { type RouterOutputs } from "~/trpc/types";
 import { useDictify } from "~/utils/hooks/useIdToValMemo";
 import { useLeagueUnreadMessages } from "~/hooks/useLeagueUnreadMessages";
+import { useChatLayer } from "~/components/messages/ChatLayer";
 
 type ClientLeaguePageProps = {
   week: number;
@@ -98,6 +99,7 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
   const firstGame = games.at(0);
   const week = firstGame?.week;
   const { unreadCount } = useLeagueUnreadMessages(props.leagueId);
+  const { openChat } = useChatLayer();
 
   const router = useRouter();
   const pathname = usePathname();
@@ -248,22 +250,22 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
             </Select>
           )}
           <Button
-            asChild
             variant="secondary"
             className="relative flex items-center gap-2"
+            onClick={() =>
+              openChat({ leagueId: props.leagueId, leagueName: league.name })
+            }
           >
-            <Link href={`/league/${league.league_id}/chat`}>
-              <MessagesSquare className="h-4 w-4" />
-              Chat
-              {unreadCount > 0 && (
-                <Badge
-                  variant="destructive"
-                  className="absolute -right-2 -top-2 flex h-5 min-w-5 items-center justify-center rounded-full px-1 text-xs"
-                >
-                  {unreadCount > 99 ? "99+" : unreadCount}
-                </Badge>
-              )}
-            </Link>
+            <MessagesSquare className="h-4 w-4" />
+            Chat
+            {unreadCount > 0 && (
+              <Badge
+                variant="destructive"
+                className="absolute -right-2 -top-2 flex h-5 min-w-5 items-center justify-center rounded-full px-1 text-xs"
+              >
+                {unreadCount > 99 ? "99+" : unreadCount}
+              </Badge>
+            )}
           </Button>
           {myPicks && firstGame && (
             <Card className="w-full">
@@ -304,22 +306,25 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
           <div className="flex w-full justify-between gap-2 xl:hidden">
             <div className="w-full">
               <Button
-                asChild
                 variant="secondary"
                 className="relative flex w-full items-center justify-center gap-2"
+                onClick={() =>
+                  openChat({
+                    leagueId: props.leagueId,
+                    leagueName: league.name,
+                  })
+                }
               >
-                <Link href={`/league/${league.league_id}/chat`}>
-                  <MessagesSquare className="h-4 w-4" />
-                  Chat
-                  {unreadCount > 0 && (
-                    <Badge
-                      variant="destructive"
-                      className="absolute -right-2 -top-2 flex h-5 min-w-5 items-center justify-center rounded-full px-1 text-xs"
-                    >
-                      {unreadCount > 99 ? "99+" : unreadCount}
-                    </Badge>
-                  )}
-                </Link>
+                <MessagesSquare className="h-4 w-4" />
+                Chat
+                {unreadCount > 0 && (
+                  <Badge
+                    variant="destructive"
+                    className="absolute -right-2 -top-2 flex h-5 min-w-5 items-center justify-center rounded-full px-1 text-xs"
+                  >
+                    {unreadCount > 99 ? "99+" : unreadCount}
+                  </Badge>
+                )}
               </Button>
             </div>
             {currentGame && firstGame && (
