@@ -25,7 +25,19 @@ import MessageComposer from "./Composer";
 
 import { MESSAGES_REFETCH_INTERVAL_MS } from "./const";
 
-type LeagueMessage = RouterOutputs["messages"]["leagueMessageBoard"][number];
+type LeagueMessage = Extract<
+  RouterOutputs["messages"]["leagueMessageBoard"],
+  readonly unknown[]
+>[number];
+
+function asLegacyMessageList(
+  data: RouterOutputs["messages"]["leagueMessageBoard"] | undefined,
+): LeagueMessage[] {
+  if (!data) {
+    return [];
+  }
+  return Array.isArray(data) ? data : data.messages;
+}
 
 export function LeagueChat({
   leagueId,
@@ -47,7 +59,7 @@ export function LeagueChat({
   const { markRead } = useLeagueUnreadMessages(leagueId);
   const utils = clientApi.useUtils();
 
-  const messages = messagesData ?? [];
+  const messages = asLegacyMessageList(messagesData);
   const latestMessage = messages.at(-1);
   const latestMessageId = latestMessage?.message_id;
 

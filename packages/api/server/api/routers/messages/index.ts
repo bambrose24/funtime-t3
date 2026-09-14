@@ -1,11 +1,41 @@
 import { z } from "zod";
 import { authorizedProcedure, createTRPCRouter } from "../../trpc";
 import { TRPCError } from "@trpc/server";
-import { MemberRole, Prisma } from "../../../../src/generated/prisma-client";
+import { MemberRole, Prisma, PrismaClient } from "../../../../src/generated/prisma-client";
 import { expoPushApi } from "../../../services/expo-push";
+
+/** Default page size for cursor-paginated callers (WEB-14a / F17). */
+export const LEAGUE_MESSAGE_BOARD_DEFAULT_LIMIT = 50;
+/** Hard cap per request to keep payload and query time bounded. */
+export const LEAGUE_MESSAGE_BOARD_MAX_LIMIT = 100;
+/**
+ * Explicit budgets for a representative full-season thread (~10k messages):
+ * - payload: ≤ ~200 KiB JSON per page of 50 messages with author includes
+ * - response time: p95 ≤ 500ms on the production-sized fixture (integration
+ *   asserts page boundaries; load budgets are validated in staging/prod traces)
+ */
+export const LEAGUE_MESSAGE_BOARD_PAYLOAD_BUDGET_KIB = 200;
+export const LEAGUE_MESSAGE_BOARD_P95_MS = 500;
 
 const leagueMessageInput = z.object({
   leagueId: z.number().int(),
+  /**
+   * When omitted, returns the legacy full ascending array for already-installed
+   * mobile/web clients. When set, returns a cursor page object instead.
+   */
+  limit: z
+    .number()
+    .int()
+    .min(1)
+    .max(LEAGUE_MESSAGE_BOARD_MAX_LIMIT)
+    .optional(),
+  /** Load older messages strictly before this (createdAt, message_id) cursor. */
+  cursor: z
+    .object({
+      createdAt: z.coerce.date(),
+      messageId: z.string().min(1),
+    })
+    .optional(),
 });
 
 const writeMessageInput = z.object({
@@ -22,6 +52,20 @@ const legacyReadStateInput = z.object({
   leagueId: z.number().int(),
   lastSeenAt: z.date(),
 });
+
+const messageBoardInclude = {
+  leaguemembers: {
+    include: {
+      people: true,
+    },
+  },
+} as const;
+
+type MessageBoardRow = Prisma.leaguemessagesGetPayload<{
+  include: typeof messageBoardInclude;
+}>;
+
+type Db = PrismaClient;
 
 function getLeagueMember(
   dbUser: {
@@ -50,12 +94,74 @@ function isCursorAfterOrEqual(
   );
 }
 
+function olderThanCursor(cursor: {
+  createdAt: Date;
+  messageId: string;
+}): Prisma.leaguemessagesWhereInput {
+  return {
+    OR: [
+      { createdAt: { lt: cursor.createdAt } },
+      {
+        createdAt: cursor.createdAt,
+        message_id: { lt: cursor.messageId },
+      },
+    ],
+  };
+}
+
+async function fetchLegacyMessageBoard(
+  db: Db,
+  leagueId: number,
+): Promise<MessageBoardRow[]> {
+  return db.leaguemessages.findMany({
+    where: {
+      league_id: leagueId,
+      status: "PUBLISHED",
+    },
+    orderBy: [{ createdAt: "asc" }, { message_id: "asc" }],
+    include: messageBoardInclude,
+  });
+}
+
+async function fetchMessageBoardPage(
+  db: Db,
+  leagueId: number,
+  limit: number,
+  cursor?: { createdAt: Date; messageId: string },
+): Promise<{
+  messages: MessageBoardRow[];
+  nextCursor: { createdAt: Date; messageId: string } | null;
+}> {
+  const rows = await db.leaguemessages.findMany({
+    where: {
+      league_id: leagueId,
+      status: "PUBLISHED",
+      ...(cursor ? olderThanCursor(cursor) : {}),
+    },
+    // Newest-first so the first page is the latest window; reverse for UI order.
+    orderBy: [{ createdAt: "desc" }, { message_id: "desc" }],
+    take: limit + 1,
+    include: messageBoardInclude,
+  });
+
+  const hasOlder = rows.length > limit;
+  const pageDesc = hasOlder ? rows.slice(0, limit) : rows;
+  const messages = [...pageDesc].reverse();
+  const oldest = messages[0];
+  const nextCursor =
+    hasOlder && oldest
+      ? { createdAt: oldest.createdAt, messageId: oldest.message_id }
+      : null;
+
+  return { messages, nextCursor };
+}
+
 export const messagesRouter = createTRPCRouter({
   leagueMessageBoard: authorizedProcedure
     .input(leagueMessageInput)
     .query(async ({ ctx, input }) => {
       const { dbUser } = ctx;
-      const { leagueId } = input;
+      const { leagueId, limit, cursor } = input;
       const member = getLeagueMember(dbUser, leagueId);
       if (!member) {
         throw new TRPCError({
@@ -64,20 +170,18 @@ export const messagesRouter = createTRPCRouter({
         });
       }
 
-      return await ctx.db.leaguemessages.findMany({
-        where: {
-          league_id: leagueId,
-          status: "PUBLISHED",
-        },
-        orderBy: [{ createdAt: "asc" }, { message_id: "asc" }],
-        include: {
-          leaguemembers: {
-            include: {
-              people: true,
-            },
-          },
-        },
-      });
+      if (limit == null) {
+        if (cursor) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "cursor requires limit for paginated leagueMessageBoard",
+          });
+        }
+        // Legacy shape: ascending Message[] for already-installed clients.
+        return await fetchLegacyMessageBoard(ctx.db, leagueId);
+      }
+
+      return await fetchMessageBoardPage(ctx.db, leagueId, limit, cursor);
     }),
   leagueWeekMessageBoard: authorizedProcedure
     .input(
@@ -96,20 +200,7 @@ export const messagesRouter = createTRPCRouter({
       }
 
       // Backward-compatible alias while week-scoped callers are migrated.
-      return await ctx.db.leaguemessages.findMany({
-        where: {
-          league_id: input.leagueId,
-          status: "PUBLISHED",
-        },
-        orderBy: [{ createdAt: "asc" }, { message_id: "asc" }],
-        include: {
-          leaguemembers: {
-            include: {
-              people: true,
-            },
-          },
-        },
-      });
+      return await fetchLegacyMessageBoard(ctx.db, input.leagueId);
     }),
   unreadCounts: authorizedProcedure.query(async ({ ctx }) => {
     const memberships = ctx.dbUser?.leaguemembers ?? [];

@@ -330,7 +330,7 @@ MOB-01 through MOB-10 above remain the release epics and keep their IDs and rele
 | 17    | MOB-03c | P2       | Chat client: incremental fetch, optimistic send, honest copy               | Component                     |
 | 18    | MOB-13b | P3       | Split the 1,849-line league screen; deliberately last                     | Existing checks only          |
 
-**Current position:** **WEB-12a** in progress (inclusive 1–200 tiebreaker bound on both clients). **MOB-02b** merged (#59). Remaining after this: **WEB-15** (BLOCKED), **WEB-14a** / **MOB-03c**. Update this line when a slice starts or merges.
+**Current position:** **WEB-14a** in progress (cursor pagination on `messages.leagueMessageBoard`; no schema/migration). **WEB-12a** merged (#61). Remaining after this: **MOB-03c**, **WEB-15** (BLOCKED). Update this line when a slice starts or merges.
 
 MOB-05 (build and signing), MOB-06 (account deletion) and MOB-07 (chat moderation) are not in this queue because they need product decisions and have long external lead times. They remain public-release prerequisites; start their decisions in parallel with this queue even though their implementation is serial with it.
 
