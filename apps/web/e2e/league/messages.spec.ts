@@ -18,7 +18,7 @@ test("member posts and deletes their message and admin deletes another member's 
   await chatButton.click();
   await expect(page).toHaveURL(new RegExp(`/league/${leagueId}$`));
   await expect(
-    page.getByRole("heading", { name: "League Chat" }),
+    page.getByRole("heading", { name: "League Chat", exact: true }),
   ).toBeVisible();
   await expect(page.getByText("Fixture player message")).toBeVisible();
   await expect
@@ -82,7 +82,7 @@ test("league chat remains available before and after the season", async ({
     const leagueId = getLeagueId(shareCode);
     await page.goto(`/league/${leagueId}/chat`);
     await expect(
-      page.getByRole("heading", { name: "League Chat" }),
+      page.getByRole("heading", { name: "League Chat", exact: true }),
     ).toBeVisible();
   }
 });

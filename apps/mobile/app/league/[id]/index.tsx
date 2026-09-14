@@ -54,6 +54,7 @@ export default function LeagueScreen() {
       setIsChatVisible(true);
       return;
     }
+    setIsChatVisible(false);
     setActiveTab((currentTab) =>
       currentTab === nextTab ? currentTab : nextTab,
     );
@@ -153,7 +154,14 @@ export default function LeagueScreen() {
     setIsChatVisible(true);
   };
 
-  const closeChat = () => setIsChatVisible(false);
+  const closeChat = () => {
+    setIsChatVisible(false);
+
+    // Remove the legacy deep-link query so the same link can reopen chat.
+    if (parseTabParam(tab) === "messages") {
+      router.replace(buildLeagueHref({ week: selectedWeekFromParams }) as any);
+    }
+  };
 
   const { data: leagueData, isLoading: leagueLoading } =
     clientApi.league.get.useQuery(

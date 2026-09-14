@@ -46,7 +46,7 @@ export function ChatLayerProvider({ children }: { children: React.ReactNode }) {
             <SheetHeader className="sr-only">
               <SheetTitle className="flex items-center gap-2">
                 <MessagesSquare className="h-5 w-5" />
-                League chat
+                Chat panel
               </SheetTitle>
               <SheetDescription>
                 Read and send messages in {chatTarget.leagueName}.
