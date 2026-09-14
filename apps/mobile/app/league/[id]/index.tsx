@@ -25,6 +25,7 @@ import { cn } from "@/lib/utils";
 import { parseTabParam, type TabType } from "@/lib/league/leagueTabs";
 import { useLeagueUnreadMessages } from "@/hooks/useLeagueUnreadMessages";
 import { getUnreadBadgeLabel } from "@/lib/messages/unreadBadge";
+import { MESSAGES_REFETCH_INTERVAL_MS } from "@/lib/messages/constants";
 import { useColorScheme } from "@/lib/useColorScheme";
 
 export default function LeagueScreen() {
@@ -172,6 +173,14 @@ export default function LeagueScreen() {
         refetchOnWindowFocus: true,
       },
     );
+  clientApi.messages.leagueMessageBoard.useQuery(
+    { leagueId: leagueIdNumber! },
+    {
+      enabled: !!leagueIdNumber && !isNaN(leagueIdNumber),
+      refetchInterval: MESSAGES_REFETCH_INTERVAL_MS,
+      refetchIntervalInBackground: true,
+    },
+  );
   const { data: session } = clientApi.session.current.useQuery();
   const { data: isSuperAdmin } = clientApi.generalAdmin.isSuperAdmin.useQuery();
   const isLeagueAdmin = Boolean(

@@ -19,8 +19,8 @@ import { clientApi } from "@/lib/trpc/react";
 import { useColorScheme } from "@/lib/useColorScheme";
 import { useLeagueUnreadMessages } from "@/hooks/useLeagueUnreadMessages";
 import { type RouterOutputs } from "~/trpc/types";
+import { MESSAGES_REFETCH_INTERVAL_MS } from "@/lib/messages/constants";
 
-const MESSAGES_REFETCH_INTERVAL_MS = 10 * 1000;
 const MESSAGE_PAGE_SIZE = 80;
 const MESSAGE_CONTENT_MAX_LENGTH = 500;
 const NEAR_BOTTOM_THRESHOLD_PX = 120;

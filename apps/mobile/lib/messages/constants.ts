@@ -1,0 +1,1 @@
+export const MESSAGES_REFETCH_INTERVAL_MS = 10 * 1000;

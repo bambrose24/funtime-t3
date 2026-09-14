@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { serverApi } from "~/trpc/server";
 import { MaybeShareLeagueLink } from "./MaybeShareLeagueLink";
 import { MaybeUpsellNextLeague } from "./MaybeUpsellNextLeague";
+import { LeagueChatPrefetch } from "~/components/messages/LeagueChatPrefetch";
 
 export default async function LeagueAuthLayout({
   children,
@@ -28,6 +29,7 @@ export default async function LeagueAuthLayout({
     <>
       <MaybeShareLeagueLink leagueId={leagueIdNumber} />
       <MaybeUpsellNextLeague leagueId={leagueIdNumber} />
+      <LeagueChatPrefetch leagueId={leagueIdNumber} />
       {children}
     </>
   );
