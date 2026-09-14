@@ -39,12 +39,27 @@ const profile = (
   superbowlPickHidden: hidden,
   correctPicks: 0,
   wrongPicks: 0,
+  missedPicks: 0,
+  decidedGames: 0,
+  accuracyPct: null as number | null,
+  rank: null as number | null,
+  leagueSize: 12,
+  tiedForRank: false,
+  leaderCorrect: 0,
+  correctBehind: 0,
+  weeks: [] as {
+    week: number;
+    correct: number;
+    wrong: number;
+    missed: number;
+    possible: number;
+    won: boolean;
+  }[],
   member: {
-    people: { username: "opponent", email: "opponent@example.com" },
+    people: { username: "opponent" },
     role: "player",
     superbowl: picks,
     WeekWinners: [],
-    leaguemessages: [],
   },
 });
 function query(data: ReturnType<typeof profile>) {
@@ -67,6 +82,7 @@ test("redacted prediction shows hidden copy instead of claiming no submission", 
   ).toBeTruthy();
   expect(screen.queryByText("No Super Bowl pick submitted.")).toBeNull();
   expect(screen.queryByText(/Total Score:/)).toBeNull();
+  expect(screen.queryByText("opponent@example.com")).toBeNull();
 });
 test("visible profile with no prediction shows the genuine empty state", () => {
   query(profile(false));

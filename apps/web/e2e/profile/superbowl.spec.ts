@@ -14,17 +14,16 @@ test("player can view their profile and update a Super Bowl prediction", async (
   await expect(page.getByText("BUF over PHI (score 48)")).toBeVisible();
 
   await page.getByRole("button", { name: "Edit" }).click();
-  const dialog = page.getByRole("dialog");
   await expect(
-    dialog.getByRole("heading", { name: "Edit your Super Bowl pick" }),
+    page.getByRole("heading", { name: "Edit your Super Bowl pick" }),
   ).toBeVisible();
 
-  await dialog.getByRole("combobox", { name: "AFC Team" }).click();
+  await page.getByRole("combobox", { name: "AFC Team" }).click();
   await page.getByRole("option", { name: "Kansas City Chiefs" }).click();
-  await dialog.getByRole("combobox", { name: "Winner" }).click();
+  await page.getByRole("combobox", { name: "Winner" }).click();
   await page.getByRole("option", { name: "Kansas City Chiefs" }).click();
-  await dialog.getByLabel("Total Score").fill("53");
-  await dialog.getByRole("button", { name: "Save" }).click();
+  await page.getByLabel("Total Score").fill("53");
+  await page.getByRole("button", { name: "Save" }).click();
 
   await expect(page.getByText("KC over PHI (score 53)")).toBeVisible();
   await expect

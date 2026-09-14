@@ -179,13 +179,13 @@ async function scenario({
           const serialized = JSON.parse(JSON.stringify(other));
           expect(serialized.member.people).toEqual({
             username: opponent.username,
-            email: opponent.email,
           });
-          expect(serialized.member.leaguemessages).toHaveLength(1);
-          expect(serialized.member.leaguemessages[0]).not.toHaveProperty(
-            "content",
-          );
+          expect(serialized.member).not.toHaveProperty("leaguemessages");
           expect(serialized.member).not.toHaveProperty("paid");
+          expect(serialized.member.people).not.toHaveProperty("email");
+          expect(JSON.stringify(serialized)).not.toContain(
+            "Private message body must not be serialized with profile",
+          );
           const board = await publicBoard.superbowlPicks({
             leagueId: league.league_id,
           });
