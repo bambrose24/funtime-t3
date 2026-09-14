@@ -330,7 +330,7 @@ MOB-01 through MOB-10 above remain the release epics and keep their IDs and rele
 | 17    | MOB-03c | P2       | Chat client: incremental fetch, optimistic send, honest copy               | Component                     |
 | 18    | MOB-13b | P3       | Split the 1,849-line league screen; deliberately last                     | Existing checks only          |
 
-**Current position:** **MOB-03c** in progress (mobile chat infinite query + optimistic send; no schema/migration). **WEB-14a** merged (#66). Remaining after this: **WEB-15** (BLOCKED). Update this line when a slice starts or merges.
+**Current position:** Deferred remediation queue complete for auto-mergeable work. **MOB-03c** merged (#67). Remaining: **WEB-15** (BLOCKED — peer email visibility product decision). Update this line when WEB-15 starts or merges.
 
 MOB-05 (build and signing), MOB-06 (account deletion) and MOB-07 (chat moderation) are not in this queue because they need product decisions and have long external lead times. They remain public-release prerequisites; start their decisions in parallel with this queue even though their implementation is serial with it.
 
