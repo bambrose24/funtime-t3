@@ -29,7 +29,19 @@ type Props = {
   leagueId: string;
 };
 
-type LeagueMessage = RouterOutputs["messages"]["leagueMessageBoard"][number];
+type LeagueMessage = Extract<
+  RouterOutputs["messages"]["leagueMessageBoard"],
+  readonly unknown[]
+>[number];
+
+function asLegacyMessageList(
+  data: RouterOutputs["messages"]["leagueMessageBoard"] | undefined,
+): LeagueMessage[] {
+  if (!data) {
+    return [];
+  }
+  return Array.isArray(data) ? data : data.messages;
+}
 
 export function LeagueMessageBoard({ leagueId }: Props) {
   const leagueIdNumber = Number(leagueId);
@@ -49,7 +61,7 @@ export function LeagueMessageBoard({ leagueId }: Props) {
 
   const { data: session } = clientApi.session.current.useQuery();
   const {
-    data: messages,
+    data: messagesData,
     isLoading,
     isFetching,
     refetch,
@@ -61,6 +73,7 @@ export function LeagueMessageBoard({ leagueId }: Props) {
       refetchInterval: MESSAGES_REFETCH_INTERVAL_MS,
     },
   );
+  const messages = asLegacyMessageList(messagesData);
 
   const { mutateAsync: writeMessage } =
     clientApi.messages.writeMessage.useMutation();
