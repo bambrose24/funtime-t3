@@ -46,6 +46,8 @@ test("completed results render weekly winners, tied ranks, chart, and profile to
 
   await page.goto(`/league/${leagueId}/my-profile`);
   await expect(page.getByRole("heading", { name: "webplayer" })).toBeVisible();
-  await expect(page.getByText("2 / 2")).toBeVisible();
-  await expect(page.getByText("Week 1", { exact: true })).toBeVisible();
+  await expect(page.getByText("2–0")).toBeVisible();
+  await expect(
+    page.locator('[aria-label="Week 1: 2 of 2 correct, won the week"]'),
+  ).toBeVisible();
 });
