@@ -9,6 +9,7 @@ import { Toaster } from "~/components/ui/sonner";
 import { Nav } from "./_nav/nav";
 import { WebVitals } from "~/lib/axiom/client";
 import { UserProviderServer } from "./(auth)/provider/UserProviderServer";
+import { ChatLayerProvider } from "~/components/messages/ChatLayer";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -50,10 +51,12 @@ export default function RootLayout({
               enableSystem
               disableTransitionOnChange
             >
-              <Nav />
-              <div className="grid grid-cols-12 gap-4 p-2">{children}</div>
-              <Toaster position="bottom-right" richColors duration={5000} />
-              <WebVitals />
+              <ChatLayerProvider>
+                <Nav />
+                <div className="grid grid-cols-12 gap-4 p-2">{children}</div>
+                <Toaster position="bottom-right" richColors duration={5000} />
+                <WebVitals />
+              </ChatLayerProvider>
             </ThemeProvider>
           </UserProviderServer>
         </TRPCReactProvider>

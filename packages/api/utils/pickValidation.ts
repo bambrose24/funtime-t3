@@ -1,7 +1,25 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
-export const pickScoreSchema = z.number().int().min(1).max(200);
+export const TIEBREAKER_SCORE_MIN = 1;
+export const TIEBREAKER_SCORE_MAX = 200;
+
+export const pickScoreSchema = z
+  .number()
+  .int()
+  .min(TIEBREAKER_SCORE_MIN)
+  .max(TIEBREAKER_SCORE_MAX);
+
+/** Form-string check matching pickScoreSchema (inclusive 1–200 integers). */
+export function isValidTiebreakerScoreInput(val: string): boolean {
+  const score = Number(val);
+  return (
+    !Number.isNaN(score) &&
+    Number.isInteger(score) &&
+    score >= TIEBREAKER_SCORE_MIN &&
+    score <= TIEBREAKER_SCORE_MAX
+  );
+}
 
 /** Validate against authoritative schedule data before either writer saves. */
 export function validatePickGame(

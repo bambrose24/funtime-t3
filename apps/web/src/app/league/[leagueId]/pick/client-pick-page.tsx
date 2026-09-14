@@ -38,6 +38,7 @@ import {
 } from "~/components/ui/dialog";
 import { Checkbox } from "~/components/ui/checkbox";
 import { orderBy } from "lodash";
+import { isValidTiebreakerScoreInput } from "@funtime/api/utils/pickValidation";
 import { useRouter } from "next/navigation";
 import confetti from "canvas-confetti";
 import { EASTERN_TIMEZONE } from "~/utils/const";
@@ -92,16 +93,9 @@ const picksSchema = z.object({
     score: z
       .string()
       .min(1, "You must pick a score")
-      .refine(
-        (val) =>
-          !isNaN(Number(val)) &&
-          Number.isInteger(Number(val)) &&
-          Number(val) > 0 &&
-          Number(val) < 200,
-        {
-          message: "Score must be between 1 and 200",
-        },
-      ),
+      .refine(isValidTiebreakerScoreInput, {
+        message: "Score must be between 1 and 200",
+      }),
   }),
 });
 

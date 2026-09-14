@@ -18,10 +18,19 @@ import { LeagueTabLoadingSkeleton } from "@/components/league/LeagueTabLoadingSk
 import { clientApi } from "@/lib/trpc/react";
 import { useColorScheme } from "@/lib/useColorScheme";
 import { useLeagueUnreadMessages } from "@/hooks/useLeagueUnreadMessages";
-import { type RouterOutputs } from "~/trpc/types";
+import {
+  createOptimisticMessage,
+  flattenMessagePages,
+  mergeMessagesWithOptimistic,
+  reconcileOptimisticWithServer,
+  withoutOptimisticId,
+  type LeagueMessage,
+  type LeagueMessageBoardPage,
+  type OptimisticLeagueMessage,
+} from "@/lib/messages/optimisticMessages";
 
 const MESSAGES_REFETCH_INTERVAL_MS = 10 * 1000;
-const MESSAGE_PAGE_SIZE = 80;
+const MESSAGE_PAGE_SIZE = 50;
 const MESSAGE_CONTENT_MAX_LENGTH = 500;
 const NEAR_BOTTOM_THRESHOLD_PX = 120;
 
@@ -29,7 +38,14 @@ type Props = {
   leagueId: string;
 };
 
-type LeagueMessage = RouterOutputs["messages"]["leagueMessageBoard"][number];
+type DisplayMessage = LeagueMessage | OptimisticLeagueMessage;
+
+function messageKey(message: DisplayMessage): string {
+  if ("optimisticId" in message && message.optimisticId) {
+    return message.optimisticId;
+  }
+  return message.message_id;
+}
 
 export function LeagueMessageBoard({ leagueId }: Props) {
   const leagueIdNumber = Number(leagueId);
@@ -38,28 +54,52 @@ export function LeagueMessageBoard({ leagueId }: Props) {
     Number.isFinite(leagueIdNumber) ? leagueIdNumber : undefined,
   );
   const utils = clientApi.useUtils();
-  const listRef = useRef<FlatList<LeagueMessage>>(null);
+  const listRef = useRef<FlatList<DisplayMessage>>(null);
   const previousTotalMessagesRef = useRef(0);
   const [draft, setDraft] = useState("");
   const [sending, setSending] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [visibleCount, setVisibleCount] = useState(MESSAGE_PAGE_SIZE);
   const [isNearBottom, setIsNearBottom] = useState(true);
   const [hasUnseenNewMessages, setHasUnseenNewMessages] = useState(false);
+  const [optimisticMessages, setOptimisticMessages] = useState<
+    OptimisticLeagueMessage[]
+  >([]);
 
   const { data: session } = clientApi.session.current.useQuery();
   const {
-    data: messages,
+    data,
     isLoading,
     isFetching,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
     refetch,
     dataUpdatedAt,
-  } = clientApi.messages.leagueMessageBoard.useQuery(
-    { leagueId: leagueIdNumber },
+  } = clientApi.messages.leagueMessageBoard.useInfiniteQuery(
+    {
+      leagueId: leagueIdNumber,
+      limit: MESSAGE_PAGE_SIZE,
+    },
     {
       enabled: Number.isFinite(leagueIdNumber),
       refetchInterval: MESSAGES_REFETCH_INTERVAL_MS,
+      getNextPageParam: (lastPage) => {
+        if (Array.isArray(lastPage)) {
+          return undefined;
+        }
+        return lastPage.nextCursor ?? undefined;
+      },
+      initialCursor: undefined,
     },
+  );
+
+  const serverMessages = useMemo(
+    () => flattenMessagePages(data?.pages as LeagueMessageBoardPage[] | undefined),
+    [data?.pages],
+  );
+  const messages = useMemo(
+    () => mergeMessagesWithOptimistic(serverMessages, optimisticMessages),
+    [optimisticMessages, serverMessages],
   );
 
   const { mutateAsync: writeMessage } =
@@ -73,19 +113,11 @@ export function LeagueMessageBoard({ leagueId }: Props) {
     );
   }, [leagueIdNumber, session?.dbUser?.leaguemembers]);
 
-  const pagedMessages = useMemo(() => {
-    const allMessages = messages ?? [];
-    const startIndex = Math.max(allMessages.length - visibleCount, 0);
-    return allMessages.slice(startIndex);
-  }, [messages, visibleCount]);
-
-  const hasOlderMessages = (messages?.length ?? 0) > pagedMessages.length;
-  const totalMessages = messages?.length ?? 0;
-  const messageCountLabel = `${totalMessages} message${totalMessages === 1 ? "" : "s"}`;
+  const messageCountLabel = `${messages.length} message${messages.length === 1 ? "" : "s"}`;
   const syncStatusLabel =
     dataUpdatedAt > 0
       ? `Updated ${formatDistanceToNow(dataUpdatedAt, { addSuffix: true })}`
-      : "Syncing messages...";
+      : "Loading messages...";
   const trimmedDraft = draft.trim();
   const draftLength = draft.length;
   const draftRemaining = MESSAGE_CONTENT_MAX_LENGTH - draftLength;
@@ -95,7 +127,7 @@ export function LeagueMessageBoard({ leagueId }: Props) {
     draftLength <= MESSAGE_CONTENT_MAX_LENGTH;
 
   useEffect(() => {
-    const totalMessages = messages?.length ?? 0;
+    const totalMessages = messages.length;
     const hadMessagesBefore = previousTotalMessagesRef.current;
     const hasNewMessages = totalMessages > hadMessagesBefore;
     const initialLoad = hadMessagesBefore === 0 && totalMessages > 0;
@@ -114,9 +146,9 @@ export function LeagueMessageBoard({ leagueId }: Props) {
     requestAnimationFrame(() => {
       listRef.current?.scrollToEnd({ animated: !initialLoad });
     });
-  }, [isNearBottom, messages?.length]);
+  }, [isNearBottom, messages.length]);
 
-  const latestMessageId = messages?.at(-1)?.message_id;
+  const latestMessageId = messages.at(-1)?.message_id;
   useEffect(() => {
     if (!isNearBottom || !latestMessageId) {
       return;
@@ -137,6 +169,7 @@ export function LeagueMessageBoard({ leagueId }: Props) {
     await Promise.all([
       utils.messages.leagueMessageBoard.invalidate({
         leagueId: leagueIdNumber,
+        limit: MESSAGE_PAGE_SIZE,
       }),
       utils.messages.unreadCounts.invalidate(),
     ]);
@@ -156,7 +189,6 @@ export function LeagueMessageBoard({ leagueId }: Props) {
   };
 
   const jumpToLatest = () => {
-    setVisibleCount(MESSAGE_PAGE_SIZE);
     setHasUnseenNewMessages(false);
     requestAnimationFrame(() => {
       listRef.current?.scrollToEnd({ animated: true });
@@ -165,7 +197,7 @@ export function LeagueMessageBoard({ leagueId }: Props) {
 
   const onSend = async () => {
     const content = trimmedDraft;
-    if (!content) {
+    if (!content || !viewerLeagueMember) {
       return;
     }
     if (content.length > MESSAGE_CONTENT_MAX_LENGTH) {
@@ -176,17 +208,43 @@ export function LeagueMessageBoard({ leagueId }: Props) {
       return;
     }
 
+    const optimisticId = `optimistic-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    const optimistic = createOptimisticMessage({
+      optimisticId,
+      content,
+      leagueId: leagueIdNumber,
+      memberId: viewerLeagueMember.membership_id,
+      username: session?.dbUser?.username ?? "You",
+    });
+
+    setDraft("");
+    setOptimisticMessages((current) => [...current, optimistic]);
+    setSending(true);
+
     try {
-      setSending(true);
-      await writeMessage({
+      const created = await writeMessage({
         leagueId: leagueIdNumber,
         content,
       });
-      setDraft("");
       await invalidateMessages();
+      setOptimisticMessages((current) =>
+        reconcileOptimisticWithServer({
+          optimistic: current,
+          optimisticId,
+          serverMessage: {
+            ...created,
+            leaguemembers: optimistic.leaguemembers,
+          } as LeagueMessage,
+          serverMessages,
+        }),
+      );
     } catch (error) {
       console.error("Failed to send message", error);
-      Alert.alert("Send Failed", "Unable to send message. Please try again.");
+      setOptimisticMessages((current) =>
+        withoutOptimisticId(current, optimisticId),
+      );
+      setDraft(content);
+      Alert.alert("Couldn't send", "Your message wasn't delivered. Try again.");
     } finally {
       setSending(false);
     }
@@ -225,10 +283,10 @@ export function LeagueMessageBoard({ leagueId }: Props) {
       className="flex-1"
     >
       <View className="flex-1">
-        <FlatList<LeagueMessage>
+        <FlatList<DisplayMessage>
           ref={listRef}
-          data={pagedMessages}
-          keyExtractor={(message) => message.message_id}
+          data={messages}
+          keyExtractor={messageKey}
           className="flex-1 px-4 pt-4"
           contentContainerStyle={{ gap: 12, paddingBottom: 16 }}
           showsVerticalScrollIndicator={false}
@@ -262,27 +320,32 @@ export function LeagueMessageBoard({ leagueId }: Props) {
                   League Chat
                 </Text>
                 <Text className="mt-1 text-sm text-gray-700 dark:text-gray-200">
-                  {messageCountLabel} - auto-refreshes every 10s
+                  {messageCountLabel} · Shared with everyone in this league
                 </Text>
                 <Text className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
-                  {isFetching && !isRefreshing ? "Syncing..." : syncStatusLabel}
+                  {isFetching && !isRefreshing && !isFetchingNextPage
+                    ? "Checking for new messages..."
+                    : syncStatusLabel}
                 </Text>
               </View>
               <View className="flex-row items-center gap-2">
-                {hasOlderMessages ? (
+                {hasNextPage ? (
                   <Button
                     variant="outline"
                     size="sm"
-                    onPress={() =>
-                      setVisibleCount((current) => current + MESSAGE_PAGE_SIZE)
-                    }
+                    disabled={isFetchingNextPage}
+                    onPress={() => {
+                      void fetchNextPage();
+                    }}
                   >
-                    Load Older Messages
+                    {isFetchingNextPage
+                      ? "Loading earlier messages..."
+                      : "Load earlier messages"}
                   </Button>
                 ) : null}
-                {visibleCount > MESSAGE_PAGE_SIZE ? (
+                {messages.length > MESSAGE_PAGE_SIZE ? (
                   <Button variant="ghost" size="sm" onPress={jumpToLatest}>
-                    Jump to Latest
+                    Jump to latest
                   </Button>
                 ) : null}
               </View>
@@ -291,16 +354,19 @@ export function LeagueMessageBoard({ leagueId }: Props) {
           ListEmptyComponent={
             <View className="py-12">
               <Text className="text-center text-base text-gray-500 dark:text-gray-400">
-                No messages yet. Start the conversation.
+                No messages yet. Say hello to get the league started.
               </Text>
             </View>
           }
           renderItem={({ item: message }) => {
             const mine =
               viewerLeagueMember?.membership_id === message.member_id;
-            const canDelete = mine || viewerLeagueMember?.role === "admin";
+            const canDelete =
+              !("pending" in message && message.pending) &&
+              (mine || viewerLeagueMember?.role === "admin");
             const username = message.leaguemembers?.people.username ?? "Member";
             const createdAt = new Date(message.createdAt);
+            const pending = "pending" in message && Boolean(message.pending);
 
             return (
               <View className="gap-1">
@@ -310,6 +376,7 @@ export function LeagueMessageBoard({ leagueId }: Props) {
                     mine
                       ? "ml-8 border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950"
                       : "mr-8 border-gray-200 bg-white dark:border-zinc-700 dark:bg-zinc-800",
+                    pending ? "opacity-70" : "",
                   ].join(" ")}
                 >
                   <Text className="text-sm text-app-fg-light dark:text-app-fg-dark">
@@ -324,18 +391,22 @@ export function LeagueMessageBoard({ leagueId }: Props) {
                 >
                   <Text className="text-xs text-gray-500 dark:text-gray-400">
                     {mine ? "You" : username} -{" "}
-                    {formatDistanceToNow(createdAt, { addSuffix: true })}
+                    {pending
+                      ? "Sending..."
+                      : formatDistanceToNow(createdAt, { addSuffix: true })}
                   </Text>
                   {canDelete ? (
                     <Pressable
+                      hitSlop={12}
+                      accessibilityLabel="Delete message"
                       onPress={() =>
                         onDelete(message.message_id, username, Boolean(mine))
                       }
-                      className="rounded-md p-1"
+                      className="rounded-md p-2"
                     >
                       <Ionicons
                         name="trash-outline"
-                        size={14}
+                        size={16}
                         color={isDarkColorScheme ? "#a1a1aa" : "#6b7280"}
                       />
                     </Pressable>
@@ -349,7 +420,7 @@ export function LeagueMessageBoard({ leagueId }: Props) {
         {hasUnseenNewMessages ? (
           <View className="px-4 pb-2">
             <Button variant="secondary" size="sm" onPress={jumpToLatest}>
-              New messages available
+              New messages
             </Button>
           </View>
         ) : null}
@@ -379,14 +450,11 @@ export function LeagueMessageBoard({ leagueId }: Props) {
                     : "text-gray-500 dark:text-gray-400",
                 ].join(" ")}
               >
-                {draftRemaining} chars left
-              </Text>
-              <Text className="text-xs text-gray-500 dark:text-gray-400">
-                Pull down to sync
+                {draftRemaining} characters left
               </Text>
             </View>
             <Button onPress={onSend} disabled={!canSendDraft}>
-              {sending ? "Sending..." : "Send Message"}
+              {sending ? "Sending..." : "Send message"}
             </Button>
           </View>
         </View>

@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   Animated,
+  Modal,
   Pressable,
   SafeAreaView,
   ScrollView,
@@ -8,6 +9,7 @@ import {
   View,
 } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { clientApi } from "@/lib/trpc/react";
 import { ClientPickPage } from "@/components/picks/ClientPickPage";
@@ -23,6 +25,7 @@ import { cn } from "@/lib/utils";
 import { parseTabParam, type TabType } from "@/lib/league/leagueTabs";
 import { useLeagueUnreadMessages } from "@/hooks/useLeagueUnreadMessages";
 import { getUnreadBadgeLabel } from "@/lib/messages/unreadBadge";
+import { useColorScheme } from "@/lib/useColorScheme";
 
 export default function LeagueScreen() {
   const { id, tab, week } = useLocalSearchParams<{
@@ -30,7 +33,14 @@ export default function LeagueScreen() {
     tab?: string;
     week?: string;
   }>();
-  const [activeTab, setActiveTab] = useState<TabType>(parseTabParam(tab));
+  const { isDarkColorScheme } = useColorScheme();
+  const [activeTab, setActiveTab] = useState<TabType>(() => {
+    const initialTab = parseTabParam(tab);
+    return initialTab === "messages" ? "overview" : initialTab;
+  });
+  const [isChatVisible, setIsChatVisible] = useState(
+    () => parseTabParam(tab) === "messages",
+  );
   const [isPicksModalVisible, setIsPicksModalVisible] = useState(false);
   const scaleValue = useState(new Animated.Value(1))[0];
   const translateValue = useState(new Animated.Value(0))[0];
@@ -39,6 +49,12 @@ export default function LeagueScreen() {
 
   useEffect(() => {
     const nextTab = parseTabParam(tab);
+    if (nextTab === "messages") {
+      setActiveTab("overview");
+      setIsChatVisible(true);
+      return;
+    }
+    setIsChatVisible(false);
     setActiveTab((currentTab) =>
       currentTab === nextTab ? currentTab : nextTab,
     );
@@ -131,6 +147,22 @@ export default function LeagueScreen() {
     });
   };
 
+  const openChat = () => {
+    Haptics.selectionAsync().catch(() => {
+      // No-op if haptics are unavailable.
+    });
+    setIsChatVisible(true);
+  };
+
+  const closeChat = () => {
+    setIsChatVisible(false);
+
+    // Remove the legacy deep-link query so the same link can reopen chat.
+    if (parseTabParam(tab) === "messages") {
+      router.replace(buildLeagueHref({ week: selectedWeekFromParams }) as any);
+    }
+  };
+
   const { data: leagueData, isLoading: leagueLoading } =
     clientApi.league.get.useQuery(
       { leagueId: leagueIdNumber! },
@@ -177,7 +209,6 @@ export default function LeagueScreen() {
     { key: "overview", label: "Overview" },
     { key: "picks", label: "Pick" },
     { key: "leaderboard", label: "Leaderboard" },
-    { key: "messages", label: "Chat" },
     { key: "info", label: "Info" },
     ...(showSuperbowlTab
       ? [{ key: "superbowl" as TabType, label: "Super Bowl" }]
@@ -236,12 +267,11 @@ export default function LeagueScreen() {
           leagueIdNumber={leagueIdNumber}
           leagueData={leagueData}
           leagueLoading={leagueLoading}
-          activeTab={activeTab}
           unreadCount={unreadCount}
           unreadBadgeLabel={unreadBadgeLabel}
           isLeagueAdmin={isLeagueAdmin}
           isSuperAdmin={Boolean(isSuperAdmin)}
-          onSwitchToMessages={() => switchToTab("messages")}
+          onOpenChat={openChat}
         />
 
         <View>
@@ -271,13 +301,6 @@ export default function LeagueScreen() {
                       >
                         {tab.label}
                       </Text>
-                      {tab.key === "messages" && unreadBadgeLabel ? (
-                        <View className="min-w-5 items-center rounded-full bg-red-600 px-1.5 py-0.5">
-                          <Text className="text-[10px] font-bold text-white">
-                            {unreadBadgeLabel}
-                          </Text>
-                        </View>
-                      ) : null}
                     </View>
                     <View
                       className={cn(
@@ -299,6 +322,46 @@ export default function LeagueScreen() {
           {renderTabContent()}
         </Animated.View>
       </Animated.View>
+
+      <Modal
+        visible={isChatVisible}
+        animationType="slide"
+        transparent
+        statusBarTranslucent
+        onRequestClose={closeChat}
+      >
+        <View className="flex-1 justify-end bg-black/60">
+          <SafeAreaView className="h-full bg-app-bg-light dark:bg-app-bg-dark">
+            <View className="flex-row items-center justify-between border-b border-gray-200 px-5 py-3 dark:border-zinc-800">
+              <View className="flex-row items-center gap-2">
+                <View className="h-2 w-2 rounded-full bg-green-500" />
+                <View>
+                  <Text className="text-base font-bold text-app-fg-light dark:text-app-fg-dark">
+                    League chat
+                  </Text>
+                  <Text className="text-xs text-gray-500 dark:text-gray-400">
+                    {leagueData?.name ?? "League"}
+                  </Text>
+                </View>
+              </View>
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel="Close league chat"
+                onPress={closeChat}
+                className="bg-app-card-light dark:bg-app-card-dark rounded-full p-2"
+                hitSlop={8}
+              >
+                <Ionicons
+                  name="close"
+                  size={22}
+                  color={isDarkColorScheme ? "#e5e7eb" : "#374151"}
+                />
+              </Pressable>
+            </View>
+            <LeagueMessageBoard leagueId={id} />
+          </SafeAreaView>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }

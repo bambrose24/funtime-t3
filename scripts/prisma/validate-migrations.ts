@@ -185,6 +185,13 @@ async function printDiagnostics(environment) {
 }
 
 async function main() {
+  if (applyMigrations && process.env.CI === "true") {
+    console.error(
+      "[prisma-check] --apply is not allowed in CI. Apply migrations manually against the target database.",
+    );
+    process.exit(1);
+  }
+
   const envFile = resolveEnvFile();
   const fileEnv = parseEnvFile(envFile);
   const environment = { ...fileEnv, ...process.env };

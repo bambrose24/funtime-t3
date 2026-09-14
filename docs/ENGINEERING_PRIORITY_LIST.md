@@ -330,7 +330,7 @@ MOB-01 through MOB-10 above remain the release epics and keep their IDs and rele
 | 17    | MOB-03c | P2       | Chat client: incremental fetch, optimistic send, honest copy               | Component                     |
 | 18    | MOB-13b | P3       | Split the 1,849-line league screen; deliberately last                     | Existing checks only          |
 
-**Current position:** **MOB-02b** in progress (notification permission + preference UX; no `apps/web`). **MOB-02a** merged (#58). Remaining after this: **WEB-12a**, **WEB-15** (BLOCKED), **WEB-14a** / **MOB-03c**. Update this line when a slice starts or merges.
+**Current position:** Deferred remediation queue complete for auto-mergeable work. **MOB-03c** merged (#67). Remaining: **WEB-15** (BLOCKED — peer email visibility product decision). Update this line when WEB-15 starts or merges.
 
 MOB-05 (build and signing), MOB-06 (account deletion) and MOB-07 (chat moderation) are not in this queue because they need product decisions and have long external lead times. They remain public-release prerequisites; start their decisions in parallel with this queue even though their implementation is serial with it.
 
@@ -443,6 +443,8 @@ Prefer clearing on transition over namespacing the persister key by user id: it 
 **Done when:** mobile home matches the PRD league-list contract, ordering is stable within a season, and no refresh failure can claim picks are in.
 
 ### WEB-12a — Inclusive 1–200 tiebreaker bound on both clients
+
+**Status: IN PROGRESS on `codex/web-12a-tiebreaker-score-bound`.**
 
 **Priority: P2. Fixes: F20 (score half).**
 
