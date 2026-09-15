@@ -66,7 +66,7 @@ This is local execution evidence from the isolated PR branch based on `778ee8f`.
 | Product area            | Covered browser flows                                                                                                                     | Owning specs                                                                                                          |
 | ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
 | Authentication          | Anonymous access, signup/onboarding, login, logout, protected-route redirects                                                             | `auth/session.spec.ts`, `auth/signup.spec.ts`                                                                         |
-| Account settings        | Client validation, duplicate username rejection, successful persistence                                                                   | `profile/settings.spec.ts`                                                                                            |
+| Account settings        | Client validation, duplicate username rejection, successful persistence, weekly recap email opt-out                                       | `profile/settings.spec.ts`                                                                                            |
 | League lifecycle        | Create with policies, join by code, duplicate prevention, waiting/completed states, renewal setup, no-send continuation, and role handoff | `league/create-and-duplicate.spec.ts`, `league/join.spec.ts`, `league/renewal.spec.ts`, `smoke/admin-renewal.spec.ts` |
 | Weekly picks            | Validation, submission, apply-to-all saved/skipped confirmation, first-kickoff policy, update, player kickoff lock, admin lock, super-admin override                                       | `picks/submit.spec.ts`, `picks/late-policy.spec.ts`, `picks/integrity.spec.ts`, `league/admin-member-workflows.spec.ts`                            |
 | Competitive integrity   | Membership authorization and opponent-pick redaction before submission and before each kickoff                                            | `picks/integrity.spec.ts`, `platform/access-and-responsive.spec.ts`                                                   |
@@ -86,6 +86,7 @@ This is local execution evidence from the isolated PR branch based on `778ee8f`.
 - [x] Existing user can sign in and sign out.
 - [x] Protected journeys redirect or fail closed for anonymous users.
 - [x] Profile username validation and update work.
+- [x] Weekly recap email preference can be turned off and back on from web settings.
 - [ ] Password-reset request, recovery-session handoff, and new-password confirmation work end to end.
 
 ### League lifecycle
