@@ -212,6 +212,7 @@ model people {
   google_userid               String?
   supabase_id                 String?                  @unique @db.VarChar(255)
   push_notifications_enabled  Boolean                  @default(true)
+  week_summary_emails_enabled Boolean                  @default(true)
   leaguemembers               leaguemembers[]
   league_renewal_member_roles league_renewal_member_roles[]
   leagues                     leagues[]
@@ -222,6 +223,7 @@ model people {
   @@index([season], map: "idx_18430_season")
   @@index([supabase_id], map: "idx_18430_supabase_id")
   @@index([push_notifications_enabled], map: "idx_people_push_notifications_enabled")
+  @@index([week_summary_emails_enabled], map: "idx_people_week_summary_emails_enabled")
 }
 
 model pushNotificationTokens {

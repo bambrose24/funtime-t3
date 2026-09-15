@@ -11,6 +11,7 @@ import {
 } from "react-email";
 import { Provider } from "../provider";
 import { EmailButton } from "../components/email-button";
+import { WEEK_SUMMARY_PREFERENCES_URL } from "../../utils/emailPreferences";
 import { movement, ordinal, type WeekSummary } from "../../utils/weekSummary";
 
 type Props = Omit<WeekSummary, "recipients"> & {
@@ -139,6 +140,14 @@ export default function WeekSummaryEmail({
                 ))}
               </Text>
             ) : null}
+            <Hr />
+            <Text className="text-xs text-slate-500">
+              Don&apos;t want these weekly summaries?{" "}
+              <Link href={WEEK_SUMMARY_PREFERENCES_URL}>
+                Set your preferences here
+              </Link>
+              .
+            </Text>
           </Container>
         </Body>
       </Provider>

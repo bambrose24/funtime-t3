@@ -1,3 +1,4 @@
+import { wantsWeekSummaryEmail } from "@funtime/api/utils/emailPreferences";
 import { buildWeekSummary, isSummaryDue } from "@funtime/api/utils/weekSummary";
 import { prisma as db, espn, expoPushApi, resendApi } from "@funtime/api";
 import { addHours, addMonths } from "date-fns";
@@ -510,8 +511,13 @@ export async function run() {
       const alreadySentMemberIds = new Set(
         existingSummaryEmailLogs.map((log) => log.member_id),
       );
+      // Recap email opt-out uses this same pending set as recap push. Cron
+      // retries every 5 minutes through noon, and email logs are the only
+      // "already processed" marker, so opted-out members must be excluded here.
       const membersToNotify = members.filter(
-        (member) => !alreadySentMemberIds.has(member.membership_id),
+        (member) =>
+          !alreadySentMemberIds.has(member.membership_id) &&
+          wantsWeekSummaryEmail(member.people),
       );
       if (membersToNotify.length === 0) {
         continue;

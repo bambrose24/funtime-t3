@@ -19,8 +19,27 @@ export default function SettingsLayout({
   const tab = useActiveSettingsTabId();
   return (
     <div className="col-span-12 flex w-full flex-row justify-center py-4 md:col-span-8 md:col-start-3">
-      {/* TODO add settings menu for mobile that is hidden above md */}
-      <div className="flex w-full flex-col lg:grid lg:grid-cols-4 lg:gap-3">
+      <div className="flex w-full flex-col gap-3 lg:grid lg:grid-cols-4">
+        <div className="flex gap-1 overflow-x-auto pb-1 lg:hidden">
+          {settingsTabs.map((t) => {
+            return (
+              <Link href={t.href} key={`mobile-${t.id}`} className="shrink-0">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className={cn(
+                    "flex justify-start",
+                    t.id === tab ? "underline" : "",
+                  )}
+                >
+                  <div className="flex flex-row items-center gap-2">
+                    {t.icon} {t.label}
+                  </div>
+                </Button>
+              </Link>
+            );
+          })}
+        </div>
         <div className="col-span-1 hidden flex-col gap-1 lg:flex">
           {settingsTabs.map((t) => {
             return (

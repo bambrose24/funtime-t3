@@ -24,9 +24,17 @@ export function UserInfoSettings(props: Props) {
     initialData: props.data,
   });
   return (
-    <div className="grid w-full grid-cols-5 flex-row justify-between gap-2">
-      <UsernameForm data={data} />
-      <AvatarForm data={data} />
+    <div className="flex w-full flex-col gap-4">
+      <div>
+        <Text.H2>Profile</Text.H2>
+        <Text.Muted>
+          Your username is how other players see you in every league.
+        </Text.Muted>
+      </div>
+      <div className="grid w-full grid-cols-1 gap-4 sm:grid-cols-5 sm:gap-2">
+        <UsernameForm data={data} />
+        <AvatarForm data={data} />
+      </div>
     </div>
   );
 }
@@ -72,7 +80,7 @@ function UsernameForm({ data }: Props) {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="col-span-3">
+    <form onSubmit={handleSubmit(onSubmit)} className="sm:col-span-3">
       <div className="flex w-full flex-col gap-3">
         <Label htmlFor="username">Username</Label>
         <Input id="username" {...register("username")} />
@@ -96,7 +104,7 @@ function UsernameForm({ data }: Props) {
 
 function AvatarForm({ data }: Props) {
   return (
-    <div className="col-span-2 flex w-full flex-col items-center">
+    <div className="flex w-full flex-col items-center sm:col-span-2">
       <Avatar className="h-16 w-16 lg:h-32 lg:w-32">
         <FuntimeAvatarFallback username={data.dbUser?.username ?? ""} />
       </Avatar>

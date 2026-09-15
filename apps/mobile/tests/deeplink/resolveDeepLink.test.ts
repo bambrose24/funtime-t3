@@ -31,6 +31,14 @@ describe("resolveDeepLink", () => {
     });
     expect(
       resolveDeepLink(
+        "https://www.play-funtime.com/settings/notifications",
+      ),
+    ).toEqual({
+      href: "/account",
+      mode: "replace",
+    });
+    expect(
+      resolveDeepLink(
         "https://play-funtime.com/login?redirectTo=%2Fleague%2F42",
       ),
     ).toEqual({

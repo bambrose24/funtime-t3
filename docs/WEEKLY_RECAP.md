@@ -12,6 +12,8 @@ Already-completed games without a timestamp are assigned their first observation
 
 ## Delivery
 
+Members who have turned off weekly recap emails on their account are excluded from that week's recap fanout (email and the bundled recap push). The preference is user-level, not league-level. Recap emails include a footer linking to `/settings/notifications`.
+
 A unique database claim on `(league_id, user_id, season, week)` is acquired **before** calling the provider. This includes user identity rather than membership identity so duplicate memberships or leaving/rejoining cannot resend the recap. Concurrent cron runs use an atomic insert; only the winner sends. Legacy email logs are backfilled into claims during migration.
 
 States are `sending`, `sent`, `retryable`, and `uncertain`. Only a confirmed HTTP 429 rejection becomes automatically retryable, using an atomic compare-and-set to ensure one retrying worker. Accepted messages become `sent` before the secondary EmailLogs write. Network timeouts, unknown provider errors, and missing message IDs are held for review. Claims never expire automatically. Provider idempotency remains an additional safeguard.

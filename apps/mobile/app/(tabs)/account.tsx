@@ -34,6 +34,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { PushNotificationsSettings } from "@/components/settings/PushNotificationsSettings";
+import { WeekSummaryEmailSettings } from "@/components/settings/WeekSummaryEmailSettings";
 import {
   APP_DIAGNOSTICS_FIELDS,
   buildAppDiagnostics,
@@ -177,6 +178,8 @@ export default function AccountScreen() {
   const [isUpdatingUsername, setIsUpdatingUsername] = useState(false);
   const [isUpdatingPushPreference, setIsUpdatingPushPreference] =
     useState(false);
+  const [isUpdatingWeekSummaryEmails, setIsUpdatingWeekSummaryEmails] =
+    useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [osPermission, setOsPermission] =
     useState<OsNotificationPermission>("unknown");
@@ -197,6 +200,8 @@ export default function AccountScreen() {
     clientApi.settings.updateUsername.useMutation();
   const { mutateAsync: setPushNotificationsEnabled } =
     clientApi.settings.setPushNotificationsEnabled.useMutation();
+  const { mutateAsync: setWeekSummaryEmailsEnabled } =
+    clientApi.settings.setWeekSummaryEmailsEnabled.useMutation();
   const { mutateAsync: registerPushToken } =
     clientApi.settings.registerPushToken.useMutation();
   const { mutateAsync: unregisterPushToken } =
@@ -438,6 +443,38 @@ export default function AccountScreen() {
     await refetchPushStatus();
     setLastSyncedAt(new Date());
     triggerSuccessHaptic();
+  };
+
+  const onToggleWeekSummaryEmails = async () => {
+    const currentEnabled = Boolean(
+      userData?.dbUser?.week_summary_emails_enabled,
+    );
+    const nextEnabled = !currentEnabled;
+    triggerSelectionHaptic();
+    setIsUpdatingWeekSummaryEmails(true);
+    try {
+      await setWeekSummaryEmailsEnabled({ enabled: nextEnabled });
+      await utils.session.current.invalidate();
+      await utils.settings.get.invalidate();
+      setLastSyncedAt(new Date());
+      triggerSuccessHaptic();
+      Alert.alert(
+        "Updated",
+        nextEnabled
+          ? "Weekly recap emails enabled."
+          : "Weekly recap emails disabled.",
+      );
+    } catch (error) {
+      console.error("Failed to update weekly recap email preference", error);
+      Alert.alert(
+        "Update Failed",
+        error instanceof Error
+          ? error.message
+          : "Unable to update weekly recap email settings.",
+      );
+    } finally {
+      setIsUpdatingWeekSummaryEmails(false);
+    }
   };
 
   const registerTokenAfterPermission = async () => {
@@ -803,6 +840,18 @@ export default function AccountScreen() {
                       Verified
                     </Text>
                   }
+                />
+              </SettingsSection>
+
+              <SettingsSection title="Emails">
+                <WeekSummaryEmailSettings
+                  enabled={Boolean(
+                    userData.dbUser.week_summary_emails_enabled,
+                  )}
+                  isUpdating={isUpdatingWeekSummaryEmails}
+                  onToggle={() => {
+                    void onToggleWeekSummaryEmails();
+                  }}
                 />
               </SettingsSection>
 

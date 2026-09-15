@@ -101,7 +101,8 @@ Unless a requirement is explicitly labeled **Target** or **Planned**, it describ
 - Session-aware routes and protected actions.
 - Auth flows preserve the intended destination when a protected link requires sign-in first.
 - Settings page supports username updates with uniqueness validation.
-- Mobile account settings support push-token registration, notification enable/disable, and current registration-status feedback.
+- Web settings include Profile and Notifications. Notifications lets a signed-in user turn weekly recap emails on or off for their account, across every league. Unauthenticated visits to `/settings/notifications` redirect to login and return there after sign-in.
+- Mobile account settings include the same weekly recap email preference, plus push-token registration, notification enable/disable, and current registration-status feedback.
 - Mobile account settings show app/build/OTA-source diagnostics, support copying diagnostic details, and allow a manual over-the-air update check when updates are enabled.
 
 ### 7.2 League Lifecycle
@@ -299,6 +300,8 @@ Super Bowl prediction privacy is enforced in player-profile and public-board res
 - Week summary notifications use dual-channel push + email delivery:
   - Personal-result push with week rank and correct-pick count
   - League recap email with standings, winners, season movement, tiebreaker context, and the recipient's picks
+- Weekly recap email opt-out is an account-level preference (`people.week_summary_emails_enabled`, default on), not a per-league setting. Recap emails include a footer linking to `/settings/notifications`.
+- Opting out skips recap email for every league on that account. Recap push for that week is skipped too, because cron retries every 5 minutes through noon and email logs are the only "already processed" marker. Chat and other pushes still follow the separate push preference.
 - Week summaries run only after every game in the week is complete and no earlier than 12:00 UTC on the day after the latest scheduled game start. Existing email logs prevent repeat email delivery for the same member/league/week.
 - League message pushes are sent near real-time to enabled devices for members other than the author.
 - Push payloads deep-link to the relevant league message thread or week view.

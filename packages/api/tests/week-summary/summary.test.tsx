@@ -361,6 +361,11 @@ describe("rendered email", () => {
     expect(text).toContain("Alex wins Week 4 on the tiebreaker!");
     expect(text).toContain("Make your Week 5 picks");
     expect(text).toContain("https://www.play-funtime.com/league/123/pick");
+    expect(text).toContain("Don't want these weekly summaries?");
+    expect(text).toContain("Set your preferences here");
+    expect(text).toContain(
+      "https://www.play-funtime.com/settings/notifications",
+    );
     expect(text).toContain("Questions? Reach out to admin@example.com");
     expect(text).not.toContain("Your picks");
     expect(text).not.toMatch(/[↑↓]/);
@@ -419,6 +424,9 @@ describe("rendered email", () => {
     expect(html).toContain("&lt;script&gt;");
     expect(html).toContain(
       'href="https://www.play-funtime.com/league/123/pick"',
+    );
+    expect(html).toContain(
+      'href="https://www.play-funtime.com/settings/notifications"',
     );
     expect(html).toContain('href="mailto:admin@example.com"');
   });

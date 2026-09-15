@@ -13826,6 +13826,7 @@ export namespace Prisma {
     google_userid: string | null
     supabase_id: string | null
     push_notifications_enabled: boolean | null
+    week_summary_emails_enabled: boolean | null
   }
 
   export type PeopleMaxAggregateOutputType = {
@@ -13841,6 +13842,7 @@ export namespace Prisma {
     google_userid: string | null
     supabase_id: string | null
     push_notifications_enabled: boolean | null
+    week_summary_emails_enabled: boolean | null
   }
 
   export type PeopleCountAggregateOutputType = {
@@ -13856,6 +13858,7 @@ export namespace Prisma {
     google_userid: number
     supabase_id: number
     push_notifications_enabled: number
+    week_summary_emails_enabled: number
     _all: number
   }
 
@@ -13883,6 +13886,7 @@ export namespace Prisma {
     google_userid?: true
     supabase_id?: true
     push_notifications_enabled?: true
+    week_summary_emails_enabled?: true
   }
 
   export type PeopleMaxAggregateInputType = {
@@ -13898,6 +13902,7 @@ export namespace Prisma {
     google_userid?: true
     supabase_id?: true
     push_notifications_enabled?: true
+    week_summary_emails_enabled?: true
   }
 
   export type PeopleCountAggregateInputType = {
@@ -13913,6 +13918,7 @@ export namespace Prisma {
     google_userid?: true
     supabase_id?: true
     push_notifications_enabled?: true
+    week_summary_emails_enabled?: true
     _all?: true
   }
 
@@ -14015,6 +14021,7 @@ export namespace Prisma {
     google_userid: string | null
     supabase_id: string | null
     push_notifications_enabled: boolean
+    week_summary_emails_enabled: boolean
     _count: PeopleCountAggregateOutputType | null
     _avg: PeopleAvgAggregateOutputType | null
     _sum: PeopleSumAggregateOutputType | null
@@ -14049,6 +14056,7 @@ export namespace Prisma {
     google_userid?: boolean
     supabase_id?: boolean
     push_notifications_enabled?: boolean
+    week_summary_emails_enabled?: boolean
     leaguemembers?: boolean | people$leaguemembersArgs<ExtArgs>
     league_renewal_member_roles?: boolean | people$league_renewal_member_rolesArgs<ExtArgs>
     leagues?: boolean | people$leaguesArgs<ExtArgs>
@@ -14070,6 +14078,7 @@ export namespace Prisma {
     google_userid?: boolean
     supabase_id?: boolean
     push_notifications_enabled?: boolean
+    week_summary_emails_enabled?: boolean
   }, ExtArgs["result"]["people"]>
 
   export type peopleSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -14085,6 +14094,7 @@ export namespace Prisma {
     google_userid?: boolean
     supabase_id?: boolean
     push_notifications_enabled?: boolean
+    week_summary_emails_enabled?: boolean
   }, ExtArgs["result"]["people"]>
 
   export type peopleSelectScalar = {
@@ -14100,9 +14110,10 @@ export namespace Prisma {
     google_userid?: boolean
     supabase_id?: boolean
     push_notifications_enabled?: boolean
+    week_summary_emails_enabled?: boolean
   }
 
-  export type peopleOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"uid" | "username" | "fname" | "lname" | "email" | "season" | "email2" | "google_photo_url" | "google_email" | "google_userid" | "supabase_id" | "push_notifications_enabled", ExtArgs["result"]["people"]>
+  export type peopleOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"uid" | "username" | "fname" | "lname" | "email" | "season" | "email2" | "google_photo_url" | "google_email" | "google_userid" | "supabase_id" | "push_notifications_enabled" | "week_summary_emails_enabled", ExtArgs["result"]["people"]>
   export type peopleInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     leaguemembers?: boolean | people$leaguemembersArgs<ExtArgs>
     league_renewal_member_roles?: boolean | people$league_renewal_member_rolesArgs<ExtArgs>
@@ -14136,6 +14147,7 @@ export namespace Prisma {
       google_userid: string | null
       supabase_id: string | null
       push_notifications_enabled: boolean
+      week_summary_emails_enabled: boolean
     }, ExtArgs["result"]["people"]>
     composites: {}
   }
@@ -14576,6 +14588,7 @@ export namespace Prisma {
     readonly google_userid: FieldRef<"people", 'String'>
     readonly supabase_id: FieldRef<"people", 'String'>
     readonly push_notifications_enabled: FieldRef<"people", 'Boolean'>
+    readonly week_summary_emails_enabled: FieldRef<"people", 'Boolean'>
   }
     
 
@@ -24971,7 +24984,8 @@ export namespace Prisma {
     google_email: 'google_email',
     google_userid: 'google_userid',
     supabase_id: 'supabase_id',
-    push_notifications_enabled: 'push_notifications_enabled'
+    push_notifications_enabled: 'push_notifications_enabled',
+    week_summary_emails_enabled: 'week_summary_emails_enabled'
   };
 
   export type PeopleScalarFieldEnum = (typeof PeopleScalarFieldEnum)[keyof typeof PeopleScalarFieldEnum]
@@ -26165,6 +26179,7 @@ export namespace Prisma {
     google_userid?: StringNullableFilter<"people"> | string | null
     supabase_id?: StringNullableFilter<"people"> | string | null
     push_notifications_enabled?: BoolFilter<"people"> | boolean
+    week_summary_emails_enabled?: BoolFilter<"people"> | boolean
     leaguemembers?: LeaguemembersListRelationFilter
     league_renewal_member_roles?: League_renewal_member_rolesListRelationFilter
     leagues?: LeaguesListRelationFilter
@@ -26185,6 +26200,7 @@ export namespace Prisma {
     google_userid?: SortOrderInput | SortOrder
     supabase_id?: SortOrderInput | SortOrder
     push_notifications_enabled?: SortOrder
+    week_summary_emails_enabled?: SortOrder
     leaguemembers?: leaguemembersOrderByRelationAggregateInput
     league_renewal_member_roles?: league_renewal_member_rolesOrderByRelationAggregateInput
     leagues?: leaguesOrderByRelationAggregateInput
@@ -26208,6 +26224,7 @@ export namespace Prisma {
     google_email?: StringNullableFilter<"people"> | string | null
     google_userid?: StringNullableFilter<"people"> | string | null
     push_notifications_enabled?: BoolFilter<"people"> | boolean
+    week_summary_emails_enabled?: BoolFilter<"people"> | boolean
     leaguemembers?: LeaguemembersListRelationFilter
     league_renewal_member_roles?: League_renewal_member_rolesListRelationFilter
     leagues?: LeaguesListRelationFilter
@@ -26228,6 +26245,7 @@ export namespace Prisma {
     google_userid?: SortOrderInput | SortOrder
     supabase_id?: SortOrderInput | SortOrder
     push_notifications_enabled?: SortOrder
+    week_summary_emails_enabled?: SortOrder
     _count?: peopleCountOrderByAggregateInput
     _avg?: peopleAvgOrderByAggregateInput
     _max?: peopleMaxOrderByAggregateInput
@@ -26251,6 +26269,7 @@ export namespace Prisma {
     google_userid?: StringNullableWithAggregatesFilter<"people"> | string | null
     supabase_id?: StringNullableWithAggregatesFilter<"people"> | string | null
     push_notifications_enabled?: BoolWithAggregatesFilter<"people"> | boolean
+    week_summary_emails_enabled?: BoolWithAggregatesFilter<"people"> | boolean
   }
 
   export type pushNotificationTokensWhereInput = {
@@ -27723,6 +27742,7 @@ export namespace Prisma {
     google_userid?: string | null
     supabase_id?: string | null
     push_notifications_enabled?: boolean
+    week_summary_emails_enabled?: boolean
     leaguemembers?: leaguemembersCreateNestedManyWithoutPeopleInput
     league_renewal_member_roles?: league_renewal_member_rolesCreateNestedManyWithoutPeopleInput
     leagues?: leaguesCreateNestedManyWithoutPeopleInput
@@ -27743,6 +27763,7 @@ export namespace Prisma {
     google_userid?: string | null
     supabase_id?: string | null
     push_notifications_enabled?: boolean
+    week_summary_emails_enabled?: boolean
     leaguemembers?: leaguemembersUncheckedCreateNestedManyWithoutPeopleInput
     league_renewal_member_roles?: league_renewal_member_rolesUncheckedCreateNestedManyWithoutPeopleInput
     leagues?: leaguesUncheckedCreateNestedManyWithoutPeopleInput
@@ -27762,6 +27783,7 @@ export namespace Prisma {
     google_userid?: NullableStringFieldUpdateOperationsInput | string | null
     supabase_id?: NullableStringFieldUpdateOperationsInput | string | null
     push_notifications_enabled?: BoolFieldUpdateOperationsInput | boolean
+    week_summary_emails_enabled?: BoolFieldUpdateOperationsInput | boolean
     leaguemembers?: leaguemembersUpdateManyWithoutPeopleNestedInput
     league_renewal_member_roles?: league_renewal_member_rolesUpdateManyWithoutPeopleNestedInput
     leagues?: leaguesUpdateManyWithoutPeopleNestedInput
@@ -27782,6 +27804,7 @@ export namespace Prisma {
     google_userid?: NullableStringFieldUpdateOperationsInput | string | null
     supabase_id?: NullableStringFieldUpdateOperationsInput | string | null
     push_notifications_enabled?: BoolFieldUpdateOperationsInput | boolean
+    week_summary_emails_enabled?: BoolFieldUpdateOperationsInput | boolean
     leaguemembers?: leaguemembersUncheckedUpdateManyWithoutPeopleNestedInput
     league_renewal_member_roles?: league_renewal_member_rolesUncheckedUpdateManyWithoutPeopleNestedInput
     leagues?: leaguesUncheckedUpdateManyWithoutPeopleNestedInput
@@ -27802,6 +27825,7 @@ export namespace Prisma {
     google_userid?: string | null
     supabase_id?: string | null
     push_notifications_enabled?: boolean
+    week_summary_emails_enabled?: boolean
   }
 
   export type peopleUpdateManyMutationInput = {
@@ -27816,6 +27840,7 @@ export namespace Prisma {
     google_userid?: NullableStringFieldUpdateOperationsInput | string | null
     supabase_id?: NullableStringFieldUpdateOperationsInput | string | null
     push_notifications_enabled?: BoolFieldUpdateOperationsInput | boolean
+    week_summary_emails_enabled?: BoolFieldUpdateOperationsInput | boolean
   }
 
   export type peopleUncheckedUpdateManyInput = {
@@ -27831,6 +27856,7 @@ export namespace Prisma {
     google_userid?: NullableStringFieldUpdateOperationsInput | string | null
     supabase_id?: NullableStringFieldUpdateOperationsInput | string | null
     push_notifications_enabled?: BoolFieldUpdateOperationsInput | boolean
+    week_summary_emails_enabled?: BoolFieldUpdateOperationsInput | boolean
   }
 
   export type pushNotificationTokensCreateInput = {
@@ -29533,6 +29559,7 @@ export namespace Prisma {
     google_userid?: SortOrder
     supabase_id?: SortOrder
     push_notifications_enabled?: SortOrder
+    week_summary_emails_enabled?: SortOrder
   }
 
   export type peopleAvgOrderByAggregateInput = {
@@ -29553,6 +29580,7 @@ export namespace Prisma {
     google_userid?: SortOrder
     supabase_id?: SortOrder
     push_notifications_enabled?: SortOrder
+    week_summary_emails_enabled?: SortOrder
   }
 
   export type peopleMinOrderByAggregateInput = {
@@ -29568,6 +29596,7 @@ export namespace Prisma {
     google_userid?: SortOrder
     supabase_id?: SortOrder
     push_notifications_enabled?: SortOrder
+    week_summary_emails_enabled?: SortOrder
   }
 
   export type peopleSumOrderByAggregateInput = {
@@ -32922,6 +32951,7 @@ export namespace Prisma {
     google_userid?: string | null
     supabase_id?: string | null
     push_notifications_enabled?: boolean
+    week_summary_emails_enabled?: boolean
     league_renewal_member_roles?: league_renewal_member_rolesCreateNestedManyWithoutPeopleInput
     leagues?: leaguesCreateNestedManyWithoutPeopleInput
     picks?: picksCreateNestedManyWithoutPeopleInput
@@ -32941,6 +32971,7 @@ export namespace Prisma {
     google_userid?: string | null
     supabase_id?: string | null
     push_notifications_enabled?: boolean
+    week_summary_emails_enabled?: boolean
     league_renewal_member_roles?: league_renewal_member_rolesUncheckedCreateNestedManyWithoutPeopleInput
     leagues?: leaguesUncheckedCreateNestedManyWithoutPeopleInput
     picks?: picksUncheckedCreateNestedManyWithoutPeopleInput
@@ -33198,6 +33229,7 @@ export namespace Prisma {
     google_userid?: NullableStringFieldUpdateOperationsInput | string | null
     supabase_id?: NullableStringFieldUpdateOperationsInput | string | null
     push_notifications_enabled?: BoolFieldUpdateOperationsInput | boolean
+    week_summary_emails_enabled?: BoolFieldUpdateOperationsInput | boolean
     league_renewal_member_roles?: league_renewal_member_rolesUpdateManyWithoutPeopleNestedInput
     leagues?: leaguesUpdateManyWithoutPeopleNestedInput
     picks?: picksUpdateManyWithoutPeopleNestedInput
@@ -33217,6 +33249,7 @@ export namespace Prisma {
     google_userid?: NullableStringFieldUpdateOperationsInput | string | null
     supabase_id?: NullableStringFieldUpdateOperationsInput | string | null
     push_notifications_enabled?: BoolFieldUpdateOperationsInput | boolean
+    week_summary_emails_enabled?: BoolFieldUpdateOperationsInput | boolean
     league_renewal_member_roles?: league_renewal_member_rolesUncheckedUpdateManyWithoutPeopleNestedInput
     leagues?: leaguesUncheckedUpdateManyWithoutPeopleNestedInput
     picks?: picksUncheckedUpdateManyWithoutPeopleNestedInput
@@ -33780,6 +33813,7 @@ export namespace Prisma {
     google_userid?: string | null
     supabase_id?: string | null
     push_notifications_enabled?: boolean
+    week_summary_emails_enabled?: boolean
     leaguemembers?: leaguemembersCreateNestedManyWithoutPeopleInput
     league_renewal_member_roles?: league_renewal_member_rolesCreateNestedManyWithoutPeopleInput
     picks?: picksCreateNestedManyWithoutPeopleInput
@@ -33799,6 +33833,7 @@ export namespace Prisma {
     google_userid?: string | null
     supabase_id?: string | null
     push_notifications_enabled?: boolean
+    week_summary_emails_enabled?: boolean
     leaguemembers?: leaguemembersUncheckedCreateNestedManyWithoutPeopleInput
     league_renewal_member_roles?: league_renewal_member_rolesUncheckedCreateNestedManyWithoutPeopleInput
     picks?: picksUncheckedCreateNestedManyWithoutPeopleInput
@@ -34034,6 +34069,7 @@ export namespace Prisma {
     google_userid?: NullableStringFieldUpdateOperationsInput | string | null
     supabase_id?: NullableStringFieldUpdateOperationsInput | string | null
     push_notifications_enabled?: BoolFieldUpdateOperationsInput | boolean
+    week_summary_emails_enabled?: BoolFieldUpdateOperationsInput | boolean
     leaguemembers?: leaguemembersUpdateManyWithoutPeopleNestedInput
     league_renewal_member_roles?: league_renewal_member_rolesUpdateManyWithoutPeopleNestedInput
     picks?: picksUpdateManyWithoutPeopleNestedInput
@@ -34053,6 +34089,7 @@ export namespace Prisma {
     google_userid?: NullableStringFieldUpdateOperationsInput | string | null
     supabase_id?: NullableStringFieldUpdateOperationsInput | string | null
     push_notifications_enabled?: BoolFieldUpdateOperationsInput | boolean
+    week_summary_emails_enabled?: BoolFieldUpdateOperationsInput | boolean
     leaguemembers?: leaguemembersUncheckedUpdateManyWithoutPeopleNestedInput
     league_renewal_member_roles?: league_renewal_member_rolesUncheckedUpdateManyWithoutPeopleNestedInput
     picks?: picksUncheckedUpdateManyWithoutPeopleNestedInput
@@ -34204,6 +34241,7 @@ export namespace Prisma {
     google_userid?: string | null
     supabase_id?: string | null
     push_notifications_enabled?: boolean
+    week_summary_emails_enabled?: boolean
     leaguemembers?: leaguemembersCreateNestedManyWithoutPeopleInput
     leagues?: leaguesCreateNestedManyWithoutPeopleInput
     picks?: picksCreateNestedManyWithoutPeopleInput
@@ -34223,6 +34261,7 @@ export namespace Prisma {
     google_userid?: string | null
     supabase_id?: string | null
     push_notifications_enabled?: boolean
+    week_summary_emails_enabled?: boolean
     leaguemembers?: leaguemembersUncheckedCreateNestedManyWithoutPeopleInput
     leagues?: leaguesUncheckedCreateNestedManyWithoutPeopleInput
     picks?: picksUncheckedCreateNestedManyWithoutPeopleInput
@@ -34309,6 +34348,7 @@ export namespace Prisma {
     google_userid?: NullableStringFieldUpdateOperationsInput | string | null
     supabase_id?: NullableStringFieldUpdateOperationsInput | string | null
     push_notifications_enabled?: BoolFieldUpdateOperationsInput | boolean
+    week_summary_emails_enabled?: BoolFieldUpdateOperationsInput | boolean
     leaguemembers?: leaguemembersUpdateManyWithoutPeopleNestedInput
     leagues?: leaguesUpdateManyWithoutPeopleNestedInput
     picks?: picksUpdateManyWithoutPeopleNestedInput
@@ -34328,6 +34368,7 @@ export namespace Prisma {
     google_userid?: NullableStringFieldUpdateOperationsInput | string | null
     supabase_id?: NullableStringFieldUpdateOperationsInput | string | null
     push_notifications_enabled?: BoolFieldUpdateOperationsInput | boolean
+    week_summary_emails_enabled?: BoolFieldUpdateOperationsInput | boolean
     leaguemembers?: leaguemembersUncheckedUpdateManyWithoutPeopleNestedInput
     leagues?: leaguesUncheckedUpdateManyWithoutPeopleNestedInput
     picks?: picksUncheckedUpdateManyWithoutPeopleNestedInput
@@ -34623,6 +34664,7 @@ export namespace Prisma {
     google_userid?: string | null
     supabase_id?: string | null
     push_notifications_enabled?: boolean
+    week_summary_emails_enabled?: boolean
     leaguemembers?: leaguemembersCreateNestedManyWithoutPeopleInput
     league_renewal_member_roles?: league_renewal_member_rolesCreateNestedManyWithoutPeopleInput
     leagues?: leaguesCreateNestedManyWithoutPeopleInput
@@ -34642,6 +34684,7 @@ export namespace Prisma {
     google_userid?: string | null
     supabase_id?: string | null
     push_notifications_enabled?: boolean
+    week_summary_emails_enabled?: boolean
     leaguemembers?: leaguemembersUncheckedCreateNestedManyWithoutPeopleInput
     league_renewal_member_roles?: league_renewal_member_rolesUncheckedCreateNestedManyWithoutPeopleInput
     leagues?: leaguesUncheckedCreateNestedManyWithoutPeopleInput
@@ -34676,6 +34719,7 @@ export namespace Prisma {
     google_userid?: NullableStringFieldUpdateOperationsInput | string | null
     supabase_id?: NullableStringFieldUpdateOperationsInput | string | null
     push_notifications_enabled?: BoolFieldUpdateOperationsInput | boolean
+    week_summary_emails_enabled?: BoolFieldUpdateOperationsInput | boolean
     leaguemembers?: leaguemembersUpdateManyWithoutPeopleNestedInput
     league_renewal_member_roles?: league_renewal_member_rolesUpdateManyWithoutPeopleNestedInput
     leagues?: leaguesUpdateManyWithoutPeopleNestedInput
@@ -34695,6 +34739,7 @@ export namespace Prisma {
     google_userid?: NullableStringFieldUpdateOperationsInput | string | null
     supabase_id?: NullableStringFieldUpdateOperationsInput | string | null
     push_notifications_enabled?: BoolFieldUpdateOperationsInput | boolean
+    week_summary_emails_enabled?: BoolFieldUpdateOperationsInput | boolean
     leaguemembers?: leaguemembersUncheckedUpdateManyWithoutPeopleNestedInput
     league_renewal_member_roles?: league_renewal_member_rolesUncheckedUpdateManyWithoutPeopleNestedInput
     leagues?: leaguesUncheckedUpdateManyWithoutPeopleNestedInput
@@ -34765,6 +34810,7 @@ export namespace Prisma {
     google_userid?: string | null
     supabase_id?: string | null
     push_notifications_enabled?: boolean
+    week_summary_emails_enabled?: boolean
     leaguemembers?: leaguemembersCreateNestedManyWithoutPeopleInput
     league_renewal_member_roles?: league_renewal_member_rolesCreateNestedManyWithoutPeopleInput
     leagues?: leaguesCreateNestedManyWithoutPeopleInput
@@ -34784,6 +34830,7 @@ export namespace Prisma {
     google_userid?: string | null
     supabase_id?: string | null
     push_notifications_enabled?: boolean
+    week_summary_emails_enabled?: boolean
     leaguemembers?: leaguemembersUncheckedCreateNestedManyWithoutPeopleInput
     league_renewal_member_roles?: league_renewal_member_rolesUncheckedCreateNestedManyWithoutPeopleInput
     leagues?: leaguesUncheckedCreateNestedManyWithoutPeopleInput
@@ -34950,6 +34997,7 @@ export namespace Prisma {
     google_userid?: NullableStringFieldUpdateOperationsInput | string | null
     supabase_id?: NullableStringFieldUpdateOperationsInput | string | null
     push_notifications_enabled?: BoolFieldUpdateOperationsInput | boolean
+    week_summary_emails_enabled?: BoolFieldUpdateOperationsInput | boolean
     leaguemembers?: leaguemembersUpdateManyWithoutPeopleNestedInput
     league_renewal_member_roles?: league_renewal_member_rolesUpdateManyWithoutPeopleNestedInput
     leagues?: leaguesUpdateManyWithoutPeopleNestedInput
@@ -34969,6 +35017,7 @@ export namespace Prisma {
     google_userid?: NullableStringFieldUpdateOperationsInput | string | null
     supabase_id?: NullableStringFieldUpdateOperationsInput | string | null
     push_notifications_enabled?: BoolFieldUpdateOperationsInput | boolean
+    week_summary_emails_enabled?: BoolFieldUpdateOperationsInput | boolean
     leaguemembers?: leaguemembersUncheckedUpdateManyWithoutPeopleNestedInput
     league_renewal_member_roles?: league_renewal_member_rolesUncheckedUpdateManyWithoutPeopleNestedInput
     leagues?: leaguesUncheckedUpdateManyWithoutPeopleNestedInput

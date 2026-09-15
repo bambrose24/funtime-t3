@@ -203,6 +203,29 @@ export const settingsRouter = createTRPCRouter({
         throw error;
       }
     }),
+  setWeekSummaryEmailsEnabled: publicProcedure
+    .input(
+      z.object({
+        enabled: z.boolean(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const dbUser = ctx.dbUser;
+      if (!dbUser) {
+        throw UnauthorizedError;
+      }
+
+      await db.people.update({
+        where: {
+          uid: dbUser.uid,
+        },
+        data: {
+          week_summary_emails_enabled: input.enabled,
+        },
+      });
+
+      return { success: true as const, enabled: input.enabled };
+    }),
   pushNotificationStatus: publicProcedure.query(async ({ ctx }) => {
     const dbUser = ctx.dbUser;
     if (!dbUser) {
