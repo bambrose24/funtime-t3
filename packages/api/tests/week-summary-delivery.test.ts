@@ -70,6 +70,7 @@ function payload() {
     leagueId: 123,
     leagueName: "Sunday Crew",
     week: 4,
+    adminEmails: ["admin@example.com", " coadmin@example.com ", "admin@example.com"],
   };
 }
 beforeEach(() => {
@@ -100,8 +101,18 @@ test("sends separate personalized emails and records each member", async () => {
   expect(send.mock.calls[0]![0].subject).toBe(
     "Sunday Crew · Your Week 4 results",
   );
+  expect(send.mock.calls.map((c) => c[0].replyTo)).toEqual([
+    ["admin@example.com", "coadmin@example.com"],
+    ["admin@example.com", "coadmin@example.com"],
+  ]);
   expect(create.mock.calls.map((c) => c[0].data.member_id)).toEqual([1, 2]);
   expect(reconcile).toHaveBeenCalledTimes(2);
+});
+test("omits reply-to when the league has no admin emails", async () => {
+  expect(
+    await resendApi.sendWeekSummaryEmail({ ...payload(), adminEmails: [] }),
+  ).toEqual({ sent: 2 });
+  expect(send.mock.calls.every((c) => c[0].replyTo === undefined)).toBe(true);
 });
 test("provider failure is not logged as sent and does not stop other recipients", async () => {
   send.mockImplementationOnce(async () => ({

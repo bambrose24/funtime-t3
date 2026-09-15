@@ -18,6 +18,7 @@ type Props = Omit<WeekSummary, "recipients"> & {
   leagueName: string;
   week: number;
   recipient: WeekSummary["recipients"][number];
+  adminEmails?: string[];
 };
 const cellStyle = {
   borderBottom: "1px solid #e2e8f0",
@@ -36,6 +37,7 @@ export default function WeekSummaryEmail({
   totalMembers,
   nextWeek,
   recipient,
+  adminEmails = [],
 }: Props) {
   const standingsUrl = `https://www.play-funtime.com/league/${leagueId}?week=${week}`;
   return (
@@ -126,6 +128,17 @@ export default function WeekSummaryEmail({
             ) : (
               <Text>Thanks for playing this season!</Text>
             )}
+            {adminEmails.length > 0 ? (
+              <Text className="text-sm text-slate-500">
+                Questions? Reach out to{" "}
+                {adminEmails.map((email, index) => (
+                  <span key={email}>
+                    {index > 0 ? ", " : null}
+                    <Link href={`mailto:${email}`}>{email}</Link>
+                  </span>
+                ))}
+              </Text>
+            ) : null}
           </Container>
         </Body>
       </Provider>

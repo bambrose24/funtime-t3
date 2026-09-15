@@ -556,6 +556,14 @@ export async function run() {
       );
 
       if (WEEK_SUMMARY_EMAILS_ENABLED && recipients.length > 0) {
+        const adminEmails = [
+          ...new Set(
+            members
+              .filter((member) => member.role === "admin")
+              .map((member) => member.people.email)
+              .filter((email): email is string => Boolean(email)),
+          ),
+        ];
         const emailResult = await resendApi.sendWeekSummaryEmail({
           season,
           leagueId: league.league_id,
@@ -563,6 +571,7 @@ export async function run() {
           week,
           ...summary,
           recipients,
+          adminEmails,
         });
         weekSummaryEmailsSent += emailResult.sent;
       } else if (recipients.length > 0) {

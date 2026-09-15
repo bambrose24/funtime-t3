@@ -606,16 +606,26 @@ export const resendApi = {
     leagueName,
     week,
     recipients,
+    adminEmails = [],
     ...summary
   }: WeekSummary & {
     leagueId: number;
     leagueName: string;
     week: number;
     season: number;
+    adminEmails?: string[];
   }) => {
     if (EMAILS_DISABLED || recipients.length === 0) {
       return { sent: 0 };
     }
+
+    const uniqueAdminEmails = [
+      ...new Set(
+        adminEmails
+          .map((email) => email.trim())
+          .filter((email) => email.length > 0),
+      ),
+    ];
 
     let sent = 0;
     for (const recipient of recipients) {
@@ -631,6 +641,9 @@ export const resendApi = {
           {
             from: FROM,
             to: [recipient.email],
+            ...(uniqueAdminEmails.length > 0
+              ? { replyTo: uniqueAdminEmails }
+              : {}),
             subject: `${leagueName} · Your Week ${week} results`,
             react: WeekSummaryEmail({
               leagueId,
@@ -638,6 +651,7 @@ export const resendApi = {
               week,
               ...summary,
               recipient,
+              adminEmails: uniqueAdminEmails,
             }),
             tags: createTags("week_summary", leagueId),
           },

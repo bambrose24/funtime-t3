@@ -101,5 +101,6 @@ export function buildPreview(
     leagueName: "Sunday Crew (test data)",
     week,
     recipient: summary.recipients.find((r) => r.username === "Brian")!,
+    adminEmails: ["admin@example.com", "coadmin@example.com"],
   };
 }
