@@ -21,6 +21,9 @@ test("role boundaries and the core league state hold on a mobile viewport", asyn
     .request.get(`/league/${activeLeagueId}`);
   expect(nonMemberLeagueResponse.status()).toBe(404);
 
+  // Leave authenticated pages before clearing the session so in-flight
+  // tRPC refetches do not log "You must be logged in" console errors.
+  await page.goto("/login");
   await page.context().clearCookies();
   await login(page, E2E_USERS.outsider);
   const ordinaryAdminResponse = await page.context().request.get("/admin");
