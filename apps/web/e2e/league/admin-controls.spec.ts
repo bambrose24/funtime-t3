@@ -8,16 +8,19 @@ test("league admin renames a league, updates a member, and player is denied admi
 }) => {
   test.setTimeout(60_000);
   const leagueId = getLeagueId(E2E_LEAGUES.competition.shareCode);
-  const renamedLeague = "E2E Competition Renamed";
+  // Unique per run so a retry still dirties the form after a prior rename.
+  const renamedLeague = `E2E Competition Renamed ${Date.now()}`;
   await login(page, E2E_USERS.admin);
 
   await page.goto(`/league/${leagueId}/admin`);
-  await page.getByLabel("League Name").fill(renamedLeague);
-  await page
-    .getByLabel("League Name")
+  const leagueNameInput = page.getByLabel("League Name");
+  await expect(leagueNameInput).toHaveValue(/.+/);
+  await leagueNameInput.fill(renamedLeague);
+  const saveButton = leagueNameInput
     .locator("xpath=ancestor::form")
-    .getByRole("button", { name: "Save" })
-    .click();
+    .getByRole("button", { name: "Save" });
+  await expect(saveButton).toBeEnabled();
+  await saveButton.click();
   await expect(
     page.getByRole("heading", { name: `${renamedLeague} — Admin` }),
   ).toBeVisible();
@@ -90,6 +93,9 @@ test("league admin renames a league, updates a member, and player is denied admi
     )
     .toBe("player");
 
+  // Leave authenticated pages before clearing the session so in-flight
+  // tRPC refetches do not log "You must be logged in" console errors.
+  await page.goto("/login");
   await page.context().clearCookies();
   await login(page, E2E_USERS.player);
   const deniedResponse = await page

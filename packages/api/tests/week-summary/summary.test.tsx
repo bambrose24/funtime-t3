@@ -324,7 +324,11 @@ describe("morning delivery in Eastern time", () => {
 });
 
 describe("rendered email", () => {
-  async function email(input: Input, username = "Brian") {
+  async function email(
+    input: Input,
+    username = "Brian",
+    adminEmails: string[] = ["admin@example.com"],
+  ) {
     const summary = buildWeekSummary(input);
     return render(
       <WeekSummaryEmail
@@ -333,6 +337,7 @@ describe("rendered email", () => {
         leagueName="Sunday Crew"
         week={input.week}
         recipient={person(summary, username)}
+        adminEmails={adminEmails}
       />,
       { plainText: true },
     );
@@ -356,8 +361,23 @@ describe("rendered email", () => {
     expect(text).toContain("Alex wins Week 4 on the tiebreaker!");
     expect(text).toContain("Make your Week 5 picks");
     expect(text).toContain("https://www.play-funtime.com/league/123/pick");
+    expect(text).toContain("Questions? Reach out to admin@example.com");
     expect(text).not.toContain("Your picks");
     expect(text).not.toMatch(/[↑↓]/);
+  });
+  test("lists every league admin email in the questions footer", async () => {
+    const text = await email(
+      fixture([["Brian", 2, 48]]),
+      "Brian",
+      ["first@example.com", "second@example.com"],
+    );
+    expect(text).toContain(
+      "Questions? Reach out to first@example.com, second@example.com",
+    );
+  });
+  test("omits the questions footer when there are no admin emails", async () => {
+    const text = await email(fixture([["Brian", 2, 48]]), "Brian", []);
+    expect(text).not.toContain("Questions? Reach out to");
   });
   test("final week omits next-week button but retains standings link", async () => {
     const f = fixture([["Brian", 2, 48]], 18);
@@ -392,6 +412,7 @@ describe("rendered email", () => {
         leagueName="A & B"
         week={4}
         recipient={summary.recipients[0]!}
+        adminEmails={["admin@example.com"]}
       />,
     );
     expect(html).not.toContain("<script>bad</script>");
@@ -399,6 +420,7 @@ describe("rendered email", () => {
     expect(html).toContain(
       'href="https://www.play-funtime.com/league/123/pick"',
     );
+    expect(html).toContain('href="mailto:admin@example.com"');
   });
 });
 
