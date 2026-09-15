@@ -5,6 +5,7 @@
     "buildCommand": "npm run build-web"
   },
   "deploy": {
+    "preDeployCommand": [],
     "startCommand": "npm run start-web",
     "healthcheckPath": "/",
     "healthcheckTimeout": 100,

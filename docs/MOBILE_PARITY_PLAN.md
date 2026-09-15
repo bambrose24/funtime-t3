@@ -205,13 +205,16 @@ Guiding rule:
 
 6. Prisma migration rollout:
 
+- runbook: [`docs/PRISMA_MIGRATIONS.md`](./PRISMA_MIGRATIONS.md)
 - migration workflow scripts are available in `packages/api/package.json` (`db:migrate:dev`, `db:migrate:create`, `db:migrate:deploy`, `db:migrate:status`, `db:migrate:resolve`, `db:migrate:check`, `db:migrate:check:apply`)
-- root shortcuts are available in `package.json` (`prisma:migrate:check`, `prisma:migrate:apply`)
+- root shortcuts are available in `package.json` (`db:migrate:deploy`, `db:migrate:status`, `prisma:migrate:check`, `prisma:migrate:apply`, `prisma:schema-sync`)
 - `prisma:migrate:check` runs `migrate status` plus host diagnostics (DNS/TCP connectivity and pooler-host detection) to make `Schema engine error` failures actionable
+- `prisma:schema-sync` is a CI drift check (`migrate diff`); it does not apply SQL
+- production Railway `web` does not run migrations automatically; apply them manually with the migration runbook after reviewing the deployment
 - baseline migration for existing schema: `packages/api/prisma/migrations/20260225000000_baseline/migration.sql`
 - incremental migration for notification tokens: `packages/api/prisma/migrations/20260225041054_add_push_notification_tokens/migration.sql`
-- for Supabase environments, `DIRECT_URL` should target a direct database host rather than `*.pooler.supabase.com` when running migrations
-- deploy environments should use `prisma migrate deploy` (not `db push`) for deterministic schema changes
+- for Supabase environments, `DATABASE_URL` and `DIRECT_URL` must include `?schema=funtime_db`; prefer a direct DB host for `DIRECT_URL` rather than `*.pooler.supabase.com` when running migrations
+- operators should use `prisma migrate deploy` (not `db push`) for shared or production schema changes
 
 ## 7. Deep-Link Routing Spec
 
