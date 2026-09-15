@@ -4,6 +4,7 @@ import * as Haptics from "expo-haptics";
 import { clientApi } from "@/lib/trpc/react";
 import { LeagueTabLoadingSkeleton } from "@/components/league/LeagueTabLoadingSkeleton";
 import { TeamLogo } from "@/components/shared/TeamLogo";
+import { MemberSeasonOverview } from "@/components/profile/MemberSeasonOverview";
 import { useColorScheme } from "@/lib/useColorScheme";
 
 type Props = {
@@ -34,13 +35,16 @@ export function LeagueMemberProfile({ leagueId, memberId }: Props) {
     },
   );
 
-  const { data: teams, isLoading: teamsLoading, refetch: refetchTeams } =
-    clientApi.teams.getTeams.useQuery(undefined, {
-      enabled:
-        Number.isFinite(leagueIdNumber) &&
-        Number.isFinite(memberIdNumber) &&
-        memberIdNumber > 0,
-    });
+  const {
+    data: teams,
+    isLoading: teamsLoading,
+    refetch: refetchTeams,
+  } = clientApi.teams.getTeams.useQuery(undefined, {
+    enabled:
+      Number.isFinite(leagueIdNumber) &&
+      Number.isFinite(memberIdNumber) &&
+      memberIdNumber > 0,
+  });
 
   const onRefresh = useCallback(async () => {
     setIsRefreshing(true);
@@ -74,12 +78,12 @@ export function LeagueMemberProfile({ leagueId, memberId }: Props) {
 
   const member = profileData.member;
   const superbowlPick = member.superbowl[0];
-  const superbowlWinner = superbowlPick ? teamById.get(superbowlPick.winner) : null;
-  const superbowlLoser = superbowlPick ? teamById.get(superbowlPick.loser) : null;
-  const correctPicks = profileData.correctPicks;
-  const wrongPicks = profileData.wrongPicks;
-  const totalPicks = correctPicks + wrongPicks;
-  const winRate = totalPicks > 0 ? Math.round((correctPicks / totalPicks) * 100) : null;
+  const superbowlWinner = superbowlPick
+    ? teamById.get(superbowlPick.winner)
+    : null;
+  const superbowlLoser = superbowlPick
+    ? teamById.get(superbowlPick.loser)
+    : null;
 
   return (
     <ScrollView
@@ -94,58 +98,11 @@ export function LeagueMemberProfile({ leagueId, memberId }: Props) {
         />
       }
     >
-      <View className="gap-4">
-        <View className="rounded-xl border border-gray-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-800">
-          <Text className="text-app-fg-light dark:text-app-fg-dark text-lg font-bold">
-            @{member.people.username}
-          </Text>
-          <Text className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-            {member.people.email}
-          </Text>
-          <Text className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-            Role: {member.role}
-          </Text>
-        </View>
+      <View className="gap-5">
+        <MemberSeasonOverview profile={profileData} />
 
-        <View className="rounded-xl border border-gray-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-800">
-          <Text className="text-app-fg-light dark:text-app-fg-dark mb-3 text-base font-semibold">
-            Season Summary
-          </Text>
-          <View className="gap-1.5">
-            <Text className="text-sm text-gray-600 dark:text-gray-400">
-              Correct Picks: {correctPicks}
-            </Text>
-            <Text className="text-sm text-gray-600 dark:text-gray-400">
-              Wrong Picks: {wrongPicks}
-            </Text>
-            <Text className="text-sm text-gray-600 dark:text-gray-400">
-              Pick Accuracy: {winRate !== null ? `${winRate}%` : "--"}
-            </Text>
-            <Text className="text-sm text-gray-600 dark:text-gray-400">
-              Week Wins: {member.WeekWinners.length}
-            </Text>
-            <Text className="text-sm text-gray-600 dark:text-gray-400">
-              Messages Posted: {member.leaguemessages.length}
-            </Text>
-          </View>
-          {member.WeekWinners.length > 0 ? (
-            <View className="mt-3 flex-row flex-wrap gap-2">
-              {member.WeekWinners.map((win) => (
-                <View
-                  key={`member_week_win_${win.week}`}
-                  className="rounded-full border border-blue-200 bg-blue-50 px-2.5 py-1 dark:border-blue-800 dark:bg-blue-950"
-                >
-                  <Text className="text-xs font-semibold text-blue-700 dark:text-blue-200">
-                    Week {win.week}
-                  </Text>
-                </View>
-              ))}
-            </View>
-          ) : null}
-        </View>
-
-        <View className="rounded-xl border border-gray-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-800">
-          <Text className="text-app-fg-light dark:text-app-fg-dark mb-3 text-base font-semibold">
+        <View className="border-t border-gray-200 pt-4 dark:border-zinc-700">
+          <Text className="mb-3 text-base font-semibold text-app-fg-light dark:text-app-fg-dark">
             Super Bowl Pick
           </Text>
           {profileData.superbowlPickHidden ? (
@@ -165,8 +122,12 @@ export function LeagueMemberProfile({ leagueId, memberId }: Props) {
                 <View className="mt-1 flex-row items-center gap-2">
                   {superbowlWinner ? (
                     <>
-                      <TeamLogo abbrev={superbowlWinner.abbrev ?? ""} width={18} height={18} />
-                      <Text className="text-app-fg-light dark:text-app-fg-dark text-sm font-semibold">
+                      <TeamLogo
+                        abbrev={superbowlWinner.abbrev ?? ""}
+                        width={18}
+                        height={18}
+                      />
+                      <Text className="text-sm font-semibold text-app-fg-light dark:text-app-fg-dark">
                         {superbowlWinner.loc} {superbowlWinner.name}
                       </Text>
                     </>
@@ -184,8 +145,12 @@ export function LeagueMemberProfile({ leagueId, memberId }: Props) {
                 <View className="mt-1 flex-row items-center gap-2">
                   {superbowlLoser ? (
                     <>
-                      <TeamLogo abbrev={superbowlLoser.abbrev ?? ""} width={18} height={18} />
-                      <Text className="text-app-fg-light dark:text-app-fg-dark text-sm font-semibold">
+                      <TeamLogo
+                        abbrev={superbowlLoser.abbrev ?? ""}
+                        width={18}
+                        height={18}
+                      />
+                      <Text className="text-sm font-semibold text-app-fg-light dark:text-app-fg-dark">
                         {superbowlLoser.loc} {superbowlLoser.name}
                       </Text>
                     </>

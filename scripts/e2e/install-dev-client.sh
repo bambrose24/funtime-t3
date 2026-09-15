@@ -90,25 +90,69 @@ configure_local_properties() {
 
 android_project_matches_app_id() {
   local gradle_file="apps/mobile/android/app/build.gradle"
-  [[ -f "$gradle_file" ]] && grep -q "applicationId \"${ANDROID_APP_ID}\"" "$gradle_file"
+  # Committed Gradle uses single quotes; Expo prebuild may emit double quotes.
+  [[ -f "$gradle_file" ]] && grep -Eq "applicationId ['\"]${ANDROID_APP_ID}['\"]" "$gradle_file"
 }
 
-configure_java17
-echo "[e2e] Using JAVA_HOME=$JAVA_HOME"
-java -version 2>&1 | head -n 1
+assemble_task() {
+  local variant="$1"
+  echo "assemble$(printf '%s' "${variant:0:1}" | tr '[:lower:]' '[:upper:]')${variant:1}"
+}
+
+apk_path() {
+  local variant="$1"
+  echo "apps/mobile/android/app/build/outputs/apk/${variant}/app-${variant}.apk"
+}
 
 has_online_device() {
   adb devices | awk 'NR>1 && $2=="device" {found=1} END {exit found ? 0 : 1}'
 }
 
 is_installed() {
-  adb shell pm list packages | tr -d '\r' | grep -q "^package:${ANDROID_APP_ID}$"
+  adb shell pm list packages 2>/dev/null | tr -d '\r' | grep -q "^package:${ANDROID_APP_ID}$"
 }
+
+wait_for_package_manager() {
+  local i
+  adb wait-for-device >/dev/null 2>&1 || true
+  for i in $(seq 1 120); do
+    if [[ "$(adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')" == "1" ]]; then
+      break
+    fi
+    sleep 1
+  done
+  for i in $(seq 1 60); do
+    if adb shell pm path android >/dev/null 2>&1; then
+      return 0
+    fi
+    sleep 1
+  done
+  echo "[e2e] Android package manager did not become ready." >&2
+  return 1
+}
+
+install_apk() {
+  local apk="$1"
+  local install_log="/tmp/funtime-e2e-dev-client-adb-install.log"
+  if adb install -r -t "$apk" >"$install_log" 2>&1; then
+    return 0
+  fi
+  echo "[e2e] adb install -r failed; uninstalling and retrying." >&2
+  cat "$install_log" >&2 || true
+  adb uninstall "$ANDROID_APP_ID" >/tmp/funtime-e2e-dev-client-uninstall.log 2>&1 || true
+  adb install -t "$apk" >"$install_log" 2>&1
+}
+
+configure_java17
+echo "[e2e] Using JAVA_HOME=$JAVA_HOME"
+java -version 2>&1 | head -n 1
 
 if ! has_online_device; then
   echo "[e2e] No running Android device detected. Start an emulator before installing the dev client." >&2
   exit 1
 fi
+
+wait_for_package_manager
 
 if is_installed; then
   if [[ "$FORCE_REINSTALL" == "1" ]]; then
@@ -122,7 +166,7 @@ fi
 
 if ! android_project_matches_app_id; then
   echo "[e2e] Regenerating Android native project for app id '${ANDROID_APP_ID}'..."
-  CI=1 pnpm --filter @funtime/mobile exec expo prebuild --platform android --clean --no-install \
+  CI=1 pnpm --filter @funtime/mobile exec -- expo prebuild --platform android --clean --no-install \
     >/tmp/funtime-e2e-dev-client-prebuild.log 2>&1 || {
     echo "[e2e] Android prebuild failed. Tail of /tmp/funtime-e2e-dev-client-prebuild.log:" >&2
     tail -n 120 /tmp/funtime-e2e-dev-client-prebuild.log >&2 || true
@@ -133,20 +177,44 @@ fi
 configure_gradle_java_home
 configure_local_properties
 
-echo "[e2e] Installing Android dev client (${ANDROID_APP_ID})..."
+echo "[e2e] Building Android APK (${BUILD_VARIANT}) without launching Expo/Metro..."
 echo "[e2e] This may take several minutes the first time."
-CI=1 pnpm --filter @funtime/mobile exec expo run:android --variant "$BUILD_VARIANT" --app-id "$ANDROID_APP_ID" --no-bundler --no-install \
-  >/tmp/funtime-e2e-dev-client-build.log 2>&1 || {
-  echo "[e2e] Dev client install failed. Tail of /tmp/funtime-e2e-dev-client-build.log:" >&2
+(
+  cd apps/mobile/android
+  ./gradlew ":app:$(assemble_task "$BUILD_VARIANT")"
+) >/tmp/funtime-e2e-dev-client-build.log 2>&1 || {
+  echo "[e2e] Gradle APK build failed. Tail of /tmp/funtime-e2e-dev-client-build.log:" >&2
   tail -n 120 /tmp/funtime-e2e-dev-client-build.log >&2 || true
   exit 1
 }
 
-if ! is_installed; then
-  echo "[e2e] Dev client install command finished, but package '${ANDROID_APP_ID}' is not on the device." >&2
-  echo "[e2e] Tail of /tmp/funtime-e2e-dev-client-build.log:" >&2
-  tail -n 120 /tmp/funtime-e2e-dev-client-build.log >&2 || true
+APK="$(apk_path "$BUILD_VARIANT")"
+if [[ ! -f "$APK" ]]; then
+  echo "[e2e] Built APK not found at ${APK}." >&2
   exit 1
 fi
 
-echo "[e2e] Dev client installed (${ANDROID_APP_ID})."
+echo "[e2e] Installing ${APK} onto the device with adb..."
+wait_for_package_manager
+install_apk "$APK" || {
+  echo "[e2e] adb install failed. Tail of /tmp/funtime-e2e-dev-client-adb-install.log:" >&2
+  tail -n 80 /tmp/funtime-e2e-dev-client-adb-install.log >&2 || true
+  echo "[e2e] Packages currently on device:" >&2
+  adb shell pm list packages 2>/dev/null | tr -d '\r' | head -n 40 >&2 || true
+  exit 1
+}
+
+for _ in $(seq 1 15); do
+  if is_installed; then
+    echo "[e2e] Dev client installed (${ANDROID_APP_ID})."
+    exit 0
+  fi
+  sleep 1
+done
+
+echo "[e2e] adb install finished, but package '${ANDROID_APP_ID}' is not on the device." >&2
+echo "[e2e] Tail of /tmp/funtime-e2e-dev-client-adb-install.log:" >&2
+tail -n 80 /tmp/funtime-e2e-dev-client-adb-install.log >&2 || true
+echo "[e2e] Packages currently on device:" >&2
+adb shell pm list packages 2>/dev/null | tr -d '\r' | head -n 40 >&2 || true
+exit 1

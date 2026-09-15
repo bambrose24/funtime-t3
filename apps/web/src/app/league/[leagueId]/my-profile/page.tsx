@@ -31,7 +31,6 @@ export default async function MyProfilePage(props: Props) {
     serverApi.league.hasStarted({ leagueId: member.league_id }),
   ]);
 
-  // TODO make a real personalized page
   return (
     <ClientMemberPage
       leagueId={member.league_id}

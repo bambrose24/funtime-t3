@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import { summarizePlayerProfile } from "../../../utils/playerProfileStats";
 import {
   canViewSuperbowlPrediction,
   hasSeasonKickedOff,
@@ -34,10 +35,9 @@ export const playerProfileRouter = createTRPCRouter({
           membership_id: true,
           league_id: true,
           role: true,
-          people: { select: { username: true, email: true } },
+          people: { select: { username: true } },
           superbowl: { select: { winner: true, loser: true, score: true } },
           WeekWinners: { select: { week: true } },
-          leaguemessages: { select: { message_id: true } },
           leagues: { select: { season: true } },
         },
       });
@@ -51,35 +51,82 @@ export const playerProfileRouter = createTRPCRouter({
         await hasSeasonKickedOff(db, member.leagues.season),
       );
 
-      const doneGames = await db.games.findMany({
-        where: {
-          season: member.leagues.season,
-          done: true,
-        },
-      });
-
-      const doneGids = doneGames.map((g) => g.gid);
-
-      const picks = await db.picks.findMany({
-        where: {
-          member_id: memberId,
-          gid: {
-            in: doneGids,
+      const [leagueMembers, doneGames] = await Promise.all([
+        db.leaguemembers.findMany({
+          where: { league_id: leagueId },
+          select: { membership_id: true },
+        }),
+        db.games.findMany({
+          where: {
+            season: member.leagues.season,
+            done: true,
           },
-        },
-      });
+          select: { gid: true, week: true },
+        }),
+      ]);
 
-      const correctPicks = picks.filter((p) => p.correct === 1).length;
-      const wrongPicks = picks.filter((p) => p.correct !== 1).length;
+      const doneGids = doneGames.map((game) => game.gid);
+      const memberIds = leagueMembers.map(
+        (leagueMember) => leagueMember.membership_id,
+      );
+
+      const [picks, correctGrouped] =
+        doneGids.length === 0
+          ? [[], []]
+          : await Promise.all([
+              db.picks.findMany({
+                where: {
+                  member_id: memberId,
+                  gid: { in: doneGids },
+                },
+                select: {
+                  gid: true,
+                  week: true,
+                  correct: true,
+                  winner: true,
+                },
+              }),
+              db.picks.groupBy({
+                by: ["member_id"],
+                where: {
+                  member_id: { in: memberIds },
+                  gid: { in: doneGids },
+                  correct: 1,
+                },
+                _count: {
+                  correct: true,
+                },
+              }),
+            ]);
+
+      const correctByMemberId = new Map<number, number>();
+      for (const row of correctGrouped) {
+        if (row.member_id == null) {
+          continue;
+        }
+        correctByMemberId.set(row.member_id, row._count.correct);
+      }
+
+      const stats = summarizePlayerProfile({
+        memberId,
+        doneGames,
+        picks,
+        weekWinWeeks: member.WeekWinners.map((win) => win.week),
+        memberIds,
+        correctByMemberId,
+      });
 
       return {
         member: {
-          ...member,
+          membership_id: member.membership_id,
+          league_id: member.league_id,
+          role: member.role,
+          people: member.people,
+          WeekWinners: member.WeekWinners,
           superbowl: superbowlPickHidden ? [] : member.superbowl,
         },
         superbowlPickHidden,
-        correctPicks,
-        wrongPicks,
+        ...stats,
       };
     }),
 });

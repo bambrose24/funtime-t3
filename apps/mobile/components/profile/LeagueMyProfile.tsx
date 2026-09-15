@@ -1,9 +1,17 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { Alert, Pressable, RefreshControl, ScrollView, Text, View } from "react-native";
+import {
+  Alert,
+  Pressable,
+  RefreshControl,
+  ScrollView,
+  Text,
+  View,
+} from "react-native";
 import * as Haptics from "expo-haptics";
 import { clientApi } from "@/lib/trpc/react";
 import { LeagueTabLoadingSkeleton } from "@/components/league/LeagueTabLoadingSkeleton";
 import { TeamLogo } from "@/components/shared/TeamLogo";
+import { MemberSeasonOverview } from "@/components/profile/MemberSeasonOverview";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -17,9 +25,8 @@ export function LeagueMyProfile({ leagueId }: Props) {
   const leagueIdNumber = Number(leagueId);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isEditingSuperbowl, setIsEditingSuperbowl] = useState(false);
-  const [activePickerField, setActivePickerField] = useState<TeamPickerField | null>(
-    null,
-  );
+  const [activePickerField, setActivePickerField] =
+    useState<TeamPickerField | null>(null);
   const [winnerTeamId, setWinnerTeamId] = useState("");
   const [loserTeamId, setLoserTeamId] = useState("");
   const [score, setScore] = useState("");
@@ -30,8 +37,7 @@ export function LeagueMyProfile({ leagueId }: Props) {
     data: session,
     isLoading: sessionLoading,
     refetch: refetchSession,
-  } =
-    clientApi.session.current.useQuery();
+  } = clientApi.session.current.useQuery();
 
   const viewerMembership = useMemo(() => {
     return session?.dbUser?.leaguemembers.find(
@@ -43,14 +49,13 @@ export function LeagueMyProfile({ leagueId }: Props) {
     data: profileData,
     isLoading: profileLoading,
     refetch: refetchProfile,
-  } =
-    clientApi.playerProfile.get.useQuery(
-      {
-        leagueId: leagueIdNumber,
-        memberId: viewerMembership?.membership_id ?? 0,
-      },
-      { enabled: !!viewerMembership },
-    );
+  } = clientApi.playerProfile.get.useQuery(
+    {
+      leagueId: leagueIdNumber,
+      memberId: viewerMembership?.membership_id ?? 0,
+    },
+    { enabled: !!viewerMembership },
+  );
 
   const {
     data: leagueData,
@@ -70,9 +75,10 @@ export function LeagueMyProfile({ leagueId }: Props) {
     { enabled: !!viewerMembership },
   );
 
-  const { data: teams, refetch: refetchTeams } = clientApi.teams.getTeams.useQuery(undefined, {
-    enabled: !!viewerMembership,
-  });
+  const { data: teams, refetch: refetchTeams } =
+    clientApi.teams.getTeams.useQuery(undefined, {
+      enabled: !!viewerMembership,
+    });
   const { mutateAsync: updateSuperbowlPick } =
     clientApi.member.updateOrCreateSuperbowlPick.useMutation();
 
@@ -90,7 +96,12 @@ export function LeagueMyProfile({ leagueId }: Props) {
     });
   }, [teams]);
 
-  if (sessionLoading || profileLoading || leagueLoading || hasSeasonStartedLoading) {
+  if (
+    sessionLoading ||
+    profileLoading ||
+    leagueLoading ||
+    hasSeasonStartedLoading
+  ) {
     return <LeagueTabLoadingSkeleton rows={3} />;
   }
 
@@ -106,14 +117,16 @@ export function LeagueMyProfile({ leagueId }: Props) {
 
   const member = profileData.member;
   const superbowlPick = member.superbowl[0];
-  const superbowlWinner = superbowlPick ? teamById.get(superbowlPick.winner) : null;
-  const superbowlLoser = superbowlPick ? teamById.get(superbowlPick.loser) : null;
-  const selectedWinner = winnerTeamId ? teamById.get(Number(winnerTeamId)) : null;
+  const superbowlWinner = superbowlPick
+    ? teamById.get(superbowlPick.winner)
+    : null;
+  const superbowlLoser = superbowlPick
+    ? teamById.get(superbowlPick.loser)
+    : null;
+  const selectedWinner = winnerTeamId
+    ? teamById.get(Number(winnerTeamId))
+    : null;
   const selectedLoser = loserTeamId ? teamById.get(Number(loserTeamId)) : null;
-  const correctPicks = profileData.correctPicks;
-  const wrongPicks = profileData.wrongPicks;
-  const totalPicks = correctPicks + wrongPicks;
-  const winRate = totalPicks > 0 ? Math.round((correctPicks / totalPicks) * 100) : null;
   const canEditSuperbowl =
     Boolean(leagueData?.superbowl_competition) &&
     Boolean(viewerMembership) &&
@@ -219,58 +232,11 @@ export function LeagueMyProfile({ leagueId }: Props) {
         />
       }
     >
-      <View className="gap-4">
-        <View className="rounded-xl border border-gray-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-800">
-          <Text className="text-app-fg-light dark:text-app-fg-dark text-lg font-bold">
-            @{member.people.username}
-          </Text>
-          <Text className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-            {member.people.email}
-          </Text>
-          <Text className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-            Role: {member.role}
-          </Text>
-        </View>
+      <View className="gap-5">
+        <MemberSeasonOverview profile={profileData} isViewer />
 
-        <View className="rounded-xl border border-gray-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-800">
-          <Text className="text-app-fg-light dark:text-app-fg-dark mb-3 text-base font-semibold">
-            Season Summary
-          </Text>
-          <View className="gap-1.5">
-            <Text className="text-sm text-gray-600 dark:text-gray-400">
-              Correct Picks: {correctPicks}
-            </Text>
-            <Text className="text-sm text-gray-600 dark:text-gray-400">
-              Wrong Picks: {wrongPicks}
-            </Text>
-            <Text className="text-sm text-gray-600 dark:text-gray-400">
-              Pick Accuracy: {winRate !== null ? `${winRate}%` : "--"}
-            </Text>
-            <Text className="text-sm text-gray-600 dark:text-gray-400">
-              Week Wins: {member.WeekWinners.length}
-            </Text>
-            <Text className="text-sm text-gray-600 dark:text-gray-400">
-              Messages Posted: {member.leaguemessages.length}
-            </Text>
-          </View>
-          {member.WeekWinners.length > 0 ? (
-            <View className="mt-3 flex-row flex-wrap gap-2">
-              {member.WeekWinners.map((win) => (
-                <View
-                  key={`week_win_${win.week}`}
-                  className="rounded-full border border-blue-200 bg-blue-50 px-2.5 py-1 dark:border-blue-800 dark:bg-blue-950"
-                >
-                  <Text className="text-xs font-semibold text-blue-700 dark:text-blue-200">
-                    Week {win.week}
-                  </Text>
-                </View>
-              ))}
-            </View>
-          ) : null}
-        </View>
-
-        <View className="rounded-xl border border-gray-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-800">
-          <Text className="text-app-fg-light dark:text-app-fg-dark mb-3 text-base font-semibold">
+        <View className="border-t border-gray-200 pt-4 dark:border-zinc-700">
+          <Text className="mb-3 text-base font-semibold text-app-fg-light dark:text-app-fg-dark">
             Super Bowl Pick
           </Text>
           {!leagueData?.superbowl_competition ? (
@@ -324,7 +290,7 @@ export function LeagueMyProfile({ leagueId }: Props) {
                             width={18}
                             height={18}
                           />
-                          <Text className="text-app-fg-light dark:text-app-fg-dark text-sm font-semibold">
+                          <Text className="text-sm font-semibold text-app-fg-light dark:text-app-fg-dark">
                             {selectedWinner.loc} {selectedWinner.name}
                           </Text>
                         </View>
@@ -353,7 +319,7 @@ export function LeagueMyProfile({ leagueId }: Props) {
                             width={18}
                             height={18}
                           />
-                          <Text className="text-app-fg-light dark:text-app-fg-dark text-sm font-semibold">
+                          <Text className="text-sm font-semibold text-app-fg-light dark:text-app-fg-dark">
                             {selectedLoser.loc} {selectedLoser.name}
                           </Text>
                         </View>
@@ -441,7 +407,10 @@ export function LeagueMyProfile({ leagueId }: Props) {
 
                     <View className="flex-row gap-2">
                       <View className="flex-1">
-                        <Button onPress={onSaveSuperbowlPick} disabled={!canSavePick}>
+                        <Button
+                          onPress={onSaveSuperbowlPick}
+                          disabled={!canSavePick}
+                        >
                           {savingPick ? "Saving..." : "Save Pick"}
                         </Button>
                       </View>
@@ -467,7 +436,9 @@ export function LeagueMyProfile({ leagueId }: Props) {
                       setIsEditingSuperbowl(true);
                     }}
                   >
-                    {superbowlPick ? "Edit Super Bowl Pick" : "Add Super Bowl Pick"}
+                    {superbowlPick
+                      ? "Edit Super Bowl Pick"
+                      : "Add Super Bowl Pick"}
                   </Button>
                 )
               ) : hasSeasonStarted ? (

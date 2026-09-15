@@ -35,10 +35,7 @@ test("Super Bowl opponents stay hidden before start and appear in progress", asy
   const profile = (await apiResponse.json()).result.data.json;
   expect(profile.superbowlPickHidden).toBe(true);
   expect(profile.member.superbowl).toEqual([]);
-  expect(Object.keys(profile.member.people).sort()).toEqual([
-    "email",
-    "username",
-  ]);
+  expect(Object.keys(profile.member.people).sort()).toEqual(["username"]);
 
   // A direct navigation serializes this profile into the server-rendered page.
   // Check that boundary as well as the client-visible section.
