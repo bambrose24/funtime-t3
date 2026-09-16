@@ -47,4 +47,10 @@ test("admin dashboard lists current-season leagues with members and admins", asy
     "href",
     `/league/${leagueId}/admin`,
   );
+
+  await row.getByRole("link", { name: LEAGUE_NAME }).click();
+  await expect(page).toHaveURL(`/league/${leagueId}/admin`);
+  await expect(
+    page.getByRole("heading", { name: `${LEAGUE_NAME} — Admin` }),
+  ).toBeVisible();
 });
