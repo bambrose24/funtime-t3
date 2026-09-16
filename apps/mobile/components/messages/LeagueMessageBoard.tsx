@@ -28,7 +28,11 @@ import {
   type LeagueMessageBoardPage,
   type OptimisticLeagueMessage,
 } from "@/lib/messages/optimisticMessages";
-import { MessageReactionAddButton, MessageReactionChips, MessageReactionPicker } from "@/components/messages/MessageReactions";
+import {
+  MessageReactionAddButton,
+  MessageReactionChips,
+  MessageReactionPicker,
+} from "@/components/messages/MessageReactions";
 import {
   applyReactionToggle,
   patchMessageReactions,
@@ -102,7 +106,8 @@ export function LeagueMessageBoard({ leagueId }: Props) {
   );
 
   const serverMessages = useMemo(
-    () => flattenMessagePages(data?.pages as LeagueMessageBoardPage[] | undefined),
+    () =>
+      flattenMessagePages(data?.pages as LeagueMessageBoardPage[] | undefined),
     [data?.pages],
   );
   const messages = useMemo(
@@ -249,7 +254,10 @@ export function LeagueMessageBoard({ leagueId }: Props) {
         },
         previous,
       );
-      Alert.alert("Couldn't react", "That reaction didn't go through. Try again.");
+      Alert.alert(
+        "Couldn't react",
+        "That reaction didn't go through. Try again.",
+      );
     }
   };
 
@@ -455,34 +463,58 @@ export function LeagueMessageBoard({ leagueId }: Props) {
 
             return (
               <View className={mine ? "items-end" : "items-start"}>
-                <Pressable
-                  disabled={pending}
-                  onLongPress={() => {
-                    if (pending) {
-                      return;
-                    }
-                    Haptics.selectionAsync().catch(() => {
-                      // No-op if haptics are unavailable.
-                    });
-                    setPickerMessageId(message.message_id);
-                  }}
-                  delayLongPress={280}
-                  className="max-w-[85%]"
+                <View
+                  className={[
+                    "max-w-[85%] items-center gap-1",
+                    mine ? "flex-row-reverse" : "flex-row",
+                  ].join(" ")}
                 >
-                  <View
-                    className={[
-                      "rounded-xl border px-2.5 py-1.5",
-                      mine
-                        ? "border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950"
-                        : "border-gray-200 bg-white dark:border-zinc-700 dark:bg-zinc-800",
-                      pending ? "opacity-70" : "",
-                    ].join(" ")}
+                  <Pressable
+                    disabled={pending}
+                    onLongPress={() => {
+                      if (pending) {
+                        return;
+                      }
+                      Haptics.selectionAsync().catch(() => {
+                        // No-op if haptics are unavailable.
+                      });
+                      setPickerMessageId(message.message_id);
+                    }}
+                    delayLongPress={280}
+                    className="min-w-0 shrink"
                   >
-                    <Text className="text-sm text-app-fg-light dark:text-app-fg-dark">
-                      {message.content}
-                    </Text>
-                  </View>
-                </Pressable>
+                    <View
+                      className={[
+                        "rounded-xl border px-2.5 py-1.5",
+                        mine
+                          ? "border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950"
+                          : "border-gray-200 bg-white dark:border-zinc-700 dark:bg-zinc-800",
+                        pending ? "opacity-70" : "",
+                      ].join(" ")}
+                    >
+                      <Text className="text-sm text-app-fg-light dark:text-app-fg-dark">
+                        {message.content}
+                      </Text>
+                    </View>
+                  </Pressable>
+                  {canDelete ? (
+                    <Pressable
+                      hitSlop={8}
+                      accessibilityRole="button"
+                      accessibilityLabel={`More actions for message from ${authorLabel}`}
+                      onPress={() =>
+                        onDelete(message.message_id, username, Boolean(mine))
+                      }
+                      className="rounded-md p-0.5"
+                    >
+                      <Ionicons
+                        name="ellipsis-horizontal"
+                        size={16}
+                        color={isDarkColorScheme ? "#a1a1aa" : "#6b7280"}
+                      />
+                    </Pressable>
+                  ) : null}
+                </View>
                 <View
                   className={[
                     "mt-0.5 max-w-full flex-row flex-wrap items-center gap-x-1.5 gap-y-0.5 px-0.5",
@@ -510,22 +542,6 @@ export function LeagueMessageBoard({ leagueId }: Props) {
                       onPress={() => setPickerMessageId(message.message_id)}
                     />
                   )}
-                  {canDelete ? (
-                    <Pressable
-                      hitSlop={8}
-                      accessibilityLabel="Delete message"
-                      onPress={() =>
-                        onDelete(message.message_id, username, Boolean(mine))
-                      }
-                      className="rounded-md p-0.5"
-                    >
-                      <Ionicons
-                        name="trash-outline"
-                        size={14}
-                        color={isDarkColorScheme ? "#a1a1aa" : "#6b7280"}
-                      />
-                    </Pressable>
-                  ) : null}
                 </View>
               </View>
             );
