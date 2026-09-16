@@ -442,6 +442,7 @@ export const leagueAdminRouter = createTRPCRouter({
         league_id: leagueId,
       },
       select: {
+        season: true,
         superbowl_competition: true,
       },
     });
@@ -450,54 +451,103 @@ export const leagueAdminRouter = createTRPCRouter({
       where: {
         league_id: leagueId,
       },
-      orderBy: {
-        people: {
-          username: "asc",
-        },
-      },
       select: {
         membership_id: true,
+        user_id: true,
         people: {
           select: {
             username: true,
           },
         },
-        superbowl: {
-          orderBy: {
-            ts: "desc",
-          },
-          take: 1,
-          select: {
-            pickid: true,
-            winner: true,
-            loser: true,
-            score: true,
-            ts: true,
-            teams_superbowl_winnerToteams: {
-              select: {
-                abbrev: true,
-                loc: true,
-                name: true,
-              },
-            },
-            teams_superbowl_loserToteams: {
-              select: {
-                abbrev: true,
-                loc: true,
-                name: true,
-              },
-            },
-          },
-        },
       },
+    });
+
+    const membershipIds = members.map((member) => member.membership_id);
+    const userIds = members.map((member) => member.user_id);
+    const picks =
+      membershipIds.length === 0
+        ? []
+        : await db.superbowl.findMany({
+            where: {
+              OR: [
+                { member_id: { in: membershipIds } },
+                {
+                  uid: { in: userIds },
+                  season: league.season,
+                  member_id: null,
+                },
+              ],
+            },
+            orderBy: { ts: "desc" },
+            select: {
+              pickid: true,
+              winner: true,
+              loser: true,
+              score: true,
+              ts: true,
+              member_id: true,
+              uid: true,
+              teams_superbowl_winnerToteams: {
+                select: {
+                  abbrev: true,
+                  loc: true,
+                  name: true,
+                },
+              },
+              teams_superbowl_loserToteams: {
+                select: {
+                  abbrev: true,
+                  loc: true,
+                  name: true,
+                },
+              },
+            },
+          });
+
+    const pickByMemberId = new Map<number, (typeof picks)[number]>();
+    const orphanPickByUid = new Map<number, (typeof picks)[number]>();
+    for (const pick of picks) {
+      if (pick.member_id != null && !pickByMemberId.has(pick.member_id)) {
+        pickByMemberId.set(pick.member_id, pick);
+        continue;
+      }
+      if (pick.member_id == null && !orphanPickByUid.has(pick.uid)) {
+        orphanPickByUid.set(pick.uid, pick);
+      }
+    }
+
+    const membersWithPicks = members.map((member) => {
+      const pick =
+        pickByMemberId.get(member.membership_id) ??
+        orphanPickByUid.get(member.user_id) ??
+        null;
+      return {
+        membership_id: member.membership_id,
+        people: member.people,
+        pick: pick
+          ? {
+              pickid: pick.pickid,
+              winner: pick.winner,
+              loser: pick.loser,
+              score: pick.score,
+              ts: pick.ts,
+              teams_superbowl_winnerToteams: pick.teams_superbowl_winnerToteams,
+              teams_superbowl_loserToteams: pick.teams_superbowl_loserToteams,
+            }
+          : null,
+      };
     });
 
     return {
       enabled: league.superbowl_competition === true,
-      members: members.map(({ superbowl, ...member }) => ({
-        ...member,
-        pick: superbowl.at(0) ?? null,
-      })),
+      members: orderBy(
+        membersWithPicks,
+        [
+          (member) => (member.pick ? 1 : 0),
+          (member) => member.people.username.toLowerCase(),
+        ],
+        ["asc", "asc"],
+      ),
     };
   }),
   setSuperbowlPick: leagueAdminProcedure
@@ -563,9 +613,19 @@ export const leagueAdminRouter = createTRPCRouter({
         });
       }
 
-      const existing = await ctx.db.superbowl.findFirst({
-        where: { member_id: memberId },
-      });
+      const existing =
+        (await ctx.db.superbowl.findFirst({
+          where: { member_id: memberId },
+          orderBy: { ts: "desc" },
+        })) ??
+        (await ctx.db.superbowl.findFirst({
+          where: {
+            uid: member.user_id,
+            season: league.season,
+            member_id: null,
+          },
+          orderBy: { ts: "desc" },
+        }));
 
       if (existing) {
         await ctx.db.superbowl.update({
@@ -574,6 +634,8 @@ export const leagueAdminRouter = createTRPCRouter({
             winner: winnerTeamId,
             loser: loserTeamId,
             score,
+            member_id: memberId,
+            season: league.season,
           },
         });
       } else {

@@ -23,6 +23,7 @@ import {
   FormField,
   FormItem,
   FormLabel,
+  FormMessage,
 } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
 import {
@@ -83,8 +84,8 @@ export function LeagueAdminSuperbowlClientPage({
             <CardTitle>Super Bowl Picks</CardTitle>
             <p className="max-w-2xl text-sm text-muted-foreground">
               See every member&apos;s predicted winner, runner-up, and combined
-              final score. You can add or change a pick for any member from this
-              page.
+              final score. Members who never submitted a pick still appear here
+              so you can add one for them.
             </p>
           </div>
           {enabled && (
@@ -121,7 +122,10 @@ export function LeagueAdminSuperbowlClientPage({
             <Table className="min-w-[680px]">
               <TableCaption>
                 {submittedCount} of {members.length} members have submitted a
-                pick.
+                pick
+                {members.length - submittedCount > 0
+                  ? `. ${members.length - submittedCount} still need one.`
+                  : "."}
               </TableCaption>
               <TableHeader>
                 <TableRow>
@@ -332,20 +336,26 @@ function AdminSuperbowlPickForm({
         loserTeamId,
         score,
       });
-      toast.success(`Updated Super Bowl pick for ${member.people.username}`);
+      toast.success(
+        member.pick
+          ? `Updated Super Bowl pick for ${member.people.username}`
+          : `Added Super Bowl pick for ${member.people.username}`,
+      );
       onCancel();
     } catch (error) {
       toast.error(
         error instanceof Error
           ? error.message
-          : "Couldn't update that Super Bowl pick",
+          : "Couldn't save that Super Bowl pick",
       );
     }
   };
 
   return (
     <form
-      onSubmit={form.handleSubmit(onSubmit)}
+      onSubmit={form.handleSubmit(onSubmit, () => {
+        toast.error("Choose both teams, a winner, and a total score");
+      })}
       className="flex flex-col gap-3"
     >
       <Form {...form}>
@@ -379,6 +389,7 @@ function AdminSuperbowlPickForm({
                     </SelectContent>
                   </Select>
                 </FormControl>
+                <FormMessage />
               </FormItem>
             )}
           />
@@ -411,6 +422,7 @@ function AdminSuperbowlPickForm({
                     </SelectContent>
                   </Select>
                 </FormControl>
+                <FormMessage />
               </FormItem>
             )}
           />
@@ -443,6 +455,7 @@ function AdminSuperbowlPickForm({
                     </SelectContent>
                   </Select>
                 </FormControl>
+                <FormMessage />
               </FormItem>
             )}
           />
@@ -463,6 +476,7 @@ function AdminSuperbowlPickForm({
                     {...field}
                   />
                 </FormControl>
+                <FormMessage />
               </FormItem>
             )}
           />
