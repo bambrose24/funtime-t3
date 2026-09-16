@@ -46,6 +46,24 @@ test("member posts and deletes their message and admin deletes another member's 
     .toBe("2");
 
   await page
+    .getByRole("button", { name: "Add a reaction to message from you" })
+    .click();
+  await page.getByRole("button", { name: "React with Fire" }).click();
+  const fireChip = page.getByRole("button", { name: /Remove Fire reaction/ });
+  await expect(fireChip).toBeVisible();
+  await expect
+    .poll(() =>
+      queryScalar(
+        `SELECT COUNT(*) FROM "league_message_reactions" r
+         JOIN "leaguemessages" m ON m."message_id" = r."message_id"
+         WHERE m."league_id" = ${leagueId} AND r."emoji" = 'fire'`,
+      ),
+    )
+    .toBe("1");
+  await fireChip.click();
+  await expect(fireChip).toBeHidden();
+
+  await page
     .getByRole("button", { name: "Delete message from webplayer" })
     .click();
   await expect(page.getByText("You are deleting a message from")).toBeVisible();

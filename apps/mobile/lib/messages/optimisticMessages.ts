@@ -66,7 +66,8 @@ export function createOptimisticMessage(args: {
         username: args.username,
       },
     },
-  } as OptimisticLeagueMessage;
+    reactions: [],
+  } as unknown as OptimisticLeagueMessage;
 }
 
 /** Drop an optimistic row after success/failure; keep server rows intact. */

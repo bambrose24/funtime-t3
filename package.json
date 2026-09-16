@@ -20,6 +20,8 @@
     "clean": "turbo run clean",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "db:generate": "turbo run db:generate",
+    "db:migrate:railway": "railway run --environment production --service web -- pnpm --filter @funtime/api exec prisma migrate deploy",
+    "db:migrate:railway:status": "railway run --environment production --service web -- pnpm --filter @funtime/api exec prisma migrate status",
     "db:push": "turbo run db:push",
     "db:pull": "turbo run db:pull",
     "db:studio": "turbo run db:studio",

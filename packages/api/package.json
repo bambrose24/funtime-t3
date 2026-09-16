@@ -25,14 +25,15 @@
     "./utils/weekPicksSort": "./utils/weekPicksSort.ts",
     "./utils/logging": "./utils/logging.ts",
     "./utils/pickPermissions": "./utils/pickPermissions.ts",
-    "./utils/pickValidation": "./utils/pickValidation.ts"
+    "./utils/pickValidation": "./utils/pickValidation.ts",
+    "./utils/messageReactions": "./utils/messageReactions.ts"
   },
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
     "email:dev": "email dev --dir emails --port 3001",
     "email:export": "email export --dir emails",
-    "test": "node --experimental-strip-types --test tests/*.test.mts && bun test ./tests/routers ./tests/email-preferences.test.ts ./tests/week-summary/summary.test.tsx ./tests/week-summary/preview.test.ts && bun test ./tests/week-summary-delivery.test.ts",
+    "test": "node --experimental-strip-types --test tests/*.test.mts && bun test ./tests/routers ./tests/email-preferences.test.ts ./tests/message-reactions.test.ts ./tests/week-summary/summary.test.tsx ./tests/week-summary/preview.test.ts && bun test ./tests/week-summary-delivery.test.ts",
     "test:integration": "DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:55422/postgres DIRECT_URL=postgresql://postgres:postgres@127.0.0.1:55422/postgres E2E_MODE=1 FUNTIME_DISABLE_EMAILS=1 NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:55421 NEXT_PUBLIC_SUPABASE_ANON_KEY=local-test bun test tests/integration",
     "typecheck": "tsc --noEmit",
     "clean": "rm -rf dist",
@@ -41,6 +42,8 @@
     "db:migrate:dev": "DOTENV_CONFIG_PATH=../../.env.local prisma migrate dev",
     "db:migrate:create": "DOTENV_CONFIG_PATH=../../.env.local prisma migrate dev --create-only",
     "db:migrate:deploy": "DOTENV_CONFIG_PATH=../../.env.local prisma migrate deploy",
+    "db:migrate:railway": "railway run --environment production --service web -- prisma migrate deploy",
+    "db:migrate:railway:status": "railway run --environment production --service web -- prisma migrate status",
     "db:migrate:status": "DOTENV_CONFIG_PATH=../../.env.local prisma migrate status",
     "db:migrate:resolve": "DOTENV_CONFIG_PATH=../../.env.local prisma migrate resolve",
     "db:migrate:check": "bun run ../../scripts/prisma/validate-migrations.ts",

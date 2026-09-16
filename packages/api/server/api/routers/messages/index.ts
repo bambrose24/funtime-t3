@@ -3,6 +3,11 @@ import { authorizedProcedure, createTRPCRouter } from "../../trpc";
 import { TRPCError } from "@trpc/server";
 import { MemberRole, Prisma, PrismaClient } from "../../../../src/generated/prisma-client";
 import { expoPushApi } from "../../../services/expo-push";
+import {
+  attachReactionsToMessages,
+  toggleMessageReaction,
+  toggleReactionInput,
+} from "./reactions";
 
 /** Default page size for cursor-paginated callers (WEB-14a / F17). */
 export const LEAGUE_MESSAGE_BOARD_DEFAULT_LIMIT = 50;
@@ -61,10 +66,6 @@ const messageBoardInclude = {
   },
 } as const;
 
-type MessageBoardRow = Prisma.leaguemessagesGetPayload<{
-  include: typeof messageBoardInclude;
-}>;
-
 type Db = PrismaClient;
 
 function getLeagueMember(
@@ -112,8 +113,9 @@ function olderThanCursor(cursor: {
 async function fetchLegacyMessageBoard(
   db: Db,
   leagueId: number,
-): Promise<MessageBoardRow[]> {
-  return db.leaguemessages.findMany({
+  viewerMembershipId: number,
+) {
+  const messages = await db.leaguemessages.findMany({
     where: {
       league_id: leagueId,
       status: "PUBLISHED",
@@ -121,17 +123,16 @@ async function fetchLegacyMessageBoard(
     orderBy: [{ createdAt: "asc" }, { message_id: "asc" }],
     include: messageBoardInclude,
   });
+  return attachReactionsToMessages(db, messages, viewerMembershipId);
 }
 
 async function fetchMessageBoardPage(
   db: Db,
   leagueId: number,
+  viewerMembershipId: number,
   limit: number,
   cursor?: { createdAt: Date; messageId: string },
-): Promise<{
-  messages: MessageBoardRow[];
-  nextCursor: { createdAt: Date; messageId: string } | null;
-}> {
+) {
   const rows = await db.leaguemessages.findMany({
     where: {
       league_id: leagueId,
@@ -153,7 +154,14 @@ async function fetchMessageBoardPage(
       ? { createdAt: oldest.createdAt, messageId: oldest.message_id }
       : null;
 
-  return { messages, nextCursor };
+  return {
+    messages: await attachReactionsToMessages(
+      db,
+      messages,
+      viewerMembershipId,
+    ),
+    nextCursor,
+  };
 }
 
 export const messagesRouter = createTRPCRouter({
@@ -178,10 +186,20 @@ export const messagesRouter = createTRPCRouter({
           });
         }
         // Legacy shape: ascending Message[] for already-installed clients.
-        return await fetchLegacyMessageBoard(ctx.db, leagueId);
+        return await fetchLegacyMessageBoard(
+          ctx.db,
+          leagueId,
+          member.membership_id,
+        );
       }
 
-      return await fetchMessageBoardPage(ctx.db, leagueId, limit, cursor);
+      return await fetchMessageBoardPage(
+        ctx.db,
+        leagueId,
+        member.membership_id,
+        limit,
+        cursor,
+      );
     }),
   leagueWeekMessageBoard: authorizedProcedure
     .input(
@@ -200,7 +218,11 @@ export const messagesRouter = createTRPCRouter({
       }
 
       // Backward-compatible alias while week-scoped callers are migrated.
-      return await fetchLegacyMessageBoard(ctx.db, input.leagueId);
+      return await fetchLegacyMessageBoard(
+        ctx.db,
+        input.leagueId,
+        member.membership_id,
+      );
     }),
   unreadCounts: authorizedProcedure.query(async ({ ctx }) => {
     const memberships = ctx.dbUser?.leaguemembers ?? [];
@@ -492,6 +514,41 @@ export const messagesRouter = createTRPCRouter({
         where: {
           message_id: message.message_id,
         },
+      });
+    }),
+
+  toggleReaction: authorizedProcedure
+    .input(toggleReactionInput)
+    .mutation(async ({ ctx, input }) => {
+      const message = await ctx.db.leaguemessages.findFirst({
+        where: {
+          message_id: input.messageId,
+          status: "PUBLISHED",
+        },
+        select: {
+          league_id: true,
+        },
+      });
+      if (!message) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Message not found",
+        });
+      }
+
+      const member = getLeagueMember(ctx.dbUser, message.league_id);
+      if (!member) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "You are not a part of that league",
+        });
+      }
+
+      return toggleMessageReaction(ctx.db, {
+        messageId: input.messageId,
+        emoji: input.emoji,
+        membershipId: member.membership_id,
+        leagueId: message.league_id,
       });
     }),
 });
