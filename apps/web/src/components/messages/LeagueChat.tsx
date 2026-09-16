@@ -22,7 +22,8 @@ import {
 import { ScrollArea, ScrollBar } from "~/components/ui/scroll-area";
 import { Separator } from "~/components/ui/separator";
 import MessageComposer from "./Composer";
-import { MessageReactions } from "./MessageReactions";
+import { MessageReactionAddButton, MessageReactionChips } from "./MessageReactions";
+import { TooltipProvider } from "~/components/ui/tooltip";
 import {
   applyReactionToggle,
   patchMessageReactions,
@@ -184,7 +185,7 @@ export function LeagueChat({
               </p>
             </div>
           ) : (
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-2">
               {messages.map((message) => (
                 <MessageBubble
                   key={message.message_id}
@@ -301,86 +302,96 @@ function MessageBubble({
   const username = message.leaguemembers.people.username;
   const authorLabel = mine ? "you" : username;
   return (
-    <div className={mine ? "group ml-12" : "group mr-12"}>
-      <div
-        className={
-          mine
-            ? "rounded-2xl rounded-br-md bg-primary px-4 py-3 text-sm text-primary-foreground"
-            : "rounded-2xl rounded-bl-md border bg-muted/40 px-4 py-3 text-sm"
-        }
-      >
-        {message.content}
-      </div>
-      <MessageReactions
-        reactions={message.reactions}
-        mine={mine}
-        viewerUsername={viewerUsername}
-        authorLabel={authorLabel}
-        onToggle={(emoji) => {
-          void onToggleReaction(emoji);
-        }}
-      />
-      <div
-        className={
-          mine
-            ? "mt-1 flex items-center justify-end gap-2 px-1 text-xs text-muted-foreground"
-            : "mt-1 flex items-center gap-2 px-1 text-xs text-muted-foreground"
-        }
-      >
-        <Link
-          href={`/league/${leagueId}/player/${message.leaguemembers.membership_id}`}
-          className="hover:text-foreground hover:underline"
+    <TooltipProvider delayDuration={200}>
+      <div className={mine ? "ml-8 flex flex-col items-end" : "mr-8 flex flex-col items-start"}>
+        <div
+          className={
+            mine
+              ? "w-fit max-w-full rounded-2xl rounded-br-md bg-primary px-2.5 py-1.5 text-sm text-primary-foreground"
+              : "w-fit max-w-full rounded-2xl rounded-bl-md border bg-muted/40 px-2.5 py-1.5 text-sm"
+          }
         >
-          {mine ? "You" : username}
-        </Link>
-        <span aria-hidden>•</span>
-        <span title={message.createdAt.toLocaleString()}>
-          {formatDistanceToNow(message.createdAt, { addSuffix: true })}
-        </span>
-        {canDelete ? (
-          <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
-            <DialogTrigger asChild>
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                className="h-6 w-6"
-                aria-label={`Delete message from ${mine ? "you" : username}`}
-              >
-                <Trash2 className="h-3.5 w-3.5" />
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Delete message?</DialogTitle>
-                <DialogDescription>
-                  This cannot be undone.
-                  {!mine ? ` You are deleting a message from ${username}.` : ""}
-                </DialogDescription>
-              </DialogHeader>
-              <DialogFooter>
+          {message.content}
+        </div>
+        <div
+          className={
+            mine
+              ? "mt-0.5 flex max-w-full flex-wrap items-center justify-end gap-x-1.5 gap-y-0.5 px-0.5 text-xs text-muted-foreground"
+              : "mt-0.5 flex max-w-full flex-wrap items-center gap-x-1.5 gap-y-0.5 px-0.5 text-xs text-muted-foreground"
+          }
+        >
+          <MessageReactionChips
+            reactions={message.reactions}
+            viewerUsername={viewerUsername}
+            onToggle={(emoji) => {
+              void onToggleReaction(emoji);
+            }}
+          />
+          <Link
+            href={`/league/${leagueId}/player/${message.leaguemembers.membership_id}`}
+            className="hover:text-foreground hover:underline"
+          >
+            {mine ? "You" : username}
+          </Link>
+          <span aria-hidden>•</span>
+          <span title={message.createdAt.toLocaleString()}>
+            {formatDistanceToNow(message.createdAt, { addSuffix: true })}
+          </span>
+          <MessageReactionAddButton
+            reactions={message.reactions}
+            mine={mine}
+            authorLabel={authorLabel}
+            onToggle={(emoji) => {
+              void onToggleReaction(emoji);
+            }}
+          />
+          {canDelete ? (
+            <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+              <DialogTrigger asChild>
                 <Button
-                  variant="secondary"
-                  onClick={() => setConfirmOpen(false)}
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="h-5 w-5"
+                  aria-label={`Delete message from ${mine ? "you" : username}`}
                 >
-                  Cancel
+                  <Trash2 className="h-3 w-3" />
                 </Button>
-                <Button
-                  variant="destructive"
-                  disabled={isPending}
-                  onClick={async () => {
-                    await deleteMessage({ messageId: message.message_id });
-                    setConfirmOpen(false);
-                    toast.success("Message deleted");
-                  }}
-                >
-                  Delete
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
-        ) : null}
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Delete message?</DialogTitle>
+                  <DialogDescription>
+                    This cannot be undone.
+                    {!mine
+                      ? ` You are deleting a message from ${username}.`
+                      : ""}
+                  </DialogDescription>
+                </DialogHeader>
+                <DialogFooter>
+                  <Button
+                    variant="secondary"
+                    onClick={() => setConfirmOpen(false)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    disabled={isPending}
+                    onClick={async () => {
+                      await deleteMessage({ messageId: message.message_id });
+                      setConfirmOpen(false);
+                      toast.success("Message deleted");
+                    }}
+                  >
+                    Delete
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          ) : null}
+        </div>
       </div>
-    </div>
+    </TooltipProvider>
   );
 }
