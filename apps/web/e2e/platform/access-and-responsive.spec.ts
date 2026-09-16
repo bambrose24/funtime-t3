@@ -15,6 +15,16 @@ test("role boundaries and the core league state hold on a mobile viewport", asyn
   await page.goto("/admin");
   await expect(page.getByText("All-time Total Picks")).toBeVisible();
   await expect(page.getByText("Picks by Season")).toBeVisible();
+  await expect(page.getByText("2026 Leagues")).toBeVisible();
+  await expect(
+    page.getByRole("columnheader", { name: "League" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("columnheader", { name: "Members" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("columnheader", { name: "Admin(s)" }),
+  ).toBeVisible();
 
   const nonMemberLeagueResponse = await page
     .context()

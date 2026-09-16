@@ -34,10 +34,9 @@ export default function MobileGlobalAdminScreen() {
     data: adminData,
     isLoading: adminDataLoading,
     refetch: refetchAdminData,
-  } =
-    clientApi.generalAdmin.getAdminData.useQuery(undefined, {
-      enabled: Boolean(isSuperAdmin),
-    });
+  } = clientApi.generalAdmin.getAdminData.useQuery(undefined, {
+    enabled: Boolean(isSuperAdmin),
+  });
 
   const seasonLeagues = useMemo(() => {
     return (adminData?.allLeagues ?? [])
@@ -145,7 +144,7 @@ export default function MobileGlobalAdminScreen() {
     (isSuperAdmin && adminDataLoading)
   ) {
     return (
-      <SafeAreaView className="bg-app-bg-light dark:bg-app-bg-dark flex-1">
+      <SafeAreaView className="flex-1 bg-app-bg-light dark:bg-app-bg-dark">
         <View className="flex-1 items-center justify-center">
           <Text className="text-base text-gray-500 dark:text-gray-400">
             Loading admin dashboard...
@@ -157,9 +156,9 @@ export default function MobileGlobalAdminScreen() {
 
   if (!session?.dbUser || !isSuperAdmin) {
     return (
-      <SafeAreaView className="bg-app-bg-light dark:bg-app-bg-dark flex-1">
-        <View className="flex-1 items-center justify-center px-6 gap-3">
-          <Text className="text-app-fg-light dark:text-app-fg-dark text-center text-2xl font-bold">
+      <SafeAreaView className="flex-1 bg-app-bg-light dark:bg-app-bg-dark">
+        <View className="flex-1 items-center justify-center gap-3 px-6">
+          <Text className="text-center text-2xl font-bold text-app-fg-light dark:text-app-fg-dark">
             Super Admin Only
           </Text>
           <Text className="text-center text-base text-gray-600 dark:text-gray-400">
@@ -172,23 +171,20 @@ export default function MobileGlobalAdminScreen() {
   }
 
   return (
-    <SafeAreaView className="bg-app-bg-light dark:bg-app-bg-dark flex-1">
+    <SafeAreaView className="flex-1 bg-app-bg-light dark:bg-app-bg-dark">
       <ScrollView
         className="flex-1"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ padding: 16, paddingBottom: 32 }}
         refreshControl={
-          <RefreshControl
-            refreshing={isRefreshing}
-            onRefresh={onRefresh}
-          />
+          <RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />
         }
       >
         <View className="gap-4">
           <View className="flex-row items-start gap-3 px-1">
             <Pressable
               onPress={() => router.back()}
-              className="mt-1 rounded-lg bg-app-card-light p-2 dark:bg-app-card-dark"
+              className="bg-app-card-light dark:bg-app-card-dark mt-1 rounded-lg p-2"
             >
               <Ionicons
                 name="chevron-back"
@@ -197,7 +193,7 @@ export default function MobileGlobalAdminScreen() {
               />
             </Pressable>
             <View className="flex-1 gap-1">
-              <Text className="text-app-fg-light dark:text-app-fg-dark text-2xl font-bold">
+              <Text className="text-2xl font-bold text-app-fg-light dark:text-app-fg-dark">
                 Global Admin
               </Text>
               <Text className="text-sm text-gray-600 dark:text-gray-400">
@@ -208,7 +204,7 @@ export default function MobileGlobalAdminScreen() {
 
           <View className="rounded-xl border border-gray-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-800">
             <View className="flex-row items-center justify-between">
-              <Text className="text-app-fg-light dark:text-app-fg-dark text-base font-semibold">
+              <Text className="text-base font-semibold text-app-fg-light dark:text-app-fg-dark">
                 System Snapshot
               </Text>
               <Text className="text-xs text-gray-500 dark:text-gray-400">
@@ -229,7 +225,8 @@ export default function MobileGlobalAdminScreen() {
             </View>
             {largestLeague ? (
               <Text className="mt-2 text-xs text-gray-500 dark:text-gray-400">
-                Largest {DEFAULT_SEASON} league: {largestLeague.name} ({largestLeague.members} members)
+                Largest {DEFAULT_SEASON} league: {largestLeague.name} (
+                {largestLeague.members} members)
               </Text>
             ) : null}
           </View>
@@ -244,7 +241,7 @@ export default function MobileGlobalAdminScreen() {
                 <Text className="text-xs text-gray-600 dark:text-gray-400">
                   {tile.label}
                 </Text>
-                <Text className="text-app-fg-light dark:text-app-fg-dark mt-1 text-2xl font-bold">
+                <Text className="mt-1 text-2xl font-bold text-app-fg-light dark:text-app-fg-dark">
                   {tile.value.toLocaleString()}
                 </Text>
               </View>
@@ -253,7 +250,7 @@ export default function MobileGlobalAdminScreen() {
 
           <View className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-zinc-700 dark:bg-zinc-800">
             <View className="border-b border-gray-100 px-4 py-3 dark:border-zinc-700">
-              <Text className="text-app-fg-light dark:text-app-fg-dark text-base font-semibold">
+              <Text className="text-base font-semibold text-app-fg-light dark:text-app-fg-dark">
                 Picks by Season
               </Text>
             </View>
@@ -294,7 +291,7 @@ export default function MobileGlobalAdminScreen() {
 
           <View className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-zinc-700 dark:bg-zinc-800">
             <View className="border-b border-gray-100 px-4 py-3 dark:border-zinc-700">
-              <Text className="text-app-fg-light dark:text-app-fg-dark text-base font-semibold">
+              <Text className="text-base font-semibold text-app-fg-light dark:text-app-fg-dark">
                 {DEFAULT_SEASON} Leagues
               </Text>
             </View>
@@ -332,8 +329,15 @@ export default function MobileGlobalAdminScreen() {
                     >
                       {league.name}
                     </Text>
-                    <Text className="text-xs text-gray-500 dark:text-gray-400">
-                      #{league.league_id}
+                    <Text
+                      numberOfLines={1}
+                      className="text-xs text-gray-500 dark:text-gray-400"
+                    >
+                      {league.admins.length > 0
+                        ? `Admin${league.admins.length === 1 ? "" : "s"}: ${league.admins
+                            .map((admin) => admin.username)
+                            .join(", ")}`
+                        : "No admins"}
                     </Text>
                   </View>
                   <Text className="w-20 text-right text-sm text-gray-700 dark:text-gray-200">
@@ -354,8 +358,8 @@ export default function MobileGlobalAdminScreen() {
             )}
           </View>
 
-          <View className="rounded-xl border border-gray-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-800 gap-3">
-            <Text className="text-app-fg-light dark:text-app-fg-dark text-base font-semibold">
+          <View className="gap-3 rounded-xl border border-gray-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-800">
+            <Text className="text-base font-semibold text-app-fg-light dark:text-app-fg-dark">
               Quick Totals
             </Text>
             {metricTiles.map((tile, index) => (
