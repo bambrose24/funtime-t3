@@ -500,6 +500,97 @@ export const leagueAdminRouter = createTRPCRouter({
       })),
     };
   }),
+  setSuperbowlPick: leagueAdminProcedure
+    .input(
+      z.object({
+        memberId: z.number().int(),
+        winnerTeamId: z.number().int(),
+        loserTeamId: z.number().int(),
+        score: z.number().int().min(1).max(200),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { leagueId, memberId, winnerTeamId, loserTeamId, score } = input;
+      if (winnerTeamId === loserTeamId) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Winner and runner-up must be different teams",
+        });
+      }
+
+      const [league, member, teams] = await Promise.all([
+        ctx.db.leagues.findFirstOrThrow({
+          where: { league_id: leagueId },
+        }),
+        ctx.db.leaguemembers.findFirst({
+          where: {
+            league_id: leagueId,
+            membership_id: memberId,
+          },
+        }),
+        ctx.db.teams.findMany({
+          where: { teamid: { in: [winnerTeamId, loserTeamId] } },
+          select: { teamid: true, conference: true },
+        }),
+      ]);
+
+      if (!member) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Member not found in this league",
+        });
+      }
+
+      if (!league.superbowl_competition) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Superbowl competition is not enabled for this league",
+        });
+      }
+
+      if (teams.length !== 2) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Winner and runner-up must be valid teams",
+        });
+      }
+
+      const conferences = new Set(teams.map((team) => team.conference));
+      if (conferences.size !== 2) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Winner and runner-up must be from different conferences",
+        });
+      }
+
+      const existing = await ctx.db.superbowl.findFirst({
+        where: { member_id: memberId },
+      });
+
+      if (existing) {
+        await ctx.db.superbowl.update({
+          where: { pickid: existing.pickid },
+          data: {
+            winner: winnerTeamId,
+            loser: loserTeamId,
+            score,
+          },
+        });
+      } else {
+        await ctx.db.superbowl.create({
+          data: {
+            uid: member.user_id,
+            member_id: memberId,
+            season: league.season,
+            winner: winnerTeamId,
+            loser: loserTeamId,
+            score,
+          },
+        });
+      }
+
+      return { success: true as const };
+    }),
   renewalInvitePreview: leagueAdminProcedure.query(async ({ ctx, input }) => {
     const { db, dbUser } = ctx;
     const { leagueId } = input;
