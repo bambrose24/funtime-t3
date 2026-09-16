@@ -64,8 +64,9 @@ test("member posts and deletes their message and admin deletes another member's 
   await expect(fireChip).toBeHidden();
 
   await page
-    .getByRole("button", { name: "Delete message from webplayer" })
+    .getByRole("button", { name: "More actions for message from webplayer" })
     .click();
+  await page.getByRole("menuitem", { name: "Delete" }).click();
   await expect(page.getByText("You are deleting a message from")).toBeVisible();
   await page
     .getByRole("dialog")
@@ -73,7 +74,10 @@ test("member posts and deletes their message and admin deletes another member's 
     .click();
   await expect(page.getByText("Fixture player message")).toBeHidden();
 
-  await page.getByRole("button", { name: "Delete message from you" }).click();
+  await page
+    .getByRole("button", { name: "More actions for message from you" })
+    .click();
+  await page.getByRole("menuitem", { name: "Delete" }).click();
   await page
     .getByRole("dialog")
     .getByRole("button", { name: "Delete" })

@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { formatDistanceToNow } from "date-fns";
 import Link from "next/link";
-import { MessagesSquare, Trash2 } from "lucide-react";
+import { Ellipsis, MessagesSquare, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { clientApi } from "~/trpc/react";
 import { type RouterOutputs } from "~/trpc/types";
@@ -17,12 +17,20 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "~/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "~/components/ui/dropdown-menu";
 import { ScrollArea, ScrollBar } from "~/components/ui/scroll-area";
 import { Separator } from "~/components/ui/separator";
 import MessageComposer from "./Composer";
-import { MessageReactionAddButton, MessageReactionChips } from "./MessageReactions";
+import {
+  MessageReactionAddButton,
+  MessageReactionChips,
+} from "./MessageReactions";
 import { TooltipProvider } from "~/components/ui/tooltip";
 import {
   applyReactionToggle,
@@ -30,6 +38,7 @@ import {
   type MessageReactionEmojiKey,
 } from "@funtime/api/utils/messageReactions";
 
+import { cn } from "~/lib/utils";
 import { MESSAGES_REFETCH_INTERVAL_MS } from "./const";
 
 type LeagueMessage = Extract<
@@ -303,15 +312,42 @@ function MessageBubble({
   const authorLabel = mine ? "you" : username;
   return (
     <TooltipProvider delayDuration={200}>
-      <div className={mine ? "ml-8 flex flex-col items-end" : "mr-8 flex flex-col items-start"}>
+      <div
+        className={
+          mine
+            ? "ml-8 flex flex-col items-end"
+            : "mr-8 flex flex-col items-start"
+        }
+      >
         <div
-          className={
-            mine
-              ? "w-fit max-w-full rounded-2xl rounded-br-md bg-primary px-2.5 py-1.5 text-sm text-primary-foreground"
-              : "w-fit max-w-full rounded-2xl rounded-bl-md border bg-muted/40 px-2.5 py-1.5 text-sm"
-          }
+          className={cn(
+            "flex max-w-full items-center gap-1",
+            mine && "flex-row-reverse",
+          )}
         >
-          {message.content}
+          <div
+            className={
+              mine
+                ? "min-w-0 rounded-2xl rounded-br-md bg-primary px-2.5 py-1.5 text-sm text-primary-foreground"
+                : "min-w-0 rounded-2xl rounded-bl-md border bg-muted/40 px-2.5 py-1.5 text-sm"
+            }
+          >
+            {message.content}
+          </div>
+          {canDelete ? (
+            <MessageOverflowMenu
+              mine={mine}
+              username={username}
+              confirmOpen={confirmOpen}
+              onConfirmOpenChange={setConfirmOpen}
+              isPending={isPending}
+              onDelete={async () => {
+                await deleteMessage({ messageId: message.message_id });
+                setConfirmOpen(false);
+                toast.success("Message deleted");
+              }}
+            />
+          ) : null}
         </div>
         <div
           className={
@@ -345,53 +381,85 @@ function MessageBubble({
               void onToggleReaction(emoji);
             }}
           />
-          {canDelete ? (
-            <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
-              <DialogTrigger asChild>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  className="h-5 w-5"
-                  aria-label={`Delete message from ${mine ? "you" : username}`}
-                >
-                  <Trash2 className="h-3 w-3" />
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Delete message?</DialogTitle>
-                  <DialogDescription>
-                    This cannot be undone.
-                    {!mine
-                      ? ` You are deleting a message from ${username}.`
-                      : ""}
-                  </DialogDescription>
-                </DialogHeader>
-                <DialogFooter>
-                  <Button
-                    variant="secondary"
-                    onClick={() => setConfirmOpen(false)}
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    variant="destructive"
-                    disabled={isPending}
-                    onClick={async () => {
-                      await deleteMessage({ messageId: message.message_id });
-                      setConfirmOpen(false);
-                      toast.success("Message deleted");
-                    }}
-                  >
-                    Delete
-                  </Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
-          ) : null}
         </div>
       </div>
     </TooltipProvider>
+  );
+}
+
+function MessageOverflowMenu({
+  mine,
+  username,
+  confirmOpen,
+  onConfirmOpenChange,
+  isPending,
+  onDelete,
+}: {
+  mine: boolean;
+  username: string;
+  confirmOpen: boolean;
+  onConfirmOpenChange: (open: boolean) => void;
+  isPending: boolean;
+  onDelete: () => Promise<void>;
+}) {
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  return (
+    <Dialog open={confirmOpen} onOpenChange={onConfirmOpenChange}>
+      <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen} modal={false}>
+        <DropdownMenuTrigger asChild>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="h-6 w-6 shrink-0 text-muted-foreground"
+            aria-label={`More actions for message from ${mine ? "you" : username}`}
+          >
+            <Ellipsis className="h-3.5 w-3.5" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent
+          align={mine ? "end" : "start"}
+          className="z-[60] w-40"
+        >
+          <DropdownMenuItem
+            className="text-destructive focus:bg-destructive/10 focus:text-destructive"
+            onSelect={() => {
+              setMenuOpen(false);
+              onConfirmOpenChange(true);
+            }}
+          >
+            <Trash2 className="mr-2 h-4 w-4" />
+            Delete
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Delete message?</DialogTitle>
+          <DialogDescription>
+            This cannot be undone.
+            {!mine ? ` You are deleting a message from ${username}.` : ""}
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter>
+          <Button
+            variant="secondary"
+            onClick={() => onConfirmOpenChange(false)}
+          >
+            Cancel
+          </Button>
+          <Button
+            variant="destructive"
+            disabled={isPending}
+            onClick={() => {
+              void onDelete();
+            }}
+          >
+            Delete
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
