@@ -42,6 +42,8 @@
     "db:migrate:dev": "DOTENV_CONFIG_PATH=../../.env.local prisma migrate dev",
     "db:migrate:create": "DOTENV_CONFIG_PATH=../../.env.local prisma migrate dev --create-only",
     "db:migrate:deploy": "DOTENV_CONFIG_PATH=../../.env.local prisma migrate deploy",
+    "db:migrate:railway": "railway run --environment production --service web -- prisma migrate deploy",
+    "db:migrate:railway:status": "railway run --environment production --service web -- prisma migrate status",
     "db:migrate:status": "DOTENV_CONFIG_PATH=../../.env.local prisma migrate status",
     "db:migrate:resolve": "DOTENV_CONFIG_PATH=../../.env.local prisma migrate resolve",
     "db:migrate:check": "bun run ../../scripts/prisma/validate-migrations.ts",
