@@ -93,6 +93,16 @@ test("league admin can create and update another member's Super Bowl pick", asyn
     )!;
     const adminCaller = await callerFor(admin.uid);
 
+    const emptyBoard = await adminCaller.superbowlPicks({
+      leagueId: league.league_id,
+    });
+    expect(emptyBoard.members).toHaveLength(2);
+    expect(
+      emptyBoard.members.find(
+        (member) => member.membership_id === playerMember.membership_id,
+      )?.pick,
+    ).toBeNull();
+
     await adminCaller.setSuperbowlPick({
       leagueId: league.league_id,
       memberId: playerMember.membership_id,
@@ -132,6 +142,139 @@ test("league admin can create and update another member's Super Bowl pick", asyn
       loser: 6,
       score: 44,
     });
+  } finally {
+    await cleanup([admin.uid, player.uid], leagueIds);
+  }
+});
+
+test("admin Super Bowl board lists members without picks ahead of submitted ones", async () => {
+  const admin = await createPerson("list-admin");
+  const player = await createPerson("list-player");
+  const waiting = await createPerson("list-wait");
+  const leagueIds: number[] = [];
+
+  try {
+    const league = await db.leagues.create({
+      data: {
+        name: `sb-admin-list-${admin.uid}`,
+        season: 2026,
+        superbowl_competition: true,
+        created_by_user_id: admin.uid,
+        leaguemembers: {
+          create: [
+            { user_id: admin.uid, role: "admin" },
+            { user_id: player.uid, role: "player" },
+            { user_id: waiting.uid, role: "player" },
+          ],
+        },
+      },
+      include: { leaguemembers: true },
+    });
+    leagueIds.push(league.league_id);
+    const playerMember = league.leaguemembers.find(
+      (member) => member.user_id === player.uid,
+    )!;
+    const waitingMember = league.leaguemembers.find(
+      (member) => member.user_id === waiting.uid,
+    )!;
+    await db.superbowl.create({
+      data: {
+        uid: player.uid,
+        member_id: playerMember.membership_id,
+        season: 2026,
+        winner: 2,
+        loser: 5,
+        score: 53,
+      },
+    });
+
+    const board = await (
+      await callerFor(admin.uid)
+    ).superbowlPicks({ leagueId: league.league_id });
+    expect(board.members.map((member) => member.people.username)).toEqual([
+      admin.username,
+      waiting.username,
+      player.username,
+    ]);
+    expect(
+      board.members.find(
+        (member) => member.membership_id === waitingMember.membership_id,
+      )?.pick,
+    ).toBeNull();
+    expect(
+      board.members.find(
+        (member) => member.membership_id === playerMember.membership_id,
+      )?.pick,
+    ).toMatchObject({ winner: 2, loser: 5, score: 53 });
+  } finally {
+    await cleanup([admin.uid, player.uid, waiting.uid], leagueIds);
+  }
+});
+
+test("admin Super Bowl edits attach an orphaned uid pick to the membership", async () => {
+  const admin = await createPerson("orphan-admin");
+  const player = await createPerson("orphan-player");
+  const leagueIds: number[] = [];
+
+  try {
+    const league = await db.leagues.create({
+      data: {
+        name: `sb-admin-orphan-${admin.uid}`,
+        season: 2026,
+        superbowl_competition: true,
+        created_by_user_id: admin.uid,
+        leaguemembers: {
+          create: [
+            { user_id: admin.uid, role: "admin" },
+            { user_id: player.uid, role: "player" },
+          ],
+        },
+      },
+      include: { leaguemembers: true },
+    });
+    leagueIds.push(league.league_id);
+    const playerMember = league.leaguemembers.find(
+      (member) => member.user_id === player.uid,
+    )!;
+    const orphan = await db.superbowl.create({
+      data: {
+        uid: player.uid,
+        member_id: null,
+        season: 2026,
+        winner: 1,
+        loser: 6,
+        score: 40,
+      },
+    });
+    const adminCaller = await callerFor(admin.uid);
+    const board = await adminCaller.superbowlPicks({
+      leagueId: league.league_id,
+    });
+    expect(
+      board.members.find(
+        (member) => member.membership_id === playerMember.membership_id,
+      )?.pick,
+    ).toMatchObject({ winner: 1, loser: 6, score: 40 });
+
+    await adminCaller.setSuperbowlPick({
+      leagueId: league.league_id,
+      memberId: playerMember.membership_id,
+      winnerTeamId: 2,
+      loserTeamId: 5,
+      score: 55,
+    });
+
+    expect(
+      await db.superbowl.findUniqueOrThrow({ where: { pickid: orphan.pickid } }),
+    ).toMatchObject({
+      member_id: playerMember.membership_id,
+      winner: 2,
+      loser: 5,
+      score: 55,
+    });
+    expect(
+      await db.superbowl.count({ where: { uid: player.uid } }),
+    ).toBe(1);
   } finally {
     await cleanup([admin.uid, player.uid], leagueIds);
   }
