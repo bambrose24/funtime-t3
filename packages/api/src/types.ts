@@ -14,4 +14,4 @@ export type {
   games,
   WeekWinners,
   PrismaClient
-} from "./generated/prisma-client"; 
+} from "./generated/prisma-client/client"; 

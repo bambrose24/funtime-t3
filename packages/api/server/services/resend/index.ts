@@ -14,7 +14,7 @@ import type {
   leaguemembers,
   leagues,
   people,
-} from "../../../src/generated/prisma-client";
+} from "../../../src/generated/prisma-client/client";
 import { Defined } from "../../../utils/defined";
 import { isE2EMode } from "../../../utils/e2e";
 import { getLogger } from "../../../utils/logging";

@@ -5,7 +5,7 @@ import { z } from "zod";
 import {
   MemberRole,
   type PrismaClient,
-} from "../../../../src/generated/prisma-client";
+} from "../../../../src/generated/prisma-client/client";
 import { resendApi } from "../../../services/resend";
 import { getBaseUrl } from "../../../../utils/getBaseUrl";
 import {

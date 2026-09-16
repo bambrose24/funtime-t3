@@ -1,5 +1,6 @@
+import { PrismaPg } from "@prisma/adapter-pg";
+import { PrismaClient } from "../src/generated/prisma-client/client";
 import { env } from "../env.js";
-import { PrismaClient } from "../src/generated/prisma-client";
 import { config } from "../utils/config";
 
 import { getLogger } from "../utils/logging";
@@ -7,18 +8,22 @@ import { getLogger } from "../utils/logging";
 const LOG_PREFIX = `[prisma client]`;
 
 const createPrismaClient = () => {
+  const adapter = new PrismaPg({
+    connectionString: env.DATABASE_URL,
+    // Match Prisma 6 engine timeouts; pg defaults are unbounded connect + 10s idle.
+    max: 10,
+    connectionTimeoutMillis: 5_000,
+    idleTimeoutMillis: 300_000,
+  });
+
   const prisma = new PrismaClient({
+    adapter,
     log: [
       {
         emit: "event",
         level: "query",
       },
     ],
-    datasources: {
-      db: {
-        url: env.DATABASE_URL,
-      },
-    },
   });
 
   if (config.logging.level !== "error") {

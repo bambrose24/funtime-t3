@@ -10,7 +10,7 @@
   "types": "./src/index.ts",
   "exports": {
     ".": "./src/index.ts",
-    "./generated/prisma-client": "./src/generated/prisma-client/index.js",
+    "./generated/prisma-client": "./src/generated/prisma-client/client.ts",
     "./types": "./src/types.ts",
     "./db": "./server/db.ts",
     "./cache": "./server/cache.ts",
@@ -39,28 +39,24 @@
     "clean": "rm -rf dist",
     "postinstall": "prisma generate",
     "db:generate": "prisma generate",
-    "db:migrate:dev": "DOTENV_CONFIG_PATH=../../.env.local prisma migrate dev",
-    "db:migrate:create": "DOTENV_CONFIG_PATH=../../.env.local prisma migrate dev --create-only",
-    "db:migrate:deploy": "DOTENV_CONFIG_PATH=../../.env.local prisma migrate deploy",
+    "db:migrate:dev": "prisma migrate dev",
+    "db:migrate:create": "prisma migrate dev --create-only",
+    "db:migrate:deploy": "prisma migrate deploy",
     "db:migrate:railway": "railway run --environment production --service web -- prisma migrate deploy",
     "db:migrate:railway:status": "railway run --environment production --service web -- prisma migrate status",
-    "db:migrate:status": "DOTENV_CONFIG_PATH=../../.env.local prisma migrate status",
-    "db:migrate:resolve": "DOTENV_CONFIG_PATH=../../.env.local prisma migrate resolve",
+    "db:migrate:status": "prisma migrate status",
+    "db:migrate:resolve": "prisma migrate resolve",
     "db:migrate:check": "bun run ../../scripts/prisma/validate-migrations.ts",
     "db:migrate:check:apply": "bun run ../../scripts/prisma/validate-migrations.ts --apply",
     "db:schema-sync": "bun run ../../scripts/prisma/assert-schema-migrations-in-sync.ts",
-    "db:push": "DOTENV_CONFIG_PATH=../../.env.local prisma db push",
-    "db:pull": "DOTENV_CONFIG_PATH=../../.env.local prisma db pull",
-    "db:studio": "DOTENV_CONFIG_PATH=../../.env.local prisma studio"
-  },
-  "prisma": {
-    "schema": "./prisma/schema.prisma"
+    "db:push": "prisma db push",
+    "db:pull": "prisma db pull",
+    "db:studio": "prisma studio"
   },
   "dependencies": {
     "@axiomhq/winston": "^2.0.0",
-    "@prisma/adapter-pg": "^6.19.3",
-    "@prisma/client": "^6.19.3",
-    "@prisma/nextjs-monorepo-workaround-plugin": "^6.19.3",
+    "@prisma/adapter-pg": "7.10.0",
+    "@prisma/client": "7.10.0",
     "@supabase/ssr": "^0.12.5",
     "@supabase/supabase-js": "^2.112.4",
     "@t3-oss/env-nextjs": "^0.13.11",
@@ -71,8 +67,10 @@
     "cron": "^3.1.7",
     "date-fns": "^4.4.0",
     "date-fns-tz": "^3.2.0",
+    "dotenv": "^17.2.3",
     "json-stable-stringify": "^1.3.0",
     "lodash": "^4.17.21",
+    "pg": "^8.16.3",
     "react-email": "^6.9.3",
     "resend": "^6.25.0",
     "superjson": "^2.2.6",
@@ -90,7 +88,8 @@
   "devDependencies": {
     "@types/lodash": "^4.17.0",
     "@types/node": "^24.13.3",
-    "prisma": "^6.19.3",
+    "@types/pg": "^8.15.6",
+    "prisma": "7.10.0",
     "typescript": "~6.0.3"
   }
 }

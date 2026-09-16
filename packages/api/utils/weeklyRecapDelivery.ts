@@ -1,4 +1,4 @@
-import type { PrismaClient } from "../src/generated/prisma-client";
+import type { PrismaClient } from "../src/generated/prisma-client/client";
 
 type Identity = {
   league_id: number;

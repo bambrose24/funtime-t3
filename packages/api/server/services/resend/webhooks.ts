@@ -1,6 +1,6 @@
 import { Resend, type WebhookEventPayload } from "resend";
 
-import { Prisma } from "../../../src/generated/prisma-client";
+import { Prisma } from "../../../src/generated/prisma-client/client";
 import { getLogger } from "../../../utils/logging";
 import { db } from "../../db";
 import {

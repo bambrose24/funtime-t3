@@ -1,5 +1,5 @@
 import { TRPCError } from "@trpc/server";
-import { MemberRole } from "../../../src/generated/prisma-client";
+import { MemberRole } from "../../../src/generated/prisma-client/client";
 import {
   createTRPCRouter,
   authorizedProcedure,

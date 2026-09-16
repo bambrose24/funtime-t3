@@ -4,7 +4,7 @@ import {
   MessageReactionEmoji,
   Prisma,
   PrismaClient,
-} from "../../../../src/generated/prisma-client";
+} from "../../../../src/generated/prisma-client/client";
 import {
   MESSAGE_REACTION_EMOJI_KEYS,
   summarizeMessageReactions,
