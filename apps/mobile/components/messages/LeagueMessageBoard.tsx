@@ -28,7 +28,7 @@ import {
   type LeagueMessageBoardPage,
   type OptimisticLeagueMessage,
 } from "@/lib/messages/optimisticMessages";
-import { MessageReactionPicker, MessageReactions } from "@/components/messages/MessageReactions";
+import { MessageReactionAddButton, MessageReactionChips, MessageReactionPicker } from "@/components/messages/MessageReactions";
 import {
   applyReactionToggle,
   patchMessageReactions,
@@ -372,7 +372,7 @@ export function LeagueMessageBoard({ leagueId }: Props) {
           data={messages}
           keyExtractor={messageKey}
           className="flex-1 px-4 pt-4"
-          contentContainerStyle={{ gap: 12, paddingBottom: 16 }}
+          contentContainerStyle={{ gap: 8, paddingBottom: 16 }}
           showsVerticalScrollIndicator={false}
           initialNumToRender={20}
           maxToRenderPerBatch={20}
@@ -454,7 +454,7 @@ export function LeagueMessageBoard({ leagueId }: Props) {
             const authorLabel = mine ? "you" : username;
 
             return (
-              <View className="gap-1">
+              <View className={mine ? "items-end" : "items-start"}>
                 <Pressable
                   disabled={pending}
                   onLongPress={() => {
@@ -467,13 +467,14 @@ export function LeagueMessageBoard({ leagueId }: Props) {
                     setPickerMessageId(message.message_id);
                   }}
                   delayLongPress={280}
+                  className="max-w-[85%]"
                 >
                   <View
                     className={[
-                      "rounded-xl border px-3 py-2",
+                      "rounded-xl border px-2.5 py-1.5",
                       mine
-                        ? "ml-8 border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950"
-                        : "mr-8 border-gray-200 bg-white dark:border-zinc-700 dark:bg-zinc-800",
+                        ? "border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950"
+                        : "border-gray-200 bg-white dark:border-zinc-700 dark:bg-zinc-800",
                       pending ? "opacity-70" : "",
                     ].join(" ")}
                   >
@@ -482,42 +483,45 @@ export function LeagueMessageBoard({ leagueId }: Props) {
                     </Text>
                   </View>
                 </Pressable>
-                {pending ? null : (
-                  <MessageReactions
-                    reactions={message.reactions ?? []}
-                    mine={Boolean(mine)}
-                    viewerUsername={session?.dbUser?.username}
-                    authorLabel={authorLabel}
-                    onAddPress={() => setPickerMessageId(message.message_id)}
-                    onToggle={(emoji) => {
-                      void onToggleReaction(message, emoji);
-                    }}
-                  />
-                )}
                 <View
                   className={[
-                    "flex-row items-center gap-2 px-1",
+                    "mt-0.5 max-w-full flex-row flex-wrap items-center gap-x-1.5 gap-y-0.5 px-0.5",
                     mine ? "justify-end" : "justify-start",
                   ].join(" ")}
                 >
+                  {pending ? null : (
+                    <MessageReactionChips
+                      reactions={message.reactions ?? []}
+                      viewerUsername={session?.dbUser?.username}
+                      onToggle={(emoji) => {
+                        void onToggleReaction(message, emoji);
+                      }}
+                    />
+                  )}
                   <Text className="text-xs text-gray-500 dark:text-gray-400">
-                    {mine ? "You" : username} -{" "}
+                    {mine ? "You" : username} ·{" "}
                     {pending
                       ? "Sending..."
                       : formatDistanceToNow(createdAt, { addSuffix: true })}
                   </Text>
+                  {pending ? null : (
+                    <MessageReactionAddButton
+                      authorLabel={authorLabel}
+                      onPress={() => setPickerMessageId(message.message_id)}
+                    />
+                  )}
                   {canDelete ? (
                     <Pressable
-                      hitSlop={12}
+                      hitSlop={8}
                       accessibilityLabel="Delete message"
                       onPress={() =>
                         onDelete(message.message_id, username, Boolean(mine))
                       }
-                      className="rounded-md p-2"
+                      className="rounded-md p-0.5"
                     >
                       <Ionicons
                         name="trash-outline"
-                        size={16}
+                        size={14}
                         color={isDarkColorScheme ? "#a1a1aa" : "#6b7280"}
                       />
                     </Pressable>

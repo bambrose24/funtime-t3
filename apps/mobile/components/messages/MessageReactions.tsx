@@ -9,23 +9,46 @@ import {
   type MessageReactionSummary,
 } from "@funtime/api/utils/messageReactions";
 
-export function MessageReactions({
+export function MessageReactionAddButton({
+  disabled,
+  authorLabel,
+  onPress,
+}: {
+  disabled?: boolean;
+  authorLabel: string;
+  onPress: () => void;
+}) {
+  return (
+    <Pressable
+      disabled={disabled}
+      hitSlop={8}
+      accessibilityRole="button"
+      accessibilityLabel={`Add a reaction to message from ${authorLabel}`}
+      onPress={onPress}
+      className="h-5 w-5 items-center justify-center rounded-full"
+    >
+      <Text className="text-sm leading-none text-gray-400 dark:text-gray-500">
+        +
+      </Text>
+    </Pressable>
+  );
+}
+
+export function MessageReactionChips({
   reactions,
-  mine,
   disabled,
   viewerUsername,
-  authorLabel,
-  onAddPress,
   onToggle,
 }: {
   reactions: MessageReactionSummary[];
-  mine: boolean;
   disabled?: boolean;
   viewerUsername?: string | null;
-  authorLabel: string;
-  onAddPress: () => void;
   onToggle: (emoji: MessageReactionEmojiKey) => void;
 }) {
+  if (reactions.length === 0) {
+    return null;
+  }
+
   const chooseChip = (emoji: MessageReactionEmojiKey) => {
     Haptics.selectionAsync().catch(() => {
       // No-op if haptics are unavailable.
@@ -34,47 +57,32 @@ export function MessageReactions({
   };
 
   return (
-    <View
-      className={[
-        "mt-1 flex-row flex-wrap items-center gap-1",
-        mine ? "justify-end" : "justify-start",
-      ].join(" ")}
-    >
+    <View className="flex-row flex-wrap items-center gap-0.5">
       {reactions.map((reaction) => {
         const meta = getMessageReactionMeta(reaction.emoji);
         return (
           <Pressable
             key={reaction.emoji}
             disabled={disabled}
-            hitSlop={8}
+            hitSlop={6}
             accessibilityRole="button"
             accessibilityState={{ selected: reaction.reacted }}
             accessibilityLabel={`${meta.label}, ${reaction.count}. ${formatReactionTooltip(reaction, viewerUsername)}`}
             onPress={() => chooseChip(reaction.emoji)}
             className={[
-              "min-h-8 flex-row items-center gap-1 rounded-full border px-2 py-1",
+              "min-h-5 flex-row items-center gap-0.5 rounded-full border px-1.5 py-0.5",
               reaction.reacted
                 ? "border-blue-300 bg-blue-100 dark:border-blue-700 dark:bg-blue-950"
                 : "border-gray-200 bg-white dark:border-zinc-700 dark:bg-zinc-800",
             ].join(" ")}
           >
-            <Text className="text-base leading-none">{meta.glyph}</Text>
-            <Text className="text-xs text-gray-700 dark:text-gray-200">
+            <Text className="text-sm leading-none">{meta.glyph}</Text>
+            <Text className="text-[11px] text-gray-700 dark:text-gray-200">
               {reaction.count}
             </Text>
           </Pressable>
         );
       })}
-      <Pressable
-        disabled={disabled}
-        hitSlop={12}
-        accessibilityRole="button"
-        accessibilityLabel={`Add a reaction to message from ${authorLabel}`}
-        onPress={onAddPress}
-        className="min-h-8 min-w-8 items-center justify-center rounded-full border border-gray-200 bg-white px-2 py-1 dark:border-zinc-700 dark:bg-zinc-800"
-      >
-        <Text className="text-sm text-gray-500 dark:text-gray-400">+</Text>
-      </Pressable>
     </View>
   );
 }
