@@ -49,6 +49,11 @@ export type leaguemessages = $Result.DefaultSelection<Prisma.$leaguemessagesPayl
  */
 export type league_message_read_state = $Result.DefaultSelection<Prisma.$league_message_read_statePayload>
 /**
+ * Model league_message_reactions
+ * 
+ */
+export type league_message_reactions = $Result.DefaultSelection<Prisma.$league_message_reactionsPayload>
+/**
  * Model leagues
  * 
  */
@@ -166,6 +171,20 @@ export const MessageType: {
 export type MessageType = (typeof MessageType)[keyof typeof MessageType]
 
 
+export const MessageReactionEmoji: {
+  fire: 'fire',
+  laugh: 'laugh',
+  cooked: 'cooked',
+  eyes: 'eyes',
+  football: 'football',
+  goat: 'goat',
+  thumbs_up: 'thumbs_up',
+  heart: 'heart'
+};
+
+export type MessageReactionEmoji = (typeof MessageReactionEmoji)[keyof typeof MessageReactionEmoji]
+
+
 export const PickPolicy: {
   choose_winner: 'choose_winner'
 };
@@ -238,6 +257,10 @@ export const MessageStatus: typeof $Enums.MessageStatus
 export type MessageType = $Enums.MessageType
 
 export const MessageType: typeof $Enums.MessageType
+
+export type MessageReactionEmoji = $Enums.MessageReactionEmoji
+
+export const MessageReactionEmoji: typeof $Enums.MessageReactionEmoji
 
 export type PickPolicy = $Enums.PickPolicy
 
@@ -450,6 +473,16 @@ export class PrismaClient<
     * ```
     */
   get league_message_read_state(): Prisma.league_message_read_stateDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.league_message_reactions`: Exposes CRUD operations for the **league_message_reactions** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more League_message_reactions
+    * const league_message_reactions = await prisma.league_message_reactions.findMany()
+    * ```
+    */
+  get league_message_reactions(): Prisma.league_message_reactionsDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.leagues`: Exposes CRUD operations for the **leagues** model.
@@ -1008,6 +1041,7 @@ export namespace Prisma {
     leaguemembers: 'leaguemembers',
     leaguemessages: 'leaguemessages',
     league_message_read_state: 'league_message_read_state',
+    league_message_reactions: 'league_message_reactions',
     leagues: 'leagues',
     league_renewal_member_roles: 'league_renewal_member_roles',
     people: 'people',
@@ -1037,7 +1071,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "emailLogs" | "emailDeliveryEvents" | "weekWinners" | "games" | "leaguemembers" | "leaguemessages" | "league_message_read_state" | "leagues" | "league_renewal_member_roles" | "people" | "pushNotificationTokens" | "picks" | "superbowl" | "superbowlsquares" | "teams" | "postseason_games" | "postseason_team_seeds" | "weeklyRecapDelivery"
+      modelProps: "emailLogs" | "emailDeliveryEvents" | "weekWinners" | "games" | "leaguemembers" | "leaguemessages" | "league_message_read_state" | "league_message_reactions" | "leagues" | "league_renewal_member_roles" | "people" | "pushNotificationTokens" | "picks" | "superbowl" | "superbowlsquares" | "teams" | "postseason_games" | "postseason_team_seeds" | "weeklyRecapDelivery"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1556,6 +1590,80 @@ export namespace Prisma {
           count: {
             args: Prisma.league_message_read_stateCountArgs<ExtArgs>
             result: $Utils.Optional<League_message_read_stateCountAggregateOutputType> | number
+          }
+        }
+      }
+      league_message_reactions: {
+        payload: Prisma.$league_message_reactionsPayload<ExtArgs>
+        fields: Prisma.league_message_reactionsFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.league_message_reactionsFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$league_message_reactionsPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.league_message_reactionsFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$league_message_reactionsPayload>
+          }
+          findFirst: {
+            args: Prisma.league_message_reactionsFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$league_message_reactionsPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.league_message_reactionsFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$league_message_reactionsPayload>
+          }
+          findMany: {
+            args: Prisma.league_message_reactionsFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$league_message_reactionsPayload>[]
+          }
+          create: {
+            args: Prisma.league_message_reactionsCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$league_message_reactionsPayload>
+          }
+          createMany: {
+            args: Prisma.league_message_reactionsCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.league_message_reactionsCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$league_message_reactionsPayload>[]
+          }
+          delete: {
+            args: Prisma.league_message_reactionsDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$league_message_reactionsPayload>
+          }
+          update: {
+            args: Prisma.league_message_reactionsUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$league_message_reactionsPayload>
+          }
+          deleteMany: {
+            args: Prisma.league_message_reactionsDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.league_message_reactionsUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.league_message_reactionsUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$league_message_reactionsPayload>[]
+          }
+          upsert: {
+            args: Prisma.league_message_reactionsUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$league_message_reactionsPayload>
+          }
+          aggregate: {
+            args: Prisma.League_message_reactionsAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateLeague_message_reactions>
+          }
+          groupBy: {
+            args: Prisma.league_message_reactionsGroupByArgs<ExtArgs>
+            result: $Utils.Optional<League_message_reactionsGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.league_message_reactionsCountArgs<ExtArgs>
+            result: $Utils.Optional<League_message_reactionsCountAggregateOutputType> | number
           }
         }
       }
@@ -2476,6 +2584,7 @@ export namespace Prisma {
     leaguemembers?: leaguemembersOmit
     leaguemessages?: leaguemessagesOmit
     league_message_read_state?: league_message_read_stateOmit
+    league_message_reactions?: league_message_reactionsOmit
     leagues?: leaguesOmit
     league_renewal_member_roles?: league_renewal_member_rolesOmit
     people?: peopleOmit
@@ -2601,6 +2710,7 @@ export namespace Prisma {
     EmailLogs: number
     WeekWinners: number
     leaguemessages: number
+    league_message_reactions: number
     picks: number
     superbowl: number
   }
@@ -2609,6 +2719,7 @@ export namespace Prisma {
     EmailLogs?: boolean | LeaguemembersCountOutputTypeCountEmailLogsArgs
     WeekWinners?: boolean | LeaguemembersCountOutputTypeCountWeekWinnersArgs
     leaguemessages?: boolean | LeaguemembersCountOutputTypeCountLeaguemessagesArgs
+    league_message_reactions?: boolean | LeaguemembersCountOutputTypeCountLeague_message_reactionsArgs
     picks?: boolean | LeaguemembersCountOutputTypeCountPicksArgs
     superbowl?: boolean | LeaguemembersCountOutputTypeCountSuperbowlArgs
   }
@@ -2648,6 +2759,13 @@ export namespace Prisma {
   /**
    * LeaguemembersCountOutputType without action
    */
+  export type LeaguemembersCountOutputTypeCountLeague_message_reactionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: league_message_reactionsWhereInput
+  }
+
+  /**
+   * LeaguemembersCountOutputType without action
+   */
   export type LeaguemembersCountOutputTypeCountPicksArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: picksWhereInput
   }
@@ -2657,6 +2775,37 @@ export namespace Prisma {
    */
   export type LeaguemembersCountOutputTypeCountSuperbowlArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: superbowlWhereInput
+  }
+
+
+  /**
+   * Count Type LeaguemessagesCountOutputType
+   */
+
+  export type LeaguemessagesCountOutputType = {
+    league_message_reactions: number
+  }
+
+  export type LeaguemessagesCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    league_message_reactions?: boolean | LeaguemessagesCountOutputTypeCountLeague_message_reactionsArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * LeaguemessagesCountOutputType without action
+   */
+  export type LeaguemessagesCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the LeaguemessagesCountOutputType
+     */
+    select?: LeaguemessagesCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * LeaguemessagesCountOutputType without action
+   */
+  export type LeaguemessagesCountOutputTypeCountLeague_message_reactionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: league_message_reactionsWhereInput
   }
 
 
@@ -7932,6 +8081,7 @@ export namespace Prisma {
     leagues?: boolean | leaguesDefaultArgs<ExtArgs>
     leaguemessages?: boolean | leaguemembers$leaguemessagesArgs<ExtArgs>
     league_message_read_state?: boolean | leaguemembers$league_message_read_stateArgs<ExtArgs>
+    league_message_reactions?: boolean | leaguemembers$league_message_reactionsArgs<ExtArgs>
     picks?: boolean | leaguemembers$picksArgs<ExtArgs>
     superbowl?: boolean | leaguemembers$superbowlArgs<ExtArgs>
     _count?: boolean | LeaguemembersCountOutputTypeDefaultArgs<ExtArgs>
@@ -7976,6 +8126,7 @@ export namespace Prisma {
     leagues?: boolean | leaguesDefaultArgs<ExtArgs>
     leaguemessages?: boolean | leaguemembers$leaguemessagesArgs<ExtArgs>
     league_message_read_state?: boolean | leaguemembers$league_message_read_stateArgs<ExtArgs>
+    league_message_reactions?: boolean | leaguemembers$league_message_reactionsArgs<ExtArgs>
     picks?: boolean | leaguemembers$picksArgs<ExtArgs>
     superbowl?: boolean | leaguemembers$superbowlArgs<ExtArgs>
     _count?: boolean | LeaguemembersCountOutputTypeDefaultArgs<ExtArgs>
@@ -7998,6 +8149,7 @@ export namespace Prisma {
       leagues: Prisma.$leaguesPayload<ExtArgs>
       leaguemessages: Prisma.$leaguemessagesPayload<ExtArgs>[]
       league_message_read_state: Prisma.$league_message_read_statePayload<ExtArgs> | null
+      league_message_reactions: Prisma.$league_message_reactionsPayload<ExtArgs>[]
       picks: Prisma.$picksPayload<ExtArgs>[]
       superbowl: Prisma.$superbowlPayload<ExtArgs>[]
     }
@@ -8408,6 +8560,7 @@ export namespace Prisma {
     leagues<T extends leaguesDefaultArgs<ExtArgs> = {}>(args?: Subset<T, leaguesDefaultArgs<ExtArgs>>): Prisma__leaguesClient<$Result.GetResult<Prisma.$leaguesPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     leaguemessages<T extends leaguemembers$leaguemessagesArgs<ExtArgs> = {}>(args?: Subset<T, leaguemembers$leaguemessagesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$leaguemessagesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     league_message_read_state<T extends leaguemembers$league_message_read_stateArgs<ExtArgs> = {}>(args?: Subset<T, leaguemembers$league_message_read_stateArgs<ExtArgs>>): Prisma__league_message_read_stateClient<$Result.GetResult<Prisma.$league_message_read_statePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    league_message_reactions<T extends leaguemembers$league_message_reactionsArgs<ExtArgs> = {}>(args?: Subset<T, leaguemembers$league_message_reactionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$league_message_reactionsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     picks<T extends leaguemembers$picksArgs<ExtArgs> = {}>(args?: Subset<T, leaguemembers$picksArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$picksPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     superbowl<T extends leaguemembers$superbowlArgs<ExtArgs> = {}>(args?: Subset<T, leaguemembers$superbowlArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$superbowlPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
@@ -8941,6 +9094,30 @@ export namespace Prisma {
   }
 
   /**
+   * leaguemembers.league_message_reactions
+   */
+  export type leaguemembers$league_message_reactionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the league_message_reactions
+     */
+    select?: league_message_reactionsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the league_message_reactions
+     */
+    omit?: league_message_reactionsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: league_message_reactionsInclude<ExtArgs> | null
+    where?: league_message_reactionsWhereInput
+    orderBy?: league_message_reactionsOrderByWithRelationInput | league_message_reactionsOrderByWithRelationInput[]
+    cursor?: league_message_reactionsWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: League_message_reactionsScalarFieldEnum | League_message_reactionsScalarFieldEnum[]
+  }
+
+  /**
    * leaguemembers.picks
    */
   export type leaguemembers$picksArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -9239,6 +9416,8 @@ export namespace Prisma {
     status?: boolean
     leagues?: boolean | leaguesDefaultArgs<ExtArgs>
     leaguemembers?: boolean | leaguemembersDefaultArgs<ExtArgs>
+    league_message_reactions?: boolean | leaguemessages$league_message_reactionsArgs<ExtArgs>
+    _count?: boolean | LeaguemessagesCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["leaguemessages"]>
 
   export type leaguemessagesSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -9282,6 +9461,8 @@ export namespace Prisma {
   export type leaguemessagesInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     leagues?: boolean | leaguesDefaultArgs<ExtArgs>
     leaguemembers?: boolean | leaguemembersDefaultArgs<ExtArgs>
+    league_message_reactions?: boolean | leaguemessages$league_message_reactionsArgs<ExtArgs>
+    _count?: boolean | LeaguemessagesCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type leaguemessagesIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     leagues?: boolean | leaguesDefaultArgs<ExtArgs>
@@ -9297,6 +9478,7 @@ export namespace Prisma {
     objects: {
       leagues: Prisma.$leaguesPayload<ExtArgs>
       leaguemembers: Prisma.$leaguemembersPayload<ExtArgs>
+      league_message_reactions: Prisma.$league_message_reactionsPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       message_id: string
@@ -9703,6 +9885,7 @@ export namespace Prisma {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     leagues<T extends leaguesDefaultArgs<ExtArgs> = {}>(args?: Subset<T, leaguesDefaultArgs<ExtArgs>>): Prisma__leaguesClient<$Result.GetResult<Prisma.$leaguesPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     leaguemembers<T extends leaguemembersDefaultArgs<ExtArgs> = {}>(args?: Subset<T, leaguemembersDefaultArgs<ExtArgs>>): Prisma__leaguemembersClient<$Result.GetResult<Prisma.$leaguemembersPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    league_message_reactions<T extends leaguemessages$league_message_reactionsArgs<ExtArgs> = {}>(args?: Subset<T, leaguemessages$league_message_reactionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$league_message_reactionsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -10142,6 +10325,30 @@ export namespace Prisma {
      * Limit how many leaguemessages to delete.
      */
     limit?: number
+  }
+
+  /**
+   * leaguemessages.league_message_reactions
+   */
+  export type leaguemessages$league_message_reactionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the league_message_reactions
+     */
+    select?: league_message_reactionsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the league_message_reactions
+     */
+    omit?: league_message_reactionsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: league_message_reactionsInclude<ExtArgs> | null
+    where?: league_message_reactionsWhereInput
+    orderBy?: league_message_reactionsOrderByWithRelationInput | league_message_reactionsOrderByWithRelationInput[]
+    cursor?: league_message_reactionsWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: League_message_reactionsScalarFieldEnum | League_message_reactionsScalarFieldEnum[]
   }
 
   /**
@@ -11248,6 +11455,1115 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: league_message_read_stateInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model league_message_reactions
+   */
+
+  export type AggregateLeague_message_reactions = {
+    _count: League_message_reactionsCountAggregateOutputType | null
+    _avg: League_message_reactionsAvgAggregateOutputType | null
+    _sum: League_message_reactionsSumAggregateOutputType | null
+    _min: League_message_reactionsMinAggregateOutputType | null
+    _max: League_message_reactionsMaxAggregateOutputType | null
+  }
+
+  export type League_message_reactionsAvgAggregateOutputType = {
+    membership_id: number | null
+  }
+
+  export type League_message_reactionsSumAggregateOutputType = {
+    membership_id: number | null
+  }
+
+  export type League_message_reactionsMinAggregateOutputType = {
+    reaction_id: string | null
+    message_id: string | null
+    membership_id: number | null
+    emoji: $Enums.MessageReactionEmoji | null
+    createdAt: Date | null
+  }
+
+  export type League_message_reactionsMaxAggregateOutputType = {
+    reaction_id: string | null
+    message_id: string | null
+    membership_id: number | null
+    emoji: $Enums.MessageReactionEmoji | null
+    createdAt: Date | null
+  }
+
+  export type League_message_reactionsCountAggregateOutputType = {
+    reaction_id: number
+    message_id: number
+    membership_id: number
+    emoji: number
+    createdAt: number
+    _all: number
+  }
+
+
+  export type League_message_reactionsAvgAggregateInputType = {
+    membership_id?: true
+  }
+
+  export type League_message_reactionsSumAggregateInputType = {
+    membership_id?: true
+  }
+
+  export type League_message_reactionsMinAggregateInputType = {
+    reaction_id?: true
+    message_id?: true
+    membership_id?: true
+    emoji?: true
+    createdAt?: true
+  }
+
+  export type League_message_reactionsMaxAggregateInputType = {
+    reaction_id?: true
+    message_id?: true
+    membership_id?: true
+    emoji?: true
+    createdAt?: true
+  }
+
+  export type League_message_reactionsCountAggregateInputType = {
+    reaction_id?: true
+    message_id?: true
+    membership_id?: true
+    emoji?: true
+    createdAt?: true
+    _all?: true
+  }
+
+  export type League_message_reactionsAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which league_message_reactions to aggregate.
+     */
+    where?: league_message_reactionsWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of league_message_reactions to fetch.
+     */
+    orderBy?: league_message_reactionsOrderByWithRelationInput | league_message_reactionsOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: league_message_reactionsWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` league_message_reactions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` league_message_reactions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned league_message_reactions
+    **/
+    _count?: true | League_message_reactionsCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: League_message_reactionsAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: League_message_reactionsSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: League_message_reactionsMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: League_message_reactionsMaxAggregateInputType
+  }
+
+  export type GetLeague_message_reactionsAggregateType<T extends League_message_reactionsAggregateArgs> = {
+        [P in keyof T & keyof AggregateLeague_message_reactions]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateLeague_message_reactions[P]>
+      : GetScalarType<T[P], AggregateLeague_message_reactions[P]>
+  }
+
+
+
+
+  export type league_message_reactionsGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: league_message_reactionsWhereInput
+    orderBy?: league_message_reactionsOrderByWithAggregationInput | league_message_reactionsOrderByWithAggregationInput[]
+    by: League_message_reactionsScalarFieldEnum[] | League_message_reactionsScalarFieldEnum
+    having?: league_message_reactionsScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: League_message_reactionsCountAggregateInputType | true
+    _avg?: League_message_reactionsAvgAggregateInputType
+    _sum?: League_message_reactionsSumAggregateInputType
+    _min?: League_message_reactionsMinAggregateInputType
+    _max?: League_message_reactionsMaxAggregateInputType
+  }
+
+  export type League_message_reactionsGroupByOutputType = {
+    reaction_id: string
+    message_id: string
+    membership_id: number
+    emoji: $Enums.MessageReactionEmoji
+    createdAt: Date
+    _count: League_message_reactionsCountAggregateOutputType | null
+    _avg: League_message_reactionsAvgAggregateOutputType | null
+    _sum: League_message_reactionsSumAggregateOutputType | null
+    _min: League_message_reactionsMinAggregateOutputType | null
+    _max: League_message_reactionsMaxAggregateOutputType | null
+  }
+
+  type GetLeague_message_reactionsGroupByPayload<T extends league_message_reactionsGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<League_message_reactionsGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof League_message_reactionsGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], League_message_reactionsGroupByOutputType[P]>
+            : GetScalarType<T[P], League_message_reactionsGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type league_message_reactionsSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    reaction_id?: boolean
+    message_id?: boolean
+    membership_id?: boolean
+    emoji?: boolean
+    createdAt?: boolean
+    leaguemessages?: boolean | leaguemessagesDefaultArgs<ExtArgs>
+    leaguemembers?: boolean | leaguemembersDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["league_message_reactions"]>
+
+  export type league_message_reactionsSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    reaction_id?: boolean
+    message_id?: boolean
+    membership_id?: boolean
+    emoji?: boolean
+    createdAt?: boolean
+    leaguemessages?: boolean | leaguemessagesDefaultArgs<ExtArgs>
+    leaguemembers?: boolean | leaguemembersDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["league_message_reactions"]>
+
+  export type league_message_reactionsSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    reaction_id?: boolean
+    message_id?: boolean
+    membership_id?: boolean
+    emoji?: boolean
+    createdAt?: boolean
+    leaguemessages?: boolean | leaguemessagesDefaultArgs<ExtArgs>
+    leaguemembers?: boolean | leaguemembersDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["league_message_reactions"]>
+
+  export type league_message_reactionsSelectScalar = {
+    reaction_id?: boolean
+    message_id?: boolean
+    membership_id?: boolean
+    emoji?: boolean
+    createdAt?: boolean
+  }
+
+  export type league_message_reactionsOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"reaction_id" | "message_id" | "membership_id" | "emoji" | "createdAt", ExtArgs["result"]["league_message_reactions"]>
+  export type league_message_reactionsInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    leaguemessages?: boolean | leaguemessagesDefaultArgs<ExtArgs>
+    leaguemembers?: boolean | leaguemembersDefaultArgs<ExtArgs>
+  }
+  export type league_message_reactionsIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    leaguemessages?: boolean | leaguemessagesDefaultArgs<ExtArgs>
+    leaguemembers?: boolean | leaguemembersDefaultArgs<ExtArgs>
+  }
+  export type league_message_reactionsIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    leaguemessages?: boolean | leaguemessagesDefaultArgs<ExtArgs>
+    leaguemembers?: boolean | leaguemembersDefaultArgs<ExtArgs>
+  }
+
+  export type $league_message_reactionsPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "league_message_reactions"
+    objects: {
+      leaguemessages: Prisma.$leaguemessagesPayload<ExtArgs>
+      leaguemembers: Prisma.$leaguemembersPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      reaction_id: string
+      message_id: string
+      membership_id: number
+      emoji: $Enums.MessageReactionEmoji
+      createdAt: Date
+    }, ExtArgs["result"]["league_message_reactions"]>
+    composites: {}
+  }
+
+  type league_message_reactionsGetPayload<S extends boolean | null | undefined | league_message_reactionsDefaultArgs> = $Result.GetResult<Prisma.$league_message_reactionsPayload, S>
+
+  type league_message_reactionsCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<league_message_reactionsFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
+      select?: League_message_reactionsCountAggregateInputType | true
+    }
+
+  export interface league_message_reactionsDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['league_message_reactions'], meta: { name: 'league_message_reactions' } }
+    /**
+     * Find zero or one League_message_reactions that matches the filter.
+     * @param {league_message_reactionsFindUniqueArgs} args - Arguments to find a League_message_reactions
+     * @example
+     * // Get one League_message_reactions
+     * const league_message_reactions = await prisma.league_message_reactions.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends league_message_reactionsFindUniqueArgs>(args: SelectSubset<T, league_message_reactionsFindUniqueArgs<ExtArgs>>): Prisma__league_message_reactionsClient<$Result.GetResult<Prisma.$league_message_reactionsPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one League_message_reactions that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {league_message_reactionsFindUniqueOrThrowArgs} args - Arguments to find a League_message_reactions
+     * @example
+     * // Get one League_message_reactions
+     * const league_message_reactions = await prisma.league_message_reactions.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends league_message_reactionsFindUniqueOrThrowArgs>(args: SelectSubset<T, league_message_reactionsFindUniqueOrThrowArgs<ExtArgs>>): Prisma__league_message_reactionsClient<$Result.GetResult<Prisma.$league_message_reactionsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first League_message_reactions that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {league_message_reactionsFindFirstArgs} args - Arguments to find a League_message_reactions
+     * @example
+     * // Get one League_message_reactions
+     * const league_message_reactions = await prisma.league_message_reactions.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends league_message_reactionsFindFirstArgs>(args?: SelectSubset<T, league_message_reactionsFindFirstArgs<ExtArgs>>): Prisma__league_message_reactionsClient<$Result.GetResult<Prisma.$league_message_reactionsPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first League_message_reactions that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {league_message_reactionsFindFirstOrThrowArgs} args - Arguments to find a League_message_reactions
+     * @example
+     * // Get one League_message_reactions
+     * const league_message_reactions = await prisma.league_message_reactions.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends league_message_reactionsFindFirstOrThrowArgs>(args?: SelectSubset<T, league_message_reactionsFindFirstOrThrowArgs<ExtArgs>>): Prisma__league_message_reactionsClient<$Result.GetResult<Prisma.$league_message_reactionsPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more League_message_reactions that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {league_message_reactionsFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all League_message_reactions
+     * const league_message_reactions = await prisma.league_message_reactions.findMany()
+     * 
+     * // Get first 10 League_message_reactions
+     * const league_message_reactions = await prisma.league_message_reactions.findMany({ take: 10 })
+     * 
+     * // Only select the `reaction_id`
+     * const league_message_reactionsWithReaction_idOnly = await prisma.league_message_reactions.findMany({ select: { reaction_id: true } })
+     * 
+     */
+    findMany<T extends league_message_reactionsFindManyArgs>(args?: SelectSubset<T, league_message_reactionsFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$league_message_reactionsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a League_message_reactions.
+     * @param {league_message_reactionsCreateArgs} args - Arguments to create a League_message_reactions.
+     * @example
+     * // Create one League_message_reactions
+     * const League_message_reactions = await prisma.league_message_reactions.create({
+     *   data: {
+     *     // ... data to create a League_message_reactions
+     *   }
+     * })
+     * 
+     */
+    create<T extends league_message_reactionsCreateArgs>(args: SelectSubset<T, league_message_reactionsCreateArgs<ExtArgs>>): Prisma__league_message_reactionsClient<$Result.GetResult<Prisma.$league_message_reactionsPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many League_message_reactions.
+     * @param {league_message_reactionsCreateManyArgs} args - Arguments to create many League_message_reactions.
+     * @example
+     * // Create many League_message_reactions
+     * const league_message_reactions = await prisma.league_message_reactions.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends league_message_reactionsCreateManyArgs>(args?: SelectSubset<T, league_message_reactionsCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many League_message_reactions and returns the data saved in the database.
+     * @param {league_message_reactionsCreateManyAndReturnArgs} args - Arguments to create many League_message_reactions.
+     * @example
+     * // Create many League_message_reactions
+     * const league_message_reactions = await prisma.league_message_reactions.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many League_message_reactions and only return the `reaction_id`
+     * const league_message_reactionsWithReaction_idOnly = await prisma.league_message_reactions.createManyAndReturn({
+     *   select: { reaction_id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends league_message_reactionsCreateManyAndReturnArgs>(args?: SelectSubset<T, league_message_reactionsCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$league_message_reactionsPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a League_message_reactions.
+     * @param {league_message_reactionsDeleteArgs} args - Arguments to delete one League_message_reactions.
+     * @example
+     * // Delete one League_message_reactions
+     * const League_message_reactions = await prisma.league_message_reactions.delete({
+     *   where: {
+     *     // ... filter to delete one League_message_reactions
+     *   }
+     * })
+     * 
+     */
+    delete<T extends league_message_reactionsDeleteArgs>(args: SelectSubset<T, league_message_reactionsDeleteArgs<ExtArgs>>): Prisma__league_message_reactionsClient<$Result.GetResult<Prisma.$league_message_reactionsPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one League_message_reactions.
+     * @param {league_message_reactionsUpdateArgs} args - Arguments to update one League_message_reactions.
+     * @example
+     * // Update one League_message_reactions
+     * const league_message_reactions = await prisma.league_message_reactions.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends league_message_reactionsUpdateArgs>(args: SelectSubset<T, league_message_reactionsUpdateArgs<ExtArgs>>): Prisma__league_message_reactionsClient<$Result.GetResult<Prisma.$league_message_reactionsPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more League_message_reactions.
+     * @param {league_message_reactionsDeleteManyArgs} args - Arguments to filter League_message_reactions to delete.
+     * @example
+     * // Delete a few League_message_reactions
+     * const { count } = await prisma.league_message_reactions.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends league_message_reactionsDeleteManyArgs>(args?: SelectSubset<T, league_message_reactionsDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more League_message_reactions.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {league_message_reactionsUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many League_message_reactions
+     * const league_message_reactions = await prisma.league_message_reactions.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends league_message_reactionsUpdateManyArgs>(args: SelectSubset<T, league_message_reactionsUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more League_message_reactions and returns the data updated in the database.
+     * @param {league_message_reactionsUpdateManyAndReturnArgs} args - Arguments to update many League_message_reactions.
+     * @example
+     * // Update many League_message_reactions
+     * const league_message_reactions = await prisma.league_message_reactions.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more League_message_reactions and only return the `reaction_id`
+     * const league_message_reactionsWithReaction_idOnly = await prisma.league_message_reactions.updateManyAndReturn({
+     *   select: { reaction_id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends league_message_reactionsUpdateManyAndReturnArgs>(args: SelectSubset<T, league_message_reactionsUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$league_message_reactionsPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one League_message_reactions.
+     * @param {league_message_reactionsUpsertArgs} args - Arguments to update or create a League_message_reactions.
+     * @example
+     * // Update or create a League_message_reactions
+     * const league_message_reactions = await prisma.league_message_reactions.upsert({
+     *   create: {
+     *     // ... data to create a League_message_reactions
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the League_message_reactions we want to update
+     *   }
+     * })
+     */
+    upsert<T extends league_message_reactionsUpsertArgs>(args: SelectSubset<T, league_message_reactionsUpsertArgs<ExtArgs>>): Prisma__league_message_reactionsClient<$Result.GetResult<Prisma.$league_message_reactionsPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of League_message_reactions.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {league_message_reactionsCountArgs} args - Arguments to filter League_message_reactions to count.
+     * @example
+     * // Count the number of League_message_reactions
+     * const count = await prisma.league_message_reactions.count({
+     *   where: {
+     *     // ... the filter for the League_message_reactions we want to count
+     *   }
+     * })
+    **/
+    count<T extends league_message_reactionsCountArgs>(
+      args?: Subset<T, league_message_reactionsCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], League_message_reactionsCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a League_message_reactions.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {League_message_reactionsAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends League_message_reactionsAggregateArgs>(args: Subset<T, League_message_reactionsAggregateArgs>): Prisma.PrismaPromise<GetLeague_message_reactionsAggregateType<T>>
+
+    /**
+     * Group by League_message_reactions.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {league_message_reactionsGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends league_message_reactionsGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: league_message_reactionsGroupByArgs['orderBy'] }
+        : { orderBy?: league_message_reactionsGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, league_message_reactionsGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetLeague_message_reactionsGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the league_message_reactions model
+   */
+  readonly fields: league_message_reactionsFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for league_message_reactions.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__league_message_reactionsClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    leaguemessages<T extends leaguemessagesDefaultArgs<ExtArgs> = {}>(args?: Subset<T, leaguemessagesDefaultArgs<ExtArgs>>): Prisma__leaguemessagesClient<$Result.GetResult<Prisma.$leaguemessagesPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    leaguemembers<T extends leaguemembersDefaultArgs<ExtArgs> = {}>(args?: Subset<T, leaguemembersDefaultArgs<ExtArgs>>): Prisma__leaguemembersClient<$Result.GetResult<Prisma.$leaguemembersPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the league_message_reactions model
+   */
+  interface league_message_reactionsFieldRefs {
+    readonly reaction_id: FieldRef<"league_message_reactions", 'String'>
+    readonly message_id: FieldRef<"league_message_reactions", 'String'>
+    readonly membership_id: FieldRef<"league_message_reactions", 'Int'>
+    readonly emoji: FieldRef<"league_message_reactions", 'MessageReactionEmoji'>
+    readonly createdAt: FieldRef<"league_message_reactions", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * league_message_reactions findUnique
+   */
+  export type league_message_reactionsFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the league_message_reactions
+     */
+    select?: league_message_reactionsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the league_message_reactions
+     */
+    omit?: league_message_reactionsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: league_message_reactionsInclude<ExtArgs> | null
+    /**
+     * Filter, which league_message_reactions to fetch.
+     */
+    where: league_message_reactionsWhereUniqueInput
+    relationLoadStrategy?: RelationLoadStrategy
+  }
+
+  /**
+   * league_message_reactions findUniqueOrThrow
+   */
+  export type league_message_reactionsFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the league_message_reactions
+     */
+    select?: league_message_reactionsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the league_message_reactions
+     */
+    omit?: league_message_reactionsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: league_message_reactionsInclude<ExtArgs> | null
+    /**
+     * Filter, which league_message_reactions to fetch.
+     */
+    where: league_message_reactionsWhereUniqueInput
+    relationLoadStrategy?: RelationLoadStrategy
+  }
+
+  /**
+   * league_message_reactions findFirst
+   */
+  export type league_message_reactionsFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the league_message_reactions
+     */
+    select?: league_message_reactionsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the league_message_reactions
+     */
+    omit?: league_message_reactionsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: league_message_reactionsInclude<ExtArgs> | null
+    /**
+     * Filter, which league_message_reactions to fetch.
+     */
+    where?: league_message_reactionsWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of league_message_reactions to fetch.
+     */
+    orderBy?: league_message_reactionsOrderByWithRelationInput | league_message_reactionsOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for league_message_reactions.
+     */
+    cursor?: league_message_reactionsWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` league_message_reactions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` league_message_reactions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of league_message_reactions.
+     */
+    distinct?: League_message_reactionsScalarFieldEnum | League_message_reactionsScalarFieldEnum[]
+    relationLoadStrategy?: RelationLoadStrategy
+  }
+
+  /**
+   * league_message_reactions findFirstOrThrow
+   */
+  export type league_message_reactionsFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the league_message_reactions
+     */
+    select?: league_message_reactionsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the league_message_reactions
+     */
+    omit?: league_message_reactionsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: league_message_reactionsInclude<ExtArgs> | null
+    /**
+     * Filter, which league_message_reactions to fetch.
+     */
+    where?: league_message_reactionsWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of league_message_reactions to fetch.
+     */
+    orderBy?: league_message_reactionsOrderByWithRelationInput | league_message_reactionsOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for league_message_reactions.
+     */
+    cursor?: league_message_reactionsWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` league_message_reactions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` league_message_reactions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of league_message_reactions.
+     */
+    distinct?: League_message_reactionsScalarFieldEnum | League_message_reactionsScalarFieldEnum[]
+    relationLoadStrategy?: RelationLoadStrategy
+  }
+
+  /**
+   * league_message_reactions findMany
+   */
+  export type league_message_reactionsFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the league_message_reactions
+     */
+    select?: league_message_reactionsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the league_message_reactions
+     */
+    omit?: league_message_reactionsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: league_message_reactionsInclude<ExtArgs> | null
+    /**
+     * Filter, which league_message_reactions to fetch.
+     */
+    where?: league_message_reactionsWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of league_message_reactions to fetch.
+     */
+    orderBy?: league_message_reactionsOrderByWithRelationInput | league_message_reactionsOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing league_message_reactions.
+     */
+    cursor?: league_message_reactionsWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` league_message_reactions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` league_message_reactions.
+     */
+    skip?: number
+    distinct?: League_message_reactionsScalarFieldEnum | League_message_reactionsScalarFieldEnum[]
+    relationLoadStrategy?: RelationLoadStrategy
+  }
+
+  /**
+   * league_message_reactions create
+   */
+  export type league_message_reactionsCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the league_message_reactions
+     */
+    select?: league_message_reactionsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the league_message_reactions
+     */
+    omit?: league_message_reactionsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: league_message_reactionsInclude<ExtArgs> | null
+    /**
+     * The data needed to create a league_message_reactions.
+     */
+    data: XOR<league_message_reactionsCreateInput, league_message_reactionsUncheckedCreateInput>
+    relationLoadStrategy?: RelationLoadStrategy
+  }
+
+  /**
+   * league_message_reactions createMany
+   */
+  export type league_message_reactionsCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many league_message_reactions.
+     */
+    data: league_message_reactionsCreateManyInput | league_message_reactionsCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * league_message_reactions createManyAndReturn
+   */
+  export type league_message_reactionsCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the league_message_reactions
+     */
+    select?: league_message_reactionsSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the league_message_reactions
+     */
+    omit?: league_message_reactionsOmit<ExtArgs> | null
+    /**
+     * The data used to create many league_message_reactions.
+     */
+    data: league_message_reactionsCreateManyInput | league_message_reactionsCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: league_message_reactionsIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * league_message_reactions update
+   */
+  export type league_message_reactionsUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the league_message_reactions
+     */
+    select?: league_message_reactionsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the league_message_reactions
+     */
+    omit?: league_message_reactionsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: league_message_reactionsInclude<ExtArgs> | null
+    /**
+     * The data needed to update a league_message_reactions.
+     */
+    data: XOR<league_message_reactionsUpdateInput, league_message_reactionsUncheckedUpdateInput>
+    /**
+     * Choose, which league_message_reactions to update.
+     */
+    where: league_message_reactionsWhereUniqueInput
+    relationLoadStrategy?: RelationLoadStrategy
+  }
+
+  /**
+   * league_message_reactions updateMany
+   */
+  export type league_message_reactionsUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update league_message_reactions.
+     */
+    data: XOR<league_message_reactionsUpdateManyMutationInput, league_message_reactionsUncheckedUpdateManyInput>
+    /**
+     * Filter which league_message_reactions to update
+     */
+    where?: league_message_reactionsWhereInput
+    /**
+     * Limit how many league_message_reactions to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * league_message_reactions updateManyAndReturn
+   */
+  export type league_message_reactionsUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the league_message_reactions
+     */
+    select?: league_message_reactionsSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the league_message_reactions
+     */
+    omit?: league_message_reactionsOmit<ExtArgs> | null
+    /**
+     * The data used to update league_message_reactions.
+     */
+    data: XOR<league_message_reactionsUpdateManyMutationInput, league_message_reactionsUncheckedUpdateManyInput>
+    /**
+     * Filter which league_message_reactions to update
+     */
+    where?: league_message_reactionsWhereInput
+    /**
+     * Limit how many league_message_reactions to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: league_message_reactionsIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * league_message_reactions upsert
+   */
+  export type league_message_reactionsUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the league_message_reactions
+     */
+    select?: league_message_reactionsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the league_message_reactions
+     */
+    omit?: league_message_reactionsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: league_message_reactionsInclude<ExtArgs> | null
+    /**
+     * The filter to search for the league_message_reactions to update in case it exists.
+     */
+    where: league_message_reactionsWhereUniqueInput
+    /**
+     * In case the league_message_reactions found by the `where` argument doesn't exist, create a new league_message_reactions with this data.
+     */
+    create: XOR<league_message_reactionsCreateInput, league_message_reactionsUncheckedCreateInput>
+    /**
+     * In case the league_message_reactions was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<league_message_reactionsUpdateInput, league_message_reactionsUncheckedUpdateInput>
+    relationLoadStrategy?: RelationLoadStrategy
+  }
+
+  /**
+   * league_message_reactions delete
+   */
+  export type league_message_reactionsDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the league_message_reactions
+     */
+    select?: league_message_reactionsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the league_message_reactions
+     */
+    omit?: league_message_reactionsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: league_message_reactionsInclude<ExtArgs> | null
+    /**
+     * Filter which league_message_reactions to delete.
+     */
+    where: league_message_reactionsWhereUniqueInput
+    relationLoadStrategy?: RelationLoadStrategy
+  }
+
+  /**
+   * league_message_reactions deleteMany
+   */
+  export type league_message_reactionsDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which league_message_reactions to delete
+     */
+    where?: league_message_reactionsWhereInput
+    /**
+     * Limit how many league_message_reactions to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * league_message_reactions without action
+   */
+  export type league_message_reactionsDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the league_message_reactions
+     */
+    select?: league_message_reactionsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the league_message_reactions
+     */
+    omit?: league_message_reactionsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: league_message_reactionsInclude<ExtArgs> | null
   }
 
 
@@ -24941,6 +26257,17 @@ export namespace Prisma {
   export type League_message_read_stateScalarFieldEnum = (typeof League_message_read_stateScalarFieldEnum)[keyof typeof League_message_read_stateScalarFieldEnum]
 
 
+  export const League_message_reactionsScalarFieldEnum: {
+    reaction_id: 'reaction_id',
+    message_id: 'message_id',
+    membership_id: 'membership_id',
+    emoji: 'emoji',
+    createdAt: 'createdAt'
+  };
+
+  export type League_message_reactionsScalarFieldEnum = (typeof League_message_reactionsScalarFieldEnum)[keyof typeof League_message_reactionsScalarFieldEnum]
+
+
   export const LeaguesScalarFieldEnum: {
     league_id: 'league_id',
     created_by_user_id: 'created_by_user_id',
@@ -25286,6 +26613,20 @@ export namespace Prisma {
    * Reference to a field of type 'MessageStatus[]'
    */
   export type ListEnumMessageStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MessageStatus[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'MessageReactionEmoji'
+   */
+  export type EnumMessageReactionEmojiFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MessageReactionEmoji'>
+    
+
+
+  /**
+   * Reference to a field of type 'MessageReactionEmoji[]'
+   */
+  export type ListEnumMessageReactionEmojiFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MessageReactionEmoji[]'>
     
 
 
@@ -25785,6 +27126,7 @@ export namespace Prisma {
     leagues?: XOR<LeaguesScalarRelationFilter, leaguesWhereInput>
     leaguemessages?: LeaguemessagesListRelationFilter
     league_message_read_state?: XOR<League_message_read_stateNullableScalarRelationFilter, league_message_read_stateWhereInput> | null
+    league_message_reactions?: League_message_reactionsListRelationFilter
     picks?: PicksListRelationFilter
     superbowl?: SuperbowlListRelationFilter
   }
@@ -25802,6 +27144,7 @@ export namespace Prisma {
     leagues?: leaguesOrderByWithRelationInput
     leaguemessages?: leaguemessagesOrderByRelationAggregateInput
     league_message_read_state?: league_message_read_stateOrderByWithRelationInput
+    league_message_reactions?: league_message_reactionsOrderByRelationAggregateInput
     picks?: picksOrderByRelationAggregateInput
     superbowl?: superbowlOrderByRelationAggregateInput
   }
@@ -25822,6 +27165,7 @@ export namespace Prisma {
     leagues?: XOR<LeaguesScalarRelationFilter, leaguesWhereInput>
     leaguemessages?: LeaguemessagesListRelationFilter
     league_message_read_state?: XOR<League_message_read_stateNullableScalarRelationFilter, league_message_read_stateWhereInput> | null
+    league_message_reactions?: League_message_reactionsListRelationFilter
     picks?: PicksListRelationFilter
     superbowl?: SuperbowlListRelationFilter
   }, "membership_id">
@@ -25866,6 +27210,7 @@ export namespace Prisma {
     status?: EnumMessageStatusFilter<"leaguemessages"> | $Enums.MessageStatus
     leagues?: XOR<LeaguesScalarRelationFilter, leaguesWhereInput>
     leaguemembers?: XOR<LeaguemembersScalarRelationFilter, leaguemembersWhereInput>
+    league_message_reactions?: League_message_reactionsListRelationFilter
   }
 
   export type leaguemessagesOrderByWithRelationInput = {
@@ -25879,6 +27224,7 @@ export namespace Prisma {
     status?: SortOrder
     leagues?: leaguesOrderByWithRelationInput
     leaguemembers?: leaguemembersOrderByWithRelationInput
+    league_message_reactions?: league_message_reactionsOrderByRelationAggregateInput
   }
 
   export type leaguemessagesWhereUniqueInput = Prisma.AtLeast<{
@@ -25895,6 +27241,7 @@ export namespace Prisma {
     status?: EnumMessageStatusFilter<"leaguemessages"> | $Enums.MessageStatus
     leagues?: XOR<LeaguesScalarRelationFilter, leaguesWhereInput>
     leaguemembers?: XOR<LeaguemembersScalarRelationFilter, leaguemembersWhereInput>
+    league_message_reactions?: League_message_reactionsListRelationFilter
   }, "message_id">
 
   export type leaguemessagesOrderByWithAggregationInput = {
@@ -25977,6 +27324,67 @@ export namespace Prisma {
     last_read_at?: DateTimeWithAggregatesFilter<"league_message_read_state"> | Date | string
     last_read_message_id?: StringWithAggregatesFilter<"league_message_read_state"> | string
     updatedAt?: DateTimeWithAggregatesFilter<"league_message_read_state"> | Date | string
+  }
+
+  export type league_message_reactionsWhereInput = {
+    AND?: league_message_reactionsWhereInput | league_message_reactionsWhereInput[]
+    OR?: league_message_reactionsWhereInput[]
+    NOT?: league_message_reactionsWhereInput | league_message_reactionsWhereInput[]
+    reaction_id?: StringFilter<"league_message_reactions"> | string
+    message_id?: StringFilter<"league_message_reactions"> | string
+    membership_id?: IntFilter<"league_message_reactions"> | number
+    emoji?: EnumMessageReactionEmojiFilter<"league_message_reactions"> | $Enums.MessageReactionEmoji
+    createdAt?: DateTimeFilter<"league_message_reactions"> | Date | string
+    leaguemessages?: XOR<LeaguemessagesScalarRelationFilter, leaguemessagesWhereInput>
+    leaguemembers?: XOR<LeaguemembersScalarRelationFilter, leaguemembersWhereInput>
+  }
+
+  export type league_message_reactionsOrderByWithRelationInput = {
+    reaction_id?: SortOrder
+    message_id?: SortOrder
+    membership_id?: SortOrder
+    emoji?: SortOrder
+    createdAt?: SortOrder
+    leaguemessages?: leaguemessagesOrderByWithRelationInput
+    leaguemembers?: leaguemembersOrderByWithRelationInput
+  }
+
+  export type league_message_reactionsWhereUniqueInput = Prisma.AtLeast<{
+    reaction_id?: string
+    message_id_membership_id_emoji?: league_message_reactionsMessage_idMembership_idEmojiCompoundUniqueInput
+    AND?: league_message_reactionsWhereInput | league_message_reactionsWhereInput[]
+    OR?: league_message_reactionsWhereInput[]
+    NOT?: league_message_reactionsWhereInput | league_message_reactionsWhereInput[]
+    message_id?: StringFilter<"league_message_reactions"> | string
+    membership_id?: IntFilter<"league_message_reactions"> | number
+    emoji?: EnumMessageReactionEmojiFilter<"league_message_reactions"> | $Enums.MessageReactionEmoji
+    createdAt?: DateTimeFilter<"league_message_reactions"> | Date | string
+    leaguemessages?: XOR<LeaguemessagesScalarRelationFilter, leaguemessagesWhereInput>
+    leaguemembers?: XOR<LeaguemembersScalarRelationFilter, leaguemembersWhereInput>
+  }, "reaction_id" | "message_id_membership_id_emoji">
+
+  export type league_message_reactionsOrderByWithAggregationInput = {
+    reaction_id?: SortOrder
+    message_id?: SortOrder
+    membership_id?: SortOrder
+    emoji?: SortOrder
+    createdAt?: SortOrder
+    _count?: league_message_reactionsCountOrderByAggregateInput
+    _avg?: league_message_reactionsAvgOrderByAggregateInput
+    _max?: league_message_reactionsMaxOrderByAggregateInput
+    _min?: league_message_reactionsMinOrderByAggregateInput
+    _sum?: league_message_reactionsSumOrderByAggregateInput
+  }
+
+  export type league_message_reactionsScalarWhereWithAggregatesInput = {
+    AND?: league_message_reactionsScalarWhereWithAggregatesInput | league_message_reactionsScalarWhereWithAggregatesInput[]
+    OR?: league_message_reactionsScalarWhereWithAggregatesInput[]
+    NOT?: league_message_reactionsScalarWhereWithAggregatesInput | league_message_reactionsScalarWhereWithAggregatesInput[]
+    reaction_id?: StringWithAggregatesFilter<"league_message_reactions"> | string
+    message_id?: StringWithAggregatesFilter<"league_message_reactions"> | string
+    membership_id?: IntWithAggregatesFilter<"league_message_reactions"> | number
+    emoji?: EnumMessageReactionEmojiWithAggregatesFilter<"league_message_reactions"> | $Enums.MessageReactionEmoji
+    createdAt?: DateTimeWithAggregatesFilter<"league_message_reactions"> | Date | string
   }
 
   export type leaguesWhereInput = {
@@ -27343,6 +28751,7 @@ export namespace Prisma {
     leagues: leaguesCreateNestedOneWithoutLeaguemembersInput
     leaguemessages?: leaguemessagesCreateNestedManyWithoutLeaguemembersInput
     league_message_read_state?: league_message_read_stateCreateNestedOneWithoutLeaguemembersInput
+    league_message_reactions?: league_message_reactionsCreateNestedManyWithoutLeaguemembersInput
     picks?: picksCreateNestedManyWithoutLeaguemembersInput
     superbowl?: superbowlCreateNestedManyWithoutLeaguemembersInput
   }
@@ -27358,6 +28767,7 @@ export namespace Prisma {
     WeekWinners?: WeekWinnersUncheckedCreateNestedManyWithoutLeaguemembersInput
     leaguemessages?: leaguemessagesUncheckedCreateNestedManyWithoutLeaguemembersInput
     league_message_read_state?: league_message_read_stateUncheckedCreateNestedOneWithoutLeaguemembersInput
+    league_message_reactions?: league_message_reactionsUncheckedCreateNestedManyWithoutLeaguemembersInput
     picks?: picksUncheckedCreateNestedManyWithoutLeaguemembersInput
     superbowl?: superbowlUncheckedCreateNestedManyWithoutLeaguemembersInput
   }
@@ -27372,6 +28782,7 @@ export namespace Prisma {
     leagues?: leaguesUpdateOneRequiredWithoutLeaguemembersNestedInput
     leaguemessages?: leaguemessagesUpdateManyWithoutLeaguemembersNestedInput
     league_message_read_state?: league_message_read_stateUpdateOneWithoutLeaguemembersNestedInput
+    league_message_reactions?: league_message_reactionsUpdateManyWithoutLeaguemembersNestedInput
     picks?: picksUpdateManyWithoutLeaguemembersNestedInput
     superbowl?: superbowlUpdateManyWithoutLeaguemembersNestedInput
   }
@@ -27387,6 +28798,7 @@ export namespace Prisma {
     WeekWinners?: WeekWinnersUncheckedUpdateManyWithoutLeaguemembersNestedInput
     leaguemessages?: leaguemessagesUncheckedUpdateManyWithoutLeaguemembersNestedInput
     league_message_read_state?: league_message_read_stateUncheckedUpdateOneWithoutLeaguemembersNestedInput
+    league_message_reactions?: league_message_reactionsUncheckedUpdateManyWithoutLeaguemembersNestedInput
     picks?: picksUncheckedUpdateManyWithoutLeaguemembersNestedInput
     superbowl?: superbowlUncheckedUpdateManyWithoutLeaguemembersNestedInput
   }
@@ -27424,6 +28836,7 @@ export namespace Prisma {
     status?: $Enums.MessageStatus
     leagues: leaguesCreateNestedOneWithoutLeaguemessagesInput
     leaguemembers: leaguemembersCreateNestedOneWithoutLeaguemessagesInput
+    league_message_reactions?: league_message_reactionsCreateNestedManyWithoutLeaguemessagesInput
   }
 
   export type leaguemessagesUncheckedCreateInput = {
@@ -27435,6 +28848,7 @@ export namespace Prisma {
     message_type: $Enums.MessageType
     createdAt?: Date | string
     status?: $Enums.MessageStatus
+    league_message_reactions?: league_message_reactionsUncheckedCreateNestedManyWithoutLeaguemessagesInput
   }
 
   export type leaguemessagesUpdateInput = {
@@ -27446,6 +28860,7 @@ export namespace Prisma {
     status?: EnumMessageStatusFieldUpdateOperationsInput | $Enums.MessageStatus
     leagues?: leaguesUpdateOneRequiredWithoutLeaguemessagesNestedInput
     leaguemembers?: leaguemembersUpdateOneRequiredWithoutLeaguemessagesNestedInput
+    league_message_reactions?: league_message_reactionsUpdateManyWithoutLeaguemessagesNestedInput
   }
 
   export type leaguemessagesUncheckedUpdateInput = {
@@ -27457,6 +28872,7 @@ export namespace Prisma {
     message_type?: EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumMessageStatusFieldUpdateOperationsInput | $Enums.MessageStatus
+    league_message_reactions?: league_message_reactionsUncheckedUpdateManyWithoutLeaguemessagesNestedInput
   }
 
   export type leaguemessagesCreateManyInput = {
@@ -27536,6 +28952,60 @@ export namespace Prisma {
     last_read_at?: DateTimeFieldUpdateOperationsInput | Date | string
     last_read_message_id?: StringFieldUpdateOperationsInput | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type league_message_reactionsCreateInput = {
+    reaction_id?: string
+    emoji: $Enums.MessageReactionEmoji
+    createdAt?: Date | string
+    leaguemessages: leaguemessagesCreateNestedOneWithoutLeague_message_reactionsInput
+    leaguemembers: leaguemembersCreateNestedOneWithoutLeague_message_reactionsInput
+  }
+
+  export type league_message_reactionsUncheckedCreateInput = {
+    reaction_id?: string
+    message_id: string
+    membership_id: number
+    emoji: $Enums.MessageReactionEmoji
+    createdAt?: Date | string
+  }
+
+  export type league_message_reactionsUpdateInput = {
+    reaction_id?: StringFieldUpdateOperationsInput | string
+    emoji?: EnumMessageReactionEmojiFieldUpdateOperationsInput | $Enums.MessageReactionEmoji
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    leaguemessages?: leaguemessagesUpdateOneRequiredWithoutLeague_message_reactionsNestedInput
+    leaguemembers?: leaguemembersUpdateOneRequiredWithoutLeague_message_reactionsNestedInput
+  }
+
+  export type league_message_reactionsUncheckedUpdateInput = {
+    reaction_id?: StringFieldUpdateOperationsInput | string
+    message_id?: StringFieldUpdateOperationsInput | string
+    membership_id?: IntFieldUpdateOperationsInput | number
+    emoji?: EnumMessageReactionEmojiFieldUpdateOperationsInput | $Enums.MessageReactionEmoji
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type league_message_reactionsCreateManyInput = {
+    reaction_id?: string
+    message_id: string
+    membership_id: number
+    emoji: $Enums.MessageReactionEmoji
+    createdAt?: Date | string
+  }
+
+  export type league_message_reactionsUpdateManyMutationInput = {
+    reaction_id?: StringFieldUpdateOperationsInput | string
+    emoji?: EnumMessageReactionEmojiFieldUpdateOperationsInput | $Enums.MessageReactionEmoji
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type league_message_reactionsUncheckedUpdateManyInput = {
+    reaction_id?: StringFieldUpdateOperationsInput | string
+    message_id?: StringFieldUpdateOperationsInput | string
+    membership_id?: IntFieldUpdateOperationsInput | number
+    emoji?: EnumMessageReactionEmojiFieldUpdateOperationsInput | $Enums.MessageReactionEmoji
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type leaguesCreateInput = {
@@ -29111,6 +30581,12 @@ export namespace Prisma {
     isNot?: league_message_read_stateWhereInput | null
   }
 
+  export type League_message_reactionsListRelationFilter = {
+    every?: league_message_reactionsWhereInput
+    some?: league_message_reactionsWhereInput
+    none?: league_message_reactionsWhereInput
+  }
+
   export type SuperbowlListRelationFilter = {
     every?: superbowlWhereInput
     some?: superbowlWhereInput
@@ -29126,6 +30602,10 @@ export namespace Prisma {
   }
 
   export type leaguemessagesOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type league_message_reactionsOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -29288,6 +30768,66 @@ export namespace Prisma {
 
   export type league_message_read_stateSumOrderByAggregateInput = {
     membership_id?: SortOrder
+  }
+
+  export type EnumMessageReactionEmojiFilter<$PrismaModel = never> = {
+    equals?: $Enums.MessageReactionEmoji | EnumMessageReactionEmojiFieldRefInput<$PrismaModel>
+    in?: $Enums.MessageReactionEmoji[] | ListEnumMessageReactionEmojiFieldRefInput<$PrismaModel>
+    notIn?: $Enums.MessageReactionEmoji[] | ListEnumMessageReactionEmojiFieldRefInput<$PrismaModel>
+    not?: NestedEnumMessageReactionEmojiFilter<$PrismaModel> | $Enums.MessageReactionEmoji
+  }
+
+  export type LeaguemessagesScalarRelationFilter = {
+    is?: leaguemessagesWhereInput
+    isNot?: leaguemessagesWhereInput
+  }
+
+  export type league_message_reactionsMessage_idMembership_idEmojiCompoundUniqueInput = {
+    message_id: string
+    membership_id: number
+    emoji: $Enums.MessageReactionEmoji
+  }
+
+  export type league_message_reactionsCountOrderByAggregateInput = {
+    reaction_id?: SortOrder
+    message_id?: SortOrder
+    membership_id?: SortOrder
+    emoji?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type league_message_reactionsAvgOrderByAggregateInput = {
+    membership_id?: SortOrder
+  }
+
+  export type league_message_reactionsMaxOrderByAggregateInput = {
+    reaction_id?: SortOrder
+    message_id?: SortOrder
+    membership_id?: SortOrder
+    emoji?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type league_message_reactionsMinOrderByAggregateInput = {
+    reaction_id?: SortOrder
+    message_id?: SortOrder
+    membership_id?: SortOrder
+    emoji?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type league_message_reactionsSumOrderByAggregateInput = {
+    membership_id?: SortOrder
+  }
+
+  export type EnumMessageReactionEmojiWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.MessageReactionEmoji | EnumMessageReactionEmojiFieldRefInput<$PrismaModel>
+    in?: $Enums.MessageReactionEmoji[] | ListEnumMessageReactionEmojiFieldRefInput<$PrismaModel>
+    notIn?: $Enums.MessageReactionEmoji[] | ListEnumMessageReactionEmojiFieldRefInput<$PrismaModel>
+    not?: NestedEnumMessageReactionEmojiWithAggregatesFilter<$PrismaModel> | $Enums.MessageReactionEmoji
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumMessageReactionEmojiFilter<$PrismaModel>
+    _max?: NestedEnumMessageReactionEmojiFilter<$PrismaModel>
   }
 
   export type EnumLatePolicyNullableFilter<$PrismaModel = never> = {
@@ -30350,6 +31890,13 @@ export namespace Prisma {
     connect?: league_message_read_stateWhereUniqueInput
   }
 
+  export type league_message_reactionsCreateNestedManyWithoutLeaguemembersInput = {
+    create?: XOR<league_message_reactionsCreateWithoutLeaguemembersInput, league_message_reactionsUncheckedCreateWithoutLeaguemembersInput> | league_message_reactionsCreateWithoutLeaguemembersInput[] | league_message_reactionsUncheckedCreateWithoutLeaguemembersInput[]
+    connectOrCreate?: league_message_reactionsCreateOrConnectWithoutLeaguemembersInput | league_message_reactionsCreateOrConnectWithoutLeaguemembersInput[]
+    createMany?: league_message_reactionsCreateManyLeaguemembersInputEnvelope
+    connect?: league_message_reactionsWhereUniqueInput | league_message_reactionsWhereUniqueInput[]
+  }
+
   export type picksCreateNestedManyWithoutLeaguemembersInput = {
     create?: XOR<picksCreateWithoutLeaguemembersInput, picksUncheckedCreateWithoutLeaguemembersInput> | picksCreateWithoutLeaguemembersInput[] | picksUncheckedCreateWithoutLeaguemembersInput[]
     connectOrCreate?: picksCreateOrConnectWithoutLeaguemembersInput | picksCreateOrConnectWithoutLeaguemembersInput[]
@@ -30389,6 +31936,13 @@ export namespace Prisma {
     create?: XOR<league_message_read_stateCreateWithoutLeaguemembersInput, league_message_read_stateUncheckedCreateWithoutLeaguemembersInput>
     connectOrCreate?: league_message_read_stateCreateOrConnectWithoutLeaguemembersInput
     connect?: league_message_read_stateWhereUniqueInput
+  }
+
+  export type league_message_reactionsUncheckedCreateNestedManyWithoutLeaguemembersInput = {
+    create?: XOR<league_message_reactionsCreateWithoutLeaguemembersInput, league_message_reactionsUncheckedCreateWithoutLeaguemembersInput> | league_message_reactionsCreateWithoutLeaguemembersInput[] | league_message_reactionsUncheckedCreateWithoutLeaguemembersInput[]
+    connectOrCreate?: league_message_reactionsCreateOrConnectWithoutLeaguemembersInput | league_message_reactionsCreateOrConnectWithoutLeaguemembersInput[]
+    createMany?: league_message_reactionsCreateManyLeaguemembersInputEnvelope
+    connect?: league_message_reactionsWhereUniqueInput | league_message_reactionsWhereUniqueInput[]
   }
 
   export type picksUncheckedCreateNestedManyWithoutLeaguemembersInput = {
@@ -30477,6 +32031,20 @@ export namespace Prisma {
     update?: XOR<XOR<league_message_read_stateUpdateToOneWithWhereWithoutLeaguemembersInput, league_message_read_stateUpdateWithoutLeaguemembersInput>, league_message_read_stateUncheckedUpdateWithoutLeaguemembersInput>
   }
 
+  export type league_message_reactionsUpdateManyWithoutLeaguemembersNestedInput = {
+    create?: XOR<league_message_reactionsCreateWithoutLeaguemembersInput, league_message_reactionsUncheckedCreateWithoutLeaguemembersInput> | league_message_reactionsCreateWithoutLeaguemembersInput[] | league_message_reactionsUncheckedCreateWithoutLeaguemembersInput[]
+    connectOrCreate?: league_message_reactionsCreateOrConnectWithoutLeaguemembersInput | league_message_reactionsCreateOrConnectWithoutLeaguemembersInput[]
+    upsert?: league_message_reactionsUpsertWithWhereUniqueWithoutLeaguemembersInput | league_message_reactionsUpsertWithWhereUniqueWithoutLeaguemembersInput[]
+    createMany?: league_message_reactionsCreateManyLeaguemembersInputEnvelope
+    set?: league_message_reactionsWhereUniqueInput | league_message_reactionsWhereUniqueInput[]
+    disconnect?: league_message_reactionsWhereUniqueInput | league_message_reactionsWhereUniqueInput[]
+    delete?: league_message_reactionsWhereUniqueInput | league_message_reactionsWhereUniqueInput[]
+    connect?: league_message_reactionsWhereUniqueInput | league_message_reactionsWhereUniqueInput[]
+    update?: league_message_reactionsUpdateWithWhereUniqueWithoutLeaguemembersInput | league_message_reactionsUpdateWithWhereUniqueWithoutLeaguemembersInput[]
+    updateMany?: league_message_reactionsUpdateManyWithWhereWithoutLeaguemembersInput | league_message_reactionsUpdateManyWithWhereWithoutLeaguemembersInput[]
+    deleteMany?: league_message_reactionsScalarWhereInput | league_message_reactionsScalarWhereInput[]
+  }
+
   export type picksUpdateManyWithoutLeaguemembersNestedInput = {
     create?: XOR<picksCreateWithoutLeaguemembersInput, picksUncheckedCreateWithoutLeaguemembersInput> | picksCreateWithoutLeaguemembersInput[] | picksUncheckedCreateWithoutLeaguemembersInput[]
     connectOrCreate?: picksCreateOrConnectWithoutLeaguemembersInput | picksCreateOrConnectWithoutLeaguemembersInput[]
@@ -30557,6 +32125,20 @@ export namespace Prisma {
     update?: XOR<XOR<league_message_read_stateUpdateToOneWithWhereWithoutLeaguemembersInput, league_message_read_stateUpdateWithoutLeaguemembersInput>, league_message_read_stateUncheckedUpdateWithoutLeaguemembersInput>
   }
 
+  export type league_message_reactionsUncheckedUpdateManyWithoutLeaguemembersNestedInput = {
+    create?: XOR<league_message_reactionsCreateWithoutLeaguemembersInput, league_message_reactionsUncheckedCreateWithoutLeaguemembersInput> | league_message_reactionsCreateWithoutLeaguemembersInput[] | league_message_reactionsUncheckedCreateWithoutLeaguemembersInput[]
+    connectOrCreate?: league_message_reactionsCreateOrConnectWithoutLeaguemembersInput | league_message_reactionsCreateOrConnectWithoutLeaguemembersInput[]
+    upsert?: league_message_reactionsUpsertWithWhereUniqueWithoutLeaguemembersInput | league_message_reactionsUpsertWithWhereUniqueWithoutLeaguemembersInput[]
+    createMany?: league_message_reactionsCreateManyLeaguemembersInputEnvelope
+    set?: league_message_reactionsWhereUniqueInput | league_message_reactionsWhereUniqueInput[]
+    disconnect?: league_message_reactionsWhereUniqueInput | league_message_reactionsWhereUniqueInput[]
+    delete?: league_message_reactionsWhereUniqueInput | league_message_reactionsWhereUniqueInput[]
+    connect?: league_message_reactionsWhereUniqueInput | league_message_reactionsWhereUniqueInput[]
+    update?: league_message_reactionsUpdateWithWhereUniqueWithoutLeaguemembersInput | league_message_reactionsUpdateWithWhereUniqueWithoutLeaguemembersInput[]
+    updateMany?: league_message_reactionsUpdateManyWithWhereWithoutLeaguemembersInput | league_message_reactionsUpdateManyWithWhereWithoutLeaguemembersInput[]
+    deleteMany?: league_message_reactionsScalarWhereInput | league_message_reactionsScalarWhereInput[]
+  }
+
   export type picksUncheckedUpdateManyWithoutLeaguemembersNestedInput = {
     create?: XOR<picksCreateWithoutLeaguemembersInput, picksUncheckedCreateWithoutLeaguemembersInput> | picksCreateWithoutLeaguemembersInput[] | picksUncheckedCreateWithoutLeaguemembersInput[]
     connectOrCreate?: picksCreateOrConnectWithoutLeaguemembersInput | picksCreateOrConnectWithoutLeaguemembersInput[]
@@ -30597,6 +32179,20 @@ export namespace Prisma {
     connect?: leaguemembersWhereUniqueInput
   }
 
+  export type league_message_reactionsCreateNestedManyWithoutLeaguemessagesInput = {
+    create?: XOR<league_message_reactionsCreateWithoutLeaguemessagesInput, league_message_reactionsUncheckedCreateWithoutLeaguemessagesInput> | league_message_reactionsCreateWithoutLeaguemessagesInput[] | league_message_reactionsUncheckedCreateWithoutLeaguemessagesInput[]
+    connectOrCreate?: league_message_reactionsCreateOrConnectWithoutLeaguemessagesInput | league_message_reactionsCreateOrConnectWithoutLeaguemessagesInput[]
+    createMany?: league_message_reactionsCreateManyLeaguemessagesInputEnvelope
+    connect?: league_message_reactionsWhereUniqueInput | league_message_reactionsWhereUniqueInput[]
+  }
+
+  export type league_message_reactionsUncheckedCreateNestedManyWithoutLeaguemessagesInput = {
+    create?: XOR<league_message_reactionsCreateWithoutLeaguemessagesInput, league_message_reactionsUncheckedCreateWithoutLeaguemessagesInput> | league_message_reactionsCreateWithoutLeaguemessagesInput[] | league_message_reactionsUncheckedCreateWithoutLeaguemessagesInput[]
+    connectOrCreate?: league_message_reactionsCreateOrConnectWithoutLeaguemessagesInput | league_message_reactionsCreateOrConnectWithoutLeaguemessagesInput[]
+    createMany?: league_message_reactionsCreateManyLeaguemessagesInputEnvelope
+    connect?: league_message_reactionsWhereUniqueInput | league_message_reactionsWhereUniqueInput[]
+  }
+
   export type EnumMessageTypeFieldUpdateOperationsInput = {
     set?: $Enums.MessageType
   }
@@ -30621,6 +32217,34 @@ export namespace Prisma {
     update?: XOR<XOR<leaguemembersUpdateToOneWithWhereWithoutLeaguemessagesInput, leaguemembersUpdateWithoutLeaguemessagesInput>, leaguemembersUncheckedUpdateWithoutLeaguemessagesInput>
   }
 
+  export type league_message_reactionsUpdateManyWithoutLeaguemessagesNestedInput = {
+    create?: XOR<league_message_reactionsCreateWithoutLeaguemessagesInput, league_message_reactionsUncheckedCreateWithoutLeaguemessagesInput> | league_message_reactionsCreateWithoutLeaguemessagesInput[] | league_message_reactionsUncheckedCreateWithoutLeaguemessagesInput[]
+    connectOrCreate?: league_message_reactionsCreateOrConnectWithoutLeaguemessagesInput | league_message_reactionsCreateOrConnectWithoutLeaguemessagesInput[]
+    upsert?: league_message_reactionsUpsertWithWhereUniqueWithoutLeaguemessagesInput | league_message_reactionsUpsertWithWhereUniqueWithoutLeaguemessagesInput[]
+    createMany?: league_message_reactionsCreateManyLeaguemessagesInputEnvelope
+    set?: league_message_reactionsWhereUniqueInput | league_message_reactionsWhereUniqueInput[]
+    disconnect?: league_message_reactionsWhereUniqueInput | league_message_reactionsWhereUniqueInput[]
+    delete?: league_message_reactionsWhereUniqueInput | league_message_reactionsWhereUniqueInput[]
+    connect?: league_message_reactionsWhereUniqueInput | league_message_reactionsWhereUniqueInput[]
+    update?: league_message_reactionsUpdateWithWhereUniqueWithoutLeaguemessagesInput | league_message_reactionsUpdateWithWhereUniqueWithoutLeaguemessagesInput[]
+    updateMany?: league_message_reactionsUpdateManyWithWhereWithoutLeaguemessagesInput | league_message_reactionsUpdateManyWithWhereWithoutLeaguemessagesInput[]
+    deleteMany?: league_message_reactionsScalarWhereInput | league_message_reactionsScalarWhereInput[]
+  }
+
+  export type league_message_reactionsUncheckedUpdateManyWithoutLeaguemessagesNestedInput = {
+    create?: XOR<league_message_reactionsCreateWithoutLeaguemessagesInput, league_message_reactionsUncheckedCreateWithoutLeaguemessagesInput> | league_message_reactionsCreateWithoutLeaguemessagesInput[] | league_message_reactionsUncheckedCreateWithoutLeaguemessagesInput[]
+    connectOrCreate?: league_message_reactionsCreateOrConnectWithoutLeaguemessagesInput | league_message_reactionsCreateOrConnectWithoutLeaguemessagesInput[]
+    upsert?: league_message_reactionsUpsertWithWhereUniqueWithoutLeaguemessagesInput | league_message_reactionsUpsertWithWhereUniqueWithoutLeaguemessagesInput[]
+    createMany?: league_message_reactionsCreateManyLeaguemessagesInputEnvelope
+    set?: league_message_reactionsWhereUniqueInput | league_message_reactionsWhereUniqueInput[]
+    disconnect?: league_message_reactionsWhereUniqueInput | league_message_reactionsWhereUniqueInput[]
+    delete?: league_message_reactionsWhereUniqueInput | league_message_reactionsWhereUniqueInput[]
+    connect?: league_message_reactionsWhereUniqueInput | league_message_reactionsWhereUniqueInput[]
+    update?: league_message_reactionsUpdateWithWhereUniqueWithoutLeaguemessagesInput | league_message_reactionsUpdateWithWhereUniqueWithoutLeaguemessagesInput[]
+    updateMany?: league_message_reactionsUpdateManyWithWhereWithoutLeaguemessagesInput | league_message_reactionsUpdateManyWithWhereWithoutLeaguemessagesInput[]
+    deleteMany?: league_message_reactionsScalarWhereInput | league_message_reactionsScalarWhereInput[]
+  }
+
   export type leaguemembersCreateNestedOneWithoutLeague_message_read_stateInput = {
     create?: XOR<leaguemembersCreateWithoutLeague_message_read_stateInput, leaguemembersUncheckedCreateWithoutLeague_message_read_stateInput>
     connectOrCreate?: leaguemembersCreateOrConnectWithoutLeague_message_read_stateInput
@@ -30633,6 +32257,38 @@ export namespace Prisma {
     upsert?: leaguemembersUpsertWithoutLeague_message_read_stateInput
     connect?: leaguemembersWhereUniqueInput
     update?: XOR<XOR<leaguemembersUpdateToOneWithWhereWithoutLeague_message_read_stateInput, leaguemembersUpdateWithoutLeague_message_read_stateInput>, leaguemembersUncheckedUpdateWithoutLeague_message_read_stateInput>
+  }
+
+  export type leaguemessagesCreateNestedOneWithoutLeague_message_reactionsInput = {
+    create?: XOR<leaguemessagesCreateWithoutLeague_message_reactionsInput, leaguemessagesUncheckedCreateWithoutLeague_message_reactionsInput>
+    connectOrCreate?: leaguemessagesCreateOrConnectWithoutLeague_message_reactionsInput
+    connect?: leaguemessagesWhereUniqueInput
+  }
+
+  export type leaguemembersCreateNestedOneWithoutLeague_message_reactionsInput = {
+    create?: XOR<leaguemembersCreateWithoutLeague_message_reactionsInput, leaguemembersUncheckedCreateWithoutLeague_message_reactionsInput>
+    connectOrCreate?: leaguemembersCreateOrConnectWithoutLeague_message_reactionsInput
+    connect?: leaguemembersWhereUniqueInput
+  }
+
+  export type EnumMessageReactionEmojiFieldUpdateOperationsInput = {
+    set?: $Enums.MessageReactionEmoji
+  }
+
+  export type leaguemessagesUpdateOneRequiredWithoutLeague_message_reactionsNestedInput = {
+    create?: XOR<leaguemessagesCreateWithoutLeague_message_reactionsInput, leaguemessagesUncheckedCreateWithoutLeague_message_reactionsInput>
+    connectOrCreate?: leaguemessagesCreateOrConnectWithoutLeague_message_reactionsInput
+    upsert?: leaguemessagesUpsertWithoutLeague_message_reactionsInput
+    connect?: leaguemessagesWhereUniqueInput
+    update?: XOR<XOR<leaguemessagesUpdateToOneWithWhereWithoutLeague_message_reactionsInput, leaguemessagesUpdateWithoutLeague_message_reactionsInput>, leaguemessagesUncheckedUpdateWithoutLeague_message_reactionsInput>
+  }
+
+  export type leaguemembersUpdateOneRequiredWithoutLeague_message_reactionsNestedInput = {
+    create?: XOR<leaguemembersCreateWithoutLeague_message_reactionsInput, leaguemembersUncheckedCreateWithoutLeague_message_reactionsInput>
+    connectOrCreate?: leaguemembersCreateOrConnectWithoutLeague_message_reactionsInput
+    upsert?: leaguemembersUpsertWithoutLeague_message_reactionsInput
+    connect?: leaguemembersWhereUniqueInput
+    update?: XOR<XOR<leaguemembersUpdateToOneWithWhereWithoutLeague_message_reactionsInput, leaguemembersUpdateWithoutLeague_message_reactionsInput>, leaguemembersUncheckedUpdateWithoutLeague_message_reactionsInput>
   }
 
   export type EmailLogsCreateNestedManyWithoutLeaguesInput = {
@@ -32120,6 +33776,23 @@ export namespace Prisma {
     _max?: NestedEnumMessageStatusFilter<$PrismaModel>
   }
 
+  export type NestedEnumMessageReactionEmojiFilter<$PrismaModel = never> = {
+    equals?: $Enums.MessageReactionEmoji | EnumMessageReactionEmojiFieldRefInput<$PrismaModel>
+    in?: $Enums.MessageReactionEmoji[] | ListEnumMessageReactionEmojiFieldRefInput<$PrismaModel>
+    notIn?: $Enums.MessageReactionEmoji[] | ListEnumMessageReactionEmojiFieldRefInput<$PrismaModel>
+    not?: NestedEnumMessageReactionEmojiFilter<$PrismaModel> | $Enums.MessageReactionEmoji
+  }
+
+  export type NestedEnumMessageReactionEmojiWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.MessageReactionEmoji | EnumMessageReactionEmojiFieldRefInput<$PrismaModel>
+    in?: $Enums.MessageReactionEmoji[] | ListEnumMessageReactionEmojiFieldRefInput<$PrismaModel>
+    notIn?: $Enums.MessageReactionEmoji[] | ListEnumMessageReactionEmojiFieldRefInput<$PrismaModel>
+    not?: NestedEnumMessageReactionEmojiWithAggregatesFilter<$PrismaModel> | $Enums.MessageReactionEmoji
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumMessageReactionEmojiFilter<$PrismaModel>
+    _max?: NestedEnumMessageReactionEmojiFilter<$PrismaModel>
+  }
+
   export type NestedEnumLatePolicyNullableFilter<$PrismaModel = never> = {
     equals?: $Enums.LatePolicy | EnumLatePolicyFieldRefInput<$PrismaModel> | null
     in?: $Enums.LatePolicy[] | ListEnumLatePolicyFieldRefInput<$PrismaModel> | null
@@ -32341,6 +34014,7 @@ export namespace Prisma {
     leagues: leaguesCreateNestedOneWithoutLeaguemembersInput
     leaguemessages?: leaguemessagesCreateNestedManyWithoutLeaguemembersInput
     league_message_read_state?: league_message_read_stateCreateNestedOneWithoutLeaguemembersInput
+    league_message_reactions?: league_message_reactionsCreateNestedManyWithoutLeaguemembersInput
     picks?: picksCreateNestedManyWithoutLeaguemembersInput
     superbowl?: superbowlCreateNestedManyWithoutLeaguemembersInput
   }
@@ -32355,6 +34029,7 @@ export namespace Prisma {
     WeekWinners?: WeekWinnersUncheckedCreateNestedManyWithoutLeaguemembersInput
     leaguemessages?: leaguemessagesUncheckedCreateNestedManyWithoutLeaguemembersInput
     league_message_read_state?: league_message_read_stateUncheckedCreateNestedOneWithoutLeaguemembersInput
+    league_message_reactions?: league_message_reactionsUncheckedCreateNestedManyWithoutLeaguemembersInput
     picks?: picksUncheckedCreateNestedManyWithoutLeaguemembersInput
     superbowl?: superbowlUncheckedCreateNestedManyWithoutLeaguemembersInput
   }
@@ -32436,6 +34111,7 @@ export namespace Prisma {
     leagues?: leaguesUpdateOneRequiredWithoutLeaguemembersNestedInput
     leaguemessages?: leaguemessagesUpdateManyWithoutLeaguemembersNestedInput
     league_message_read_state?: league_message_read_stateUpdateOneWithoutLeaguemembersNestedInput
+    league_message_reactions?: league_message_reactionsUpdateManyWithoutLeaguemembersNestedInput
     picks?: picksUpdateManyWithoutLeaguemembersNestedInput
     superbowl?: superbowlUpdateManyWithoutLeaguemembersNestedInput
   }
@@ -32450,6 +34126,7 @@ export namespace Prisma {
     WeekWinners?: WeekWinnersUncheckedUpdateManyWithoutLeaguemembersNestedInput
     leaguemessages?: leaguemessagesUncheckedUpdateManyWithoutLeaguemembersNestedInput
     league_message_read_state?: league_message_read_stateUncheckedUpdateOneWithoutLeaguemembersNestedInput
+    league_message_reactions?: league_message_reactionsUncheckedUpdateManyWithoutLeaguemembersNestedInput
     picks?: picksUncheckedUpdateManyWithoutLeaguemembersNestedInput
     superbowl?: superbowlUncheckedUpdateManyWithoutLeaguemembersNestedInput
   }
@@ -32509,6 +34186,7 @@ export namespace Prisma {
     leagues: leaguesCreateNestedOneWithoutLeaguemembersInput
     leaguemessages?: leaguemessagesCreateNestedManyWithoutLeaguemembersInput
     league_message_read_state?: league_message_read_stateCreateNestedOneWithoutLeaguemembersInput
+    league_message_reactions?: league_message_reactionsCreateNestedManyWithoutLeaguemembersInput
     picks?: picksCreateNestedManyWithoutLeaguemembersInput
     superbowl?: superbowlCreateNestedManyWithoutLeaguemembersInput
   }
@@ -32523,6 +34201,7 @@ export namespace Prisma {
     EmailLogs?: EmailLogsUncheckedCreateNestedManyWithoutLeaguemembersInput
     leaguemessages?: leaguemessagesUncheckedCreateNestedManyWithoutLeaguemembersInput
     league_message_read_state?: league_message_read_stateUncheckedCreateNestedOneWithoutLeaguemembersInput
+    league_message_reactions?: league_message_reactionsUncheckedCreateNestedManyWithoutLeaguemembersInput
     picks?: picksUncheckedCreateNestedManyWithoutLeaguemembersInput
     superbowl?: superbowlUncheckedCreateNestedManyWithoutLeaguemembersInput
   }
@@ -32604,6 +34283,7 @@ export namespace Prisma {
     leagues?: leaguesUpdateOneRequiredWithoutLeaguemembersNestedInput
     leaguemessages?: leaguemessagesUpdateManyWithoutLeaguemembersNestedInput
     league_message_read_state?: league_message_read_stateUpdateOneWithoutLeaguemembersNestedInput
+    league_message_reactions?: league_message_reactionsUpdateManyWithoutLeaguemembersNestedInput
     picks?: picksUpdateManyWithoutLeaguemembersNestedInput
     superbowl?: superbowlUpdateManyWithoutLeaguemembersNestedInput
   }
@@ -32618,6 +34298,7 @@ export namespace Prisma {
     EmailLogs?: EmailLogsUncheckedUpdateManyWithoutLeaguemembersNestedInput
     leaguemessages?: leaguemessagesUncheckedUpdateManyWithoutLeaguemembersNestedInput
     league_message_read_state?: league_message_read_stateUncheckedUpdateOneWithoutLeaguemembersNestedInput
+    league_message_reactions?: league_message_reactionsUncheckedUpdateManyWithoutLeaguemembersNestedInput
     picks?: picksUncheckedUpdateManyWithoutLeaguemembersNestedInput
     superbowl?: superbowlUncheckedUpdateManyWithoutLeaguemembersNestedInput
   }
@@ -33037,6 +34718,7 @@ export namespace Prisma {
     createdAt?: Date | string
     status?: $Enums.MessageStatus
     leagues: leaguesCreateNestedOneWithoutLeaguemessagesInput
+    league_message_reactions?: league_message_reactionsCreateNestedManyWithoutLeaguemessagesInput
   }
 
   export type leaguemessagesUncheckedCreateWithoutLeaguemembersInput = {
@@ -33047,6 +34729,7 @@ export namespace Prisma {
     message_type: $Enums.MessageType
     createdAt?: Date | string
     status?: $Enums.MessageStatus
+    league_message_reactions?: league_message_reactionsUncheckedCreateNestedManyWithoutLeaguemessagesInput
   }
 
   export type leaguemessagesCreateOrConnectWithoutLeaguemembersInput = {
@@ -33074,6 +34757,30 @@ export namespace Prisma {
   export type league_message_read_stateCreateOrConnectWithoutLeaguemembersInput = {
     where: league_message_read_stateWhereUniqueInput
     create: XOR<league_message_read_stateCreateWithoutLeaguemembersInput, league_message_read_stateUncheckedCreateWithoutLeaguemembersInput>
+  }
+
+  export type league_message_reactionsCreateWithoutLeaguemembersInput = {
+    reaction_id?: string
+    emoji: $Enums.MessageReactionEmoji
+    createdAt?: Date | string
+    leaguemessages: leaguemessagesCreateNestedOneWithoutLeague_message_reactionsInput
+  }
+
+  export type league_message_reactionsUncheckedCreateWithoutLeaguemembersInput = {
+    reaction_id?: string
+    message_id: string
+    emoji: $Enums.MessageReactionEmoji
+    createdAt?: Date | string
+  }
+
+  export type league_message_reactionsCreateOrConnectWithoutLeaguemembersInput = {
+    where: league_message_reactionsWhereUniqueInput
+    create: XOR<league_message_reactionsCreateWithoutLeaguemembersInput, league_message_reactionsUncheckedCreateWithoutLeaguemembersInput>
+  }
+
+  export type league_message_reactionsCreateManyLeaguemembersInputEnvelope = {
+    data: league_message_reactionsCreateManyLeaguemembersInput | league_message_reactionsCreateManyLeaguemembersInput[]
+    skipDuplicates?: boolean
   }
 
   export type picksCreateWithoutLeaguemembersInput = {
@@ -33361,6 +35068,33 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type league_message_reactionsUpsertWithWhereUniqueWithoutLeaguemembersInput = {
+    where: league_message_reactionsWhereUniqueInput
+    update: XOR<league_message_reactionsUpdateWithoutLeaguemembersInput, league_message_reactionsUncheckedUpdateWithoutLeaguemembersInput>
+    create: XOR<league_message_reactionsCreateWithoutLeaguemembersInput, league_message_reactionsUncheckedCreateWithoutLeaguemembersInput>
+  }
+
+  export type league_message_reactionsUpdateWithWhereUniqueWithoutLeaguemembersInput = {
+    where: league_message_reactionsWhereUniqueInput
+    data: XOR<league_message_reactionsUpdateWithoutLeaguemembersInput, league_message_reactionsUncheckedUpdateWithoutLeaguemembersInput>
+  }
+
+  export type league_message_reactionsUpdateManyWithWhereWithoutLeaguemembersInput = {
+    where: league_message_reactionsScalarWhereInput
+    data: XOR<league_message_reactionsUpdateManyMutationInput, league_message_reactionsUncheckedUpdateManyWithoutLeaguemembersInput>
+  }
+
+  export type league_message_reactionsScalarWhereInput = {
+    AND?: league_message_reactionsScalarWhereInput | league_message_reactionsScalarWhereInput[]
+    OR?: league_message_reactionsScalarWhereInput[]
+    NOT?: league_message_reactionsScalarWhereInput | league_message_reactionsScalarWhereInput[]
+    reaction_id?: StringFilter<"league_message_reactions"> | string
+    message_id?: StringFilter<"league_message_reactions"> | string
+    membership_id?: IntFilter<"league_message_reactions"> | number
+    emoji?: EnumMessageReactionEmojiFilter<"league_message_reactions"> | $Enums.MessageReactionEmoji
+    createdAt?: DateTimeFilter<"league_message_reactions"> | Date | string
+  }
+
   export type picksUpsertWithWhereUniqueWithoutLeaguemembersInput = {
     where: picksWhereUniqueInput
     update: XOR<picksUpdateWithoutLeaguemembersInput, picksUncheckedUpdateWithoutLeaguemembersInput>
@@ -33462,6 +35196,7 @@ export namespace Prisma {
     people: peopleCreateNestedOneWithoutLeaguemembersInput
     leagues: leaguesCreateNestedOneWithoutLeaguemembersInput
     league_message_read_state?: league_message_read_stateCreateNestedOneWithoutLeaguemembersInput
+    league_message_reactions?: league_message_reactionsCreateNestedManyWithoutLeaguemembersInput
     picks?: picksCreateNestedManyWithoutLeaguemembersInput
     superbowl?: superbowlCreateNestedManyWithoutLeaguemembersInput
   }
@@ -33476,6 +35211,7 @@ export namespace Prisma {
     EmailLogs?: EmailLogsUncheckedCreateNestedManyWithoutLeaguemembersInput
     WeekWinners?: WeekWinnersUncheckedCreateNestedManyWithoutLeaguemembersInput
     league_message_read_state?: league_message_read_stateUncheckedCreateNestedOneWithoutLeaguemembersInput
+    league_message_reactions?: league_message_reactionsUncheckedCreateNestedManyWithoutLeaguemembersInput
     picks?: picksUncheckedCreateNestedManyWithoutLeaguemembersInput
     superbowl?: superbowlUncheckedCreateNestedManyWithoutLeaguemembersInput
   }
@@ -33483,6 +35219,30 @@ export namespace Prisma {
   export type leaguemembersCreateOrConnectWithoutLeaguemessagesInput = {
     where: leaguemembersWhereUniqueInput
     create: XOR<leaguemembersCreateWithoutLeaguemessagesInput, leaguemembersUncheckedCreateWithoutLeaguemessagesInput>
+  }
+
+  export type league_message_reactionsCreateWithoutLeaguemessagesInput = {
+    reaction_id?: string
+    emoji: $Enums.MessageReactionEmoji
+    createdAt?: Date | string
+    leaguemembers: leaguemembersCreateNestedOneWithoutLeague_message_reactionsInput
+  }
+
+  export type league_message_reactionsUncheckedCreateWithoutLeaguemessagesInput = {
+    reaction_id?: string
+    membership_id: number
+    emoji: $Enums.MessageReactionEmoji
+    createdAt?: Date | string
+  }
+
+  export type league_message_reactionsCreateOrConnectWithoutLeaguemessagesInput = {
+    where: league_message_reactionsWhereUniqueInput
+    create: XOR<league_message_reactionsCreateWithoutLeaguemessagesInput, league_message_reactionsUncheckedCreateWithoutLeaguemessagesInput>
+  }
+
+  export type league_message_reactionsCreateManyLeaguemessagesInputEnvelope = {
+    data: league_message_reactionsCreateManyLeaguemessagesInput | league_message_reactionsCreateManyLeaguemessagesInput[]
+    skipDuplicates?: boolean
   }
 
   export type leaguesUpsertWithoutLeaguemessagesInput = {
@@ -33557,6 +35317,7 @@ export namespace Prisma {
     people?: peopleUpdateOneRequiredWithoutLeaguemembersNestedInput
     leagues?: leaguesUpdateOneRequiredWithoutLeaguemembersNestedInput
     league_message_read_state?: league_message_read_stateUpdateOneWithoutLeaguemembersNestedInput
+    league_message_reactions?: league_message_reactionsUpdateManyWithoutLeaguemembersNestedInput
     picks?: picksUpdateManyWithoutLeaguemembersNestedInput
     superbowl?: superbowlUpdateManyWithoutLeaguemembersNestedInput
   }
@@ -33571,8 +35332,25 @@ export namespace Prisma {
     EmailLogs?: EmailLogsUncheckedUpdateManyWithoutLeaguemembersNestedInput
     WeekWinners?: WeekWinnersUncheckedUpdateManyWithoutLeaguemembersNestedInput
     league_message_read_state?: league_message_read_stateUncheckedUpdateOneWithoutLeaguemembersNestedInput
+    league_message_reactions?: league_message_reactionsUncheckedUpdateManyWithoutLeaguemembersNestedInput
     picks?: picksUncheckedUpdateManyWithoutLeaguemembersNestedInput
     superbowl?: superbowlUncheckedUpdateManyWithoutLeaguemembersNestedInput
+  }
+
+  export type league_message_reactionsUpsertWithWhereUniqueWithoutLeaguemessagesInput = {
+    where: league_message_reactionsWhereUniqueInput
+    update: XOR<league_message_reactionsUpdateWithoutLeaguemessagesInput, league_message_reactionsUncheckedUpdateWithoutLeaguemessagesInput>
+    create: XOR<league_message_reactionsCreateWithoutLeaguemessagesInput, league_message_reactionsUncheckedCreateWithoutLeaguemessagesInput>
+  }
+
+  export type league_message_reactionsUpdateWithWhereUniqueWithoutLeaguemessagesInput = {
+    where: league_message_reactionsWhereUniqueInput
+    data: XOR<league_message_reactionsUpdateWithoutLeaguemessagesInput, league_message_reactionsUncheckedUpdateWithoutLeaguemessagesInput>
+  }
+
+  export type league_message_reactionsUpdateManyWithWhereWithoutLeaguemessagesInput = {
+    where: league_message_reactionsScalarWhereInput
+    data: XOR<league_message_reactionsUpdateManyMutationInput, league_message_reactionsUncheckedUpdateManyWithoutLeaguemessagesInput>
   }
 
   export type leaguemembersCreateWithoutLeague_message_read_stateInput = {
@@ -33584,6 +35362,7 @@ export namespace Prisma {
     people: peopleCreateNestedOneWithoutLeaguemembersInput
     leagues: leaguesCreateNestedOneWithoutLeaguemembersInput
     leaguemessages?: leaguemessagesCreateNestedManyWithoutLeaguemembersInput
+    league_message_reactions?: league_message_reactionsCreateNestedManyWithoutLeaguemembersInput
     picks?: picksCreateNestedManyWithoutLeaguemembersInput
     superbowl?: superbowlCreateNestedManyWithoutLeaguemembersInput
   }
@@ -33598,6 +35377,7 @@ export namespace Prisma {
     EmailLogs?: EmailLogsUncheckedCreateNestedManyWithoutLeaguemembersInput
     WeekWinners?: WeekWinnersUncheckedCreateNestedManyWithoutLeaguemembersInput
     leaguemessages?: leaguemessagesUncheckedCreateNestedManyWithoutLeaguemembersInput
+    league_message_reactions?: league_message_reactionsUncheckedCreateNestedManyWithoutLeaguemembersInput
     picks?: picksUncheckedCreateNestedManyWithoutLeaguemembersInput
     superbowl?: superbowlUncheckedCreateNestedManyWithoutLeaguemembersInput
   }
@@ -33627,6 +35407,7 @@ export namespace Prisma {
     people?: peopleUpdateOneRequiredWithoutLeaguemembersNestedInput
     leagues?: leaguesUpdateOneRequiredWithoutLeaguemembersNestedInput
     leaguemessages?: leaguemessagesUpdateManyWithoutLeaguemembersNestedInput
+    league_message_reactions?: league_message_reactionsUpdateManyWithoutLeaguemembersNestedInput
     picks?: picksUpdateManyWithoutLeaguemembersNestedInput
     superbowl?: superbowlUpdateManyWithoutLeaguemembersNestedInput
   }
@@ -33641,6 +35422,141 @@ export namespace Prisma {
     EmailLogs?: EmailLogsUncheckedUpdateManyWithoutLeaguemembersNestedInput
     WeekWinners?: WeekWinnersUncheckedUpdateManyWithoutLeaguemembersNestedInput
     leaguemessages?: leaguemessagesUncheckedUpdateManyWithoutLeaguemembersNestedInput
+    league_message_reactions?: league_message_reactionsUncheckedUpdateManyWithoutLeaguemembersNestedInput
+    picks?: picksUncheckedUpdateManyWithoutLeaguemembersNestedInput
+    superbowl?: superbowlUncheckedUpdateManyWithoutLeaguemembersNestedInput
+  }
+
+  export type leaguemessagesCreateWithoutLeague_message_reactionsInput = {
+    message_id?: string
+    content: string
+    week?: number | null
+    message_type: $Enums.MessageType
+    createdAt?: Date | string
+    status?: $Enums.MessageStatus
+    leagues: leaguesCreateNestedOneWithoutLeaguemessagesInput
+    leaguemembers: leaguemembersCreateNestedOneWithoutLeaguemessagesInput
+  }
+
+  export type leaguemessagesUncheckedCreateWithoutLeague_message_reactionsInput = {
+    message_id?: string
+    content: string
+    member_id: number
+    league_id: number
+    week?: number | null
+    message_type: $Enums.MessageType
+    createdAt?: Date | string
+    status?: $Enums.MessageStatus
+  }
+
+  export type leaguemessagesCreateOrConnectWithoutLeague_message_reactionsInput = {
+    where: leaguemessagesWhereUniqueInput
+    create: XOR<leaguemessagesCreateWithoutLeague_message_reactionsInput, leaguemessagesUncheckedCreateWithoutLeague_message_reactionsInput>
+  }
+
+  export type leaguemembersCreateWithoutLeague_message_reactionsInput = {
+    ts?: Date | string
+    role?: $Enums.MemberRole | null
+    paid?: boolean | null
+    EmailLogs?: EmailLogsCreateNestedManyWithoutLeaguemembersInput
+    WeekWinners?: WeekWinnersCreateNestedManyWithoutLeaguemembersInput
+    people: peopleCreateNestedOneWithoutLeaguemembersInput
+    leagues: leaguesCreateNestedOneWithoutLeaguemembersInput
+    leaguemessages?: leaguemessagesCreateNestedManyWithoutLeaguemembersInput
+    league_message_read_state?: league_message_read_stateCreateNestedOneWithoutLeaguemembersInput
+    picks?: picksCreateNestedManyWithoutLeaguemembersInput
+    superbowl?: superbowlCreateNestedManyWithoutLeaguemembersInput
+  }
+
+  export type leaguemembersUncheckedCreateWithoutLeague_message_reactionsInput = {
+    membership_id?: number
+    league_id: number
+    user_id: number
+    ts?: Date | string
+    role?: $Enums.MemberRole | null
+    paid?: boolean | null
+    EmailLogs?: EmailLogsUncheckedCreateNestedManyWithoutLeaguemembersInput
+    WeekWinners?: WeekWinnersUncheckedCreateNestedManyWithoutLeaguemembersInput
+    leaguemessages?: leaguemessagesUncheckedCreateNestedManyWithoutLeaguemembersInput
+    league_message_read_state?: league_message_read_stateUncheckedCreateNestedOneWithoutLeaguemembersInput
+    picks?: picksUncheckedCreateNestedManyWithoutLeaguemembersInput
+    superbowl?: superbowlUncheckedCreateNestedManyWithoutLeaguemembersInput
+  }
+
+  export type leaguemembersCreateOrConnectWithoutLeague_message_reactionsInput = {
+    where: leaguemembersWhereUniqueInput
+    create: XOR<leaguemembersCreateWithoutLeague_message_reactionsInput, leaguemembersUncheckedCreateWithoutLeague_message_reactionsInput>
+  }
+
+  export type leaguemessagesUpsertWithoutLeague_message_reactionsInput = {
+    update: XOR<leaguemessagesUpdateWithoutLeague_message_reactionsInput, leaguemessagesUncheckedUpdateWithoutLeague_message_reactionsInput>
+    create: XOR<leaguemessagesCreateWithoutLeague_message_reactionsInput, leaguemessagesUncheckedCreateWithoutLeague_message_reactionsInput>
+    where?: leaguemessagesWhereInput
+  }
+
+  export type leaguemessagesUpdateToOneWithWhereWithoutLeague_message_reactionsInput = {
+    where?: leaguemessagesWhereInput
+    data: XOR<leaguemessagesUpdateWithoutLeague_message_reactionsInput, leaguemessagesUncheckedUpdateWithoutLeague_message_reactionsInput>
+  }
+
+  export type leaguemessagesUpdateWithoutLeague_message_reactionsInput = {
+    message_id?: StringFieldUpdateOperationsInput | string
+    content?: StringFieldUpdateOperationsInput | string
+    week?: NullableIntFieldUpdateOperationsInput | number | null
+    message_type?: EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: EnumMessageStatusFieldUpdateOperationsInput | $Enums.MessageStatus
+    leagues?: leaguesUpdateOneRequiredWithoutLeaguemessagesNestedInput
+    leaguemembers?: leaguemembersUpdateOneRequiredWithoutLeaguemessagesNestedInput
+  }
+
+  export type leaguemessagesUncheckedUpdateWithoutLeague_message_reactionsInput = {
+    message_id?: StringFieldUpdateOperationsInput | string
+    content?: StringFieldUpdateOperationsInput | string
+    member_id?: IntFieldUpdateOperationsInput | number
+    league_id?: IntFieldUpdateOperationsInput | number
+    week?: NullableIntFieldUpdateOperationsInput | number | null
+    message_type?: EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: EnumMessageStatusFieldUpdateOperationsInput | $Enums.MessageStatus
+  }
+
+  export type leaguemembersUpsertWithoutLeague_message_reactionsInput = {
+    update: XOR<leaguemembersUpdateWithoutLeague_message_reactionsInput, leaguemembersUncheckedUpdateWithoutLeague_message_reactionsInput>
+    create: XOR<leaguemembersCreateWithoutLeague_message_reactionsInput, leaguemembersUncheckedCreateWithoutLeague_message_reactionsInput>
+    where?: leaguemembersWhereInput
+  }
+
+  export type leaguemembersUpdateToOneWithWhereWithoutLeague_message_reactionsInput = {
+    where?: leaguemembersWhereInput
+    data: XOR<leaguemembersUpdateWithoutLeague_message_reactionsInput, leaguemembersUncheckedUpdateWithoutLeague_message_reactionsInput>
+  }
+
+  export type leaguemembersUpdateWithoutLeague_message_reactionsInput = {
+    ts?: DateTimeFieldUpdateOperationsInput | Date | string
+    role?: NullableEnumMemberRoleFieldUpdateOperationsInput | $Enums.MemberRole | null
+    paid?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    EmailLogs?: EmailLogsUpdateManyWithoutLeaguemembersNestedInput
+    WeekWinners?: WeekWinnersUpdateManyWithoutLeaguemembersNestedInput
+    people?: peopleUpdateOneRequiredWithoutLeaguemembersNestedInput
+    leagues?: leaguesUpdateOneRequiredWithoutLeaguemembersNestedInput
+    leaguemessages?: leaguemessagesUpdateManyWithoutLeaguemembersNestedInput
+    league_message_read_state?: league_message_read_stateUpdateOneWithoutLeaguemembersNestedInput
+    picks?: picksUpdateManyWithoutLeaguemembersNestedInput
+    superbowl?: superbowlUpdateManyWithoutLeaguemembersNestedInput
+  }
+
+  export type leaguemembersUncheckedUpdateWithoutLeague_message_reactionsInput = {
+    membership_id?: IntFieldUpdateOperationsInput | number
+    league_id?: IntFieldUpdateOperationsInput | number
+    user_id?: IntFieldUpdateOperationsInput | number
+    ts?: DateTimeFieldUpdateOperationsInput | Date | string
+    role?: NullableEnumMemberRoleFieldUpdateOperationsInput | $Enums.MemberRole | null
+    paid?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    EmailLogs?: EmailLogsUncheckedUpdateManyWithoutLeaguemembersNestedInput
+    WeekWinners?: WeekWinnersUncheckedUpdateManyWithoutLeaguemembersNestedInput
+    leaguemessages?: leaguemessagesUncheckedUpdateManyWithoutLeaguemembersNestedInput
+    league_message_read_state?: league_message_read_stateUncheckedUpdateOneWithoutLeaguemembersNestedInput
     picks?: picksUncheckedUpdateManyWithoutLeaguemembersNestedInput
     superbowl?: superbowlUncheckedUpdateManyWithoutLeaguemembersNestedInput
   }
@@ -33717,6 +35633,7 @@ export namespace Prisma {
     people: peopleCreateNestedOneWithoutLeaguemembersInput
     leaguemessages?: leaguemessagesCreateNestedManyWithoutLeaguemembersInput
     league_message_read_state?: league_message_read_stateCreateNestedOneWithoutLeaguemembersInput
+    league_message_reactions?: league_message_reactionsCreateNestedManyWithoutLeaguemembersInput
     picks?: picksCreateNestedManyWithoutLeaguemembersInput
     superbowl?: superbowlCreateNestedManyWithoutLeaguemembersInput
   }
@@ -33731,6 +35648,7 @@ export namespace Prisma {
     WeekWinners?: WeekWinnersUncheckedCreateNestedManyWithoutLeaguemembersInput
     leaguemessages?: leaguemessagesUncheckedCreateNestedManyWithoutLeaguemembersInput
     league_message_read_state?: league_message_read_stateUncheckedCreateNestedOneWithoutLeaguemembersInput
+    league_message_reactions?: league_message_reactionsUncheckedCreateNestedManyWithoutLeaguemembersInput
     picks?: picksUncheckedCreateNestedManyWithoutLeaguemembersInput
     superbowl?: superbowlUncheckedCreateNestedManyWithoutLeaguemembersInput
   }
@@ -33753,6 +35671,7 @@ export namespace Prisma {
     createdAt?: Date | string
     status?: $Enums.MessageStatus
     leaguemembers: leaguemembersCreateNestedOneWithoutLeaguemessagesInput
+    league_message_reactions?: league_message_reactionsCreateNestedManyWithoutLeaguemessagesInput
   }
 
   export type leaguemessagesUncheckedCreateWithoutLeaguesInput = {
@@ -33763,6 +35682,7 @@ export namespace Prisma {
     message_type: $Enums.MessageType
     createdAt?: Date | string
     status?: $Enums.MessageStatus
+    league_message_reactions?: league_message_reactionsUncheckedCreateNestedManyWithoutLeaguemessagesInput
   }
 
   export type leaguemessagesCreateOrConnectWithoutLeaguesInput = {
@@ -34384,6 +36304,7 @@ export namespace Prisma {
     leagues: leaguesCreateNestedOneWithoutLeaguemembersInput
     leaguemessages?: leaguemessagesCreateNestedManyWithoutLeaguemembersInput
     league_message_read_state?: league_message_read_stateCreateNestedOneWithoutLeaguemembersInput
+    league_message_reactions?: league_message_reactionsCreateNestedManyWithoutLeaguemembersInput
     picks?: picksCreateNestedManyWithoutLeaguemembersInput
     superbowl?: superbowlCreateNestedManyWithoutLeaguemembersInput
   }
@@ -34398,6 +36319,7 @@ export namespace Prisma {
     WeekWinners?: WeekWinnersUncheckedCreateNestedManyWithoutLeaguemembersInput
     leaguemessages?: leaguemessagesUncheckedCreateNestedManyWithoutLeaguemembersInput
     league_message_read_state?: league_message_read_stateUncheckedCreateNestedOneWithoutLeaguemembersInput
+    league_message_reactions?: league_message_reactionsUncheckedCreateNestedManyWithoutLeaguemembersInput
     picks?: picksUncheckedCreateNestedManyWithoutLeaguemembersInput
     superbowl?: superbowlUncheckedCreateNestedManyWithoutLeaguemembersInput
   }
@@ -34852,6 +36774,7 @@ export namespace Prisma {
     leagues: leaguesCreateNestedOneWithoutLeaguemembersInput
     leaguemessages?: leaguemessagesCreateNestedManyWithoutLeaguemembersInput
     league_message_read_state?: league_message_read_stateCreateNestedOneWithoutLeaguemembersInput
+    league_message_reactions?: league_message_reactionsCreateNestedManyWithoutLeaguemembersInput
     superbowl?: superbowlCreateNestedManyWithoutLeaguemembersInput
   }
 
@@ -34866,6 +36789,7 @@ export namespace Prisma {
     WeekWinners?: WeekWinnersUncheckedCreateNestedManyWithoutLeaguemembersInput
     leaguemessages?: leaguemessagesUncheckedCreateNestedManyWithoutLeaguemembersInput
     league_message_read_state?: league_message_read_stateUncheckedCreateNestedOneWithoutLeaguemembersInput
+    league_message_reactions?: league_message_reactionsUncheckedCreateNestedManyWithoutLeaguemembersInput
     superbowl?: superbowlUncheckedCreateNestedManyWithoutLeaguemembersInput
   }
 
@@ -35045,6 +36969,7 @@ export namespace Prisma {
     leagues?: leaguesUpdateOneRequiredWithoutLeaguemembersNestedInput
     leaguemessages?: leaguemessagesUpdateManyWithoutLeaguemembersNestedInput
     league_message_read_state?: league_message_read_stateUpdateOneWithoutLeaguemembersNestedInput
+    league_message_reactions?: league_message_reactionsUpdateManyWithoutLeaguemembersNestedInput
     superbowl?: superbowlUpdateManyWithoutLeaguemembersNestedInput
   }
 
@@ -35059,6 +36984,7 @@ export namespace Prisma {
     WeekWinners?: WeekWinnersUncheckedUpdateManyWithoutLeaguemembersNestedInput
     leaguemessages?: leaguemessagesUncheckedUpdateManyWithoutLeaguemembersNestedInput
     league_message_read_state?: league_message_read_stateUncheckedUpdateOneWithoutLeaguemembersNestedInput
+    league_message_reactions?: league_message_reactionsUncheckedUpdateManyWithoutLeaguemembersNestedInput
     superbowl?: superbowlUncheckedUpdateManyWithoutLeaguemembersNestedInput
   }
 
@@ -35162,6 +37088,7 @@ export namespace Prisma {
     leagues: leaguesCreateNestedOneWithoutLeaguemembersInput
     leaguemessages?: leaguemessagesCreateNestedManyWithoutLeaguemembersInput
     league_message_read_state?: league_message_read_stateCreateNestedOneWithoutLeaguemembersInput
+    league_message_reactions?: league_message_reactionsCreateNestedManyWithoutLeaguemembersInput
     picks?: picksCreateNestedManyWithoutLeaguemembersInput
   }
 
@@ -35176,6 +37103,7 @@ export namespace Prisma {
     WeekWinners?: WeekWinnersUncheckedCreateNestedManyWithoutLeaguemembersInput
     leaguemessages?: leaguemessagesUncheckedCreateNestedManyWithoutLeaguemembersInput
     league_message_read_state?: league_message_read_stateUncheckedCreateNestedOneWithoutLeaguemembersInput
+    league_message_reactions?: league_message_reactionsUncheckedCreateNestedManyWithoutLeaguemembersInput
     picks?: picksUncheckedCreateNestedManyWithoutLeaguemembersInput
   }
 
@@ -35295,6 +37223,7 @@ export namespace Prisma {
     leagues?: leaguesUpdateOneRequiredWithoutLeaguemembersNestedInput
     leaguemessages?: leaguemessagesUpdateManyWithoutLeaguemembersNestedInput
     league_message_read_state?: league_message_read_stateUpdateOneWithoutLeaguemembersNestedInput
+    league_message_reactions?: league_message_reactionsUpdateManyWithoutLeaguemembersNestedInput
     picks?: picksUpdateManyWithoutLeaguemembersNestedInput
   }
 
@@ -35309,6 +37238,7 @@ export namespace Prisma {
     WeekWinners?: WeekWinnersUncheckedUpdateManyWithoutLeaguemembersNestedInput
     leaguemessages?: leaguemessagesUncheckedUpdateManyWithoutLeaguemembersNestedInput
     league_message_read_state?: league_message_read_stateUncheckedUpdateOneWithoutLeaguemembersNestedInput
+    league_message_reactions?: league_message_reactionsUncheckedUpdateManyWithoutLeaguemembersNestedInput
     picks?: picksUncheckedUpdateManyWithoutLeaguemembersNestedInput
   }
 
@@ -36524,6 +38454,13 @@ export namespace Prisma {
     status?: $Enums.MessageStatus
   }
 
+  export type league_message_reactionsCreateManyLeaguemembersInput = {
+    reaction_id?: string
+    message_id: string
+    emoji: $Enums.MessageReactionEmoji
+    createdAt?: Date | string
+  }
+
   export type picksCreateManyLeaguemembersInput = {
     pickid?: number
     uid: number
@@ -36622,6 +38559,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumMessageStatusFieldUpdateOperationsInput | $Enums.MessageStatus
     leagues?: leaguesUpdateOneRequiredWithoutLeaguemessagesNestedInput
+    league_message_reactions?: league_message_reactionsUpdateManyWithoutLeaguemessagesNestedInput
   }
 
   export type leaguemessagesUncheckedUpdateWithoutLeaguemembersInput = {
@@ -36632,6 +38570,7 @@ export namespace Prisma {
     message_type?: EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumMessageStatusFieldUpdateOperationsInput | $Enums.MessageStatus
+    league_message_reactions?: league_message_reactionsUncheckedUpdateManyWithoutLeaguemessagesNestedInput
   }
 
   export type leaguemessagesUncheckedUpdateManyWithoutLeaguemembersInput = {
@@ -36642,6 +38581,27 @@ export namespace Prisma {
     message_type?: EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumMessageStatusFieldUpdateOperationsInput | $Enums.MessageStatus
+  }
+
+  export type league_message_reactionsUpdateWithoutLeaguemembersInput = {
+    reaction_id?: StringFieldUpdateOperationsInput | string
+    emoji?: EnumMessageReactionEmojiFieldUpdateOperationsInput | $Enums.MessageReactionEmoji
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    leaguemessages?: leaguemessagesUpdateOneRequiredWithoutLeague_message_reactionsNestedInput
+  }
+
+  export type league_message_reactionsUncheckedUpdateWithoutLeaguemembersInput = {
+    reaction_id?: StringFieldUpdateOperationsInput | string
+    message_id?: StringFieldUpdateOperationsInput | string
+    emoji?: EnumMessageReactionEmojiFieldUpdateOperationsInput | $Enums.MessageReactionEmoji
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type league_message_reactionsUncheckedUpdateManyWithoutLeaguemembersInput = {
+    reaction_id?: StringFieldUpdateOperationsInput | string
+    message_id?: StringFieldUpdateOperationsInput | string
+    emoji?: EnumMessageReactionEmojiFieldUpdateOperationsInput | $Enums.MessageReactionEmoji
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type picksUpdateWithoutLeaguemembersInput = {
@@ -36715,6 +38675,34 @@ export namespace Prisma {
     score?: IntFieldUpdateOperationsInput | number
     ts?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     season?: NullableIntFieldUpdateOperationsInput | number | null
+  }
+
+  export type league_message_reactionsCreateManyLeaguemessagesInput = {
+    reaction_id?: string
+    membership_id: number
+    emoji: $Enums.MessageReactionEmoji
+    createdAt?: Date | string
+  }
+
+  export type league_message_reactionsUpdateWithoutLeaguemessagesInput = {
+    reaction_id?: StringFieldUpdateOperationsInput | string
+    emoji?: EnumMessageReactionEmojiFieldUpdateOperationsInput | $Enums.MessageReactionEmoji
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    leaguemembers?: leaguemembersUpdateOneRequiredWithoutLeague_message_reactionsNestedInput
+  }
+
+  export type league_message_reactionsUncheckedUpdateWithoutLeaguemessagesInput = {
+    reaction_id?: StringFieldUpdateOperationsInput | string
+    membership_id?: IntFieldUpdateOperationsInput | number
+    emoji?: EnumMessageReactionEmojiFieldUpdateOperationsInput | $Enums.MessageReactionEmoji
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type league_message_reactionsUncheckedUpdateManyWithoutLeaguemessagesInput = {
+    reaction_id?: StringFieldUpdateOperationsInput | string
+    membership_id?: IntFieldUpdateOperationsInput | number
+    emoji?: EnumMessageReactionEmojiFieldUpdateOperationsInput | $Enums.MessageReactionEmoji
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type EmailLogsCreateManyLeaguesInput = {
@@ -36854,6 +38842,7 @@ export namespace Prisma {
     people?: peopleUpdateOneRequiredWithoutLeaguemembersNestedInput
     leaguemessages?: leaguemessagesUpdateManyWithoutLeaguemembersNestedInput
     league_message_read_state?: league_message_read_stateUpdateOneWithoutLeaguemembersNestedInput
+    league_message_reactions?: league_message_reactionsUpdateManyWithoutLeaguemembersNestedInput
     picks?: picksUpdateManyWithoutLeaguemembersNestedInput
     superbowl?: superbowlUpdateManyWithoutLeaguemembersNestedInput
   }
@@ -36868,6 +38857,7 @@ export namespace Prisma {
     WeekWinners?: WeekWinnersUncheckedUpdateManyWithoutLeaguemembersNestedInput
     leaguemessages?: leaguemessagesUncheckedUpdateManyWithoutLeaguemembersNestedInput
     league_message_read_state?: league_message_read_stateUncheckedUpdateOneWithoutLeaguemembersNestedInput
+    league_message_reactions?: league_message_reactionsUncheckedUpdateManyWithoutLeaguemembersNestedInput
     picks?: picksUncheckedUpdateManyWithoutLeaguemembersNestedInput
     superbowl?: superbowlUncheckedUpdateManyWithoutLeaguemembersNestedInput
   }
@@ -36888,6 +38878,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumMessageStatusFieldUpdateOperationsInput | $Enums.MessageStatus
     leaguemembers?: leaguemembersUpdateOneRequiredWithoutLeaguemessagesNestedInput
+    league_message_reactions?: league_message_reactionsUpdateManyWithoutLeaguemessagesNestedInput
   }
 
   export type leaguemessagesUncheckedUpdateWithoutLeaguesInput = {
@@ -36898,6 +38889,7 @@ export namespace Prisma {
     message_type?: EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumMessageStatusFieldUpdateOperationsInput | $Enums.MessageStatus
+    league_message_reactions?: league_message_reactionsUncheckedUpdateManyWithoutLeaguemessagesNestedInput
   }
 
   export type leaguemessagesUncheckedUpdateManyWithoutLeaguesInput = {
@@ -37055,6 +39047,7 @@ export namespace Prisma {
     leagues?: leaguesUpdateOneRequiredWithoutLeaguemembersNestedInput
     leaguemessages?: leaguemessagesUpdateManyWithoutLeaguemembersNestedInput
     league_message_read_state?: league_message_read_stateUpdateOneWithoutLeaguemembersNestedInput
+    league_message_reactions?: league_message_reactionsUpdateManyWithoutLeaguemembersNestedInput
     picks?: picksUpdateManyWithoutLeaguemembersNestedInput
     superbowl?: superbowlUpdateManyWithoutLeaguemembersNestedInput
   }
@@ -37069,6 +39062,7 @@ export namespace Prisma {
     WeekWinners?: WeekWinnersUncheckedUpdateManyWithoutLeaguemembersNestedInput
     leaguemessages?: leaguemessagesUncheckedUpdateManyWithoutLeaguemembersNestedInput
     league_message_read_state?: league_message_read_stateUncheckedUpdateOneWithoutLeaguemembersNestedInput
+    league_message_reactions?: league_message_reactionsUncheckedUpdateManyWithoutLeaguemembersNestedInput
     picks?: picksUncheckedUpdateManyWithoutLeaguemembersNestedInput
     superbowl?: superbowlUncheckedUpdateManyWithoutLeaguemembersNestedInput
   }

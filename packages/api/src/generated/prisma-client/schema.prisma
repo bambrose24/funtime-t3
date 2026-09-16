@@ -112,6 +112,7 @@ model leaguemembers {
   leagues                   leagues                    @relation(fields: [league_id], references: [league_id], onUpdate: Restrict, onDelete: Cascade, map: "leaguemembers_ibfk_2")
   leaguemessages            leaguemessages[]
   league_message_read_state league_message_read_state?
+  league_message_reactions  league_message_reactions[]
   picks                     picks[]
   superbowl                 superbowl[]
 
@@ -123,16 +124,17 @@ model leaguemembers {
 }
 
 model leaguemessages {
-  message_id    String        @id @default(cuid())
-  content       String
-  member_id     Int
-  league_id     Int
-  week          Int?
-  message_type  MessageType
-  createdAt     DateTime      @default(now())
-  status        MessageStatus @default(PUBLISHED)
-  leagues       leagues       @relation(fields: [league_id], references: [league_id], onDelete: Cascade)
-  leaguemembers leaguemembers @relation(fields: [member_id], references: [membership_id], onDelete: Cascade)
+  message_id               String                     @id @default(cuid())
+  content                  String
+  member_id                Int
+  league_id                Int
+  week                     Int?
+  message_type             MessageType
+  createdAt                DateTime                   @default(now())
+  status                   MessageStatus              @default(PUBLISHED)
+  leagues                  leagues                    @relation(fields: [league_id], references: [league_id], onDelete: Cascade)
+  leaguemembers            leaguemembers              @relation(fields: [member_id], references: [membership_id], onDelete: Cascade)
+  league_message_reactions league_message_reactions[]
 
   @@index([createdAt])
   @@index([league_id])
@@ -152,6 +154,20 @@ model league_message_read_state {
   leaguemembers        leaguemembers @relation(fields: [membership_id], references: [membership_id], onDelete: Cascade)
 
   @@index([last_read_at])
+}
+
+model league_message_reactions {
+  reaction_id    String               @id @default(cuid())
+  message_id     String
+  membership_id  Int
+  emoji          MessageReactionEmoji
+  createdAt      DateTime             @default(now())
+  leaguemessages leaguemessages       @relation(fields: [message_id], references: [message_id], onDelete: Cascade)
+  leaguemembers  leaguemembers        @relation(fields: [membership_id], references: [membership_id], onDelete: Cascade)
+
+  @@unique([message_id, membership_id, emoji])
+  @@index([message_id])
+  @@index([membership_id])
 }
 
 model leagues {
@@ -364,6 +380,17 @@ enum MessageStatus {
 enum MessageType {
   WEEK_COMMENT
   LEAGUE_MESSAGE
+}
+
+enum MessageReactionEmoji {
+  fire
+  laugh
+  cooked
+  eyes
+  football
+  goat
+  thumbs_up
+  heart
 }
 
 enum PickPolicy {

@@ -28,6 +28,13 @@ import {
   type LeagueMessageBoardPage,
   type OptimisticLeagueMessage,
 } from "@/lib/messages/optimisticMessages";
+import { MessageReactionPicker, MessageReactions } from "@/components/messages/MessageReactions";
+import {
+  applyReactionToggle,
+  patchMessageReactions,
+  type MessageReactionEmojiKey,
+  type MessageReactionSummary,
+} from "@funtime/api/utils/messageReactions";
 
 const MESSAGES_REFETCH_INTERVAL_MS = 10 * 1000;
 const MESSAGE_PAGE_SIZE = 50;
@@ -64,6 +71,7 @@ export function LeagueMessageBoard({ leagueId }: Props) {
   const [optimisticMessages, setOptimisticMessages] = useState<
     OptimisticLeagueMessage[]
   >([]);
+  const [pickerMessageId, setPickerMessageId] = useState<string | null>(null);
 
   const { data: session } = clientApi.session.current.useQuery();
   const {
@@ -106,6 +114,8 @@ export function LeagueMessageBoard({ leagueId }: Props) {
     clientApi.messages.writeMessage.useMutation();
   const { mutateAsync: deleteMessage } =
     clientApi.messages.deleteMessage.useMutation();
+  const { mutateAsync: toggleReaction } =
+    clientApi.messages.toggleReaction.useMutation();
 
   const viewerLeagueMember = useMemo(() => {
     return session?.dbUser?.leaguemembers.find(
@@ -175,6 +185,74 @@ export function LeagueMessageBoard({ leagueId }: Props) {
     ]);
   };
 
+  const patchBoardReactions = (
+    messageId: string,
+    reactions: MessageReactionSummary[],
+  ) => {
+    utils.messages.leagueMessageBoard.setInfiniteData(
+      {
+        leagueId: leagueIdNumber,
+        limit: MESSAGE_PAGE_SIZE,
+      },
+      (current) => {
+        if (!current) {
+          return current;
+        }
+        return {
+          ...current,
+          pages: current.pages.map((page) => {
+            if (Array.isArray(page)) {
+              return patchMessageReactions(page, messageId, reactions);
+            }
+            return {
+              ...page,
+              messages: patchMessageReactions(
+                page.messages,
+                messageId,
+                reactions,
+              ),
+            };
+          }),
+        };
+      },
+    );
+  };
+
+  const onToggleReaction = async (
+    message: DisplayMessage,
+    emoji: MessageReactionEmojiKey,
+  ) => {
+    const username = session?.dbUser?.username;
+    if (!username || ("pending" in message && message.pending)) {
+      return;
+    }
+    const previous = utils.messages.leagueMessageBoard.getInfiniteData({
+      leagueId: leagueIdNumber,
+      limit: MESSAGE_PAGE_SIZE,
+    });
+    patchBoardReactions(
+      message.message_id,
+      applyReactionToggle(message.reactions ?? [], emoji, username),
+    );
+    try {
+      const result = await toggleReaction({
+        messageId: message.message_id,
+        emoji,
+      });
+      patchBoardReactions(message.message_id, result.reactions);
+    } catch (error) {
+      console.error("Failed to toggle reaction", error);
+      utils.messages.leagueMessageBoard.setInfiniteData(
+        {
+          leagueId: leagueIdNumber,
+          limit: MESSAGE_PAGE_SIZE,
+        },
+        previous,
+      );
+      Alert.alert("Couldn't react", "That reaction didn't go through. Try again.");
+    }
+  };
+
   const onRefresh = async () => {
     Haptics.selectionAsync().catch(() => {
       // No-op if haptics are unavailable.
@@ -234,6 +312,7 @@ export function LeagueMessageBoard({ leagueId }: Props) {
           serverMessage: {
             ...created,
             leaguemembers: optimistic.leaguemembers,
+            reactions: [],
           } as LeagueMessage,
           serverMessages,
         }),
@@ -272,6 +351,11 @@ export function LeagueMessageBoard({ leagueId }: Props) {
       ],
     );
   };
+
+  const pickerMessage = useMemo(
+    () => messages.find((message) => message.message_id === pickerMessageId),
+    [messages, pickerMessageId],
+  );
 
   if (isLoading) {
     return <LeagueTabLoadingSkeleton rows={4} />;
@@ -367,22 +451,49 @@ export function LeagueMessageBoard({ leagueId }: Props) {
             const username = message.leaguemembers?.people.username ?? "Member";
             const createdAt = new Date(message.createdAt);
             const pending = "pending" in message && Boolean(message.pending);
+            const authorLabel = mine ? "you" : username;
 
             return (
               <View className="gap-1">
-                <View
-                  className={[
-                    "rounded-xl border px-3 py-2",
-                    mine
-                      ? "ml-8 border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950"
-                      : "mr-8 border-gray-200 bg-white dark:border-zinc-700 dark:bg-zinc-800",
-                    pending ? "opacity-70" : "",
-                  ].join(" ")}
+                <Pressable
+                  disabled={pending}
+                  onLongPress={() => {
+                    if (pending) {
+                      return;
+                    }
+                    Haptics.selectionAsync().catch(() => {
+                      // No-op if haptics are unavailable.
+                    });
+                    setPickerMessageId(message.message_id);
+                  }}
+                  delayLongPress={280}
                 >
-                  <Text className="text-sm text-app-fg-light dark:text-app-fg-dark">
-                    {message.content}
-                  </Text>
-                </View>
+                  <View
+                    className={[
+                      "rounded-xl border px-3 py-2",
+                      mine
+                        ? "ml-8 border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950"
+                        : "mr-8 border-gray-200 bg-white dark:border-zinc-700 dark:bg-zinc-800",
+                      pending ? "opacity-70" : "",
+                    ].join(" ")}
+                  >
+                    <Text className="text-sm text-app-fg-light dark:text-app-fg-dark">
+                      {message.content}
+                    </Text>
+                  </View>
+                </Pressable>
+                {pending ? null : (
+                  <MessageReactions
+                    reactions={message.reactions ?? []}
+                    mine={Boolean(mine)}
+                    viewerUsername={session?.dbUser?.username}
+                    authorLabel={authorLabel}
+                    onAddPress={() => setPickerMessageId(message.message_id)}
+                    onToggle={(emoji) => {
+                      void onToggleReaction(message, emoji);
+                    }}
+                  />
+                )}
                 <View
                   className={[
                     "flex-row items-center gap-2 px-1",
@@ -458,6 +569,17 @@ export function LeagueMessageBoard({ leagueId }: Props) {
             </Button>
           </View>
         </View>
+        <MessageReactionPicker
+          open={pickerMessage != null}
+          reactions={pickerMessage?.reactions ?? []}
+          onClose={() => setPickerMessageId(null)}
+          onToggle={(emoji) => {
+            if (!pickerMessage) {
+              return;
+            }
+            void onToggleReaction(pickerMessage, emoji);
+          }}
+        />
       </View>
     </KeyboardAvoidingView>
   );

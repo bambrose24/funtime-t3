@@ -211,6 +211,14 @@ exports.Prisma.League_message_read_stateScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.League_message_reactionsScalarFieldEnum = {
+  reaction_id: 'reaction_id',
+  message_id: 'message_id',
+  membership_id: 'membership_id',
+  emoji: 'emoji',
+  createdAt: 'createdAt'
+};
+
 exports.Prisma.LeaguesScalarFieldEnum = {
   league_id: 'league_id',
   created_by_user_id: 'created_by_user_id',
@@ -406,6 +414,17 @@ exports.MessageStatus = exports.$Enums.MessageStatus = {
   DELETED: 'DELETED'
 };
 
+exports.MessageReactionEmoji = exports.$Enums.MessageReactionEmoji = {
+  fire: 'fire',
+  laugh: 'laugh',
+  cooked: 'cooked',
+  eyes: 'eyes',
+  football: 'football',
+  goat: 'goat',
+  thumbs_up: 'thumbs_up',
+  heart: 'heart'
+};
+
 exports.LatePolicy = exports.$Enums.LatePolicy = {
   allow_late_whole_week: 'allow_late_whole_week',
   close_at_first_game_start: 'close_at_first_game_start',
@@ -450,6 +469,7 @@ exports.Prisma.ModelName = {
   leaguemembers: 'leaguemembers',
   leaguemessages: 'leaguemessages',
   league_message_read_state: 'league_message_read_state',
+  league_message_reactions: 'league_message_reactions',
   leagues: 'leagues',
   league_renewal_member_roles: 'league_renewal_member_roles',
   people: 'people',

@@ -22,6 +22,12 @@ import {
 import { ScrollArea, ScrollBar } from "~/components/ui/scroll-area";
 import { Separator } from "~/components/ui/separator";
 import MessageComposer from "./Composer";
+import { MessageReactions } from "./MessageReactions";
+import {
+  applyReactionToggle,
+  patchMessageReactions,
+  type MessageReactionEmojiKey,
+} from "@funtime/api/utils/messageReactions";
 
 import { MESSAGES_REFETCH_INTERVAL_MS } from "./const";
 
@@ -186,6 +192,7 @@ export function LeagueChat({
                   message={message}
                   viewerMembershipId={viewerMembership?.membership_id}
                   viewerIsAdmin={viewerMembership?.role === "admin"}
+                  viewerUsername={session?.dbUser?.username}
                 />
               ))}
             </div>
@@ -228,11 +235,13 @@ function MessageBubble({
   message,
   viewerMembershipId,
   viewerIsAdmin,
+  viewerUsername,
 }: {
   leagueId: number;
   message: LeagueMessage;
   viewerMembershipId: number | undefined;
   viewerIsAdmin: boolean;
+  viewerUsername: string | undefined;
 }) {
   const utils = clientApi.useUtils();
   const [confirmOpen, setConfirmOpen] = useState(false);
@@ -247,10 +256,52 @@ function MessageBubble({
         ]);
       },
     });
+  const { mutateAsync: toggleReaction } =
+    clientApi.messages.toggleReaction.useMutation();
+
+  const patchBoardReactions = (
+    messageId: string,
+    reactions: LeagueMessage["reactions"],
+  ) => {
+    utils.messages.leagueMessageBoard.setData({ leagueId }, (current) => {
+      if (!current) {
+        return current;
+      }
+      if (Array.isArray(current)) {
+        return patchMessageReactions(current, messageId, reactions);
+      }
+      return {
+        ...current,
+        messages: patchMessageReactions(current.messages, messageId, reactions),
+      };
+    });
+  };
+
+  const onToggleReaction = async (emoji: MessageReactionEmojiKey) => {
+    if (!viewerUsername) {
+      return;
+    }
+    const previous = utils.messages.leagueMessageBoard.getData({ leagueId });
+    patchBoardReactions(
+      message.message_id,
+      applyReactionToggle(message.reactions, emoji, viewerUsername),
+    );
+    try {
+      const result = await toggleReaction({
+        messageId: message.message_id,
+        emoji,
+      });
+      patchBoardReactions(message.message_id, result.reactions);
+    } catch {
+      utils.messages.leagueMessageBoard.setData({ leagueId }, previous);
+      toast.error("Couldn't add that reaction");
+    }
+  };
 
   const username = message.leaguemembers.people.username;
+  const authorLabel = mine ? "you" : username;
   return (
-    <div className={mine ? "ml-12" : "mr-12"}>
+    <div className={mine ? "group ml-12" : "group mr-12"}>
       <div
         className={
           mine
@@ -260,6 +311,15 @@ function MessageBubble({
       >
         {message.content}
       </div>
+      <MessageReactions
+        reactions={message.reactions}
+        mine={mine}
+        viewerUsername={viewerUsername}
+        authorLabel={authorLabel}
+        onToggle={(emoji) => {
+          void onToggleReaction(emoji);
+        }}
+      />
       <div
         className={
           mine

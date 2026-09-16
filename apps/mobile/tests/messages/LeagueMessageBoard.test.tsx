@@ -20,6 +20,7 @@ function message(partial: Partial<LeagueMessage> & { message_id: string }): Leag
     leaguemembers: {
       people: { username: "player" },
     },
+    reactions: [],
     ...partial,
   } as LeagueMessage;
 }
