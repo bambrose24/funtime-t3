@@ -1,4 +1,4 @@
-import { type PrismaClient } from "../../../src/generated/prisma-client";
+import { type PrismaClient } from "../../../src/generated/prisma-client/client";
 import { isE2EMode } from "../../../utils/e2e";
 
 const EXPO_PUSH_ENDPOINT = "https://exp.host/--/api/v2/push/send";

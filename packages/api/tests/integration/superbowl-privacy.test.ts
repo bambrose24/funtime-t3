@@ -1,6 +1,6 @@
 import { afterAll, beforeAll, expect, setSystemTime, test } from "bun:test";
 import type { TRPCContext } from "../../server/api/trpc";
-import type { LeagueStatus } from "../../src/generated/prisma-client";
+import type { LeagueStatus } from "../../src/generated/prisma-client/client";
 
 const localUrl = "postgresql://postgres:postgres@127.0.0.1:55422/postgres";
 if (process.env.DATABASE_URL !== localUrl || process.env.E2E_MODE !== "1") {

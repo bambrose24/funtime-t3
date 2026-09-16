@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { authorizedProcedure, createTRPCRouter } from "../../trpc";
 import { TRPCError } from "@trpc/server";
-import { MemberRole, Prisma, PrismaClient } from "../../../../src/generated/prisma-client";
+import { MemberRole, Prisma, PrismaClient } from "../../../../src/generated/prisma-client/client";
 import { expoPushApi } from "../../../services/expo-push";
 import {
   attachReactionsToMessages,

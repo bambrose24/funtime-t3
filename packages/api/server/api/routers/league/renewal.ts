@@ -1,4 +1,4 @@
-import { MemberRole } from "../../../../src/generated/prisma-client";
+import { MemberRole } from "../../../../src/generated/prisma-client/client";
 import {
   CAN_CREATE_NEXT_SEASON_LEAGUES,
   DEFAULT_SEASON,

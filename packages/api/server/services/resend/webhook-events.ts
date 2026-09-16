@@ -1,6 +1,6 @@
 import type { WebhookEventPayload } from "resend";
 
-import type { EmailDeliveryStatus } from "../../../src/generated/prisma-client";
+import type { EmailDeliveryStatus } from "../../../src/generated/prisma-client/client";
 
 const TRACKED_EVENT_TYPES = [
   "email.delivered",

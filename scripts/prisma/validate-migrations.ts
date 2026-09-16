@@ -136,7 +136,7 @@ async function checkTcpConnectivity(urlString) {
 function runPrisma(env, args) {
   return spawnSync(
     "pnpm",
-    ["exec", "prisma", ...args, "--schema", "prisma/schema.prisma"],
+    ["exec", "prisma", ...args],
     {
       cwd: apiDir,
       env,

@@ -1,4 +1,4 @@
-import type { PrismaClient } from "../src/generated/prisma-client";
+import type { PrismaClient } from "../src/generated/prisma-client/client";
 
 /** Reveal predictions at the same scheduled kickoff that locks owner edits. */
 export async function hasSeasonKickedOff(

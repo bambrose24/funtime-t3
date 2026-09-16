@@ -18,7 +18,7 @@ import {
   PickPolicy,
   ReminderPolicy,
   ScoringType,
-} from "../../../../src/generated/prisma-client";
+} from "../../../../src/generated/prisma-client/client";
 import {
   CAN_CREATE_NEXT_SEASON_LEAGUES,
   DEFAULT_SEASON,

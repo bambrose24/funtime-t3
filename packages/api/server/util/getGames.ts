@@ -1,4 +1,4 @@
-import type { PrismaClient } from "../../src/generated/prisma-client";
+import type { PrismaClient } from "../../src/generated/prisma-client/client";
 import { cache } from "../../utils/cache";
 
 export async function getGames({

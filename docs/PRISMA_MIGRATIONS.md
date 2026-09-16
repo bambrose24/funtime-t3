@@ -10,7 +10,7 @@ GitHub Actions workflow **Prisma schema sync** runs:
 pnpm prisma:schema-sync
 ```
 
-That compares migrations → schema with `prisma migrate diff --exit-code` against a temporary Postgres shadow database.
+That compares migrations → schema with `prisma migrate diff --exit-code` against a temporary Postgres shadow database. Prisma 7 reads the shadow URL from `packages/api/prisma.config.ts` (`SHADOW_DATABASE_URL`).
 
 | Exit | Meaning |
 | --- | --- |

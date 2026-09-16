@@ -3,7 +3,6 @@
  * for Docker builds.
  */
 await import("./src/env.js");
-import { PrismaPlugin } from "@prisma/nextjs-monorepo-workaround-plugin";
 
 /** @type {import("next").NextConfig} */
 const config = {
@@ -15,12 +14,6 @@ const config = {
         protocol: "https",
       },
     ],
-  },
-  webpack: (config, { isServer }) => {
-    if (isServer) {
-      config.plugins = [...config.plugins, new PrismaPlugin()];
-    }
-    return config;
   },
   async rewrites() {
     return [

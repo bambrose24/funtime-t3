@@ -1,5 +1,5 @@
 import { orderBy } from "lodash";
-import type { Prisma } from "../../../src/generated/prisma-client";
+import type { Prisma } from "../../../src/generated/prisma-client/client";
 
 import { createTRPCRouter, publicProcedure } from "../trpc";
 import { DEFAULT_SEASON } from "../../../utils/const";

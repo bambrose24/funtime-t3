@@ -8,7 +8,7 @@
  *   2 = drift (a new migration is required)
  *
  * Requires SHADOW_DATABASE_URL (empty Postgres database). DATABASE_URL / DIRECT_URL
- * are only needed so Prisma can load the schema datasource block.
+ * are only needed so prisma.config.ts can load a datasource URL.
  */
 
 import { spawnSync } from "node:child_process";
@@ -62,10 +62,8 @@ const result = spawnSync(
     "diff",
     "--from-migrations",
     "./prisma/migrations",
-    "--to-schema-datamodel",
+    "--to-schema",
     "./prisma/schema.prisma",
-    "--shadow-database-url",
-    shadowUrl,
     "--exit-code",
   ],
   {
@@ -74,6 +72,7 @@ const result = spawnSync(
       ...process.env,
       DATABASE_URL: process.env.DATABASE_URL ?? placeholderUrl,
       DIRECT_URL: process.env.DIRECT_URL ?? placeholderUrl,
+      SHADOW_DATABASE_URL: shadowUrl,
     },
     encoding: "utf8",
   },
