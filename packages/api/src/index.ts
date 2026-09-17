@@ -13,7 +13,7 @@ export * from "./generated/prisma-client/client";
 // Use the same Prisma client singleton from server/db.ts
 export { db as prisma } from "../server/db";
 
-export { espn } from "../server/services/espn";
+export { espn, loadRegularSeasonEspnGames } from "../server/services/espn";
 
 export * as config from "../utils/config";
 export { isRegularSeasonComplete } from "../utils/postseason";
