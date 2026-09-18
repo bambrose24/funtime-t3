@@ -1,8 +1,12 @@
 import { z } from "zod";
 import { isE2EMode } from "../../../utils/e2e";
+import {
+  POSTSEASON_WEEKS,
+  REGULAR_SEASON_WEEK_COUNT,
+  postseasonWeekScoreboardUrl,
+  regularSeasonWeekScoreboardUrl,
+} from "./scoreboardUrls";
 import { fetchEspnResponse } from "./transport.mjs";
-
-const BASE_URL = "https://site.api.espn.com/apis/site/v2/sports/football/nfl";
 
 export class ESPNResponseError extends Error {
   constructor({
@@ -199,6 +203,7 @@ const EventsResponseSchema = z.object({
 });
 
 type ESPNEvent = z.infer<typeof EventSchema>;
+type EspnJsonFetcher = (url: string) => Promise<unknown>;
 
 // Map ESPN playoff week numbers to our round enum
 const PLAYOFF_WEEK_TO_ROUND = {
@@ -211,17 +216,41 @@ const PLAYOFF_WEEK_TO_ROUND = {
 
 export type PostseasonRound = "wild_card" | "divisional" | "conference" | "super_bowl";
 
+function appendUniqueEvents(
+  events: ESPNEvent[],
+  seenIds: Set<string>,
+  incoming: ESPNEvent[],
+) {
+  for (const event of incoming) {
+    if (seenIds.has(event.id)) continue;
+    seenIds.add(event.id);
+    events.push(event);
+  }
+}
+
 export class ESPNClient {
+  private readonly fetchJson: EspnJsonFetcher;
+
+  constructor(fetchJson: EspnJsonFetcher = fetchEspnJson) {
+    this.fetchJson = fetchJson;
+  }
+
   async getGamesBySeason({ season }: { season: number }): Promise<ESPNEvent[]> {
     if (isE2EMode) {
       return [];
     }
-    const startDate = `${season}0901`; // September 1st of the season year
-    const endDate = `${season + 1}0301`; // March 1st of the following year
-    const url = `${BASE_URL}/scoreboard?limit=1000&dates=${startDate}-${endDate}&seasontype=2`;
-    const data = await fetchEspnJson(url);
-    const parsedData = EventsResponseSchema.parse(data);
-    return parsedData.events;
+    // ESPN rejects multi-day `dates=` scoreboard queries with HTTP 400.
+    // Week + season still works, so assemble the season from weeks 1-18.
+    const events: ESPNEvent[] = [];
+    const seenIds = new Set<string>();
+    for (let week = 1; week <= REGULAR_SEASON_WEEK_COUNT; week++) {
+      appendUniqueEvents(
+        events,
+        seenIds,
+        await this.getGamesByWeek({ season, week }),
+      );
+    }
+    return events;
   }
 
   async getGamesByWeek({
@@ -234,9 +263,8 @@ export class ESPNClient {
     if (isE2EMode) {
       return [];
     }
-    const url = `${BASE_URL}/scoreboard?limit=100&seasontype=2&week=${week}&season=${season}`;
-    const data = await fetchEspnJson(url);
-    const parsedData = EventsResponseSchema.parse(data);
+    const url = regularSeasonWeekScoreboardUrl(season, week);
+    const parsedData = EventsResponseSchema.parse(await this.fetchJson(url));
     return parsedData.events;
   }
 
@@ -249,19 +277,20 @@ export class ESPNClient {
     if (isE2EMode) {
       return [];
     }
-    // Playoffs start in January of the following year
-    const startDate = `${season + 1}0101`; // January 1st
-    const endDate = `${season + 1}0220`; // February 20th (after Super Bowl)
-    const url = `${BASE_URL}/scoreboard?limit=100&dates=${startDate}-${endDate}`;
-    const data = await fetchEspnJson(url);
-    const parsedData = EventsResponseSchema.parse(data);
-    
-    // Filter to only postseason games (season.type === 3) and exclude Pro Bowl (week 4)
-    return parsedData.events.filter(
-      (event) => 
-        event.season.type === 3 && 
-        event.week.number !== 4 // Exclude Pro Bowl
-    );
+    const events: ESPNEvent[] = [];
+    const seenIds = new Set<string>();
+    for (const week of POSTSEASON_WEEKS) {
+      const url = postseasonWeekScoreboardUrl(season, week);
+      const parsedData = EventsResponseSchema.parse(await this.fetchJson(url));
+      appendUniqueEvents(
+        events,
+        seenIds,
+        parsedData.events.filter(
+          (event) => event.season.type === 3 && event.week.number !== 4,
+        ),
+      );
+    }
+    return events;
   }
 
   /**
