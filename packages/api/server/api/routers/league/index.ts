@@ -683,93 +683,29 @@ export const leagueRouter = createTRPCRouter({
       }
 
       const { season } = data;
-
-      const [mostRecentStartedGame, nextGameToStart] = await Promise.all([
-        ctx.db.games.findFirst({
-          where: {
-            season,
-            ts: {
-              lte: new Date(),
-            },
-          },
-          orderBy: {
-            ts: "desc",
-          },
-        }),
-        ctx.db.games.findFirst({
-          where: {
-            season,
-            ts: {
-              gte: new Date(),
-            },
-          },
-          orderBy: {
-            ts: "asc",
-          },
-        }),
-      ]);
-
-      const { week } = mostRecentStartedGame ?? nextGameToStart ?? { week: 1 };
-
-      const gamesResp = await ctx.db.games.findMany({
-        where: {
-          season,
-          OR: [
-            {
-              week,
-            },
-            // A fix to not look ahead if week 1 hasn't started yet
-            { week: week + 1 },
-          ],
-        },
+      const now = new Date();
+      const seasonGames = await ctx.db.games.findMany({
+        where: { season },
       });
-
-      const games = orderBy(
-        gamesResp,
+      const weekToReturn = getWeekToPick(seasonGames, now);
+      const gamesToReturn = orderBy(
+        seasonGames.filter((game) => game.week === weekToReturn),
         [(g) => g.is_tiebreaker, (g) => g.ts, (g) => g.gid],
         ["asc", "asc", "asc"],
       );
-
-      const mostRecentStartedWeekGames = games.filter((g) => g.week === week);
-      const nextWeekGames = games.filter((g) => g.week === week + 1);
-
-      const multipleWeekMemberPicks = await ctx.db.picks.findMany({
+      const picksToReturn = await ctx.db.picks.findMany({
         where: {
           gid: {
-            in: games.map((g) => g.gid),
+            in: gamesToReturn.map((game) => game.gid),
           },
           member_id: member?.membership_id ?? -1,
         },
       });
 
-      const mostRecentStartedWeekPicks = multipleWeekMemberPicks.filter(
-        (pick) =>
-          mostRecentStartedWeekGames.some((game) => game.gid === pick.gid),
-      );
-      const nextWeekPicks = multipleWeekMemberPicks.filter((pick) =>
-        nextWeekGames.some((game) => game.gid === pick.gid),
-      );
-
-      // Keep the current week editable while it still has an upcoming game.
-      // A submitted pick is not a reason to advance: players may update any
-      // game that has not started yet. Move forward only when the next game on
-      // the schedule belongs to the following week.
-      const weekToReturn = getWeekToPick(
-        mostRecentStartedGame?.week,
-        nextGameToStart?.week,
-      );
-
-      const picksToReturn =
-        weekToReturn === week ? mostRecentStartedWeekPicks : nextWeekPicks;
-      const gamesToReturn =
-        weekToReturn === week ? mostRecentStartedWeekGames : nextWeekGames;
-
       const picksCloseAt = getWeekPickDeadline(data.late_policy, gamesToReturn);
       return {
         picksCloseAt,
-        picksClosed: picksCloseAt
-          ? isPickLocked(picksCloseAt, new Date())
-          : false,
+        picksClosed: picksCloseAt ? isPickLocked(picksCloseAt, now) : false,
         season,
         week: weekToReturn,
         games: gamesToReturn,

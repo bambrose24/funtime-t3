@@ -32,6 +32,12 @@ Last recorded full-suite baseline: **26 Playwright tests in 21 files, all passin
 on a fresh local-Supabase reset, migration and seed (2026-09-12, home league list).**
 This is local execution evidence from the isolated PR branch based on `778ee8f`.
 
+## Next-unstarted-week picker — September 17, 2026
+
+- Added `picks/week-to-pick.spec.ts`: a started Week 1 leftover game no longer
+  keeps `/pick` on that week when Week 2 exists. The form shows Week 2, rejects
+  the leftover Week 1 radios, and persists only Week 2 picks.
+
 ## Home league list — September 12, 2026
 
 - Added `home/leagues.spec.ts` for the first web home redesign: single active league remains on Home, weekly picks-needed status links to submission, returning after submission shows picks-in, past seasons expand on demand, and a 390px viewport has no horizontal overflow. Desktop and mobile screenshots support visual review.
@@ -68,7 +74,7 @@ This is local execution evidence from the isolated PR branch based on `778ee8f`.
 | Authentication          | Anonymous access, signup/onboarding, login, logout, protected-route redirects                                                             | `auth/session.spec.ts`, `auth/signup.spec.ts`                                                                         |
 | Account settings        | Client validation, duplicate username rejection, successful persistence, weekly recap email opt-out                                       | `profile/settings.spec.ts`                                                                                            |
 | League lifecycle        | Create with policies, join by code, duplicate prevention, waiting/completed states, renewal setup, no-send continuation, and role handoff | `league/create-and-duplicate.spec.ts`, `league/join.spec.ts`, `league/renewal.spec.ts`, `smoke/admin-renewal.spec.ts` |
-| Weekly picks            | Validation, submission, apply-to-all saved/skipped confirmation, first-kickoff policy, update, player kickoff lock, admin lock, super-admin override                                       | `picks/submit.spec.ts`, `picks/late-policy.spec.ts`, `picks/integrity.spec.ts`, `league/admin-member-workflows.spec.ts`                            |
+| Weekly picks            | Validation, submission, apply-to-all saved/skipped confirmation, first-kickoff policy, next-unstarted-week targeting, update, player kickoff lock, admin lock, super-admin override                                       | `picks/submit.spec.ts`, `picks/late-policy.spec.ts`, `picks/week-to-pick.spec.ts`, `picks/integrity.spec.ts`, `league/admin-member-workflows.spec.ts`                            |
 | Competitive integrity   | Membership authorization and opponent-pick redaction before submission and before each kickoff                                            | `picks/integrity.spec.ts`, `platform/access-and-responsive.spec.ts`                                                   |
 | Standings and profiles  | Weekly co-winners, competition ranking, cumulative chart, result totals, player profile                                                   | `standings/results.spec.ts`, `profile/superbowl.spec.ts`                                                              |
 | Super Bowl contest      | Required join prediction, edit, preseason privacy, in-progress visibility, completed bracket and ranking                                  | `league/join.spec.ts`, `profile/superbowl.spec.ts`, `superbowl/visibility.spec.ts`, `superbowl/results.spec.ts`       |
@@ -112,6 +118,7 @@ This is local execution evidence from the isolated PR branch based on `778ee8f`.
 - [x] Tiebreaker validation rejects missing or invalid scores.
 - [x] Existing picks can be updated idempotently.
 - [x] Randomize fills the open week's picks before submission.
+- [x] After a week's first kickoff, `/pick` shows the next unstarted week even if later games in the started week are still open.
 - [x] Started games cannot be changed by a player.
 - [x] Started games cannot be changed by a league admin.
 - [x] Super admin can override a started pick for a correction.
