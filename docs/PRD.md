@@ -60,8 +60,9 @@ Funtime solves this by combining:
 - Mobile release order: player-first core loop, then admin capabilities.
 - Weekly picks are one complete weekly submission per league, not a sequence of partial submissions. Players select every available game and enter the required tiebreaker before submitting. Home reports whether that week's picks are in or still need to be made; it does not show per-game completion counts.
 - Pick visibility:
-  - If a member has not submitted picks for that week, they cannot see other members' picks.
-  - If a member has submitted picks for that week, they can see the full slate of other members' picks, including games that have not started and the tiebreaker score.
+  - The weekly picks table is always visible. Opponent picks, including later games and the tiebreaker score, stay empty until the first game of that week starts.
+  - After that first kickoff, the full slate is visible to every member.
+  - A member who has already submitted still sees their own picks in the table before kickoff.
 - Late policy: league-configurable; no single mandated league default requirement.
 - `close_at_first_game_start` closes the entire week at its earliest scheduled kickoff, including later games. Recompute against the current schedule after rescheduling. Ordinary admins follow this deadline; explicit super-admin corrections remain exempt.
 - `allow_late_and_lock_after_start` locks each game at its own kickoff. Legacy `allow_late_whole_week` and unset policies temporarily retain this same per-game behavior pending inventory and migration decisions.

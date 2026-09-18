@@ -17,33 +17,49 @@ test.beforeEach(() => {
   `);
 });
 
-test("started games lock and submission reveals the full weekly picks table", async ({
+function picksSummaryUrl(leagueId: number, week = 1) {
+  return `/api/trpc/league.picksSummary?input=${encodeURIComponent(
+    JSON.stringify({ json: { leagueId, week } }),
+  )}`;
+}
+
+test("started games lock and first kickoff reveals the full weekly picks table", async ({
   page,
 }) => {
   const leagueId = getLeagueId(E2E_LEAGUES.integrity.shareCode);
   await login(page, E2E_USERS.player);
 
   await page.goto(`/league/${leagueId}?week=1`);
-  const hiddenAdminRow = page.getByRole("row").filter({ hasText: "webadmin" });
-  await expect(hiddenAdminRow.getByText("--")).toHaveCount(2);
-  await expect(hiddenAdminRow.getByRole("cell").nth(2)).toHaveText("0");
+  const adminRow = page.getByRole("row").filter({ hasText: "webadmin" });
+  await expect(adminRow.getByText("KC", { exact: true })).toBeVisible();
+  const futureTeam = queryScalar(`
+    SELECT t."abbrev" FROM "games" g
+    JOIN "teams" t ON t."teamid" = g."home"
+    WHERE g."gid" = 2028002
+  `);
+  expect(futureTeam).not.toBe("");
+  await expect(adminRow.getByRole("cell")).toHaveText([
+    "webadmin",
+    "0",
+    "46",
+    "KC",
+    futureTeam,
+  ]);
 
   // Check the authenticated response too: hiding only the table would leak picks.
-  const summaryUrl = `/api/trpc/league.picksSummary?input=${encodeURIComponent(
-    JSON.stringify({ json: { leagueId, week: 1 } }),
-  )}`;
-  const hiddenResponse = await page.request.get(summaryUrl);
-  expect(hiddenResponse.ok()).toBe(true);
-  const hiddenRows = (await hiddenResponse.json()).result.data.json;
-  const hiddenAdmin = hiddenRows.find(
+  const summaryUrl = picksSummaryUrl(leagueId);
+  const startedResponse = await page.request.get(summaryUrl);
+  expect(startedResponse.ok()).toBe(true);
+  const startedRows = (await startedResponse.json()).result.data.json;
+  const startedAdmin = startedRows.find(
     (row: { people: { username: string } }) =>
       row.people.username === "webadmin",
   );
-  expect(hiddenAdmin).toMatchObject({ correctPicks: 0, tiebreakerScore: 0 });
-  expect(hiddenAdmin.picks).toHaveLength(2);
-  for (const pick of hiddenAdmin.picks) {
-    expect(pick).toMatchObject({ winner: null, correct: null });
-  }
+  expect(startedAdmin.tiebreakerScore).toBe(46);
+  expect(startedAdmin.picks).toEqual([
+    expect.objectContaining({ gid: 2028001, winner: 2 }),
+    expect.objectContaining({ gid: 2028002, winner: 6 }),
+  ]);
 
   await page.goto(`/league/${leagueId}/pick`);
   await expect(
@@ -87,49 +103,69 @@ test("started games lock and submission reveals the full weekly picks table", as
     .first()
     .click();
   await page.goto(`/league/${leagueId}?week=1`);
-  const submittedAdminRow = page
-    .getByRole("row")
-    .filter({ hasText: "webadmin" });
-  await expect(
-    submittedAdminRow.getByText("KC", { exact: true }),
-  ).toBeVisible();
-  // The seeded week has one started game and one future tiebreaker. Both
-  // opponents' picks must appear, even though the viewer missed the first game.
-  const futureTeam = queryScalar(`
-    SELECT t."abbrev" FROM "games" g
-    JOIN "teams" t ON t."teamid" = g."home"
-    WHERE g."gid" = 2028002
-  `);
-  expect(futureTeam).not.toBe("");
-  await expect(submittedAdminRow.getByRole("cell")).toHaveText([
+  await expect(adminRow.getByRole("cell")).toHaveText([
     "webadmin",
     "0",
     "46",
     "KC",
     futureTeam,
   ]);
-  await expect(submittedAdminRow.getByText("--")).toHaveCount(0);
-
-  const visibleResponse = await page.request.get(summaryUrl);
-  expect(visibleResponse.ok()).toBe(true);
-  const visibleRows = (await visibleResponse.json()).result.data.json;
-  const visibleAdmin = visibleRows.find(
-    (row: { people: { username: string } }) =>
-      row.people.username === "webadmin",
-  );
-  expect(visibleAdmin.tiebreakerScore).toBe(46);
-  expect(visibleAdmin.picks).toEqual([
-    expect.objectContaining({ gid: 2028001, winner: 2 }),
-    expect.objectContaining({ gid: 2028002, winner: 6 }),
-  ]);
+  await expect(adminRow.getByText("--")).toHaveCount(0);
 
   // A fresh server render must preserve the reveal, not just client state.
   await page.reload();
-  await expect(submittedAdminRow.getByRole("cell")).toHaveText([
+  await expect(adminRow.getByRole("cell")).toHaveText([
     "webadmin",
     "0",
     "46",
     "KC",
     futureTeam,
   ]);
+});
+
+test("submitted picks stay private until the first game of the week starts", async ({
+  page,
+}) => {
+  const leagueId = getLeagueId(E2E_LEAGUES.competition.shareCode);
+  const gameCount = Number(
+    queryScalar(`
+      SELECT COUNT(*) FROM "games" g
+      JOIN "leagues" l ON l."season" = g."season"
+      WHERE l."league_id" = ${leagueId} AND g."week" = 1
+    `),
+  );
+  expect(gameCount).toBeGreaterThan(0);
+  await login(page, E2E_USERS.admin);
+
+  await page.goto(`/league/${leagueId}?week=1`);
+  const adminRow = page.getByRole("row").filter({ hasText: "webadmin" });
+  const playerRow = page.getByRole("row").filter({ hasText: "webplayer" });
+  await expect(adminRow.getByText("--")).toHaveCount(0);
+  await expect(playerRow.getByText("--")).toHaveCount(gameCount);
+  await expect(playerRow.getByRole("cell").nth(2)).toHaveText("0");
+
+  const response = await page.request.get(picksSummaryUrl(leagueId));
+  expect(response.ok()).toBe(true);
+  const rows = (await response.json()).result.data.json;
+  const admin = rows.find(
+    (row: { people: { username: string } }) =>
+      row.people.username === "webadmin",
+  );
+  const player = rows.find(
+    (row: { people: { username: string } }) =>
+      row.people.username === "webplayer",
+  );
+  expect(admin.picks.length).toBe(gameCount);
+  expect(
+    admin.picks.every((pick: { winner: number | null }) => pick.winner),
+  ).toBe(true);
+  expect(admin.tiebreakerScore).toBe(44);
+  expect(
+    player.picks.every((pick: { winner: number | null }) => pick.winner == null),
+  ).toBe(true);
+  expect(player.tiebreakerScore).toBe(0);
+
+  await page.reload();
+  await expect(adminRow.getByText("--")).toHaveCount(0);
+  await expect(playerRow.getByText("--")).toHaveCount(gameCount);
 });

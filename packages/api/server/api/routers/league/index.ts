@@ -4,7 +4,9 @@ import {
   hasSeasonKickedOff,
 } from "../../../../utils/superbowlVisibility";
 import {
+  canViewMemberWeekPicks,
   getWeekPickDeadline,
+  hasWeekKickedOff,
   isPickLocked,
 } from "../../../../utils/pickPermissions";
 import { TRPCError } from "@trpc/server";
@@ -828,11 +830,7 @@ export const leagueRouter = createTRPCRouter({
         getGames({ season, week, db }),
       ]);
 
-      const viewerMemberPicks = memberPicks.find(
-        (mp) => mp.membership_id === viewerMember.membership_id,
-      );
-      const viewerHasPicks = Boolean(viewerMemberPicks?.picks?.length);
-
+      const weekHasStarted = hasWeekKickedOff(games);
       const gidToIndex = games.reduce((prev, curr, idx) => {
         prev.set(curr.gid, idx);
         return prev;
@@ -847,11 +845,15 @@ export const leagueRouter = createTRPCRouter({
         );
 
         mp.picks = mp.picks.map((p) => {
-          // Submitting picks reveals the entire week, including future games.
-          // Keep this gate on the server so unsubmitted viewers receive no picks.
+          // The table is always visible. Opponent picks and tiebreakers stay
+          // empty until the first game of the week starts; your own row is not
+          // redacted after you submit.
           if (
-            !viewerHasPicks &&
-            mp.membership_id !== viewerMember.membership_id
+            !canViewMemberWeekPicks(
+              viewerMember.membership_id,
+              mp.membership_id,
+              weekHasStarted,
+            )
           ) {
             return { ...p, winner: null, correct: null, score: null };
           }
