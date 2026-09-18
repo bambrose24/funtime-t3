@@ -235,8 +235,14 @@ export class ESPNClient {
     this.fetchJson = fetchJson;
   }
 
+  private skipExternalEspn() {
+    // E2E_MODE blocks live ESPN. Injected fetchers are for tests and must run
+    // even when sibling unit tests set E2E_MODE in the same process.
+    return isE2EMode && this.fetchJson === fetchEspnJson;
+  }
+
   async getGamesBySeason({ season }: { season: number }): Promise<ESPNEvent[]> {
-    if (isE2EMode) {
+    if (this.skipExternalEspn()) {
       return [];
     }
     // ESPN rejects multi-day `dates=` scoreboard queries with HTTP 400.
@@ -260,7 +266,7 @@ export class ESPNClient {
     season: number;
     week: number;
   }): Promise<ESPNEvent[]> {
-    if (isE2EMode) {
+    if (this.skipExternalEspn()) {
       return [];
     }
     const url = regularSeasonWeekScoreboardUrl(season, week);
@@ -274,7 +280,7 @@ export class ESPNClient {
    * e.g., 2024 season playoffs are in January-February 2025.
    */
   async getPostseasonGames({ season }: { season: number }): Promise<ESPNEvent[]> {
-    if (isE2EMode) {
+    if (this.skipExternalEspn()) {
       return [];
     }
     const events: ESPNEvent[] = [];

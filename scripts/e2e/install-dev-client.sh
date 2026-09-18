@@ -109,7 +109,9 @@ has_online_device() {
 }
 
 is_installed() {
-  adb shell pm list packages 2>/dev/null | tr -d '\r' | grep -q "^package:${ANDROID_APP_ID}$"
+  # Avoid `grep -q` in a pipe under `set -o pipefail`: a match can SIGPIPE `tr`
+  # and report the package missing even when `pm list packages` printed it.
+  adb shell pm path "$ANDROID_APP_ID" >/dev/null 2>&1
 }
 
 wait_for_package_manager() {

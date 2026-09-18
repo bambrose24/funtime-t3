@@ -1,6 +1,14 @@
 import { expect, test } from "bun:test";
-
 import { ESPNClient } from "../server/services/espn/client";
+import {
+  POSTSEASON_WEEKS,
+  REGULAR_SEASON_WEEK_COUNT,
+  postseasonWeekScoreboardUrl,
+  regularSeasonWeekScoreboardUrl,
+} from "../server/services/espn/scoreboardUrls";
+
+// Isolated Bun process so router tests cannot leak E2E_MODE into this file.
+process.env.E2E_MODE = "0";
 import {
   POSTSEASON_WEEKS,
   REGULAR_SEASON_WEEK_COUNT,
