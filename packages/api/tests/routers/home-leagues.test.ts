@@ -1,6 +1,5 @@
 import { expect, test } from "bun:test";
 import { getHomeLeagueStatus } from "../../utils/homeLeagueStatus";
-import { getWeekToPick } from "../../utils/weekToPick";
 import type { TRPCContext } from "../../server/api/trpc";
 
 process.env.DATABASE_URL = "postgresql://test:test@127.0.0.1:1/test";
@@ -15,69 +14,91 @@ const schedule = [
   { week: 1, ts: new Date("2026-09-14T00:00:00Z"), done: false },
   { week: 2, ts: new Date("2026-09-17T00:00:00Z"), done: false },
 ];
+const week1Only = schedule.filter((game) => game.week === 1);
+const firstKickoff = schedule[0]!.ts;
 
 for (const policy of [
   null,
   "allow_late_and_lock_after_start",
   "allow_late_whole_week",
+  "close_at_first_game_start",
 ]) {
-  test(`${policy}: an unsubmitted week with open games needs picks`, () => {
+  test(`${policy}: a started week advances Home to the next unstarted week`, () => {
     expect(getHomeLeagueStatus(schedule, new Set(), policy, now)).toEqual({
       state: "needed",
-      week: 1,
+      week: 2,
     });
   });
 }
-test("a submitted week stays submitted with missed locked games", () => {
+test("submitting the started week does not fulfill the next unstarted week", () => {
   expect(getHomeLeagueStatus(schedule, new Set([1]), null, now)).toEqual({
-    state: "submitted",
-    week: 1,
+    state: "needed",
+    week: 2,
   });
 });
-test("another week's submission does not fulfill this week", () => {
-  expect(getHomeLeagueStatus(schedule, new Set([2]), null, now).state).toBe(
-    "needed",
-  );
+test("the next unstarted week can already be submitted", () => {
+  expect(getHomeLeagueStatus(schedule, new Set([2]), null, now)).toEqual({
+    state: "submitted",
+    week: 2,
+  });
 });
-test("first-kickoff policy closes the whole week, but keeps submitted status", () => {
+test("first-kickoff policy closes the last remaining started week", () => {
   expect(
-    getHomeLeagueStatus(schedule, new Set(), "close_at_first_game_start", now)
-      .state,
-  ).toBe("closed");
+    getHomeLeagueStatus(week1Only, new Set(), "close_at_first_game_start", now),
+  ).toEqual({ state: "closed", week: 1 });
   expect(
     getHomeLeagueStatus(
-      schedule,
+      week1Only,
       new Set([1]),
       "close_at_first_game_start",
       now,
-    ).state,
-  ).toBe("submitted");
+    ),
+  ).toEqual({ state: "submitted", week: 1 });
+});
+test("per-game policy still needs remaining games when no later week exists", () => {
+  expect(getHomeLeagueStatus(week1Only, new Set(), null, now)).toEqual({
+    state: "needed",
+    week: 1,
+  });
 });
 test("the deadline is inclusive and follows the current schedule", () => {
-  const firstKickoff = schedule[0]!.ts;
+  expect(
+    getHomeLeagueStatus(
+      week1Only,
+      new Set(),
+      "close_at_first_game_start",
+      new Date(firstKickoff.getTime() - 1),
+    ),
+  ).toEqual({ state: "needed", week: 1 });
+  expect(
+    getHomeLeagueStatus(
+      week1Only,
+      new Set(),
+      "close_at_first_game_start",
+      firstKickoff,
+    ),
+  ).toEqual({ state: "closed", week: 1 });
   expect(
     getHomeLeagueStatus(
       schedule,
       new Set(),
       "close_at_first_game_start",
       new Date(firstKickoff.getTime() - 1),
-    ).state,
-  ).toBe("needed");
+    ),
+  ).toEqual({ state: "needed", week: 1 });
   expect(
     getHomeLeagueStatus(
       schedule,
       new Set(),
       "close_at_first_game_start",
       firstKickoff,
-    ).state,
-  ).toBe("closed");
-});
-test("week advances after its last kickoff, regardless of existing picks", () => {
-  expect(
-    getHomeLeagueStatus(schedule, new Set([1]), null, new Date("2026-09-15")),
+    ),
   ).toEqual({ state: "needed", week: 2 });
-  expect(getWeekToPick(1, 1)).toBe(1);
-  expect(getWeekToPick(undefined, 1)).toBe(1);
+});
+test("week advances at first kickoff, regardless of existing picks", () => {
+  expect(
+    getHomeLeagueStatus(schedule, new Set([1]), null, firstKickoff),
+  ).toEqual({ state: "needed", week: 2 });
 });
 test("missing schedule, final games in progress, and completed season are distinct", () => {
   expect(getHomeLeagueStatus([], new Set(), null, now).state).toBe(

@@ -1,8 +1,16 @@
-/** Match the editor: advance only when the next kickoff is in the next week. */
+/** The pick page shows the next week that has not started. */
 export function getWeekToPick(
-  mostRecentStartedWeek: number | undefined,
-  nextGameWeek: number | undefined,
+  schedule: readonly { week: number; ts: Date }[],
+  now: Date,
 ) {
-  const week = mostRecentStartedWeek ?? nextGameWeek ?? 1;
-  return nextGameWeek === week + 1 ? week + 1 : week;
+  if (!schedule.length) {
+    return 1;
+  }
+  const startedWeeks = new Set(
+    schedule.filter((game) => game.ts <= now).map((game) => game.week),
+  );
+  const weeks = [...new Set(schedule.map((game) => game.week))].sort(
+    (a, b) => a - b,
+  );
+  return weeks.find((week) => !startedWeeks.has(week)) ?? weeks.at(-1)!;
 }

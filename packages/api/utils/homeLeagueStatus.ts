@@ -13,9 +13,7 @@ export function getHomeLeagueStatus(
     return { state: "no_schedule" as const, week: null };
   }
   const ordered = [...schedule].sort((a, b) => a.ts.getTime() - b.ts.getTime());
-  const lastStarted = ordered.filter((game) => game.ts <= now).at(-1);
-  const nextGame = ordered.find((game) => game.ts > now);
-  const week = getWeekToPick(lastStarted?.week, nextGame?.week);
+  const week = getWeekToPick(ordered, now);
   if (ordered.every((game) => game.done)) {
     return { state: "season_over" as const, week };
   }

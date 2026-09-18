@@ -215,7 +215,7 @@ Unless a requirement is explicitly labeled **Target** or **Planned**, it describ
 
 - The player-facing unit of work is the whole week: choose every available game's winner and supply the required tiebreaker score, then submit once. There is no supported save-partial-week workflow. Players may revise their submitted picks while the applicable locks permit it.
 - Under a per-game late policy, a player who arrives after kickoff submits all still-available games together. Previously locked games are preserved or remain missed; they do not make an otherwise valid weekly submission "incomplete." The first-kickoff policy instead closes the entire week as defined in section 6.1.
-- Determine the current target week for picks (`weekToPick`) from the game schedule and kickoff state. Existing picks alone must not advance a player past a week that still has open games.
+- Determine the current target week for picks (`weekToPick`) from the game schedule and kickoff state. The pick page shows the next week that has not started. Once a week's first game has kicked off, that week is locked as the pick target if a later week exists. Existing picks alone must not skip an unstarted week.
 - Show games for target week ordered for usable entry.
 - Allow a player to randomize open-game selections while preserving locked games.
 - Submit picks for one or more leagues with validation:

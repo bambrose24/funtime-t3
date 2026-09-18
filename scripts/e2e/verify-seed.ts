@@ -95,17 +95,12 @@ FROM (
 ) s;
 `);
 
-const currentWeek =
-  seasonState?.most_recent_started_game?.week ??
-  seasonState?.next_game_to_start?.week ??
-  1;
-
 const candidateGames = runJsonQuery(`
 SELECT COALESCE(json_agg(g ORDER BY g."is_tiebreaker" ASC, g."ts" ASC, g."gid" ASC), '[]'::json)
 FROM (
   SELECT "gid", "week", "ts", "home", "away", COALESCE("is_tiebreaker", false) AS "is_tiebreaker"
   FROM "games"
-  WHERE "season" = ${season} AND "week" IN (${currentWeek}, ${currentWeek + 1})
+  WHERE "season" = ${season}
 ) g;
 `);
 
@@ -114,14 +109,18 @@ assert(
   "No candidate games for weekToPick verification",
 );
 
-const weekGames = candidateGames.filter((g) => g.week === currentWeek);
-const nextWeekGames = candidateGames.filter((g) => g.week === currentWeek + 1);
+const nowMs = Date.now();
+const startedWeeks = new Set(
+  candidateGames
+    .filter((g) => new Date(g.ts).getTime() <= nowMs)
+    .map((g) => g.week),
+);
+const weeks = [...new Set(candidateGames.map((g) => g.week))].sort(
+  (a, b) => a - b,
+);
 const weekToReturn =
-  seasonState?.next_game_to_start?.week === currentWeek + 1
-    ? currentWeek + 1
-    : currentWeek;
-
-const gamesToReturn = weekToReturn === currentWeek ? weekGames : nextWeekGames;
+  weeks.find((week) => !startedWeeks.has(week)) ?? weeks.at(-1) ?? 1;
+const gamesToReturn = candidateGames.filter((g) => g.week === weekToReturn);
 
 assert(
   weekToReturn === 1,

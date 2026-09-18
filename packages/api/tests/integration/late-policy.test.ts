@@ -26,6 +26,7 @@ const confirmation = spyOn(resendApi, "sendWeekPicksEmail").mockResolvedValue(
 );
 let firstGame: Awaited<ReturnType<typeof db.games.findFirstOrThrow>>;
 let laterGame: typeof firstGame;
+let nextWeekGame: typeof firstGame | null;
 beforeAll(async () => {
   firstGame = await db.games.findFirstOrThrow({ orderBy: { gid: "asc" } });
   laterGame = await db.games.findFirstOrThrow({
@@ -35,6 +36,13 @@ beforeAll(async () => {
       ts: { gt: firstGame.ts },
     },
     orderBy: { ts: "asc" },
+  });
+  nextWeekGame = await db.games.findFirst({
+    where: {
+      season: firstGame.season,
+      week: { gt: firstGame.week },
+    },
+    orderBy: [{ week: "asc" }, { ts: "asc" }],
   });
 });
 afterAll(async () => {
@@ -145,10 +153,18 @@ async function scenario({
           const result = await leagueRouter
             .createCaller(ctx)
             .weekToPick({ leagueId: league.league_id });
-          expect(result.picksClosed).toBe(closed);
+          const pickWeek =
+            offset >= 0 && nextWeekGame ? nextWeekGame : firstGame;
+          expect(result.week).toBe(pickWeek.week);
+          expect(result.picksClosed).toBe(
+            policy === "close_at_first_game_start" &&
+              offset >= 0 &&
+              !nextWeekGame &&
+              !rescheduled,
+          );
           expect(result.picksCloseAt?.getTime() ?? null).toBe(
             policy === "close_at_first_game_start"
-              ? (rescheduled ? laterGame.ts : firstGame.ts).getTime()
+              ? pickWeek.ts.getTime()
               : null,
           );
         } else {
