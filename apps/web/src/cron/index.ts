@@ -1,6 +1,12 @@
 import { wantsWeekSummaryEmail } from "@funtime/api/utils/emailPreferences";
 import { buildWeekSummary, isSummaryDue } from "@funtime/api/utils/weekSummary";
-import { prisma as db, espn, expoPushApi, resendApi } from "@funtime/api";
+import {
+  prisma as db,
+  espn,
+  expoPushApi,
+  loadRegularSeasonEspnGames,
+  resendApi,
+} from "@funtime/api";
 import { addHours, addMonths } from "date-fns";
 import { chunk, groupBy, orderBy } from "lodash";
 
@@ -40,20 +46,18 @@ export async function run() {
   // Fetch ESPN games
   // ========================================
   console.log(`${LOG_PREFIX} Fetching ESPN games...`);
-  let allEspnGames: Awaited<ReturnType<typeof espn.getGamesBySeason>>;
-  try {
-    allEspnGames = await espn.getGamesBySeason({ season });
-  } catch (error) {
+  const { espnGames, skippedEspn, totalFetched, error: espnError } =
+    await loadRegularSeasonEspnGames(() => espn.getGamesBySeason({ season }));
+  if (skippedEspn) {
     console.error(
-      `${LOG_PREFIX} Unable to fetch ESPN games; skipping this run so no data is changed.`,
-      error,
+      `${LOG_PREFIX} Unable to fetch ESPN games; skipping score and kickoff-time sync, continuing with reminders from DB games.`,
+      espnError,
     );
-    return;
+  } else {
+    console.log(
+      `${LOG_PREFIX} ✓ Found ${espnGames.length} regular season games (${totalFetched - espnGames.length} postseason filtered out)`,
+    );
   }
-  const espnGames = allEspnGames.filter((g) => g.season.type === 2);
-  console.log(
-    `${LOG_PREFIX} ✓ Found ${espnGames.length} regular season games (${allEspnGames.length - espnGames.length} postseason filtered out)`,
-  );
   // ========================================
   // Update game scores from ESPN
   // ========================================
