@@ -20,8 +20,9 @@ Guiding rule:
 ## 3. Product Constraints (Current Decisions)
 
 - Pick visibility:
-  - No weekly picks submitted -> cannot view others' picks.
-  - Weekly picks submitted -> can view others for started games.
+  - Opponent weekly picks stay hidden until the first game of that week starts.
+  - After that first kickoff, the full slate is visible.
+  - A member who has already submitted still sees their own picks before kickoff.
 - Super Bowl pick is required at join time when enabled for the league.
 - Messaging target:
   - Persistent league board (no week partitioning).
