@@ -1,59 +1,72 @@
 appId: com.funtime.mobile
 ---
 # Requires MAESTRO_JOIN_CODE to be provided by the caller.
-- launchApp
-- repeat:
-    times: 8
-    commands:
-      - openLink: ${E2E_APP_BOOT_URL}
-      - tapOn:
-          text: ${E2E_DEV_SERVER_URL}
-          optional: true
-      - tapOn:
-          text: "Continue"
-          optional: true
-      - tapOn:
-          text: "Reload"
-          optional: true
-      - tapOn:
-          text: "Go home"
-          optional: true
-      - waitForAnimationToEnd
-- extendedWaitUntil:
-    visible: "Enter your email"
-    timeout: 180000
+- runFlow: boot-to-login.yaml
 - tapOn: "Don't have an account? Sign up"
-- tapOn: "example@gmail.com"
-- inputText: "maestro.e2e+user2@example.com"
-- tapOn: "Enter your password"
-- inputText: "Password123!"
-- tapOn: "Confirm your password"
-- inputText: "Password123!"
-- tapOn: "Create Account"
-- tapOn: "Create an account"
 - tapOn:
-    text: "GO TO LOGIN"
-    optional: true
-- tapOn: "Go to Login"
-- tapOn: "Enter your email"
-- inputText: "maestro.e2e+user2@example.com"
-- tapOn: "Enter your password"
+    id: "signup-email-input"
+- inputText: ${E2E_EMAIL}
+- tapOn:
+    id: "signup-password-input"
 - inputText: "Password123!"
-- tapOn: "Sign In"
-- tapOn: "First Name"
+- tapOn:
+    id: "signup-password-confirm-input"
+- inputText: "Password123!"
+- hideKeyboard
+- tapOn:
+    id: "signup-create-account"
+- tapOn:
+    text: "Go to Login"
+    optional: true
+- tapOn:
+    text: "Continue"
+    optional: true
+- tapOn:
+    text: "OK"
+    optional: true
+- extendedWaitUntil:
+    visible: "First Name"
+    timeout: 60000
+- tapOn:
+    id: "confirm-signup-first-name"
 - inputText: "Maestro"
-- tapOn: "Last Name"
+- tapOn:
+    id: "confirm-signup-last-name"
 - inputText: "Joiner"
-- tapOn: "Username"
-- inputText: "maestrojoiner2"
-- tapOn: "Finish Signup"
-- tapOn: "Continue"
-- tapOn: "Join League"
-- tapOn: "ABC123 or https://play-funtime.com/join-league/ABC123"
+- tapOn:
+    id: "confirm-signup-username"
+- inputText: ${E2E_USERNAME}
+- hideKeyboard
+- tapOn:
+    id: "confirm-signup-finish"
+- tapOn:
+    text: "Continue"
+    optional: true
+- extendedWaitUntil:
+    visible: "Join League"
+    timeout: 30000
+- tapOn:
+    id: "home-join-league"
+- tapOn:
+    id: "join-league-code"
 - inputText: "${MAESTRO_JOIN_CODE}"
-- tapOn: "Continue"
-- tapOn: "Register for League"
+- hideKeyboard
+- tapOn:
+    id: "join-league-continue"
+- tapOn:
+    id: "join-league-register"
 - tapOn: "Pick"
-- tapOn: "Randomize Open Picks"
-- tapOn: "Submit Picks"
+- tapOn:
+    id: "picks-randomize"
+- runFlow:
+    when:
+      visible:
+        id: "picks-tiebreaker-score"
+    commands:
+      - tapOn:
+          id: "picks-tiebreaker-score"
+      - inputText: "47"
+      - hideKeyboard
+- tapOn:
+    id: "picks-submit"
 - assertVisible: "Update Picks"

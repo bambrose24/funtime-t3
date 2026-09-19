@@ -472,7 +472,11 @@ export default function JoinLeagueCodeScreen() {
           )}
 
           <View className="gap-3">
-            <Button onPress={onRegister} disabled={submitting || !superbowlReady}>
+            <Button
+              testID="join-league-register"
+              onPress={onRegister}
+              disabled={submitting || !superbowlReady}
+            >
               {submitting ? "Registering..." : registerButtonText}
             </Button>
             <Button variant="outline" onPress={() => router.back()} disabled={submitting}>

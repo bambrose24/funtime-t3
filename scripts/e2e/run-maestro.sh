@@ -253,6 +253,11 @@ if ! curl -sf "http://127.0.0.1:${WEB_PORT}" >/dev/null; then
 fi
 
 echo "[e2e] Starting Expo mobile app..."
+# RN DevTools ships a Chromium helper that aborts on GitHub-hosted Linux
+# unless the SUID sandbox is disabled.
+export CHROME_DEVEL_SANDBOX="${CHROME_DEVEL_SANDBOX:-}"
+export ELECTRON_DISABLE_SANDBOX="${ELECTRON_DISABLE_SANDBOX:-1}"
+export EXPO_NO_TELEMETRY="${EXPO_NO_TELEMETRY:-1}"
 EXPO_PUBLIC_SUPABASE_URL="$MOBILE_SUPABASE_URL" \
 EXPO_PUBLIC_SUPABASE_ANON_KEY="$ANON_KEY" \
 EXPO_PUBLIC_API_URL="$MOBILE_API_URL" \
@@ -285,12 +290,15 @@ echo "[e2e] Metro is healthy on port ${EXPO_PORT}."
 echo "[e2e] Boot link: ${MOBILE_DEVCLIENT_URL}"
 
 echo "[e2e] Opening app in Android dev client (${ANDROID_APP_ID})..."
+adb logcat -c >/dev/null 2>&1 || true
 launch_via_link() {
-  if adb shell am start -W -a android.intent.action.VIEW -d "$MOBILE_DEVCLIENT_URL" "$ANDROID_APP_ID" >/tmp/funtime-e2e-open-link.log 2>&1; then
+  # Do not wait for idle (-W): the dev client often never reports launch complete
+  # on software emulators, which used to look like a hang before Maestro started.
+  if adb shell am start -a android.intent.action.VIEW -d "$MOBILE_DEVCLIENT_URL" "$ANDROID_APP_ID" >/tmp/funtime-e2e-open-link.log 2>&1; then
     return 0
   fi
   # Fallback: let Android resolve app for the deep link if package targeting fails.
-  adb shell am start -W -a android.intent.action.VIEW -d "$MOBILE_DEVCLIENT_URL" >/tmp/funtime-e2e-open-link.log 2>&1
+  adb shell am start -a android.intent.action.VIEW -d "$MOBILE_DEVCLIENT_URL" >/tmp/funtime-e2e-open-link.log 2>&1
 }
 
 launch_ok=0
@@ -324,12 +332,31 @@ if ! adb shell pidof "$ANDROID_APP_ID" >/dev/null 2>&1; then
 fi
 
 echo "[e2e] Running Maestro flow ${FLOW_PATH}"
-maestro test "$FLOW_PATH" \
-  -e E2E_EMAIL="$E2E_EMAIL" \
-  -e E2E_USERNAME="$E2E_USERNAME" \
-  -e E2E_APP_BOOT_URL="$MOBILE_DEVCLIENT_URL" \
-  -e E2E_EXPO_AUTH_URL="$MOBILE_EXPO_AUTH_URL" \
-  -e E2E_DEV_SERVER_URL="http://10.0.2.2:${EXPO_PORT}" \
+maestro_args=(
+  -e E2E_EMAIL="$E2E_EMAIL"
+  -e E2E_USERNAME="$E2E_USERNAME"
+  -e E2E_APP_BOOT_URL="$MOBILE_DEVCLIENT_URL"
+  -e E2E_EXPO_AUTH_URL="$MOBILE_EXPO_AUTH_URL"
+  -e E2E_DEV_SERVER_URL="http://10.0.2.2:${EXPO_PORT}"
   -e E2E_ANDROID_APP_ID="$ANDROID_APP_ID"
+)
+if [[ -n "${MAESTRO_JOIN_CODE:-}" ]]; then
+  maestro_args+=(-e MAESTRO_JOIN_CODE="$MAESTRO_JOIN_CODE")
+fi
+
+set +e
+maestro test "$FLOW_PATH" "${maestro_args[@]}"
+maestro_status=$?
+set -e
+
+if [[ "$maestro_status" -ne 0 ]]; then
+  echo "[e2e] Maestro failed (exit ${maestro_status}). Capturing logcat and debug artifacts." >&2
+  adb logcat -d -t 5000 > /tmp/funtime-e2e-logcat.txt 2>&1 || true
+  echo "[e2e] Tail of /tmp/funtime-e2e-expo.log:" >&2
+  tail -n 80 /tmp/funtime-e2e-expo.log >&2 || true
+  echo "[e2e] Tail of logcat:" >&2
+  tail -n 80 /tmp/funtime-e2e-logcat.txt >&2 || true
+  exit "$maestro_status"
+fi
 
 echo "[e2e] Maestro flow completed."

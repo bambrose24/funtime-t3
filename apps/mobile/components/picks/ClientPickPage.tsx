@@ -403,6 +403,7 @@ function PickForm({
         ) : null}
 
         <Button
+          testID="picks-randomize"
           onPress={randomizePicks}
           variant="secondary"
           className="mb-6"
@@ -449,6 +450,7 @@ function PickForm({
                         Tiebreaker Score
                       </Text>
                       <Input
+                        testID="picks-tiebreaker-score"
                         placeholder="Total score"
                         keyboardType="numeric"
                         value={form.watch("tiebreakerScore.score")}
@@ -476,6 +478,7 @@ function PickForm({
 
         {/* Submit Button */}
         <Button
+          testID="picks-submit"
           onPress={form.handleSubmit(onSubmit)}
           disabled={submitDisabled}
           variant="default"

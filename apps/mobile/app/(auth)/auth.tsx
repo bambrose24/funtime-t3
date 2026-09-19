@@ -82,7 +82,10 @@ export default function LoginScreen() {
   };
 
   return (
-    <SafeAreaView className="bg-app-bg-light dark:bg-app-bg-dark flex-1">
+    <SafeAreaView
+      testID="auth-login-screen"
+      className="bg-app-bg-light dark:bg-app-bg-dark flex-1"
+    >
       <ScrollView
         className="flex-1"
         showsVerticalScrollIndicator={false}
@@ -111,6 +114,7 @@ export default function LoginScreen() {
                 Email
               </Text>
               <Input
+                testID="auth-email-input"
                 value={email}
                 onChangeText={(text) => {
                   setEmail(text);
@@ -145,6 +149,7 @@ export default function LoginScreen() {
                 </Pressable>
               </View>
               <Input
+                testID="auth-password-input"
                 value={password}
                 onChangeText={(text) => {
                   setPassword(text);
@@ -165,6 +170,7 @@ export default function LoginScreen() {
 
             {/* Login Button */}
             <Button
+              testID="auth-sign-in"
               onPress={handleLogin}
               disabled={loading || !email || !password}
               className="mt-2"
@@ -175,7 +181,10 @@ export default function LoginScreen() {
 
           {/* Footer Links */}
           <View className="mt-6">
-            <Pressable onPress={() => router.push(withRedirectTo("/signup") as any)}>
+            <Pressable
+              testID="auth-go-to-signup"
+              onPress={() => router.push(withRedirectTo("/signup") as any)}
+            >
               <Text className="text-center text-blue-600 dark:text-blue-400">
                 Don't have an account? Sign up
               </Text>

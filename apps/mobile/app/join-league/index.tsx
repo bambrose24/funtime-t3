@@ -72,13 +72,18 @@ export default function JoinLeagueEntryScreen() {
 
           <View className="gap-3">
             <Input
+              testID="join-league-code"
               value={leagueCode}
               onChangeText={setLeagueCode}
               placeholder="ABC123 or https://play-funtime.com/join-league/ABC123"
               autoCapitalize="none"
               autoCorrect={false}
             />
-            <Button onPress={onSubmit} disabled={submitting || !normalizedCode}>
+            <Button
+              testID="join-league-continue"
+              onPress={onSubmit}
+              disabled={submitting || !normalizedCode}
+            >
               {submitting ? "Opening..." : "Continue"}
             </Button>
             <Button

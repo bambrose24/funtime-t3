@@ -1,0 +1,32 @@
+appId: com.funtime.mobile
+---
+# Connect the Expo dev client to Metro, then stop once login is actually visible.
+# Re-opening the boot deep link after JS loads can yank Expo Router off /auth.
+# Keep optional tap timeouts short; missing Continue/Reload used to cost ~10s each.
+- launchApp
+- repeat:
+    while:
+      notVisible: "Welcome Back"
+    times: 12
+    commands:
+      - openLink: ${E2E_APP_BOOT_URL}
+      - tapOn:
+          text: ${E2E_DEV_SERVER_URL}
+          optional: true
+          timeout: 1000
+      - tapOn:
+          text: "Continue"
+          optional: true
+          timeout: 1000
+      - tapOn:
+          text: "Reload"
+          optional: true
+          timeout: 1000
+      - tapOn:
+          text: "Go home"
+          optional: true
+          timeout: 1000
+      - waitForAnimationToEnd
+- extendedWaitUntil:
+    visible: "Welcome Back"
+    timeout: 120000
