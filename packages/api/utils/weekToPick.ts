@@ -1,16 +1,38 @@
-/** The pick page shows the next week that has not started. */
+import { hasWeekKickedOff, isWeekClosedForPicks } from "./pickPermissions";
+
+type WeekToPickGame = { week: number; ts: Date };
+
+/**
+ * Pick target from kickoff time, league late policy, and this person's picks.
+ * Unstarted weeks stay the target even after a submit. A started week stays
+ * only while it still accepts picks and this person has not submitted it.
+ */
 export function getWeekToPick(
-  schedule: readonly { week: number; ts: Date }[],
-  now: Date,
+  schedule: readonly WeekToPickGame[],
+  {
+    now,
+    policy,
+    submittedWeeks,
+  }: {
+    now: Date;
+    policy: string | null | undefined;
+    submittedWeeks: ReadonlySet<number>;
+  },
 ) {
   if (!schedule.length) {
     return 1;
   }
-  const startedWeeks = new Set(
-    schedule.filter((game) => game.ts <= now).map((game) => game.week),
-  );
   const weeks = [...new Set(schedule.map((game) => game.week))].sort(
     (a, b) => a - b,
   );
-  return weeks.find((week) => !startedWeeks.has(week)) ?? weeks.at(-1)!;
+  for (const week of weeks) {
+    const weekGames = schedule.filter((game) => game.week === week);
+    if (isWeekClosedForPicks(policy, weekGames, now)) {
+      continue;
+    }
+    if (!hasWeekKickedOff(weekGames, now) || !submittedWeeks.has(week)) {
+      return week;
+    }
+  }
+  return weeks.at(-1)!;
 }

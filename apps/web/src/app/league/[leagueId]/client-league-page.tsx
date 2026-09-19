@@ -1,5 +1,5 @@
 "use client";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { GameCard } from "~/components/league/GameCard";
 import { Button } from "~/components/ui/button";
@@ -25,7 +25,6 @@ import { Separator } from "~/components/ui/separator";
 import { Text } from "~/components/ui/text";
 import { PicksTable } from "./picks-table";
 import { CompactYourPicksList, YourPicksList } from "./your-picks-list";
-// import cloneDeep from "lodash/cloneDeep";
 import { AlertCircleIcon, MessagesSquare, Trophy } from "lucide-react";
 import Link from "next/link";
 import { ScenariosButton } from "~/components/league/ScenariosButton";
@@ -37,6 +36,10 @@ import { type RouterOutputs } from "~/trpc/types";
 import { useDictify } from "~/utils/hooks/useIdToValMemo";
 import { useLeagueUnreadMessages } from "~/hooks/useLeagueUnreadMessages";
 import { useChatLayer } from "~/components/messages/ChatLayer";
+import {
+  isWeekClosedForPicks,
+  shouldHideLeaguePicksTable,
+} from "@funtime/api/utils/pickPermissions";
 
 type ClientLeaguePageProps = {
   week: number;
@@ -50,7 +53,6 @@ type ClientLeaguePageProps = {
   currentGame: RouterOutputs["time"]["activeWeekByLeague"];
   weekWinners: RouterOutputs["league"]["weekWinners"];
   weeksWithPicks: RouterOutputs["picks"]["weeksWithPicks"];
-  viewerHasPicks: boolean;
 };
 
 const REFETCH_INTERVAL_MS = 1000 * 60 * 2;
@@ -103,7 +105,6 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
 
   const router = useRouter();
   const pathname = usePathname();
-  const searchParams = useSearchParams();
 
   const [overrideGidToWinner, setOverrideGidToWinner] = useState<
     Record<number, number>
@@ -134,6 +135,7 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
   }, [picksSummaryData, overrideGidToWinner]);
 
   const myPicks = picksSummary.find((p) => p.user_id === session.dbUser?.uid);
+  const viewerHasPicks = (myPicks?.picks.length ?? 0) > 0;
 
   const selectGame = useCallback(
     (gid: number, winner: number) => {
@@ -158,13 +160,17 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
     Number(gid),
   );
   const simulatedGameCount = simulatedGids.length;
+  const hideLeaguePicks = shouldHideLeaguePicksTable(
+    viewerHasPicks,
+    isWeekClosedForPicks(
+      league.late_policy,
+      games.map((game) => ({ ts: new Date(game.ts) })),
+      new Date(),
+    ),
+  );
 
-  const banner: "make-picks" | "winners" | null =
-    weekWinners.winners.length > 0
-      ? "winners"
-      : !props.viewerHasPicks && !searchParams.get("week")
-        ? "make-picks"
-        : null;
+  const banner: "winners" | null =
+    weekWinners.winners.length > 0 ? "winners" : null;
 
   return (
     <>
@@ -202,20 +208,8 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
             </Alert>
           </div>
         </div>
-      ) : banner === "make-picks" ? (
-        <Alert className="col-span-12 flex items-center">
-          <AlertTitle>
-            You need to make your picks for this week. Make them{" "}
-            <Link
-              href={`/league/${league.league_id}/pick`}
-              className="underline"
-            >
-              here
-            </Link>
-            .
-          </AlertTitle>
-        </Alert>
       ) : simulatedGameCount === 0 &&
+        !hideLeaguePicks &&
         session.dbUser?.email === "bambrose24@gmail.com" ? (
         <div className="col-span-12 flex justify-center">
           <ScenariosButton
@@ -267,7 +261,7 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
               </Badge>
             )}
           </Button>
-          {myPicks && firstGame && (
+          {viewerHasPicks && myPicks && firstGame && (
             <Card className="w-full">
               <CardHeader>
                 <CardTitle className="text-balance pb-2 text-center">
@@ -401,7 +395,7 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
             </div>
           )}
           <div className="flex flex-col xl:hidden">
-            {myPicks && firstGame && (
+            {viewerHasPicks && myPicks && firstGame && (
               <Drawer>
                 <DrawerTrigger asChild>
                   <Button variant="secondary" className="w-full">
@@ -438,12 +432,32 @@ export function ClientLeaguePage(props: ClientLeaguePageProps) {
               </Drawer>
             )}
           </div>
-          <PicksTable
-            picksSummary={picksSummary}
-            teams={teams}
-            games={games}
-            simulatedGames={overrideGidToWinner}
-          />
+          {hideLeaguePicks ? (
+            <Card>
+              <CardHeader>
+                <CardTitle>
+                  Make your picks to see the league&apos;s picks
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="flex flex-col gap-4">
+                <p className="text-sm text-muted-foreground">
+                  Submit this week&apos;s picks to unlock the league table.
+                </p>
+                <Button asChild>
+                  <Link href={`/league/${league.league_id}/pick`}>
+                    Make your picks
+                  </Link>
+                </Button>
+              </CardContent>
+            </Card>
+          ) : (
+            <PicksTable
+              picksSummary={picksSummary}
+              teams={teams}
+              games={games}
+              simulatedGames={overrideGidToWinner}
+            />
+          )}
         </div>
       </div>
     </>

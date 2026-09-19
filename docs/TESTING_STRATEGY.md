@@ -49,14 +49,21 @@ The CI job performs these gates in order:
 
 1. Installs pinned Node, pnpm, Bun, Supabase CLI, PostgreSQL client, and the
    Playwright Chromium browser plus Linux dependencies.
-2. Starts the Docker-backed Supabase stack on the ephemeral runner.
-3. Resets the local database, applies Prisma migrations, loads the deterministic
+2. Runs `@funtime/api` unit tests (`pnpm --filter @funtime/api test`), including
+   week-to-pick, pick-permission, picks-summary, and home-status coverage.
+3. Starts the Docker-backed Supabase stack on the ephemeral runner.
+4. Resets the local database, applies Prisma migrations, loads the deterministic
    schedule seed, and runs the read-only seed verification.
-4. Creates deterministic local Auth users and web fixtures.
-5. Starts Next.js against that local database and runs all Playwright specs.
-6. Uploads the Playwright report, traces/screenshots/videos, Next.js log,
+5. Runs `@funtime/api` integration tests against that local PostgreSQL
+   (`pnpm --filter @funtime/api test:integration`), including late-policy and
+   week-to-pick router cases.
+6. Creates deterministic local Auth users and web fixtures.
+7. Starts Next.js against that local database and runs all Playwright specs,
+   including `apps/web/e2e/picks/week-to-pick.spec.ts` and
+   `apps/web/e2e/picks/integrity.spec.ts`.
+8. Uploads the Playwright report, traces/screenshots/videos, Next.js log,
    Supabase status, and Docker container state on success or failure.
-7. Stops the temporary Supabase stack without retaining its data.
+9. Stops the temporary Supabase stack without retaining its data.
 
 Any bootstrap, migration, seed, readiness, browser, assertion, or uncaught-page
 error exits nonzero and fails the `chromium-e2e` job. To prevent merging on a

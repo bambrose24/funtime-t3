@@ -29,6 +29,7 @@ function caller(
   viewerWeek: number | null,
   memberLeague = leagueId,
   games = startedGames,
+  policy: string | null = null,
 ) {
   const pick = (gid: number, pickWeek: number) => ({
     gid,
@@ -59,7 +60,12 @@ function caller(
       leaguemembers: [{ league_id: memberLeague, membership_id: 1 }],
     },
     db: {
-      leagues: { findFirstOrThrow: async () => ({ season: 2026 }) },
+      leagues: {
+        findFirstOrThrow: async () => ({
+          season: 2026,
+          late_policy: policy,
+        }),
+      },
       games: { findMany: async () => games },
       leaguemembers: {
         findMany: async (args: {
@@ -79,19 +85,52 @@ function caller(
   return leagueRouter.createCaller(ctx);
 }
 
-test("after first kickoff, every member sees the full slate and future tiebreaker score", async () => {
-  for (const viewerWeek of [week, null, 2]) {
-    const rows = await caller(viewerWeek).picksSummary({ leagueId, week });
-    const other = rows.find((row) => row.membership_id === 2)!;
-    expect(other.picks.map((p) => p.winner)).toEqual([101, 102]);
-    expect(other.correctPicks).toBe(1);
-    expect(other.tiebreakerScore).toBe(44);
-  }
+test("after first kickoff, submitted viewers see the full slate and future tiebreaker score", async () => {
+  const rows = await caller(week).picksSummary({ leagueId, week });
+  const other = rows.find((row) => row.membership_id === 2)!;
+  expect(other.picks.map((p) => p.winner)).toEqual([101, 102]);
+  expect(other.correctPicks).toBe(1);
+  expect(other.tiebreakerScore).toBe(44);
 
-  const submitted = await caller(week).picksSummary({ leagueId, week });
-  const own = submitted.find((row) => row.membership_id === 1)!;
+  const own = rows.find((row) => row.membership_id === 1)!;
   expect(own.picks.map((p) => p.winner)).toEqual([101, 102]);
   expect(own.tiebreakerScore).toBe(44);
+});
+
+test("after first kickoff, unsubmitted viewers cannot see opponents while the week still accepts picks", async () => {
+  for (const viewerWeek of [null, 2]) {
+    const rows = await caller(viewerWeek).picksSummary({ leagueId, week });
+    const other = rows.find((row) => row.membership_id === 2)!;
+    expect(other.picks.map((p) => p.winner)).toEqual([null, null]);
+    expect(other.correctPicks).toBe(0);
+    expect(other.tiebreakerScore).toBe(0);
+  }
+});
+
+test("after the week no longer accepts picks, unsubmitted viewers can see the slate", async () => {
+  const finishedGames = [
+    { gid: 100, ts: new Date("2000-01-01"), is_tiebreaker: false },
+    { gid: 101, ts: new Date("2000-01-02"), is_tiebreaker: true },
+  ];
+  const rows = await caller(null, leagueId, finishedGames).picksSummary({
+    leagueId,
+    week,
+  });
+  const other = rows.find((row) => row.membership_id === 2)!;
+  expect(other.picks.map((p) => p.winner)).toEqual([101, 102]);
+  expect(other.tiebreakerScore).toBe(44);
+});
+
+test("first-kickoff policy reveals opponents after kickoff even without a submit", async () => {
+  const rows = await caller(
+    null,
+    leagueId,
+    startedGames,
+    "close_at_first_game_start",
+  ).picksSummary({ leagueId, week });
+  const other = rows.find((row) => row.membership_id === 2)!;
+  expect(other.picks.map((p) => p.winner)).toEqual([101, 102]);
+  expect(other.tiebreakerScore).toBe(44);
 });
 
 test("before first kickoff, submitted viewers see only their own picks", async () => {
@@ -119,11 +158,15 @@ test("before first kickoff, unsubmitted viewers also see empty opponent picks", 
   expect(other.tiebreakerScore).toBe(0);
 });
 
-test("the full slate appears at the first kickoff, not one millisecond before", async () => {
+test("the full slate appears at the first kickoff for submitted viewers, not one millisecond before", async () => {
   const kickoff = new Date();
   const slate = [
     { gid: 100, ts: new Date(kickoff.getTime() - 1), is_tiebreaker: false },
-    { gid: 101, ts: new Date(kickoff.getTime() + 86_400_000), is_tiebreaker: true },
+    {
+      gid: 101,
+      ts: new Date(kickoff.getTime() + 86_400_000),
+      is_tiebreaker: true,
+    },
   ];
   const justStarted = await caller(week, leagueId, slate).picksSummary({
     leagueId,
@@ -136,8 +179,16 @@ test("the full slate appears at the first kickoff, not one millisecond before", 
   ).toEqual([101, 102]);
 
   const stillUpcoming = [
-    { gid: 100, ts: new Date(kickoff.getTime() + 60_000), is_tiebreaker: false },
-    { gid: 101, ts: new Date(kickoff.getTime() + 86_400_000), is_tiebreaker: true },
+    {
+      gid: 100,
+      ts: new Date(kickoff.getTime() + 60_000),
+      is_tiebreaker: false,
+    },
+    {
+      gid: 101,
+      ts: new Date(kickoff.getTime() + 86_400_000),
+      is_tiebreaker: true,
+    },
   ];
   const hidden = await caller(week, leagueId, stillUpcoming).picksSummary({
     leagueId,

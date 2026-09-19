@@ -2,6 +2,10 @@ import {
   getStartedTiebreakerScore,
   sortWeekPicks,
 } from "@funtime/api/utils/weekPicksSort";
+import {
+  isWeekClosedForPicks,
+  shouldHideLeaguePicksTable,
+} from "@funtime/api/utils/pickPermissions";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   Modal,
@@ -326,6 +330,14 @@ export function LeagueOverviewTab({
     totalMembersCount > 0
       ? `${submittedMembersCount}/${totalMembersCount} members submitted`
       : "League submissions will appear once picks are posted";
+  const hideLeaguePicks = shouldHideLeaguePicksTable(
+    myPickCount > 0,
+    isWeekClosedForPicks(
+      leagueData?.late_policy,
+      (games ?? []).map((game) => ({ ts: new Date(game.ts) })),
+      now,
+    ),
+  );
   const refreshStatusLabel = isRefreshing
     ? "Refreshing..."
     : lastRefreshedAt
@@ -624,7 +636,9 @@ export function LeagueOverviewTab({
               </View>
             </View>
             <Text className="mt-2 text-xs text-gray-600 dark:text-gray-400">
-              {leagueProgressLabel}
+              {hideLeaguePicks
+                ? "Submit this week's picks to see who is in."
+                : leagueProgressLabel}
             </Text>
           </View>
         )}
@@ -785,7 +799,24 @@ export function LeagueOverviewTab({
           )}
 
         {/* Picks Table */}
-        {picksSummary && picksSummary.length > 0 && games && (
+        {hideLeaguePicks ? (
+          <View className="mx-4 mb-6 rounded-xl border border-gray-200 bg-gray-50 px-4 py-5 dark:border-zinc-700 dark:bg-zinc-800">
+            <Text className="text-base font-semibold text-app-fg-light dark:text-app-fg-dark">
+              Make your picks to see the league's picks
+            </Text>
+            <Text className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+              Submit this week's picks to unlock the league table.
+            </Text>
+            <Pressable
+              onPress={onSwitchToPicks}
+              className="mt-4 rounded-lg bg-blue-500 px-4 py-2.5"
+            >
+              <Text className="text-center font-medium text-white">
+                Make your picks
+              </Text>
+            </Pressable>
+          </View>
+        ) : picksSummary && picksSummary.length > 0 && games ? (
           <View className="mb-6">
             <Text className="mb-3 px-4 text-lg font-semibold text-app-fg-light dark:text-app-fg-dark">
               League Picks
@@ -801,7 +832,7 @@ export function LeagueOverviewTab({
               teams={teamById}
             />
           </View>
-        )}
+        ) : null}
 
         {!isLoading &&
           !isUserPicksLoading &&
