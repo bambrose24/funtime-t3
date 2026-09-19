@@ -6,7 +6,12 @@ type InputProps = TextInputProps & {
   className?: string;
 };
 
-function Input({ className, ...props }: InputProps) {
+function Input({
+  className,
+  accessibilityLabel,
+  placeholder,
+  ...props
+}: InputProps) {
   return (
     <TextInput
       className={cn(
@@ -15,6 +20,11 @@ function Input({ className, ...props }: InputProps) {
         className,
       )}
       placeholderTextColor="#9CA3AF"
+      placeholder={placeholder}
+      accessibilityLabel={
+        accessibilityLabel ??
+        (typeof placeholder === "string" ? placeholder : undefined)
+      }
       {...props}
     />
   );

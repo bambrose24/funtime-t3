@@ -346,6 +346,7 @@ export default function CreateLeagueScreen() {
               League Name
             </Text>
             <Input
+              testID="create-league-name"
               value={name}
               onChangeText={setName}
               placeholder="My Funtime League"
@@ -537,6 +538,7 @@ export default function CreateLeagueScreen() {
               </View>
               <View className="flex-1">
                 <SelectOption
+                  testID="create-league-superbowl-disabled"
                   selected={!superbowlCompetition}
                   onPress={() => setSuperbowlCompetition(false)}
                   className="px-4 py-3"
@@ -550,7 +552,7 @@ export default function CreateLeagueScreen() {
           </View>
 
           <View className="gap-3 pt-2">
-            <Button onPress={onSubmit} disabled={!canSubmit}>
+            <Button testID="create-league-submit" onPress={onSubmit} disabled={!canSubmit}>
               {createButtonText}
             </Button>
             <Button

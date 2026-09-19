@@ -7,6 +7,7 @@ cd "$ROOT_DIR"
 ANDROID_APP_ID="${E2E_ANDROID_APP_ID:-com.funtime.mobile}"
 BUILD_VARIANT="${E2E_ANDROID_BUILD_VARIANT:-debug}"
 FORCE_REINSTALL="${E2E_FORCE_REINSTALL_DEV_CLIENT:-0}"
+ANDROID_ARCH="${E2E_ANDROID_ARCH:-}"
 ANDROID_SDK_ROOT_DEFAULT="${HOME}/Library/Android/sdk"
 ANDROID_SDK_ROOT="${ANDROID_SDK_ROOT:-${ANDROID_HOME:-$ANDROID_SDK_ROOT_DEFAULT}}"
 export ANDROID_SDK_ROOT
@@ -181,9 +182,14 @@ configure_local_properties
 
 echo "[e2e] Building Android APK (${BUILD_VARIANT}) without launching Expo/Metro..."
 echo "[e2e] This may take several minutes the first time."
+gradle_args=(":app:$(assemble_task "$BUILD_VARIANT")")
+if [[ -n "$ANDROID_ARCH" ]]; then
+  echo "[e2e] Limiting native ABIs to ${ANDROID_ARCH}."
+  gradle_args+=("-PreactNativeArchitectures=${ANDROID_ARCH}")
+fi
 (
   cd apps/mobile/android
-  ./gradlew ":app:$(assemble_task "$BUILD_VARIANT")"
+  ./gradlew "${gradle_args[@]}"
 ) >/tmp/funtime-e2e-dev-client-build.log 2>&1 || {
   echo "[e2e] Gradle APK build failed. Tail of /tmp/funtime-e2e-dev-client-build.log:" >&2
   tail -n 120 /tmp/funtime-e2e-dev-client-build.log >&2 || true
@@ -206,7 +212,7 @@ install_apk "$APK" || {
   exit 1
 }
 
-for _ in $(seq 1 15); do
+for _ in $(seq 1 90); do
   if is_installed; then
     echo "[e2e] Dev client installed (${ANDROID_APP_ID})."
     exit 0

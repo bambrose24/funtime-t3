@@ -1,67 +1,88 @@
 appId: com.funtime.mobile
 ---
-- launchApp
-- repeat:
-    times: 8
-    commands:
-      - openLink: ${E2E_APP_BOOT_URL}
-      - tapOn:
-          text: ${E2E_DEV_SERVER_URL}
-          optional: true
-      - tapOn:
-          text: "Continue"
-          optional: true
-      - tapOn:
-          text: "Reload"
-          optional: true
-      - tapOn:
-          text: "Go home"
-          optional: true
-      - waitForAnimationToEnd
-- extendedWaitUntil:
-    visible: "Enter your email"
-    timeout: 180000
+- runFlow: boot-to-login.yaml
 - tapOn: "Don't have an account? Sign up"
 - extendedWaitUntil:
     visible: "Create an account"
     timeout: 30000
-- tapOn: "example@gmail.com"
-- inputText: ${E2E_EMAIL}
-- tapOn: "Enter your password"
-- inputText: "Password123!"
-- tapOn: "Confirm your password"
-- inputText: "Password123!"
-- tapOn: "Create Account"
-- tapOn: "Create an account"
 - tapOn:
-    text: "GO TO LOGIN"
-    optional: true
-- tapOn: "Go to Login"
-- extendedWaitUntil:
-    visible: "Welcome Back"
-    timeout: 30000
-- tapOn: "Enter your email"
+    id: "signup-email-input"
 - inputText: ${E2E_EMAIL}
-- tapOn: "Enter your password"
+- tapOn:
+    id: "signup-password-input"
 - inputText: "Password123!"
-- tapOn: "Sign In"
+- tapOn:
+    id: "signup-password-confirm-input"
+- inputText: "Password123!"
+- hideKeyboard
+- tapOn:
+    id: "signup-create-account"
+# Local Supabase has email confirmations off, so signup creates a session and
+# routes to confirm-signup. Dismiss whichever dialog is covering that screen.
+- tapOn:
+    text: "Go to Login"
+    optional: true
+- tapOn:
+    text: "Continue"
+    optional: true
+- tapOn:
+    text: "OK"
+    optional: true
 - extendedWaitUntil:
     visible: "First Name"
-    timeout: 30000
-- tapOn: "First Name"
+    timeout: 60000
+- tapOn:
+    id: "confirm-signup-first-name"
 - inputText: "Maestro"
-- tapOn: "Last Name"
+- tapOn:
+    id: "confirm-signup-last-name"
 - inputText: "Tester"
-- tapOn: "Username"
+- tapOn:
+    id: "confirm-signup-username"
 - inputText: ${E2E_USERNAME}
-- tapOn: "Finish Signup"
-- tapOn: "Continue"
-- tapOn: "Create League"
-- tapOn: "My Funtime League"
-- inputText: "E2E League One"
-- tapOn: "Disabled"
-- tapOn: "Create League"
+- hideKeyboard
+- tapOn:
+    id: "confirm-signup-finish"
+- tapOn:
+    text: "Continue"
+    optional: true
+- extendedWaitUntil:
+    visible: "My Leagues"
+    timeout: 30000
 - tapOn: "Pick"
-- tapOn: "Randomize Open Picks"
-- tapOn: "Submit Picks"
+- tapOn:
+    id: "pick-create-league"
+- extendedWaitUntil:
+    visible: "League Name"
+    timeout: 30000
+- tapOn:
+    id: "create-league-name"
+- inputText: "E2E League One"
+- hideKeyboard
+- scrollUntilVisible:
+    element:
+      id: "create-league-superbowl-disabled"
+    direction: DOWN
+    timeout: 15000
+- tapOn:
+    id: "create-league-superbowl-disabled"
+- tapOn:
+    id: "create-league-submit"
+- tapOn: "Pick"
+- extendedWaitUntil:
+    visible: "Randomize Open Picks"
+    timeout: 60000
+- tapOn:
+    id: "picks-randomize"
+- runFlow:
+    when:
+      visible:
+        id: "picks-tiebreaker-score"
+    commands:
+      - tapOn:
+          id: "picks-tiebreaker-score"
+      - inputText: "47"
+      - hideKeyboard
+- tapOn:
+    id: "picks-submit"
 - assertVisible: "Update Picks"

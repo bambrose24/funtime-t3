@@ -151,7 +151,10 @@ export default function PickScreen() {
                 </Button>
               </View>
               <View className="flex-1">
-                <Button onPress={() => router.push("/league/create" as any)}>
+                <Button
+                  testID="pick-create-league"
+                  onPress={() => router.push("/league/create" as any)}
+                >
                   Create League
                 </Button>
               </View>

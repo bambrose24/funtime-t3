@@ -133,7 +133,10 @@ export default function SignupScreen() {
 
   if (success) {
     return (
-      <SafeAreaView className="bg-app-bg-light dark:bg-app-bg-dark flex-1">
+      <SafeAreaView
+        testID="auth-signup-success-screen"
+        className="bg-app-bg-light dark:bg-app-bg-dark flex-1"
+      >
         <View className="flex-1 justify-center items-center px-6">
           <View className="w-full max-w-sm">
             <Text className="text-app-fg-light dark:text-app-fg-dark text-center text-2xl font-bold mb-4">
@@ -143,7 +146,10 @@ export default function SignupScreen() {
               We've sent you a confirmation email. Click the link in your email to
               verify your account and complete your profile setup.
             </Text>
-            <Button onPress={() => router.replace(withRedirectTo("/auth") as any)}>
+            <Button
+              testID="signup-go-to-login"
+              onPress={() => router.replace(withRedirectTo("/auth") as any)}
+            >
               Go to Login
             </Button>
           </View>
@@ -153,7 +159,10 @@ export default function SignupScreen() {
   }
 
   return (
-    <SafeAreaView className="bg-app-bg-light dark:bg-app-bg-dark flex-1">
+    <SafeAreaView
+      testID="auth-signup-screen"
+      className="bg-app-bg-light dark:bg-app-bg-dark flex-1"
+    >
       <ScrollView 
         className="flex-1" 
         showsVerticalScrollIndicator={false}
@@ -188,6 +197,7 @@ export default function SignupScreen() {
                 Email
               </Text>
               <Input
+                testID="signup-email-input"
                 value={email}
                 onChangeText={(text) => {
                   setEmail(text);
@@ -210,6 +220,7 @@ export default function SignupScreen() {
                 Password
               </Text>
               <Input
+                testID="signup-password-input"
                 value={password1}
                 onChangeText={(text) => {
                   setPassword1(text);
@@ -231,6 +242,7 @@ export default function SignupScreen() {
                 Confirm Password
               </Text>
               <Input
+                testID="signup-password-confirm-input"
                 value={password2}
                 onChangeText={(text) => {
                   setPassword2(text);
@@ -248,6 +260,7 @@ export default function SignupScreen() {
 
             {/* Signup Button */}
             <Button
+              testID="signup-create-account"
               onPress={handleSignup}
               disabled={loading}
               className="mt-2"

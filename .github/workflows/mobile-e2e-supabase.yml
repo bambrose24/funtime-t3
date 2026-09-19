@@ -34,6 +34,9 @@ jobs:
 
     env:
       SUPABASE_DB_URL: "postgresql://postgres:postgres@127.0.0.1:55422/postgres"
+      MAESTRO_CLI_NO_ANALYTICS: "1"
+      EXPO_NO_TELEMETRY: "1"
+      ELECTRON_DISABLE_SANDBOX: "1"
 
     steps:
       - name: Checkout
@@ -69,6 +72,18 @@ jobs:
           curl -Ls "https://get.maestro.mobile.dev" | bash
           echo "$HOME/.maestro/bin" >> "$GITHUB_PATH"
 
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+          if [[ -e /dev/kvm ]]; then
+            echo "KVM is available"
+            ls -l /dev/kvm
+          else
+            echo "KVM is not available; the emulator will use software rendering"
+          fi
+
       - name: Build deterministic seed
         run: pnpm e2e:fixtures:build-seed
 
@@ -81,6 +96,11 @@ jobs:
           api-level: 34
           arch: x86_64
           profile: pixel_7
+          ram-size: 4096M
+          disk-size: 6144M
+          heap-size: 512M
+          disable-animations: true
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
           script: |
             eval "$(supabase status -o env | sed 's/^/export /')"
 
@@ -89,6 +109,7 @@ jobs:
             export E2E_FORCE_REINSTALL_DEV_CLIENT=0
             export E2E_CLEAR_DEV_CLIENT_DATA=1
             export E2E_EMULATOR_WAIT_SECONDS=300
+            export E2E_ANDROID_ARCH=x86_64
             pnpm e2e:mobile:maestro -- --skip-backend-up
 
       - name: Upload logs
@@ -105,5 +126,7 @@ jobs:
             /tmp/funtime-e2e-dev-client-build.log
             /tmp/funtime-e2e-dev-client-prebuild.log
             /tmp/funtime-e2e-dev-client-adb-install.log
+            /tmp/funtime-e2e-logcat.txt
+            /home/runner/.maestro/tests
             apps/mobile/e2e/flows
           if-no-files-found: warn

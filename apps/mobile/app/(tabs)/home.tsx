@@ -208,6 +208,7 @@ export default function HomeScreen() {
 
         <View className="px-6 pb-4">
           <Button
+            testID="home-join-league"
             variant="outline"
             onPress={() => router.push("/join-league" as any)}
           >

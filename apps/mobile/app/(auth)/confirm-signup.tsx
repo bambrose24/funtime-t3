@@ -100,7 +100,10 @@ export default function ConfirmSignupScreen() {
   };
 
   return (
-    <SafeAreaView className="bg-app-bg-light dark:bg-app-bg-dark flex-1">
+    <SafeAreaView
+      testID="confirm-signup-screen"
+      className="bg-app-bg-light dark:bg-app-bg-dark flex-1"
+    >
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         className="flex-1"
@@ -134,6 +137,7 @@ export default function ConfirmSignupScreen() {
                     name="firstName"
                     render={({ field: { onChange, onBlur, value } }) => (
                       <Input
+                        testID="confirm-signup-first-name"
                         placeholder="John"
                         value={value}
                         onChangeText={onChange}
@@ -159,6 +163,7 @@ export default function ConfirmSignupScreen() {
                     name="lastName"
                     render={({ field: { onChange, onBlur, value } }) => (
                       <Input
+                        testID="confirm-signup-last-name"
                         placeholder="Doe"
                         value={value}
                         onChangeText={onChange}
@@ -186,6 +191,7 @@ export default function ConfirmSignupScreen() {
                   name="username"
                   render={({ field: { onChange, onBlur, value } }) => (
                     <Input
+                      testID="confirm-signup-username"
                       placeholder="john_doe123"
                       value={value}
                       onChangeText={onChange}
@@ -208,6 +214,7 @@ export default function ConfirmSignupScreen() {
 
               {/* Submit Button */}
               <Button
+                testID="confirm-signup-finish"
                 onPress={handleSubmit(onSubmit)}
                 disabled={!isValid || submitting}
                 size="lg"
