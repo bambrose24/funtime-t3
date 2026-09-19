@@ -21,23 +21,36 @@ for (const policy of [
   null,
   "allow_late_and_lock_after_start",
   "allow_late_whole_week",
-  "close_at_first_game_start",
 ]) {
-  test(`${policy}: a started week advances Home to the next unstarted week`, () => {
+  test(`${policy}: an unsubmitted started week still needs remaining games`, () => {
     expect(getHomeLeagueStatus(schedule, new Set(), policy, now)).toEqual({
       state: "needed",
-      week: 2,
+      week: 1,
     });
   });
 }
+test("first-kickoff policy advances Home once the started week is closed", () => {
+  expect(
+    getHomeLeagueStatus(schedule, new Set(), "close_at_first_game_start", now),
+  ).toEqual({
+    state: "needed",
+    week: 2,
+  });
+});
 test("submitting the started week does not fulfill the next unstarted week", () => {
   expect(getHomeLeagueStatus(schedule, new Set([1]), null, now)).toEqual({
     state: "needed",
     week: 2,
   });
 });
-test("the next unstarted week can already be submitted", () => {
+test("picks on a later week do not skip a still-open unsubmitted week", () => {
   expect(getHomeLeagueStatus(schedule, new Set([2]), null, now)).toEqual({
+    state: "needed",
+    week: 1,
+  });
+});
+test("the next unstarted week can already be submitted", () => {
+  expect(getHomeLeagueStatus(schedule, new Set([1, 2]), null, now)).toEqual({
     state: "submitted",
     week: 2,
   });
@@ -95,7 +108,7 @@ test("the deadline is inclusive and follows the current schedule", () => {
     ),
   ).toEqual({ state: "needed", week: 2 });
 });
-test("week advances at first kickoff, regardless of existing picks", () => {
+test("submitting a started allow-late week advances Home to the next open week", () => {
   expect(
     getHomeLeagueStatus(schedule, new Set([1]), null, firstKickoff),
   ).toEqual({ state: "needed", week: 2 });

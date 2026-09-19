@@ -60,9 +60,10 @@ Funtime solves this by combining:
 - Mobile release order: player-first core loop, then admin capabilities.
 - Weekly picks are one complete weekly submission per league, not a sequence of partial submissions. Players select every available game and enter the required tiebreaker before submitting. Home reports whether that week's picks are in or still need to be made; it does not show per-game completion counts.
 - Pick visibility:
-  - The weekly picks table is always visible. Opponent picks, including later games and the tiebreaker score, stay empty until the first game of that week starts.
-  - After that first kickoff, the full slate is visible to every member.
-  - A member who has already submitted still sees their own picks in the table before kickoff.
+  - Until a member submits that week's picks, the weekly picks table is replaced with a prompt to pick. Opponent picks stay hidden in the API while that week still accepts picks.
+  - After the first kickoff, submitted members see the full slate, including later games and the tiebreaker.
+  - A member who has already submitted still sees their own picks in the table before kickoff; opponent cells stay empty until kickoff.
+  - Once the week no longer accepts picks, the table is visible even without a submission so members can see results.
 - Late policy: league-configurable; no single mandated league default requirement.
 - `close_at_first_game_start` closes the entire week at its earliest scheduled kickoff, including later games. Recompute against the current schedule after rescheduling. Ordinary admins follow this deadline; explicit super-admin corrections remain exempt.
 - `allow_late_and_lock_after_start` locks each game at its own kickoff. Legacy `allow_late_whole_week` and unset policies temporarily retain this same per-game behavior pending inventory and migration decisions.
@@ -215,7 +216,7 @@ Unless a requirement is explicitly labeled **Target** or **Planned**, it describ
 
 - The player-facing unit of work is the whole week: choose every available game's winner and supply the required tiebreaker score, then submit once. There is no supported save-partial-week workflow. Players may revise their submitted picks while the applicable locks permit it.
 - Under a per-game late policy, a player who arrives after kickoff submits all still-available games together. Previously locked games are preserved or remain missed; they do not make an otherwise valid weekly submission "incomplete." The first-kickoff policy instead closes the entire week as defined in section 6.1.
-- Determine the current target week for picks (`weekToPick`) from the game schedule and kickoff state. The pick page shows the next week that has not started. Once a week's first game has kicked off, that week is locked as the pick target if a later week exists. Existing picks alone must not skip an unstarted week.
+- Determine the current target week for picks (`weekToPick`) from the game schedule, the league late policy, and the viewer's existing picks. An unstarted week stays the target even if picks already exist. Under a per-game late policy, a started week stays the target while games remain open and the viewer has not submitted; after they submit, or after every remaining game is locked, the picker advances. `close_at_first_game_start` advances at that week's first kickoff.
 - Show games for target week ordered for usable entry.
 - Allow a player to randomize open-game selections while preserving locked games.
 - Submit picks for one or more leagues with validation:
@@ -237,8 +238,9 @@ Super Bowl prediction privacy is enforced in player-profile and public-board res
 
 - Weekly picks summary is league-member-only.
 - Visibility rules:
-  - Viewer with no picks submitted for the week cannot view others' picks.
-  - Viewer with picks submitted can view others' picks for started games.
+  - Viewer with no picks submitted for the week cannot view others' picks while the week still accepts picks.
+  - Viewer with picks submitted can view others' picks after the week's first kickoff.
+  - Once the week no longer accepts picks, the table is visible even without a submission.
 - Expose week winners after results are finalized.
 
 ### 7.5 Standings and Leaderboard

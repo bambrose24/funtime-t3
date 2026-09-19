@@ -8,6 +8,7 @@ import {
   getWeekPickDeadline,
   hasWeekKickedOff,
   isPickLocked,
+  isWeekClosedForPicks,
 } from "../../../../utils/pickPermissions";
 import { TRPCError } from "@trpc/server";
 import { getWeekToPick } from "../../../../utils/weekToPick";
@@ -684,10 +685,23 @@ export const leagueRouter = createTRPCRouter({
 
       const { season } = data;
       const now = new Date();
-      const seasonGames = await ctx.db.games.findMany({
-        where: { season },
+      const [seasonGames, submittedWeekRows] = await Promise.all([
+        ctx.db.games.findMany({
+          where: { season },
+        }),
+        member
+          ? ctx.db.picks.findMany({
+              where: { member_id: member.membership_id },
+              distinct: ["week"],
+              select: { week: true },
+            })
+          : Promise.resolve([]),
+      ]);
+      const weekToReturn = getWeekToPick(seasonGames, {
+        now,
+        policy: data.late_policy,
+        submittedWeeks: new Set(submittedWeekRows.map((pick) => pick.week)),
       });
-      const weekToReturn = getWeekToPick(seasonGames, now);
       const gamesToReturn = orderBy(
         seasonGames.filter((game) => game.week === weekToReturn),
         [(g) => g.is_tiebreaker, (g) => g.ts, (g) => g.gid],
@@ -734,7 +748,7 @@ export const leagueRouter = createTRPCRouter({
           }
         : {};
 
-      const { season } = await db.leagues.findFirstOrThrow({
+      const { season, late_policy } = await db.leagues.findFirstOrThrow({
         where: { league_id: leagueId },
       });
 
@@ -767,6 +781,16 @@ export const leagueRouter = createTRPCRouter({
       ]);
 
       const weekHasStarted = hasWeekKickedOff(games);
+      const weekClosedForPicks = isWeekClosedForPicks(
+        late_policy,
+        games,
+        new Date(),
+      );
+      const viewerHasSubmitted = Boolean(
+        memberPicks.find(
+          (member) => member.membership_id === viewerMember.membership_id,
+        )?.picks.length,
+      );
       const gidToIndex = games.reduce((prev, curr, idx) => {
         prev.set(curr.gid, idx);
         return prev;
@@ -781,15 +805,16 @@ export const leagueRouter = createTRPCRouter({
         );
 
         mp.picks = mp.picks.map((p) => {
-          // The table is always visible. Opponent picks and tiebreakers stay
-          // empty until the first game of the week starts; your own row is not
-          // redacted after you submit.
+          // Opponent picks stay empty until first kickoff. After that they
+          // stay hidden until this viewer submits, unless the week is closed.
           if (
-            !canViewMemberWeekPicks(
-              viewerMember.membership_id,
-              mp.membership_id,
+            !canViewMemberWeekPicks({
+              viewerMemberId: viewerMember.membership_id,
+              targetMemberId: mp.membership_id,
               weekHasStarted,
-            )
+              viewerHasSubmitted,
+              weekClosedForPicks,
+            })
           ) {
             return { ...p, winner: null, correct: null, score: null };
           }

@@ -23,28 +23,24 @@ function picksSummaryUrl(leagueId: number, week = 1) {
   )}`;
 }
 
-test("started games lock and first kickoff reveals the full weekly picks table", async ({
+test("started games lock and the league table stays hidden until this player submits", async ({
   page,
 }) => {
   const leagueId = getLeagueId(E2E_LEAGUES.integrity.shareCode);
   await login(page, E2E_USERS.player);
 
   await page.goto(`/league/${leagueId}?week=1`);
-  const adminRow = page.getByRole("row").filter({ hasText: "webadmin" });
-  await expect(adminRow.getByText("KC", { exact: true })).toBeVisible();
-  const futureTeam = queryScalar(`
-    SELECT t."abbrev" FROM "games" g
-    JOIN "teams" t ON t."teamid" = g."home"
-    WHERE g."gid" = 2028002
-  `);
-  expect(futureTeam).not.toBe("");
-  await expect(adminRow.getByRole("cell")).toHaveText([
-    "webadmin",
-    "0",
-    "46",
-    "KC",
-    futureTeam,
-  ]);
+  await expect(
+    page.getByRole("heading", {
+      name: "Make your picks to see the league's picks",
+    }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: "Make your picks" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("row").filter({ hasText: "webadmin" }),
+  ).toHaveCount(0);
 
   // Check the authenticated response too: hiding only the table would leak picks.
   const summaryUrl = picksSummaryUrl(leagueId);
@@ -55,11 +51,12 @@ test("started games lock and first kickoff reveals the full weekly picks table",
     (row: { people: { username: string } }) =>
       row.people.username === "webadmin",
   );
-  expect(startedAdmin.tiebreakerScore).toBe(46);
-  expect(startedAdmin.picks).toEqual([
-    expect.objectContaining({ gid: 2028001, winner: 2 }),
-    expect.objectContaining({ gid: 2028002, winner: 6 }),
-  ]);
+  expect(startedAdmin.tiebreakerScore).toBe(0);
+  expect(
+    startedAdmin.picks.every(
+      (pick: { winner: number | null }) => pick.winner == null,
+    ),
+  ).toBe(true);
 
   await page.goto(`/league/${leagueId}/pick`);
   await expect(
@@ -103,6 +100,13 @@ test("started games lock and first kickoff reveals the full weekly picks table",
     .first()
     .click();
   await page.goto(`/league/${leagueId}?week=1`);
+  const adminRow = page.getByRole("row").filter({ hasText: "webadmin" });
+  const futureTeam = queryScalar(`
+    SELECT t."abbrev" FROM "games" g
+    JOIN "teams" t ON t."teamid" = g."home"
+    WHERE g."gid" = 2028002
+  `);
+  expect(futureTeam).not.toBe("");
   await expect(adminRow.getByRole("cell")).toHaveText([
     "webadmin",
     "0",
@@ -111,6 +115,18 @@ test("started games lock and first kickoff reveals the full weekly picks table",
     futureTeam,
   ]);
   await expect(adminRow.getByText("--")).toHaveCount(0);
+
+  const revealedResponse = await page.request.get(summaryUrl);
+  expect(revealedResponse.ok()).toBe(true);
+  const revealedAdmin = (await revealedResponse.json()).result.data.json.find(
+    (row: { people: { username: string } }) =>
+      row.people.username === "webadmin",
+  );
+  expect(revealedAdmin.tiebreakerScore).toBe(46);
+  expect(revealedAdmin.picks).toEqual([
+    expect.objectContaining({ gid: 2028001, winner: 2 }),
+    expect.objectContaining({ gid: 2028002, winner: 6 }),
+  ]);
 
   // A fresh server render must preserve the reveal, not just client state.
   await page.reload();
@@ -161,7 +177,9 @@ test("submitted picks stay private until the first game of the week starts", asy
   ).toBe(true);
   expect(admin.tiebreakerScore).toBe(44);
   expect(
-    player.picks.every((pick: { winner: number | null }) => pick.winner == null),
+    player.picks.every(
+      (pick: { winner: number | null }) => pick.winner == null,
+    ),
   ).toBe(true);
   expect(player.tiebreakerScore).toBe(0);
 

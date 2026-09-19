@@ -56,10 +56,6 @@ export default async function LeaguePage(props: Props) {
     week = activeGame?.week ?? picks.at(0)?.week ?? 1;
   }
 
-  const viewerMember = session.dbUser?.leaguemembers.find(
-    (m) => m.league_id === leagueId,
-  );
-
   const [data, games, teams, weekWinners, weeksWithPicks] = await Promise.all([
     serverApi.league.picksSummary({ leagueId, week }),
     serverApi.games.getGames({ week, season }),
@@ -67,11 +63,6 @@ export default async function LeaguePage(props: Props) {
     serverApi.league.weekWinners({ week, leagueId }),
     serverApi.picks.weeksWithPicks({ leagueId }),
   ]);
-
-  const viewerHasPicks =
-    Boolean(viewerMember) &&
-    (data.find((p1) => p1.membership_id === viewerMember?.membership_id)?.picks
-      ?.length ?? 0) > 0;
 
   return (
     <ClientLeaguePage
@@ -84,7 +75,6 @@ export default async function LeaguePage(props: Props) {
       league={league}
       session={session}
       currentGame={activeGame}
-      viewerHasPicks={viewerHasPicks}
       weekWinners={weekWinners}
       weeksWithPicks={weeksWithPicks}
     />

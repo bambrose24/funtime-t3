@@ -20,6 +20,19 @@ export const getWeekPickDeadline = (
 ): Date | null =>
   policy === "close_at_first_game_start" ? firstKickoff(games) : null;
 
+/** First-kickoff leagues close at the earliest start; others stay open while any game is unstarted. */
+export const isWeekClosedForPicks = (
+  policy: string | null | undefined,
+  games: readonly { ts: Date }[],
+  now: Date,
+) => {
+  const deadline = getWeekPickDeadline(policy, games);
+  if (deadline) {
+    return isPickLocked(deadline, now);
+  }
+  return !games.some((game) => game.ts > now);
+};
+
 /** Opponent picks stay hidden until the week's earliest kickoff, inclusive. */
 export const hasWeekKickedOff = (
   games: readonly { ts: Date | string }[],
@@ -29,8 +42,24 @@ export const hasWeekKickedOff = (
   return Boolean(kickoff && isPickLocked(kickoff, now));
 };
 
-export const canViewMemberWeekPicks = (
-  viewerMemberId: number,
-  targetMemberId: number,
-  weekHasStarted: boolean,
-) => viewerMemberId === targetMemberId || weekHasStarted;
+export const canViewMemberWeekPicks = ({
+  viewerMemberId,
+  targetMemberId,
+  weekHasStarted,
+  viewerHasSubmitted,
+  weekClosedForPicks,
+}: {
+  viewerMemberId: number;
+  targetMemberId: number;
+  weekHasStarted: boolean;
+  viewerHasSubmitted: boolean;
+  weekClosedForPicks: boolean;
+}) =>
+  viewerMemberId === targetMemberId ||
+  (weekHasStarted && (viewerHasSubmitted || weekClosedForPicks));
+
+/** Replace the league table until this person can no longer pick this week. */
+export const shouldHideLeaguePicksTable = (
+  viewerHasSubmitted: boolean,
+  weekClosedForPicks: boolean,
+) => !viewerHasSubmitted && !weekClosedForPicks;

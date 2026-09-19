@@ -118,12 +118,12 @@ This is local execution evidence from the isolated PR branch based on `778ee8f`.
 - [x] Tiebreaker validation rejects missing or invalid scores.
 - [x] Existing picks can be updated idempotently.
 - [x] Randomize fills the open week's picks before submission.
-- [x] After a week's first kickoff, `/pick` shows the next unstarted week even if later games in the started week are still open.
+- [x] After a week's first kickoff, `/pick` keeps an allow-late week for remaining games until that player submits, then advances; first-kickoff leagues skip the closed week immediately.
 - [x] Started games cannot be changed by a player.
 - [x] Started games cannot be changed by a league admin.
 - [x] Super admin can override a started pick for a correction.
 - [x] Apply-to-all-season-leagues submits to each eligible membership.
-- [x] A player without submitted picks cannot see other players' picks.
+- [x] A player without submitted picks cannot see other players' picks; the league table is replaced until they submit or the week closes.
 - [x] A submitted player sees only started-game picks from other players.
 
 ### Standings and profiles
