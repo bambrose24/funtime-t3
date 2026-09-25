@@ -29,7 +29,7 @@ const event = <Type extends TrackedResendWebhookEvent["type"]>(
     data: { ...baseData, ...extraData },
   }) as Extract<TrackedResendWebhookEvent, { type: Type }>;
 
-test("tracks delivery outcome events but ignores engagement events", () => {
+test("tracks delivery and engagement events separately", () => {
   assert.equal(isTrackedResendWebhookEvent(event("email.delivered")), true);
   assert.equal(
     isTrackedResendWebhookEvent({
@@ -37,8 +37,11 @@ test("tracks delivery outcome events but ignores engagement events", () => {
       created_at: occurredAt.toISOString(),
       data: baseData,
     } satisfies WebhookEventPayload),
-    false,
+    true,
   );
+  assert.equal(getEmailDeliveryUpdate(event("email.opened")), null);
+  assert.equal(getEmailDeliveryUpdate(event("email.clicked")), null);
+  assert.equal(getEmailDeliveryUpdate(event("email.sent")), null);
 });
 
 test("records successful delivery and clears a prior failure", () => {

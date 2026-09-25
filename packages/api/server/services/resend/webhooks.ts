@@ -4,6 +4,7 @@ import { Prisma } from "../../../src/generated/prisma-client/client";
 import { getLogger } from "../../../utils/logging";
 import { db } from "../../db";
 import {
+  DELIVERY_EVENT_TYPES,
   getEmailDeliveryUpdate,
   isTrackedResendWebhookEvent,
   type TrackedResendWebhookEvent,
@@ -48,6 +49,7 @@ const applyEmailDeliveryUpdate = async ({
   occurredAt: Date;
 }) => {
   const update = getEmailDeliveryUpdate(event, occurredAt);
+  if (!update) return 0;
   const result = await database.emailLogs.updateMany({
     where: {
       resend_id: event.data.email_id,
@@ -110,7 +112,10 @@ export const reconcileEmailDeliveryState = async (resendId: string) => {
   let latestEvent;
   try {
     latestEvent = await db.emailDeliveryEvents.findFirst({
-      where: { resend_id: resendId },
+      where: {
+        resend_id: resendId,
+        event_type: { in: [...DELIVERY_EVENT_TYPES] },
+      },
       orderBy: [{ occurred_at: "desc" }, { received_at: "desc" }],
     });
   } catch (error) {

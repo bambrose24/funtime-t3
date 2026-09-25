@@ -7,6 +7,8 @@ import {
   type PrismaClient,
 } from "../../../../src/generated/prisma-client/client";
 import { resendApi } from "../../../services/resend";
+import { getEmailActivity } from "../../../services/resend/email-activity";
+import { safeEmailPreview } from "../../../services/resend/email-preview";
 import { getBaseUrl } from "../../../../utils/getBaseUrl";
 import {
   pickScoreSchema,
@@ -977,7 +979,12 @@ export const leagueAdminRouter = createTRPCRouter({
       }
     }),
   memberEmails: leagueAdminProcedure
-    .input(z.object({ memberId: z.number().int() }))
+    .input(
+      z.object({
+        memberId: z.number().int(),
+        includeContent: z.boolean().default(true),
+      }),
+    )
     .query(async ({ ctx, input }) => {
       const { db } = ctx;
       const { memberId, leagueId } = input;
@@ -1008,16 +1015,18 @@ export const leagueAdminRouter = createTRPCRouter({
         },
       });
 
-      // Fetch email contents from Resend API
+      const activity = await getEmailActivity(db, emailLogs);
+      // Older mobile clients still expect content in this response. New clients
+      // request stored statuses here and fetch one email's content on demand.
       const emailsResponse = await Promise.all(
-        emailLogs.map(async (log) => {
+        activity.map(async (log) => {
           try {
-            const emailContent = await resendApi.get(log.resend_id);
+            const emailContent = input.includeContent
+              ? await resendApi.get(log.resend_id)
+              : null;
             const data = emailContent?.data;
             return {
-              id: log.email_log_id,
-              resend_id: log.resend_id,
-              sent_at: log.ts,
+              ...log,
               resend_data: data,
             };
           } catch (error) {
@@ -1026,9 +1035,7 @@ export const leagueAdminRouter = createTRPCRouter({
               error,
             );
             return {
-              id: log.email_log_id,
-              resend_id: log.resend_id,
-              sent_at: log.ts,
+              ...log,
               resend_data: null,
             };
           }
@@ -1036,6 +1043,39 @@ export const leagueAdminRouter = createTRPCRouter({
       );
 
       return { emails: emailsResponse };
+    }),
+  memberEmail: leagueAdminProcedure
+    .input(
+      z.object({ memberId: z.number().int(), emailLogId: z.string().min(1) }),
+    )
+    .query(async ({ ctx, input }) => {
+      // Scope by both league and member before contacting Resend. A caller
+      // cannot look up another league's message using a guessed log ID.
+      const log = await ctx.db.emailLogs.findFirst({
+        where: {
+          email_log_id: input.emailLogId,
+          member_id: input.memberId,
+          league_id: input.leagueId,
+        },
+      });
+      if (!log)
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Email not found in this league",
+        });
+      const [activity, response] = await Promise.all([
+        getEmailActivity(ctx.db, [log]),
+        resendApi.get(log.resend_id),
+      ]);
+      return {
+        ...activity[0]!,
+        resend_data: response?.data ?? null,
+        preview_html: safeEmailPreview(
+          response?.data?.html ?? null,
+          response?.data?.text ?? null,
+        ),
+        provider_available: Boolean(response?.data),
+      };
     }),
   changeName: leagueAdminProcedure
     .input(

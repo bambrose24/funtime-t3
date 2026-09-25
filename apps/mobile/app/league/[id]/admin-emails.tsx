@@ -15,6 +15,11 @@ import { WebView } from "react-native-webview";
 import { Button } from "@/components/ui/button";
 import { clientApi } from "@/lib/trpc/react";
 import { useColorScheme } from "@/lib/useColorScheme";
+import {
+  emailTypeLabels,
+  getEmailDisplayStatus,
+  isEmailFailure,
+} from "@funtime/api/utils/emailStatus";
 
 const toDateLabel = (value?: string | Date | null) => {
   if (!value) {
@@ -58,25 +63,8 @@ const toTimestamp = (value?: string | Date | null) => {
   return parsed.getTime();
 };
 
-const escapeHtml = (input: string) => {
-  return input
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
-};
-
 const toHtmlDocument = (htmlBody: string) => {
-  return `<!doctype html><html><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><style>body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;padding:16px;color:#111;margin:0;} img{max-width:100%;height:auto;} pre{white-space:pre-wrap;word-break:break-word;} a{color:#0b63f6;}</style></head><body>${htmlBody}</body></html>`;
-};
-
-type SelectedPreview = {
-  subject: string;
-  renderedHtml: string | null;
-  source: "html" | "text" | null;
-  sentAtLabel: string;
-  resendId: string;
+  return `<!doctype html><html><head><meta charset="utf-8"/><meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline';"/><meta name="viewport" content="width=device-width,initial-scale=1"/><style>body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;padding:16px;color:#111;margin:0;} pre{white-space:pre-wrap;word-break:break-word;}</style></head><body>${htmlBody}</body></html>`;
 };
 
 export default function LeagueAdminEmailsScreen() {
@@ -87,20 +75,20 @@ export default function LeagueAdminEmailsScreen() {
   }>();
   const leagueIdNumber = Number(id);
   const memberIdNumber = Number(memberId);
-  const [selectedPreview, setSelectedPreview] = useState<SelectedPreview | null>(
-    null,
-  );
+  const [selectedEmailId, setSelectedEmailId] = useState<string | null>(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  const { data: session, isLoading: sessionLoading, refetch: refetchSession } =
-    clientApi.session.current.useQuery();
+  const {
+    data: session,
+    isLoading: sessionLoading,
+    refetch: refetchSession,
+  } = clientApi.session.current.useQuery();
   const {
     data: isSuperAdmin,
     isLoading: superAdminLoading,
     refetch: refetchSuperAdmin,
-  } =
-    clientApi.generalAdmin.isSuperAdmin.useQuery();
+  } = clientApi.generalAdmin.isSuperAdmin.useQuery();
 
   const viewerMember = useMemo(() => {
     return session?.dbUser?.leaguemembers.find(
@@ -114,25 +102,61 @@ export default function LeagueAdminEmailsScreen() {
     data: membersData,
     isLoading: membersLoading,
     refetch: refetchMembers,
-  } =
-    clientApi.league.admin.members.useQuery(
-      { leagueId: leagueIdNumber },
-      { enabled: Number.isFinite(leagueIdNumber) && canManageLeague },
-    );
+  } = clientApi.league.admin.members.useQuery(
+    { leagueId: leagueIdNumber },
+    { enabled: Number.isFinite(leagueIdNumber) && canManageLeague },
+  );
 
-  const { data: emailData, isLoading: emailsLoading, refetch: refetchEmails } =
-    clientApi.league.admin.memberEmails.useQuery(
-      {
-        leagueId: leagueIdNumber,
-        memberId: memberIdNumber,
-      },
-      {
-        enabled:
-          Number.isFinite(leagueIdNumber) &&
-          Number.isFinite(memberIdNumber) &&
-          canManageLeague,
-      },
-    );
+  const {
+    data: emailData,
+    isLoading: emailsLoading,
+    isError: emailsError,
+    refetch: refetchEmails,
+  } = clientApi.league.admin.memberEmails.useQuery(
+    {
+      leagueId: leagueIdNumber,
+      memberId: memberIdNumber,
+      includeContent: false,
+    },
+    {
+      enabled:
+        Number.isFinite(leagueIdNumber) &&
+        Number.isFinite(memberIdNumber) &&
+        canManageLeague,
+    },
+  );
+
+  const detail = clientApi.league.admin.memberEmail.useQuery(
+    {
+      leagueId: leagueIdNumber,
+      memberId: memberIdNumber,
+      emailLogId: selectedEmailId ?? "",
+    },
+    {
+      enabled: isPreviewOpen && Boolean(selectedEmailId) && canManageLeague,
+      staleTime: 60_000,
+      retry: false,
+    },
+  );
+  const selectedLog =
+    detail.data ??
+    emailData?.emails.find((email) => email.id === selectedEmailId);
+  const selectedStatus = selectedLog
+    ? getEmailDisplayStatus(selectedLog)
+    : null;
+  const selectedPreview = selectedLog
+    ? {
+        subject:
+          selectedLog.resend_data?.subject ??
+          emailTypeLabels[selectedLog.email_type] ??
+          "League email",
+        renderedHtml: detail.data?.preview_html
+          ? toHtmlDocument(detail.data.preview_html)
+          : null,
+        sentAtLabel: toDateLabel(selectedLog.sent_at),
+        resendId: selectedLog.resend_id,
+      }
+    : null;
 
   const onRefresh = useCallback(async () => {
     setIsRefreshing(true);
@@ -176,7 +200,7 @@ export default function LeagueAdminEmailsScreen() {
     Number.isNaN(memberIdNumber)
   ) {
     return (
-      <SafeAreaView className="bg-app-bg-light dark:bg-app-bg-dark flex-1">
+      <SafeAreaView className="flex-1 bg-app-bg-light dark:bg-app-bg-dark">
         <View className="flex-1 items-center justify-center px-6">
           <Text className="text-center text-base text-gray-500 dark:text-gray-400">
             Member context is missing.
@@ -192,7 +216,7 @@ export default function LeagueAdminEmailsScreen() {
     (canManageLeague && (membersLoading || emailsLoading))
   ) {
     return (
-      <SafeAreaView className="bg-app-bg-light dark:bg-app-bg-dark flex-1">
+      <SafeAreaView className="flex-1 bg-app-bg-light dark:bg-app-bg-dark">
         <View className="flex-1 items-center justify-center">
           <Text className="text-base text-gray-500 dark:text-gray-400">
             Loading email logs...
@@ -204,9 +228,9 @@ export default function LeagueAdminEmailsScreen() {
 
   if (!canManageLeague) {
     return (
-      <SafeAreaView className="bg-app-bg-light dark:bg-app-bg-dark flex-1">
-        <View className="flex-1 items-center justify-center px-6 gap-3">
-          <Text className="text-app-fg-light dark:text-app-fg-dark text-center text-2xl font-bold">
+      <SafeAreaView className="flex-1 bg-app-bg-light dark:bg-app-bg-dark">
+        <View className="flex-1 items-center justify-center gap-3 px-6">
+          <Text className="text-center text-2xl font-bold text-app-fg-light dark:text-app-fg-dark">
             Admin Access Required
           </Text>
           <Text className="text-center text-base text-gray-600 dark:text-gray-400">
@@ -219,23 +243,20 @@ export default function LeagueAdminEmailsScreen() {
   }
 
   return (
-    <SafeAreaView className="bg-app-bg-light dark:bg-app-bg-dark flex-1">
+    <SafeAreaView className="flex-1 bg-app-bg-light dark:bg-app-bg-dark">
       <ScrollView
         className="flex-1"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ padding: 16, paddingBottom: 32 }}
         refreshControl={
-          <RefreshControl
-            refreshing={isRefreshing}
-            onRefresh={onRefresh}
-          />
+          <RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />
         }
       >
         <View className="gap-4">
           <View className="flex-row items-start gap-3 px-1">
             <Pressable
               onPress={() => router.back()}
-              className="mt-1 rounded-lg bg-app-card-light p-2 dark:bg-app-card-dark"
+              className="bg-app-card-light dark:bg-app-card-dark mt-1 rounded-lg p-2"
             >
               <Ionicons
                 name="chevron-back"
@@ -244,7 +265,7 @@ export default function LeagueAdminEmailsScreen() {
               />
             </Pressable>
             <View className="flex-1 gap-1">
-              <Text className="text-app-fg-light dark:text-app-fg-dark text-2xl font-bold">
+              <Text className="text-2xl font-bold text-app-fg-light dark:text-app-fg-dark">
                 Email Logs
               </Text>
               <Text className="text-sm text-gray-600 dark:text-gray-400">
@@ -255,7 +276,14 @@ export default function LeagueAdminEmailsScreen() {
             </View>
           </View>
 
-          {sortedEmails.length === 0 ? (
+          {emailsError ? (
+            <Text
+              accessibilityRole="alert"
+              className="text-sm text-red-600 dark:text-red-400"
+            >
+              Couldn’t load email activity. Pull down to try again.
+            </Text>
+          ) : sortedEmails.length === 0 ? (
             <View className="rounded-xl border border-gray-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-800">
               <Text className="text-sm text-gray-600 dark:text-gray-400">
                 No email logs found for this member.
@@ -268,39 +296,24 @@ export default function LeagueAdminEmailsScreen() {
                   Sent
                 </Text>
                 <Text className="flex-1 text-[11px] font-semibold uppercase tracking-wide text-gray-600 dark:text-gray-400">
-                  Subject
+                  Email
                 </Text>
                 <Text className="w-20 text-right text-[11px] font-semibold uppercase tracking-wide text-gray-600 dark:text-gray-400">
-                  Preview
+                  Details
                 </Text>
               </View>
               {sortedEmails.map((email, index) => {
-                const subject = email.resend_data?.subject ?? "No subject";
-                const sentAt = toDateLabel(
-                  email.resend_data?.created_at ?? email.sent_at,
-                );
+                const current =
+                  email.id === selectedEmailId && detail.data
+                    ? detail.data
+                    : email;
+                const status = getEmailDisplayStatus(current);
+                const subject =
+                  current.resend_data?.subject ??
+                  `${emailTypeLabels[email.email_type] ?? "League email"}${email.week != null ? ` · Week ${email.week}` : ""}`;
                 const compactSentAt = toCompactDateLabel(
                   email.resend_data?.created_at ?? email.sent_at,
                 );
-                const htmlContent =
-                  email.resend_data?.html?.trim().length
-                    ? email.resend_data.html
-                    : null;
-                const textContent =
-                  email.resend_data?.text?.trim().length
-                    ? email.resend_data.text
-                    : null;
-                const previewSource = htmlContent
-                  ? "html"
-                  : textContent
-                    ? "text"
-                    : null;
-                const renderedHtml = htmlContent
-                  ? toHtmlDocument(htmlContent)
-                  : textContent
-                    ? toHtmlDocument(`<pre>${escapeHtml(textContent)}</pre>`)
-                    : null;
-                const previewAvailable = Boolean(previewSource);
 
                 return (
                   <View
@@ -317,33 +330,38 @@ export default function LeagueAdminEmailsScreen() {
                     >
                       {compactSentAt}
                     </Text>
-                    <Text
-                      numberOfLines={1}
-                      className="flex-1 pr-2 text-sm text-app-fg-light dark:text-app-fg-dark"
-                    >
-                      {subject}
-                    </Text>
+                    <View className="flex-1 gap-1 pr-2">
+                      <Text className="text-sm text-app-fg-light dark:text-app-fg-dark">
+                        {subject}
+                      </Text>
+                      <Text
+                        className={
+                          isEmailFailure(status.delivery)
+                            ? "text-xs font-semibold text-red-600 dark:text-red-400"
+                            : "text-xs font-semibold text-app-fg-light dark:text-app-fg-dark"
+                        }
+                      >
+                        {status.label}
+                      </Text>
+                      <Text className="text-xs text-gray-500 dark:text-gray-400">
+                        {status.opened ? "Opened" : "No open recorded"} ·{" "}
+                        {status.clicked ? "Clicked" : "No click recorded"}
+                      </Text>
+                      {current.failure_reason && (
+                        <Text className="text-xs text-red-600 dark:text-red-400">
+                          {current.failure_reason}
+                        </Text>
+                      )}
+                    </View>
                     <Pressable
                       className="w-20 items-end"
                       onPress={() => {
-                        setSelectedPreview({
-                          subject,
-                          renderedHtml,
-                          source: previewSource,
-                          sentAtLabel: sentAt,
-                          resendId: email.resend_id,
-                        });
+                        setSelectedEmailId(email.id);
                         setIsPreviewOpen(true);
                       }}
                     >
-                      <Text
-                        className={`text-xs font-semibold ${
-                          previewAvailable
-                            ? "text-blue-600 dark:text-blue-400"
-                            : "text-gray-400 dark:text-gray-500"
-                        }`}
-                      >
-                        {previewAvailable ? "Open" : "Unavailable"}
+                      <Text className="py-3 text-xs font-semibold text-blue-600 dark:text-blue-400">
+                        Open
                       </Text>
                     </Pressable>
                   </View>
@@ -352,8 +370,9 @@ export default function LeagueAdminEmailsScreen() {
             </View>
           )}
           <Text className="px-1 text-xs text-gray-500 dark:text-gray-400">
-            Preview is shown when Resend returns an HTML or text body for the
-            selected email.
+            No recorded activity doesn’t mean an email wasn’t read. Tracking may
+            be disabled or blocked; automated activity can register opens or
+            clicks.
           </Text>
         </View>
       </ScrollView>
@@ -363,21 +382,21 @@ export default function LeagueAdminEmailsScreen() {
         animationType="slide"
         onRequestClose={() => {
           setIsPreviewOpen(false);
-          setSelectedPreview(null);
+          setSelectedEmailId(null);
         }}
       >
-        <SafeAreaView className="bg-app-bg-light dark:bg-app-bg-dark flex-1">
-          <View className="border-b border-gray-200 px-4 py-3 dark:border-zinc-800 flex-row items-center justify-between">
+        <SafeAreaView className="flex-1 bg-app-bg-light dark:bg-app-bg-dark">
+          <View className="flex-row items-center justify-between border-b border-gray-200 px-4 py-3 dark:border-zinc-800">
             <Text
               numberOfLines={1}
-              className="text-app-fg-light dark:text-app-fg-dark text-lg font-semibold flex-1 pr-2"
+              className="flex-1 pr-2 text-lg font-semibold text-app-fg-light dark:text-app-fg-dark"
             >
               {selectedPreview?.subject ?? "Email Preview"}
             </Text>
             <Pressable
               onPress={() => {
                 setIsPreviewOpen(false);
-                setSelectedPreview(null);
+                setSelectedEmailId(null);
               }}
             >
               <Text className="text-sm font-semibold text-blue-600 dark:text-blue-400">
@@ -386,10 +405,56 @@ export default function LeagueAdminEmailsScreen() {
             </Pressable>
           </View>
 
-          {selectedPreview?.renderedHtml ? (
+          <View className="gap-2 border-b border-gray-200 px-4 py-3 dark:border-zinc-800">
+            {selectedStatus && (
+              <Text className="text-sm text-app-fg-light dark:text-app-fg-dark">
+                {selectedStatus.label} ·{" "}
+                {selectedStatus.opened ? "Opened" : "No open recorded"} ·{" "}
+                {selectedStatus.clicked ? "Clicked" : "No click recorded"}
+              </Text>
+            )}
+            {selectedLog?.last_opened_at && (
+              <Text className="text-xs text-gray-500 dark:text-gray-400">
+                Last open: {toDateLabel(selectedLog.last_opened_at)} ·{" "}
+                {selectedLog.open_count} recorded
+              </Text>
+            )}
+            {selectedLog?.last_clicked_at && (
+              <Text className="text-xs text-gray-500 dark:text-gray-400">
+                Last click: {toDateLabel(selectedLog.last_clicked_at)} ·{" "}
+                {selectedLog.click_count} recorded
+              </Text>
+            )}
+            {selectedLog?.failure_reason && (
+              <Text className="text-sm text-red-600 dark:text-red-400">
+                {selectedLog.failure_reason}
+              </Text>
+            )}
+            {(detail.isError ||
+              (detail.data && !detail.data.provider_available)) && (
+              <Text className="text-xs text-gray-500 dark:text-gray-400">
+                Resend is unavailable. Stored activity is still shown.
+              </Text>
+            )}
+            <Button
+              variant="outline"
+              disabled={detail.isFetching}
+              onPress={() => void detail.refetch()}
+            >
+              {detail.isFetching ? "Checking Resend…" : "Refresh from Resend"}
+            </Button>
+          </View>
+          {detail.isLoading ? (
+            <Text className="p-4 text-gray-500">Loading email details…</Text>
+          ) : selectedPreview?.renderedHtml ? (
             <WebView
               originWhitelist={["*"]}
               source={{ html: selectedPreview.renderedHtml }}
+              javaScriptEnabled={false}
+              onShouldStartLoadWithRequest={(request) =>
+                request.url === "about:blank" ||
+                request.url.startsWith("data:text/html")
+              }
               style={{ flex: 1, backgroundColor: "white" }}
             />
           ) : (
@@ -408,10 +473,11 @@ export default function LeagueAdminEmailsScreen() {
             </View>
           )}
 
-          {selectedPreview?.source ? (
+          {selectedPreview?.renderedHtml ? (
             <View className="border-t border-gray-200 px-4 py-2 dark:border-zinc-800">
               <Text className="text-xs text-gray-500 dark:text-gray-400">
-                Showing {selectedPreview.source.toUpperCase()} preview
+                Images and links are disabled so this preview won’t count as an
+                open or click.
               </Text>
             </View>
           ) : null}
