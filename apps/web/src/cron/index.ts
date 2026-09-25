@@ -510,6 +510,7 @@ export async function run() {
           none: { email_type: "week_reminder", week: upcomingWeek },
         },
       },
+      orderBy: { membership_id: "asc" },
       include: { people: true },
     });
     reminderCandidates = membersNeedingReminder.length;

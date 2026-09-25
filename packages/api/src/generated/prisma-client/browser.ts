@@ -112,3 +112,8 @@ export type postseason_team_seeds = Prisma.postseason_team_seedsModel
  * 
  */
 export type WeeklyRecapDelivery = Prisma.WeeklyRecapDeliveryModel
+/**
+ * Model PickReminderDelivery
+ *
+ */
+export type PickReminderDelivery = Prisma.PickReminderDeliveryModel

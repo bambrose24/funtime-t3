@@ -69,7 +69,8 @@ export const ModelName = {
   teams: 'teams',
   postseason_games: 'postseason_games',
   postseason_team_seeds: 'postseason_team_seeds',
-  WeeklyRecapDelivery: 'WeeklyRecapDelivery'
+  WeeklyRecapDelivery: 'WeeklyRecapDelivery',
+  PickReminderDelivery: 'PickReminderDelivery'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -381,6 +382,21 @@ export const WeeklyRecapDeliveryScalarFieldEnum = {
 } as const
 
 export type WeeklyRecapDeliveryScalarFieldEnum = (typeof WeeklyRecapDeliveryScalarFieldEnum)[keyof typeof WeeklyRecapDeliveryScalarFieldEnum]
+
+
+export const PickReminderDeliveryScalarFieldEnum = {
+  id: 'id',
+  league_id: 'league_id',
+  user_id: 'user_id',
+  season: 'season',
+  week: 'week',
+  state: 'state',
+  resend_id: 'resend_id',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+} as const
+
+export type PickReminderDeliveryScalarFieldEnum = (typeof PickReminderDeliveryScalarFieldEnum)[keyof typeof PickReminderDeliveryScalarFieldEnum]
 
 
 export const SortOrder = {
