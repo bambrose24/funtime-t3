@@ -483,3 +483,18 @@ model WeeklyRecapDelivery {
 
   @@unique([league_id, user_id, season, week])
 }
+
+// Keep reminder identity independent of batch composition and membership churn.
+model PickReminderDelivery {
+  id         String   @id @default(cuid())
+  league_id  Int
+  user_id    Int
+  season     Int
+  week       Int
+  state      String   @default("sending")
+  resend_id  String?
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  updated_at DateTime @default(now()) @updatedAt @db.Timestamptz(6)
+
+  @@unique([league_id, user_id, season, week])
+}

@@ -415,7 +415,8 @@ export const ModelName = {
   teams: 'teams',
   postseason_games: 'postseason_games',
   postseason_team_seeds: 'postseason_team_seeds',
-  WeeklyRecapDelivery: 'WeeklyRecapDelivery'
+  WeeklyRecapDelivery: 'WeeklyRecapDelivery',
+  PickReminderDelivery: 'PickReminderDelivery'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -431,7 +432,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "emailLogs" | "emailDeliveryEvents" | "weekWinners" | "games" | "leaguemembers" | "leaguemessages" | "league_message_read_state" | "league_message_reactions" | "leagues" | "league_renewal_member_roles" | "people" | "pushNotificationTokens" | "picks" | "superbowl" | "superbowlsquares" | "teams" | "postseason_games" | "postseason_team_seeds" | "weeklyRecapDelivery"
+    modelProps: "emailLogs" | "emailDeliveryEvents" | "weekWinners" | "games" | "leaguemembers" | "leaguemessages" | "league_message_read_state" | "league_message_reactions" | "leagues" | "league_renewal_member_roles" | "people" | "pushNotificationTokens" | "picks" | "superbowl" | "superbowlsquares" | "teams" | "postseason_games" | "postseason_team_seeds" | "weeklyRecapDelivery" | "pickReminderDelivery"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1841,6 +1842,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    PickReminderDelivery: {
+      payload: Prisma.$PickReminderDeliveryPayload<ExtArgs>
+      fields: Prisma.PickReminderDeliveryFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PickReminderDeliveryFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PickReminderDeliveryPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PickReminderDeliveryFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PickReminderDeliveryPayload>
+        }
+        findFirst: {
+          args: Prisma.PickReminderDeliveryFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PickReminderDeliveryPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PickReminderDeliveryFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PickReminderDeliveryPayload>
+        }
+        findMany: {
+          args: Prisma.PickReminderDeliveryFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PickReminderDeliveryPayload>[]
+        }
+        create: {
+          args: Prisma.PickReminderDeliveryCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PickReminderDeliveryPayload>
+        }
+        createMany: {
+          args: Prisma.PickReminderDeliveryCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PickReminderDeliveryCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PickReminderDeliveryPayload>[]
+        }
+        delete: {
+          args: Prisma.PickReminderDeliveryDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PickReminderDeliveryPayload>
+        }
+        update: {
+          args: Prisma.PickReminderDeliveryUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PickReminderDeliveryPayload>
+        }
+        deleteMany: {
+          args: Prisma.PickReminderDeliveryDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PickReminderDeliveryUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PickReminderDeliveryUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PickReminderDeliveryPayload>[]
+        }
+        upsert: {
+          args: Prisma.PickReminderDeliveryUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PickReminderDeliveryPayload>
+        }
+        aggregate: {
+          args: Prisma.PickReminderDeliveryAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePickReminderDelivery>
+        }
+        groupBy: {
+          args: Prisma.PickReminderDeliveryGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PickReminderDeliveryGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PickReminderDeliveryCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PickReminderDeliveryCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -2173,6 +2248,21 @@ export const WeeklyRecapDeliveryScalarFieldEnum = {
 } as const
 
 export type WeeklyRecapDeliveryScalarFieldEnum = (typeof WeeklyRecapDeliveryScalarFieldEnum)[keyof typeof WeeklyRecapDeliveryScalarFieldEnum]
+
+
+export const PickReminderDeliveryScalarFieldEnum = {
+  id: 'id',
+  league_id: 'league_id',
+  user_id: 'user_id',
+  season: 'season',
+  week: 'week',
+  state: 'state',
+  resend_id: 'resend_id',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+} as const
+
+export type PickReminderDeliveryScalarFieldEnum = (typeof PickReminderDeliveryScalarFieldEnum)[keyof typeof PickReminderDeliveryScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -2649,6 +2739,7 @@ export type GlobalOmitConfig = {
   postseason_games?: Prisma.postseason_gamesOmit
   postseason_team_seeds?: Prisma.postseason_team_seedsOmit
   weeklyRecapDelivery?: Prisma.WeeklyRecapDeliveryOmit
+  pickReminderDelivery?: Prisma.PickReminderDeliveryOmit
 }
 
 /* Types for Logging */

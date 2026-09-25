@@ -76,3 +76,8 @@ jobs:
 
       - name: Unit tests for the schema-sync gate
         run: node --experimental-strip-types --test packages/api/tests/prisma-schema-sync.test.mts
+
+      - name: Verify reminder migration backfill
+        env:
+          PICK_REMINDER_TEST_DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/postgres
+        run: node --experimental-strip-types --test packages/api/tests/pick-reminder-migration.test.mts
