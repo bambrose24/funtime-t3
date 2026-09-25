@@ -60,6 +60,33 @@ const createTags = (category: string, leagueId?: number) => [
     : [{ name: "league_id", value: leagueId.toString() }]),
 ];
 
+const summarizeResendError = (error: unknown) => {
+  if (!error || typeof error !== "object") {
+    return { message: String(error) };
+  }
+
+  const value = error as Record<string, unknown>;
+  return {
+    ...(typeof value.name === "string" ? { name: value.name } : {}),
+    ...(typeof value.message === "string" ? { message: value.message } : {}),
+    ...(typeof value.statusCode === "number"
+      ? { statusCode: value.statusCode }
+      : {}),
+    ...(typeof value.code === "string" ? { code: value.code } : {}),
+    ...(typeof value.type === "string" ? { type: value.type } : {}),
+  };
+};
+
+const getEmailDomain = (email: string) =>
+  email.split("@").at(-1)?.toLowerCase() ?? "unknown";
+
+type PickReminderRecipient = {
+  member: leaguemembers;
+  user: people;
+  league: leagues;
+  week: number;
+};
+
 const sendEmail = async (
   payload: Parameters<Resend["emails"]["send"]>[0],
   context: string,
@@ -534,70 +561,128 @@ export const resendApi = {
       throw err;
     }
   },
-  sendPickReminderEmail: async ({
-    member,
-    user,
-    league,
-    week,
-  }: {
-    member: leaguemembers;
-    user: people;
-    league: leagues;
-    week: number;
-  }) => {
-    if (!user.email || !league) {
-      throw new Error(
-        "User does not have an email or league to send pick reminder to",
-      );
+  sendPickReminderEmails: async (recipients: PickReminderRecipient[]) => {
+    if (recipients.length === 0) {
+      return 0;
     }
 
-    getLogger().info(
-      `${LOG_PREFIX} Going to send pick reminder email for league ${league.league_id} for member ${member.membership_id}`,
-    );
-
-    const { data, error } = await sendEmail(
-      {
-        from: FROM,
-        to: [user.email],
-        subject: `Reminder: Make Your Picks for ${league.name}!`,
-        react: PickReminderEmail({
-          username: user.username,
-          leagueName: league.name,
-          leagueHomeHref: `https://www.play-funtime.com/league/${league.league_id}`,
-        }),
-        tags: createTags("pick_reminder", league.league_id),
-      },
-      `pick_reminder:${league.league_id}:${member.membership_id}:${week}`,
-      createIdempotencyKey(
-        "pick-reminder",
-        `${league.league_id}:${member.membership_id}:${week}`,
+    const week = recipients[0]?.week;
+    const memberIds = recipients
+      .map(({ member }) => member.membership_id)
+      .sort((a, b) => a - b);
+    const context = `pick_reminder_batch:${week}:${memberIds.join(",")}`;
+    const recipientDomains = Object.fromEntries(
+      Object.entries(
+        recipients.reduce<Record<string, number>>((counts, { user }) => {
+          const domain = user.email ? getEmailDomain(user.email) : "missing";
+          counts[domain] = (counts[domain] ?? 0) + 1;
+          return counts;
+        }, {}),
       ),
     );
 
-    if (error) {
+    if (recipients.some(({ user, league }) => !user.email || !league)) {
       getLogger().error(
-        `${LOG_PREFIX} Error sending pick reminder email for league ${league.league_id} for member ${member.membership_id}`,
-        { error },
+        `${LOG_PREFIX} Skipping pick reminder batch with an invalid recipient`,
+        { context, count: recipients.length, recipientDomains },
       );
-    } else {
-      getLogger().info(
-        `${LOG_PREFIX} Sent pick reminder email for league ${league.league_id} for member ${member.membership_id}`,
-        { data },
-      );
+      return 0;
     }
 
-    if (data?.id) {
-      await db.emailLogs.create({
-        data: {
-          email_type: "week_reminder",
-          resend_id: data.id,
-          league_id: league.league_id,
-          member_id: member.membership_id,
-          week,
-        },
-        select: { email_log_id: true },
+    getLogger().info(`${LOG_PREFIX} Sending personalized pick reminder batch`, {
+      context,
+      count: recipients.length,
+      recipientDomains,
+    });
+
+    try {
+      const { data, error } = await sendBatchEmail(
+        recipients.map(({ user, league }) => ({
+          from: FROM,
+          to: user.email!,
+          subject: `Reminder: Make Your Picks for ${league.name}!`,
+          react: PickReminderEmail({
+            username: user.username,
+            leagueName: league.name,
+            leagueHomeHref: `https://www.play-funtime.com/league/${league.league_id}`,
+          }),
+          tags: createTags("pick_reminder", league.league_id),
+        })),
+        context,
+        createIdempotencyKey(
+          "pick-reminder-batch",
+          `${week}:${memberIds.join(",")}`,
+        ),
+      );
+
+      if (error) {
+        const resendError = summarizeResendError(error);
+        getLogger().error(
+          `${LOG_PREFIX} Pick reminder batch rejected by Resend`,
+          {
+            context,
+            count: recipients.length,
+            recipientDomains,
+            retryable: resendError.statusCode === 429,
+            resendError,
+          },
+        );
+        return 0;
+      }
+
+      const sentEmails = data?.data ?? [];
+      if (sentEmails.length !== recipients.length) {
+        getLogger().error(
+          `${LOG_PREFIX} Resend returned an unexpected number of pick reminder IDs`,
+          {
+            context,
+            requested: recipients.length,
+            returned: sentEmails.length,
+          },
+        );
+      }
+
+      // Resend returns batch IDs in the same order as the input email objects.
+      const logsToCreate = sentEmails
+        .map((email, index) => {
+          const recipient = recipients[index];
+          if (!recipient?.member || !email.id) {
+            return null;
+          }
+
+          return {
+            email_type: "week_reminder",
+            resend_id: email.id,
+            league_id: recipient.league.league_id,
+            member_id: recipient.member.membership_id,
+            week: recipient.week,
+          } as const;
+        })
+        .filter(Defined);
+
+      if (logsToCreate.length > 0) {
+        await db.emailLogs.createMany({ data: logsToCreate });
+        await Promise.all(
+          logsToCreate.map(({ resend_id }) =>
+            reconcileEmailDeliveryState(resend_id),
+          ),
+        );
+      }
+
+      getLogger().info(`${LOG_PREFIX} Sent pick reminder batch`, {
+        context,
+        requested: recipients.length,
+        sent: logsToCreate.length,
       });
-      await reconcileEmailDeliveryState(data.id);
+      return logsToCreate.length;
+    } catch (error) {
+      getLogger().error(`${LOG_PREFIX} Pick reminder batch threw`, {
+        context,
+        count: recipients.length,
+        recipientDomains,
+        resendError: summarizeResendError(error),
+      });
+      return 0;
     }
   },
   sendWeekSummaryEmail: async ({

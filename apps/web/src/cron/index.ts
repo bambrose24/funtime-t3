@@ -46,8 +46,12 @@ export async function run() {
   // Fetch ESPN games
   // ========================================
   console.log(`${LOG_PREFIX} Fetching ESPN games...`);
-  const { espnGames, skippedEspn, totalFetched, error: espnError } =
-    await loadRegularSeasonEspnGames(() => espn.getGamesBySeason({ season }));
+  const {
+    espnGames,
+    skippedEspn,
+    totalFetched,
+    error: espnError,
+  } = await loadRegularSeasonEspnGames(() => espn.getGamesBySeason({ season }));
   if (skippedEspn) {
     console.error(
       `${LOG_PREFIX} Unable to fetch ESPN games; skipping score and kickoff-time sync, continuing with reminders from DB games.`,
@@ -250,7 +254,9 @@ export async function run() {
 
   let winnersCreated = 0;
   for (const league of leagues) {
-    const doneWeeks = [...new Set(games.filter((g) => g.done).map((g) => g.week))];
+    const doneWeeks = [
+      ...new Set(games.filter((g) => g.done).map((g) => g.week)),
+    ];
 
     for (const week of doneWeeks) {
       const allGamesDone = games
@@ -258,7 +264,11 @@ export async function run() {
         .every((g) => g.done);
 
       if (!allGamesDone) continue;
-      if (existingWinners.some((w) => w.league_id === league.league_id && w.week === week)) {
+      if (
+        existingWinners.some(
+          (w) => w.league_id === league.league_id && w.week === week,
+        )
+      ) {
         continue;
       }
 
@@ -268,22 +278,35 @@ export async function run() {
       });
 
       const picksByMember = groupBy(weekPicks, (p) => p.member_id);
-      const scores = Object.entries(picksByMember).map(([memberId, memberPicks]) => {
-        const correctPicks = memberPicks.filter((p) => p.correct === 1).length;
-        const tiebreakerGame = games.find((g) => g.week === week && g.is_tiebreaker);
-        const tiebreakerPick = memberPicks.find((p) => p.gid === tiebreakerGame?.gid);
-        const tiebreakerDiff =
-          tiebreakerPick && tiebreakerPick.score !== null && tiebreakerGame
-            ? Math.abs(
-                tiebreakerPick.score -
-                  ((tiebreakerGame.homescore ?? 0) + (tiebreakerGame.awayscore ?? 0)),
-              )
-            : Infinity;
+      const scores = Object.entries(picksByMember).map(
+        ([memberId, memberPicks]) => {
+          const correctPicks = memberPicks.filter(
+            (p) => p.correct === 1,
+          ).length;
+          const tiebreakerGame = games.find(
+            (g) => g.week === week && g.is_tiebreaker,
+          );
+          const tiebreakerPick = memberPicks.find(
+            (p) => p.gid === tiebreakerGame?.gid,
+          );
+          const tiebreakerDiff =
+            tiebreakerPick && tiebreakerPick.score !== null && tiebreakerGame
+              ? Math.abs(
+                  tiebreakerPick.score -
+                    ((tiebreakerGame.homescore ?? 0) +
+                      (tiebreakerGame.awayscore ?? 0)),
+                )
+              : Infinity;
 
-        return { memberId: parseInt(memberId), correctPicks, tiebreakerDiff };
-      });
+          return { memberId: parseInt(memberId), correctPicks, tiebreakerDiff };
+        },
+      );
 
-      const sortedScores = orderBy(scores, ["correctPicks", "tiebreakerDiff"], ["desc", "asc"]);
+      const sortedScores = orderBy(
+        scores,
+        ["correctPicks", "tiebreakerDiff"],
+        ["desc", "asc"],
+      );
       if (!sortedScores.length) continue;
 
       const winners = sortedScores.filter(
@@ -328,20 +351,46 @@ export async function run() {
   }, new Map<number, typeof games>());
 
   const recordUpdates = games.map((game) => {
-    const homePriorGames = gamesByTeamId.get(game.home)?.filter((g) => g.week < game.week) ?? [];
-    const awayPriorGames = gamesByTeamId.get(game.away)?.filter((g) => g.week < game.week) ?? [];
+    const homePriorGames =
+      gamesByTeamId.get(game.home)?.filter((g) => g.week < game.week) ?? [];
+    const awayPriorGames =
+      gamesByTeamId.get(game.away)?.filter((g) => g.week < game.week) ?? [];
     const homeDonePriorGames = homePriorGames.filter((g) => g.done);
     const awayDonePriorGames = awayPriorGames.filter((g) => g.done);
 
-    const homeWins = homeDonePriorGames.reduce((p, c) => p + (c.winner === game.home ? 1 : 0), 0);
-    const awayWins = awayDonePriorGames.reduce((p, c) => p + (c.winner === game.away ? 1 : 0), 0);
-    const homeLosses = homeDonePriorGames.reduce((p, c) => p + (c.winner && c.winner !== game.home ? 1 : 0), 0);
-    const awayLosses = awayDonePriorGames.reduce((p, c) => p + (c.winner && c.winner !== game.away ? 1 : 0), 0);
-    const homeTies = homeDonePriorGames.reduce((p, c) => p + (c.done && !c.winner ? 1 : 0), 0);
-    const awayTies = awayDonePriorGames.reduce((p, c) => p + (c.done && !c.winner ? 1 : 0), 0);
+    const homeWins = homeDonePriorGames.reduce(
+      (p, c) => p + (c.winner === game.home ? 1 : 0),
+      0,
+    );
+    const awayWins = awayDonePriorGames.reduce(
+      (p, c) => p + (c.winner === game.away ? 1 : 0),
+      0,
+    );
+    const homeLosses = homeDonePriorGames.reduce(
+      (p, c) => p + (c.winner && c.winner !== game.home ? 1 : 0),
+      0,
+    );
+    const awayLosses = awayDonePriorGames.reduce(
+      (p, c) => p + (c.winner && c.winner !== game.away ? 1 : 0),
+      0,
+    );
+    const homeTies = homeDonePriorGames.reduce(
+      (p, c) => p + (c.done && !c.winner ? 1 : 0),
+      0,
+    );
+    const awayTies = awayDonePriorGames.reduce(
+      (p, c) => p + (c.done && !c.winner ? 1 : 0),
+      0,
+    );
 
-    const awayrecord = awayTies > 0 ? `${awayWins}-${awayLosses}-${awayTies}` : `${awayWins}-${awayLosses}`;
-    const homerecord = homeTies > 0 ? `${homeWins}-${homeLosses}-${homeTies}` : `${homeWins}-${homeLosses}`;
+    const awayrecord =
+      awayTies > 0
+        ? `${awayWins}-${awayLosses}-${awayTies}`
+        : `${awayWins}-${awayLosses}`;
+    const homerecord =
+      homeTies > 0
+        ? `${homeWins}-${homeLosses}-${homeTies}`
+        : `${homeWins}-${homeLosses}`;
 
     return db.games.update({
       where: { gid: game.gid },
@@ -350,14 +399,19 @@ export async function run() {
   });
 
   await db.$transaction(recordUpdates);
-  console.log(`${LOG_PREFIX} ✓ Updated records for ${recordUpdates.length} games`);
+  console.log(
+    `${LOG_PREFIX} ✓ Updated records for ${recordUpdates.length} games`,
+  );
 
   // ========================================
   // Update game start times
   // ========================================
   console.log(`${LOG_PREFIX} Checking game start times...`);
 
-  games = await db.games.findMany({ where: { season }, orderBy: { ts: "asc" } });
+  games = await db.games.findMany({
+    where: { season },
+    orderBy: { ts: "asc" },
+  });
 
   const now = new Date();
   const firstUnstartedGame = games.find((g) => g.ts > now);
@@ -365,7 +419,9 @@ export async function run() {
 
   let timesUpdated = 0;
   for (const game of games) {
-    const espnGame = game.espn_id ? espnGamesById[game.espn_id]?.at(0) : undefined;
+    const espnGame = game.espn_id
+      ? espnGamesById[game.espn_id]?.at(0)
+      : undefined;
     if (
       firstUnstartedGameWeek &&
       espnGame &&
@@ -385,12 +441,17 @@ export async function run() {
   // ========================================
   console.log(`${LOG_PREFIX} Checking tiebreaker assignments...`);
 
-  games = await db.games.findMany({ where: { season }, orderBy: { ts: "asc" } });
+  games = await db.games.findMany({
+    where: { season },
+    orderBy: { ts: "asc" },
+  });
   const gamesByWeek = groupBy(games, (g) => g.week);
   const weeksToCheck = new Set(
     games
       .map((g) => g.week)
-      .filter((week) => firstUnstartedGameWeek && week > firstUnstartedGameWeek),
+      .filter(
+        (week) => firstUnstartedGameWeek && week > firstUnstartedGameWeek,
+      ),
   );
 
   let tiebreakersUpdated = 0;
@@ -398,7 +459,11 @@ export async function run() {
     const weekGames = gamesByWeek[week];
     if (!weekGames?.length) continue;
 
-    const tiebreakerGame = orderBy(weekGames, ["ts", "msf_id"], ["asc", "asc"])?.at(-1);
+    const tiebreakerGame = orderBy(
+      weekGames,
+      ["ts", "msf_id"],
+      ["asc", "asc"],
+    )?.at(-1);
     const nonTiebreakerGids = weekGames
       .filter((g) => g.gid !== (tiebreakerGame ?? 0))
       .map((g) => g.gid);
@@ -416,7 +481,9 @@ export async function run() {
       tiebreakersUpdated++;
     }
   }
-  console.log(`${LOG_PREFIX} ✓ Updated tiebreakers for ${tiebreakersUpdated} weeks`);
+  console.log(
+    `${LOG_PREFIX} ✓ Updated tiebreakers for ${tiebreakersUpdated} weeks`,
+  );
 
   // ========================================
   // Send pick reminders
@@ -425,40 +492,61 @@ export async function run() {
 
   const upcomingWeek = firstUnstartedGameWeek;
   let remindersSent = 0;
+  let reminderCandidates = 0;
 
-  if (upcomingWeek && firstUnstartedGame && addHours(now, 3) >= firstUnstartedGame.ts) {
+  if (
+    upcomingWeek &&
+    firstUnstartedGame &&
+    addHours(now, 3) >= firstUnstartedGame.ts
+  ) {
     const membersNeedingReminder = await db.leaguemembers.findMany({
       where: {
-        leagues: { reminder_policy: "three_hours_before", season: DEFAULT_SEASON },
+        leagues: {
+          reminder_policy: "three_hours_before",
+          season: DEFAULT_SEASON,
+        },
         picks: { none: { week: upcomingWeek } },
-        EmailLogs: { none: { email_type: "week_reminder", week: upcomingWeek } },
+        EmailLogs: {
+          none: { email_type: "week_reminder", week: upcomingWeek },
+        },
       },
       include: { people: true },
     });
+    reminderCandidates = membersNeedingReminder.length;
 
     if (membersNeedingReminder.length > 0) {
+      console.log(
+        `${LOG_PREFIX} Found ${membersNeedingReminder.length} members needing pick reminders for week ${upcomingWeek}`,
+      );
       const reminderLeagues = await db.leagues.findMany({
-        where: { league_id: { in: [...new Set(membersNeedingReminder.map((p) => p.league_id))] } },
+        where: {
+          league_id: {
+            in: [...new Set(membersNeedingReminder.map((p) => p.league_id))],
+          },
+        },
       });
 
       const memberChunks = chunk(membersNeedingReminder, 100);
       for (const memberChunk of memberChunks) {
-        await Promise.all(
-          memberChunk.map(async (member) => {
-            await resendApi.sendPickReminderEmail({
-              member,
-              user: member.people,
-              league: reminderLeagues.find((l) => l.league_id === member.league_id)!,
-              week: upcomingWeek,
-            });
-            remindersSent++;
-          }),
+        remindersSent += await resendApi.sendPickReminderEmails(
+          memberChunk.map((member) => ({
+            member,
+            user: member.people,
+            league: reminderLeagues.find(
+              (l) => l.league_id === member.league_id,
+            )!,
+            week: upcomingWeek,
+          })),
         );
+        // Resend accepts up to 100 personalized emails per batch. Keep batch
+        // requests separated so retries do not immediately hit the API limit.
         await new Promise((resolve) => setTimeout(resolve, 500));
       }
     }
   }
-  console.log(`${LOG_PREFIX} ✓ Sent ${remindersSent} pick reminders`);
+  console.log(
+    `${LOG_PREFIX} ✓ Sent ${remindersSent} of ${reminderCandidates} pick reminders`,
+  );
 
   // ========================================
   // Send week summary emails + pushes
