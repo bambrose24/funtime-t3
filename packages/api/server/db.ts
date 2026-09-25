@@ -1,7 +1,6 @@
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../src/generated/prisma-client/client";
 import { env } from "../env.js";
-import { config } from "../utils/config";
 import { prismaPgConfigFromUrl } from "../utils/prismaPgConfig";
 
 import { getLogger } from "../utils/logging";
@@ -31,7 +30,7 @@ const createPrismaClient = () => {
     ],
   });
 
-  if (config.logging.level !== "error") {
+  if (process.env.PRISMA_LOG_QUERIES === "1") {
     prisma.$on("query", (e) => {
       getLogger().info(`${LOG_PREFIX} Query executed`, {
         prismaQueryDurationMs: e.duration,
