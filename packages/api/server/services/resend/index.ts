@@ -788,24 +788,24 @@ export const resendApi = {
       ),
     ];
 
-    const claimedRecipients = [];
-    for (const recipient of recipients) {
-      const identity = {
-        league_id: leagueId,
-        user_id: recipient.userId,
-        season,
-        week,
-      };
-      if (await claimWeeklyRecap(db, identity)) {
-        claimedRecipients.push({ identity, recipient });
-      }
-    }
-
     let sent = 0;
-    for (const [chunkIndex, recipientChunk] of chunk(
-      claimedRecipients,
-      100,
-    ).entries()) {
+    for (const [chunkIndex, candidates] of chunk(recipients, 100).entries()) {
+      // Leave later batches unclaimed so another run can send them if this
+      // process stops while the current provider request is in flight.
+      const recipientChunk = [];
+      for (const recipient of candidates) {
+        const identity = {
+          league_id: leagueId,
+          user_id: recipient.userId,
+          season,
+          week,
+        };
+        if (await claimWeeklyRecap(db, identity)) {
+          recipientChunk.push({ identity, recipient });
+        }
+      }
+      if (recipientChunk.length === 0) continue;
+
       const memberIds = recipientChunk
         .map(({ recipient }) => recipient.memberId)
         .sort((a, b) => a - b);
@@ -896,6 +896,9 @@ export const resendApi = {
           }
         }
 
+        // Provider acceptance is independent of subsequent database/webhook
+        // bookkeeping; keep the cron metric accurate even if that work fails.
+        sent += accepted.length;
         await Promise.all([
           ...accepted.map(({ identity, resendId }) =>
             db.weeklyRecapDelivery.updateMany({
@@ -927,7 +930,6 @@ export const resendApi = {
             ),
           );
         }
-        sent += accepted.length;
         getLogger().info(`${LOG_PREFIX} Sent week summary batch`, {
           context,
           requested: recipientChunk.length,

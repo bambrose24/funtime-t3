@@ -81,7 +81,8 @@ beforeEach(() => {
   claims.clear();
   sendBatch.mockReset();
   createMany.mockReset();
-  reconcile.mockClear();
+  reconcile.mockReset();
+  reconcile.mockImplementation(async () => {});
   logError.mockClear();
   sendBatch.mockImplementation(async (payload: any[]) => ({
     data: { data: payload.map((_, index) => ({ id: `email-${index + 1}` })) },
@@ -127,7 +128,7 @@ test("omits reply-to when the league has no admin emails", async () => {
     ),
   ).toBe(true);
 });
-test("provider failure is not logged as sent and does not stop other recipients", async () => {
+test("a rejected batch is not logged or counted as sent", async () => {
   sendBatch.mockImplementationOnce(async () => ({
     data: null,
     error: { message: "rate limited", statusCode: 429 },
@@ -165,6 +166,56 @@ test("chunks large personalized summary deliveries at Resend's batch limit", asy
     sent: 101,
   });
   expect(sendBatch.mock.calls.map((call) => call[0].length)).toEqual([100, 1]);
+});
+
+test("later batches remain available while the first provider request is in flight", async () => {
+  const p = payload();
+  const recipients = Array.from({ length: 200 }, (_, index) => ({
+    ...p.recipients[0]!,
+    userId: index + 1,
+    memberId: index + 1,
+    email: `member-${index + 1}@example.com`,
+  }));
+  let started!: () => void;
+  let release!: () => void;
+  const firstRequestStarted = new Promise<void>((resolve) => {
+    started = resolve;
+  });
+  const firstRequestHeld = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  sendBatch.mockImplementationOnce(async (emails: any[]) => {
+    started();
+    await firstRequestHeld;
+    return {
+      data: { data: emails.map((_, index) => ({ id: `first-${index}` })) },
+      error: null,
+    };
+  });
+
+  const firstRun = resendApi.sendWeekSummaryEmail({ ...p, recipients });
+  try {
+    await firstRequestStarted;
+    expect(claims.size).toBe(100);
+    expect([...claims.values()].every((row) => row.state === "sending")).toBe(
+      true,
+    );
+
+    // A subsequent cron run can deliver the untouched half even if the first
+    // process never returns, while skipping its ambiguous in-flight claims.
+    expect(await resendApi.sendWeekSummaryEmail({ ...p, recipients })).toEqual({
+      sent: 100,
+    });
+    expect(sendBatch.mock.calls[1]![0].map((email: any) => email.to)).toEqual(
+      recipients.slice(100).map((recipient) => recipient.email),
+    );
+  } finally {
+    release();
+    await firstRun;
+  }
+  expect(await firstRun).toEqual({ sent: 100 });
+  expect(sendBatch).toHaveBeenCalledTimes(2);
+  expect([...claims.values()].every((row) => row.state === "sent")).toBe(true);
 });
 
 test("different weeks and leagues get distinct retry identities", async () => {
@@ -215,12 +266,22 @@ test("accepted email is never resent when the email log write fails", async () =
   createMany.mockImplementation(async () => {
     throw new Error("database unavailable");
   });
-  await resendApi.sendWeekSummaryEmail(payload());
-  await resendApi.sendWeekSummaryEmail(payload());
+  expect(await resendApi.sendWeekSummaryEmail(payload())).toEqual({ sent: 2 });
+  expect(await resendApi.sendWeekSummaryEmail(payload())).toEqual({ sent: 0 });
   expect(sendBatch).toHaveBeenCalledTimes(1);
   expect([...claims.values()].every((r) => r.state === "sent")).toBe(true);
 });
-test("network timeout leaves the claim held and still processes other users", async () => {
+test("accepted emails stay counted and are not resent when reconciliation fails", async () => {
+  reconcile.mockImplementation(async () => {
+    throw new Error("reconciliation unavailable");
+  });
+  expect(await resendApi.sendWeekSummaryEmail(payload())).toEqual({ sent: 2 });
+  expect(await resendApi.sendWeekSummaryEmail(payload())).toEqual({ sent: 0 });
+  expect(sendBatch).toHaveBeenCalledTimes(1);
+  expect([...claims.values()].every((row) => row.state === "sent")).toBe(true);
+  expect(logError).toHaveBeenCalledTimes(1);
+});
+test("network timeout leaves the batch's claims held", async () => {
   sendBatch.mockImplementationOnce(async () => {
     throw new Error("timeout after acceptance");
   });
