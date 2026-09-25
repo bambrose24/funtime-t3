@@ -788,7 +788,7 @@ export const resendApi = {
       ),
     ];
 
-    let sent = 0;
+    const claimedRecipients = [];
     for (const recipient of recipients) {
       const identity = {
         league_id: leagueId,
@@ -796,12 +796,38 @@ export const resendApi = {
         season,
         week,
       };
-      if (!(await claimWeeklyRecap(db, identity))) continue;
+      if (await claimWeeklyRecap(db, identity)) {
+        claimedRecipients.push({ identity, recipient });
+      }
+    }
+
+    let sent = 0;
+    for (const [chunkIndex, recipientChunk] of chunk(
+      claimedRecipients,
+      100,
+    ).entries()) {
+      const memberIds = recipientChunk
+        .map(({ recipient }) => recipient.memberId)
+        .sort((a, b) => a - b);
+      const context = `week_summary_batch:${leagueId}:${week}:${chunkIndex}`;
+      const recipientDomains = Object.fromEntries(
+        Object.entries(
+          recipientChunk.reduce<Record<string, number>>(
+            (counts, { recipient }) => {
+              const domain = recipient.email.split("@").at(-1) ?? "unknown";
+              counts[domain] = (counts[domain] ?? 0) + 1;
+              return counts;
+            },
+            {},
+          ),
+        ),
+      );
+
       try {
-        const { data, error } = await sendEmail(
-          {
+        const { data, error } = await sendBatchEmail(
+          recipientChunk.map(({ recipient }) => ({
             from: FROM,
-            to: [recipient.email],
+            to: recipient.email,
             ...(uniqueAdminEmails.length > 0
               ? { replyTo: uniqueAdminEmails }
               : {}),
@@ -815,55 +841,108 @@ export const resendApi = {
               adminEmails: uniqueAdminEmails,
             }),
             tags: createTags("week_summary", leagueId),
-          },
-          `week_summary:${leagueId}:${recipient.memberId}:${week}`,
-          createIdempotencyKey("week-summary", JSON.stringify(identity)),
+          })),
+          context,
+          createIdempotencyKey(
+            "week-summary-batch",
+            JSON.stringify({ leagueId, season, week, memberIds }),
+          ),
         );
 
         if (error) {
           // Only an explicit rate-limit rejection is automatically retryable.
           // Unknown outcomes stay claimed, even after the provider deduplication window.
-          await db.weeklyRecapDelivery.updateMany({
-            where: identity,
-            data: {
-              state: error.statusCode === 429 ? "retryable" : "uncertain",
-            },
-          });
-          getLogger().error(
-            `${LOG_PREFIX} Error sending week summary email for league ${leagueId} member ${recipient.memberId}`,
-            { error },
+          await Promise.all(
+            recipientChunk.map(({ identity }) =>
+              db.weeklyRecapDelivery.updateMany({
+                where: identity,
+                data: {
+                  state: error.statusCode === 429 ? "retryable" : "uncertain",
+                },
+              }),
+            ),
           );
+          getLogger().error(`${LOG_PREFIX} Week summary batch rejected`, {
+            context,
+            count: recipientChunk.length,
+            recipientDomains,
+            retryable: error.statusCode === 429,
+            resendError: summarizeResendError(error),
+          });
           continue;
         }
 
-        if (data?.id) {
-          await db.weeklyRecapDelivery.updateMany({
-            where: identity,
-            data: { state: "sent", resend_id: data.id },
-          });
-          sent += 1;
-          await db.emailLogs.create({
-            data: {
+        const sentEmails = data?.data ?? [];
+        if (sentEmails.length !== recipientChunk.length) {
+          getLogger().error(
+            `${LOG_PREFIX} Resend returned an unexpected number of week summary IDs`,
+            {
+              context,
+              requested: recipientChunk.length,
+              returned: sentEmails.length,
+            },
+          );
+        }
+
+        // Resend returns batch IDs in the same order as the input email objects.
+        const accepted = [];
+        const missing = [];
+        for (const [index, claimed] of recipientChunk.entries()) {
+          const resendId = sentEmails[index]?.id;
+          if (resendId) {
+            accepted.push({ ...claimed, resendId });
+          } else {
+            missing.push(claimed);
+          }
+        }
+
+        await Promise.all([
+          ...accepted.map(({ identity, resendId }) =>
+            db.weeklyRecapDelivery.updateMany({
+              where: identity,
+              data: { state: "sent", resend_id: resendId },
+            }),
+          ),
+          ...missing.map(({ identity }) =>
+            db.weeklyRecapDelivery.updateMany({
+              where: identity,
+              data: { state: "uncertain" },
+            }),
+          ),
+        ]);
+
+        if (accepted.length > 0) {
+          await db.emailLogs.createMany({
+            data: accepted.map(({ resendId, recipient }) => ({
               email_type: "week_summary",
-              resend_id: data.id,
+              resend_id: resendId,
               league_id: leagueId,
               member_id: recipient.memberId,
               week,
-            },
-            select: { email_log_id: true },
+            })),
           });
-          await reconcileEmailDeliveryState(data.id);
-        } else {
-          await db.weeklyRecapDelivery.updateMany({
-            where: identity,
-            data: { state: "uncertain" },
-          });
+          await Promise.all(
+            accepted.map(({ resendId }) =>
+              reconcileEmailDeliveryState(resendId),
+            ),
+          );
         }
+        sent += accepted.length;
+        getLogger().info(`${LOG_PREFIX} Sent week summary batch`, {
+          context,
+          requested: recipientChunk.length,
+          sent: accepted.length,
+        });
       } catch (error) {
-        // A crash/network timeout may happen after acceptance. Never expire this claim.
+        // A crash/network timeout may happen after acceptance. Never expire these claims.
         getLogger().error(
-          `${LOG_PREFIX} Weekly recap outcome requires review`,
-          { identity, error },
+          `${LOG_PREFIX} Weekly recap batch outcome requires review`,
+          {
+            context,
+            count: recipientChunk.length,
+            recipientDomains,
+            resendError: summarizeResendError(error),
+          },
         );
       }
     }
