@@ -6,16 +6,16 @@ import { buildWeekSummary } from "../utils/weekSummary";
 process.env.E2E_MODE = "0";
 process.env.FUNTIME_DISABLE_EMAILS = "0";
 process.env.RESEND_API_KEY = "fake-unit-test-key";
-const send = mock(async (_payload: any, _options: any): Promise<any> => ({
-  data: { id: "email-1" },
+const sendBatch = mock(async (payload: any[], _options: any): Promise<any> => ({
+  data: { data: payload.map((_, index) => ({ id: `email-${index + 1}` })) },
   error: null,
 }));
-const create = mock(async (_args: any) => ({ email_log_id: "log-1" }));
+const createMany = mock(async (_args: any) => ({ count: 1 }));
 const reconcile = mock(async (_id: string) => {});
 const logError = mock(() => {});
 mock.module("resend", () => ({
   Resend: class {
-    emails = { send };
+    batch = { send: sendBatch };
   },
 }));
 const claims = new Map<string, { state: string; resend_id?: string }>();
@@ -36,7 +36,7 @@ const weeklyRecapDelivery = {
   },
 };
 mock.module("../server/db", () => ({
-  db: { emailLogs: { create }, weeklyRecapDelivery },
+  db: { emailLogs: { createMany }, weeklyRecapDelivery },
 }));
 mock.module("../server/services/resend/webhooks", () => ({
   reconcileEmailDeliveryState: reconcile,
@@ -70,102 +70,180 @@ function payload() {
     leagueId: 123,
     leagueName: "Sunday Crew",
     week: 4,
-    adminEmails: ["admin@example.com", " coadmin@example.com ", "admin@example.com"],
+    adminEmails: [
+      "admin@example.com",
+      " coadmin@example.com ",
+      "admin@example.com",
+    ],
   };
 }
 beforeEach(() => {
   claims.clear();
-  send.mockReset();
-  create.mockReset();
-  reconcile.mockClear();
+  sendBatch.mockReset();
+  createMany.mockReset();
+  reconcile.mockReset();
+  reconcile.mockImplementation(async () => {});
   logError.mockClear();
-  send.mockImplementation(async () => ({
-    data: { id: "email-1" },
+  sendBatch.mockImplementation(async (payload: any[]) => ({
+    data: { data: payload.map((_, index) => ({ id: `email-${index + 1}` })) },
     error: null,
   }));
-  create.mockImplementation(async () => ({ email_log_id: "log-1" }));
+  createMany.mockImplementation(async () => ({ count: 1 }));
 });
 test("empty recipient list makes no provider or database calls", async () => {
   expect(
     await resendApi.sendWeekSummaryEmail({ ...payload(), recipients: [] }),
   ).toEqual({ sent: 0 });
-  expect(send).not.toHaveBeenCalled();
-  expect(create).not.toHaveBeenCalled();
+  expect(sendBatch).not.toHaveBeenCalled();
+  expect(createMany).not.toHaveBeenCalled();
 });
-test("sends separate personalized emails and records each member", async () => {
+test("sends one personalized batch and records each member", async () => {
   expect(await resendApi.sendWeekSummaryEmail(payload())).toEqual({ sent: 2 });
-  expect(send.mock.calls.map((c) => c[0].to)).toEqual([
-    ["alex@example.com"],
-    ["brian@example.com"],
+  expect(sendBatch).toHaveBeenCalledTimes(1);
+  expect(sendBatch.mock.calls[0]![0].map((email: any) => email.to)).toEqual([
+    "alex@example.com",
+    "brian@example.com",
   ]);
-  expect(send.mock.calls[0]![0].subject).toBe(
+  expect(sendBatch.mock.calls[0]![0][0].subject).toBe(
     "Sunday Crew · Your Week 4 results",
   );
-  expect(send.mock.calls.map((c) => c[0].replyTo)).toEqual([
+  expect(
+    sendBatch.mock.calls[0]![0].map((email: any) => email.replyTo),
+  ).toEqual([
     ["admin@example.com", "coadmin@example.com"],
     ["admin@example.com", "coadmin@example.com"],
   ]);
-  expect(create.mock.calls.map((c) => c[0].data.member_id)).toEqual([1, 2]);
+  expect(
+    createMany.mock.calls[0]![0].data.map((row: any) => row.member_id),
+  ).toEqual([1, 2]);
   expect(reconcile).toHaveBeenCalledTimes(2);
 });
 test("omits reply-to when the league has no admin emails", async () => {
   expect(
     await resendApi.sendWeekSummaryEmail({ ...payload(), adminEmails: [] }),
   ).toEqual({ sent: 2 });
-  expect(send.mock.calls.every((c) => c[0].replyTo === undefined)).toBe(true);
+  expect(
+    sendBatch.mock.calls[0]![0].every(
+      (email: any) => email.replyTo === undefined,
+    ),
+  ).toBe(true);
 });
-test("provider failure is not logged as sent and does not stop other recipients", async () => {
-  send.mockImplementationOnce(async () => ({
+test("a rejected batch is not logged or counted as sent", async () => {
+  sendBatch.mockImplementationOnce(async () => ({
     data: null,
     error: { message: "rate limited", statusCode: 429 },
   }));
-  expect(await resendApi.sendWeekSummaryEmail(payload())).toEqual({ sent: 1 });
-  expect(create).toHaveBeenCalledTimes(1);
-  expect(create.mock.calls[0]![0].data.member_id).toBe(2);
+  expect(await resendApi.sendWeekSummaryEmail(payload())).toEqual({ sent: 0 });
+  expect(createMany).not.toHaveBeenCalled();
   expect(logError).toHaveBeenCalledTimes(1);
 });
 test("retry identity stays stable when results or wording change", async () => {
   const p = payload();
-  send.mockImplementation(async () => ({
+  sendBatch.mockImplementation(async () => ({
     data: null,
     error: { statusCode: 429 },
   }));
   await resendApi.sendWeekSummaryEmail(p);
-  const keys = send.mock.calls.map((c) => c[1].idempotencyKey);
+  const firstKey = sendBatch.mock.calls[0]![1].idempotencyKey;
   await resendApi.sendWeekSummaryEmail({
     ...p,
     winnerText: "Updated",
     recipients: p.recipients.map((r) => ({ ...r, correctPicks: 12 })),
   });
-  expect(send.mock.calls.slice(2).map((c) => c[1].idempotencyKey)).toEqual(
-    keys,
-  );
-  expect(keys[0]).not.toBe(keys[1]);
+  expect(sendBatch.mock.calls[1]![1].idempotencyKey).toBe(firstKey);
 });
+
+test("chunks large personalized summary deliveries at Resend's batch limit", async () => {
+  const p = payload();
+  const recipients = Array.from({ length: 101 }, (_, index) => ({
+    ...p.recipients[0]!,
+    userId: index + 1,
+    memberId: index + 1,
+    email: `member-${index + 1}@example.com`,
+  }));
+
+  expect(await resendApi.sendWeekSummaryEmail({ ...p, recipients })).toEqual({
+    sent: 101,
+  });
+  expect(sendBatch.mock.calls.map((call) => call[0].length)).toEqual([100, 1]);
+});
+
+test("later batches remain available while the first provider request is in flight", async () => {
+  const p = payload();
+  const recipients = Array.from({ length: 200 }, (_, index) => ({
+    ...p.recipients[0]!,
+    userId: index + 1,
+    memberId: index + 1,
+    email: `member-${index + 1}@example.com`,
+  }));
+  let started!: () => void;
+  let release!: () => void;
+  const firstRequestStarted = new Promise<void>((resolve) => {
+    started = resolve;
+  });
+  const firstRequestHeld = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  sendBatch.mockImplementationOnce(async (emails: any[]) => {
+    started();
+    await firstRequestHeld;
+    return {
+      data: { data: emails.map((_, index) => ({ id: `first-${index}` })) },
+      error: null,
+    };
+  });
+
+  const firstRun = resendApi.sendWeekSummaryEmail({ ...p, recipients });
+  try {
+    await firstRequestStarted;
+    expect(claims.size).toBe(100);
+    expect([...claims.values()].every((row) => row.state === "sending")).toBe(
+      true,
+    );
+
+    // A subsequent cron run can deliver the untouched half even if the first
+    // process never returns, while skipping its ambiguous in-flight claims.
+    expect(await resendApi.sendWeekSummaryEmail({ ...p, recipients })).toEqual({
+      sent: 100,
+    });
+    expect(sendBatch.mock.calls[1]![0].map((email: any) => email.to)).toEqual(
+      recipients.slice(100).map((recipient) => recipient.email),
+    );
+  } finally {
+    release();
+    await firstRun;
+  }
+  expect(await firstRun).toEqual({ sent: 100 });
+  expect(sendBatch).toHaveBeenCalledTimes(2);
+  expect([...claims.values()].every((row) => row.state === "sent")).toBe(true);
+});
+
 test("different weeks and leagues get distinct retry identities", async () => {
   const p = payload();
   await resendApi.sendWeekSummaryEmail(p);
   await resendApi.sendWeekSummaryEmail({ ...p, week: 5 });
   await resendApi.sendWeekSummaryEmail({ ...p, leagueId: 124 });
-  expect(new Set(send.mock.calls.map((c) => c[1].idempotencyKey)).size).toBe(6);
+  expect(
+    new Set(sendBatch.mock.calls.map((c) => c[1].idempotencyKey)).size,
+  ).toBe(3);
 });
 test("no provider message ID is not counted as a successful send", async () => {
-  send.mockImplementation(async () => ({ data: null, error: null }));
+  sendBatch.mockImplementation(async () => ({ data: null, error: null }));
   expect(await resendApi.sendWeekSummaryEmail(payload())).toEqual({ sent: 0 });
-  expect(create).not.toHaveBeenCalled();
+  expect(createMany).not.toHaveBeenCalled();
 });
 
 test("overlapping cron runs send each user only once", async () => {
   const results = await Promise.all(
     Array.from({ length: 10 }, () => resendApi.sendWeekSummaryEmail(payload())),
   );
-  expect(send).toHaveBeenCalledTimes(2);
+  expect(sendBatch).toHaveBeenCalledTimes(1);
   expect(results.reduce((sum, r) => sum + r.sent, 0)).toBe(2);
 });
 test("later cron runs skip previously sent emails indefinitely", async () => {
   await resendApi.sendWeekSummaryEmail(payload());
   expect(await resendApi.sendWeekSummaryEmail(payload())).toEqual({ sent: 0 });
-  expect(send).toHaveBeenCalledTimes(2);
+  expect(sendBatch).toHaveBeenCalledTimes(1);
 });
 test("membership changes do not permit a second email to the same user", async () => {
   const p = payload();
@@ -174,7 +252,7 @@ test("membership changes do not permit a second email to the same user", async (
     ...p,
     recipients: p.recipients.map((r) => ({ ...r, memberId: r.memberId + 100 })),
   });
-  expect(send).toHaveBeenCalledTimes(2);
+  expect(sendBatch).toHaveBeenCalledTimes(1);
 });
 test("one user with duplicate memberships is sent only one email", async () => {
   const p = payload();
@@ -182,49 +260,61 @@ test("one user with duplicate memberships is sent only one email", async () => {
     ...p,
     recipients: [p.recipients[0]!, { ...p.recipients[0]!, memberId: 99 }],
   });
-  expect(send).toHaveBeenCalledTimes(1);
+  expect(sendBatch).toHaveBeenCalledTimes(1);
 });
 test("accepted email is never resent when the email log write fails", async () => {
-  create.mockImplementation(async () => {
+  createMany.mockImplementation(async () => {
     throw new Error("database unavailable");
   });
-  await resendApi.sendWeekSummaryEmail(payload());
-  await resendApi.sendWeekSummaryEmail(payload());
-  expect(send).toHaveBeenCalledTimes(2);
+  expect(await resendApi.sendWeekSummaryEmail(payload())).toEqual({ sent: 2 });
+  expect(await resendApi.sendWeekSummaryEmail(payload())).toEqual({ sent: 0 });
+  expect(sendBatch).toHaveBeenCalledTimes(1);
   expect([...claims.values()].every((r) => r.state === "sent")).toBe(true);
 });
-test("network timeout leaves the claim held and still processes other users", async () => {
-  send.mockImplementationOnce(async () => {
+test("accepted emails stay counted and are not resent when reconciliation fails", async () => {
+  reconcile.mockImplementation(async () => {
+    throw new Error("reconciliation unavailable");
+  });
+  expect(await resendApi.sendWeekSummaryEmail(payload())).toEqual({ sent: 2 });
+  expect(await resendApi.sendWeekSummaryEmail(payload())).toEqual({ sent: 0 });
+  expect(sendBatch).toHaveBeenCalledTimes(1);
+  expect([...claims.values()].every((row) => row.state === "sent")).toBe(true);
+  expect(logError).toHaveBeenCalledTimes(1);
+});
+test("network timeout leaves the batch's claims held", async () => {
+  sendBatch.mockImplementationOnce(async () => {
     throw new Error("timeout after acceptance");
   });
-  expect(await resendApi.sendWeekSummaryEmail(payload())).toEqual({ sent: 1 });
+  expect(await resendApi.sendWeekSummaryEmail(payload())).toEqual({ sent: 0 });
   await resendApi.sendWeekSummaryEmail(payload());
-  expect(send).toHaveBeenCalledTimes(2);
+  expect(sendBatch).toHaveBeenCalledTimes(1);
 });
 test("ambiguous provider error never automatically resends", async () => {
-  send.mockImplementation(async () => ({
+  sendBatch.mockImplementation(async () => ({
     data: null,
     error: { statusCode: 500 },
   }));
   await resendApi.sendWeekSummaryEmail(payload());
   await resendApi.sendWeekSummaryEmail(payload());
-  expect(send).toHaveBeenCalledTimes(2);
+  expect(sendBatch).toHaveBeenCalledTimes(1);
   expect([...claims.values()].every((r) => r.state === "uncertain")).toBe(true);
 });
 test("only one concurrent runner retries a confirmed rate limit rejection", async () => {
-  send.mockImplementation(async () => ({
+  sendBatch.mockImplementation(async () => ({
     data: null,
     error: { statusCode: 429 },
   }));
   await resendApi.sendWeekSummaryEmail(payload());
-  send.mockImplementation(async () => ({
-    data: { id: "retry-success" },
+  sendBatch.mockImplementation(async (payload: any[]) => ({
+    data: {
+      data: payload.map((_, index) => ({ id: `retry-success-${index}` })),
+    },
     error: null,
   }));
   await Promise.all(
     Array.from({ length: 10 }, () => resendApi.sendWeekSummaryEmail(payload())),
   );
-  expect(send).toHaveBeenCalledTimes(4);
+  expect(sendBatch).toHaveBeenCalledTimes(2);
   expect([...claims.values()].every((r) => r.state === "sent")).toBe(true);
 });
 test("a different season can send a new recap", async () => {
