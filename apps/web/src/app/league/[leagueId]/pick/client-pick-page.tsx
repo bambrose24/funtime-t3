@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useFieldArray, useForm } from "react-hook-form";
+import { useFieldArray, useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { TeamLogo } from "~/components/shared/TeamLogo";
 import { Card, CardContent, CardHeader } from "~/components/ui/card";
@@ -192,9 +192,10 @@ export function ClientPickPage({
   const applyToAllSeasonLeagues = form.watch("applyToAllSeasonLeagues");
 
   const picksField = useFieldArray({
-    control: form.control, // control props comes from useForm (optional: if you are using FormProvider)
+    control: form.control,
     name: "picks",
   });
+  const pickValues = useWatch({ control: form.control, name: "picks" });
 
   const [picksDialogOpen, setPicksDialogOpen] = useState(false);
 
@@ -266,28 +267,39 @@ export function ClientPickPage({
       return;
     }
     console.log(`going to update idx ${idx} gid ${gid} winner ${winner}`);
-    picksField.update(idx, {
-      type: "toPick",
-      gid,
-      winner,
-      isRandom: false,
+    form.setValue(`picks.${idx}.winner`, winner, {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
+    form.setValue(`picks.${idx}.isRandom`, false, {
+      shouldDirty: true,
     });
   };
 
   const randomizePicks = () => {
-    picksField.fields.forEach((f, idx) => {
-      const game = gameById.get(f.gid);
-      if (!game || game.ts < new Date()) {
-        return;
-      }
-      const winner = Math.random() < 0.5 ? game.away : game?.home;
-      picksField.update(idx, {
-        type: "toPick",
-        gid: f.gid,
-        winner,
-        isRandom: true,
-      });
-    });
+    form.setValue(
+      "picks",
+      pickValues.map((pick) => {
+        if (pick.type !== "toPick") {
+          return pick;
+        }
+        const game = gameById.get(pick.gid);
+        if (!game || game.ts < new Date()) {
+          return pick;
+        }
+        return {
+          ...pick,
+          winner: Math.random() < 0.5 ? game.away : game.home,
+          isRandom: true,
+        };
+      }),
+      {
+        shouldDirty: true,
+        shouldTouch: true,
+        shouldValidate: true,
+      },
+    );
+    void form.trigger("picks");
   };
 
   if (picksClosed && games.length) {
@@ -416,16 +428,18 @@ export function ClientPickPage({
             >
               Randomize Picks
             </Button>
-            {picksField.fields.map((f, idx) => {
-              const { gid } = f;
+            {pickValues.map((pick, idx) => {
+              const { gid } = pick;
               const winner =
-                f.type === "toPick" ? f.winner : f.alreadyPickedWinner;
+                pick.type === "toPick"
+                  ? pick.winner
+                  : pick.alreadyPickedWinner;
               const game = gameById.get(gid);
               if (!game) {
                 return null;
               }
               const started = game.ts < new Date();
-              const disabled = started || f.type === "alreadyStarted";
+              const disabled = started || pick.type === "alreadyStarted";
               const home = teamById.get(game.home);
               const away = teamById.get(game.away);
               if (!home || !away) {
@@ -444,7 +458,7 @@ export function ClientPickPage({
 
               return (
                 <Card
-                  key={`${idx}_${winner}`}
+                  key={picksField.fields[idx]?.id ?? gid}
                   className={cn("w-full", { "border-transparent": winnerTeam })}
                 >
                   <div
@@ -467,7 +481,7 @@ export function ClientPickPage({
                               })}
                             >
                               <RadioGroup
-                                value={winner?.toString()}
+                                value={winner?.toString() ?? ""}
                                 disabled={started}
                               >
                                 <div className="grid w-full grid-cols-5 gap-2">
