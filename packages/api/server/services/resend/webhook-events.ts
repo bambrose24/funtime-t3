@@ -2,13 +2,20 @@ import type { WebhookEventPayload } from "resend";
 
 import type { EmailDeliveryStatus } from "../../../src/generated/prisma-client/client";
 
-const TRACKED_EVENT_TYPES = [
+export const DELIVERY_EVENT_TYPES = [
   "email.delivered",
   "email.delivery_delayed",
   "email.failed",
   "email.bounced",
   "email.complained",
   "email.suppressed",
+] as const;
+
+const TRACKED_EVENT_TYPES = [
+  ...DELIVERY_EVENT_TYPES,
+  "email.opened",
+  "email.clicked",
+  "email.sent",
 ] as const;
 
 type TrackedEventType = (typeof TRACKED_EVENT_TYPES)[number];
@@ -33,8 +40,13 @@ export const isTrackedResendWebhookEvent = (
 export const getEmailDeliveryUpdate = (
   event: TrackedResendWebhookEvent,
   occurredAt = new Date(event.created_at),
-): EmailDeliveryUpdate => {
+): EmailDeliveryUpdate | null => {
   switch (event.type) {
+    case "email.opened":
+    case "email.clicked":
+    case "email.sent":
+      // Engagement belongs in the event history, not the delivery outcome.
+      return null;
     case "email.delivered":
       return {
         delivery_status: "delivered",
